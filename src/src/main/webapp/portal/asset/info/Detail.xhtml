@@ -18,14 +18,13 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <h:panelGroup rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead')}">
+            <h:panelGroup rendered="#{!assetInfoController.terminate and userContextService.hasAnyRoleByApmRoles('SuperAdmin','HospitalHead','AssetHead','AssetStaff','DeptHead')}">
                 <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
                     <f:param name="asset_name" value="#{assetInfoController.selected.name}" />
                     <f:param name="asset_id" value="#{assetInfoController.selected.id}" />
                 </p:link>
                 <br/>
             </h:panelGroup>
-
 
             <p:accordionPanel id="accordion" multiple="false" >
                 <p:tab title="#{msg.BasicInfo}">
@@ -323,23 +322,22 @@
                                     <p:inputText id="terminateDate" value="#{assetInfoController.selected.terminateDate}" readonly="true">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                     </p:inputText>
-                                    <!--<p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
                                 </h:panelGroup>
                                 <h:panelGroup></h:panelGroup>
 
-                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
+                                <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin','HospitalHead','AssetHead','AssetStaff')}">
                                     <label class="label">#{msg.purchasePrice}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
+                                <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin','HospitalHead','AssetHead','AssetStaff')}">
                                     <label class="label">#{msg.salvageValue}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
+                                <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin','HospitalHead','AssetHead','AssetStaff')}">
                                     <label class="label">#{msg.lifecycle}</label>
                                     <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
+                                <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin','HospitalHead','AssetHead','AssetStaff')}">
                                     <label class="label">#{msg.depreciationMethod}</label>
                                     <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
                                 </h:panelGroup>
@@ -529,7 +527,6 @@
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
                         <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
@@ -541,11 +538,9 @@
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
                         <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
-                        <!--<p:barcode value="#{assetInfoController.selected.qrCode}" type="qr" height="200" format="png"/>-->
                         <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode,assetInfoController.selected.siteUID)}" />
                     </p:tab>
                 </p:tabView>

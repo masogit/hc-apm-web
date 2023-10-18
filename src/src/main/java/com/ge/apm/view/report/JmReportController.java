@@ -3,6 +3,7 @@ package com.ge.apm.view.report;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     private UaaService uaaService;
     private UserContextService userContextService;
     private JmReportAssignTenantRepository assignTenantDao;
+    private MicroServiceUtil microServiceUtil;
 
     @Getter @Setter
     private TenantInfo selectedTenant;
@@ -61,6 +63,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         siteDao =  WebUtil.getBean(TenantInfoRepository.class);
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         assignTenantDao = WebUtil.getBean(JmReportAssignTenantRepository.class);
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
 
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -95,7 +98,12 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        List<JmReport> reports = dao.findByTenantUid(loginUser.getTenantUID());
+        List<JmReport> reports = new ArrayList<>();
+        if (userContextService.hasRole("SuperAdmin")) {
+            reports = dao.findAll();
+        } else {
+            reports = dao.findByTenantUid(loginUser.getTenantUID());
+        }
         List<JmReport> reportIds = new ArrayList();
         if (!userContextService.hasAnyRole("SuperAdmin,ITAdmin")) {
             reports.forEach(val -> {
@@ -241,6 +249,16 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         dao.delete(selected);
     }
 
+    public String getType(Integer type) {
+        String typeName = "";
+        if (type.equals(1)) {
+            typeName = "积木";
+        } else if (type.equals(2)) {
+            typeName = "达芬奇";
+        }
+        return typeName;
+    }
+
     public void getViewUrl(JmReport jmReport) {
         this.selected = jmReport;
     }
@@ -253,17 +271,26 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     }
 
     public String view(int type) {
+        String linkUrl = "";
         if (selected == null) {
-            return "";
+            return linkUrl;
         }
-        switch (type) {
-            case 1:
-                return selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
-            case 2:
-                return selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
-            default:
-                return "";
+        if (selected.getType().equals(1)) {
+            switch (type) {
+                case 1:
+                    linkUrl = selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+                    break;
+                case 2:
+                    linkUrl = selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+                    break;
+                default:
+                    linkUrl = "";
+                    break;
+            }
+        } else if (selected.getType().equals(2)) {
+            linkUrl = microServiceUtil.getDaVinciShareLink(UserContextService.getAccessToken(), selected.getReportViewUrl());
         }
+        return linkUrl;
     }
 
 }

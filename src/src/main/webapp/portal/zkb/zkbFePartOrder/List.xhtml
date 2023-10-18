@@ -14,24 +14,31 @@
             <div class="ui-g-12 card">
                 <h:form id="zkbFePartOrderListForm">
 
-                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam') or userContextService.isZkbFeUserConfig('Reviewer')}">
-                        <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
-                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}">
-                            <p:ajax  update="datalist"/>
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" >
+                        <p:selectOneMenu  id="notGeAsset" disabled="#{zkbFePartOrderController.checkAssignmentBox()}" style="transform: scale(1.2)" valueChangeListener="#{zkbFePartOrderController.notGeAssetChange}" value="#{zkbFePartOrderController.notGeAsset}">
+                            <p:ajax update="datalist buttonSet"/>
+                            <f:selectItem itemLabel="GE" itemValue="f"/>
+                            <f:selectItem itemLabel="非GE" itemValue="t"/>
                         </p:selectOneMenu>
+                        <h:panelGroup rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam') or userContextService.isZkbFeUserConfig('Reviewer')}">
+                            <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
+                            <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}" >
+                                <p:ajax  update="datalist buttonSet"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </h:panelGrid>
 
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
-                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="#{zkbFePartOrderController.showPendingStatusBtn}" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
-                        <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
-                        <p:commandButton value="待Commercial确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial')}" />
-                        <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
-                        <p:commandButton value="待FE归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
-                        <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
-                        <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
-                        <p:commandButton value="待上传探头说明函"  process="@this" disabled="#{zkbFePartOrderController.queryStatus eq 'waitingUpload'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbFePartOrderController.hasLetterViewRight()}" action="#{zkbFePartOrderController.queryListByStatus('waitingUpload')}" />
+                        <p:commandButton value="待办 #{zkbFePartOrderController.statusCountFE('myWork')}"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="#{zkbFePartOrderController.showPendingStatusBtn}" action="#{zkbFePartOrderController.queryListByStatus('myWork',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="待代理商确认 #{zkbFePartOrderController.statusCountFE('WaitingAssignment')}"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="待Commercial确认 #{zkbFePartOrderController.statusCountFE('WaitingCommercial')}"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="#{(zkbFePartOrderController.notGeAsset eq 'f')}" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="待400开单/下单 #{zkbFePartOrderController.statusCountFE('WaitingApm')}"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="待FE归还 #{zkbFePartOrderController.statusCountFE('WaitingGEAdmin')}"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
+                        <p:commandButton value="待上传探头说明函"  process="@this" disabled="#{zkbFePartOrderController.queryStatus eq 'waitingUpload'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{(zkbFePartOrderController.hasLetterViewRight()) and (zkbFePartOrderController.notGeAsset eq 'f')}" action="#{zkbFePartOrderController.queryListByStatus('waitingUpload',zkbFePartOrderController.notGeAsset,zkbFePartOrderController.queryTenantUID)}" />
                         <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" update=":growl :zkbVacationForm" rendered="#{zkbFePartOrderController.fourHundredsTeam}">
                             <h:outputText value="#{msg.zkbFePartOrder_isVacation}" />
                         </p:commandLink>
@@ -142,8 +149,8 @@
                             <h:outputText value="#{item.phenomenon}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}"  disabled="#{zkbFePartOrderController.selected==null}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel()}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel()}"  disabled="#{zkbFePartOrderController.selected==null}"/>
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbFePartOrderController.exportAll}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbFePartOrderController.exportFile}"/>
                             </p:commandButton>

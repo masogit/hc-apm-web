@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
 public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOrder> {
 
     private ZkbPartOrderRepository dao;
+    private ZkbPartOrderMapper zkbPartOrderMapper;
     private UserContextService userContextService;
     private UserAccount currentUser;
     private List<TenantInfo> tenantInfoList;
@@ -54,6 +56,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
+    private boolean disableNotGeAsset = false;
     /**
      * 按钮待办是否显示
      */
@@ -64,10 +67,24 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private boolean operateDelete = false;
     private String notGeAsset;
 
+    private Integer pendingQty = 0;
+    private Integer pendingTechQty = 0;
+    private Integer pendingManageQty = 0;
+    private Integer pendingTseQty = 0;
+    private Integer pendingOsscQty = 0;
+    private Integer pendingCommercialQty = 0;
+    private Integer pendingDirectorQty = 0;
+    private Integer pendingOrderQty = 0;
+    private Integer pendingOsscReturnQty = 0;
+    private Integer pendingUnOrderQty = 0;
+    private Integer pendingReturnQty = 0;
+    private Integer pendingCloseQty = 0;
+
     @Override
     protected void init() {
         super.init();
         dao = WebUtil.getBean(ZkbPartOrderRepository.class);
+        zkbPartOrderMapper = WebUtil.getBean(ZkbPartOrderMapper.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         zkbPartOrderExcelService = WebUtil.getBean(ZkbPartOrderExcelService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -83,6 +100,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
+            Integer c = zkbPartOrderService.getZkbContractRepository().fetchContractCount(selectionTenantInfo);
+            if(c == null || c == 0){
+                if(StrUtil.isEmpty(notGeAsset)){
+                    notGeAsset = "";
+                }
+                disableNotGeAsset = true;
+            }
         }else {
             zkbPartOrderUserConfigList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByLoginName(currentUser.getLoginName());
             if(zkbPartOrderUserConfigList != null && zkbPartOrderUserConfigList.size() >0){
@@ -93,9 +117,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
                 }
@@ -132,20 +154,187 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
             Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-            if(!mm.containsKey("notGeAsset")){
+            //if(!mm.containsKey("notGeAsset")){
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
-                            ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
+                        ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
                     ){
                         notGeAsset = CopyByInvok.T;
+                        disableNotGeAsset = true;
+                    }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(c.getConfigType()) ||
+                            ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(c.getConfigType()) ||
+                            ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(c.getConfigType())){
+                        notGeAsset = "";
+                        disableNotGeAsset = true;
                     }
                 }
-            }
+            //}
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
+        calcStepQty();
     }
 
+    public Map<String, Object> initQtyMap(){
+        Map<String, Object> mm = new HashMap<>();
+        if(StrUtil.isNotEmpty(selectionTenantInfo)){
+            mm.put("tenantUid", selectionTenantInfo);
+        }
+        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+            mm.put("testLogin", CopyByInvok.T);
+        }else{
+            mm.put("testLogin", CopyByInvok.F);
+        }
+        return mm;
+    }
+
+    public void calcStepQty(){
+        calcPendQty();
+
+        if(showStatusBtn){
+            Map<String, Object> mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+            pendingTechQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+            pendingManageQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+            pendingTseQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+            pendingOsscQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+            pendingDirectorQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+            pendingCommercialQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+            pendingOrderQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+            pendingUnOrderQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+            pendingReturnQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            pendingCloseQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
+            pendingOsscReturnQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+        }
+    }
+
+    public void calcPendQty(){
+        if(userContextService.isZkbUser()) {
+            if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+                pendingQty = dao.fetchQtyByStepForTest(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString(), selectionTenantInfo);
+            }else{
+                pendingQty = dao.fetchQtyByStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString(), selectionTenantInfo);
+            }
+        }else{
+            Map<String, Object> mm = new HashMap<>();
+            if(StrUtil.isNotEmpty(selectionTenantInfo)){
+                mm.put("tenantUid", selectionTenantInfo);
+            }
+            if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+                mm.put("testLogin", CopyByInvok.T);
+            }else{
+                mm.put("testLogin", CopyByInvok.F);
+            }
+
+            if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
+            }else if(zkbPartOrderUserConfigList.size() == 1){
+                ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
+                if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
+                        mm.put("onlineEngineer", zkbPartOrderUserConfig.getId());
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                    }else {
+                        mm.put("assetTypeDi", zkbPartOrderUserConfig.getAssetType());
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                    }
+                }else if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
+                        mm.put("onlineEngineer", zkbPartOrderUserConfig.getId());
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                    }else {
+                        mm.put("assetTypeDi", zkbPartOrderUserConfig.getAssetType());
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                    }
+                }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("region", zkbPartOrderUserConfig.getRegion());
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    List<String> currentSteps = new ArrayList<>();
+                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
+                    mm.put("currentSteps", currentSteps);
+                }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                }else if(ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
+                }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                        mm.put("orderType", ZkbPartOrder.OrderType.Probe.toString());
+                    }else{
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                        mm.put("orderTypeNe", ZkbPartOrder.OrderType.Probe.toString());
+                    }
+                }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+                }else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    mm.put("status", ZkbPartOrder.PartOrderStatus.PartReturned.toString());
+                }
+                pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+            }else if(zkbPartOrderUserConfigList.size() == 2){
+                boolean is4ooRole = true;
+                boolean isCommercialRole = false;
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
+                    if (StringUtils.isEmpty(c.getConfigType())) {
+                        is4ooRole = false;
+                    }
+                    if (!c.getConfigType().contains("Order")) {
+                        is4ooRole = false;
+                    }
+                    if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString())){
+                        isCommercialRole = true;
+                    }
+                }
+                if(is4ooRole) {
+                    mm.put("ordersRole", CopyByInvok.T);
+                }
+                if(isCommercialRole) {
+                    List<String> currentSteps = new ArrayList<>();
+                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                    mm.put("currentSteps", currentSteps);
+                }
+                if(is4ooRole || isCommercialRole){
+                    pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+                }
+            }else if(zkbPartOrderUserConfigList.size() == 3){
+                mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+            }
+        }
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
@@ -217,15 +406,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
                         }else if("all".equals(queryStatus)){
-                            /*if(searchFilters.size() > 0) {
-                                searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
-                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1*2+3*"));
-                                searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
-                            }else{
-                                searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1+2*"));
-                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1+2*"));
-                                searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));
-                            }*/
                             searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
                         }
                     }
@@ -261,7 +441,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
+                    /*if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString()));
                     }else if("all".equals(queryStatus)){
                         if(searchFilters.size() > 0) {
@@ -270,6 +450,25 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }else {
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+"));
                             searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        }
+                    }*/
+                    if (StringUtils.isEmpty(queryStatus)) {
+                        if(searchFilters.size() > 0){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1*2+"));
+                        }else{
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1+"));
+                        }
+                    }else if("all".equals(queryStatus)){
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
@@ -403,9 +602,19 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
-
-
                         }
+                    }
+                }
+            }else if(zkbPartOrderUserConfigList.size() == 3) {
+                if (StringUtils.isEmpty(queryStatus)) {
+                    searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
+                } else if ("all".equals(queryStatus)){
+                    if(searchFilters.size() > 0) {
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1*2+"));
+                    }else{
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1+"));
                     }
                 }
             }
@@ -469,6 +678,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
      */
     public void tenantInfoSelect(){
         this.cancel();
+        calcStepQty();
     }
 
     public void cancel() {
@@ -546,7 +756,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/APM_ZKB_PartOrder_Exp_Template.xlsx");
+            String impFileName= "";
+            if(StringUtils.isEmpty(notGeAsset) ){
+                impFileName = "APM_ZKB_PartOrder_Exp_Template.xlsx";
+            }else {
+                impFileName = "APM_ZKB_PartOrder_Exp_Non_Template.xlsx";
+            }
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/" + impFileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             zkbPartOrderExcelService.exportData(doc, dataMap);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
@@ -682,5 +898,109 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setNotGeAsset(String notGeAsset) {
         this.notGeAsset = notGeAsset;
+    }
+
+    public boolean isDisableNotGeAsset() {
+        return disableNotGeAsset;
+    }
+
+    public void setDisableNotGeAsset(boolean disableNotGeAsset) {
+        this.disableNotGeAsset = disableNotGeAsset;
+    }
+
+    public Integer getPendingQty() {
+        return pendingQty;
+    }
+
+    public void setPendingQty(Integer pendingQty) {
+        this.pendingQty = pendingQty;
+    }
+
+    public Integer getPendingTechQty() {
+        return pendingTechQty;
+    }
+
+    public void setPendingTechQty(Integer pendingTechQty) {
+        this.pendingTechQty = pendingTechQty;
+    }
+
+    public Integer getPendingManageQty() {
+        return pendingManageQty;
+    }
+
+    public void setPendingManageQty(Integer pendingManageQty) {
+        this.pendingManageQty = pendingManageQty;
+    }
+
+    public Integer getPendingTseQty() {
+        return pendingTseQty;
+    }
+
+    public void setPendingTseQty(Integer pendingTseQty) {
+        this.pendingTseQty = pendingTseQty;
+    }
+
+    public Integer getPendingOsscQty() {
+        return pendingOsscQty;
+    }
+
+    public void setPendingOsscQty(Integer pendingOsscQty) {
+        this.pendingOsscQty = pendingOsscQty;
+    }
+
+    public Integer getPendingCommercialQty() {
+        return pendingCommercialQty;
+    }
+
+    public void setPendingCommercialQty(Integer pendingCommercialQty) {
+        this.pendingCommercialQty = pendingCommercialQty;
+    }
+
+    public Integer getPendingDirectorQty() {
+        return pendingDirectorQty;
+    }
+
+    public void setPendingDirectorQty(Integer pendingDirectorQty) {
+        this.pendingDirectorQty = pendingDirectorQty;
+    }
+
+    public Integer getPendingOrderQty() {
+        return pendingOrderQty;
+    }
+
+    public void setPendingOrderQty(Integer pendingOrderQty) {
+        this.pendingOrderQty = pendingOrderQty;
+    }
+
+    public Integer getPendingUnOrderQty() {
+        return pendingUnOrderQty;
+    }
+
+    public void setPendingUnOrderQty(Integer pendingUnOrderQty) {
+        this.pendingUnOrderQty = pendingUnOrderQty;
+    }
+
+    public Integer getPendingReturnQty() {
+        return pendingReturnQty;
+    }
+
+    public void setPendingReturnQty(Integer pendingReturnQty) {
+        this.pendingReturnQty = pendingReturnQty;
+    }
+
+    public Integer getPendingCloseQty() {
+        return pendingCloseQty;
+    }
+
+    public void setPendingCloseQty(Integer pendingCloseQty) {
+        this.pendingCloseQty = pendingCloseQty;
+    }
+
+    public Integer getPendingOsscReturnQty() {
+        return pendingOsscReturnQty;
+    }
+
+    public void setPendingOsscReturnQty(Integer pendingOsscReturnQty) {
+        this.pendingOsscReturnQty = pendingOsscReturnQty;
     }
 }

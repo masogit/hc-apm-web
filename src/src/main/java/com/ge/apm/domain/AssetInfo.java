@@ -5,6 +5,7 @@ package com.ge.apm.domain;
 import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
@@ -178,7 +179,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
     private String assetDeptUID;
     
-    @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
+    @Column(name = "asset_type") // 设备类型, 支持自定义
     private String assetType;
     
     @Column(name = "asset_CDFA_type") // CDFA设备类型
@@ -852,6 +853,346 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     @TableField(exist = false)
     private String sharedAssetSwapIndexId;
+
+
+
+
+    //待报废操作人
+    @Transient
+    @TableField(exist = false)
+    private String terminateOperation;
+    @Transient
+    @TableField(exist = false)
+    private Date terminateOperationDate;
+
+
+    @Column(name = "supplier_py_code")
+    private String supplierPyCode;
+
+    @Column(name = "is_cleaned")
+    private Boolean isCleaned = true;
+
+    @Temporal(TemporalType.DATE)
+    private Date lastMeasuringDate;
+    @Size(max = 256)
+    @Column(name = "bar_code")
+    private String barCode;
+
+    // 入库单号
+    @Column(name = "receipt_number")
+    private String receiptNumber;
+
+    // 产地
+    @Column(name = "product_place")
+    private String productPlace;
+
+
+    // 保修
+    @Column(name = "guarantee")
+    private String guarantee;
+
+
+    @Column(name = "start_using_date")
+    @Temporal(TemporalType.DATE)
+    private Date startUsingDate;
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "auth_group_uid")
+    private String authGroupUid;
+
+    @Transient
+    @JsonProperty
+    @Column(name = "is_mvs_tant")
+    private Boolean isMvsTant;
+//    @Column(name = "swap_type")
+//    private String swapType;
+    @Column(name = "sharable")
+    private Boolean sharable;
+    @Column(name = "is_open_tube")
+    private Integer isOpenTube;//0：不开启 1：开启
+
+    //是否开启设备失联监控
+    @Column(name = "enable_loss_of_communication_monitoring")
+    private Boolean enableLossOfCommunicationMonitoring;
+
+    //设备状态失联时间（小时）
+    @Column(name = "loc_duration_device_status")
+    private Double locDurationDeviceStatus;
+
+    //环境监控失联时间（小时）
+    @Column(name = "loc_duration_env_monitoring")
+    private Double locDurationEnvMonitoring;
+    @Column(name = "connectivity")
+    private Integer connectivity;
+
+    // 所属科室代码
+    @Column(name = "owner_dept_code")
+    private String ownerDeptCode;
+
+    // 使用科室代码
+    @Column(name = "use_dept_code")
+    private String useDeptCode;
+
+    // 是否是计量设备
+    @Column(name = "measure_device")
+    private Integer measureDevice;
+
+    // 是否有注册证
+    @Column(name = "has_registration_no")
+    private Integer hasRegistrationNo;
+
+
+    /**
+     * 异常反馈
+     */
+    @Column(name = "abnormal_feedback")
+    private String abnormalFeedback;
+
+    /**
+     * 异常原因
+     */
+    @Column(name = "abnormal_reason")
+    @Size(min = 0, max = 256)
+    private String abnormalReason;
+    @Column(name = "install_status")
+    private Integer installStatus;
+    /**
+     * 智慧球服务
+     * 0:关闭 1：开启
+     */
+    @Column(name = "tubewatch_status")
+    private String tubeWatchStatus;
+
+
+    public void setSupplierPyCode(String supplierPyCode) {
+        this.supplierPyCode = supplierPyCode;
+    }
+
+    public Boolean getCleaned() {
+        return isCleaned;
+    }
+
+    public void setCleaned(Boolean cleaned) {
+        isCleaned = cleaned;
+    }
+
+    public Date getLastMeasuringDate() {
+        return lastMeasuringDate;
+    }
+
+    public void setLastMeasuringDate(Date lastMeasuringDate) {
+        this.lastMeasuringDate = lastMeasuringDate;
+    }
+
+    public String getBarCode() {
+        return barCode;
+    }
+
+    public void setBarCode(String barCode) {
+        this.barCode = barCode;
+    }
+
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
+    }
+
+    public String getProductPlace() {
+        return productPlace;
+    }
+
+    public void setProductPlace(String productPlace) {
+        this.productPlace = productPlace;
+    }
+
+    public String getGuarantee() {
+        return guarantee;
+    }
+
+    public void setGuarantee(String guarantee) {
+        this.guarantee = guarantee;
+    }
+
+    public Date getStartUsingDate() {
+        return startUsingDate;
+    }
+
+    public void setStartUsingDate(Date startUsingDate) {
+        this.startUsingDate = startUsingDate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAuthGroupUid() {
+        return authGroupUid;
+    }
+
+    public void setAuthGroupUid(String authGroupUid) {
+        this.authGroupUid = authGroupUid;
+    }
+
+    public Boolean getMvsTant() {
+        return isMvsTant;
+    }
+
+    public void setMvsTant(Boolean mvsTant) {
+        isMvsTant = mvsTant;
+    }
+
+
+    public Boolean getSharable() {
+        return sharable;
+    }
+
+    public void setSharable(Boolean sharable) {
+        this.sharable = sharable;
+    }
+
+    public Integer getIsOpenTube() {
+        return isOpenTube;
+    }
+
+    public void setIsOpenTube(Integer isOpenTube) {
+        this.isOpenTube = isOpenTube;
+    }
+
+    public Boolean getEnableLossOfCommunicationMonitoring() {
+        return enableLossOfCommunicationMonitoring;
+    }
+
+    public void setEnableLossOfCommunicationMonitoring(Boolean enableLossOfCommunicationMonitoring) {
+        this.enableLossOfCommunicationMonitoring = enableLossOfCommunicationMonitoring;
+    }
+
+    public Double getLocDurationDeviceStatus() {
+        return locDurationDeviceStatus;
+    }
+
+    public void setLocDurationDeviceStatus(Double locDurationDeviceStatus) {
+        this.locDurationDeviceStatus = locDurationDeviceStatus;
+    }
+
+    public Double getLocDurationEnvMonitoring() {
+        return locDurationEnvMonitoring;
+    }
+
+    public void setLocDurationEnvMonitoring(Double locDurationEnvMonitoring) {
+        this.locDurationEnvMonitoring = locDurationEnvMonitoring;
+    }
+
+    public Integer getConnectivity() {
+        return connectivity;
+    }
+
+    public void setConnectivity(Integer connectivity) {
+        this.connectivity = connectivity;
+    }
+
+    public String getOwnerDeptCode() {
+        return ownerDeptCode;
+    }
+
+    public void setOwnerDeptCode(String ownerDeptCode) {
+        this.ownerDeptCode = ownerDeptCode;
+    }
+
+    public String getUseDeptCode() {
+        return useDeptCode;
+    }
+
+    public void setUseDeptCode(String useDeptCode) {
+        this.useDeptCode = useDeptCode;
+    }
+
+    public Integer getMeasureDevice() {
+        return measureDevice;
+    }
+
+    public void setMeasureDevice(Integer measureDevice) {
+        this.measureDevice = measureDevice;
+    }
+
+    public Integer getHasRegistrationNo() {
+        return hasRegistrationNo;
+    }
+
+    public void setHasRegistrationNo(Integer hasRegistrationNo) {
+        this.hasRegistrationNo = hasRegistrationNo;
+    }
+
+    public String getAbnormalFeedback() {
+        return abnormalFeedback;
+    }
+
+    public void setAbnormalFeedback(String abnormalFeedback) {
+        this.abnormalFeedback = abnormalFeedback;
+    }
+
+    public String getAbnormalReason() {
+        return abnormalReason;
+    }
+
+    public void setAbnormalReason(String abnormalReason) {
+        this.abnormalReason = abnormalReason;
+    }
+
+    public Integer getInstallStatus() {
+        return installStatus;
+    }
+
+    public void setInstallStatus(Integer installStatus) {
+        this.installStatus = installStatus;
+    }
+
+    public String getTubeWatchStatus() {
+        return tubeWatchStatus;
+    }
+
+    public void setTubeWatchStatus(String tubeWatchStatus) {
+        this.tubeWatchStatus = tubeWatchStatus;
+    }
+
+    public void setWarrantyAlertStatus(String warrantyAlertStatus) {
+        this.warrantyAlertStatus = warrantyAlertStatus;
+    }
+
+    public Boolean getIsMvsTant() {
+        return isMvsTant == null ? false : isMvsTant;
+    }
+
+    public void setIsMvsTant(Boolean isMvsTant) {
+        this.isMvsTant = isMvsTant;
+    }
+
+    public String getSupplierPyCode() {
+        return supplierPyCode;
+    }
+
+    public String getTerminateOperation() {
+        return terminateOperation;
+    }
+
+    public void setTerminateOperation(String terminateOperation) {
+        this.terminateOperation = terminateOperation;
+    }
+
+    public Date getTerminateOperationDate() {
+        return terminateOperationDate;
+    }
+
+    public void setTerminateOperationDate(Date terminateOperationDate) {
+        this.terminateOperationDate = terminateOperationDate;
+    }
 
     public Integer getAssetDisposalResults() {
         return assetDisposalResults;
@@ -2686,14 +3027,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setBoUuid(String boUuid) { this.boUuid = boUuid; }
 
     public Integer getNetworkingStatus() {
-        if(networkingStatus == null) return 0;
         return networkingStatus;
     }
 
     public void setNetworkingStatus(Integer networkingStatus) { this.networkingStatus = networkingStatus; }
 
     public Boolean getIsUseRegistration() {
-        if(isUseRegistration==null) return true;
         return isUseRegistration;
     }
 
@@ -2714,4 +3053,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public Date getLastPmDateFour() { return lastPmDateFour; }
 
     public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
+
+    public void clearDefaultValue(){
+        this.isChecked=null;
+        this.isFixed=null;
+        this.isWarranty=null;
+        this.isCleaned=null;
+        this.isPm=null;
+        this.isUseRegistration=null;
+        this.networkingStatus=null;
+    }
 }

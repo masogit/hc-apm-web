@@ -67,7 +67,7 @@ public class JobController extends GenericCRUDUUIDController<HisEquipmentDataRes
     //复选的设备
     private Map<String, Boolean> selectedMap = new HashMap<>();
     List<String> pmIdList = new ArrayList<>(); //选中的
-
+    private HisOrgComponentController orgComponentController;
     private Boolean flag = false;
 
     public Boolean getFlag() {
@@ -87,6 +87,8 @@ public class JobController extends GenericCRUDUUIDController<HisEquipmentDataRes
         loginUser = UserContextService.getCurrentUserAccount();
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
+        orgComponentController.registerController(this);
         rebuildOrgTree(loginUser.getTenantUID());
     }
     public void changAssetList(Boolean flg){
@@ -103,6 +105,13 @@ public class JobController extends GenericCRUDUUIDController<HisEquipmentDataRes
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
+        removeFilterOnField("orgCode");
+
+        OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
+        if (selectedOrg != null) {
+            searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
+        }
+
         Page<HisEquipmentDataResult> page = null;
         if (this.searchFilters.isEmpty()) {
             page = resultDao.findAll(pageRequest);

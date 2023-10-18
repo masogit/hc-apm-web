@@ -96,7 +96,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         loadConfigForSite(userAccount.getSiteUID());
 //        CustomConfigObject  customConfig = customConfigService.getCurrentCustomConfig(userAccount.getSiteUID());
         List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
-        logger.info("assetsImportantFields siteuid:{}, size:{},assetsImportantFields:{}",userAccount.getSiteUID(),assetsImportantFields.size(),assetsImportantFields.toString());
+//        logger.info("assetsImportantFields siteuid:{}, size:{},assetsImportantFields:{}",userAccount.getSiteUID(),assetsImportantFields.size(),assetsImportantFields.toString());
         searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.CONTAINS, assetsImportantFields));
         if(!StringUtils.isEmpty(oneSearchStr)) {
             searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));

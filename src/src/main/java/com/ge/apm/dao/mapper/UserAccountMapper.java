@@ -1,6 +1,8 @@
 package com.ge.apm.dao.mapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.domain.*;
@@ -99,4 +101,12 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
             "tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid})")
     public List<UserAccount> getBySiteUid(String siteUid);
 
+    @Select({
+            "<script>" +
+                    "select login_name loginName, name from  user_account where login_name in " +
+                    "<foreach item = 'item' index = 'index' collection = 'loginNames' open='(' separator=',' close=')'>" +
+                    "#{item}" +
+                    "</foreach>" +
+                    "</script>"})
+    List<Map<String, String>> findNameByLoginNames(@Param("loginNames") Set<String> loginNames);
 }

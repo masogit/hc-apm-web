@@ -27,7 +27,7 @@ public class StockRecord implements Serializable {
     @JoinColumn(name = "spare_part_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SparePart sparePart;
     @Column(name = "record_type")
-    private Integer recordType;//1 入库，2 出库
+    private Integer recordType;//1 入库，2 出库，3 入库退库，4 出库退库
     @Column(name = "quantity")
     private Integer quantity;
     @Temporal(TemporalType.TIMESTAMP)
@@ -53,6 +53,12 @@ public class StockRecord implements Serializable {
     private String siteUID;
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
+    @Column(name = "inbound_number")
+    private String inboundNumber;
+    @Column(name = "outbound_number")
+    private String outboundNumber;
+    @Column(name = "return_number")
+    private String returnNumber;
 
     @Override
     public int hashCode() {

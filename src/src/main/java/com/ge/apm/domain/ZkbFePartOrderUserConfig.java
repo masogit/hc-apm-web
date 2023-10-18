@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * @author : 503202755
@@ -86,6 +87,9 @@ public class ZkbFePartOrderUserConfig implements Serializable {
 
     @Column(name = "is_vacation")
     private String isVacation = "f";// 是否休假 t f
+
+    @Column(name = "responsible_asset")
+    private Boolean responsibleAsset = false;// 负责相关设备
 
     public String getId() {
         return id;
@@ -189,5 +193,16 @@ public class ZkbFePartOrderUserConfig implements Serializable {
 
     public void setIsVacation(String isVacation) {
         this.isVacation = isVacation;
+    }
+
+    public Boolean getResponsibleAsset() {
+        if(!Optional.ofNullable(responsibleAsset).isPresent()){
+            return false;
+        }
+        return responsibleAsset;
+    }
+
+    public void setResponsibleAsset(Boolean responsibleAsset) {
+        this.responsibleAsset = responsibleAsset;
     }
 }

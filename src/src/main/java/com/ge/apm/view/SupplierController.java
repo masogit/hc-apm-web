@@ -11,6 +11,9 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.util.StringUtils;
@@ -50,6 +53,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     private Boolean isShowSupplierCertificate = null;
 
+    @Getter @Setter
+    private List<Supplier> currentPageSuppliers;
+    @Getter @Setter
+    private Map<Integer, Boolean> selectedMap; //复选的供应商
+    @Getter @Setter
+    private Boolean isSelectedCurrentPage = false;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
@@ -62,6 +72,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         this.filterBySite = false;
         this.selectedMapPending = new HashMap();
         this.selectedMapApproved = new HashMap();
+        this.selectedMap = new HashMap();
     }
 
     @Override
@@ -98,11 +109,14 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             this.removeFilterOnField("supplierType");
 
         }
+        Page<Supplier> res;
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
+            res = dao.findAll(pageRequest);
         } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+        currentPageSuppliers = res.getContent();
+        return res;
     }
 
     @Override
@@ -168,6 +182,16 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Override
     public void onAfterUpdateObject(Supplier object, boolean isOK) {
         super.onAfterUpdateObject(object, isOK);
+    }
+
+    public void batchDeleteSupplier() {
+        selectedMap.forEach((k,v) -> {
+            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
+            if (selected != null) {
+                deleteSupplier();
+            }
+        });
+        selectedMap.clear();
     }
 
     public void deleteSupplier() {
@@ -250,6 +274,30 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public void queryByApproved(){
         approvedUserList = supplierService.getSupplierUserList(null, SupplierUser.Status.Approved.name(), queryStrApproved);
+    }
+
+    public boolean isChecked() {
+        Map<Integer, Boolean> map = this.selectedMap;
+        for (Map.Entry<Integer, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void onItemSelected() {
+        isSelectedCurrentPage = !currentPageSuppliers.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        selected = null;
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageSuppliers.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (Supplier item : currentPageSuppliers) {
+            selectedMap.put(item.getId(), !isSelectedAll);
+        }
+        isSelectedCurrentPage = !isSelectedAll;
+        selected = null;
     }
 
     public void onSelectAllOfPagePending() {

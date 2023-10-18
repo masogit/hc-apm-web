@@ -150,6 +150,17 @@
                                <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                            </p:inputNumber>
                        </h:panelGroup>
+                       <h:panelGroup>
+                           <label class="label">#{msg.emergencyEquipment}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['emergencyEquipment'].required? '*':''}</span></label>
+                           <p:selectOneMenu id="emergencyEquipment" value="#{relRuleAssetController.queryAsset.emergencyEquipment}" >
+                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+
+                               <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                               <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                           </p:selectOneMenu>
+                       </h:panelGroup>
+
+
 
                        <c:if test="#{userContextService.zkbAccount}" >
                            <h:panelGroup>

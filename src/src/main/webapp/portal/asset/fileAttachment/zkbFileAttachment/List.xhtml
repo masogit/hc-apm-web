@@ -20,7 +20,7 @@
                     <p:dataTable id="datalist" value="#{zkbFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbFileAttachmentController.selected}" disabledSelection="true"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.operationType}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -93,12 +93,14 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-
-                        <p:column headerText="#{msg.download}" exportable="false">
-                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">#{msg.download}</p:link>-->
-                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
-                        </p:column>
-
+                        <p:column headerText="操作" exportable="false">
+                            <h:panelGroup rendered="#{'OperationVideo' ne item.boSubType}">
+                                <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{'OperationVideo' eq item.boSubType and item.extLink !=null}">
+                                <p:link href="#{item.extLink}"  target="_blank">观看</p:link>
+                            </h:panelGroup>
+                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbFileAttachmentController.prepareCreate}" update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.zkbAdmin}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbFileAttachmentController.prepareEdit}"  update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.checkedOne or not zkbFileAttachmentController.zkbAdmin}"/>

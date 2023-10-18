@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:his="http://www.ge.com/tags/his">
     <ui:define name="preRenderView">
         <h:outputScript name="js/main.js"/>
     </ui:define>
@@ -13,110 +14,154 @@
                 <div class="ui-g-12 card cardTitle">
                     <p:outputLabel class="pageTitle" value="#{msg.chargeDetailSource}"/>
                 </div>
-                <div class="ui-g-12 card">
-            <h:form id="IouListForm">
-                <div style="border:0px solid ;display:inline-block;width: 95%;float: left;">
-                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
+                <div class="ui-g-12 card ">
+                    <p:tabView id="HisDataSourceTab" class="tabs">
+                        <p:tab title="收费结果数据" id="showList">
+                            <div class="ui-g-12 card">
+                                <h:form id="IouListForm">
+                                    <div style="border:0px solid ;display:inline-block;width: 95%;float: left;">
+                                        <p:panelGrid columns="4" layout="grid"
+                                                     styleClass="ui-panelgrid-blank form-group">
 
-                        <h:panelGroup>
-                            <label class="label">执行开始时间</label>
-                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{hisEquipmentDataSourceController.hisRequestParamsDto.startDate}"
-                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">执行结束时间</label>
-                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endDate" value="#{hisEquipmentDataSourceController.hisRequestParamsDto.endDate}"
-                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">执行开始时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="startDate"
+                                                            value="#{hisEquipmentDataSourceController.hisRequestParamsDto.startDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"
+                                                            mask="true"/>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">执行结束时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="endDate"
+                                                            value="#{hisEquipmentDataSourceController.hisRequestParamsDto.endDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"
+                                                            mask="true"/>
+                                            </h:panelGroup>
 
-                    </p:panelGrid>
-                </div>
-                <div style="float: left;margin: 30px -80px 0px -450px">
-                    <p:commandButton validateClient="true" value="检索" update="IouListForm:datalist" />
-                </div>
+                                        </p:panelGrid>
+                                    </div>
+                                    <div style="float: left;margin: 30px -80px 0px -450px">
+                                        <p:commandButton validateClient="true" value="检索"
+                                                         update="IouListForm:datalist"/>
+                                    </div>
 
-                <p:dataTable id="datalist" value="#{hisEquipmentDataSourceController.lazyModel}" var="item"
-                             widgetVar="varDataList"
-                             selectionMode="single" selection="#{hisEquipmentDataSourceController.selected}"
-                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                             rows="20" emptyMessage="#{msg.noRecordFound}" expandableRowGroups="true"
-                             rowsPerPageTemplate="20,50,100,500">
+                                    <p:dataTable id="datalist" value="#{hisEquipmentDataSourceController.lazyModel}"
+                                                 var="item"
+                                                 widgetVar="varDataList"
+                                                 selectionMode="single"
+                                                 selection="#{hisEquipmentDataSourceController.selected}"
+                                                 lazy="true" paginator="true" paginatorPosition="both"
+                                                 paginatorAlwaysVisible="true"
+                                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                                 sortBy="#{item.id}"
+                                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                                 expandableRowGroups="true"
+                                                 rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="filter" listener="#{hisEquipmentDataSourceController.onFilter}"  />
-                    <p:column headerText="编号" sortBy="#{item.id}" filterBy="#{item.id}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.id}"/>
-                    </p:column>
-                    <p:column headerText="所属机构" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.orgCode}"/>
-                    </p:column>
-                    <p:column headerText="设备代码" sortBy="#{item.deviceCode}" filterBy="#{item.deviceCode}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.deviceCode}"/>
-                    </p:column>
-                    <p:column headerText="住院号或门诊" sortBy="#{item.patientRegistrationNum}" filterBy="#{item.patientRegistrationNum}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.patientRegistrationNum}"/>
-                    </p:column>
-                    <p:column headerText="申请单号" sortBy="#{item.prescriptionNum}" filterBy="#{item.prescriptionNum}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.prescriptionNum}"/>
-                    </p:column>
+                                        <p:ajax event="filter" listener="#{hisEquipmentDataSourceController.onFilter}"/>
+                                        <p:column headerText="编号" sortBy="#{item.id}" filterBy="#{item.id}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.id}"/>
+                                        </p:column>
+                                        <p:column headerText="所属机构" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.orgCode}"/>
+                                        </p:column>
+                                        <p:column headerText="设备代码" sortBy="#{item.deviceCode}"
+                                                  filterBy="#{item.deviceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.deviceCode}"/>
+                                        </p:column>
+                                        <p:column headerText="住院号或门诊" sortBy="#{item.patientRegistrationNum}"
+                                                  filterBy="#{item.patientRegistrationNum}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.patientRegistrationNum}"/>
+                                        </p:column>
+                                        <p:column headerText="申请单号" sortBy="#{item.prescriptionNum}"
+                                                  filterBy="#{item.prescriptionNum}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.prescriptionNum}"/>
+                                        </p:column>
 
-                    <p:column headerText="收费项目代码" sortBy="#{item.deviceDeptCode}" filterBy="#{item.deviceDeptCode}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.deviceDeptCode}"/>
-                    </p:column>
+                                        <p:column headerText="收费项目代码" sortBy="#{item.deviceDeptCode}"
+                                                  filterBy="#{item.deviceDeptCode}" filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.deviceDeptCode}"/>
+                                        </p:column>
 
 
+                                        <p:column headerText="数量" sortBy="#{item.receiptNum}"
+                                                  filterBy="#{item.receiptNum}"
+                                                  filterMatchMode="GTE">
+                                            <h:outputText value="#{item.receiptNum}"/>
+                                        </p:column>
+                                        <p:column headerText="单位" sortBy="#{item.unit}" filterBy="#{item.unit}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.unit}"/>
+                                        </p:column>
+                                        <p:column headerText="金额" sortBy="#{item.totalAmount}"
+                                                  filterBy="#{item.totalAmount}"
+                                                  filterMatchMode="GTE">
+                                            <h:outputText value="#{item.totalAmount}"/>
+                                        </p:column>
+                                        <p:column headerText="执行科室" sortBy="#{item.execDept}"
+                                                  filterBy="#{item.execDept}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.execDept}"/>
+                                        </p:column>
+                                        <p:column headerText="执行科室代码" sortBy="#{item.execDeptCode}"
+                                                  filterBy="#{item.execDeptCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.execDeptCode}"/>
+                                        </p:column>
+                                        <p:column headerText="是否匹配" sortBy="#{item.isMatched}"
+                                                  filterBy="#{item.isMatched}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.isMatched}"/>
+                                        </p:column>
+                                        <p:column headerText="执行时间" sortBy="#{item.execTime}"
+                                                  filterBy="#{item.execTime}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.execTime}"/>
+                                        </p:column>
+                                        <p:column headerText="系统来源" sortBy="#{item.sourceCode}"
+                                                  filterBy="#{item.sourceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.sourceCode}"/>
+                                        </p:column>
+                                        <!--                    <p:column headerText="是否匹配" sortBy="#{item.isMatched}" filterBy="#{item.isMatched}"-->
+                                        <!--                              filterMatchMode="EQ">-->
+                                        <!--                        <h:outputText value="#{item.isMatched}"/>-->
+                                        <!--                    </p:column>-->
+                                        <f:facet name="{Toolbar}">
+                                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                                             class="btn btn-sm btn-gray" ajax="false">
+                                                <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                                            </p:commandButton>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </h:form>
+                                <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true"
+                                          resizable="true" draggable="true" appendTo="@(body)" header="提示信息">
+                                </p:dialog>
+                            </div>
 
-                    <p:column headerText="数量" sortBy="#{item.receiptNum}" filterBy="#{item.receiptNum}"
-                              filterMatchMode="GTE">
-                        <h:outputText value="#{item.receiptNum}"/>
-                    </p:column>
-                    <p:column headerText="单位" sortBy="#{item.unit}" filterBy="#{item.unit}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.unit}"/>
-                    </p:column>
-                    <p:column headerText="金额" sortBy="#{item.totalAmount}" filterBy="#{item.totalAmount}"
-                              filterMatchMode="GTE">
-                        <h:outputText value="#{item.totalAmount}"/>
-                    </p:column>
-                    <p:column headerText="执行科室" sortBy="#{item.execDept}" filterBy="#{item.execDept}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.execDept}"/>
-                    </p:column>
-                    <p:column headerText="执行科室代码" sortBy="#{item.execDeptCode}" filterBy="#{item.execDeptCode}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.execDeptCode}"/>
-                    </p:column>
-                    <p:column headerText="是否匹配" sortBy="#{item.isMatched}" filterBy="#{item.isMatched}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.isMatched}"/>
-                    </p:column>
-                    <p:column headerText="执行时间" sortBy="#{item.execTime}" filterBy="#{item.execTime}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.execTime}"/>
-                    </p:column>
-                    <p:column headerText="系统来源" sortBy="#{item.sourceCode}" filterBy="#{item.sourceCode}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.sourceCode}"/>
-                    </p:column>
-<!--                    <p:column headerText="是否匹配" sortBy="#{item.isMatched}" filterBy="#{item.isMatched}"-->
-<!--                              filterMatchMode="EQ">-->
-<!--                        <h:outputText value="#{item.isMatched}"/>-->
-<!--                    </p:column>-->
-                    <f:facet name="{Toolbar}">
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
-                                         class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
-                        </p:commandButton>
-                    </f:facet>
-                </p:dataTable>
-            </h:form>
-                    <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="提示信息" >
-                    </p:dialog>
+                        </p:tab>
+                        <p:tab title="数据导入" id="import">
+                            <ui:include src="HisDataSourceImport.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+
                 </div>
             </div>
         </div>

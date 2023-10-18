@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>auto login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        iframe {
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+<div style="width:100%;height:100vh;overflow: hidden;">
+    <iframe id="autoLoginIframe" width="1920px" height="1080px" allow="fullscreen" src=""></iframe>
+</div>
+<script src="./js/axios.min.js"></script>
+<script>
+
+        function setZoom() {
+            const baseWidth = 1920;
+            const clientWidth = document.body.clientWidth;
+            const baseZoom = clientWidth / baseWidth;
+            const dom = document.querySelector("#autoLoginIframe")
+            dom.style.zoom = baseZoom
+        }
+        window.onresize = function () {
+            setZoom()
+        }
+        window.onload = function () {
+            // http://10.189.154.29:8000/innerPage?s=VTJGc2RHVmtYMThqSDBjeWIyUUlGbWEweGxLYlJZeEVyZDRpblBaSytXaEdYaFVwT1p3SWQ2MUFCaC9EUmZBbQ==&page=/geapm/portal/asset/info/AssetList.xhtml
+            let origin = location.origin;
+            let search = location.search;
+            let params = new URLSearchParams(search)
+            let base64 = params.get('s');
+            let page = params.get('page');
+            axios.post(`${origin}/geapm/web/bypassLogin?paramStr=${base64}`).then(res => {
+                let jsessionid = res.headers.jsessionid
+                document.cookie = `JSESSIONID=${jsessionid}`
+                document.querySelector("#autoLoginIframe").src = `${origin}${page}`
+            })
+        }
+    </script>
+</body>
+</html>

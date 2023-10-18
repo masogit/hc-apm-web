@@ -91,8 +91,9 @@
                                 <!--老逻辑-->
                                 <p:tab title="#{msg.AccessPermission}" class="ui-g-12" >
                                     <p:scrollPanel style="height: 300px; border: 0;" mode="native">
-
-                                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                        <p:inputText id = "accessOrgSearch" value="#{userAccountController.retrieval}"/>
+                                        <p:commandButton partialSubmit="true" icon="ui-icon-search" update="orgTree3" actionListener="#{userAccountController.getFilteredNodes}" value="检索"/>
+                                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true" propagateSelectionUp="#{userAccountController.propagateSelectionUp}">
                                             <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
                                             <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
 
@@ -105,6 +106,22 @@
                                 </p:tab>
                             </c:otherwise>
                         </c:choose>
+
+
+                        <p:tab title="#{msg.AssetTypeGroup}" class="ui-g-12"   rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}" >
+                            <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+
+                                <p:tree id="authGroupTree" class="tree" style="border:0;height:362px" value="#{userAccountController.assetTypeGroupTree}" selection="#{userAccountController.selectedAssetTypeGroupNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                    <p:ajax event="select" listener="#{userAccountController.onSelectAssetTypeGroupTreeNode}" />
+                                    <p:ajax event="unselect" listener="#{userAccountController.onUnselectAssetTypeGroupTreeNode}" />
+
+                                    <p:treeNode type="assetTypeGroup">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:tab>
+
                     </p:tabView>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display2,:RoleEditDlg,:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog');"/>

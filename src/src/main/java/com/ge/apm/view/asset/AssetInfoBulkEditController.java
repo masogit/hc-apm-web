@@ -1,7 +1,8 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -20,8 +21,6 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,8 +32,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -86,6 +83,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetHistoryService assetHistoryService;
     private SupplierController supplierController;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private MqUtils mqUtils;
 
     private QrCodeLib createRequest;
@@ -215,10 +213,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
 
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        assetTypeGroupTreeComponentController.registerController(this);
 
         selected = new AssetInfo();
+        selected.clearDefaultValue();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -434,6 +435,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             }
         }
 
+        // 资产分类
+        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
+            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
+        }
+
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
@@ -481,12 +488,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 }
             }
         }
+        Integer assetDeptId = selected.getAssetDeptId();
         for (AssetInfo assetInfo : newList ) {
             idList.add(assetInfo.getId());
             selected.setIsValid(assetInfo.getIsValid());
             selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
             selected.setConnectToInsite(assetInfo.getConnectToInsite());
-            if(selected.getAssetDeptId()==0){
+            if(assetDeptId == null || assetDeptId == 0){
                 selected.setAssetDeptId(assetInfo.getAssetDeptId());
             }
             selected.setSiteId(assetInfo.getSiteId());
@@ -618,30 +626,17 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
 
     private void sendAssetMq(AssetInfo newAsset) {
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setDescribe("批量修改设备");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetInfoBulkEditController");
+        mqContext.setMethodName("verifyIfRequiredBeforeApplyChange");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-        assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
-        assetInfo.setAssetTags(null);
-        assetInfo.setBrand(null);
-        assetInfo.setTags(null);
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
+
     private boolean updateQrCode() {
         QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
         if (qrCodeLib == null) {
@@ -1612,9 +1607,17 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+        switch (eventName) {
+            case MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE:
+                SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+                break;
+            case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
+                AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
+                selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+                break;
+            default:
+                break;
         }
     }
 

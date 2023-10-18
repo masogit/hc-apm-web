@@ -52,6 +52,9 @@ public class ReminderRule implements Serializable {
     @Column(name = "reminder_type")
     private String reminderType;
 
+    @Column(name = "parent_uid")
+    private String parentUid;
+
     @Column(name = "parameters", columnDefinition = "text")
     private String parameters;
 
@@ -62,5 +65,8 @@ public class ReminderRule implements Serializable {
     @Transient
     @TableField(exist = false)
     private WechatParam wechatParam = new WechatParam();
+
+    @Column(name = "push_date_unit")
+    private Integer pushDateUnit;
 
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="reminderRuleAssignOrgEditDlg" widgetVar="reminderRuleAssignOrgEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="租户设置">
+            <h:form id="assignOrgEditForm">
+                <h:panelGroup id="display">
+                    <label class="label">#{msg.AccessPermission}<span style="color:red">*</span></label>
+                    <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+                        <p:inputText id = "accessOrgSearch" value="#{reminderRuleController.retrieval}"/>
+                        <p:commandButton partialSubmit="true" icon="ui-icon-search" update="orgTree3" actionListener="#{reminderRuleController.getFilteredNodes}" value="检索"/>
+                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{reminderRuleController.accessOrgTree}" selection="#{reminderRuleController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true" propagateSelectionUp="#{reminderRuleController.propagateSelectionUp}">
+                            <p:ajax event="select" listener="#{reminderRuleController.onSelectAccessTreeNode}" />
+                            <p:ajax event="unselect" listener="#{reminderRuleController.onUnselectAccessTreeNode}" />
+
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node.shortName}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                    <p:commandButton validateClient="true" action="#{reminderRuleController.saveOrgs()}" value="#{msg.Save}" update="display,:reminderRuleAssignOrgEditDlg, :reminderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleAssignOrgEditDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('reminderRuleAssignOrgEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

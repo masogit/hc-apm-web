@@ -23,6 +23,43 @@
 
 						<p:ajax event="rowSelect" update="editButton deleteButton ruleSettingButton"/>
 						<p:ajax event="filter" listener="#{reminderRuleController.onFilter}"/>
+						<p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUid}" filterBy="#{item.tenantUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getTenantName(item.tenantUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('0')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+
+						<p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUid}" filterBy="#{item.institutionUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getInsNameByUId(item.institutionUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('1')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUid}" filterBy="#{item.hospitalUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getHospitalNameByUId(item.hospitalUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('2')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.Site}" sortBy="#{item.siteUid}" filterBy="#{item.siteUid}" filterMatchMode="EQ" >
+							<h:outputText value="#{reminderRuleController.getSiteNameByUId(item.siteUid)}" />
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('3')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
 						<p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.name}"/>
 						</p:column>
@@ -62,14 +99,13 @@
 								<p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{reminderRuleController.setToUsing(item.id,true)}" update="datalist"  rendered="#{item.state eq 0}"/>
 								<p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}" actionListener="#{reminderRuleController.setToUsing(item.id,false)}" update="datalist"  rendered="#{item.state eq 1}"/>
 								<p:commandButton icon="ui-icon-search" style="zoom:0.7" title="#{msg.View}" actionListener="#{reminderRuleController.onRuleEvent(item.id)}" update="datalist" oncomplete="openEventListWindow(xhr, status, args)"/>
-<!--								<p:link target="_detail" title="#{msg.View}" outcome="#{reminderRuleController.getEventPage(item.id)}">-->
-<!--									<p:graphicImage name="icons/eye.png" style="zoom:0.7"/>-->
-<!--								</p:link>-->
 							</h:panelGroup>
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()"/>
+<!--							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleCreateDlg" oncomplete="PF('reminderRuleCreateDialog').show()"/>-->
 							<p:commandButton id="editButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
+<!--							<p:commandButton id="orgButton" actionListener="#{reminderRuleController.prepareUserScope}" icon="ui-icon-person" process="@this" title="分配访问组织"  update=":reminderRuleAssignOrgEditDlg" oncomplete="PF('reminderRuleAssignOrgEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>-->
 							<p:commandButton id="deleteButton" actionListener="#{reminderRuleController.delete}" icon="ui-icon-close" title="#{msg.Delete}" update="datalist" disabled="#{empty reminderRuleController.selected}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
@@ -79,8 +115,10 @@
 				</h:form>
 			</div>
 		</div>
+		<ui:include src="reminderRuleCreate.xhtml"/>
 		<ui:include src="reminderRuleEdit.xhtml"/>
 		<ui:include src="reminderRuleSetting.xhtml"/>
+<!--		<ui:include src="reminderRuleAssignOrg.xhtml"/>-->
 		<script>
 			function openEventListWindow(xhr, status, args) {
 				window.open(args.url, '_blank');

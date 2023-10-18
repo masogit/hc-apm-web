@@ -5,18 +5,27 @@
  */
 package com.ge.apm.service.utils;
 
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.service.common.GatewayURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -31,13 +40,36 @@ public class MicroServiceInvoker {
     protected RestTemplate template;
 
     @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
+    protected String baseURL;
 
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     protected String downLoadURL;
 
     @Value("#{systemEnvironment['DOCXTOPDF_URL'] ?: urlProperties.docxtopdf}")
     protected String docxToPdfUrl;
+
+    @Value("#{wxProperties.qrcode_web_context_url}")
+    protected String webContextUrl;
+
+    @Autowired
+    protected BlobObjectRepository blobObjectRepository;
+
+    @PostConstruct
+    public void initRestTemplate(){
+        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
+        List<HttpMessageConverter<?>> messageConverters = template.getMessageConverters();
+//        Iterator<HttpMessageConverter<?>> iterator = messageConverters.iterator();
+//        while(iterator.hasNext()){
+//            HttpMessageConverter<?> messageConverter = iterator.next();
+//            if(messageConverter instanceof StringHttpMessageConverter){
+//                iterator.remove();
+//            }
+//
+//        }
+//        messageConverters.add(stringHttpMessageConverter);
+        messageConverters.set(1,stringHttpMessageConverter);
+        template.setMessageConverters(messageConverters);
+    }
 
     public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();

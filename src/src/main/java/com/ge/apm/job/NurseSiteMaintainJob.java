@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @EnableScheduling
+@Deprecated
 public class NurseSiteMaintainJob {
     public static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainJob.class);
 
@@ -71,7 +72,7 @@ public class NurseSiteMaintainJob {
     @Autowired
     NurseSiteMaintainCheckItemRepository nurseSiteMaintainCheckItemRepository;
 
-    @Scheduled(cron = "5/20 * * * * *")
+//    @Scheduled(cron = "5/20 * * * * *")
     public void execute() {
         try {
             checkJob();

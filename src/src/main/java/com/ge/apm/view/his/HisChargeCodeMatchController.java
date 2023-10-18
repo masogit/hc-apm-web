@@ -9,6 +9,10 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisEquipmentSfxm;
 import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
+import com.ge.apm.service.his.load.HisEquipmentImportService;
+import com.ge.apm.service.his.load.HisEquipmentSfxmImportService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -16,8 +20,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +32,13 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +69,8 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
     @Getter@Setter
     private Boolean subEquipment = false;//过滤子设备
     private List<HisAssetGroupAssetMatch> currentPagePmOrders;
+
+    private HisEquipmentSfxmImportService hisEquipmentSfxmImportService;
 
     //初始化定义pageRequest,提供给待匹配的页面使用
     @Getter@Setter
@@ -92,6 +104,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
         sfxDao = WebUtil.getBean(HisEquipmentSfxmRepository.class);
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        hisEquipmentSfxmImportService = WebUtil.getBean(HisEquipmentSfxmImportService.class);
         orgComponentController.registerController(this);
         pageRequest =  new PageRequest(0 ,200);
         initAssets();//初始化 availableAssets
@@ -325,6 +338,52 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
         refreshAfterOrgChange();
     }
 
+
+
+
+    private List<Map<String, Object>> importMapList;
+    private List<Map<String, Object>> errorList;
+    private UploadedFile file;
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            //检查导入模板版本
+//            if(!checkDocVersion(doc)){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
+//                return;
+//            }
+
+            int maxRowNum = HisEquipmentSfxmImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
+            if(doc.exceedMaxRowNum(HisEquipmentSfxmImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                return;
+            }
+            importMapList = hisEquipmentSfxmImportService.getMapFromTemplate(doc);
+            hisEquipmentSfxmImportService.importData(importMapList);
+            errorList = hisEquipmentSfxmImportService.filterErrorRecords(importMapList);
+            if(!errorList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    public List<Map<String, Object>> getErrorList() {
+        return errorList;
+    }
 }
 
 

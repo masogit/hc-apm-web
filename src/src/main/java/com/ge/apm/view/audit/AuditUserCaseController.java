@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -205,12 +206,18 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     public List<TenantInfo> getAllTenant(){
         List<TenantInfo> list = tenantInfoRepository.getAllOrderByName();
         List<TenantInfo> tenantInfoList = list.stream().filter(item -> {
+            if (StringUtils.isNotEmpty(item.getFeatureList())) {
+                Set<String> apmFeatures = ((List<String>)JSON.parse(item.getFeatureList())).stream().collect(Collectors.toSet());
+                if (apmFeatures.contains("AUDIT")) {
+                    return true;
+                }
+            }
             String tenantConfig = item.getTenantConfig();
             JSONObject jsonObject = JSONObject.parseObject(tenantConfig);
             if(jsonObject != null){
                 JSONArray jsonArray = jsonObject.getJSONArray("menuList");
                 List<String> menuList = jsonArray != null ? jsonArray.toJavaList(String.class) : null;
-                if (menuList != null && menuList.size() > 0 && menuList.contains("audit")) {
+                if (menuList != null && menuList.size() > 0 && (menuList.contains("audit"))) {
                     return true;
                 }
             }

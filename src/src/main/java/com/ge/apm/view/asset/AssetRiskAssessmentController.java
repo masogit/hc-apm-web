@@ -4,7 +4,6 @@ import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantOptionConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
@@ -60,7 +59,6 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     /*接口类*/
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoRepository orgInfoRepository;
-    private TenantOptionConfigRepository tenantOptionConfigRepository;
     private I18nMessageRepository i18nDao;
     private UserContextService userContextService;
     private OrgInfoTreeService orgInfoTreeService;
@@ -128,7 +126,6 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         /*接口类*/
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);

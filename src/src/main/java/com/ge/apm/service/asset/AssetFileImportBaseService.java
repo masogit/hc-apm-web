@@ -5,10 +5,9 @@
  */
 package com.ge.apm.service.asset;
 
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -20,14 +19,10 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -38,6 +33,7 @@ import webapp.framework.web.WebUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -98,6 +94,9 @@ public class AssetFileImportBaseService {
     protected UserAccountRepository userDao;
 
     @Autowired
+    protected UserAccountMapper userAccountMapper;
+
+    @Autowired
     protected QrCodeLibRepository qrcodeDao;
 
     @Autowired
@@ -105,6 +104,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected SysAuthGroupRepository authGroupDao;
+
+    @Autowired
+    protected AssetTypeGroupRepository assetTypeGroupRepository;
 
     @Autowired
     protected AssetFinacingNumGenerateService assetFinacingNumGenerateService;
@@ -152,6 +154,8 @@ public class AssetFileImportBaseService {
 
     protected Map<String, AssetInfo> parentAssetsMap = new HashMap<>();
 
+    protected List<AssetTypeGroup> assetTypeGroupList = new ArrayList<>();
+    protected Map<String, AssetTypeGroup> assetTypeGroupMap = new HashMap<>();
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -210,7 +214,6 @@ public class AssetFileImportBaseService {
         int row = 0;
 
         try {
-
             if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
 
                 //locate parent assets first for later use
@@ -500,13 +503,32 @@ public class AssetFileImportBaseService {
         supportingService.removeParentAssetIfNotExists(newAsset);
 
         //if import status failure, already returned, will not reach here.
-        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
-            String uid = UUID.randomUUID().toString().replace("-", "");
-            newAsset.setUid(uid);
+//        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
+//            String uid = UUID.randomUUID().toString().replace("-", "");
+//            newAsset.setUid(uid);
+//        }
+        boolean isCreate=false;
+        if(newAsset.getId()==null){
+            isCreate=true;
         }
-        this.saveAssetHistory( newAsset);
+
+        // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(newAsset.getAssetType())) {
+            if (assetTypeGroupList.isEmpty()) {
+                item.put("assetType", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "错误: 资产分类为空！");
+                return;
+            }
+            newAsset.setAssetType(assetTypeGroupList.get(0).getEncoded());
+        }
 
         assetDao.save(newAsset);
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        if(isCreate){
+            assetInfo.setId(null);
+        }
+        this.saveAssetHistory(assetInfo);
 
         assetDepreciationService.saveAssetDerpeciation(newAsset);
 
@@ -524,35 +546,25 @@ public class AssetFileImportBaseService {
 
     }
     private void saveAssetHistory(AssetInfo newAsset) {
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setDescribe("资产导入添加");
+        mqContext.setMethodName("importOneAsset");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetFileImportBaseService");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-
-        assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
-        assetInfo.setAssetTags(null);
-        assetInfo.setBrand(null);
-        assetInfo.setTags(null);
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
+        try {
+            mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+        }catch (Exception e){
+            logger.error("importOneAsset send mq error:",e);
+        }
     }
+
     public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {
         LocalDateTime startTime = LocalDateTime.now();
-
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
+        assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
         if (!crossSite) {
             //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
             importOrgMap.forEach(item -> {
@@ -710,19 +722,19 @@ public class AssetFileImportBaseService {
                 if(orgInfo!=null){
                     assetDeptNameOld=orgInfo.getName();
                 }
-                if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(assetDeptNameOld) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
+
+                if ((StringUtils.hasText(assetDeptNameOld) && !assetDeptNameOld.equals(assetDeptName)) ||
+                        (StringUtils.hasText(asset.getClinicalDeptName()) && !asset.getClinicalDeptName().equals(clinicalDeptName)) ) {
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备已绑定调剂名称,不能修改科室");
                     }
-
                     if(!assetInfoBulkEditCheckService.verifyForMaintain(assets)){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的保养工单,不能修改科室");
                     }
-
                     if(!assetInfoBulkEditCheckService.verifyForInventory(assets)){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
@@ -746,7 +758,6 @@ public class AssetFileImportBaseService {
                             }
                         }
                     }
-
                     //临床助手检查进行中
                     unCheckNurseSiteMaintainList.addAll(assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets));
                 }
@@ -859,6 +870,16 @@ public class AssetFileImportBaseService {
                     item.put("status", ImportStatus.CheckFail);
                     result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
+                    continue;
+                }
+            }
+            // 资产分类校验
+            if(StringUtils.hasLength(newAsset.getAssetType())){
+                AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupMap.get(newAsset.getAssetType());
+                if (selectedAssetTypeGroup == null) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.put("canBeImport",Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetTypeGroup") + "编码不存在");
                     continue;
                 }
             }

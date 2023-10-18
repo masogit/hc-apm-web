@@ -3,15 +3,22 @@ package com.ge.apm.view.SparePart;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -19,6 +26,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +41,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private SparePartRepository dao;
     private StockRecordRepository stockRecordRepository;
     private SimplePartsWarehouseService warehouseService;
+    private BlobFileService blobService;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -48,7 +58,13 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Getter @Setter
     private Integer outQuantity;
     @Getter @Setter
+    private Date outDate;
+    @Getter @Setter
     private String remark;
+    @Getter @Setter
+    private List<V2_BlobObject> picList;
+    @Getter @Setter
+    private List<TempFileUtil> tempFile;
 
     @Override
     protected void init() {
@@ -57,13 +73,15 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         uaaService = WebUtil.getBean(UaaService.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
 
         this.filterBySite = false;
         this.filterByHospital = false;
-
+        picList = new ArrayList<>();
+        tempFile = new ArrayList<>();
         initWarehouses();
         loadClinicalDeptList();
     }
@@ -105,12 +123,33 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        picList = new ArrayList<>();
+        tempFile = new ArrayList<>();
     }
 
     @Override
     public void prepareEdit() {
         super.prepareEdit();
         partsWarehouseId = selected.getPartsWarehouseId();
+    }
+
+    public void clickSelectAttach(SparePart sparePart) {
+        selected = sparePart;
+    }
+
+    public boolean hasBlob(String id) {
+        if (StringUtils.hasText(id)) {
+            List<V2_BlobObject> blobObjects =  blobService.fetchBlobObject(id, V2_BlobObject.BO_TYPE_PART_PIC);
+            return !CollectionUtils.isEmpty(blobObjects);
+        }
+        return false;
+    }
+
+    public List<V2_BlobObject> getPicList() {
+        if (selected != null && StringUtils.hasText(selected.getId())) {
+            picList = blobService.fetchBlobObject(selected.getId(), V2_BlobObject.BO_TYPE_PART_PIC);
+        }
+        return picList;
     }
 
     public void saveEdit() {
@@ -126,6 +165,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     public void outStock(SparePart sparePart) {
         selected = sparePart;
         outQuantity = null;
+        outDate = new Date();
         filterClinicalDeptOrg = null;
         remark = null;
     }
@@ -143,14 +183,20 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     public void saveSparePartAndRecord(Integer recordType) {
         selected.setTenantUID(loginUser.getTenantUID());
         dao.save(selected);
+        tempFile.forEach(this::saveTempFile);
         stockRecordRepository.save(buildStockRecord(recordType));
+        tempFile = new ArrayList<>();
     }
 
     private StockRecord buildStockRecord(Integer recordType) {
+        Date recordDate = new Date();
+        if(recordType == 2){
+            recordDate = outDate;
+        }
         return setOutStockRecord(StockRecord.builder()
                 .recordType(recordType)
                 .sparePartId(selected.getId())
-                .recordDate(new Date())
+                .recordDate(recordDate)
                 .warehouseOprPerson(loginUser.getName())
                 .warehouseOprPersonUid(loginUser.getUid())
                 .quantity(selected.getQuantity())
@@ -165,8 +211,31 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
             record.setReceivingDepartmentUid(orgInfo.getUid());
             record.setQuantity(outQuantity);
             record.setRemark(remark);
+            record.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("C"));
+        }
+        if (record.getRecordType() == 1) {
+            record.setInboundNumber(OrderNumberGenerator.generateOrderNumber("R"));
         }
         return record;
+    }
+
+    public Date getInStockDate(String sparePartId){
+        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(sparePartId, 1);
+
+        if(stockRecord != null){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                return sdf.parse(sdf.format(stockRecord.getRecordDate()));
+            } catch (ParseException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean AreThereNnyOutboundRecords(String sparePartId) {
+        return stockRecordRepository.findInBySparePartId(sparePartId, 2) != null;
     }
 
     public void cancel() {
@@ -176,6 +245,10 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public void delete() {
+        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(selected.getId(), 1);
+        if (!ObjectUtils.isEmpty(stockRecord)) {
+            stockRecordRepository.delete(stockRecord);
+        }
         dao.delete(selected);
     }
 
@@ -194,6 +267,52 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+    }
+
+    public boolean disableUploadButton_temp() {
+        return tempFile.size() > 4;
+    }
+
+    public boolean disableUploadButton() {
+        return picList.size() > 4;
+    }
+
+    public void saveTempFile(TempFileUtil tempFile) {
+        V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PART_PIC);
+            blobObject.setBoUuid(selected.getId());
+            blobService.saveBlobObject(blobObject);
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PART_PIC);
+            blobObject.setBoUuid(selected.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void tempFileUpload(FileUploadEvent event) {
+        UploadedFile file = event.getFile();
+        tempFile.add(TempFileUtil.builder()
+                .fileName(file.getFileName())
+                .contentType(file.getContentType())
+                .contents(file.getContents())
+                .build());
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public void removeTempAttachment(TempFileUtil file) {
+        tempFile.remove(file);
     }
 
 }

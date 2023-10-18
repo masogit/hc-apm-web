@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="NewSiteInfoEditVersionDlg" widgetVar="NewSiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息"
+              width="1000px" height="700px" maximizable="true">
+        <p:ajax event="close" update=":SiteInfoListForm:datalist" />
+        <h:form id="NewSiteInfoEditVersionForm" rendered="#{tenantInfoController.selected != null}">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label class="label">版本</label>
+                    <p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}">
+                        <p:ajax update=":NewSiteInfoEditVersionForm" listener="#{tenantInfoController.changeListener}"></p:ajax>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">设备运营管理链接</label>
+                    <p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:scrollPanel style="height: 600; border: 0;" mode="native">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <p:fieldset legend="设备档案">
+                            <p:selectManyCheckbox id="asset" widgetVar="asset" value="#{tenantInfoController.selectedMenuFeaturesAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="资产管理" itemValue="ASSET_INFO"/>
+                                <f:selectItem itemLabel="主子设备信息" itemValue="ASSET_PARENTS_INFO"/>
+                                <f:selectItem itemLabel="资产批量修改院区" itemValue="ASSET_BATCH_MODIFY"/>
+                                <f:selectItem itemLabel="设备风险评估" itemValue="ASSET_RISK_EVALUATE"/>
+                                <f:selectItem itemLabel="设备定位" itemValue="ASSET_LOCATION"/>
+                                <f:selectItem itemLabel="报损模板管理" itemValue="ASSET_SCRAP_TEMPLATE"/>
+                                <f:selectItem itemLabel="资产审核" itemValue="ASSET_APPROVE"/>
+                                <f:selectItem itemLabel="盘点工单" itemValue="ASSET_INVENTORY"/>
+                                <f:selectItem itemLabel="设备绩效记录" itemValue="ASSET_PERFORMANCE"/>
+                                <f:selectItem itemLabel="合同管理" itemValue="ASSET_CONTRACT"/>
+                                <f:selectItem itemLabel="供应商管理" itemValue="ASSET_SUPPLIER"/>
+                                <f:selectItem itemLabel="供应商评价" itemValue="ASSET_SUPPLIER_EVALUATION"/>
+                                <f:selectItem itemLabel="供应商负责人赋权" itemValue="ASSET_SUPPLIER_EMPOWERMENT"/>
+                                <f:selectItem itemLabel="重点医疗设备报表" itemValue="ASSET_KEYASSETDATAINPUT"/>
+                                <f:selectItem itemLabel="MVS设备信息导入" itemValue="ASSET_MVS_DATA"/>
+                                <f:selectItem itemLabel="设备超期" itemValue="ASSET_DEVICE_OVERDUE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="审批">
+                            <p:selectManyCheckbox id="approve" widgetVar="approve" value="#{tenantInfoController.selectedMenuFeaturesApprove}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="多级审批" itemValue="MULTILEVEL_APPROVE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="到货安装">
+                            <p:selectManyCheckbox id="install" widgetVar="install" value="#{tenantInfoController.selectedMenuFeaturesInstall}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="到货安装" itemValue="INSTALL"/>
+                                <f:selectItem itemLabel="核对入库" itemValue="INSTALL_CHECK"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="特种设备管理">
+                            <p:selectManyCheckbox id="specialAsset" widgetVar="specialAsset" value="#{tenantInfoController.selectedMenuFeaturesSpecialAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="特种设备管理" itemValue="SPECIAL_ASSET"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="备件管理">
+                            <p:selectManyCheckbox id="parts" widgetVar="parts" value="#{tenantInfoController.selectedMenuFeaturesParts}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="备件管理" itemValue="PARTS_APPLY"/>
+                                <f:selectItem itemLabel="简易备件管理" itemValue="PARTS"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="维修">
+                            <p:selectManyCheckbox id="repair" widgetVar="repair" value="#{tenantInfoController.selectedMenuFeaturesRepair}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="维修" itemValue="REPAIR"/>
+                                <f:selectItem itemLabel="常用故障及分类" itemValue="REPAIR_FAULTS"/>
+                                <f:selectItem itemLabel="排班管理" itemValue="REPAIR_ARRANGE"/>
+                                <f:selectItem itemLabel="核心组审核进度查看" itemValue="REPAIR_APPROVE_PROCESS"/>
+                                <f:selectItem itemLabel="休假管理" itemValue="REPAIR_VACATION"/>
+                                <f:selectItem itemLabel="不良事件" itemValue="REPAIR_ADVERSE"/>
+                                <f:selectItem itemLabel="报告模版管理" itemValue="REPAIR_TEMPLATE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="保养">
+                            <p:selectManyCheckbox id="maintain" widgetVar="maintain" value="#{tenantInfoController.selectedMenuFeaturesMaintain}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="保养" itemValue="MAINTAIN"/>
+                                <f:selectItem itemLabel="电气安全数据导入" itemValue="MAINTAIN_ELECTRICDATAIMPORT"/>
+                                <f:selectItem itemLabel="报表模版管理" itemValue="MAINTAIN_TEMPLATE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="计量">
+                            <p:selectManyCheckbox id="measure" widgetVar="measure" value="#{tenantInfoController.selectedMenuFeaturesMeasure}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="计量" itemValue="MEASURE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="日常检查">
+                            <p:selectManyCheckbox id="nursesite" widgetVar="nursesite" value="#{tenantInfoController.selectedMenuFeaturesNurseSite}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="日常检查" itemValue="NURSESITE"/>
+                                <f:selectItem itemLabel="开关机登记" itemValue="NURSESITE_RECORD"/>
+                                <f:selectItem itemLabel="使用登记" itemValue="NURSESITE_USING"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="知识文档">
+                            <p:selectManyCheckbox id="knowledge" widgetVar="knowledge" value="#{tenantInfoController.selectedMenuFeaturesKnowledge}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="知识文档" itemValue="KNOWLEDGE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="设备调剂">
+                            <p:selectManyCheckbox id="adjust" widgetVar="adjust" value="#{tenantInfoController.selectedMenuFeaturesAdjust}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="调剂中心" itemValue="ADJUST_ASSET"/>
+                                <f:selectItem itemLabel="排班管理" itemValue="ADJUST_ARRANGE"/>
+                                <f:selectItem itemLabel="科室借调" itemValue="ADJUST_DEPTMENT"/>
+                                <f:selectItem itemLabel="无人值守" itemValue="ADJUST_UNATTENDED"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="质控评审">
+                            <p:selectManyCheckbox id="audit" widgetVar="audit" value="#{tenantInfoController.selectedMenuFeaturesAudit}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="质控评审" itemValue="AUDIT"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="绩效分析">
+                            <p:selectManyCheckbox id="performance" widgetVar="performance" value="#{tenantInfoController.selectedMenuFeaturesPerformance}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="绩效分析" itemValue="PERFORMANCE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="预算管理">
+                            <p:selectManyCheckbox id="budget" widgetVar="budget" value="#{tenantInfoController.selectedMenuFeaturesBudget}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="预算管理" itemValue="BUDGET"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="His绩效分析">
+                            <p:selectManyCheckbox id="hisperformance" widgetVar="hisperformance" value="#{tenantInfoController.selectedMenuFeaturesHisPerformance}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="His绩效分析" itemValue="HISPERFORMANCE"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="报表中心">
+                            <p:selectManyCheckbox id="reportCenter" widgetVar="reportCenter" value="#{tenantInfoController.selectedMenuFeaturesReportCenter}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="报表中心" itemValue="REPORT_CENTER"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="资产管理一览">
+                            <p:selectManyCheckbox id="assetAccountDashboard" widgetVar="assetAccountDashboard" value="#{tenantInfoController.selectedMenuFeaturesAssetAccountDashboard}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="资产管理一览" itemValue="ASSET_ACCOUNT_DASHBOARD"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <p:fieldset legend="质控评审配置">-->
+<!--                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >-->
+<!--                                <p:ajax update="@this"/>-->
+<!--                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>-->
+<!--                            </p:selectManyCheckbox>-->
+<!--                        </p:fieldset>-->
+<!--                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <p:fieldset legend="MVS设备管理">
+                            <p:selectManyCheckbox id="mvsAsset" widgetVar="mvsAsset" value="#{tenantInfoController.selectedMenuFeaturesMvsAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="MVS设备管理" itemValue="MVS_ASSET"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="日志审计">
+                            <p:selectManyCheckbox id="logAudit" widgetVar="logAudit" value="#{tenantInfoController.selectedMenuFeaturesLogAudit}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="日志审计" itemValue="LOG_AUDIT"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:fieldset legend="系统配置">
+                            <p:selectManyCheckbox id="config" widgetVar="config" value="#{tenantInfoController.selectedMenuFeaturesConfigAssetGroup}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="资产分类" itemValue="CONFIG_ASSET_TYPE_GROUP"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="设备数据概览">
+                            <p:selectManyCheckbox id="deviceDataReview" widgetVar="deviceDataReview" value="#{tenantInfoController.selectedMenuFeaturesDeviceDataReview}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="设备数据概览" itemValue="DEVICEDATAPREVIEW"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:fieldset legend="供应商租户">
+                            <p:selectManyCheckbox id="supplierTenant" widgetVar="supplierTenant" value="#{tenantInfoController.selectedMenuFeaturesSupplierTenant}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="供应商租户" itemValue="SUPPLIER_TENANT"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:scrollPanel>
+        <p:commandButton validateClient="true" actionListener="#{tenantInfoController.saveFeature}" value="#{msg.Save}" update=":growl" icon="ui-icon-check"
+                         oncomplete="handleSubmit(args, 'NewSiteInfoEditVersionDialog');" />
+        &nbsp;&nbsp;
+        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel"
+                         onclick="PF('NewSiteInfoEditVersionDialog').hide()" />
+    </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

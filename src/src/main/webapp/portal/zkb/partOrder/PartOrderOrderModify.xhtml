@@ -38,12 +38,12 @@
                                     <label class="label">Order#*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.orderNo}" required="true" requiredMessage="#{msg.zkbPartOrder_orderNo} #{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{!userContextService.zkbUser}">
+                                <h:panelGroup rendered="#{!userContextService.zkbUser and empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <label class="label">价格*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.price}" required="true" requiredMessage="价格 #{msg.ValidationRequire}" />
                                 </h:panelGroup>
 
-                                <h:panelGroup>
+                                <h:panelGroup  rendered="#{empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <label class="label" >是否需要探头说明函*</label>
                                     <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="不需要" itemValue="f"/>
