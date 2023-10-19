@@ -43,7 +43,7 @@ public class BudgetApplicationExportService {
     public static final String OVER_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/over_fifty_thousand.docx";
     public static final String LESS_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/less_fifty_thousand.docx";
     public static final int TOTAL_SPLIT = 50000;
-    public static final String FILE_NAME_ROOT = "年度采购报表";
+    public static final String FILE_NAME_ROOT = "年度采购申报表";
 
 
     @Autowired
@@ -66,10 +66,10 @@ public class BudgetApplicationExportService {
         BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationId);
         BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetApplicationAssetId);
 
-        return exportZip(budgetApplication, budgetApplicationAsset);
+        return exportZip(budgetApplication, budgetApplicationAsset, null);
     }
 
-    public StreamedContent exportZip(BudgetApplication budgetApplication, BudgetApplicationAsset budgetApplicationAsset) throws IOException {
+    public StreamedContent exportZip(BudgetApplication budgetApplication, BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException {
         String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
 
         //1、doc模板部分
@@ -85,14 +85,14 @@ public class BudgetApplicationExportService {
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
-        String fileName = buildFileName(data, true);
+        String fileName = buildFileName(data, false);
         zout.putNextEntry(new ZipEntry(FILE_NAME_ROOT +"/" + fileName));
         IOUtils.write(bytes, zout);
         zout.closeEntry();
 
         //2、上传附件部分
         HashMap<String,Integer> nameMap = new HashMap<>();
-        List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
+        //List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
         if(blobObjects != null && blobObjects.size() > 0){
             for(V2_BlobObject v : blobObjects){
                 String fn = v.getObjectName();
@@ -143,7 +143,7 @@ public class BudgetApplicationExportService {
     public Map<String, Object> createReportData(BudgetApplication budgetApplication, BudgetApplicationAsset budgetApplicationAsset) throws IOException {
         Map<String, Object> mm = new HashMap<>();
         if(budgetApplicationAsset != null){
-            mm.put("deptName", budgetApplication.getApplicationDept().getName());
+            mm.put("deptName", budgetApplication.getApplicationDeptName());
             mm.put("assetName", budgetApplicationAsset.getApplicationAssetName());
             mm.put("num", budgetApplicationAsset.getApplicationQuantity());
             mm.put("price", budgetApplicationAsset.getApplicationPrice());
@@ -227,10 +227,10 @@ public class BudgetApplicationExportService {
                 mm.put("connectNetworkNo", yesTx);
             }
 
-            V2_BlobObject blobObject = blobObjectRepository.findById("402886818b3c5660018b3cc6b6000002");
+            /*V2_BlobObject blobObject = blobObjectRepository.findById("402886818b3c5660018b3cc6b6000002");
             StreamedContent sf = msService.downloadSingleFile(blobObject.getObjectStorageId());
             byte[] pictureBytes = IOUtils.toByteArray(sf.getStream());
-            mm.put("sign", new PictureRenderData(80, 25, "sign.png", pictureBytes));
+            mm.put("sign", new PictureRenderData(80, 25, "sign.png", pictureBytes));*/
 
         }
         return mm;

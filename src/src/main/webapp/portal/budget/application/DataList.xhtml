@@ -16,7 +16,7 @@
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
-            <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+            <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton exportZipButton"/>
             <p:ajax event="rowDblselect" listener="#{budgetController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
             <p:column headerText="#{msg.ApplicationNum}" >
                 <h:outputText value="#{item.applicationNum}"/>
@@ -84,6 +84,11 @@
                 </p:commandButton>
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
                                  disabled="#{empty budgetController.selected or budgetController.selected.applicationStatus ne 1}" actionListener="#{budgetController.delete}"  rendered="#{budgetController.tabIndex eq 0 }"/>
+                <p:commandButton id="exportZipButton" ajax="false" title="下载压缩文件" actionListener="#{budgetController.exportAll}"
+                                 disabled="#{empty budgetController.selected}"
+                                 icon="ui-icon-circle-triangle-s" class="btn btn-sm btn-gray">
+                    <p:fileDownload value="#{budgetController.exportFile}"/>
+                </p:commandButton>
             </f:facet>
         </p:dataTable>
     </h:form>

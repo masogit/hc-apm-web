@@ -9,6 +9,7 @@ import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -19,6 +20,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.fePartOrder.ZkbFePartOrderController;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -28,6 +31,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +45,12 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -90,6 +96,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     private UserContextService userContextService;
     private BudgetPersistService persistService;
+    private BudgetApplicationExportService budgetApplicationExportService;
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
@@ -108,6 +115,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
         budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        budgetApplicationExportService = WebUtil.getBean(BudgetApplicationExportService.class);
 
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -589,6 +597,28 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+
+    @Getter
+    @Setter
+    private StreamedContent exportFile;
+
+
+    public void exportAll()  {
+        try {
+            this.selected = this.dao.findById(selected.getId());
+            this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
+            this.selectedDept = this.selected.getApplicationDept();
+            this.selected.setApplicationDeptName(this.selectedDept.getName());
+            if(this.curSelectApplicationBudgetAsset!=null ){
+                this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
+            }
+            exportFile = budgetApplicationExportService.exportZip(selected, curSelectApplicationBudgetAsset, attachList);
+
+        }catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
