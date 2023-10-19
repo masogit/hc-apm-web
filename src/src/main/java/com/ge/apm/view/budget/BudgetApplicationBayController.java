@@ -1,0 +1,691 @@
+
+package com.ge.apm.view.budget;
+
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.BudgetAssetInfo;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.budget.BudgetPersistService;
+import com.ge.apm.service.common.SysRoleConstant;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
+import com.ge.apm.view.budget.form.BudgetSearchForm;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * @author Yangfan, Liu
+ */
+@ViewScoped
+@ManagedBean(name = "budgetBayController")
+public class BudgetApplicationBayController extends GenericCRUDUUIDController<BudgetApplication> {
+    private static Logger logger = LoggerFactory.getLogger(BudgetApplicationBayController.class);
+
+    private Page<BudgetApplication> emptyPage = new PageImpl<>(Collections.emptyList());
+    private UserAccount account = UserContextService.getCurrentUserAccount();
+    private Integer tabIndex = 0;
+    private Integer tabIndexList = 0;
+
+
+    public final static String CREATE_ACTION = "Create";
+    public final static String EDIT_ACTION = "Edit";
+    public final static String VIEW_ACTION = "View";
+
+    private BlobFileService blobService;
+    /**
+     * 编辑数据主键
+     */
+    private String editId;
+
+    private BudgetApplicationAsset curSelectApplicationBudgetAsset = new BudgetApplicationAsset();
+
+    private BudgetAssetInfo curSelectBudgetAssetInfo;
+
+    private List<V2_BlobObject> attachList;
+
+    // 弹窗列表
+    private List<BudgetApplicationAsset> optionalBudgetAssets = new ArrayList<>();
+
+    private List<SearchFilter> assetSearchFilters;
+
+    private BudgetApplicationRepository dao;
+    private BudgetAssetInfoRepository budgetAssetDao;
+    private BlobObjectRepository blobObjectRepository;
+
+    private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
+
+    private UserContextService userContextService;
+    private BudgetPersistService persistService;
+
+    private BudgetSearchForm searchForm = new BudgetSearchForm();
+    private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
+
+    private BudgetAssetInfo selectedAsset;
+
+    private OrgInfo org;
+    private CustomConfigObject customConfig;
+    private TreeNode orgTree;
+    private TreeNode orgTreeEdit;
+    private OrgInfo selectedDept;
+
+    @Override
+    protected void init() {
+        dao = WebUtil.getBean(BudgetApplicationRepository.class);
+        budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
+        budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+
+        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        persistService = WebUtil.getBean(BudgetPersistService.class);
+
+        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        org = orgDao.findById(account.getOrgInfoId());
+
+        CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(treeNode);
+        orgTreeEdit = initOrgTree(treeNodeEdit);
+        String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
+        this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
+        attachList = new ArrayList<>();
+        String tabIndexStr = (String) WebUtil.getRequestParameter("tabIndex");
+        if(StringUtils.isNotBlank(tabIndexStr)){
+            this.tabIndex = Integer.parseInt(tabIndexStr);
+        }
+        String tabIndexList = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "tabIndexList");
+        if(StringUtils.isNotBlank(tabIndexList)){
+            this.tabIndexList = Integer.parseInt(tabIndexList);
+        }
+        try {
+            curSelectApplicationBudgetAsset = new BudgetApplicationAsset();
+            if (BudgetApplicationBayController.CREATE_ACTION.equals(action)) {
+                this.prepareCreate();
+            } else if (BudgetApplicationBayController.EDIT_ACTION.equals(action)) {
+                this.prepareEdit();
+            } else if (BudgetApplicationBayController.VIEW_ACTION.equals(action)){
+                this.prepareView();
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected GenericRepositoryUUID<BudgetApplication> getDAO() {
+        return dao;
+    }
+
+    public List<BudgetAssetInfo> autoCompleteAssetName(String query) {
+        optionalBudgetAssets.clear();
+        if(selectedDept == null){
+            WebUtil.addErrorMessage("错误：请先选择科室！");
+            return null;
+        }
+        List<BudgetAssetInfo> assetInfoList = budgetAssetDao.findByTenantUIDAndIsDeleted(selectedDept.getTenantUID(),0);
+        assetInfoList = assetInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
+        return CollectionUtils.isNotEmpty(assetInfoList)?assetInfoList:new ArrayList<BudgetAssetInfo>();
+    }
+
+    public void onBudgetAssetInfoChange(){
+        this.curSelectApplicationBudgetAsset.setApplicationAssetCategory(this.curSelectBudgetAssetInfo.getApplicationAssetCategory());
+        this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
+        this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
+        this.curSelectApplicationBudgetAsset.setStandards(this.curSelectBudgetAssetInfo.getStandards());
+    }
+
+    public boolean curModelDisables(){
+        return "View".equals(crudActionName)?true:false;
+    }
+    public boolean curModelCreate(){
+        return "Create".equals(crudActionName)?true:false;
+    }
+
+    public void onTabChange(TabChangeEvent event) {
+        selected = null;
+        switch (event.getTab().getId()) {
+            case "s1":
+                tabIndex = 1;
+                break;
+            case "s2":
+                tabIndex = 2;
+                break;
+            case "s3":
+                tabIndex = 3;
+                break;
+            case "s4":
+                tabIndex = 4;
+                break;
+            default:
+                tabIndex = 0;
+                break;
+        }
+    }
+
+    protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
+        if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
+                ||userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+            this.searchFilters = this.getSearchFilter(this.tabIndex);
+        } else {
+            return emptyPage;
+        }
+        List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
+        return new PageImpl(dataList,pageRequest,dataList.size());
+    }
+
+
+    public List<SearchFilter> getSearchFilter(Integer tabIndex) {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ, BudgetApplication.OrderType.BAY.toString()));
+        updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
+        removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");
+        if (tabIndex == 0) {//待办
+            searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1,4)));
+        } else if(tabIndex == 1){//待审核
+            searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "PendingApproval"));
+        } else if(tabIndex == 2){//待完成
+            searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "PendingComplete"));
+        } else if(tabIndex == 3){//完成
+            searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "Complete"));
+        } else if(tabIndex == 4){//全部
+            searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
+        }
+        if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)) {
+            // 临床科室主任, 医学工程处主任
+            queryScope(org);
+        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+            // 临床科室人员
+            searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
+        }
+        return searchFilters;
+    }
+
+    /**
+     * 跳转新增模式
+     *
+     * @return
+     */
+    public String intoCreateModel(){
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+    }
+    /**
+     * 跳转编辑模式
+     *
+     * @return
+     */
+    public String intoEditModel() {
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+    }
+    /**
+     * 跳转查看模式
+     *
+     * @return
+     */
+    public String intoViewModel() {
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+    }
+
+    public void doubleClick(SelectEvent event) {
+        String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
+        String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+    public void saveApplication() {
+        this.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString());
+        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
+        this.editId = selected.getId();
+        actionMessage(isOk);
+    }
+
+    public String submitApplication() {
+        this.handleCommonField(selected,selectedDept,2,BudgetApplication.applicationStep.PendingApproval.toString());
+        boolean isOk = persistService.submitApplication(selected, this.curSelectApplicationBudgetAsset,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
+        return this.backList();
+    }
+    /**
+     * 取消申请单  审批不通
+     * @return
+     */
+    public String cancelApplicationN() {
+        this.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString());
+        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAP.toString());
+        actionMessage(isOk);
+        return this.backList();
+    }
+    public String compaleteApplication() {
+        this.handleCommonField(selected,selectedDept,6,BudgetApplication.applicationStep.Complete.toString());
+        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
+        actionMessage(isOk);
+        return this.backList();
+    }
+
+    public String cancelApplication() {
+        this.handleCommonField(selected,selectedDept,5,BudgetApplication.applicationStep.Complete.toString());
+        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
+        actionMessage(isOk);
+        return this.backList();
+    }
+
+    public String backList() {
+        return "List.xhtml?faces-redirect=true"+"&tabIndex="+tabIndexList;
+    }
+
+    public BudgetApplication handleCommonField(BudgetApplication budgetApplication, OrgInfo curDept,
+                                               Integer applicationStatus,String applicationStep ){
+        budgetApplication.setLastModifiedBy(account.getLoginName());
+        budgetApplication.setLastModifiedDate(new Date());
+
+
+        budgetApplication.setApplicationDept(curDept);
+        budgetApplication.setApplicationDeptId(curDept.getId());
+        budgetApplication.setTenantUID(curDept.getTenantUID());
+        budgetApplication.setInstitutionUID(curDept.getInstitutionUID());
+        budgetApplication.setHospitalUID(curDept.getHospitalUID());
+        budgetApplication.setSiteUID(curDept.getSiteUID());
+        budgetApplication.setApplicationStatus(applicationStatus);
+        budgetApplication.setApplicationStep(applicationStep);
+        budgetApplication.setOrderType(BudgetApplication.OrderType.BAY.toString());
+        budgetApplication.setTotalAmount(this.curSelectApplicationBudgetAsset.getApplicationAmount());
+        //设备信息
+        if(this.curSelectApplicationBudgetAsset.getCreatedDate()== null){
+            this.curSelectApplicationBudgetAsset.setCreatedDate(new Date());
+        }
+        this.curSelectApplicationBudgetAsset.setCreatedBy(account.getLoginName());
+        this.curSelectApplicationBudgetAsset.setLastModifiedBy(account.getLoginName());
+        this.curSelectApplicationBudgetAsset.setLastModifiedDate(new Date());
+        this.curSelectApplicationBudgetAsset.setTenantUID(curDept.getTenantUID());
+        this.curSelectApplicationBudgetAsset.setInstitutionUID(curDept.getInstitutionUID());
+        this.curSelectApplicationBudgetAsset.setHospitalUID(curDept.getHospitalUID());
+        this.curSelectApplicationBudgetAsset.setSiteUID(curDept.getSiteUID());
+        if("Create".equals(crudActionName)){
+            this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
+        }
+        return budgetApplication;
+    }
+
+    @Override
+    public void delete() {
+        BudgetApplication application = dao.findById(selected.getId());
+        boolean isOk = persistService.deleteApplication(selected);
+        selected = null;
+        WebUtil.addSuccessMessage("删除成功！");
+    }
+
+    public void saveAsset() {
+        // 保存时设置科室·
+        selectedAsset.setDept(selectedDept);
+        selectedAsset.setDeptId(selectedDept.getId());
+        selectedAsset.setTenantUID(selectedDept.getTenantUID());
+        selectedAsset.setInstitutionUID(selectedDept.getInstitutionUID());
+        selectedAsset.setHospitalUID(selectedDept.getHospitalUID());
+        selectedAsset.setSiteUID(selectedDept.getSiteUID());
+
+        boolean isOk = persistService.saveAsset(selectedAsset);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
+                + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
+                + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+    }
+
+    private void actionMessage(boolean isOk) {
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetApplication") + WebUtil.getMessage("Blank")
+                + WebUtil.getMessage(crudActionName) + WebUtil.getMessage("Blank")
+                + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+    }
+
+    public void search() {
+        selected = null;
+        clearSearchFilter();
+        addSearchFilter();
+    }
+
+    public void resetSearch() {
+        selected = null;
+        clearSearchFilter();
+        searchForm = new BudgetSearchForm();
+        addSearchFilter();
+    }
+
+    private void clearSearchFilter() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        } else {
+            searchFilters.clear();
+        }
+    }
+
+    private void addSearchFilter() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        if (null != searchForm.getDept()) {
+            OrgInfo orgInfo = searchForm.getDept();
+            queryScope(orgInfo);
+        }
+        if (null != searchForm.getDateStart()) {
+            updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE,  formatter.format(searchForm.getDateStart())));
+        }
+        if (null != searchForm.getDateEnd()) {
+            this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.LT, formatter.format(new DateTime(searchForm.getDateEnd()).plusDays(1).toDate())));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
+            updateSearchFilter(new SearchFilter("applicationNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicantName())) {
+            updateSearchFilter(new SearchFilter("applicantName", SearchFilter.Operator.EQ, searchForm.getApplicantName()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getAssetName())) {
+            updateSearchFilter(new SearchFilter("applicationAssetName", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
+        }
+    }
+    private void queryScope(OrgInfo org){
+        if(org == null) return;
+        switch (org.getOrgType()) {
+            case 4:
+                // 科室
+                searchFilters.add(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, org.getId()));
+                break;
+            case 3:
+                // 院区
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
+                break;
+            case 2:
+                // 医院
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
+                break;
+            case 1:
+                // 集团
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
+                break;
+            default:
+                // 租户
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+        }
+    }
+    public void calcAmount(BudgetApplicationAsset budgetApplicationAsset) {
+        if(budgetApplicationAsset.getApplicationPrice()!= null && budgetApplicationAsset.getApplicationQuantity()!= null){
+            budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
+                    .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP));
+        }
+    }
+
+    public void prepareCreateAsset() {
+        selectedAsset = new BudgetAssetInfo();
+        selectedAsset.setIsDeleted(0);
+        selectedAsset.setCreatedBy(account.getLoginName());
+        selectedAsset.setCreatedDate(new Date());
+        selectedAsset.setLastModifiedBy(account.getLoginName());
+        selectedAsset.setLastModifiedDate(new Date());
+    }
+
+    public TreeNode initOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return orgTree;
+    }
+
+    public void onSearchTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        searchForm.setDept(orgInfo);
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        selectedDept = orgInfo;
+        this.selected.setApplicationDeptName(selectedDept.getName());
+    }
+
+    public boolean show(String fieldKey) {
+        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) {
+            return true;
+        }
+        return customConfig.getAssetsEditpageStatusFields().contains(fieldKey);
+    }
+
+
+    public void clearSelected() {
+        if (StringUtils.isEmpty(selected.getId())) {
+            selected = null;
+        }
+    }
+
+    public void onSelect() {
+        if (selected != null && selected.getId() != null) {
+            selected = dao.findById(selected.getId());
+        }
+    }
+
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        crudActionName = "Create";
+        selectedDept = null;
+        selected = new BudgetApplication();
+        selected.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
+        selected.setApplicant(account);
+        selected.setApplicantId(account.getId());
+        selected.setApplicationDate(new Date());
+        selected.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
+        selected.setApprovalProgress(0);
+        selected.setBudgetApprovals(new HashSet<>());
+        selected.setIsDeleted(0);
+        selected.setCreatedBy(account.getLoginName());
+        selected.setCreatedDate(new Date());
+        selected.setLastModifiedBy(account.getLoginName());
+        selected.setLastModifiedDate(new Date());
+    }
+
+    @Override
+    public void prepareEdit() {
+        crudActionName = "Edit";
+        curDetail();
+    }
+
+    @Override
+    public void prepareView() {
+        crudActionName = "View";
+        curDetail();
+    }
+
+    public void curDetail(){
+        this.selected = this.dao.findById(this.editId);
+        this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
+        this.selectedDept = this.selected.getApplicationDept();
+        this.selected.setApplicationDeptName(this.selectedDept.getName());
+        if(this.curSelectApplicationBudgetAsset!=null ){
+            this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
+        }
+    }
+
+    public boolean budgetApprovalsDisplay(){
+        return (CollectionUtils.isNotEmpty(this.selected.getBudgetApprovals())&&this.selected.getBudgetApprovals().size()>0)?true:false;
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject && CollectionUtils.isNotEmpty(selected.getBudgetAssets())) {
+            attachList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET);
+            blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    @Override
+    public void prepareDelete() {
+        crudActionName = "Delete";
+    }
+
+
+    public Integer getTabIndex() {
+        return tabIndex;
+    }
+
+    public void setTabIndex(Integer tabIndex) {
+        this.tabIndex = tabIndex;
+    }
+
+    public BudgetSearchForm getSearchForm() {
+        return searchForm;
+    }
+
+    public void setSearchForm(BudgetSearchForm searchForm) {
+        this.searchForm = searchForm;
+    }
+
+    public BudgetAssetSearchForm getAssetSearchForm() {
+        return assetSearchForm;
+    }
+
+    public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
+        this.assetSearchForm = assetSearchForm;
+    }
+
+    public BudgetAssetInfo getSelectedAsset() {
+        return selectedAsset;
+    }
+
+    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
+        this.selectedAsset = selectedAsset;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getOrgTreeEdit() {
+        return orgTreeEdit;
+    }
+
+    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
+        this.orgTreeEdit = orgTreeEdit;
+    }
+
+    public OrgInfo getSelectedDept() {
+        return selectedDept;
+    }
+
+    public void setSelectedDept(OrgInfo selectedDept) {
+        this.selectedDept = selectedDept;
+    }
+
+    public String getEditId() {
+        return editId;
+    }
+
+    public void setEditId(String editId) {
+        this.editId = editId;
+    }
+
+    public BudgetApplicationAsset getCurSelectApplicationBudgetAsset() {
+        return curSelectApplicationBudgetAsset;
+    }
+
+    public void setCurSelectApplicationBudgetAsset(BudgetApplicationAsset curSelectApplicationBudgetAsset) {
+        this.curSelectApplicationBudgetAsset = curSelectApplicationBudgetAsset;
+    }
+
+    public List<V2_BlobObject> getAttachList() {
+        if(this.curSelectApplicationBudgetAsset!=null && StringUtils.isNotBlank(this.curSelectApplicationBudgetAsset.getId())){
+            attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
+        }
+        return attachList;
+    }
+
+    public void setAttachList(List<V2_BlobObject> attachList) {
+        this.attachList = attachList;
+    }
+
+    public BudgetAssetInfo getCurSelectBudgetAssetInfo() {
+        return curSelectBudgetAssetInfo;
+    }
+
+    public void setCurSelectBudgetAssetInfo(BudgetAssetInfo curSelectBudgetAssetInfo) {
+        this.curSelectBudgetAssetInfo = curSelectBudgetAssetInfo;
+    }
+
+
+}

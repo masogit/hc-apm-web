@@ -36,7 +36,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -47,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -105,7 +103,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     @Autowired
     private AssetInfoToBeTerminatedService assetInfoToBeTerminatedService;
 
-
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
         logger.info("approvableTarget" + approvableTarget);
@@ -155,7 +152,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     /**
      * 获取指定审核人列表
-     *
      * @return
      */
     public MultiLevelApprovalConfig getApproveWorkflowConfig(String approvalUid) {
@@ -321,8 +317,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
-                // 预算管理
-                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED);
+                // 预算管理 审批不通过
+                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.applicationStep.ToSubmitted.toString());
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
@@ -410,6 +406,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * @return MultiLevelApprovalConfig
      * @date 2020/7/30 16:00
      * 根据金额查询审批配置信息
+     *
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
@@ -645,7 +642,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                                 // 预算管理
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED);
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.applicationStep.PendingComplete.toString());
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
@@ -732,7 +729,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS);
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.applicationStep.PendingApproval.toString());
                             }
                             String linkUrl;
                             switch (multiLevelApproval.getBusinessType()) {
@@ -944,13 +941,25 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
-    private void updateBudget(String businessUid, Integer approvalStatus) {
+    private void updateBudget(String businessUid, Integer approvalStatus,String applicationStep) {
         BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
         budget.setApplicationStatus(approvalStatus);
-        budget.setApprovalProgress(budget.getApprovalProgress() + 1);
+        budget.setApplicationStep(applicationStep);
+        //budget.setApprovalProgress(budget.getApprovalProgress() + 1);
         budget.setApproverId(UserContextService.getCurrentUserAccount().getId());
         budget.setApprovalDate(new Date());
         budgetApplicationRepository.save(budget);
+    }
+
+    // 预算管理
+    public void cancelApplication(String businessUid, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+        budget.setApplicationStatus(approvalStatus);
+        budget.setApplicationStep(applicationStep);
+        budgetApplicationRepository.save(budget);
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(budget.getBudgetApprovals())){
+            multiLevelApprovalRepository.delete(budget.getBudgetApprovals());
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
