@@ -141,7 +141,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
             }
             selected = purchaseBudgetConfigRepository.save(selected);
         }
-        //purchaseBudgetConfigService.sendWxMsg(selected);
+        purchaseBudgetConfigService.sendWxMsg(selected);
         selected = null;
     }
 
