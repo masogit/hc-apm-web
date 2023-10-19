@@ -111,7 +111,7 @@ public class BudgetApplicationExportService {
 
         zout.close();
 
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", encoding(base)+".zip");
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
     }
 
