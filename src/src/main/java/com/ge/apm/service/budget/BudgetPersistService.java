@@ -1,12 +1,10 @@
-package com.ge.apm.view.budget;
+package com.ge.apm.service.budget;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.ApprovalNode;
-import com.ge.apm.domain.MultiLevelApproval;
-import com.ge.apm.domain.MultiLevelApprovalConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.mapper.BudgetApplicationMapper;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
@@ -23,14 +21,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
- * @author Yangfan, Liu
- * @date 4/9/2022 16:51
+ * LYJ
+ * 2023.10.18
  */
 @Service
 public class BudgetPersistService {
@@ -48,16 +47,33 @@ public class BudgetPersistService {
     private MultiLevelApprovalRepository approvalDao;
     @Autowired
     private MultiLevelApprovalService approvalService;
+    @Autowired
+    private BudgetApplicationMapper budgetApplicationMapper;
+
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application, List<BudgetApplicationAsset> deletedBudgetAssets) {
-        boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
-        application.getBudgetAssets().forEach(a -> Optional.of(a.isNew()).filter(b -> b).ifPresent(b -> a.setId(null)));
-
-        // 新增
-        if (!isEditAction) {
+    public boolean saveApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,BudgetAssetInfo budgetAssetInfo,String orderType) {
+        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
+        if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
             // 保存以获得ID
-            application = budgetApplicationDao.save(application);
+            this.genApplicationNum(application,orderType);
+        }
+        application = budgetApplicationDao.save(application);
+        budgetApplicationAsset.setApplicationNum(application.getApplicationNum());
+        budgetApplicationAsset.setApplicationDeptId(application.getApplicationDeptId());
+        budgetApplicationAsset.setApplicationId(application.getId());
+        budgetApplicationAssetSet.add(budgetApplicationAssetDao.save(budgetApplicationAsset));
+        application.setBudgetAssets(budgetApplicationAssetSet);
+        return true;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean submitApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,BudgetAssetInfo budgetAssetInfo,String orderType) {
+        this.saveApplication(application,budgetApplicationAsset,budgetAssetInfo,orderType);
+        boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
+       /* if (true) {*/
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
             MultiLevelApproval approval = generateApproval(application, approvalConfig);
             if (approval == null) {
@@ -71,7 +87,7 @@ public class BudgetPersistService {
                 budgetApplicationDao.save(application);
                 sendMsg(application, approvalConfig);
             }
-        } else {
+       /* } else {
             // 编辑
             Set<MultiLevelApproval> budgetApprovals = application.getBudgetApprovals();
             MultiLevelApprovalConfig newApprovalConfig = approvalService.getFirstApprovalList(application, false);
@@ -114,18 +130,17 @@ public class BudgetPersistService {
                 }
             }
             budgetApplicationDao.save(application);
-            // 删除逻辑
-            List<BudgetApplicationAsset> deletedAssets = deletedBudgetAssets.stream().filter(a -> StringUtils.isNotEmpty(a.getId())).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(deletedAssets)) {
-                budgetApplicationAssetDao.delete(deletedAssets);
-            }
-        }
+
+        }*/
         return true;
     }
 
+
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteApplication(BudgetApplication application) {
-        approvalDao.delete(application.getBudgetApprovals());
+        if(CollectionUtils.isNotEmpty(application.getBudgetApprovals())){
+            approvalDao.delete(application.getBudgetApprovals());
+        }
         application.setIsDeleted(1);
         budgetApplicationDao.save(application);
         return true;
@@ -172,7 +187,6 @@ public class BudgetPersistService {
         });
         return approval.get();
     }
-
     private void sendMsg(BudgetApplication application, MultiLevelApprovalConfig config) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
@@ -208,4 +222,34 @@ public class BudgetPersistService {
         budgetAssetInfoDao.save(assetInfo);
         return true;
     }
+    /**
+     * 回退列表
+     *
+     * @param
+     * @return
+     */
+    public String backList() {
+        return "List.xhtml?faces-redirect=true";
+    }
+
+    /**
+     * 给申请单添加单号和索引
+     *
+     * @param
+     * @return
+     */
+    private BudgetApplication genApplicationNum(BudgetApplication budgetApplication, String orderType) {
+        Object o = budgetApplicationDao.getMaxIndex(orderType );
+        int index = o == null ? 0 : Integer.parseInt(o.toString());
+        index++;
+        String applicationNum = orderType + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        budgetApplication.setApplicationNum(applicationNum);
+        budgetApplication.setApplicationNumIndex(index);
+        return budgetApplication;
+    }
+
+    public List<BudgetApplication> loadDataList(List<SearchFilter> searchFilters){
+        return budgetApplicationMapper.loadDataList(searchFilters);
+    }
+
 }

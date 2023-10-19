@@ -6,6 +6,7 @@ import com.ge.apm.domain.pure.AssetWorkOrder;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class AssetWorkOrderService {
     @Autowired
     UaaService uaaService;
 
-    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate){
+    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate, Set<String> assetTypeGroupEncodedSet){
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         ZoneId zone = ZoneId.systemDefault();
@@ -87,6 +88,10 @@ public class AssetWorkOrderService {
             LocalDate endLocalDate = LocalDateTime.ofInstant(endDate.toInstant(), zone).toLocalDate();
             SearchFilter searchStrFilter = new SearchFilter("createdDateEnd", SearchFilter.Operator.LT, Date.from(endLocalDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant()));
             searchFilters.add(searchStrFilter);
+        }
+
+        if (ObjectUtil.isNotEmpty(assetTypeGroupEncodedSet)) {
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet));
         }
 
 

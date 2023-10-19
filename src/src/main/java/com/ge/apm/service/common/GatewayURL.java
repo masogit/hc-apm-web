@@ -129,6 +129,8 @@ public enum GatewayURL {
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
     PURCHASE_BUDGET_CONFIG_SEND_WX_MESSAGE("/hcapmassetservice/api/apm/budget/config/sendWeChatMessages"),
 
+    SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/sendWeChat"),
+
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
 
     SMS_VERIFICATION_CODE("/hcapmreportservice/api/apm/report/partOrder/sendTheVerificationCode"),
@@ -160,6 +162,11 @@ public enum GatewayURL {
     INSERT_BUSINESS_ERROR_LOG("/hcapmelasticservice/businessErrorLog/insertBusinessErrorLog"),
     // jimureport
     JI_MU_REPORT("/apmReport/jmreport/view"),
+
+    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+
+    // davinci
+    DAVINCI_EXTERNAL("/davinci/externalSharePageLink")
 
     ;
     private final String url;
