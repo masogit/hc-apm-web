@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**
- * @author Yangfan, Liu
+ * @author liyongjian
  */
 public interface BudgetApplicationAssetRepository extends GenericRepositoryUUID<BudgetApplicationAsset> {
 
@@ -19,4 +19,9 @@ public interface BudgetApplicationAssetRepository extends GenericRepositoryUUID<
             " left join budget_application_asset tb on ta.id = tb.application_id" +
             " where ta.is_deleted = 0 and tb.application_asset_id = ?1")
     Integer countByApplicationAssetId(String budgetAssetId);
+
+    BudgetApplicationAsset findByApplicationId(String applicationId);
+
+
+
 }

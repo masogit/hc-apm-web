@@ -26,6 +26,17 @@ public class BudgetAssetInfo implements Serializable {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(name = "id", columnDefinition = "CHAR(32)")
     private String id;
+    /**
+     * *设备品类
+     */
+    @Column(name = "application_asset_category")
+    private String applicationAssetCategory;
+
+    /**
+     * *规格
+     */
+    @Column(name = "standards")
+    private String standards;
 
     // 设备名
     @Column(name = "name")
@@ -42,7 +53,7 @@ public class BudgetAssetInfo implements Serializable {
     @Column(name = "asset_group_secondary")
     private Integer assetGroupSecondary;
 
-    // 设备品牌
+    // 推荐设备品牌
     @Column(name = "asset_brand")
     private String assetBrand;
 
@@ -126,6 +137,22 @@ public class BudgetAssetInfo implements Serializable {
         }
         BudgetAssetInfo other = (BudgetAssetInfo) object;
         return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+    }
+
+    public String getApplicationAssetCategory() {
+        return applicationAssetCategory;
+    }
+
+    public void setApplicationAssetCategory(String applicationAssetCategory) {
+        this.applicationAssetCategory = applicationAssetCategory;
+    }
+
+    public String getStandards() {
+        return standards;
+    }
+
+    public void setStandards(String standards) {
+        this.standards = standards;
     }
 
     public String getId() {
