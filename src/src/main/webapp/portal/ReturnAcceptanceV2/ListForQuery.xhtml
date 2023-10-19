@@ -73,9 +73,18 @@
                                      </p:column>
                                </c:if>
                                <c:if test="#{columnItem eq 'departNum'}">
-                                   <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE">
-                                        <h:outputText value="#{item.assetNumber}"/>
-                                    </p:column>
+                                   <c:choose>
+                                   <c:when test="#{userContextService.hasCurrentTenantName('')}">
+                                       <p:column headerText="设备二维码" sortBy="#{item.qr_code}" filterBy="#{item.qr_code}" filterMatchMode="LIKE">
+                                           <h:outputText value="#{item.qrCode}"/>
+                                       </p:column>
+                                   </c:when>
+                                   <c:otherwise>
+                                       <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE">
+                                           <h:outputText value="#{item.assetNumber}"/>
+                                       </p:column>
+                                   </c:otherwise>
+                                   </c:choose>
                                </c:if>
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
                                <c:if test="#{columnItem eq 'swapName'}">

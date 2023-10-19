@@ -8,6 +8,9 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PinyinUtil;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -48,6 +51,33 @@ public class UserAccount implements ChineseName, Serializable {
 	public static final int SALT_SIZE = 8;
 	public static final int LI_XIANG = -1;
 
+	/**
+	 * 历史操作类型
+	 */
+	public enum HistoryAction {
+		CREATE("新增"),
+		DELETE("删除"),
+		UPDATE("修改"),
+		UPDATE_ROLE("修改角色"),
+		UPDATE_ORG("修改访问权限"),
+		RESET_PASSWORD("重置密码"),
+		IMPORT_CREATE("导入新增用户"),
+		IMPORT_CREATE_ROLE("导入修改用户"),
+		IMPORT_CREATE_ORG("导入新增访问权限"),
+		IMPORT_UPDATE("导入修改用户"),
+		IMPORT_UPDATE_ROLE("导入修改角色"),
+		IMPORT_UPDATE_ORG("导入修改访问权限");
+
+		private final String value;
+
+		HistoryAction(String value){
+			this.value = value;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -224,7 +254,7 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
-	private List<UserRole> userRoleList;
+	private List<UserRole> userRoleList = ListUtil.newArrayList();
 
 	@Column(name = "org_id")
 	@Basic(optional = false)
@@ -268,7 +298,7 @@ public class UserAccount implements ChineseName, Serializable {
 	private String geSso;
 
 	@Column(name = "is_deleted")
-	private Boolean isDeleted;//是否删除
+	private Boolean isDeleted = false;//是否删除
 
 	@Column(name = "comment")
 	private String comment;
@@ -277,6 +307,17 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Column(name = "account_creation_type")
 	private Integer accountCreationType;
+
+	@Column(name = "app_alias", length = 40)
+	private String appAlias;
+
+	public String getAppAlias() {
+		return appAlias;
+	}
+
+	public void setAppAlias(String appAlias) {
+		this.appAlias = appAlias;
+	}
 
 	public Integer getAccountCreationType() {
 		return accountCreationType;
@@ -317,16 +358,28 @@ public class UserAccount implements ChineseName, Serializable {
 	private String importRoleNames;
 	
 	@Transient
-	private List<UserOrgInfo> listUserOrgInfo;
+	private List<UserOrgInfo> listUserOrgInfo = ListUtil.newArrayList();
 	
 	@Transient
-	private List<UserRole> listImportUserRole;
+	private List<UserRole> listImportUserRole = ListUtil.newArrayList();
 	
 	@Transient
-	private List<UserOrgInfo> listImportUserOrgInfo;
-	
+	private List<UserOrgInfo> listImportUserOrgInfo = ListUtil.newArrayList();
+
 	@Transient
 	private boolean isGeSSO=false;
+
+	@Transient
+	@Getter @Setter
+	private List<AssetTypeGroup> assetTypeGroupList;
+
+	@Transient
+	@Getter @Setter
+	private Map<String, AssetTypeGroup> assetTypeGroupMap;
+
+	@Transient
+	@Getter @Setter
+	private boolean enableAssetTypeGroup = false;
 
 	public String getUserTagsView(){
 		String userTagsView = "";

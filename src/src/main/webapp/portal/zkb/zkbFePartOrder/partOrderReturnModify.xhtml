@@ -10,13 +10,28 @@
     <p:dialog id="zkbPartOrderRetrunModifyDlg" widgetVar="zkbPartOrderRetrunModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还信息修改" width="70%" height="620" closable="false">
         <h:form id="zkbOrderRetrunModifyForm" style="height: 100%">
             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
-                <h:panelGroup>
+                <h:panelGroup rendered="#{!(zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
                     <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                     <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
-                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
+                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup " />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
+                    <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
+                    <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
+                        <p:ajax event="change"  update="geAdminNgeComment" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnTypeNotGe')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                    <h:panelGroup id="geAdminNgeComment">
+                        <h:panelGroup  rendered="#{zkbFePartOrderProbeController.selected.returnType eq 'notRepaired'}">
+                            <label class="label">原因*</label>
+                            <p:inputTextarea  value="#{zkbFePartOrderProbeController.selected.geAdminNgeComment}"  >
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </h:panelGroup>
                 </h:panelGroup>
                 <h:panelGroup id="partSerialNumberGroup" style="text-align: left">
                     <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.returnType eq 'DOA')}" style="text-align: left">
@@ -41,7 +56,7 @@
                     <label class="label">#{msg.zkbFePartOrder_returnDate1}*</label>
                     <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
-                <h:panelGroup>
+                <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.notGeAsset != 't')}">
                     <label class="label">#{msg.zkbFePartOrder_newCatSn}*</label>
                     <p:inputText  value="#{zkbFePartOrderProbeController.selected.newCatSn}" required="true" requiredMessage="#{msg.zkbFePartOrder_newCatSn} #{msg.ValidationRequire}" />
                 </h:panelGroup>

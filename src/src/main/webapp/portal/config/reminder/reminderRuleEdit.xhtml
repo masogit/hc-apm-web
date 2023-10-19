@@ -46,8 +46,15 @@
                             <f:selectItem itemLabel="#{msg.False2No}" itemValue="1"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">是否通用<span style="color:red">*</span></label>-->
+<!--                        <p:selectOneRadio id="valueuniversal" value="#{reminderRuleController.selected.universal}" required="#{reminderRuleController.apm}" style="width: 15%;">-->
+<!--                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>-->
+<!--                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>-->
+<!--                        </p:selectOneRadio>-->
+<!--                    </h:panelGroup>-->
                 </p:panelGrid>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{reminderRuleController.save}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{reminderRuleController.save('base')}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('reminderRuleEditDialog').hide()"/>
             </h:form>
         </p:dialog>

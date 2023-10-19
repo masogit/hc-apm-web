@@ -256,6 +256,11 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
         return "";
     }
 
+    public String getDefaultValue(String key) {
+        ConfigItem configItem = dao.findByDefaultValueForKey(key);
+        return null == configItem ? "" : configItem.getDefaultValue();
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }

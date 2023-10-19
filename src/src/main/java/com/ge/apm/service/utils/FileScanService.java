@@ -8,6 +8,7 @@ package com.ge.apm.service.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.UUID;
 import org.primefaces.model.UploadedFile;
@@ -32,7 +33,7 @@ public class FileScanService {
     //save for file scan
     public String saveUploadedFile(UploadedFile file) throws Exception {
         String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
-        return saveFile(file, folderName, file.getFileName());
+        return saveFile(file, folderName, URLEncoder.encode(file.getFileName()));
     }
 
     public String saveBatchUploadedFile(UploadedFile file, String fileType) throws Exception {

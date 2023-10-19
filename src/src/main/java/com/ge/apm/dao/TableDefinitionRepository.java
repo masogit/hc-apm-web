@@ -23,6 +23,9 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
     @Query("select o from TableDefinition o where o.tenantUID = ?1 and o.status='Released'")
 	public List<TableDefinition> findByTenantUID(String tenantUID);
 
+    @Query("select o from TableDefinition o where o.tenantUID = ?1")
+    public List<TableDefinition> findAllByTenantUID(String tenantUID);
+
         @Query("select o from TableDefinition o where o.baseId = ?1 and o.status='Released'")
         public TableDefinition findByBaseId(String baseId);
     public TableDefinition findById(String ID);

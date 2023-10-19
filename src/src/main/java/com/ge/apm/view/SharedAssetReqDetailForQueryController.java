@@ -216,7 +216,12 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (queryIndex == 1){
             this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
         }
-
+        if (filterBeginTime != null){
+            this.updateSearchFilter(new SearchFilter("charging_begin_time", SearchFilter.Operator.GTE,filterBeginTime));
+        }
+        if (filterEndTime != null){
+            this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.LTE,filterEndTime));
+        }
         Wrapper wrapper = sharedAssetReqDetailService.buildDefaultFilters(searchFilters);
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
 //            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));

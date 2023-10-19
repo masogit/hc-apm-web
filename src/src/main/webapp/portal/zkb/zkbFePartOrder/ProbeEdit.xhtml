@@ -23,7 +23,7 @@
                         <label class="label">#{msg.zkbFePartOrder_sr}</label>
                         <p:inputText id="probeFatherPartOrderNo" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
-                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder probeMessages"/>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(zkbFePartOrderDetailController.selected.notGeAsset,param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder probeMessages"/>
                 </p:panelGrid>
                 </h:form>
                 <h:form id="zkbFePartOrderProbeForm">
@@ -31,13 +31,21 @@
                              widgetVar="probeZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderProbeController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderProbeController.selectedWorkFlow}"  update="zkbFePartOrderProbeEditForm:zkbContractDatalist_probe zkbFePartOrderProbeEditForm probeMessages" />
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderProbeController.selectedWorkFlow(zkbFePartOrderDetailController.selected.notGeAsset)}"  update="zkbFePartOrderProbeEditForm:zkbContractDatalist_probe zkbFePartOrderProbeEditForm probeMessages" />
                     <p:column headerText="报修单号">
                         <h:outputText value="#{item.partOrderNo}"/>
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_sr}">
                         <h:outputText value="#{item.sr}"/>
                     </p:column>
+                    <p:column rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't'}" headerText="二维码">
+                        <h:outputText value="#{item.qrCode}"/>
+                    </p:column>
+
+                    <p:column headerText="主机序列号" rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't'}" >
+                        <h:outputText value="#{item.departNum}"/>
+                    </p:column>
+
                     <p:column headerText="#{msg.zkbFePartOrder_functionType}">
                         <h:outputText value="#{item.functionType}"/>
                     </p:column>
@@ -128,6 +136,10 @@
                             <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderProbeController.selected.reportDate}"
                                         showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't'}" >
+                            <label class="label">设备品牌</label>
+                            <p:inputText id="manufacture" readonly="true" disabled="true" value="#{zkbFePartOrderProbeController.selected.manufacture}"  />
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{'1'.equals(zkbFePartOrderProbeController.selected.assetGroup)}">
                             <label class="label">#{msg.zkbFePartOrder_assetTypeDi}*</label>
                             <p:selectOneMenu  disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.assetTypeDi}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetTypeDi} #{msg.ValidationRequire}">
@@ -171,17 +183,31 @@
                             <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.zkbPoProbeQuotaType}" required="true" requiredMessage="#{msg.zkbFePartOrder_deductType} #{msg.ValidationRequire}">
                                 <p:ajax update="valueType valueTypeGroup" listener="#{zkbFePartOrderProbeController.initZknPartCat}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{zkbFePartOrderProbeController.getZkbPoProbeQuotaType(zkbFePartOrderDetailController.selected.notGeAsset)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbFePartOrderProbeController.showZkbhighCatFlag}">
-                            <label class="label">是否高值探头*</label>
-                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="valueType valueTypeGroup" />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemLabel="是" itemValue="t"/>
-                                <f:selectItem itemLabel="否" itemValue="f"/>
-                            </p:selectOneMenu>
+                            <c:choose>
+                                <c:when test="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't' }">
+                                    <label class="label">是否高值探头*</label>
+                                    <p:selectOneMenu disabled="true" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                                        <p:ajax event="change" update="valueType valueTypeGroup" />
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu style="display: none" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </c:when>
+                                <c:otherwise>
+                                    <label class="label">是否高值探头*</label>
+                                    <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                                        <p:ajax event="change" update="valueType valueTypeGroup" />
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="是" itemValue="t"/>
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </c:otherwise>
+                            </c:choose>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbFePartOrder_phenomenon}</label>
@@ -220,15 +246,19 @@
                             </p:selectOneMenu>
                             <label style="color: red">#{zkbFePartOrderProbeController.noHighCatTips}</label>
                         </c:if>
-                        <c:if test="#{!zkbFePartOrderProbeController.checkShowSN()}">
+                        <c:if test="#{(!zkbFePartOrderProbeController.checkShowSN()) and (zkbFePartOrderDetailController.selected.notGeAsset eq 'f')}">
                             <label class="label">#{msg.zkbFePartOrder_zkbPartOrderCat}*</label>
                             <p:autoComplete disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" dropdown="true" value="#{zkbFePartOrderProbeController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.zkbFePartOrder_zkbPartOrderCat} #{msg.ValidationRequire}"
                                             completeMethod="#{zkbFePartOrderProbeController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                                 <p:ajax event="itemSelect" update="valueTypeGroup"  />
                             </p:autoComplete>
                         </c:if>
+                        <c:if test="#{(!zkbFePartOrderProbeController.checkShowSN()) and (zkbFePartOrderDetailController.selected.notGeAsset eq 't')}">
+                            <label class="label">#{msg.zkbFePartOrder_zkbPartOrderCat}*</label>
+                            <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.catModelNonGe}" required="true" requiredMessage="#{msg.zkbFePartOrder_zkbPartOrderCat} #{msg.ValidationRequire}" />
+                        </c:if>
                     </h:panelGroup>
-                    <h:panelGroup id="valueTypeGroup">
+                    <h:panelGroup id="valueTypeGroup" rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 'f'}">
                         <c:if test="#{!zkbFePartOrderProbeController.checkShowSN()}">
                         <label class="label">#{msg.zkbFePartOrder_valueType}</label>
                         <p:inputText  value="#{fieldMsg.fieldValue('zkbPoValueType',zkbFePartOrderProbeController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
@@ -267,7 +297,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.notGeAsset.equals('t')}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}" value="#{zkbFePartOrderProbeController.selected.newCatFlag}" >
                             <p:ajax event="change" update="managementFieldset confirmMessage thisDeductionMessage" />
@@ -317,18 +347,18 @@
                         <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.orderNo}"  />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')) and (zkbFePartOrderDetailController.fourHundredStatus())}" >
+                    <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')) and (zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}" >
                         <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.price}"   />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
+                    <h:panelGroup rendered="#{(zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondNewCatFlag}"  >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()  and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <c:choose>
                             <c:when test="#{zkbFePartOrderProbeController.selected.needLetterFlag eq 't' and 'f' eq zkbFePartOrderProbeController.selected.hasUploadLetter}">
                                 <label class="label" style="color: red!important;font-weight:100;font-size :xx-large ">#{msg.zkbFePartOrder_needProbeLetter}*</label>
@@ -392,7 +422,7 @@
                 </p:panel>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbFePartOrderProbeController.selected.notGeAsset eq't')}">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                         <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  >
@@ -437,8 +467,41 @@
                         <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>
                     </h:panelGroup>
                 </p:panelGrid>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{(zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
+                    <h:panelGroup >
+                        <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
+                        <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  >
+                            <p:ajax event="change"  update="geAdminNgeComment" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnTypeNotGe')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="geAdminNgeComment">
+                        <h:panelGroup  rendered="#{zkbFePartOrderProbeController.selected.returnType eq 'notRepaired'}">
+                            <label class="label">原因*</label>
+                            <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminNgeComment}" rows="2" cols="20">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_airWayBillNo}*</label>
+                        <p:inputText  value="#{zkbFePartOrderProbeController.selected.waybillNo}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"   />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_returnDate1}*</label>
+                        <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_remark}</label>
+                        <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminComment}" rows="2" cols="20">
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderReturnModifyRight()}">
+                        <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>
+                    </h:panelGroup>
+                </p:panelGrid>
             </p:fieldset>
-            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" style="float:left"/>
                 <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
                     <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
                 </p:commandButton>

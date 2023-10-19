@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
@@ -56,6 +58,7 @@ public class CustomConfigService {
         return customConfigDao.findBySiteUID(siteUID);
     }
 
+    @Cacheable(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
     public CustomConfigObject getCurrentCustomConfig(String siteUid) {
         OrgInfo org = orgDao.findByUid(siteUid);
         if (configService.isInsulateTenant(org.getTenantUID())) {
@@ -79,6 +82,7 @@ public class CustomConfigService {
         return defaultConfig;
     }
 
+    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#selectSite.siteUID")
     public void saveConfig(OrgInfo selectSite, CustomConfigObject customConfigObject) {
         CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if (config == null) {
@@ -98,6 +102,7 @@ public class CustomConfigService {
         customConfigDao.save(config);
     }
 
+    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#selectSite.siteUID")
     public void removeConfig(OrgInfo selectSite) {
         CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if (null != config) {
@@ -157,6 +162,11 @@ public class CustomConfigService {
 
         List<String> localizedExportFields = exportFields.stream()
                 .map(item -> CustomConfigConstant.getExportOrImportFields().get(item)).collect(Collectors.toList());
+
+        if (localizedExportFields.contains(WebUtil.getMessage("assetTypeGroup"))
+                && !localizedExportFields.contains(WebUtil.getMessage("assetTypeGroupEncoded"))) {
+            localizedExportFields.add(WebUtil.getMessage("assetTypeGroupEncoded"));
+        }
 
         //uuid is required to export, but not in custom config fields, so include it here.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);

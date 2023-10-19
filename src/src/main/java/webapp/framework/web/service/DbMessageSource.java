@@ -27,6 +27,7 @@ public final class DbMessageSource extends ResourceBundleMessageSource {
     private static final String TYPE_LABEL = "label";
     private static final String TYPE_MESSAGE = "message";
     private static final String TYPE_FIELD_NAME = "field_name";
+    private static final String TYPE_CUSTOM = "customI18n";
 
     public static Map<String, I18nMessage> getMessageCache(int siteId){
         if(msgCache==null) reLoadMessages();
@@ -168,7 +169,7 @@ public final class DbMessageSource extends ResourceBundleMessageSource {
             String msgType = msg.getMsgType();
             String msgKey = msg.getMsgKey();
             
-            if(!TYPE_LABEL.equals(msgType) && !TYPE_FIELD_NAME.equals(msgType) && !TYPE_MESSAGE.equals(msgType))
+            if(!TYPE_LABEL.equals(msgType) && !TYPE_FIELD_NAME.equals(msgType) && !TYPE_MESSAGE.equals(msgType) && !TYPE_CUSTOM.equals(msgType))
                 msgKey = String.format("%s-%s", msgType, msgKey);
 
             msgKey = msgKey.toLowerCase();

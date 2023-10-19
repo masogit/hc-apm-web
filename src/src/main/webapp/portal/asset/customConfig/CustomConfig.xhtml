@@ -85,8 +85,9 @@
                                         <h:outputText />
                                         <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('UsingFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
                                     </f:facet>
-                                    <p:commandLink value="#{msg.Update}" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()" style="padding:10px"/>
-                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.removeAssetField(item.key)}" disabled="#{customConfigController.isSystemFields(item.key)}" update=":customConfigForm"/>
+                                    <p:commandLink value="#{msg.Update}" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()" />
+                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.removeAssetField(item.key)}" disabled="#{customConfigController.isSystemFields(item.key)}" update=":customConfigForm" style="padding:10px"/>
+                                    <p:commandLink value="修改名称" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsRenameForm" disabled="#{not customConfigController.isRenameFields(item.key)}" oncomplete="PF('AssetFieldsRenameDialog').show()" />
                                 </p:column>
                             </p:dataTable>
                         </p:tab>
@@ -96,9 +97,7 @@
                                 <p:column headerText="#{msg.DisplayedField}">
                                     <h:outputText value="#{customConfigController.allFields[item]}" />
                                 </p:column>
-                                <!--                            <p:column headerText="列宽%">
-                                                                <h:outputText value="#{customConfigController.customConfigObject.assetFields[item].widthInListPage}" />
-                                                            </p:column>-->
+
                                 <p:column headerText="#{msg.Operation}">
                                     <f:facet name="header" >
                                         <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('ListPageFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
@@ -206,11 +205,6 @@
                                         <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
                                         <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                         <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
-                                        <!--                                        <h:panelGroup style="float:right;padding-left: 5px">
-                                                                                    <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="上移"  update=":customConfigForm "   disabled="false"/>
-                                                                                    <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="下移"  update=":customConfigForm "  disabled="false"/>
-                                                                                    <p:selectBooleanCheckbox style="padding-left: 5px"  label="显示" value="#{groupItem.show}" />
-                                                                                </h:panelGroup>-->
                                     </p:fieldset>
                                     <p:fieldset legend="#{msg.ProvideTheRequestInformation}" rendered="#{groupItem.type eq 'orderFields'}">
                                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="priorityGroup">
@@ -219,10 +213,6 @@
                                                 <p:selectBooleanCheckbox value="#{groupItem.priority.enable}" >
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
-                                            <!--                                            <h:panelGroup>
-                                                                                            <label class="label">必填</label>
-                                                                                            <p:selectBooleanCheckbox value="#{groupItem.priority.required}" disabled="true" />
-                                                                                        </h:panelGroup>-->
                                             <h:panelGroup >
                                                 <label class="label">#{msg.Default}</label>
                                                 <p:selectOneMenu value="#{groupItem.priority.defaultValue}" >
@@ -238,10 +228,6 @@
                                                 <p:selectBooleanCheckbox value="#{groupItem.assetStatus.enable}" >
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
-                                            <!--                                            <h:panelGroup >
-                                                                                            <label class="label">必填</label>
-                                                                                            <p:selectBooleanCheckbox value="#{groupItem.assetStatus.required}" disabled="true" />
-                                                                                        </h:panelGroup>-->
                                             <h:panelGroup >
                                                 <label class="label">#{msg.Default}</label>
                                                 <p:selectOneMenu value="#{groupItem.assetStatus.defaultValue}" >
@@ -377,9 +363,6 @@
                                 <p:column headerText="#{msg.DisplayedField}">
                                     <h:outputText value="#{customConfigController.allAllocateFields[item]}" />
                                 </p:column>
-                                <!--                            <p:column headerText="列宽%">
-                                                                <h:outputText value="#{customConfigController.customConfigObject.assetFields[item].widthInListPage}" />
-                                                            </p:column>-->
                                 <p:column headerText="#{msg.Operation}">
                                     <f:facet name="header" >
                                         <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('assetAllocateFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
@@ -398,10 +381,10 @@
 
                 </h:form>
 
-                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="650"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="950" height="450" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
                     <h:form id="AssetFieldsEditForm" >
                         <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup >
                                     <label class="label">#{msg.name}</label>
                                     <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
@@ -415,22 +398,28 @@
                                     <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.arrivalRequired}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">#{msg.ReadableRole}</label>
-                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}">
-                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}" />
-                                    </p:selectManyCheckbox>
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
+                                        <label class="label">#{msg.ReadableRole}</label>
+                                        <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}" layout="pageDirection">
+                                            <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}" />
+                                        </p:selectManyCheckbox>
+                                    </p:scrollPanel>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">#{msg.ExportableRole}</label>
-                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.exportRoles}" >
-                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
-                                    </p:selectManyCheckbox>
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
+                                        <label class="label">#{msg.ExportableRole}</label>
+                                        <p:selectManyCheckbox value="#{customConfigController.currentEditField.exportRoles}" layout="pageDirection">
+                                            <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
+                                        </p:selectManyCheckbox>
+                                    </p:scrollPanel>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">#{msg.ModifiableRole}</label>
-                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" disabled="#{customConfigController.isReadOnlyFields(customConfigController.currentEditField.key)}">
-                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
-                                    </p:selectManyCheckbox>
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
+                                        <label class="label">#{msg.ModifiableRole}</label>
+                                        <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" disabled="#{customConfigController.isReadOnlyFields(customConfigController.currentEditField.key)}" layout="pageDirection">
+                                            <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
+                                        </p:selectManyCheckbox>
+                                    </p:scrollPanel>
                                 </h:panelGroup>
 
                             </p:panelGrid>
@@ -438,6 +427,41 @@
                             <h:panelGroup>
                                 <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}" update=" :customConfigForm:tabView:assetFieldsTable :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetFieldsEditDialog');"/>
                                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetFieldsEditDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+
+
+                <p:dialog id="AssetFieldsRenameDialog" widgetVar="AssetFieldsRenameDialog" modal="true" width="950" height="450" resizable="true" draggable="true" appendTo="@(body)" header="字段重命名">
+                    <h:form id="AssetFieldsRenameForm" >
+                        <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
+                            <h:panelGroup >
+                                <h:outputText value="此修改租户内生效"/>
+                            </h:panelGroup>
+
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup >
+                                    <label class="label">当前名称</label>
+                                    <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup >
+                                    <label class="label">系统默认</label>
+                                    <h:outputText value="#{customConfigController.getSystemShowName()}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup >
+                                    <label class="label">重命名</label>
+                                    <p:inputText value="#{customConfigController.newName}"/>
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}修改" update=" :customConfigForm:tabView:assetFieldsTable :growl" icon="ui-icon-check"  actionListener="#{customConfigController.renameField()}" oncomplete="handleSubmit(args, 'AssetFieldsRenameDialog');" />
+                                <p:commandButton immediate="false" validateClient="true" value="恢复系统默认" update=" :customConfigForm:tabView:assetFieldsTable :growl"  actionListener="#{customConfigController.resetField()}" oncomplete="handleSubmit(args, 'AssetFieldsRenameDialog');"/>
+                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetFieldsRenameDialog').hide()"/>
                             </h:panelGroup>
                         </h:panelGroup>
                     </h:form>

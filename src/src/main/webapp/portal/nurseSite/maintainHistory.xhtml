@@ -61,7 +61,7 @@
         <h:panelGroup>
             <p:commandButton value="预览结果" actionListener="#{maintainHistoryController.previewData}"
                              icon="ui-icon-arrowthick-1-s" validateClient="true"
-                             update=":growl :maintainExportTab:dataListHistoryForm" rendered="#{maintainHistoryController.customRoleAuth.authSearch}">
+                             update=":growl :maintainExportTab:dataListHistoryForm" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
             </p:commandButton>
         </h:panelGroup>
     </p:panelGrid>
@@ -102,30 +102,30 @@
         </p:column>
        
         <f:facet name="{Toolbar}">
-            <p:commandButton value="报表全部导出" actionListener="#{maintainHistoryController.exportAll()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+            <p:commandButton value="报表全部导出" actionListener="#{maintainHistoryController.exportAll()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
-            <p:commandButton value="报表选择导出" actionListener="#{maintainHistoryController.exportSelected()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+            <p:commandButton value="报表选择导出" actionListener="#{maintainHistoryController.exportSelected()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
             <p:commandButton ajax="false" value="详情全部导出"
                              actionListener="#{maintainHistoryController.exportAllDetail()}"
-                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
             <p:commandButton ajax="false" value="详情选择导出"
                              actionListener="#{maintainHistoryController.exportSelectedDetail()}"
-                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
             <p:commandButton ajax="false" value="Word全部导出"
                              actionListener="#{maintainHistoryController.exportAll2Docx()}"
-                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
             <p:commandButton ajax="false" value="Word选择导出"
                              actionListener="#{maintainHistoryController.exportSelected2Docx()}"
-                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{maintainHistoryController.customRoleAuth.authExport}">
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_HISTORY_VIEW')}">
                 <p:fileDownload value="#{maintainHistoryController.exportFile}"/>
             </p:commandButton>
         </f:facet>

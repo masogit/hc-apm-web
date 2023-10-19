@@ -27,6 +27,7 @@ public class PmOrderActionForm {
     String pmOrderId;
     Integer pmType;
     String applyTime;
+    String pmRuleUid;
     /**
      * 创建方式 1:医院创建  2:供应商创建
      */
@@ -234,5 +235,13 @@ public class PmOrderActionForm {
 
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    public String getPmRuleUid() {
+        return pmRuleUid;
+    }
+
+    public void setPmRuleUid(String pmRuleUid) {
+        this.pmRuleUid = pmRuleUid;
     }
 }

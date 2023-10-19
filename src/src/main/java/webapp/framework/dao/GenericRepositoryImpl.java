@@ -62,7 +62,7 @@ public class GenericRepositoryImpl<E> extends SimpleJpaRepository<E, Long> imple
 			return findAll(spec);
 		}
 	}
-	
+
 	public List<E> findBySearchFilter(final List<SearchFilter> filterFilter,Sort sort) {
 		if (filterFilter == null)
 			return findAll(sort);
@@ -121,5 +121,14 @@ public class GenericRepositoryImpl<E> extends SimpleJpaRepository<E, Long> imple
 
 		entityManager.merge(entity);
 		return entity;
+	}
+
+    @Override
+	public long count(final List<SearchFilter> filterFilter) {
+		if (filterFilter == null) {
+			return count();
+		} else {
+			return count(BySearchFilterSpecification.bySearchFilter(filterFilter, type));
+		}
 	}
 }

@@ -2,10 +2,31 @@
 				xmlns:h="http://java.sun.com/jsf/html"
 				xmlns:f="http://java.sun.com/jsf/core"
 				xmlns:ui="http://java.sun.com/jsf/facelets"
-				xmlns:p="http://primefaces.org/ui"
+				xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
 				template="/WEB-INF/template.xhtml">
 
 	<ui:define name="content">
+		<style>
+			.warrantyExpireSoon {
+				background-color: #fca752!important;
+				color: #000000!important;
+			}
+			.warrantyExpired {
+				background-color: #f04134!important;
+				color: #000000!important;
+			}
+			.btn+.btn { margin-left: 0 }
+			.ui-column-resizer:before {content: none!important;}
+			th{font-size: 12px!important;}
+			td{font-size: 12px!important;padding: 0px!important;}
+			table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+			.bottom-label {
+				position: absolute;
+				bottom: 0;
+				font-size:15px;
+				color: red;
+			}
+		</style>
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
 				<p:outputLabel class="pageTitle" value="备件出入库记录"/>
@@ -15,9 +36,11 @@
 				<h:form id="searchForm">
 					<h:panelGrid id="searchPanel" columns="10">
 						<p:selectOneMenu id="filterRecordType" value="#{sparePartStockRecordController.filterRecordType}" style="margin-right: 20px">
-							<p:ajax update=":recordPartForm:datalist" />
+							<p:ajax listener="#{sparePartStockRecordController.onSelectChange}" update=":recordPartForm:datalist" />
 							<f:selectItem itemValue='1' itemLabel="入库 "/>
 							<f:selectItem itemValue='2' itemLabel="出库 "/>
+							<f:selectItem itemValue='3' itemLabel="入库退库 "/>
+							<f:selectItem itemValue='4' itemLabel="出库退库 "/>
 						</p:selectOneMenu>
 						<label class="label">#{msg.StartTime}*</label>
 						<p:calendar id="StartTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartStockRecordController.startTime}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="开始时间不得为空"/>
@@ -30,34 +53,53 @@
 					<p:panelGrid columns="1" layout="grid">
 						<h:panelGroup>
 							<p:dataTable id="datalist" value="#{sparePartStockRecordController.lazyModel}" var="item" widgetVar="varDataList"
-										 selectionMode="single" selection="#{sparePartStockRecordController.selected}"
+										 selection="#{sparePartStockRecordController.selectedItems}"
 										 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 										 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 										 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 										 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
+								<p:column exportable="false" selectionMode="multiple" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}" style="width:50px;text-align:center"/>
 								<p:ajax event="filter" listener="#{sparePartStockRecordController.onFilter}"/>
+								<p:column headerText="入库单号" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 3}" filterBy="#{item.inboundNumber}" filterMatchMode="LIKE">
+									<h:outputText value="#{item.inboundNumber}"/>
+								</p:column>
+								<p:column headerText="出库单号" rendered="#{sparePartStockRecordController.filterRecordType eq 2 or sparePartStockRecordController.filterRecordType eq 4}" filterBy="#{item.outboundNumber}" filterMatchMode="LIKE">
+									<h:outputText value="#{item.outboundNumber}"/>
+								</p:column>
+								<p:column headerText="入库退库单号" rendered="#{sparePartStockRecordController.filterRecordType eq 3}" filterBy="#{item.returnNumber}" filterMatchMode="LIKE">
+									<h:outputText value="#{item.returnNumber}"/>
+								</p:column>
+								<p:column headerText="出库退库单号" rendered="#{sparePartStockRecordController.filterRecordType eq 4}" filterBy="#{item.returnNumber}" filterMatchMode="LIKE">
+									<h:outputText value="#{item.returnNumber}"/>
+								</p:column>
 								<p:column headerText="备件名称" filterBy="#{item.sparePart.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.name}"/>
 								</p:column>
-								<p:column headerText="规格型号">
+								<p:column headerText="规格型号" filterBy="#{item.sparePart.model}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.model}" />
 								</p:column>
-								<p:column headerText="序列号">
+								<p:column headerText="序列号" filterBy="#{item.sparePart.serialNumber}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.serialNumber}" />
 								</p:column>
-								<p:column headerText="厂家">
+								<p:column headerText="厂家" filterBy="#{item.sparePart.manufacturer}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.manufacturer}" />
 								</p:column>
-								<p:column headerText="供应商">
+								<p:column headerText="供应商" filterBy="#{item.sparePart.supplier}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.supplier}" />
 								</p:column>
 								<p:column headerText="单位">
 									<h:outputText value="#{item.sparePart.unit}" />
 								</p:column>
-								<p:column headerText="数量">
+								<p:column headerText="#{sparePartStockRecordController.getTitle(sparePartStockRecordController.filterRecordType, '数量') }">
 									<h:outputText value="#{item.quantity}" />
+								</p:column>
+								<p:column headerText="可用数量" rendered="#{sparePartStockRecordController.filterRecordType eq 1 }">
+									<h:outputText value="#{item.sparePart.quantity}" />
+								</p:column>
+								<p:column headerText="可退数量" rendered="#{sparePartStockRecordController.filterRecordType eq 2 }">
+									<h:outputText value="#{sparePartStockRecordController.getValidQuantity(item)}" />
 								</p:column>
 								<p:column headerText="单价">
 									<h:outputText value="#{item.sparePart.unitPrice}" />
@@ -65,19 +107,17 @@
 								<p:column headerText="总价">
 									<h:outputText value="#{sparePartStockRecordController.totalPrice(item.sparePart.unitPrice, item.quantity)}" />
 								</p:column>
+								<p:column headerText="发票号">
+									<h:outputText value="#{item.sparePart.invoiceNumber}" />
+								</p:column>
 								<p:column headerText="仓库">
 									<h:outputText value="#{item.sparePart.partsWarehouse.name}" />
 								</p:column>
 								<p:column headerText="入库人" rendered="#{sparePartStockRecordController.filterRecordType eq 1}">
 									<h:outputText value="#{item.warehouseOprPerson}" />
 								</p:column>
-								<p:column headerText="入库时间" rendered="#{sparePartStockRecordController.filterRecordType eq 1}">
+								<p:column headerText="#{sparePartStockRecordController.getTitle(sparePartStockRecordController.filterRecordType, '时间')}" sortBy="#{item.recordDate}">
 									<h:outputText value="#{item.recordDate}">
-										<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-									</h:outputText>
-								</p:column>
-								<p:column headerText="出库时间" rendered="#{sparePartStockRecordController.filterRecordType eq 2}">
-									<h:outputText value="#{item.recordDate}" >
 										<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 									</h:outputText>
 								</p:column>
@@ -90,15 +130,68 @@
 								<p:column headerText="说明" rendered="#{sparePartStockRecordController.filterRecordType eq 2}">
 									<h:outputText value="#{item.remark}" />
 								</p:column>
+								<p:column headerText="适用设备" rendered="${(sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2) and userContextService.hasCurrentTenantName('')}">
+									<h:outputText value="#{item.sparePart.adaptingDevices}" />
+								</p:column>
+								<p:column headerText="有效期" rendered="${(sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2) and userContextService.hasCurrentTenantName('')}">
+									<h:outputText value="#{item.sparePart.effectiveDate}" >
+										<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="附件" rendered="#{userContextService.hasCurrentTenantName('') and sparePartStockRecordController.filterRecordType eq 1}" exportable="false">
+									<p:commandButton id="findAttach" rendered="#{sparePartStockRecordController.hasBlob(item.sparePart.id)}" value="查看" actionListener="#{sparePartStockRecordController.clickSelectAttach(item)}" update="@(.updateTrCls) sidebar" oncomplete="PF('sidebar').show()"/>
+								</p:column>
+								<p:column  headerText="操作" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}" exportable="false">
+									<p:commandButton id="rtButton" value="退库" actionListener="#{sparePartStockRecordController.rtStock(item)}" update="pkRtDialog" disabled="#{sparePartStockRecordController.canRtStock(item)}" oncomplete="PF('pkRtDialog').show()"/>
+								</p:column>
 								<f:facet name="{Toolbar}">
-									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-										<p:dataExporter type="xls" target="datalist" fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':'备件出库记录'}" />
+									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+													 class="btn btn-sm btn-gray" ajax="false">
+										<p:dataExporter type="xls" target="datalist"
+														fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':
+														sparePartStockRecordController.filterRecordType eq 2?'备件出库记录':
+														sparePartStockRecordController.filterRecordType eq 3?'备件入库退库记录':'备件出库退库记录'}"/>
+									</p:commandButton>
+									<p:commandButton title="导出到word" ajax="false" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}"
+													 actionListener="#{sparePartStockRecordController.exportToDocx()}"
+													 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+										<p:fileDownload value="#{sparePartStockRecordController.exportDocx}"/>
 									</p:commandButton>
 								</f:facet>
 							</p:dataTable>
 						</h:panelGroup>
 					</p:panelGrid>
 				</h:form>
+				<p:dialog id="pkRtDialog" widgetVar="pkRtDialog" width="400" height="150" modal="true" resizable="true" draggable="true" appendTo="@this" header="备件退库" closable="false">
+					<h:form id="RtForm">
+						<p:panelGrid columns="1" layout="grid">
+							<h:panelGroup>
+								<label class ="label">数量* </label>
+								<p:inputText id="quantity" value="#{sparePartStockRecordController.rtQuantity}"  required="true" requiredMessage="数量必填">
+									<f:validateLongRange minimum="1" />
+								</p:inputText>
+							</h:panelGroup>
+						</p:panelGrid>
+						<br/>
+						<p:commandButton validateClient="true" actionListener="#{sparePartStockRecordController.saveRtStock()}" value="#{msg.Confirm}" update=":recordPartForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkRtDialog');"/>
+						<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sparePartStockRecordController.cancel()}" icon="ui-icon-cancel" update=":recordPartForm:datalist" onclick="PF('pkRtDialog').hide()" />
+					</h:form>
+				</p:dialog>
+				<p:panelGrid columns="1" layout="grid" rendered="#{userContextService.hasCurrentTenantName('')}">
+					<h:panelGroup>
+						<p:sidebar id="sidebar" widgetVar="sidebar" position="left" style="width: 100%;height: 70%; " >
+							<h3>附件列表</h3>
+							<p:dataGrid id="pic" var="fileitem" value="#{sparePartStockRecordController.picList}" columns="5" layout="grid">
+								<p:panel  style="text-align:center">
+									<h:panelGrid columns="1" style="width:100%" >
+										<p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="180" width="200" stream="false"/>
+									</h:panelGrid>
+								</p:panel>
+							</p:dataGrid>
+							<h:outputLabel value="*tip:点击任意空白处即可关闭该显示框!" styleClass="bottom-label" />
+						</p:sidebar>
+					</h:panelGroup>
+				</p:panelGrid>
 			</div>
 		</div>
 	</ui:define>

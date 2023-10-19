@@ -6,6 +6,8 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -41,82 +43,98 @@ public class WordReportExportService {
         if (listMaintain.isEmpty()) {
             throw new IllegalStateException("所选检查没有完成");
         }
-        List<NurseSiteMaintain> nurseSiteMaintains =null;
-        Map<Integer,List<byte[]>>reportMap = null;
+        List<NurseSiteMaintain> nurseSiteMaintains;
+        Map<Integer,List<byte[]>>reportMap;
         Map<String,Map<Integer,List<byte[]>>> reportMapMap = new LinkedHashMap<>();
-        List<byte[]> reports= null;
+        List<byte[]> reports;
         Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
+        Map<String, Integer> nameSuffixMap = MapUtil.newHashMap();
+        Map<String, Map<String, String>> nameKeyMap = MapUtil.newHashMap();
         for (NurseSiteMaintain maintain : listMaintain) {
             String name;
             Integer sequence = maintain.getSequence();
             String year = DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
+            String month = DateFormatUtils.format(maintain.getScheduleDate(), "MM");
             if (sequence==0){
                  name = maintain.getName();
             }else {
-                 name = maintain.getName()+"-"+sequence;
+                 name = maintain.getName() + "-" + sequence;
             }
-            name = name  + " " + year;
-            if(listMap.containsKey(name)){
-                listMap.get(name).add(maintain);
-                listMap.put(name,listMap.get(name));
-            }else {
+            name += " " + year + "-" + month + "月";
+            String nameKey = name + "#" + maintain.getConfigId();
+            if (listMap.containsKey(name)) {
+                Map<String, String> nameKeys = nameKeyMap.get(name);
+                if (nameKeys.containsKey(nameKey)) {
+                    listMap.get(nameKeys.get(nameKey)).add(maintain);
+                } else {
+                    nurseSiteMaintains = ListUtil.newArrayList(maintain);
+                    Integer suffix = nameSuffixMap.get(name);
+                    ++suffix;
+                    name += "(" + suffix + ")";
+                    nameKeys.put(nameKey, name);
+                    nameSuffixMap.put(name, suffix);
+                    listMap.put(name, nurseSiteMaintains);
+                }
+            } else {
                 nurseSiteMaintains = new ArrayList<>();
                 nurseSiteMaintains.add(maintain);
-                listMap.put(name,nurseSiteMaintains);
+                listMap.put(name, nurseSiteMaintains);
+                nameKeyMap.put(name, MapUtil.newHashMap(nameKey, name));
+                nameSuffixMap.put(name, 0);
             }
-
         }
-        String name=null;
         for (Map.Entry<String, List<NurseSiteMaintain>> a : listMap.entrySet()) {
+            String name = a.getKey();
             reportMap = new LinkedHashMap<>();
-            name = a.getKey();
             TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
             Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
             Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
             Map<Date,Map<String,String>> updateByMapMap = new HashMap<>();
-            Map<String,List<String>> assetNameMap = null;
-            Map<String,String> commentMap = null;
-            Map<String,String> updateByMap = null;
             for (NurseSiteMaintain maintain : a.getValue()) {
                 Date scheduleDate = maintain.getScheduleDate();
                 if (scheduleDate == null) {
                     continue;
                 }
                 List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
-                assetNameMap = new HashMap<>();
-                commentMap = new HashMap<>();
-                updateByMap = new HashMap<>();
-                for (int i = 0;i < items.size();i++) {
-                    NurseSiteMaintainItem nurseSiteMaintainItem = items.get(i);
+                Map<String,List<String>> assetNameMap = new HashMap<>();
+                Map<String,String> commentMap = new HashMap<>();
+                Map<String,String> updateByMap = new HashMap<>();
+                for (NurseSiteMaintainItem nurseSiteMaintainItem : items) {
                     AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
                     List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
                     List<String> stringList = new ArrayList<>();
-                    for (int j = 0 ;j < listData.size();j++) {
-                        NurseSiteMaintainData nurseSiteMaintainData = listData.get(j);
+                    for (NurseSiteMaintainData nurseSiteMaintainData : listData) {
                         Boolean checkValue = nurseSiteMaintainData.getCheckValue();
-                        if(checkValue!=null && checkValue){
+                        if (Boolean.TRUE.equals(checkValue)) {
                             stringList.add("√");
-                        }else if(checkValue!=null && !checkValue){
+                        } else if (Boolean.FALSE.equals(checkValue)) {
                             stringList.add("x");
-                        }else {
+                        } else {
                             stringList.add(null);
                         }
                     }
-                    assetNameMap.put(assetInfo.getName(),stringList);
-                    commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
-                    updateByMap.put(assetInfo.getName(),nurseSiteMaintainItem.getUpdateByUid());
+                    assetNameMap.put(assetInfo.getName(), stringList);
+                    commentMap.put(assetInfo.getName(), nurseSiteMaintainItem.getComment());
+                    updateByMap.put(assetInfo.getName(), nurseSiteMaintainItem.getUpdateByUid());
 
                 }
-                map.put(scheduleDate, items);
-                stringMap.put(scheduleDate,assetNameMap);
-                commentMapMap.put(scheduleDate,commentMap);
-                updateByMapMap.put(scheduleDate,updateByMap);
+                if (map.containsKey(scheduleDate)) {
+                    map.get(scheduleDate).addAll(items);
+                    stringMap.get(scheduleDate).putAll(assetNameMap);
+                    commentMapMap.get(scheduleDate).putAll(commentMap);
+                    updateByMapMap.get(scheduleDate).putAll(updateByMap);
+                } else {
+                    map.put(scheduleDate, items);
+                    stringMap.put(scheduleDate,assetNameMap);
+                    commentMapMap.put(scheduleDate,commentMap);
+                    updateByMapMap.put(scheduleDate,updateByMap);
+                }
             }
             List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
             int num =0;
             int month=0;
             Map<Integer ,Date> dataMap = new LinkedHashMap<>();
-            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap<>();
             for (Map.Entry<Date, List<NurseSiteMaintainItem>> i : map.entrySet()) {
                 int secondCount =0;
                 nurseSiteMaintainItemList = i.getValue();
@@ -170,74 +188,92 @@ public class WordReportExportService {
         if (listMaintain.isEmpty()) {
             throw new IllegalStateException("所选检查没有完成");
         }
-        List<NurseSiteMaintainHistory> nurseSiteMaintains =null;
-        Map<Integer,List<byte[]>>reportMap = null;
+        List<NurseSiteMaintainHistory> nurseSiteMaintains;
+        Map<Integer,List<byte[]>>reportMap;
         Map<String,Map<Integer,List<byte[]>>> reportMapMap = new LinkedHashMap<>();
-        List<byte[]> reports= null;
+        List<byte[]> reports;
         Map<String,List<NurseSiteMaintainHistory>>listMap = new LinkedHashMap<>();
+        Map<String, Integer> nameSuffixMap = MapUtil.newHashMap();
+        Map<String, Map<String, String>> nameKeyMap = MapUtil.newHashMap();
         for (NurseSiteMaintainHistory maintain : listMaintain) {
-            String name = maintain.getName() + " " + DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
-            if(listMap.containsKey(name)){
-                listMap.get(name).add(maintain);
-                listMap.put(name,listMap.get(name));
-            }else {
+            String year = DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
+            String month = DateFormatUtils.format(maintain.getScheduleDate(), "MM");
+            String name = maintain.getName() + " " + year + "-" + month + "月";
+            String nameKey = name + "#" + maintain.getConfigId();
+            if (listMap.containsKey(name)) {
+                Map<String, String> nameKeys = nameKeyMap.get(name);
+                if (nameKeys.containsKey(nameKey)) {
+                    listMap.get(nameKeys.get(nameKey)).add(maintain);
+                } else {
+                    nurseSiteMaintains = ListUtil.newArrayList(maintain);
+                    Integer suffix = nameSuffixMap.get(name);
+                    ++suffix;
+                    name += "(" + suffix + ")";
+                    nameKeys.put(nameKey, name);
+                    nameSuffixMap.put(name, suffix);
+                    listMap.put(name, nurseSiteMaintains);
+                }
+            } else {
                 nurseSiteMaintains = new ArrayList<>();
                 nurseSiteMaintains.add(maintain);
-                listMap.put(name,nurseSiteMaintains);
+                listMap.put(name, nurseSiteMaintains);
+                nameKeyMap.put(name, MapUtil.newHashMap(nameKey, name));
+                nameSuffixMap.put(name, 0);
             }
-
         }
-        String name=null;
+
         for (Map.Entry<String, List<NurseSiteMaintainHistory>> a : listMap.entrySet()) {
+            String name = a.getKey();
             reportMap = new LinkedHashMap<>();
-            name = a.getKey();
             TreeMap<Date, List<NurseSiteMaintainItemHistory>> map = new TreeMap<>();
             Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
             Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
             Map<Date,Map<String,String>> updateByMapMap = new HashMap<>();
-            Map<String,List<String>> assetNameMap = null;
-            Map<String,String> commentMap = null;
-            Map<String,String> updateByMap = null;
             for (NurseSiteMaintainHistory maintain : a.getValue()) {
                 Date scheduleDate = maintain.getScheduleDate();
                 if (scheduleDate == null) {
                     continue;
                 }
                 List<NurseSiteMaintainItemHistory> items = maintain.getListNurseSiteMaintainItem();
-                assetNameMap = new HashMap<>();
-                commentMap = new HashMap<>();
-                updateByMap = new HashMap<>();
-                for (int i = 0;i < items.size();i++) {
-                    NurseSiteMaintainItemHistory nurseSiteMaintainItem = items.get(i);
+                Map<String,List<String>> assetNameMap = new HashMap<>();
+                Map<String,String> commentMap = new HashMap<>();
+                Map<String,String> updateByMap = new HashMap<>();
+                for (NurseSiteMaintainItemHistory nurseSiteMaintainItem : items) {
                     AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
                     List<NurseSiteMaintainDataHistory> listData = nurseSiteMaintainItem.getListData();
                     List<String> stringList = new ArrayList<>();
-                    for (int j = 0 ;j < listData.size();j++) {
-                        NurseSiteMaintainDataHistory nurseSiteMaintainData = listData.get(j);
+                    for (NurseSiteMaintainDataHistory nurseSiteMaintainData : listData) {
                         Boolean checkValue = nurseSiteMaintainData.getCheckValue();
-                        if(checkValue!=null && checkValue){
+                        if (Boolean.TRUE.equals(checkValue)) {
                             stringList.add("√");
-                        }else if(checkValue!=null && !checkValue){
+                        } else if (Boolean.FALSE.equals(checkValue)) {
                             stringList.add("x");
-                        }else {
+                        } else {
                             stringList.add(null);
                         }
                     }
-                    assetNameMap.put(assetInfo.getName(),stringList);
-                    commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
-                    updateByMap.put(assetInfo.getName(),nurseSiteMaintainItem.getUpdateByUid());
+                    assetNameMap.put(assetInfo.getName(), stringList);
+                    commentMap.put(assetInfo.getName(), nurseSiteMaintainItem.getComment());
+                    updateByMap.put(assetInfo.getName(), nurseSiteMaintainItem.getUpdateByUid());
 
                 }
-                map.put(scheduleDate, items);
-                stringMap.put(scheduleDate,assetNameMap);
-                commentMapMap.put(scheduleDate,commentMap);
-                updateByMapMap.put(scheduleDate,updateByMap);
+                if (map.containsKey(scheduleDate)) {
+                    map.get(scheduleDate).addAll(items);
+                    stringMap.get(scheduleDate).putAll(assetNameMap);
+                    commentMapMap.get(scheduleDate).putAll(commentMap);
+                    updateByMapMap.get(scheduleDate).putAll(updateByMap);
+                } else {
+                    map.put(scheduleDate, items);
+                    stringMap.put(scheduleDate,assetNameMap);
+                    commentMapMap.put(scheduleDate,commentMap);
+                    updateByMapMap.put(scheduleDate,updateByMap);
+                }
             }
             List<NurseSiteMaintainItemHistory> nurseSiteMaintainItemList= null;
             int num =0;
             int month=0;
             Map<Integer ,Date> dataMap = new LinkedHashMap<>();
-            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap<>();
             for (Map.Entry<Date, List<NurseSiteMaintainItemHistory>> i : map.entrySet()) {
                 int secondCount =0;
                 nurseSiteMaintainItemList = i.getValue();
@@ -450,7 +486,7 @@ public class WordReportExportService {
                     List<byte[]> reports = m.getValue();
                     Integer key = m.getKey();
                     for (int i = 0; i < reports.size(); i++) {
-                        zos.putNextEntry(new ZipEntry(n.getKey()+"-"+key+"月" +".docx"));
+                        zos.putNextEntry(new ZipEntry(n.getKey() + ".docx"));
                         IOUtils.write(reports.get(i), zos);
                     }
                 }

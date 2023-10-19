@@ -7,7 +7,7 @@
 
 	<ui:define name="content">
 		<div class="ui-g">
-			<div class="ui-g-12 card cardTitle">
+			<div class="ui-g-12">
 				<div class="ui-g-12 card cardTitle">
 					<p:outputLabel class="pageTitle" value="报表中心"/>
 				</div>
@@ -30,6 +30,9 @@
 								</p:column>
 								<p:column headerText="报表描述">
 									<h:outputText value="#{item.description}" />
+								</p:column>
+								<p:column headerText="报表类型">
+									<h:outputText value="#{jmReportController.getType(item.type)}" />
 								</p:column>
 								<p:column  headerText="预览/设计" >
 									<h:panelGroup>

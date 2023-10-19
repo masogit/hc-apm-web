@@ -24,6 +24,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.tools.FileObject;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -582,6 +583,20 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             blobObject.setBoSubType(type);
             blobService.saveBlobObject(blobObject);
+            try {
+                blobService.sendImageCompressMQ(blobObject);
+//                if(blobObject.getObjectName().endsWith(".pdf")){
+//                    V2_BlobObject v2BlobObject = blobService.compressByObjectId(blobObject.getObjectStorageId());
+//                    if(v2BlobObject!=null){
+//                        blobObject.setCompressObjectId(v2BlobObject.getObjectStorageId());
+//                        blobService.saveBlobObject(blobObject);
+//                    }
+//                }else{
+//                    blobService.sendImageCompressMQ(blobObject);
+//                }
+            }catch (Exception e){
+                logger.error("到货安装，图片生成缩略图MQ发生失败：", e);
+            }
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");

@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.WorkFlowConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -29,7 +30,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
@@ -52,7 +52,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     private List<V2_DeviceType> deviceTypeList;
     private OrgInfoRepository orgInfoRepository;
     private AssetInfoRepository assetInfoRepository;
-    private TenantInfoRepository tenantInfoRepository;
     private Boolean isInsulate;
     private Integer loginUserOrgType;
     private UserCommonService userCommonService;
@@ -74,6 +73,9 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     @Getter
     private WorkflowConfig.AttachmentCategory attachmentCategory;
 
+
+    private ConfigCacheService cacheService;
+
     @Override
     protected void init() {
         filterBySite = false;
@@ -82,8 +84,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         userDao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        cacheService = WebUtil.getBean(ConfigCacheService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         isInsulate = UserContextService.isInsulate();
@@ -208,15 +210,10 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     }
 
     public void setTenantUid(String tenantUid) {
-        //searchFilters.clear();
-        //this.tenantUid = tenantUid;
-        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isInsulate()) {
-            //selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
         } else {
-            //selectedTenant = tenantInfoRepository.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -259,7 +256,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         if (selectedUserOrg == null || selected == null) {
             return;
         }
-        TenantInfo tenant = tenantInfoRepository.findByuid(selectedUserOrg.getTenantUID());
+        TenantInfo tenant = cacheService.getTenantByUid(selectedUserOrg.getTenantUID());
         if (tenant.getInsulate() != null && tenant.getInsulate()) {
             Integer orgType = selectedUserOrg.getOrgType();
             if (orgType == 0) {
@@ -359,7 +356,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     }
 
     public String getTenantName(String tenantUID) {
-        return tenantInfoRepository.findByuid(tenantUID).getName();
+        return cacheService.getTenantByUid(tenantUID).getName();
     }
 
     @Override
@@ -501,6 +498,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             selected.setAutoAckMaintenance(false);
         }
 
+        cacheService.cleanWorkflowConfigCache(selected.getSiteUID());
     }
 
     @Transactional
@@ -643,6 +641,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
+        cacheService.cleanWorkflowConfigCache(selected.getSiteUID());
         selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
         selected = null;
     }
@@ -737,7 +736,10 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
             selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
         }
-
+        if (selected.getStartSendingTime() == null && selected.getEndSendingTime() == null) {
+            selected.setStartSendingTime(new DateTime().withHourOfDay(07).withMinuteOfHour(45).withSecondOfMinute(00).toDate());
+            selected.setEndSendingTime(new DateTime().withHourOfDay(23).withMinuteOfHour(00).withSecondOfMinute(00).toDate());
+        }
 /*		if(swapCenter.getString("periodStart") == null && swapCenter.getString("periodEnd") == null){
 			selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
 			selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());

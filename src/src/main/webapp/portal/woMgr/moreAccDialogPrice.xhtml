@@ -4,46 +4,57 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition><!--备件对话框 修改-->
     <p:dialog id="moreAccDialogPriceDlg" class="moreAccDialogPriceDlg" widgetVar="moreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PartUpdate}" positionType="absolute"><!--维修工单备件更新-->
         <h:form id="moreAccDialogFormX" >
             <h:panelGroup id="display42">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup id="sparePartsName" rendered="#{workOrderMgrController.statusFlag==1}">
-                        <label class="label">#{msg.PartName}*</label>
-                        <p:autoComplete id="sparePartName" dropdown="true"
-                                        value="#{workOrderMgrController.partsItem}"
-                                        readonly="false"
-                                        forceSelection="true"
-                                        completeMethod="#{workOrderMgrController.autosparePartName}"
-                                        var="item" itemLabel="#{item.name}"
-                                        itemValue="#{item}"
-                                        converter="simplePartsItemConverter">
-                            <p:ajax event="itemSelect"
-                                    listener="#{workOrderMgrController.onSparePartsValueChange}"
-                                    update="moreAccDialogFormX"/>
-                        </p:autoComplete>
+                    <c:choose>
+                        <c:when test="#{!workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.PartName}*</label>
+                                <p:inputText value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                        </c:when>
+                        <c:otherwise>
+                            <h:panelGroup id="sparePartsName" rendered="#{workOrderMgrController.statusFlag==1}">
+                                <label class="label">#{msg.PartName}*</label>
+                                <p:autoComplete id="sparePartName" dropdown="true"
+                                                value="#{workOrderMgrController.partsItem}"
+                                                readonly="false"
+                                                forceSelection="true"
+                                                completeMethod="#{workOrderMgrController.autosparePartName}"
+                                                var="item" itemLabel="#{item.name}"
+                                                itemValue="#{item}"
+                                                converter="simplePartsItemConverter">
+                                    <p:ajax event="itemSelect"
+                                            listener="#{workOrderMgrController.onSparePartsValueChange}"
+                                            update="moreAccDialogFormX"/>
+                                </p:autoComplete>
 
-                    </h:panelGroup>
-                    <h:panelGroup  rendered="#{workOrderMgrController.statusFlag==3}">
-                        <label class="label">#{msg.PartName}*</label>
-                        <p:inputText id="partsOther" value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{workOrderMgrController.statusFlag==2}">
-                        <label class="label">#{msg.PartName}*</label>
-                        <p:autoComplete id="parts" dropdown="true"
-                                        value="#{workOrderMgrController.partsItem}"
-                                        readonly="false" forceSelection="true"
-                                        completeMethod="#{workOrderMgrController.initSparePartsMaster}"
-                                        var="item" itemLabel="#{item.name}"
-                                        itemValue="#{item}"
-                                        converter="simplePartsItemConverter">
-                            <p:ajax event="itemSelect"
-                                    listener="#{workOrderMgrController.onSparePartsMasterValueChange}"
-                                    update="moreAccDialogFormX"/>
-                        </p:autoComplete>
-                    </h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup  rendered="#{workOrderMgrController.statusFlag==3}">
+                                <label class="label">#{msg.PartName}*</label>
+                                <p:inputText id="partsOther" value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{workOrderMgrController.statusFlag==2}">
+                                <label class="label">#{msg.PartName}*</label>
+                                <p:autoComplete id="parts" dropdown="true"
+                                                value="#{workOrderMgrController.partsItem}"
+                                                readonly="false" forceSelection="true"
+                                                completeMethod="#{workOrderMgrController.initSparePartsMaster}"
+                                                var="item" itemLabel="#{item.name}"
+                                                itemValue="#{item}"
+                                                converter="simplePartsItemConverter">
+                                    <p:ajax event="itemSelect"
+                                            listener="#{workOrderMgrController.onSparePartsMasterValueChange}"
+                                            update="moreAccDialogFormX"/>
+                                </p:autoComplete>
+                            </h:panelGroup>
+                        </c:otherwise>
+                    </c:choose>
+
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
                         <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">

@@ -445,7 +445,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return contractInfoItem == null ? null : contractInfoItem.getContractAssetName();
     }
 
-    public String getDetailPageLink(AssetInfo item) {
+    public String getDetailPageLinkByAsset(AssetInfo item) {
         String url = "";
         if (null != item) {
             AssetInfo asset = item;
@@ -456,7 +456,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return url;
     }
     //==============================================
-    public String getDetailPageLink(String uid) {
+    public String getDetailPageLinkByUid(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
                 + viewAsset.getUid()
@@ -472,7 +472,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void viewContractItemPage(ContractInfoItem item) {
-        String url = getDetailPageLink(item.getAssetInfo());
+        String url = getDetailPageLinkByAsset(item.getAssetInfo());
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }

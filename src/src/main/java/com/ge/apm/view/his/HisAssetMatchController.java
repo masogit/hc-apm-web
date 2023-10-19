@@ -9,24 +9,38 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.AssetInfoDto;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.domain.his.HisEquipmentMatch;
+import com.ge.apm.service.asset.ContractImportService;
 import com.ge.apm.service.his.HisAssetService;
+import com.ge.apm.service.his.load.HisDataExcelImportService;
+import com.ge.apm.service.his.load.HisEquipmentImportService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.UploadedFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +50,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipmentMatch> implements ServerEventInterface {
 
+
+    private UploadedFile file;
     public static final String FIELD_NAME_EQ_HOSID = "eqHosid";
     private OrgInfoRepository orgInfoDao;
     private HisEquipmentMatchRepository dao;
@@ -58,6 +74,13 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
     @Setter
     private HisEquipmentConnect hisEquipmentConnect;
 
+    @Getter
+    @Setter
+    private HisDataExcelImportService hisDataExcelImportService;
+
+    private HisEquipmentImportService hisEquipmentImportService;
+
+
     //初始化定义pageRequest,提供给待匹配的页面使用
     final PageRequest pageRequest = new PageRequest(0 ,100);
 
@@ -75,6 +98,7 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
         hisAssetService = WebUtil.getBean(HisAssetService.class);
 
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
+        hisEquipmentImportService = WebUtil.getBean(HisEquipmentImportService.class);
 
         hisEquipmentConnect = new HisEquipmentConnect();
         assetInfoDto = new AssetInfoDto();
@@ -224,6 +248,56 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
         secondQueryOrder();
 
     }
+
+    private List<Map<String, Object>> importMapList;
+    private List<Map<String, Object>> errorList;
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            //检查导入模板版本
+//            if(!checkDocVersion(doc)){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
+//                return;
+//            }
+
+            int maxRowNum = HisEquipmentImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
+            if(doc.exceedMaxRowNum(HisEquipmentImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                return;
+            }
+            importMapList = hisEquipmentImportService.getMapFromTemplate(doc);
+            hisEquipmentImportService.importData(importMapList);
+            errorList = hisEquipmentImportService.filterErrorRecords(importMapList);
+            if(!errorList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    public List<Map<String, Object>> getErrorList() {
+        return errorList;
+    }
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.4";
+
+//    private boolean checkDocVersion(ExcelDocument doc) {
+//
+//        return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(doc.getVersion());
+//
+//    }
 }
 
 

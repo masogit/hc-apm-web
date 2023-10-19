@@ -7,16 +7,22 @@ package com.ge.apm.service.asset;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
+import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,12 +35,15 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
 
+import javax.tools.FileObject;
+
 /**
  *
  * @author 212579464
  */
 @Component
 public class BlobFileService {
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(AssetFaultTypeService.class);
 
     @Autowired
     BlobObjectRepository blobDao;
@@ -44,6 +53,9 @@ public class BlobFileService {
 
     @Autowired
     FileScanService fsService;
+
+    @Autowired
+    private MqUtils mqUtils;
     
     public V2_BlobObject uploadFile(FileUploadEvent event) {
         return uploadFile(event.getFile());
@@ -71,7 +83,15 @@ public class BlobFileService {
 
         if (null != fileObject) {
             V2_BlobObject blobObject = new V2_BlobObject();
+            String objectName = (String) fileObject.get("objectName");
             blobObject.setObjectName((String) fileObject.get("objectName"));
+//            try {
+//                String name = new String(objectName.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
+//                log.info("objectName:{}",name);
+//                blobObject.setObjectName(name);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
             blobObject.setObjectStorageId((String) fileObject.get("objectId"));
             blobObject.setObjectType((String) fileObject.get("objectType"));
@@ -317,6 +337,23 @@ public class BlobFileService {
         return microService.downloadSingleFile(storageId);
     }
 
+
+    public V2_BlobObject compressByObjectId( String objectStorageId ) {
+        Map<String, Object> fileObject = microService.compressByObjectId(objectStorageId);
+        if (null != fileObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobObject;
+        } else {
+            return null;
+        }
+    }
+
     public V2_BlobObject uploadCompressFile(UploadedFile file) {
 
         String path = "";
@@ -350,5 +387,25 @@ public class BlobFileService {
             return null;
         }
 
+    }
+
+    public void sendImageCompressMQ(V2_BlobObject blobObject){
+        if(null == blobObject){
+            return;
+        }
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("imageCompress");
+        mqContext.setRoutingKey(RabbitConfig.IMAGE_COMPRESS_ROUTING_KEY);
+        mqContext.setExChange(RabbitConfig.IMAGE_COMPRESS_CHANGE);
+
+        List<V2_BlobObject> list = new ArrayList<>();
+        list.add(blobObject);
+        JSONObject jsonObject = new JSONObject();
+        String str = JSON.toJSONString(list, SerializerFeature.WriteDateUseDateFormat);
+        jsonObject.put("blobObject", str);
+        mqContext.setJsonObject(jsonObject);
+
+        mqUtils.sendToMq(mqContext);
     }
 }

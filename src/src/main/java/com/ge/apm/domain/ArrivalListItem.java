@@ -5,10 +5,7 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -417,6 +414,10 @@ public class ArrivalListItem implements Serializable {
 
     @Column(name = "medical_apparatus_classification")
     private String medicalApparatusClassification; // 医疗器械分类
+
+    // 资产分类 encoded
+    @Column(name = "encoded")
+    private String encoded;
 
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;

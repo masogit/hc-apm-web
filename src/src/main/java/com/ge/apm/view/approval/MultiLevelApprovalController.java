@@ -1,9 +1,9 @@
 package com.ge.apm.view.approval;
 
-import com.ge.apm.dao.BudgetApplicationRepository;
-import com.ge.apm.dao.MultiLevelApprovalRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
@@ -12,12 +12,15 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -34,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -48,6 +52,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private BudgetApplicationRepository budgetDao;
     private WorkflowService workflowService;
     private BlobFileService blobService;
+
+
+    private AssetScrapRepository assetScrapDao;
+    private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+
+    private AssetInfoRepository assetInfoRepository;
+
 
     @Setter
     @Getter
@@ -83,6 +94,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private boolean isAgree = true;
     private boolean needSignature = false;
 
+    private boolean isReturnApproval=false;
+
+    private boolean isDirectDelivery=false;
+
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
         return multiLevelApprovalRepository;
@@ -98,6 +113,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         budgetDao = WebUtil.getBean(BudgetApplicationRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
+        assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -142,6 +160,23 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
                 primaryApprovalData = budgetApplication;
                 secondaryApprovalData = budgetApplication.getBudgetAssets();
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
+                JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
+                jsonObject.put("assetInfo",asset);
+                List<Object> objects = new ArrayList<>();
+                objects.add(jsonObject);
+                primaryApprovalData = objects;
+                secondaryApprovalData =objects;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                List<AssetDepartmentConvert> assetDepartmentConverts = new ArrayList<>();
+                assetDepartmentConverts.add(assetDepartmentConvert);
+                primaryApprovalData = assetDepartmentConvert;
+                secondaryApprovalData =assetDepartmentConvert;
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -254,6 +289,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(this.businessTypeFlag == 8){
             V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
             siteUid = v2PmOrder.getSiteUID();
+        }else if(this.businessTypeFlag == 15){
+            AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+            siteUid = assetScrap.getSiteUid();
+        }else if(this.businessTypeFlag == 16){
+            AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+            AssetInfo byUid = assetInfoRepository.findByUid(assetDepartmentConvert.getAssetUid());
+            siteUid=byUid.getSiteUID();
         }
 
         if(StringUtils.isNotEmpty(siteUid)){
@@ -263,6 +305,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     this.isAgree = true;
                 }else if(agree == 2){
                     this.isAgree = false;
+                }else if(agree==3){
+                    this.isReturnApproval=true;
+                }else if(agree==4){
+                    this.isDirectDelivery=true;
                 }
                 this.needSignature = true;
                 // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
@@ -279,9 +325,67 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(agree == 2){
             this.isAgree = false;
             this.getMultiLevelApprovalPersionAndSubmitByDisagree();
+        }else if(agree == 3){
+            this.returnApprove();
+        }else if(agree==4){
+            this.directDelivery();
         }
 
     }
+
+
+
+    public void returnApprove() throws Exception {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+
+        int level = 0;
+        for (int i=1;i<=nodes.size();i++){
+            if(nodes.get(i-1).getNodeName().equals(nodeName)){
+                level=i;
+            }
+        }
+        if(level==0 || level>multiLevelApproval.getApprovalLevelNow() || multiLevelApproval.getApprovalLevelNow()==1 || multiLevelApproval.getApprovalLevelNow()==level){
+            return;
+        }
+
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            return;
+        }
+        this.isAgree = false;
+
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApprovalService.getMultiLevelApprovalReturn(multiLevelApproval,approvalOpinion,level);
+        selected = null;
+        this.needSignature = false;
+        this.isReturnApproval=false;
+        this.nodes=null;
+        this.nodeName=null;
+        this.resetSignature();
+    }
+    public void directDelivery() throws Exception {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            return;
+        }
+        this.isAgree = false;
+
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApprovalService.getMultiLevelApprovalDirectDelivery(multiLevelApproval,approvalOpinion);
+        selected = null;
+        this.needSignature = false;
+        this.isDirectDelivery=false;
+        this.resetSignature();
+    }
+
 
     public void getSignature() {
         this.signatureContent = null;
@@ -333,6 +437,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             }
         }
 
+        if(this.isReturnApproval){
+            this.returnApprove();
+            return;
+        }
+        if(this.isDirectDelivery){
+            this.directDelivery();
+            return;
+        }
         if(this.isAgree){
             this.getMultiLevelApprovalPersonByAgree();
         }else{
@@ -346,4 +458,46 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.signatureContentStream = null;
         this.newSignature = true;
     }
+
+
+    @Getter@Setter
+    private  List<ApprovalNode> nodes;
+    @Getter@Setter
+    private String nodeName;
+
+    public List<ApprovalNode> getApprovalNode(){
+        MultiLevelApprovalConfig multiLevelApprovalConfig = multiLevelApprovalService.getApproveWorkflowConfig(selected.getWorkflowConfigApproveUid());
+        String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+        if (null != approvalItem) {
+            List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
+            });
+            Integer approvalLevelNow = selected.getApprovalLevelNow();
+            if(approvalLevelNow!=0){
+                approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
+            }
+            nodes= approvalNodes;
+            return nodes;
+        }
+        return new ArrayList<>();
+    }
+
+
+    public List<ApprovalNode> getNodes(){
+        return nodes;
+    }
+
+    public boolean  getReturn(){
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
+        if(multiLevelApprovals.size()>2){
+            MultiLevelApproval multiLevelApprovalReturn = multiLevelApprovals.get(multiLevelApprovals.size() - 2);
+            if(multiLevelApprovalReturn.getApprovalNodeStatus()==ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN){
+                return  true;
+            }
+        }else{
+            return false;
+        }
+        return false;
+    }
+
 }

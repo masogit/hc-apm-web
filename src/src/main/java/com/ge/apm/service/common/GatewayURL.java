@@ -23,6 +23,9 @@ public enum GatewayURL {
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     AUTH_DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/auth/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
+
+    COMPRESS_IMAGE("/hcapmobjecthubservice/api/apm/objectHub/objects/compress/{objectId}"),
+
     // Service Request Service
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
@@ -105,6 +108,7 @@ public enum GatewayURL {
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
     GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum"),
     REJECT_APPLY("/hcapmworkflowservice/api/apm/allocation/rent/rejectApply"),
+    REJECT_RETURN("/hcapmworkflowservice/api/apm/allocation/rent/rejectReturn"),
 
     BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload"),
 
@@ -123,6 +127,7 @@ public enum GatewayURL {
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
     PART_ORDER_QR_CODE_JOB_SCHEDULE("/hc-apm-schedule/job/api/929"),
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
+    SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/sendWeChat"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
 
@@ -147,8 +152,19 @@ public enum GatewayURL {
 
     //es查询设备修改历史记录分页
     SEARCH_ASSET_HISTORY("/hcapmelasticservice/assetHistory/searchAssetHistory"),
+    ELASTICSEARCH_QUERY("/hcapmelasticservice/elasticSearch/query"),
     SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
     INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
+    INSERT_PHYSICAL_DATA_DEL("/hcapmelasticservice/physicalDataDel/insertPhysicalDataDel"),
+    ELASTICSEARCH_INSERT("/hcapmelasticservice/elasticSearch/insert"),
+    INSERT_BUSINESS_ERROR_LOG("/hcapmelasticservice/businessErrorLog/insertBusinessErrorLog"),
+    // jimureport
+    JI_MU_REPORT("/apmReport/jmreport/view"),
+
+    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+
+    // davinci
+    DAVINCI_EXTERNAL("/davinci/externalSharePageLink")
 
     ;
     private final String url;

@@ -37,7 +37,33 @@ public class HisAdministrativeOffices implements Serializable {
     @Column(name = "is_matched")//辅助字段，是否匹配过,默认是false
     private Boolean isMatched;
 
+    //excel行数
+    @Transient
+    private int lineNum;
+
     public HisAdministrativeOffices() {
     }
 
+
+
+    public enum TyBz {
+        OPEN("0","OPEN"),
+        STOP("1","STOP"),
+        ;
+        private String key;
+        private String value;TyBz(String key, String value) {
+            this.key=key;
+            this.value=value;
+        }
+
+
+        public static TyBz getTyBz(String key) {
+            for (TyBz value : values()) {
+                if(value.key.equals(key)){
+                    return value;
+                }
+            }
+            return null;
+        }
+    }
 }
