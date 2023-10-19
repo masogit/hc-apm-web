@@ -957,7 +957,7 @@ public class UserAccountImportService {
                 String strLocked = ExcelParser.getCellStringValue(row, isLockedIndex);
                 isLocked = !StringUtils.isNotEmpty(strLocked) || !"否".equals(strLocked);
                 String strDisable = ExcelParser.getCellStringValue(row, isDisableIndex);
-                isDisable = !StringUtils.isNotEmpty(strDisable) || !"否".equals(strDisable);
+                isDisable = StringUtils.isNotEmpty(strDisable) && "是".equals(strDisable);
                 roleName = ExcelParser.getCellStringValue(row, roleNameIndex);
                 accessScope = ExcelParser.getCellStringValue(row, accessScopeIndex);
 
@@ -1043,9 +1043,9 @@ public class UserAccountImportService {
                 if (StringUtils.isEmpty(roleName)) {
                     newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE, "角色不能为空;");
                 }
-                if(StringUtils.isEmpty(assetClassification)){
-                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"资产分类不能为空;");
-                }
+//                if(StringUtils.isEmpty(assetClassification)){
+//                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"资产分类不能为空;");
+//                }
 
                 if (!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo,assetClassification)) {
                     importFailedDataList.add(newUser);
