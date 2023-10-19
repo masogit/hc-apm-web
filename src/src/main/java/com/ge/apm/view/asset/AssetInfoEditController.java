@@ -177,6 +177,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private UserContextService userContextService;
 
+    private AssetScrapService assetScrapService;
 
     private MqUtils mqUtils;
 
@@ -259,6 +260,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         nurseSiteMaintainConfigJNItemRepository = WebUtil.getBean(NurseSiteMaintainConfigJNItemRepository.class);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetScrapService = WebUtil.getBean(AssetScrapService.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -1127,6 +1129,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
+//        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
+//        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
     }
 

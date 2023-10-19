@@ -129,6 +129,7 @@
         <intercept-url pattern="/portal/analysis/assetDecision**" access="hasAnyRole('SuperAdmin','HospitalHead', 'AssetHead')"/> <!-- 辅助决策 -->
 
         <intercept-url pattern="/portal/tenant/TenantOptionConfig.xhtml" access="hasAnyRole('SuperAdmin')"/> <!-- 租户选项配置 -->
+        <intercept-url pattern="/portal/transactionManage/deptTransactionManage.xhtml" access="@customPermissionEvaluator.hasPermission(authentication, request, 'PERFORMANCE_DEPT_MANAGE_EDIT') or hasAnyRole('HospitalHead','AssetHead','AssetStaff')"/> <!-- 文档管理 -->
 
         <!-- 护士站 -->
         <!-- <intercept-url pattern="/portal/nurseSite/**" access="hasAnyRole('SuperAdmin','HospitalHead', 'NursingStaff')"/> -->

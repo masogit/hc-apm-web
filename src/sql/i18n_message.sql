@@ -4786,10 +4786,23 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'budgetManagement', '预算管理', 'Budget Management', NULL, -1);
 
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '1', '待审核', 'Pending Approval', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '2', '审核中', 'Approval In Progress', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '3', '审核通过', 'Approved', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '4', '审核未通过', 'Not Approved', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '1', '未提交', 'Staging', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '2', '已提交', 'Submitted', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '3', '审核通过', 'Pass', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '4', '审核不通过', 'Not Pass', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '5', '取消', 'Cancel', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '6', '已完成', 'Complete', NULL, -1);
+
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'ToSubmitted', '待提交', 'To be submitted', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'PendingApproval', '待审核', 'Pending Approval', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'PendingComplete', '待完成', 'Pending Complete', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'Complete', '完成', 'Complete', NULL, -1);
+--经费来源
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'SelfRaised', '自筹资金', 'Self raised funds', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'Appropriation', '拨款资金', 'Appropriation funds', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'HorizontalSpecial', '横向专项经费(科研)', 'Horizontal special funds', NULL, -1);
+
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetStockType', '1', '新增', 'CREATE', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetStockType', '2', '更新', 'UPDATE', NULL, -1);
@@ -5051,4 +5064,15 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'classificationCode', '资产分类编码', 'classificationCode', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ImportGroupingInBatch', '批量导入资产分类信息', 'ImportGroupingInBatch', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetScrap', '资产报废', 'assetScrap', NULL, '-1');
+-- YHAAO-19547 设备超期
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceOverdue', '设备超期', 'device overdue', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetScrap', '设备报废', 'assetScrap', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetDepartmentConvert', '设备转科', 'assetDepartmentConvert', NULL, '-1');
+
+
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','0','待审批','0',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','1','审批中','1',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','2','审批通过','2',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','3','审批不通过','3',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','4','审批退回','4',NULL,	-1	);

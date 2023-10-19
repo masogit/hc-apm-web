@@ -1042,4 +1042,24 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		});
 	}
 
+	public void batchUpdateAssetDeptId() {
+		List<AssetInfo> assetInfos = assetInfoRepository.notEqualAssetDeptId();
+		logger.info("update asset_dept_id data size:{}",assetInfos.size());
+		for (AssetInfo assetInfo : assetInfos) {
+			String uid=assetInfo.getUid();
+			Integer assetDeptId=assetInfo.getAssetDeptId();
+			String  assetDeptUid=assetInfo.getAssetDeptUID();
+			try {
+				logger.info("update asset_dept_id data before assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,assetDeptId,assetDeptUid);
+				OrgInfo byUid = orgInfoRepository.findByUid(assetDeptUid);
+				assetInfo.setAssetDeptId(byUid.getId());
+				assetInfoRepository.save(assetInfo);
+				logger.info("update asset_dept_id data after assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,byUid.getId(),assetDeptUid);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("update asset_dept_id data error assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,assetDeptId,assetDeptUid);
+
+			}
+		}
+	}
 }

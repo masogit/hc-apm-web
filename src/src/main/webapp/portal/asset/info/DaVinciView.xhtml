@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+        <ui:define name="content">
+            <div class="ui-g">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="报表预览"/>
+                </div>
+                <p:panelGrid columns="1" layout="grid">
+                    <iframe src="#{daVinciController.view()}" style="width: 1650px;height: 800px" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+                </p:panelGrid>
+            </div>
+        </ui:define>
+    </ui:composition>
+

@@ -58,6 +58,14 @@
                         <p:ajax listener="#{workOrderReportExportController.onCurrentOwnerChange}" />
                     </p:autoComplete>
                 </h:panelGroup>
+                <h:panelGroup rendered="#{workOrderReportExportController.enableAssetTypeGroup}">
+                    <label class="label">#{msg.assetTypeGroup}</label>
+                    <p:autoComplete dropdown="true" value="#{workOrderReportExportController.filterAssetTypeName}"
+                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderReportExportController.completeAssetTypeGroupList}">
+                        <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onAssetTypeGroupChange}" />
+                        <p:ajax listener="#{workOrderReportExportController.onAssetTypeGroupChange}" />
+                    </p:autoComplete>
+                </h:panelGroup>
 
             </p:panelGrid>
         </p:fieldset>

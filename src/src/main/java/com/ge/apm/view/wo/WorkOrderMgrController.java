@@ -395,14 +395,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private List<UserAccount> acker;
     public List<UserAccount> completeAckList(String query) {
-       //return woService.getAckerList(selectedWorkOrder.getId());
         if (acker == null) {
             return Collections.emptyList();
         }
 
         List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-//        res.sort(new PinYinComparatorByName());
+        if (loginUser.isEnableAssetTypeGroup()) {
+            // 已开启资产分类，需要过滤掉没有资产分类权限的人
+            List<String> userUidList = assetTypeGroupRepository.getUserUidListByEncoded(selectedWorkOrder.getAssetInfo().getAssetType());
+            res = res.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+        }
         return res;
     }
     public void changeStatus() {

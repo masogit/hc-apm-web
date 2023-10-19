@@ -11,25 +11,24 @@
 
     <p:dialog id="AssetEditDlg" widgetVar="AssetEditDialog" modal="true" resizable="false"
               draggable="true" appendTo="@(body)" width="920"
-              header="#{msg.Create}#{msg.Blank}#{msg.BudgetAsset}">
+              header="#{msg.Create}#{msg.Blank}#{msg.BudgetAsset}">1111111
         <h:form id="AssetEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid id="editPanel" columns="4" layout="grid"
-                             styleClass="ui-panelgrid-blank form-group"
-                             rendered="#{budgetController.selectedAsset != null}">
-                    <h:panelGroup>
+                             styleClass="ui-panelgrid-blank form-group">
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.ProductNumber}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.financingNum}" required="true"
                                      requiredMessage="#{msg.ProductNumber}#{msg.Blank}#{msg.ValidationRequire}"/>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup>
                         <p:outputLabel class="label">#{msg.EquipmentName}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.name}" required="true"
                                      requiredMessage="#{msg.EquipmentName}#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.AssetGroup}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:selectOneMenu value="#{budgetController.selectedAsset.assetGroup}" required="true"
@@ -40,8 +39,8 @@
                             <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
                                     update="@this assetGroupSecondary"/>
                         </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
+                    </h:panelGroup>-->
+                    <!--<h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
                         <p:outputLabel class="label">#{msg.AssetGroupSecondary}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:selectOneMenu id="assetGroupSecondary" required="true"
@@ -51,9 +50,9 @@
                             <f:selectItems value="#{budgetController.assetCreateAssetGroupSecondaryList}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetBrand}
+                        <p:outputLabel class="label">推荐#{msg.AssetBrand}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.assetBrand}" required="true"
                                      requiredMessage="#{msg.AssetBrand}#{msg.Blank}#{msg.ValidationRequire}"/>
@@ -65,6 +64,14 @@
                                      requiredMessage="#{msg.EquipmentModel}#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <p:outputLabel class="label">设备规格  <span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetController.selectedAsset.standards}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetController.selectedAsset.applicationAssetCategory}" />
+                    </h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.Unit}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.unit}" required="true"
@@ -94,7 +101,7 @@
                             <f:selectItem itemValue="否" itemLabel="否" />
                             <f:selectItem itemValue="是" itemLabel="是" />
                         </p:selectOneMenu>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                 </p:panelGrid>
 
                 <br/>

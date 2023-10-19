@@ -8,6 +8,10 @@ import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.asset.AssetHistoryService;
+import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
+import com.ge.apm.service.asset.AssetLifecyleService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -24,6 +28,7 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -31,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -86,8 +91,17 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private UserRoleRepository userRoleDao;
 
     @Autowired
-
     private SysRoleRepository roleDao;
+
+    @Autowired
+    private UserOrgInfoRepository userOrgDao;
+    @Autowired
+    private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private AssetInfoToBeTerminatedService assetInfoToBeTerminatedService;
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
@@ -138,7 +152,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     /**
      * 获取指定审核人列表
-     *
      * @return
      */
     public MultiLevelApprovalConfig getApproveWorkflowConfig(String approvalUid) {
@@ -238,13 +251,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
         RoleApproveCondition roleApproveCondition = approvalNode.getRoleApproveCondition();
         List<String> uids=null;
-        if(roleApproveCondition!=null){
+        if(roleApproveCondition!=null && roleApproveCondition.getCondition()!=null && org.apache.commons.lang3.StringUtils.isNotBlank(roleApproveCondition.getApproveRole())){
             String clinicalDeptUID=null;
             if(roleApproveCondition.getCondition()==1) {
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(businessUid);
+                if(v2WorkOrder==null){
+                    return  null;
+                }
                 clinicalDeptUID=v2WorkOrder.getAssetInfo().getClinicalDeptUID();
             }
-            if(org.apache.commons.lang3.StringUtils.isNotBlank(roleApproveCondition.getApproveRole())  && org.apache.commons.lang3.StringUtils.isNotBlank(clinicalDeptUID)) {
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(clinicalDeptUID)) {
                 int roleId = roleDao.getIdByName(roleApproveCondition.getApproveRole());
                 uids = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
             }
@@ -301,12 +317,20 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
-                // 预算管理
-                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED);
+                // 预算管理 审批不通过
+                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.applicationStep.ToSubmitted.toString());
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
-                updateAssetScrap(multiLevelApproval.getBusinessUid(), ApprovalConstant.SCRAP_STATUS_REVIEW_REFUSE, userAccount, approvalOpinion);
+                updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_REVIEW_REFUSE, userAccount, approvalOpinion);
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                byId.setCurrentStatus(4);
+                byId.setLastModifiedDate(new Date());
+                byId.setLastModifiedBy(userAccount.getLoginName());
+                byId.setApprovalReason(approvalOpinion);
+                assetDepartmentConvertRepository.save(byId);
                 break;
             //备件审批
             default:
@@ -320,8 +344,28 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
         }
 
-        String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
-        this.sendWxMsg(paramList,message,"审批失败","");
+        switch (multiLevelApproval.getBusinessType()) {
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                AssetInfo assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
+                ArrayList<UserAccount> userAccounts = new ArrayList<>();
+                userAccounts.add(user);
+                if(!assetScrap.getRequestUserUid().equals(assetScrap.getApprovalUid())){
+                    UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
+                    userAccounts.add(applyUser);
+                }
+                HashMap<String, Object> map = combineMsg("审批失败", assetScrap, assetInfo, null, userAccount);
+                sendWxMsg(map,userAccounts);
+                break;
+            default:
+                //审批同意时 给审批人发送微信
+                String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
+                this.sendWxMsg(paramList,message,"审批失败","");
+                break;
+
+        }
+
+
     }
 
     public void doWorkDetailByIsAgreeType(String id, int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
@@ -362,6 +406,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * @return MultiLevelApprovalConfig
      * @date 2020/7/30 16:00
      * 根据金额查询审批配置信息
+     *
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
@@ -492,6 +537,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+        List<UserAccount> userAccounts=new ArrayList<>();
+
         if (multiLevelApprovalConfig != null) {
             multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
             multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
@@ -531,6 +578,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         //发起人UID
                         String initiateApproverUid = null;
                         String businessType = this.getBusinessType(multiLevelApproval.getBusinessType());
+                        UserAccount user=null;
                         if (null != list) {
 
                             for (int i = 0; i < list.size(); i++) {
@@ -543,12 +591,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 multiLevelApprovalRepository.save(multi);
                             }
                             //微信通知发起人审批通过
-                            UserAccount user = userAccountRepository.getByUid(initiateApproverUid);
+                             user = userAccountRepository.getByUid(initiateApproverUid);
                             if (ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                 paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
                             }
                             String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
-                            this.sendWxMsg(paramList, message,"审批通过","");
+                            if(multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP){
+                                this.sendWxMsg(paramList, message,"审批通过","");
+                            }
                         }
                         switch (multiLevelApproval.getBusinessType()) {
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
@@ -562,6 +612,21 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
                                     generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList, userAccountRepository.findById(v2WorkOrder.getCurrentPersonId()));
                                 }
+
+                                paramList.clear();
+                                //推送消息到临床(该工单的报修人)
+//                                String initiateApproverUid1 = multiLevelApproval.getInitiateApproverUid();
+//                                Integer requestId = v2WorkOrder.getServiceRequest().getRequestorId();
+//                                UserAccount requestUser = userAccountRepository.getByUid(initiateApproverUid1);
+//                                paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
+                                //设备科长(可见范围内包含该设备的所有医学工程处主任)
+//                                int roleId = roleDao.getIdByName("AssetHead");
+                                String clinicalDeptUID = v2WorkOrder.getAssetInfo().getClinicalDeptUID();
+                                userAccounts=userAccountRepository.findUserByClinicalDeptUID(clinicalDeptUID,"AssetHead");
+                                userAccounts.add(user);
+                                userAccounts.stream().distinct().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
+                                String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
+                                this.sendWxMsg(paramList, message,"审批通过","");
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
                                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
@@ -577,10 +642,37 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                                 // 预算管理
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED);
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.applicationStep.PendingComplete.toString());
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
-                                updateAssetScrap(multiLevelApproval.getBusinessUid(), ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
+                                updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
+                                break;
+                            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                                AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                                byId.setCurrentStatus(3);
+                                byId.setLastModifiedBy(userAccount.getLoginName());
+                                byId.setLastModifiedDate(new Date());
+                                byId.setTransferInName(userAccount.getLoginName());
+                                byId.setTransferInAt(new Date());
+                                byId.setTransferInUid(userAccount.getUid());
+                                assetDepartmentConvertRepository.save(byId);
+                                AssetInfo assetInfoByUid = assetInfoDao.getByUid(byId.getAssetUid());
+                                OrgInfo orgInfo = orgInfoRepository.getByUid(byId.getInDeptUid());
+                                assetInfoByUid.setClinicalDeptUID(byId.getInDeptUid());
+                                assetInfoByUid.setClinicalDeptId(orgInfo.getId());
+                                assetInfoByUid.setClinicalDeptName(byId.getInDeptName());
+                                assetInfoByUid.setLastModifiedDate(new Date());
+                                assetInfoByUid.setLastModifiedBy(userAccount.getLoginName());
+                                assetInfoDao.save(assetInfoByUid);
+
+                                MqContext mqContext = new MqContext();
+                                mqContext.setClassName("MultiLevelApprovalService");
+                                mqContext.setServiceName("hc-apm-web");
+                                mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
+                                mqContext.setDescribe("资产转科审核同意");
+                                UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                                mqUtils.sendAssetToMQ(assetInfoByUid,currentUserAccount,mqContext);
+
                                 break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
@@ -592,7 +684,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             if (usingRole) {//角色审批，根据角色拉取用户进行审批
                                 List<Integer> nodeRoleUids = node.getRoleUids();
                                 if (nodeRoleUids != null) {
-                                    List<UserAccount> userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
+                                    userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
                                     for (UserAccount user : userAccounts) {
                                         if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                             paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
@@ -611,7 +703,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     userUids.addAll(uids);
                                     userUids = userUids.stream().distinct().collect(Collectors.toList());
                                 }
-                                List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
+                                userAccounts = userAccountRepository.findByUidIn(userUids);
                                 for (UserAccount user : userAccounts) {
                                     if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                         paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
@@ -637,12 +729,27 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS);
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.applicationStep.PendingApproval.toString());
                             }
-                            //审批同意时 给审批人发送微信
-                            String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
-                            this.sendWxMsg(paramList, message,"待审批",linkUrl);
+                            String linkUrl;
+                            switch (multiLevelApproval.getBusinessType()) {
+                                case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                                    AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                                    AssetInfo assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
+                                    linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                                    HashMap<String, Object> map = combineMsg(node.getNodeName(), assetScrap, assetInfo, linkUrl, userAccount);
+                                    sendWxMsg(map,userAccounts);
+                                    break;
+                                default:
+                                    //审批同意时 给审批人发送微信
+                                    String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
+                                    linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                                    this.sendWxMsg(paramList, message,"待审批",linkUrl);
+                                    break;
+                            }
+
+
+
                         }
                     }
                 }
@@ -650,25 +757,74 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
     }
 
-    private void updateAssetScrap(String businessUid, Integer status, UserAccount userAccount, String approvalOpinion) {
-        AssetScrap assetScrap = assetScrapDao.findById(businessUid);
+    private void updateAssetScrap(MultiLevelApproval multiLevelApproval, Integer status, UserAccount userAccount, String approvalOpinion) {
+        AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
         assetScrap.setLastModifiedBy(userAccount.getLoginName());
         assetScrap.setCurrentStatus(status);
         assetScrap.setLastModifiedDate(new Date());
         assetScrap.setApprovalReason(approvalOpinion);
         assetScrapDao.save(assetScrap);
+        AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
+
         if (status == ApprovalConstant.SCRAP_STATUS_SUCCESS) {
-            AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
-            assetInfo.setUsageStatus(4);
-            assetInfo.setStatus(4);
-            assetInfo.setIsValid(false);
-            assetInfo.setTerminateDate(new Date());
-            assetInfo.setLastModifiedDate(new Date());
-            assetInfoDao.save(assetInfo);
+
+
+            UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
+            //待报废
+//            processToBeTerminated(assetInfo);
+            //报废
+            assetInfoToBeTerminatedService.terminateAsset(assetInfo,applyUser);
+
+            //设备科长(可见范围内包含该设备的所有医学工程处主任)
+            List<UserAccount> userAccounts=userAccountRepository.findUserByClinicalDeptUID(assetInfo.getClinicalDeptUID(),"AssetHead");
+            //推送消息到临床(该工单的报修人)
+            UserAccount user = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
+            userAccounts.add(user);
+            if(!assetScrap.getRequestUserUid().equals(assetScrap.getApprovalUid())){
+                //责任工程师(提交审核时，该工单的当前owner)
+                UserAccount approvalUser = userAccountRepository.getByUid(assetScrap.getApprovalUid());
+                userAccounts.add(approvalUser);
+            }
+            List<WechatParam> paramList = ListUtil.newArrayList();
+            userAccounts.stream().distinct().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
+            HashMap<String, Object> map = combineMsg("审批通过", assetScrap, assetInfo, null, userAccount);
+            sendWxMsg(map,userAccounts);
         }
 
     }
 
+    @Autowired
+    AssetLifecyleService assetLifecyleService;
+    @Autowired
+    private AssetHistoryService assetHistoryService;
+    @Autowired
+    private MqUtils mqUtils;
+    //转入待报废
+    private  void processToBeTerminated(AssetInfo assetInfo) {
+//        assetInfo.setUsageStatus(4);
+        assetInfo.setStatus(4);
+//        assetInfo.setIsValid(false);
+        assetInfo.setTerminateDate(new Date());
+        assetInfo.setLastModifiedDate(new Date());
+
+        int originStatus = assetInfo.getStatus();
+        assetInfo.setStatus(4);
+        assetInfoDao.save(assetInfo);
+
+        saveAssetHistoryIfUpdated(assetInfo);
+        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+    }
+    public void saveAssetHistoryIfUpdated(AssetInfo newAsset) {
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("MultiLevelApprovalService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("saveAssetHistoryIfUpdated");
+        mqContext.setDescribe("资产报废多级审批流程");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+    }
     public void sendWxMsg(List<WechatParam> paramList, String message, String remark,String linkUrl){
         if (CollectionUtils.isEmpty(paramList)) {
             return;
@@ -697,7 +853,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     /**
      * @param type        0 维修工单, 1 保养工单
-     * @param isAgreeType 0 不同意, 1 同意
+     *
      */
     private void generateSparePartsBuyList(int type, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList, UserAccount userAccount) {
         if (accessorySparePartsRequestList != null && !accessorySparePartsRequestList.isEmpty()) {
@@ -743,6 +899,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP_NAME;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME;
         }
         return null;
     }
@@ -783,19 +941,34 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
-    private void updateBudget(String businessUid, Integer approvalStatus) {
+    private void updateBudget(String businessUid, Integer approvalStatus,String applicationStep) {
         BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
         budget.setApplicationStatus(approvalStatus);
-        budget.setApprovalProgress(budget.getApprovalProgress() + 1);
+        budget.setApplicationStep(applicationStep);
+        //budget.setApprovalProgress(budget.getApprovalProgress() + 1);
         budget.setApproverId(UserContextService.getCurrentUserAccount().getId());
         budget.setApprovalDate(new Date());
         budgetApplicationRepository.save(budget);
     }
 
-    public void getMultiLevelApprovalReturn(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion) {
+    // 预算管理
+    public void cancelApplication(String businessUid, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+        budget.setApplicationStatus(approvalStatus);
+        budget.setApplicationStep(applicationStep);
+        budgetApplicationRepository.save(budget);
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(budget.getBudgetApprovals())){
+            multiLevelApprovalRepository.delete(budget.getBudgetApprovals());
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void getMultiLevelApprovalReturn(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion,int returnLevel) {
 
         MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        List<UserAccount> userAccounts=new ArrayList<>();
+
         MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
         if (multiLevelApprovalConfig != null) {
             multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
@@ -806,21 +979,21 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalOpinion(approvalOpinion);
             multiLevelApproval.setApprovalIng(true);
             int approvalLevel = multiLevelApproval.getApprovalLevel();
-            int level = approvalLevel - 1;
+            int level = returnLevel;
             if(level==0){
                 return ;
             }
-            multiLevelApproval.setApprovalLevelNow(level);
+            multiLevelApproval.setApprovalLevelNow(returnLevel);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
             //更新审批进度
-            if (level > 1) {
+            if (level > 0) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
-                            multi.setApprovalLevelNow(level);
+                        if (multi != null ) {
+                            multi.setApprovalLevelNow(returnLevel);
                             multiLevelApprovalRepository.save(multi);
                         }
                     }
@@ -838,13 +1011,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
                         //没有特殊处理
                     }
-                    com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel - 1);
+                    com.ge.apm.domain.ApprovalNode node = approvalNodes.get(level-1);
                     if (node != null) {
                         boolean usingRole = node.getUsingRole();
                         if (usingRole) {//角色审批，根据角色拉取用户进行审批
                             List<Integer> nodeRoleUids = node.getRoleUids();
                             if (nodeRoleUids != null) {
-                                List<UserAccount> userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
+                                userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
                                 for (UserAccount user : userAccounts) {
                                     if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                         paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
@@ -863,7 +1036,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 userUids.addAll(uids);
                                 userUids = userUids.stream().distinct().collect(Collectors.toList());
                             }
-                            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
+                            userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
                                 if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                     paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
@@ -887,18 +1060,208 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setActualApproverDate(null);
                         date.setApprovalOpinion(null);
                         //生成下条待审批数据
-                        multiLevelApprovalRepository.save(date);
+                        MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                         if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP) {
                             //TODO 需要跟新报废表  assetScrap
                         }
-                        //审批同意时 给审批人发送微信
-                        String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                        this.sendWxMsg(paramList, message, "待审批","");
+
+
+                        String linkUrl;
+                        switch (multiLevelApproval.getBusinessType()) {
+                            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                                AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                                linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                                AssetInfo assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
+                                HashMap<String, Object> map = combineMsg(node.getNodeName(), assetScrap, assetInfo, linkUrl, userAccount);
+                                sendWxMsg(map,userAccounts);
+                                break;
+                            default:
+                                //审批同意时 给审批人发送微信
+                                String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
+                                linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+
+                                this.sendWxMsg(paramList, message, "待审批",linkUrl);
+
+                        }
+
                     }
 
                 }
             }
         }
 
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void getMultiLevelApprovalDirectDelivery(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion) {
+
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+
+        List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
+        MultiLevelApproval multiLevelApprovalReturn = list.get(list.size() - 2);
+
+        if(multiLevelApprovalReturn.getApprovalNodeStatus()!=ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN){
+           return;
+        }
+        List<UserAccount> userAccounts=new ArrayList<>();
+
+        if (multiLevelApprovalConfig != null) {
+            multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+            multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
+            multiLevelApproval.setActualApproverName(userAccount.getName());
+            multiLevelApproval.setActualApproverDate(new Date());
+            multiLevelApproval.setActualApproverUid(userAccount.getUid());
+            multiLevelApproval.setApprovalOpinion(approvalOpinion);
+            multiLevelApproval.setApprovalIng(true);
+            int approvalLevel = multiLevelApproval.getApprovalLevel();
+            int level = multiLevelApprovalReturn.getApprovalLevel();
+
+            multiLevelApproval.setApprovalLevelNow(level);
+            //更新审批数据
+            multiLevelApprovalRepository.save(multiLevelApproval);
+            //更新审批进度
+
+                if (null != list) {
+                    for (int i = 0; i < list.size(); i++) {
+                        MultiLevelApproval multi = list.get(i);
+                        if (multi != null) {
+                            multi.setApprovalLevelNow(level);
+                            multiLevelApprovalRepository.save(multi);
+                        }
+                    }
+                }
+
+            String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+            if (null != approvalItem) {
+                List<WechatParam> paramList = ListUtil.newArrayList();
+                List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
+                });
+                if (approvalNodes != null) {
+                    MultiLevelApproval date = multiLevelApprovalNew;
+                    int maxNodeId = approvalNodes.size();
+                    if (level == 1) {//退回第一节点
+
+                        //没有特殊处理
+                    }
+                    com.ge.apm.domain.ApprovalNode node = approvalNodes.get(level-1);
+                    if (node != null) {
+                        boolean usingRole = node.getUsingRole();
+                        if (usingRole) {//角色审批，根据角色拉取用户进行审批
+                            List<Integer> nodeRoleUids = node.getRoleUids();
+                            if (nodeRoleUids != null) {
+                                userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
+                                for (UserAccount user : userAccounts) {
+                                    if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
+                                        paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
+                                    }
+                                }
+                                //保存角色到审批流中
+                                date.setApprovalType(ApprovalConstant.ROLE_APPROVAL_TYPE);
+                                Object[] objects = nodeRoleUids.toArray();
+                                String str = StringUtils.join(objects, ",");
+                                date.setApprovalUid(str);
+                            }
+                        } else {//用户审批
+                            List<String> userUids = node.getUserUids();
+                            List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
+                            if(CollectionUtils.isNotEmpty(uids)){
+                                userUids.addAll(uids);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
+                            userAccounts = userAccountRepository.findByUidIn(userUids);
+                            for (UserAccount user : userAccounts) {
+                                if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
+                                    paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
+                                }
+                            }
+                            date.setApprovalType(ApprovalConstant.USER_APPROVAL_TYPE);
+                            Object[] objects = userUids.toArray();
+                            String str = StringUtils.join(objects, ",");
+                            date.setApprovalUid(str);
+                        }
+                        date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+                        date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+                        date.setApprovalLevel(level);
+                        date.setCreatedBy(userAccount.getLoginName());
+                        date.setApprovalIng(false);
+                        date.setApprovalLevelNow(level);
+                        date.setInitiateApproverUid(null);
+                        date.setCreatedDate(new Date());
+                        date.setId(null);
+                        date.setActualApproverName(null);
+                        date.setActualApproverDate(null);
+                        date.setApprovalOpinion(null);
+                        //生成下条待审批数据
+                        MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
+                        if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP) {
+                            //TODO 需要跟新报废表  assetScrap
+                        }
+
+                        String linkUrl;
+                        switch (multiLevelApproval.getBusinessType()) {
+                            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                                AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                                linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                                AssetInfo assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
+                                HashMap<String, Object> map = combineMsg(node.getNodeName(), assetScrap, assetInfo, linkUrl, userAccount);
+                                sendWxMsg(map,userAccounts);
+                                break;
+                            default:
+                                //审批同意时 给审批人发送微信
+                                String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
+                                linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                                this.sendWxMsg(paramList, message, "待审批",linkUrl);
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+    }
+
+
+
+
+
+    private HashMap<String, Object> combineMsg(String woSteps, AssetScrap assetScrap, AssetInfo assetInfo,String linkUrl,UserAccount user) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword1", assetScrap.getBusinessNumber() + "  业务类型：" + "设备报废");
+        params.put("keyword2", assetScrap.getApplyReason());
+        params.put("keyword3", assetScrap.getAssetName() + "  所属科室：" + assetInfo.getClinicalDeptName());
+        if(woSteps.equals("审批通过") || woSteps.equals("审批失败")){
+            params.put("keyword4", woSteps);
+        }else{
+            params.put("keyword4", "待" + woSteps + "审批");
+        }
+        String handler =  user.getLoginName();
+        params.put("keyword5", handler);
+        if(org.apache.commons.lang3.StringUtils.isNotBlank(linkUrl)){
+            params.put("linkUrl", linkUrl);
+        }
+        return params;
+    }
+
+    public void sendWxMsg( HashMap<String, Object> param,List<UserAccount>  userAccounts){
+        List<WechatParam> paramList = new ArrayList<>();
+        for (UserAccount user : userAccounts) {
+            WechatParam wechatParam = JSON.parseObject(JSON.toJSONString(param), WechatParam.class);
+            wechatParam.setOpenId(user.getWeChatId());
+            wechatParam.setAppAlias(user.getAppAlias());
+            paramList.add(wechatParam);
+        }
+        String token = UserContextService.getAccessToken();
+        Map<String, Object> map = new HashMap<>();
+        map.put("paramList", paramList);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.SEND_WE_CHAT);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String str = responseMap.get("message").toString();
+            throw new RuntimeException(str);
+        }
     }
 }

@@ -37,11 +37,6 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
             "select * from cte_child_auth_group order by encoded\n", nativeQuery = true)
     List<AssetTypeGroup> listAssetTypeGroupInHierarchyByUser(@Param("userUid") String userUid);
 
-    @Query(value = "    select sag.uid,  sag.name, sag.encoded, sag.classification_code, sag.parent_uid,sag.tenant_uid\n" +
-            "    from asset_type_group sag join user_asset_group uag on uag.asset_group_uid = sag.uid\n" +
-            "    where uag.user_uid = :userUid \n", nativeQuery = true)
-    List<AssetTypeGroup> listAssetTypeGroupByUser(@Param("userUid") String userUid);
-
     AssetTypeGroup findByUid(String uid);
     AssetTypeGroup findByEncodedAndTenantUid(String encoded,String tenantUid);
     List<AssetTypeGroup> findByEncodedInAndTenantUid(Collection<String> codedList, String tenantUid);

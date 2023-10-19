@@ -11,6 +11,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -178,6 +179,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     //保存审批节点
     public void saveNode() {
 //        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
+        if(CollectionUtils.isEmpty(approvalNode.getApproveUsers()) &&( StringUtils.isBlank(roleApproveCondition.getApproveRole())  ||  roleApproveCondition.getCondition()==null )){
+            WebUtil.addErrorMessage("请选择审核人");
+            return;
+        }
 
         if (null != approvalNode.getNodeId()) {
 //            if(approvalNode.isClinicalDepartmentDirector()){

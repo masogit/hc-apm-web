@@ -12,7 +12,8 @@
     <p:dialog id="AssetSelectDlg" widgetVar="AssetSelectDialog" modal="true" resizable="false"
               draggable="true" appendTo="@(body)" width="960" height="560"
               header="#{budgetController.CRUDActionName}#{msg.Blank}#{msg.BudgetApplication}">
-        <h:form id="assetSearchForm">
+        2222222
+       <h:form id="assetSearchForm">
             <p:fieldset legend="#{msg.searchAsset}">
                 <p:panelGrid id="assetSearchPanel" columns="3" layout="grid"
                              styleClass="ui-panelgrid-blank form-group">
@@ -42,19 +43,10 @@
                     <h:panelGroup>
                         <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
                         <p:inputText value="#{budgetController.assetSearchForm.assetBrand}"/>
-                        <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.assetBrand}"-->
-                        <!--                                        scrollHeight="250" forceSelection="false">-->
-                        <!--                                                completeMethod="#{budgetController.listSearchWarehouse}">-->
-                        <!--                                    <p:ajax event="itemSelect" update="searchLocator"-->
-                        <!--                                            listener="#{budgetController.onSearchWarehouseSelect}"/>-->
-                        <!--                        </p:autoComplete>-->
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EquipmentModel}</label>
                         <p:inputText value="#{budgetController.assetSearchForm.assetModel}"/>
-                        <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.functionType}"-->
-                        <!--                                        scrollHeight="250" forceSelection="false"/>-->
-                        <!--                                                completeMethod="#{budgetController.listItems}"/>-->
                     </h:panelGroup>
                     <h:panelGroup style="display: flex;">
                         <p:commandButton value="#{msg.Search}"
@@ -68,42 +60,33 @@
             </p:fieldset>
         </h:form>
         <h:form id="AssetSelectForm">
-            <p:dataTable id="assetDatalist" value="#{budgetController.optionalBudgetAssets}" var="item"
+           <!-- <p:dataTable id="assetDatalist" value="#{budgetController.optionalBudgetAssets}" var="item"
                          widgetVar="varAssetDatalist"
                          lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.asset.id}"
                          paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
-
-                <p:column headerText="#{msg.ProductNumber}">
-                    <h:outputText value="#{item.asset.financingNum}"/>
+                <p:column headerText="设备名称">
+                    <h:outputText value="#{item.applicationAssetName}"/>
                 </p:column>
-                <p:column headerText="#{msg.EquipmentName}">
-                    <h:outputText value="#{item.asset.name}"/>
+                <p:column headerText="设备品类">
+                    <h:outputText value="#{item.applicationAssetCategory}"/>
                 </p:column>
-                <p:column headerText="#{msg.AssetBrand}">
-                    <h:outputText value="#{item.asset.assetBrand}"/>
+                <p:column headerText="推荐品牌">
+                      <h:outputText value="#{item.recommendedBrand}"/>
                 </p:column>
-                <p:column headerText="#{msg.EquipmentModel}">
-                    <h:outputText value="#{item.asset.assetModel}"/>
+                <p:column headerText="规格">
+                    <h:outputText value="#{item.standards}"/>
                 </p:column>
-                <p:column headerText="#{msg.Unit}">
-                    <h:outputText value="#{item.asset.unit}"/>
+                <p:column headerText="型号">
+                    <h:outputText value="#{item.model}"/>
                 </p:column>
-                <p:column headerText="#{msg.StockType}">
-                    <p:selectOneMenu id="stockType" value="#{item.stockType}">
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('budgetStockType')}" var="t"
-                                       itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
-                    </p:selectOneMenu>
-                </p:column>
-                <p:column headerText="#{msg.ApplicationQuantity}">
+                &lt;!&ndash;<p:column headerText="数量">
                     <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0"
                                    value="#{item.applicationQuantity}">
-                        <p:ajax update="@this amount"/>
                     </p:inputNumber>
-                </p:column>
-                <p:column headerText="#{msg.ApplicationPrice}">
+                </p:column> <p:column headerText="#{msg.ApplicationPrice}">
                     <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
                                    value="#{item.applicationPrice}">
                         <p:ajax update="@this amount"/>
@@ -114,17 +97,58 @@
                         <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                     </h:outputText>
                 </p:column>
+&ndash;&gt;
                 <f:facet name="{Toolbar}">
                     <p:commandButton value="#{msg.AddNewAsset}" class="zoom-08"
                                      actionListener="#{budgetController.prepareCreateAsset}"
                                      update="AssetEditDlg"
                                      oncomplete="PF('AssetEditDialog').show()"/>
                 </f:facet>
-            </p:dataTable>
+
+
+                &lt;!&ndash;  <p:column headerText="#{msg.EquipmentName}">
+                      <h:outputText value="#{item.asset.name}"/>
+                  </p:column>
+                   <p:column headerText="#{msg.EquipmentModel}">
+                       <h:outputText value="#{item.asset.assetModel}"/>
+                   </p:column>
+                   <p:column headerText="#{msg.Unit}">
+                       <h:outputText value="#{item.asset.unit}"/>
+                   </p:column>
+                   <p:column headerText="#{msg.StockType}">
+                       <p:selectOneMenu id="stockType" value="#{item.stockType}">
+                           <f:selectItems value="#{fieldMsg.getFieldValueList('budgetStockType')}" var="t"
+                                          itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                       </p:selectOneMenu>
+                   </p:column>
+                   <p:column headerText="#{msg.ApplicationQuantity}">
+                       <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0"
+                                      value="#{item.applicationQuantity}">
+                           <p:ajax update="@this amount"/>
+                       </p:inputNumber>
+                   </p:column>
+                   <p:column headerText="#{msg.ApplicationPrice}">
+                       <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
+                                      value="#{item.applicationPrice}">
+                           <p:ajax update="@this amount"/>
+                       </p:inputNumber>
+                   </p:column>
+                   <p:column headerText="#{msg.ApplicationAmount}">
+                       <h:outputText id="amount" value="#{item.applicationQuantity * item.applicationPrice}">
+                           <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                       </h:outputText>
+                   </p:column>
+                   <f:facet name="{Toolbar}">
+                       <p:commandButton value="#{msg.AddNewAsset}" class="zoom-08"
+                                        actionListener="#{budgetController.prepareCreateAsset}"
+                                        update="AssetEditDlg"
+                                        oncomplete="PF('AssetEditDialog').show()"/>
+                   </f:facet>&ndash;&gt;
+            </p:dataTable>-->
 
             <br/>
             <p:commandButton validateClient="true" actionListener="#{budgetController.addBudgetAsset}"
-                             value="#{msg.Save}"
+                             value="确定"
                              update=":AssetSelectDlg, BudgetApplicationEditForm, :growl"
                              oncomplete="handleSubmit(args, 'AssetSelectDialog');"/>
             <p:commandButton immediate="true" value="#{msg.Cancel}"

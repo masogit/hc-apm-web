@@ -215,7 +215,7 @@
 
                             <p:fieldset legend="审批节点-条件">
                                 <p:selectOneMenu   value="#{multiLevelApprovalConfigController.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="0" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItem itemLabel="工单设备所属科室" itemValue="1" />
                                 </p:selectOneMenu>
                             </p:fieldset>
@@ -225,12 +225,13 @@
                                 value="#{multiLevelApprovalConfigController.approvalNode.approveUsers}"
                                 panelStyle="width:280px" style="width:100%"
                                 converter="userAccountConverter" multiple="true" filter="true"
-                                filterMatchMode="contains" required="true" requiredMessage="审核人不能为空"
+                                filterMatchMode="contains"
                                 disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}">
                             <f:selectItems value="#{multiLevelApprovalConfigController.users4Approval}" var="item"
                                            itemLabel="#{multiLevelApprovalConfigController.getNameWithOrgName(item)}" itemValue="#{item}"/>
                             <p:ajax process="@this"/>
                         </p:selectCheckboxMenu>
+<!--                         required="true" requiredMessage="审核人不能为空"-->
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

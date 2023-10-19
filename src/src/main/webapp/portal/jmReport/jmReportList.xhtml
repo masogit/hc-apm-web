@@ -28,7 +28,6 @@
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
 
-<!--								<p:ajax event="rowSelect" listener="#{jmReportController.onSelect}" update="roleButton reportName" oncomplete="PF('sidebar').show()"/>-->
 								<p:ajax event="rowSelect" listener="#{jmReportController.onSelect}" update="roleButton" />
 								<p:ajax event="filter" listener="#{jmReportController.onFilter}" update="datalist roleButton"/>
 								<p:column headerText="报表名称"  filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -36,6 +35,9 @@
 								</p:column>
 								<p:column headerText="报表描述">
 									<h:outputText value="#{item.description}" />
+								</p:column>
+								<p:column headerText="报表类型">
+									<h:outputText value="#{jmReportController.getType(item.type)}" />
 								</p:column>
 								<p:column  headerText="新窗口预览" selectRow="none">
 									<h:commandLink id="viewReportButton" title="预览" target="_blank" action="#{jmReportController.openNewWindowView(item.id)}" onblur="reload()">
@@ -49,14 +51,6 @@
 						</h:panelGroup>
 					</p:panelGrid>
 				</h:form>
-<!--				<p:panelGrid columns="1" layout="grid">-->
-<!--					<h:panelGroup>-->
-<!--						<p:sidebar id="reportName" widgetVar="sidebar" position="left" style="width: 100%;height: 90%; " >-->
-<!--							<h3>#{jmReportController.selected.name}预览</h3>-->
-<!--							<iframe src="#{jmReportController.view(1)}" style="width: 100%;height: 90%; " > </iframe>-->
-<!--						</p:sidebar>-->
-<!--					</h:panelGroup>-->
-<!--				</p:panelGrid>-->
 				<ui:include src="jmReportRole.xhtml"/>
 			</div>
 		</div>
