@@ -157,7 +157,7 @@
                         </p:fieldset>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:fieldset legend="预算管理">
+                        <p:fieldset legend="预算管理" rendered="false">
                             <p:selectManyCheckbox id="budget" widgetVar="budget" value="#{tenantInfoController.selectedMenuFeaturesBudget}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
                                 <f:selectItem itemLabel="预算管理" itemValue="BUDGET"/>
