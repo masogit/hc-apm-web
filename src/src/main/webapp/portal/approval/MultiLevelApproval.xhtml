@@ -152,11 +152,15 @@
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14}">
                         <p:commandButton validateClient="true" immediate="false"
                                          actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}"
-                                         value="#{msg.Approved}" update="approvalList ItemDetailViewForm"
+                                         value="审核通过" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false"
                                          actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}"
-                                         value="#{msg.NotApproved}" update="approvalList ItemDetailViewForm"
+                                         value="审核不通过" update="approvalList ItemDetailViewForm"
+                                         oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false"
+                                         actionListener="#{multiLevelApprovalController.cancelApplicationMultiLevelApproval()}"
+                                         value="取消申请单" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
 
