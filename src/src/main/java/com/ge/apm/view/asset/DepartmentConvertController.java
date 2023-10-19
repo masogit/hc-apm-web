@@ -2,9 +2,12 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.SiteToSiteAllocationRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetDepartmentConvert;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SiteToSiteAllocation;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.DepartmentConvertService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -12,6 +15,7 @@ import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.*;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -22,8 +26,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,17 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private Date filterBeginTime;
     private Date returnAtTime;
 
+    private List<AssetDepartmentConvert> currentPageAssets;
+
+    //复选的设备
+    private Map<String, Boolean> selectedMap;
+    private  StreamedContent transferOrderFile;
+    private UserAccount user;
+
+    private Boolean isInsulate;
+    private TenantInfoRepository tenantInfoRepository;
+
+    private DepartmentConvertService departmentConvertService;
     @Override
     protected AssetDepartmentConvertRepository getDAO() {
         return dao;
@@ -49,6 +63,16 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
+
+        this.selectedMap = new HashMap();
+
+        user = UserContextService.getCurrentUserAccount();
+
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        departmentConvertService = WebUtil.getBean(DepartmentConvertService.class);
+
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
     }
 
     @Override
@@ -65,10 +89,23 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         if (returnAtTime != null) {
             searchFilters.add(new SearchFilter("transferInAt", SearchFilter.Operator.GTE, returnAtTime));
         }
+
+        Page<AssetDepartmentConvert> res =null;
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
+            res= dao.findAll(pageRequest);
         } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            res= dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+        currentPageAssets = res.getContent();
+
+        return res;
+    }
+
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (AssetDepartmentConvert item : currentPageAssets) {
+            selectedMap.put(item.getId(), !isSelectedAll);
         }
     }
 
@@ -171,5 +208,29 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
         }
         return stringStatus;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public boolean isChecked() {
+        return selectedMap.containsValue(true);
+    }
+    public StreamedContent getTransferOrderFile() {
+        return transferOrderFile;
+    }
+
+    public void exportTransferOrderFile() {
+        try {
+            transferOrderFile = null;
+            List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+            transferOrderFile = departmentConvertService.export(selectedIds);
+        } catch (IllegalStateException e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("exportTransferOrderFile error:",e);
+            WebUtil.addErrorMessage("Fail to download report");
+        }
     }
 }
