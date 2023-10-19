@@ -7,6 +7,7 @@ import com.ge.apm.domain.TenantOptionConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -105,7 +106,7 @@ public class UpdateTenantFeatureService {
 	private ConfigItemValueRepository configItemValueRepository;
 
 	@Autowired
-	private TenantOptionConfigRepository tenantOptionConfigRepository;
+	private ConfigCacheService configCacheService;
 
 	@Autowired
 	private ConfigService configService;
@@ -122,14 +123,7 @@ public class UpdateTenantFeatureService {
 	}
 
 	public boolean isAllowAssetBatchUpdate(TenantInfo tenantInfo) {
-		Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(tenantInfo.getUid());
-		if (!tenantOptionConfigOptional.isPresent()) {
-			return false;
-		}
-		TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
-		if (null == tenantOptionConfig.getAllowAssetBatchUpdate()) {
-			return false;
-		}
+		TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(tenantInfo.getUid());
 		return tenantOptionConfig.getAllowAssetBatchUpdate();
 	}
 
@@ -139,10 +133,8 @@ public class UpdateTenantFeatureService {
 	}
 
 	public Boolean showSupplierViewAndEditFieldsTable(TenantInfo tenantInfo) {
-		Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(tenantInfo.getUid());
-		if (!tenantOptionConfigOptional.isPresent()) return false;
-		TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
-		return BooleanUtils.isTrue(tenantOptionConfig.getActiveSupplier());
+		TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(tenantInfo.getUid());
+		return tenantOptionConfig.getActiveSupplier();
 	}
 
 	public Boolean hasCurrentTenantName(TenantInfo tenantInfo) {

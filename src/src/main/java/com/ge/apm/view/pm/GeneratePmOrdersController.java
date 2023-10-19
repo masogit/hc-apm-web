@@ -385,6 +385,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
         filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
+		List<AssetTypeGroup> assetTypeGroupList = null;
+		if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+			List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+			filter.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+		}
 		return filter;
 	}
 

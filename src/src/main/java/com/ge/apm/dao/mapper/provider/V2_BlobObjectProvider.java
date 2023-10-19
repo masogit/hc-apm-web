@@ -42,7 +42,7 @@ public class V2_BlobObjectProvider {
                 " GROUP BY main_directory, second_directory)" +
                 " union all" +
                 " (SELECT 'AW' as main_directory, 'AW' as second_directory from asset_info" +
-                " where asset_group = '1' and tenant_uid = '"+tenantUid+"' limit 1)) directory" +
+                " where warranty_date>=to_date(to_char(now(),'yyyyMMdd'),'yyyyMMdd') and asset_group = '1' and is_deleted = false and is_valid = true and tenant_uid = '"+tenantUid+"' limit 1)) directory" +
                 " where directory.main_directory = bo.main_directory " +
                 " and directory.second_directory = bo.second_directory)" +
                 " and bo.bo_type ='"+boType+"'"+

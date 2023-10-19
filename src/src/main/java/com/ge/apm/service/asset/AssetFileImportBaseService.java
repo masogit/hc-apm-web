@@ -722,19 +722,19 @@ public class AssetFileImportBaseService {
                 if(orgInfo!=null){
                     assetDeptNameOld=orgInfo.getName();
                 }
-                if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(assetDeptNameOld) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
+
+                if ((StringUtils.hasText(assetDeptNameOld) && !assetDeptNameOld.equals(assetDeptName)) ||
+                        (StringUtils.hasText(asset.getClinicalDeptName()) && !asset.getClinicalDeptName().equals(clinicalDeptName)) ) {
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备已绑定调剂名称,不能修改科室");
                     }
-
                     if(!assetInfoBulkEditCheckService.verifyForMaintain(assets)){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的保养工单,不能修改科室");
                     }
-
                     if(!assetInfoBulkEditCheckService.verifyForInventory(assets)){
                         item.put("status", ImportStatus.CheckFail);
                         result.put("canBeImport",Boolean.FALSE);
@@ -758,7 +758,6 @@ public class AssetFileImportBaseService {
                             }
                         }
                     }
-
                     //临床助手检查进行中
                     unCheckNurseSiteMaintainList.addAll(assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets));
                 }

@@ -270,7 +270,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<OrgInfo> orgList;
     @Getter @Setter
     private boolean hospitalShow = false;
-    private List<AssetTypeGroup> assetTypeGroupList;
+    private UserAccount loginUser;
 
     @Override
     protected void init() {
@@ -320,9 +320,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
+            loginUser = UserContextService.getCurrentUserAccount();
 
-            // 用户可见资产分类
-            assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -396,14 +395,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private List<UserAccount> acker;
     public List<UserAccount> completeAckList(String query) {
-       //return woService.getAckerList(selectedWorkOrder.getId());
         if (acker == null) {
             return Collections.emptyList();
         }
 
         List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-//        res.sort(new PinYinComparatorByName());
+        if (loginUser.isEnableAssetTypeGroup()) {
+            // 已开启资产分类，需要过滤掉没有资产分类权限的人
+            List<String> userUidList = assetTypeGroupRepository.getUserUidListByEncoded(selectedWorkOrder.getAssetInfo().getAssetType());
+            res = res.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+        }
         return res;
     }
     public void changeStatus() {
@@ -699,8 +701,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         if (!this.hasFilterOnField("siteUID")) {
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -777,7 +778,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         Page<V2_WorkOrder> pageResult = null;
         try {
-            if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(loginUser.getAssetTypeGroupList())) {
                 return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
             }
             this.setSearchFilter();
@@ -876,12 +877,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 //            }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
-                UserAccount userAccount = userContextService.getCurrentUserAccount();
-                String tenantUID = userAccount.getTenantUID();
+                String tenantUID = loginUser.getTenantUID();
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
                 if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                     List<UserAccount> userAccountList = new ArrayList<>();
-                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(loginUser.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     if (auditGroupConfiguration != null) {
                         String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
                         List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {
@@ -898,7 +898,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
                         }
                     }
-                    if (userAccountList.contains(userAccount)) {
+                    if (userAccountList.contains(loginUser)) {
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1, "1*approve+"));
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(), "1*approve+9*"));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0, "1*approve+9*"));
@@ -1008,14 +1008,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = pageResult.getContent();
             }
-            UserAccount userAccount = userContextService.getCurrentUserAccount();
-            TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
             List<V2_WorkOrder> workOrderList = new ArrayList<>();
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
                 List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
                 if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
                     for (V2_WorkOrder v2_workOrder :v2_workOrders) {
-                        if (getSign(v2_workOrder.getId(), userAccount)) {
+                        if (getSign(v2_workOrder.getId(), loginUser)) {
                             workOrderList.add(v2_workOrder);
                         }
                     }
@@ -1102,9 +1101,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
         if (!this.hasFilterOnField("siteUID")) {
-            UserAccount userAccount = userContextService.getCurrentUserAccount();
-            String tenantUID = userAccount.getTenantUID();
-            TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
                 String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
                 updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
@@ -1123,9 +1120,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         // 资产分类权限
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
-            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        if (loginUser.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, loginUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
     }
 
@@ -1327,9 +1323,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        UserAccount userAccount = userContextService.getCurrentUserAccount();
-        String tenantUID = userAccount.getTenantUID();
-        TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
             List<V2_WorkOrder_Detail> approvedDetailList = new ArrayList<>();
             approvedDetails.stream().forEach(item -> {
@@ -2337,8 +2331,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     //保存一个备件
     public void saveItem(){
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-//        if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getParts()==null && partsItem==null) {
                 WebUtil.addErrorMessage("备件名称必填！");
@@ -2369,10 +2361,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
             itemDetail.setArrivedGood(false);
             itemDetail.setArrivedGoodReturn(false);
-            itemDetail.setSiteUID(currentUserAccount.getSiteUID());
-            itemDetail.setTenantUID(currentUserAccount.getTenantUID());
-            itemDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
-            itemDetail.setHospitalUID(currentUserAccount.getHospitalUID());
+            itemDetail.setSiteUID(loginUser.getSiteUID());
+            itemDetail.setTenantUID(loginUser.getTenantUID());
+            itemDetail.setInstitutionUID(loginUser.getInstitutionUID());
+            itemDetail.setHospitalUID(loginUser.getHospitalUID());
             accessoryList.add(itemDetail);
 
         //调用微服务来存附件
@@ -2697,8 +2689,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         Boolean hospitalNameBoolean = UserContextService.isHospitalName("");
         List<UserAccount> uaList=new ArrayList<>();
         if (hospitalNameBoolean){
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getHospitalUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(loginUser.getHospitalUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
             if(auditGroupConfiguration!=null){
                 String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
                 List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
@@ -2715,15 +2706,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
             }else {
                 WebUtil.addErrorMessage("未配置医工分组,请先配置!");
-                return uaList;
             }
         }else {
             uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
-            /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
-             List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
         }
-            return uaList;
 
+        if (loginUser.isEnableAssetTypeGroup()) {
+            // 已开启资产分类，需要过滤掉没有资产分类权限的人
+            List<String> userUidList = assetTypeGroupRepository.getUserUidListByEncoded(selectedWorkOrder.getAssetInfo().getAssetType());
+            uaList = uaList.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+        }
+
+        return uaList;
     }
 
     public void prepareEditWorkOrderManHoursDetail(String itemId) {
@@ -2962,7 +2956,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return coWorkerList;
     }
     public void saveNewSupplier() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
         this.newSupplier.setTenantUID(loginUser.getTenantUID());

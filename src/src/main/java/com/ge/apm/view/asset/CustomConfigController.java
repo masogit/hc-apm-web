@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantOptionConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
@@ -51,7 +50,7 @@ public class CustomConfigController {
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
     private ConfigService configService;
-    private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private ConfigCacheService configCacheService;
     private UserContextService userContextService;
     private I18nMessageService i18nMessageService;
 
@@ -83,7 +82,7 @@ public class CustomConfigController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
-        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -556,7 +555,15 @@ public class CustomConfigController {
     }
 
     public boolean isRenameFields(String key) {
-        return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+        try {
+            return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+        }catch (IllegalArgumentException e){
+            logger.error("CustomConfigFields is not key:{}",key);
+            return  false;
+        }catch (Exception e){
+            logger.error("CustomConfigController isRenameFields key:{}, error :{}",key,e);
+            return false;
+        }
     }
 
     public boolean isReadOnlyFields(String key) {
@@ -742,9 +749,7 @@ public class CustomConfigController {
 
     public Boolean showSupplierViewAndEditFieldsTable() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        if (!tenantOptionConfigOptional.isPresent()) return false;
-        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+        TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(UserContextService.getCurrentUserAccount().getTenantUID());
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         if(workflowConfig!=null && tenantOptionConfig!=null && workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()!=null && workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
         return false;

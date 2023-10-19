@@ -132,6 +132,28 @@ public class ZkbAssetQrCodeInfo {
     @Column(name = "reason_categorize")
     private String reasonCategorize;
 
+    @Transient
+    private Integer excelIdex;
+
+    @Transient
+    private String errorInfo;
+
+    public Integer getExcelIdex() {
+        return excelIdex;
+    }
+
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+
     public String getReasonCategorize() {
         return reasonCategorize;
     }

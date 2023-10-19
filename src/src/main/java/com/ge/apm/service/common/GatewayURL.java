@@ -127,6 +127,7 @@ public enum GatewayURL {
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
     PART_ORDER_QR_CODE_JOB_SCHEDULE("/hc-apm-schedule/job/api/929"),
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
+    SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/sendWeChat"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
 
@@ -159,6 +160,11 @@ public enum GatewayURL {
     INSERT_BUSINESS_ERROR_LOG("/hcapmelasticservice/businessErrorLog/insertBusinessErrorLog"),
     // jimureport
     JI_MU_REPORT("/apmReport/jmreport/view"),
+
+    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+
+    // davinci
+    DAVINCI_EXTERNAL("/davinci/externalSharePageLink")
 
     ;
     private final String url;

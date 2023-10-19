@@ -1478,6 +1478,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
+    public void workStationFlagSelect(){
+        if(CopyByInvok.T.equals(selected.getWorkStationFlag())){
+            selected.setProductNumber("AW");
+        }else {
+            selected.setProductNumber(assetInfo.getFunctionType());
+        }
+    }
+
     public void ccsbApplyTypeSelect(){
         calcRemainQty();
     }

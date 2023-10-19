@@ -31,6 +31,9 @@
 								<p:column headerText="报表描述">
 									<h:outputText value="#{item.description}" />
 								</p:column>
+								<p:column headerText="报表类型">
+									<h:outputText value="#{jmReportController.getType(item.type)}" />
+								</p:column>
 								<p:column  headerText="预览/设计" >
 									<h:panelGroup>
 										<p:commandLink id="viewReportButton" title="预览"   action="#{jmReportController.getViewUrl(item)}" oncomplete="PF('sidebar').show()" update="reportView">

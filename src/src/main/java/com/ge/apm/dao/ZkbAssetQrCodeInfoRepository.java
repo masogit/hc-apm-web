@@ -29,6 +29,9 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
      */
     List<ZkbAssetQrCodeInfo> findByTenantUIDAndCanNotPastQrCode(String tenantUID,String canNotPastQrCode);
 
+
+    List<ZkbAssetQrCodeInfo> findByTenantNameAndSystemId(String TenantName,String SystemId);
+
     /**
      * 二维码是否已实施 or 是否设备无法粘贴二维码
      * 已经贴码设备

@@ -27,7 +27,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup");
     }
 
     //只读字段
@@ -108,7 +108,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle","assetTypeGroup");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -118,13 +118,13 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle","assetTypeGroup");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality","assetTypeGroup");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {

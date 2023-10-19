@@ -326,7 +326,7 @@ public class QrCodeService {
                         itemObject.put("TextShowValue", textValue.concat(asset.getQrCode() == null ? "" : asset.getQrCode()));
                         break;
                     case "installDate":
-                        itemObject.put("TextShowValue", textValue.concat(asset.getInstallDate() == null ? "" : TimeUtils.getStrDate(asset.getInstallDate(), "yyyy-MM-dd")));
+                        itemObject.put("TextShowValue", textValue.concat(asset.getInstallDate() == null ? "" :" "+TimeUtils.getStrDate(asset.getInstallDate(), "yyyy-MM-dd")));
                         break;
                     case "locationName":
                         itemObject.put("TextShowValue", textValue.concat(asset.getLocationName() == null ? "" : asset.getLocationName()));
@@ -343,6 +343,9 @@ public class QrCodeService {
                                         textValue.concat(FieldValueMessageController.fieldValue("riskGrade", asset.getRiskGrade().toString())));
                             }
                         }
+                        break;
+                    case "purchaseDate":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getPurchaseDate() == null ? "" :" "+TimeUtils.getStrDate(asset.getPurchaseDate(), "yyyy-MM-dd")));
                         break;
                 }
             }
