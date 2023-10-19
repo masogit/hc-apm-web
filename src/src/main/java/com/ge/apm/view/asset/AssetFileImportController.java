@@ -97,6 +97,11 @@ public class AssetFileImportController {
 
     @PostConstruct
     protected void init() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if (!userContextService.accessContainsFunctionMenu("ASSET_BATCH_IMPORT_DATA")) {
+            WebUtil.redirectTo("/accessdeniedzh.xhtml");
+            return;
+        }
         streamingService = WebUtil.getBean(AssetFileImportStreamingService.class);
         orgInfoLocalCacheService = WebUtil.getBean(OrgInfoLocalCacheService.class);
         uaaService = WebUtil.getBean(UaaService.class);
