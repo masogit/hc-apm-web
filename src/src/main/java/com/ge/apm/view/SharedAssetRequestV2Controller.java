@@ -3,6 +3,7 @@ package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
@@ -602,7 +603,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                      if (infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())) {
                          selectedSart = applySwapType;//明细表联动选中
                          if (applySwapType.getActualQty() < applySwapType.getApplyQty()) {
-                             String sql = "select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id = '"+infoVo.getUid()+" 'and b.state in (3, 6) AND a.return_id is NULL";
+                             String sql = "select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id = '"+infoVo.getUid()+"' and b.state in (3, 6) AND a.return_id is NULL";
                              List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
                              ArrayList<SharedAssetReqDetail> detail_list = new ArrayList<>();
                              for (int i = 0; i < data.size(); i++) {
@@ -1190,7 +1191,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        List<SharedAssetReqType> sartList = selected.getSartList();
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 1) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         } 
         if(sta == 5){
         	dao.updateState(uid, state);
@@ -1237,6 +1239,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
 
     }
+    public void rejectReturn(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        Map<String, Object> params = new HashMap<>();
+        String id = selected.getId();
+        params.put("id", id);
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
+        ResponseEntity<LinkedHashMap> result = null;
+        try {
+            result = sharedAssetService.rejectApply(GatewayURL.REJECT_RETURN, params);
+            logger.info("拒绝归还申请：id="+id);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+        }
+
+    }
     public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1244,7 +1265,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 8;//2归还待交付状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 7) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+            dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         }
         if(sta == 11) {
         	dao.updateState(uid, state);
@@ -1443,6 +1465,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 selected.setState(state);
                 dao.save(selected);
                 asiDao.save(selected.getInfoList());
+               sharedAssetRequestService.sendMq(selected.getInfoList());
 
                apdDao.save(selected.getSartList());
 
@@ -1464,6 +1487,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
+
 
     public int getSwapQty2(String Uid,String clinicalDeptUID){
         if(null == Uid||Uid.equalsIgnoreCase("")){

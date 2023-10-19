@@ -13,8 +13,8 @@
 
             <div class="ui-g-12 card">
                 <h:form>
-                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.ContractImport}" title="#{msg.ContractImport}" action="#{contractInfoController.importAction}"/>
-                    <p:commandButton id="importItemButton" icon="ui-icon-extlink" value="#{msg.ContractRelatedEquipmentImport}" title="#{msg.ContractRelatedEquipmentImport}" action="#{contractInfoController.importItemAction}"/>
+                    <p:commandButton id="importButton" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" icon="ui-icon-extlink" value="#{msg.ContractImport}" title="#{msg.ContractImport}" action="#{contractInfoController.importAction}"/>
+                    <p:commandButton id="importItemButton" icon="ui-icon-extlink" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" value="#{msg.ContractRelatedEquipmentImport}" title="#{msg.ContractRelatedEquipmentImport}" action="#{contractInfoController.importItemAction}"/>
                 </h:form>
 
                 <h:form id="AssetContractListForm">
@@ -51,6 +51,14 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="#{msg.plannedArriveDate}" sortBy="#{item.expectArrivalDate}">
+                            <f:facet name="filter">
+                                <p:inputText id="filterExpectArrivalDate" widgetVar="varfilterExpectArrivalDate"/>
+                            </f:facet>
+                            <h:outputText value="#{item.expectArrivalDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="#{msg.startTime}" sortBy="#{item.startDate}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>
@@ -82,10 +90,9 @@
                                              action="#{contractInfoController.completeContract(item)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{contractInfoController.createAction}" />
-                            <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{contractInfoController.prepareView}" update=":AssetContractViewDlg" oncomplete="PF('AssetContractViewDialog').show()" disabled="#{empty contractInfoController.selected}"/>-->
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{contractInfoController.editAction}" disabled="#{!contractInfoController.isEditable(contractInfoController.selected)}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{contractInfoController.deleteContract}" update=":AssetContractListForm:datalist, :growl"  disabled="#{!contractInfoController.isEditable(contractInfoController.selected)}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" title="#{msg.Create}" action="#{contractInfoController.createAction}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" action="#{contractInfoController.editAction}" disabled="#{!contractInfoController.isEditable(contractInfoController.selected)}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_DELETE')}" actionListener="#{contractInfoController.deleteContract}" update=":AssetContractListForm:datalist, :growl"  disabled="#{!contractInfoController.isEditable(contractInfoController.selected)}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" action="#{contractInfoController.exportAction}"/>

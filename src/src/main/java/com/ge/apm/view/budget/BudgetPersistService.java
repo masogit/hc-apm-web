@@ -13,6 +13,9 @@ import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BudgetPersistService {
-    private static Logger logger = LoggerFactory.getLogger(BudgetApplicationController.class);
+    private static Logger logger = LoggerFactory.getLogger(BudgetPersistService.class);
 
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
@@ -174,22 +177,22 @@ public class BudgetPersistService {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
                 })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
-            List<String> weChatIdList = new ArrayList<>();
+            List<WechatParam> paramList = ListUtil.newArrayList();
             if (node.getUsingRole()) {
                 // 角色审批, 目前ACCT没有角色审批
                 Optional.ofNullable(node.getRoleUids()).flatMap(list -> Optional.ofNullable(userDao.getApprovalPersonByRoleId(list)))
-                        .ifPresent(userList -> userList.stream().filter(user -> user != null && user.getWeChatId() != null)
-                                .forEach(user -> weChatIdList.add(user.getWeChatId())));
+                        .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
+                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
             } else {
                 // 用户审批
                 Optional.ofNullable(node.getUserUids()).flatMap(list -> Optional.ofNullable(userDao.findByUidIn(list)))
-                        .ifPresent(userList -> userList.stream().filter(user -> user != null && user.getWeChatId() != null)
-                                .forEach(user -> weChatIdList.add(user.getWeChatId())));
+                        .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
+                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
             }
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + application.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(weChatIdList, message, "待审批");
+            approvalService.sendWxMsg(paramList, message, "待审批","");
         });
     }
 

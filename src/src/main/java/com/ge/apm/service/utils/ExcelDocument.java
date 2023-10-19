@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -476,6 +477,32 @@ public class ExcelDocument implements AutoCloseable{
         }
         if (value instanceof Integer) {
             return Double.valueOf((Integer) value);
+        }
+        return null;
+    }
+
+    static public BigDecimal getCellBigDecimalValue(Object value) {
+
+        ValueWrapper valueWrapper = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+        }
+
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty() ? null : new BigDecimal(((String) value));
+        }
+        if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Double) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Integer) {
+            return new BigDecimal((Integer) value);
         }
         return null;
     }

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+
+<div class="ui-g-12 card">
+
+
+
+    <div class="ui-g-12 card">
+        <h:form id="importRecord">
+                <p:dataTable id="importRecordList"  value="#{hisEquipmentDataSourceController.excelImportRecords}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="文件名">
+                        <h:outputText value="#{item.fileName}" />
+                    </p:column>
+                    <p:column headerText="时间">
+                        <h:outputText value="#{item.createdDate}" />
+                    </p:column>
+                    <p:column headerText="导入人">
+                        <h:outputText value="#{item.importName}" />
+                    </p:column>
+                </p:dataTable>
+        </h:form>
+    </div>
+
+
+
+
+    <h:form id="importForm">
+
+        <p:fieldset   legend="导入收费明细源数据" id="crossSiteUploaderContainer">
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+
+            <h:panelGroup>
+            <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{hisEquipmentDataSourceController.uploadDataFile}" value="#{hisEquipmentDataSourceController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                           multiple="false" sizeLimit="10000000" update="HisDataSourceTab:importForm HisDataSourceTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+
+            <p:fieldset  legend="收费明细导入" id="uploaderContainer">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('HIS_EQUIPMENT_DATA_SOURCE')}" styleClass="p-mr-2"/>        2. 文件中填写要导入的收费明细源数据      3. #{msg.UpFileImport}</div>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+            </h:panelGroup>
+            </p:panelGrid>
+
+<!--            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/asset/contract/ContractList?faces-redirect=true" immediate="true" />-->
+
+        </p:fieldset>
+
+
+
+    </h:form>
+
+
+
+
+</div>
+<div>
+
+    <div class="ui-g-12 card">
+        <h:form id="errorDataListForm">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+            <p:fieldset  legend="#{msg.ImportFailureData}">
+                <p:dataTable id="errorDatalist" rendered="#{not empty hisEquipmentDataSourceController.errorList}" value="#{hisEquipmentDataSourceController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="#{msg.EXCELRowNumber}">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').lineNum}" />
+                    </p:column>
+                    <p:column headerText="#{msg.HospitalCode}">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').orgCode}" />
+                    </p:column>
+                    <p:column headerText="#{msg.EqId}">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').deviceCode}" />
+                    </p:column>
+                    <p:column headerText="病人住院号或门诊号">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').patientRegistrationNum}" />
+                    </p:column>
+                    <p:column headerText="医嘱号、处方号、申请单号">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').prescriptionNum}" />
+                    </p:column>
+                    <p:column headerText="收费项目代码">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').deviceDeptCode}" />
+                    </p:column>
+                    <p:column headerText="收费数量">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').receiptNum}" />
+                    </p:column>
+                    <p:column headerText="单位">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').unit}" />
+                    </p:column>
+                    <p:column headerText="单价">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').unitPrice}" />
+                    </p:column>
+                    <p:column headerText="总金额">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').totalAmount}" />
+                    </p:column>
+                    <p:column headerText="执行时间">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').execTime}" />
+                    </p:column>
+                    <p:column headerText="执行科室">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').execDept}" />
+                    </p:column>
+                    <p:column headerText="执行科室代码">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').execDeptCode}" />
+                    </p:column>
+                    <p:column headerText="检查部位">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').examBodyPart}" />
+                    </p:column>
+                    <p:column headerText="系统来源">
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').sourceCode}" />
+                    </p:column>
+                    <p:column headerText="#{msg.FailureInformation}" >
+                        <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>-->
+                        <h:outputText value="#{item.get('errmsg')}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:fieldset>
+        </h:form>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+</html>

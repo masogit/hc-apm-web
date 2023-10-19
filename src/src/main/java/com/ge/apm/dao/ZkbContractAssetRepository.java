@@ -73,4 +73,13 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
 
     @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.start_date =?2", nativeQuery = true)
     List<ZkbContractAsset> findByStartDateAsset(String tenantUID, Date startDate);
+
+    @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and ((zkbc.start_date<=?2 and zkbc.end_date>=?2) or zkbc.start_date =?3)", nativeQuery = true)
+    List<ZkbContractAsset> findAssetByModifyAndStart(String tenantUID, Date cd, Date sd);
+
+    @Query(value = "SELECT distinct zca.asset_id from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and ((zkbc.start_date<=?2 and zkbc.end_date>=?2) or zkbc.start_date =?3)", nativeQuery = true)
+    List<String> queryAssetIds(String tenantUID, Date cd, Date sd);
+
+    @Query(value = "SELECT distinct zca.asset_id from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.end_date =?2", nativeQuery = true)
+    List<String> queryAssetIdsByEndDate(String tenantUID, Date endDate);
 }

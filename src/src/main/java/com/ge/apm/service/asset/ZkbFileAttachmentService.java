@@ -99,51 +99,54 @@ public class ZkbFileAttachmentService {
     }
 
     @Transactional
-    public void saveZkbFileAttachment(V2_BlobObject blobObject, List<V2_BlobObject> uploadedFileList, List<TenantInfo> tenantInfoList){
-
+    public void saveZkbFileAttachment(V2_BlobObject blobObject, List<V2_BlobObject> uploadedFileList, List<TenantInfo> tenantInfoList,String vlink,String vlinkTitle){
         blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB);
         blobObject.setCreatedDate(new Date());
         blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
-
-        for (V2_BlobObject tempBlobObject: uploadedFileList) {
-
-            tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB);
-            tempBlobObject.setCreatedDate(new Date());
-            tempBlobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
-
-            tempBlobObject.setBoSubType(blobObject.getBoSubType());
-            tempBlobObject.setOperationType(blobObject.getOperationType());
-            tempBlobObject.setMainDirectory(blobObject.getMainDirectory());
-            tempBlobObject.setSecondDirectory(blobObject.getSecondDirectory());
-
-            blobObjectDao.save(tempBlobObject);
-
-            for (TenantInfo tenantInfo: tenantInfoList) {
-                FileAttachmentOrgInfo tempFileAttachmentOrgInfo = new FileAttachmentOrgInfo();
-                tempFileAttachmentOrgInfo.setBlobObjectUid(tempBlobObject.getId());
-                tempFileAttachmentOrgInfo.setTenantUID(tenantInfo.getUid());
-                fileAttachmentOrgInfoDao.save(tempFileAttachmentOrgInfo);
+        if ("OperationVideo".equals(blobObject.getBoSubType())) {
+            blobObject.setExtLink(vlink);
+            blobObject.setObjectName(vlinkTitle);
+            blobObjectDao.save(blobObject);
+        }else{
+            for (V2_BlobObject tempBlobObject: uploadedFileList) {
+                tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB);
+                tempBlobObject.setCreatedDate(new Date());
+                tempBlobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+                tempBlobObject.setBoSubType(blobObject.getBoSubType());
+                tempBlobObject.setOperationType(blobObject.getOperationType());
+                tempBlobObject.setMainDirectory(blobObject.getMainDirectory());
+                tempBlobObject.setSecondDirectory(blobObject.getSecondDirectory());
+                blobObjectDao.save(tempBlobObject);
+                for (TenantInfo tenantInfo: tenantInfoList) {
+                    FileAttachmentOrgInfo tempFileAttachmentOrgInfo = new FileAttachmentOrgInfo();
+                    tempFileAttachmentOrgInfo.setBlobObjectUid(tempBlobObject.getId());
+                    tempFileAttachmentOrgInfo.setTenantUID(tenantInfo.getUid());
+                    fileAttachmentOrgInfoDao.save(tempFileAttachmentOrgInfo);
+                }
             }
         }
     }
 
     @Transactional
-    public void updateZkbFileAttachment(V2_BlobObject blobObject, List<TenantInfo> tenantInfoList){
+    public void updateZkbFileAttachment(V2_BlobObject blobObject, List<TenantInfo> tenantInfoList,String vlink,String vlinkTitle) {
 
         blobObject.setLastModifiedDate(new Date());
         blobObject.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
 
         fileAttachmentOrgInfoDao.deleteByBlobObjectUid(blobObject.getId());
-
-        for (TenantInfo tenantInfo: tenantInfoList) {
-            FileAttachmentOrgInfo tempFileAttachmentOrgInfo = new FileAttachmentOrgInfo();
-            tempFileAttachmentOrgInfo.setBlobObjectUid(blobObject.getId());
-            tempFileAttachmentOrgInfo.setTenantUID(tenantInfo.getUid());
-            fileAttachmentOrgInfoDao.save(tempFileAttachmentOrgInfo);
+        if ("OperationVideo".equals(blobObject.getBoSubType())) {
+            blobObject.setExtLink(vlink);
+            blobObject.setObjectName(vlinkTitle);
+            blobObjectDao.save(blobObject);
+        }else{
+            for (TenantInfo tenantInfo : tenantInfoList) {
+                FileAttachmentOrgInfo tempFileAttachmentOrgInfo = new FileAttachmentOrgInfo();
+                tempFileAttachmentOrgInfo.setBlobObjectUid(blobObject.getId());
+                tempFileAttachmentOrgInfo.setTenantUID(tenantInfo.getUid());
+                fileAttachmentOrgInfoDao.save(tempFileAttachmentOrgInfo);
+            }
+            blobObjectDao.save(blobObject);
         }
-
-        blobObjectDao.save(blobObject);
-
     }
 
     @Transactional

@@ -37,7 +37,6 @@
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{assetContractController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <!--<f:selectItems value="#{fieldMsg.getFieldValueList('contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -58,43 +57,15 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
-                            <!-- <h:outputText  value="#{item.contractAmount}"/> -->
                             <p:inputNumber value="#{item.contractAmount}" readonly="true"> </p:inputNumber>
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAttachment}" exportable="false">
                             <p:commandLink value="#{msg.Download}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.objectId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(item.objectId)}">#{msg.Download}</p:link>-->
-<!--                            <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download" rendered="#{item.fileId > 0}">
-                                <p:fileDownload value="#{attachmentFileService.getFile(item.fileId)}" />
-                            </p:commandButton>-->
                         </p:column>
-                        
-<!--                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetId}" >
-                            <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.fileType}" sortBy="#{item.fileType}" filterBy="#{item.fileType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.fileType)}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.download}" >
-                            <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download">
-                                <p:fileDownload value="#{attachmentFileService.getFile(item.fileId)}" />
-                            </p:commandButton>
-                        </p:column>-->
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetContractController.prepareCreate}" update=":AssetContractEditForm" />
-                            <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetContractController.prepareView}" update=":AssetContractViewDlg" oncomplete="PF('AssetContractViewDialog').show()" disabled="#{empty assetContractController.selected}"/>-->
-                            <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetContractController.prepareEdit}"  update=":AssetContractEditForm" disabled="#{empty assetContractController.selected}"/>-->
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetContractController.delete}" update=":AssetContractEditForm :AssetContractListForm:datalist, :growl"  disabled="#{empty assetContractController.selected}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetContractController.prepareCreate}" update=":AssetContractEditForm" />
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetContractController.delete}" update=":AssetContractEditForm :AssetContractListForm:datalist, :growl"  disabled="#{empty assetContractController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_DELETE')}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             
                             

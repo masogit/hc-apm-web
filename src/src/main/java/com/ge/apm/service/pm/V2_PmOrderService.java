@@ -174,7 +174,12 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 pmOrderRule= pmOrderRuleRepository.findPmOrderRuleLevel1(v2PmOrder.getAssetUid());break;
             }
             case 4:{
-                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel4(v2PmOrder.getAssetUid());break;
+                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel4(v2PmOrder.getAssetUid());
+                //rule_uid4 存在多个规则,此时v2_pm_order表中会保存本工单实际绑定的保养规则(可增加流程配置项中是否启用质控绑定多个规则限定条件。但是若中途再修改流程配置项会影响正常流程，此处逻辑需产品经理确认？)
+                if(pmOrderRule == null){
+                     pmOrderRule = pmOrderRuleRepository.findByUid(v2PmOrder.getPmRuleUid());
+                }
+                break;
             }
         }
         return pmOrderRule;
@@ -568,7 +573,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setAttachments(attachment);
+        //formData.setAttachments(attachment);
         if(endTime!=null)
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
@@ -650,7 +655,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setAttachments(attachment);
+        //formData.setAttachments(attachment);
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)

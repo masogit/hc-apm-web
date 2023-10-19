@@ -45,6 +45,10 @@
                                 <p:column style="float: left;width:25%;">
                                     <h:outputText value="#{item.orgCode}"/>
                                 </p:column>
+
+                                <p:column style="float: left;width:25%;">
+                                    <h:outputText value="#{hisClinicalMatchController.selectSiteName(item.siteUID)}"/>
+                                </p:column>
                             </p:pickList>
 
                             <div style="display:inline-block;float: left;">

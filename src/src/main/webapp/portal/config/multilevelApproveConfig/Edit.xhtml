@@ -192,16 +192,46 @@
                     </h:panelGroup>
                     <h:panelGroup id="approveuser">
                         <label class="label"> 审核人选择 </label>
+                        <br></br>
+
+                        <h:panelGroup>
+
+<!--                            <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.RoleApproveCondition.approveRoles}"-->
+<!--                                                     itemLabel="临床科室主任" >-->
+<!--&lt;!&ndash;                                <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>&ndash;&gt;-->
+<!--                            </p:selectBooleanCheckbox>-->
+
+<!--                            <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.clinicalDepartmentDirector}"-->
+<!--                                                     itemLabel="设备所属科室" >-->
+<!--                                &lt;!&ndash;                                <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>&ndash;&gt;-->
+<!--                            </p:selectBooleanCheckbox>-->
+                            <p:fieldset legend="审批节点-角色">
+                                <p:selectOneMenu  value="#{multiLevelApprovalConfigController.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}审批角色" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="临床科室主任" itemValue="DeptHead" />
+                                    <f:selectItem itemLabel="工程师" itemValue="AssetStaff"  />
+                                </p:selectOneMenu>
+                            </p:fieldset>
+
+                            <p:fieldset legend="审批节点-条件">
+                                <p:selectOneMenu   value="#{multiLevelApprovalConfigController.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="工单设备所属科室" itemValue="1" />
+                                </p:selectOneMenu>
+                            </p:fieldset>
+                        </h:panelGroup>
+                        <br></br>
                         <p:selectCheckboxMenu
                                 value="#{multiLevelApprovalConfigController.approvalNode.approveUsers}"
                                 panelStyle="width:280px" style="width:100%"
                                 converter="userAccountConverter" multiple="true" filter="true"
-                                filterMatchMode="contains" required="true" requiredMessage="审核人不能为空"
+                                filterMatchMode="contains"
                                 disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}">
                             <f:selectItems value="#{multiLevelApprovalConfigController.users4Approval}" var="item"
                                            itemLabel="#{multiLevelApprovalConfigController.getNameWithOrgName(item)}" itemValue="#{item}"/>
                             <p:ajax process="@this"/>
                         </p:selectCheckboxMenu>
+<!--                         required="true" requiredMessage="审核人不能为空"-->
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

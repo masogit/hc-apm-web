@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Entity
@@ -54,6 +56,15 @@ public class SparePart implements Serializable {
     private String siteUID;
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
+    @Column(name = "invoice_number")
+    private String invoiceNumber;
+    @Column(name = "remark")
+    private String remark;
+    @Column(name = "adapting_devices")
+    private String adaptingDevices;
+    @Column(name = "effective_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date effectiveDate;
 
     @Override
     public int hashCode() {

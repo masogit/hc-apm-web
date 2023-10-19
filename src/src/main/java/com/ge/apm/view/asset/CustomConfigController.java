@@ -9,17 +9,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.TenantOptionConfigRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.common.AllocateCustomConfigConstant;
-import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.common.*;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -30,15 +25,17 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.DbMessageSource;
 
 /**
  *
@@ -53,7 +50,10 @@ public class CustomConfigController {
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
     private ConfigService configService;
-    private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private ConfigCacheService configCacheService;
+    private UserContextService userContextService;
+    private I18nMessageService i18nMessageService;
+
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -65,8 +65,11 @@ public class CustomConfigController {
     private String addFieldsType;
     private Map<String, String> configInfo = new HashMap();
     private PinYinComparator pinYinComparator;
-    private WorkflowConfigRepository workflowConfigRepository;
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
+
+    @Setter
+    @Getter
+    private String newName;
 
     @Setter
     @Getter
@@ -78,11 +81,18 @@ public class CustomConfigController {
         userService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
-        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
-        workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
+        if (userContextService.isOpenNewMenuRoles()) {
+            List<CustomRole> customRoles = WebUtil.getBean(UaaService.class).getTenantCustomRoles(selectSite.getTenantUID());
+            customRoles = customRoles.stream().filter(r -> StringUtils.isNotEmpty(r.getFunctionList()) && r.getFunctionList().contains(ApmFunction.ASSET_INFO_READ.name())).collect(Collectors.toList());
+            configRoles.putAll(customRoles.stream().collect(Collectors.toMap(CustomRole::getName, CustomRole::getName)));
+        }
         selectedAddFields = new HashMap();
         pinYinComparator = new PinYinComparator();
         loadConfigForSite(selectSite.getUid());
@@ -463,7 +473,7 @@ public class CustomConfigController {
     //角色名称
     public String getAssetFieldsRoles(List<String> roles) {
         StringBuilder res = new StringBuilder();
-        roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
+        roles.stream().forEach(item -> res.append(configRoles.get(item) == null ? "" : configRoles.get(item)).append(" "));
         return res.toString();
     }
 
@@ -527,6 +537,35 @@ public class CustomConfigController {
         return CustomConfigConstant.getSystemFields().contains(key);
     }
 
+
+    public String getSystemShowName(){
+         return   i18nMessageService.getSystemFieldName(CustomConfigFields.valueOf(currentEditField.getKey()));
+    }
+
+    public void resetField(){
+        i18nMessageService.resetCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId());
+        DbMessageSource.reLoadMessages();
+    }
+
+    public void renameField(){
+        allFields.put(currentEditField.getKey(), newName);
+        i18nMessageService.changeCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId(),newName);
+        DbMessageSource.reLoadMessages();
+        newName = "";
+    }
+
+    public boolean isRenameFields(String key) {
+        try {
+            return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+        }catch (IllegalArgumentException e){
+            logger.error("CustomConfigFields is not key:{}",key);
+            return  false;
+        }catch (Exception e){
+            logger.error("CustomConfigController isRenameFields key:{}, error :{}",key,e);
+            return false;
+        }
+    }
+
     public boolean isReadOnlyFields(String key) {
         return CustomConfigConstant.getReadOnlyFields().contains(key);
     }
@@ -543,6 +582,7 @@ public class CustomConfigController {
     }
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
+        this.newName =allFields.get(fieldKey);
     }
 
     public List<String> getRolesSelectItems() {
@@ -709,9 +749,7 @@ public class CustomConfigController {
 
     public Boolean showSupplierViewAndEditFieldsTable() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        if (!tenantOptionConfigOptional.isPresent()) return false;
-        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+        TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(UserContextService.getCurrentUserAccount().getTenantUID());
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         if(workflowConfig!=null && tenantOptionConfig!=null && workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()!=null && workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
         return false;
@@ -721,10 +759,7 @@ public class CustomConfigController {
         return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
     }
     public boolean enabledWhethertoenableunattended(){
-        if(selectSite == null) return false;
-        List<WorkflowConfig> bySiteUID = workflowConfigRepository.findBySiteUID(selectSite.getUid());
-        if(CollectionUtils.isEmpty(bySiteUID)) return false;
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        WorkflowConfig workflowConfig = configService.findConfigBySite(selectSite.getUid());
         if(workflowConfig == null ) return false;
         return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
     }

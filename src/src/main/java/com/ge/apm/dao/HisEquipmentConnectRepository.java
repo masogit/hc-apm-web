@@ -40,4 +40,7 @@ public interface HisEquipmentConnectRepository extends GenericRepositoryUUID<His
     @Query(value="select o from HisEquipmentConnect o where o.isMatched = true and o.id in ?1 ")
     public List<HisEquipmentConnect> findHisEquipmentConnectByIds(List<String> ids);
 
+    HisEquipmentConnect findByEqId(String eqId);
+
+    HisEquipmentConnect findByEqIdAndEqHosid(String eqId, String eqHosid);
 }

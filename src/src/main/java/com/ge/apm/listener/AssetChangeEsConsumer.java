@@ -3,7 +3,7 @@ package com.ge.apm.listener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.remote.ElasticService;
@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+@Deprecated
 public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AssetChangeEsConsumer.class);
@@ -47,8 +48,6 @@ public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
                 retryCount=retryCount+1;
                 mqContext.setRetryCount(retryCount);
                 mqUtils.sendToMq(mqContext);
-                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){

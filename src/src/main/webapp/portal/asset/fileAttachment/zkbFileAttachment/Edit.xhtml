@@ -24,7 +24,8 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.fileType}*</label>
-                        <p:selectOneMenu id="fileType" value="#{zkbFileAttachmentController.selected.boSubType}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
+                        <p:selectOneMenu id="fileType" value="#{zkbFileAttachmentController.selected.boSubType}" valueChangeListener="#{zkbFileAttachmentController.onSelectChange}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
+                            <p:ajax update="zkbFileAttachmentEditForm"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{fieldMsg.getFieldValueList('zkbAttachmentType')}" var="v">
                                 <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
@@ -52,7 +53,6 @@
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup>
                         <label class="label">#{msg.secondDirectory}*</label>
                         <p:selectOneMenu id="fileSecondDirectory" value="#{zkbFileAttachmentController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
@@ -62,11 +62,19 @@
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
+                    <p:panel id="vlinkPanel" styleClass="ui-panelgrid-blank" style=" border: 0"  rendered="#{'OperationVideo' eq zkbFileAttachmentController.selected.boSubType}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.name}<span style="color:red">*</span></label>
+                            <p:inputTextarea id="vlinkTitle" value="#{zkbFileAttachmentController.vlinkTitle}"
+                                             rows="1" cols="33"/>
+                            <label class="label">#{msg.link}<span style="color:red">*</span></label>
+                            <p:inputTextarea id="vlinkinput" value="#{zkbFileAttachmentController.vlink}" rows="1"
+                                             cols="33"/>
+                        </h:panelGroup>
+                    </p:panel>
                 </p:panelGrid>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                    <h:panelGroup rendered="#{zkbFileAttachmentController.actionName eq 'Create'}">
+                    <h:panelGroup rendered="#{zkbFileAttachmentController.actionName eq 'Create' and 'OperationVideo' ne zkbFileAttachmentController.selected.boSubType}">
                         <p:dataList id="zkbUploadList" value="#{zkbFileAttachmentController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.attachmentList}</f:facet>
                             <h:outputText value="#{fileitem.objectName}"/>
@@ -77,7 +85,6 @@
                         <p:fileUpload id="zkbUploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/" fileUploadListener="#{zkbFileAttachmentController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                       multiple="true"  sizeLimit="500000000"  update="zkbUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
-
                     <h:panelGroup rendered="false">
                         <label class="label">#{msg.TenantInfo}</label>
                         <p:selectManyMenu value="#{zkbFileAttachmentController.selectedTenantInfoList}" var="t" converter="tenantInfoConverter" required="false" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.TenantInfo} #{msg.ValidationRequire}" style="width:50%">

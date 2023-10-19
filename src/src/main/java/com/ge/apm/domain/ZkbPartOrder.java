@@ -26,14 +26,15 @@ public class ZkbPartOrder implements Serializable {
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消 FourHundredCancel:400取消
-     * Returned：归还  Closed：关单
+     * Returned：归还  Closed：已完成
+     * 已归还之后
      */
     public enum PartOrderStatus {
         Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
         Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,
         DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel,
-        CloseReject,TseAccept,TseReject,OsscAccept,OsscReject
+        CloseReject,TseAccept,TseReject,OsscAccept,OsscReject,OsscReturned
     }
 
     /**
@@ -213,6 +214,17 @@ public class ZkbPartOrder implements Serializable {
     private String osscAuditer;
     @Column(name = "ossc_auditer_uid")
     private String osscAuditerUid;
+
+
+
+    @Column(name = "ossc_return_audit_date")
+    private Date osscReturnAuditDate;
+
+    @Column(name = "ossc_return_auditer")
+    private String osscReturnAuditer;
+    @Column(name = "ossc_return_auditer_uid")
+    private String osscReturnAuditerUid;
+
 
     /**
      * 产品经理审批备注
@@ -529,6 +541,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "cat_num")
     private Integer catNum;
 
+    @Column(name = "cat_model_non_ge")
+    private String catModelNonGe;
+
     @Column(name = "contract_cat_id")
     private String contractCatId;
 
@@ -665,6 +680,83 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "not_ge_asset")
     private String notGeAsset;
+
+    @Column(name = "repair_flag")
+    private String repairFlag;
+
+    @Column(name = "take_flag")
+    private String takeFlag;
+
+    @Column(name = "un_taked_reason")
+    private String unTakedReason;
+
+    @Column(name = "un_repair_reason")
+    private String unRepairReason;
+
+    @Column(name = "fault_un_closed_sr")
+    private String faultUnClosedSr;
+
+    /**
+     * 是否工作站  t f
+     */
+    @Column(name = "work_station_flag")
+    private String workStationFlag;
+
+    public String getWorkStationFlag() {
+        return workStationFlag;
+    }
+
+    public void setWorkStationFlag(String workStationFlag) {
+        this.workStationFlag = workStationFlag;
+    }
+
+    public String getFaultUnClosedSr() {
+        return faultUnClosedSr;
+    }
+
+    public void setFaultUnClosedSr(String faultUnClosedSr) {
+        this.faultUnClosedSr = faultUnClosedSr;
+    }
+
+    public String getCatModelNonGe() {
+        return catModelNonGe;
+    }
+
+    public void setCatModelNonGe(String catModelNonGe) {
+        this.catModelNonGe = catModelNonGe;
+    }
+
+    public String getTakeFlag() {
+        return takeFlag;
+    }
+
+    public void setTakeFlag(String takeFlag) {
+        this.takeFlag = takeFlag;
+    }
+
+    public String getUnTakedReason() {
+        return unTakedReason;
+    }
+
+    public void setUnTakedReason(String unTakedReason) {
+        this.unTakedReason = unTakedReason;
+    }
+
+    public String getUnRepairReason() {
+        return unRepairReason;
+    }
+
+    public void setUnRepairReason(String unRepairReason) {
+        this.unRepairReason = unRepairReason;
+    }
+
+    public String getRepairFlag() {
+        return repairFlag;
+    }
+
+    public void setRepairFlag(String repairFlag) {
+        this.repairFlag = repairFlag;
+    }
 
     public String getNotGeAsset() {
         return notGeAsset;
@@ -1776,6 +1868,30 @@ public class ZkbPartOrder implements Serializable {
 
     public void setOsscPartNo(String osscPartNo) {
         this.osscPartNo = osscPartNo;
+    }
+
+    public Date getOsscReturnAuditDate() {
+        return osscReturnAuditDate;
+    }
+
+    public void setOsscReturnAuditDate(Date osscReturnAuditDate) {
+        this.osscReturnAuditDate = osscReturnAuditDate;
+    }
+
+    public String getOsscReturnAuditer() {
+        return osscReturnAuditer;
+    }
+
+    public void setOsscReturnAuditer(String osscReturnAuditer) {
+        this.osscReturnAuditer = osscReturnAuditer;
+    }
+
+    public String getOsscReturnAuditerUid() {
+        return osscReturnAuditerUid;
+    }
+
+    public void setOsscReturnAuditerUid(String osscReturnAuditerUid) {
+        this.osscReturnAuditerUid = osscReturnAuditerUid;
     }
 
     @Override

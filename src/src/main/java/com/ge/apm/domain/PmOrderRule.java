@@ -2,6 +2,8 @@ package com.ge.apm.domain;
 
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -50,7 +52,11 @@ public class PmOrderRule implements Serializable{
 	private Date createdDate;//制定日期
     
     @Column(name = "period")
-	private Integer period;//保养周期,单位‘月’
+	private Integer period;//保养周期
+
+	@Column(name = "period_unit", columnDefinition = "CHAR(1)" )
+	@Getter @Setter
+	private String periodUnit;//保养周期单位 /y 、m 、w、d  /年 月 周 日
     
     @Column(name = "check_list_uid")
 	private String checkListUID;//检查项uid

@@ -159,20 +159,35 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             }
         }
 
-        System.out.println("======");
         List<ZkbIbCrossUserStatus> zkbIbCrossUserStatusList = zkbIbCrossUserStatusRepository.find();
         for(ZkbIbCrossUserStatus s : zkbIbCrossUserStatusList){
             if(StringUtils.isEmpty(s.getLoginName())){
                 continue;
             }
             if(userHashMap.containsKey("ZKB."+s.getLoginName())){
-                ZkbIbCrossUser u = userHashMap.get(s.getLoginName());
+                ZkbIbCrossUser u = userHashMap.get("ZKB."+s.getLoginName());
                 if("D".equals(s.getStatus())){
-                    if(u.getDeleted() == null || !u.getDeleted()){
+                    if(u != null && u.getDeleted() == null || !u.getDeleted()){
                         u.setDeleted(true);
+                        List<ZkbIbCrossRelationShip> removeList = new ArrayList<>();
+                        for(ZkbIbCrossRelationShip rs : zkbIbCrossRelationShipList){
+                            removeList.add(rs);
+                        }
+                        if(removeList != null && removeList.size() > 0){
+                            zkbIbCrossRelationShipList.removeAll(removeList);
+                        }
+
+                        List<ZkbIbCrossRelationShipLog> removeLogList = new ArrayList<>();
+                        for(ZkbIbCrossRelationShipLog rl : zkbIbCrossRelationShipLogList){
+                            removeLogList.add(rl);
+                        }
+                        if(removeList != null && removeList.size() > 0){
+                            zkbIbCrossRelationShipList.removeAll(removeList);
+                            zkbIbCrossRelationShipLogList.removeAll(removeLogList);
+                        }
                     }
                 }else {
-                    if(u.getDeleted()){
+                    if(u != null && u.getDeleted()){
                         //如果发现数据库已经存在一条状态为删除的数据则不进行任何操作
                     }
                 }

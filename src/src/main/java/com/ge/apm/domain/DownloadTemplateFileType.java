@@ -18,6 +18,11 @@ public enum DownloadTemplateFileType {
     MEASURE_ELECTRIC_SAFETY("APM_Electric_Safety_Template.ps", "APM_Electric_Safety_Template.ps"),
     MVS_CONTRACT("APM_mvs_contract.xlsx", "APM_mvs_contract.xlsx"),
     MVS_SITE("APM_mvs_site.xlsx", "APM_mvs_site.xlsx"),
+    HIS_EQUIPMENT_CONNECT("His_equipment_connect.xlsx", "His_equipment_connect.xlsx"),
+    HIS_CLINICAL("His_clinical.xlsx", "His_clinical.xlsx"),
+    HIS_EQUIPMENT_SFXM("His_sfxm.xlsx", "His_sfxm.xlsx"),
+    HIS_EQUIPMENT_DATA_SOURCE("His_data_source_Template.xlsx", "His_data_source_Template.xlsx"),
+
     ;
 
     private final String templateFileZh;

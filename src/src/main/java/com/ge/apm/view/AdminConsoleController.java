@@ -227,4 +227,41 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void  batchSynchronizationConfig(){
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				adminConsoleService.batchSynchronizationConfig();
+			}
+		},"workflow-thread");
+		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchAnalyseMenus(){
+		new Thread(() -> adminConsoleService.analyseMenus()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateReminderRule(){
+		new Thread(() -> adminConsoleService.batchUpdateReminderRule()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateAssetApprove(){
+		new Thread(() -> adminConsoleService.batchUpdateAssetApprove()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateSparPart(){
+		new Thread(() -> adminConsoleService.batchUpdateSparPart()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateAssetDeptId(){
+		new Thread(() -> adminConsoleService.batchUpdateAssetDeptId()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }
