@@ -10,7 +10,6 @@ import com.ge.apm.dao.BudgetApplicationRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.service.asset.ArrivalItemTableRenderPolicy;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.zkb.CopyByInvok;
 import org.apache.commons.io.IOUtils;
@@ -19,7 +18,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -166,15 +164,14 @@ public class BudgetApplicationExportService {
             mm.put("applicationReason", budgetApplicationAsset.getApplicationReason());
             mm.put("equipmentUsage", budgetApplicationAsset.getEquipmentUsage());
 
-            Style s = new Style("宋体",11);
             TextRenderData noTx = new TextRenderData("□");
-            noTx.setStyle(s);
+            noTx.setStyle(new Style("宋体",11));
             TextRenderData yesTx = new TextRenderData("☑");
-            yesTx.setStyle(s);
+            yesTx.setStyle(new Style("宋体",12));
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
                 mm.put("importedOrYes", noTx);
-                mm.put("importedOrNo", noTx);
+                mm.put("importedOrNo", yesTx);
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getImportedOr())){
                 mm.put("importedOrYes", yesTx);
                 mm.put("importedOrNo", noTx);
@@ -185,7 +182,7 @@ public class BudgetApplicationExportService {
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
                 mm.put("pyes", noTx);
-                mm.put("pno", noTx);
+                mm.put("pno", yesTx);
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getPlaceSite())){
                 mm.put("pyes", yesTx);
                 mm.put("pno", noTx);
@@ -196,7 +193,7 @@ public class BudgetApplicationExportService {
             //是否在手术室使用
             if(StringUtils.isEmpty(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("roomYes", noTx);
-                mm.put("roomNo", noTx);
+                mm.put("roomNo", yesTx);
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("roomYes", yesTx);
                 mm.put("roomNo", noTx);
@@ -218,7 +215,7 @@ public class BudgetApplicationExportService {
             //是否需要连接外网
             if(StringUtils.isEmpty(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetworkYes", noTx);
-                mm.put("connectNetworkNo", noTx);
+                mm.put("connectNetworkNo", yesTx);
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetworkYes", yesTx);
                 mm.put("connectNetworkNo", noTx);
