@@ -40,9 +40,21 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "application_num")
     private String applicationNum;
 
-    // 申请状态 1: 待审核, 2: 审核中, 3: 审核通过, 4: 审核未通过
+    //1暂存 2 通过  3 不通过
     @Column(name = "application_status")
     private Integer applicationStatus;
+    /**
+     * 申请步骤
+     *已完成   待审核   已完成
+     */
+    public enum applicationStep {
+        ToSubmitted, PendingApproval,PendingComplete,Complete
+    }
+    /**
+     * 申请步骤
+     */
+    @Column(name = "application_step")
+    private String applicationStep;
 
     // 申请日期
     @Column(name = "application_date")
@@ -158,6 +170,134 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
+
+    @Transient
+    private String approveName ;    //审批人
+
+    @Transient
+    private String applicantName ;//申请人
+
+    /**
+     * *设备名称
+     */
+    @Transient
+    private String applicationAssetName;
+
+    // 预算单价
+    @Transient
+    private BigDecimal applicationPrice;
+
+    // 预算总价
+    @Transient
+    private BigDecimal applicationAmount;
+
+    // 申请数量
+    @Transient
+    private Integer applicationQuantity;
+
+    // 申请科室
+    @Transient
+    private String applicationDeptName;
+
+    public String getApplicationDeptName() {
+        return applicationDeptName;
+    }
+
+    public void setApplicationDeptName(String applicationDeptName) {
+        this.applicationDeptName = applicationDeptName;
+    }
+
+    public Integer getApplicationQuantity() {
+        return applicationQuantity;
+    }
+
+    public void setApplicationQuantity(Integer applicationQuantity) {
+        this.applicationQuantity = applicationQuantity;
+    }
+
+    public String getApplicationAssetName() {
+        return applicationAssetName;
+    }
+
+    public void setApplicationAssetName(String applicationAssetName) {
+        this.applicationAssetName = applicationAssetName;
+    }
+
+    public BigDecimal getApplicationPrice() {
+        return applicationPrice;
+    }
+
+    public void setApplicationPrice(BigDecimal applicationPrice) {
+        this.applicationPrice = applicationPrice;
+    }
+
+    public BigDecimal getApplicationAmount() {
+        return applicationAmount;
+    }
+
+    public void setApplicationAmount(BigDecimal applicationAmount) {
+        this.applicationAmount = applicationAmount;
+    }
+
+    public String getApproveName() {
+        return approveName;
+    }
+
+    public void setApproveName(String approveName) {
+        this.approveName = approveName;
+    }
+
+    public String getApplicantName() {
+        return applicantName;
+    }
+
+    public void setApplicantName(String applicantName) {
+        this.applicantName = applicantName;
+    }
+
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    public enum OrderType {
+        BAY, BAP
+    }
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    @Column(name = "order_type")
+    private String orderType;
+
+    public String getApplicationStep() {
+        return applicationStep;
+    }
+
+    public void setApplicationStep(String applicationStep) {
+        this.applicationStep = applicationStep;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    /**
+     * 申请编号索引
+     */
+    @Column(name = "application_num_index")
+    private Integer applicationNumIndex;
+
+    public Integer getApplicationNumIndex() {
+        return applicationNumIndex;
+    }
+
+    public void setApplicationNumIndex(Integer applicationNumIndex) {
+        this.applicationNumIndex = applicationNumIndex;
+    }
 
     @Override
     public int hashCode() {
