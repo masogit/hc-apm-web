@@ -89,4 +89,8 @@ public class HisEquipmentDataResult implements Serializable {
      */
     @Column(name = "asset_counts",scale = 4)
     private BigDecimal assetCounts;
+
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
 }
