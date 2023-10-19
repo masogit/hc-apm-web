@@ -6,6 +6,10 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ *
+ * 设备分组科室匹配设备
+ */
 @Entity
 @Table(name = "his_asset_group_clinical_match")
 @Data

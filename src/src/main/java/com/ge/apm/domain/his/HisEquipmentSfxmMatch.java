@@ -9,6 +9,7 @@ import java.util.Date;
 
 /**
  * Created by 503189826 on 7/26/2020.
+ * 收费代码与分组匹配
  */
 
 @Entity
