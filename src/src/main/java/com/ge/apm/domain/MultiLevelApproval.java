@@ -75,7 +75,7 @@ public class MultiLevelApproval implements Serializable {
     @Column(name = "approval_status")
     private Integer approvalStatus;
     /**
-     * 审批节点状态0待审批  2审批通过 3审批不同意
+     * 审批节点状态0待审批  2审批通过 3审批不同意 4退回上一层节点
      */
     @Column(name = "approval_node_status")
     private Integer approvalNodeStatus;

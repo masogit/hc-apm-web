@@ -16,7 +16,8 @@ public class WorkOrderReport {
     private String staffName;
     private Long totalSpendTime;
     private Long totalManHour;
-
+    private Long collaboratedManHour;//他人协作工时
+    private Long collaborateManHour;//协作他人工时
     private Long totalCount;
     private Long openCount;
     private Long closeCount;
@@ -145,6 +146,22 @@ public class WorkOrderReport {
 
     public Long getTotalManHour() {
         return totalManHour;
+    }
+
+    public Long getCollaboratedManHour() {
+        return collaboratedManHour;
+    }
+
+    public void setCollaboratedManHour(Long collaboratedManHour) {
+        this.collaboratedManHour = collaboratedManHour;
+    }
+
+    public Long getCollaborateManHour() {
+        return collaborateManHour;
+    }
+
+    public void setCollaborateManHour(Long collaborateManHour) {
+        this.collaborateManHour = collaborateManHour;
     }
 
     public void setTotalManHour(Long totalManHour) {

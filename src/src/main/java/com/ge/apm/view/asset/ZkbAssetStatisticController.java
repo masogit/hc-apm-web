@@ -4,14 +4,15 @@ import com.ge.apm.dao.ZkbAssetQrCodeInfoRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
-import com.ge.apm.domain.ZkbFePartOrder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbAssetStatisticService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,15 +22,14 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * @author 503202755 2020/10/13
@@ -104,6 +104,10 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private UserContextService userContextService;
 
     private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
+
+    private UploadedFile file;
+
+    private List<ZkbAssetQrCodeInfo> errorImportList;
 
     @Override
     protected void init() {
@@ -219,6 +223,17 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
         }
     }
 
+    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.file = event.getFile();
+        errorImportList = zkbAssetStatisticService.handleExcel(file, currentUser);
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
     public String getSystemId() {
         return systemId;
     }
@@ -320,5 +335,13 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
             searchFilters.add(systemIdFilter);
         }
         return searchFilters;
+    }
+
+    public List<ZkbAssetQrCodeInfo> getErrorImportList() {
+        return errorImportList;
+    }
+
+    public void setErrorImportList(List<ZkbAssetQrCodeInfo> errorImportList) {
+        this.errorImportList = errorImportList;
     }
 }

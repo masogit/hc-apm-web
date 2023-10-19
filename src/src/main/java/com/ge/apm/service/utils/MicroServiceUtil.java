@@ -19,12 +19,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.*;
 
-import javax.imageio.ImageIO;
-import javax.tools.FileObject;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -33,6 +29,13 @@ import java.util.*;
 @Component
 public class MicroServiceUtil extends MicroServiceInvoker {
 
+    public String getBaseUrl() {
+        return super.baseURL;
+    }
+
+    public String getWebContextUrl() {
+        return super.webContextUrl;
+    }
 
     public InputStream downloadRepeatedReadFile(String fileId) {
         HttpHeaders headers = new HttpHeaders();
@@ -402,5 +405,18 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         }
 
         return null;
+    }
+
+    public String getDaVinciShareLink(String token, String dashboardId) {
+        String webContextUrl = getWebContextUrl();
+        String daVinciShareLink = GatewayURL.DAVINCI_EXTERNAL.toString();
+        String url = webContextUrl + daVinciShareLink + "?dashboardId=" + dashboardId + "&token=" + token;
+        logger.info("getDaVinciShareLink url ================================== {}", url);
+        ResponseEntity<String> response = template.getForEntity(url, String.class);
+        if (HttpStatus.OK.equals(response.getStatusCode())) {
+            String result = response.getBody();
+            return webContextUrl + result.substring(1, result.length() - 1);
+        }
+        return "";
     }
 }

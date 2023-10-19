@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.ZkbFileDirectoryRepository;
+import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbFileDirectory;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -111,9 +112,12 @@ public class ZkbFileDirectoryService {
      * @param name  目录名称
      * @return
      */
-    public List<ZkbFileDirectory> findByLevelAndName(Integer level,String name)
-    {
+    public List<ZkbFileDirectory> findByLevelAndName(Integer level,String name) {
         return this.zkbFileDirectoryRepository.findByLevelAndName(level,name);
     }
 
+    public boolean checkEffectiveContract(String tenantUid) {
+        List<ZkbContract> zkbContracts = this.zkbFileDirectoryRepository.getEffectiveContract(tenantUid);
+        return zkbContracts.size()>0?true:false;
+    }
 }

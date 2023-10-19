@@ -1,5 +1,6 @@
 package com.ge.apm.service.wo;
 
+import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -91,79 +92,78 @@ public class WorkOrderExportService {
         }
     }
 
-    public List<Map<String, Object>> createPreviewWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep, Integer assetInfoId){
+    public List<Map<String, Object>> createPreviewWorkOrderData(V2WorkOrderReportDto v2WorkOrderReportDto){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        List<SearchFilter> searchFilters = new ArrayList<>();
 
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 0) {
-            SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 0) {
+            SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(tenantFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 1) {
-            SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 1) {
+            SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(institutionFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 2) {
-            SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 2) {
+            SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(hospitalFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 3) {
-            SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 3) {
+            SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(siteFilter);
         }
 
-        if (selectedOrg != null) {
-            SearchFilter siteFilter = new SearchFilter("orgUID", SearchFilter.Operator.IN, selectedOrg.getUid());
+        if (v2WorkOrderReportDto.getSelectedOrg() != null) {
+            SearchFilter siteFilter = new SearchFilter("orgUID", SearchFilter.Operator.IN, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(siteFilter);
         }
 
-        if(clinicalDept !=null){
+        if(v2WorkOrderReportDto.getClinicalDept() !=null){
             List<OrgInfo> orgSearchList = new ArrayList<>();
-            orgSearchList.add(clinicalDept);
-
-            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
-            List<String> clinicalDeptUIDList = new ArrayList<>();
-            for (OrgInfo oi : tempOrgSearchSet) {
-                clinicalDeptUIDList.add(oi.getUid());
-            }
+            orgSearchList.add(v2WorkOrderReportDto.getClinicalDept());
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, v2WorkOrderReportDto.getClinicalDeptList());
+            List<String> clinicalDeptUIDList = tempOrgSearchSet.stream().map(OrgInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
-        if(currentOwner !=null) {
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
+        if(v2WorkOrderReportDto.getCurrentOwner() !=null) {
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getCurrentOwner().getId()));
         }
 
         ZoneId zone = ZoneId.systemDefault();
 
-        if (startTime != null) {
-            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, startTime));
+        if (v2WorkOrderReportDto.getStartTime() != null) {
+            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, v2WorkOrderReportDto.getStartTime()));
         }
-        if (endTime != null) {
-            LocalDate endDate = LocalDateTime.ofInstant(endTime.toInstant(), zone).toLocalDate();
+        if (v2WorkOrderReportDto.getEndTime() != null) {
+            LocalDate endDate = LocalDateTime.ofInstant(v2WorkOrderReportDto.getEndTime().toInstant(), zone).toLocalDate();
             searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
-        if (closedStartTime != null) {
-            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.GTE, closedStartTime));
+        if (v2WorkOrderReportDto.getClosedStartTime() != null) {
+            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.GTE, v2WorkOrderReportDto.getClosedStartTime()));
         }
-        if (closedEndTime != null) {
-            LocalDate closeEndDate = LocalDateTime.ofInstant(closedEndTime.toInstant(), zone).toLocalDate();
+        if (v2WorkOrderReportDto.getClosedEndTime() != null) {
+            LocalDate closeEndDate = LocalDateTime.ofInstant(v2WorkOrderReportDto.getClosedEndTime().toInstant(), zone).toLocalDate();
             searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.LT, Date.from(closeEndDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
-        if (statusList != null && !statusList.isEmpty()) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
+        if (ObjectUtil.isNotEmpty(v2WorkOrderReportDto.getStatusList())) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, v2WorkOrderReportDto.getStatusList()));
         }
-        if(filterParts != null){
-            searchFilters.add(new SearchFilter("filterParts", SearchFilter.Operator.EQ, filterParts));
+        if(v2WorkOrderReportDto.getFilterParts() != null){
+            searchFilters.add(new SearchFilter("filterParts", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getFilterParts()));
         }
-        if(filterTotalPrice != null){
-            searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
+        if(v2WorkOrderReportDto.getFilterTotalPrice() != null){
+            searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getFilterTotalPrice()));
         }
-        if(assetInfoId != null){
-            searchFilters.add(new SearchFilter("assetInfoId", SearchFilter.Operator.EQ, assetInfoId));
+        if(v2WorkOrderReportDto.getAssetInfoId() != null){
+            searchFilters.add(new SearchFilter("assetInfoId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getAssetInfoId()));
         }
-        List<Integer> assetIds = getVisableMvAssetIds(selectedOrg,clinicalDept);
+        if (ObjectUtil.isNotEmpty(v2WorkOrderReportDto.getAssetTypeGroupEncodedSet())) {
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, v2WorkOrderReportDto.getAssetTypeGroupEncodedSet()));
+        }
+        List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(),v2WorkOrderReportDto.getClinicalDept());
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
-        if(assetIds.size()>0) {
+        if(!assetIds.isEmpty()) {
             List<Integer> orderAssetIds = workOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
             List<Integer> mvsAssetIds = assetIds.stream().filter(assetId -> !orderAssetIds.contains(assetId)).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
@@ -172,58 +172,58 @@ public class WorkOrderExportService {
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
             boolean isReturn = true;
-            if(filterMap.get("srNum") != null && filterMap.get("srNum").length() > 0) {   //报修单号
+            if(v2WorkOrderReportDto.getFilterMap().get("srNum") != null && v2WorkOrderReportDto.getFilterMap().get("srNum").length() > 0) {   //报修单号
                 if(workOrderExportPojo.getSrNum()!=null) {
-                    isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
+                    isReturn = workOrderExportPojo.getSrNum().contains(v2WorkOrderReportDto.getFilterMap().get("srNum").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
+            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum")!=null && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum").length()>0) {  //设备编号
                 if(workOrderExportPojo.getAssetDepartNum()!=null) {
-                    isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
+                    isReturn = workOrderExportPojo.getAssetDepartNum().contains(v2WorkOrderReportDto.getFilterMap().get("assetDepartNum").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn  && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
+            if(isReturn  && v2WorkOrderReportDto.getFilterMap().get("assetName")!=null && v2WorkOrderReportDto.getFilterMap().get("assetName").length()>0) {    //设备名称
                 if(workOrderExportPojo.getAssetName()!=null) {
-                    isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
+                    isReturn = workOrderExportPojo.getAssetName().contains(v2WorkOrderReportDto.getFilterMap().get("assetName").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
+            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType")!=null && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType").length()>0) {  //设备型号
                 if(workOrderExportPojo.getAssetFunctionType()!=null) {
-                    isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
+                    isReturn = workOrderExportPojo.getAssetFunctionType().contains(v2WorkOrderReportDto.getFilterMap().get("assetFunctionType").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn  && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
-                if(workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null) {
-                    isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
+            if(isReturn  && v2WorkOrderReportDto.getFilterMap().get("requestorName")!=null && v2WorkOrderReportDto.getFilterMap().get("requestorName").length()>0) {  //报修人
+                if(workOrderExportPojo.getRequestorName()!=null && v2WorkOrderReportDto.getFilterMap().get("requestorName")!=null) {
+                    isReturn = workOrderExportPojo.getRequestorName().contains(v2WorkOrderReportDto.getFilterMap().get("requestorName").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
+            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("requestReason")!=null && v2WorkOrderReportDto.getFilterMap().get("requestReason").length()>0) {  //故障描述
                 if(workOrderExportPojo.getRequestReason()!=null) {
-                    isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
+                    isReturn = workOrderExportPojo.getRequestReason().contains(v2WorkOrderReportDto.getFilterMap().get("requestReason").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && currentStep!=null) {  //当前步骤
+            if(isReturn && v2WorkOrderReportDto.getCurrentStepId()!=null) {  //当前步骤
                 if(workOrderExportPojo.getCurrentStepId()!=null) {
-                    isReturn = Integer.parseInt(currentStep)==workOrderExportPojo.getCurrentStepId();
+                    isReturn = Integer.parseInt(v2WorkOrderReportDto.getCurrentStepId())==workOrderExportPojo.getCurrentStepId();
                 } else {
                     isReturn = false;
                 }
             }
-            if(filterMap.get("hospitalName") != null && filterMap.get("hospitalName").length() > 0) {   //所属院区
+            if(v2WorkOrderReportDto.getFilterMap().get("hospitalName") != null && v2WorkOrderReportDto.getFilterMap().get("hospitalName").length() > 0) {   //所属院区
                 if(workOrderExportPojo.getSrNum()!=null) {
-                    isReturn = workOrderExportPojo.getHospitalName().contains(filterMap.get("hospitalName").trim());
+                    isReturn = workOrderExportPojo.getHospitalName().contains(v2WorkOrderReportDto.getFilterMap().get("hospitalName").trim());
                 } else {
                     isReturn = false;
                 }
@@ -237,7 +237,6 @@ public class WorkOrderExportService {
             workOrderMap.put("woId", workOrderExportPojo.getId());
             workOrderMap.put(WebUtil.getMessage("srNum_xlsx"), workOrderExportPojo.getSrNum() != null ? workOrderExportPojo.getSrNum() : "");
             workOrderMap.put(WebUtil.getMessage("EquipmentID_xlsx"), workOrderExportPojo.getAssetDepartNum());
-            //workOrderMap.put("工单状态", workOrderExportPojo.getStatusName());
             workOrderMap.put(WebUtil.getMessage("WorkorderStatus_xlsx"), workOrderExportPojo.getStatus() != null ? FieldValueMessageController.fieldValue("status", workOrderExportPojo.getStatus().toString()) : "");
             workOrderMap.put(WebUtil.getMessage("AssetID_xlsx"), workOrderExportPojo.getAssetFinancingNum());
             workOrderMap.put(WebUtil.getMessage("EquipmentSerialNumber_xlsx"), workOrderExportPojo.getAssetSerialNum());
@@ -249,10 +248,8 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));
             workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
-            //workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
-            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-            if(userContextService.hasCurrentTenantName("")){
+            if(UserContextService.hasCurrentTenantName("")){
                 if (currentStepId == null) {
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), "");
                 }else if(currentStepId == 7 || currentStepId == 9){//云阜用户 已关单

@@ -269,4 +269,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
             "ur.roleType = 1 and ur.roleId in (select cr.id from CustomRole cr where cr.id in (?1)))")
     List<UserAccount> findCustomRoleUser(List<Integer> customRoleId);
 
+
+
+    @Query(value = "WITH recursive t AS( ( SELECT * FROM org_info WHERE uid = ?1) UNION ALL ( SELECT org_info.* FROM org_info JOIN t ON t.parent_uid = org_info.uid ) ) SELECT ua.* FROM t LEFT JOIN user_org uo ON uo.org_uid = t.uid LEFT JOIN user_account ua ON uo.user_uid = ua.uid LEFT JOIN user_role ur ON ua.id = ur.user_id LEFT JOIN sys_role sr ON ur.role_id = sr.id WHERE uo.id IS NOT NULL AND sr.NAME =?2 group by ua.id ", nativeQuery = true)
+    List<UserAccount> findUserByClinicalDeptUID(String clinicalDeptUID,String roleName);
+
 }
