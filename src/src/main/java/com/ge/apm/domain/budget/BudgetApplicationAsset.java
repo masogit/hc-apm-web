@@ -94,6 +94,7 @@ public class BudgetApplicationAsset implements Serializable {
      * *申请理由
      */
     @Column(name = "application_reason")
+    @Size(max = 4000)
     private String applicationReason;
 
     /**
@@ -106,7 +107,7 @@ public class BudgetApplicationAsset implements Serializable {
      * *需求说明
      */
     @Column(name = "description")
-    @Size(max = 2000)
+    @Size(max = 4000)
     private String description;
 
     // 科室现有同类设备数量
@@ -209,7 +210,30 @@ public class BudgetApplicationAsset implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+    /*offline线下审批数据*/
 
+    // 线下审批时间日期
+    @Column(name = "offline_approval_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date offlineApprovalDate;
+    // 线下审批意见
+    @Column(name = "offline_approval_opinions")
+    @Size(max = 4000)
+    private String offlineApprovalOpinions;
+    // 线下审批结论
+    @Column(name = "offline_approval_conclusion")
+    @Size(max = 4000)
+    private String offlineApprovalConclusion;
+    // 线下审批结论
+    @Column(name = "offline_approval_remark")
+    @Size(max = 4000)
+    private String offlineApprovalRemark;
+    // 线下审批记录人
+    @Column(name = "offline_approval_recorder")
+    private String offlineApprovalRecorder;
+
+    /*offline线下审批数据*/
 
     // 申请人
     @Transient
@@ -222,6 +246,46 @@ public class BudgetApplicationAsset implements Serializable {
     // 申请日期
     @Transient
     private Date applicationDate;
+
+    public Date getOfflineApprovalDate() {
+        return offlineApprovalDate;
+    }
+
+    public void setOfflineApprovalDate(Date offlineApprovalDate) {
+        this.offlineApprovalDate = offlineApprovalDate;
+    }
+
+    public String getOfflineApprovalOpinions() {
+        return offlineApprovalOpinions;
+    }
+
+    public void setOfflineApprovalOpinions(String offlineApprovalOpinions) {
+        this.offlineApprovalOpinions = offlineApprovalOpinions;
+    }
+
+    public String getOfflineApprovalConclusion() {
+        return offlineApprovalConclusion;
+    }
+
+    public void setOfflineApprovalConclusion(String offlineApprovalConclusion) {
+        this.offlineApprovalConclusion = offlineApprovalConclusion;
+    }
+
+    public String getOfflineApprovalRemark() {
+        return offlineApprovalRemark;
+    }
+
+    public void setOfflineApprovalRemark(String offlineApprovalRemark) {
+        this.offlineApprovalRemark = offlineApprovalRemark;
+    }
+
+    public String getOfflineApprovalRecorder() {
+        return offlineApprovalRecorder;
+    }
+
+    public void setOfflineApprovalRecorder(String offlineApprovalRecorder) {
+        this.offlineApprovalRecorder = offlineApprovalRecorder;
+    }
 
     public String getApplicantName() {
         return applicantName;
