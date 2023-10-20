@@ -9,6 +9,7 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
@@ -49,12 +50,13 @@ public class BudgetPersistService {
     private MultiLevelApprovalService approvalService;
     @Autowired
     private BudgetApplicationMapper budgetApplicationMapper;
-
+    @Autowired
+    private BlobFileService blobService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,BudgetAssetInfo budgetAssetInfo,String orderType) {
+    public boolean saveApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,List<V2_BlobObject> attachList,String orderType) {
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
             // 保存以获得ID
@@ -64,14 +66,19 @@ public class BudgetPersistService {
         budgetApplicationAsset.setApplicationNum(application.getApplicationNum());
         budgetApplicationAsset.setApplicationDeptId(application.getApplicationDeptId());
         budgetApplicationAsset.setApplicationId(application.getId());
-        budgetApplicationAssetSet.add(budgetApplicationAssetDao.save(budgetApplicationAsset));
+        BudgetApplicationAsset budgetApplicationAssetPersistent =  budgetApplicationAssetDao.save(budgetApplicationAsset);
+        budgetApplicationAssetSet.add(budgetApplicationAssetPersistent);
         application.setBudgetAssets(budgetApplicationAssetSet);
+        if(CollectionUtils.isNotEmpty(attachList)){
+            attachList.stream().forEach(att -> att.setBoUuid(budgetApplicationAssetPersistent.getId()));
+        }
+        blobService.saveBlobObject(attachList);
         return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean submitApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,BudgetAssetInfo budgetAssetInfo,String orderType) {
-        this.saveApplication(application,budgetApplicationAsset,budgetAssetInfo,orderType);
+    public boolean submitApplication(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,List<V2_BlobObject> attachList,String orderType) {
+        this.saveApplication(application,budgetApplicationAsset,attachList,orderType);
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
        /* if (true) {*/
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
