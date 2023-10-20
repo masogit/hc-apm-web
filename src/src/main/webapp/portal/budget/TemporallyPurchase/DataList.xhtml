@@ -83,7 +83,9 @@
                     <p:dataExporter type="xls" target="datalist" fileName="Budget_Application_Export"/>
                 </p:commandButton>
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
-                                 disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStatus ne 1}" actionListener="#{budgetBayController.delete}"  rendered="#{budgetBayController.tabIndex eq 0 }"/>
+                                 disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStatus ne 1}" actionListener="#{budgetBayController.delete}"  rendered="#{budgetBayController.tabIndex eq 0 }">
+                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                </p:commandButton>
             </f:facet>
         </p:dataTable>
     </h:form>

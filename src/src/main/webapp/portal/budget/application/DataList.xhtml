@@ -83,7 +83,9 @@
                     <p:dataExporter type="xls" target="datalist" fileName="Budget_Application_Export"/>
                 </p:commandButton>
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
-                                 disabled="#{empty budgetController.selected or budgetController.selected.applicationStatus ne 1}" actionListener="#{budgetController.delete}"  rendered="#{budgetController.tabIndex eq 0 }"/>
+                                 disabled="#{empty budgetController.selected or budgetController.selected.applicationStatus ne 1}" actionListener="#{budgetController.delete}"  rendered="#{budgetController.tabIndex eq 0 }">
+                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                </p:commandButton>
                 <p:commandButton id="exportZipButton" ajax="false" title="下载压缩文件" actionListener="#{budgetController.exportAll}"
                                  disabled="#{empty budgetController.selected}"
                                  icon="ui-icon-circle-triangle-s" class="btn btn-sm btn-gray">
