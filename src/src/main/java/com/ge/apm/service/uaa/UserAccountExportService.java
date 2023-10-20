@@ -48,6 +48,7 @@ public class UserAccountExportService {
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_POSITION="职务";
 	private static final String HEADER_TAGS="标签";
+	private static final String HEADER_ASSET_CLASSIFICATION="资产分类";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 
@@ -84,6 +85,12 @@ public class UserAccountExportService {
 	@Autowired
 	UserTagsRepository userTagsDao;
 
+	@Autowired
+	private UserAssetGroupRepository userAssetGroupRepository;
+
+	@Autowired
+	private AssetTypeGroupRepository assetTypeGroupRepository;
+
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 
@@ -114,6 +121,9 @@ public class UserAccountExportService {
 				tempMap.put(HEADER_POSITION, convertPositionIdToLabel(tempUser.getPosition()));
 				tempMap.put(HEADER_TAGS, joinTags(tempUser));
 				tempMap.put(HEADER_ACCESSSCOPE, getOrgInfoName(tempUser.getListOrgInfo()));
+				List<String> assetGroupEncoded = userAssetGroupRepository.findByUserUid(tempUser.getUid());
+				String str = org.apache.commons.lang.StringUtils.join(assetGroupEncoded, ",");
+				tempMap.put(HEADER_ASSET_CLASSIFICATION,str);
 				tempMap.put(HEADER_UUID, tempUser.getUid());
 				listMapResult.add(tempMap);
 			}
