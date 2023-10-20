@@ -83,10 +83,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private AssetTypeGroupRepository assetTypeGroupRepository;
 
+    private BuildManagementRepository buildManagementRepository;
+
+
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
+
+    public List<BuildManagement> getManagementList() {
+        return managementList;
+    }
+
+    public void setManagementList(List<BuildManagement> managementList) {
+        this.managementList = managementList;
+    }
+
+    private List<BuildManagement>  managementList=new ArrayList<>();
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
 
@@ -261,6 +274,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
+        buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -354,6 +368,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initOrgTree();
 
         updateClinicalDeptOnSiteChange();
+        updateManagementOnSiteChange();
         updateAssetStatusList();
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -596,6 +611,41 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
     }
+
+    private void updateManagementOnSiteChange() {
+        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
+        if(CollectionUtils.isEmpty(managementList)){
+            return;
+        }
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        if (!org.apache.commons.collections4.CollectionUtils.isEmpty(managementList)) {
+            managementList.forEach(val -> root.getChildren().add(new DefaultTreeNode("org", val, null)));
+            componentFloor(root);
+        }
+    }
+
+
+    private void componentFloor(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            componentRoom(val);
+        });
+    }
+
+    private void componentRoom(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            managementList.addAll(buildFloorList);
+        });
+    }
+
+
+
+
 
     public void onParentAssetChange() {
         AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
@@ -1705,4 +1755,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setApproval(boolean approval) {
         this.approval = approval;
     }
+
+
 }
