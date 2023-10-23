@@ -138,7 +138,7 @@
                                 <p:selectOneMenu disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}"
                                                  value="#{budgetController.curSelectApplicationBudgetAsset.importedOr}"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -187,28 +187,36 @@
                                 <p:outputLabel class="label">设备是否有放置场地</p:outputLabel>
                                 <p:selectOneMenu disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.placeSite}"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                     <p:outputLabel class="label">是否在手术室使用</p:outputLabel>
                                     <p:selectOneMenu disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.usedOperatingRoom}"  >
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                             </h:panelGroup>
+
+                            <h:panelGroup rendered="#{budgetController.curSelectApplicationBudgetAsset.signatureNurse ne '' and budgetController.curSelectApplicationBudgetAsset.signatureNurse ne null}" >
+                                <p:outputLabel class="label">护士长是否已签名</p:outputLabel>
+                                <p:selectOneMenu disabled="true"    value="#{budgetController.curSelectApplicationBudgetAsset.signatureNurse}"  >
+                                    <f:selectItem itemLabel="" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <p:outputLabel class="label">是否需要同院内信息系统对接</p:outputLabel>
                                 <p:selectOneMenu disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.systemDocking}"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">是否需要连接外网</p:outputLabel>
                                 <p:selectOneMenu disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.connectNetwork}"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -303,18 +311,23 @@
 
                     <br/>
                     <p:commandButton update=":growl :BudgetApplicationEditForm" rendered="#{budgetController.selected.applicationStatus eq '1' and !budgetController.curModelDisables()}"
-                                     validateClient="true"  actionListener="#{budgetController.saveApplication}" value="暂存" id="saveApplication" />
-                    <p:commandButton update=":growl :BudgetApplicationEditForm" validateClient="true" action="#{budgetController.submitApplication}"
+                                     validateClient="true"
+                                     actionListener="#{budgetController.saveApplication}" value="暂存" id="saveApplication" />
+                    <p:commandButton update=":growl :BudgetApplicationEditForm" validateClient="true"
+                                     action="#{budgetController.applicationDataFlow(2,'PendingApproval','BAP')}"
                                      value="提交审批" rendered="#{budgetController.selected.applicationStep eq 'ToSubmitted' and !budgetController.curModelDisables()}" id="submitApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStep eq 'PendingComplete'}"
-                                     validateClient="true" action="#{budgetController.compaleteApplication}" value="完成" id="compaleteApplication" />
+                                     validateClient="true"
+                                     action="#{budgetController.applicationDataFlow(6,'Complete','BAP')}" value="完成" id="compaleteApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStep eq 'PendingComplete'}"
-                                     validateClient="true" action="#{budgetController.cancelApplication}" value="取消" id="cancelApplicationC" />
+                                     validateClient="true"
+                                     action="#{budgetController.applicationDataFlow(5,'Complete','BAP')}" value="取消" id="cancelApplicationC" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStatus eq '4'}"
-                                     validateClient="true" action="#{budgetController.cancelApplicationN}" value="取消申请单" id="cancelApplicationN" />
+                                     validateClient="true"
+                                     action="#{budgetController.applicationDataFlow(1,'ToSubmitted','BAP')}" value="取消申请单" id="cancelApplicationN" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{budgetController.backList}" />
                     <p:commandLink process="@this" ajax="false"><a href="docTemplate/单价50万元以上（含50万）设备论证报告.docx" title="download">下载论证报告</a></p:commandLink>

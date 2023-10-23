@@ -33,6 +33,9 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "application_num")
     private String applicationNum;
 
+    // 申请设备id
+    @Column(name = "application_asset_id")
+    private Integer applicationAssetId;
     // 申请科室id
     @Column(name = "applicant_dept_id")
     private Integer applicationDeptId;
@@ -170,7 +173,7 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "place_site")
     private String placeSite;
 
-    //护士长签名
+    //护士长是否已签名
     @Column(name = "signature_nurse")
     private String signatureNurse;
 
@@ -235,6 +238,10 @@ public class BudgetApplicationAsset implements Serializable {
 
     /*offline线下审批数据*/
 
+    // 删除标识 0: 未删除；1：已删除
+    @Column(name = "is_deleted")
+    private Integer isDeleted = 0;
+
     // 申请人
     @Transient
     private String applicantName;
@@ -246,6 +253,14 @@ public class BudgetApplicationAsset implements Serializable {
     // 申请日期
     @Transient
     private Date applicationDate;
+
+    public Integer getApplicationAssetId() {
+        return applicationAssetId;
+    }
+
+    public void setApplicationAssetId(Integer applicationAssetId) {
+        this.applicationAssetId = applicationAssetId;
+    }
 
     public Date getOfflineApprovalDate() {
         return offlineApprovalDate;
@@ -712,11 +727,12 @@ public class BudgetApplicationAsset implements Serializable {
     public void setApplicationDeptId(Integer applicationDeptId) {
         this.applicationDeptId = applicationDeptId;
     }
-/* public boolean isNew() {
-        return isNew;
+
+    public Integer getIsDeleted() {
+        return isDeleted;
     }
 
-    public void setNew(boolean aNew) {
-        isNew = aNew;
-    }*/
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

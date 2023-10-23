@@ -17,15 +17,11 @@
                 <p:panelGrid id="editPanel" columns="4" layout="grid"
                              styleClass="ui-panelgrid-blank form-group"
                              rendered="#{budgetAssetController.selected != null}">
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.ProductNumber}</p:outputLabel>
                         <p:inputText value="#{budgetAssetController.selected.financingNum}"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.EquipmentName}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.name}" required="true"
-                                     requiredMessage="#{msg.EquipmentName}#{msg.Blank}#{msg.ValidationRequire}"/>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
+
                     <h:panelGroup>
                         <p:outputLabel class="label">#{msg.clinicaldepart}</p:outputLabel>
                         <p:inputText id="dept" readonly="true"
@@ -52,6 +48,15 @@
                         </p:overlayPanel>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.EquipmentName}*</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.name}" required="true"
+                                     requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">设备品类</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.applicationAssetCategory}"/>
+                    </h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
                         <p:selectOneMenu value="#{budgetAssetController.selected.assetGroup}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -69,25 +74,25 @@
                             <f:selectItems value="#{budgetAssetController.budgetAssetGroupSecondaryList}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
+                        <p:outputLabel class="label">推荐#{msg.AssetBrand}</p:outputLabel>
                         <p:inputText value="#{budgetAssetController.selected.assetBrand}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.EquipmentModel}</p:outputLabel>
+                        <p:outputLabel class="label">型号</p:outputLabel>
                         <p:inputText value="#{budgetAssetController.selected.assetModel}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.Unit}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.unit}"/>
+                        <p:outputLabel class="label">规格</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.standards}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.Price}</p:outputLabel>
                         <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
                                        value="#{budgetAssetController.selected.price}">
                         </p:inputNumber>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                 </p:panelGrid>
 
                 <br/>

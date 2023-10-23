@@ -137,11 +137,11 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
 
     @Override
     public void delete() {
-        int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
+        /*int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
         if (usingAssetsCount > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("BudgetAssetAlreadyInUsing"));
             return;
-        }
+        }*/
         boolean isOk = persistService.deleteAsset(selected);
         selected = null;
         actionMessage(isOk);
@@ -193,6 +193,12 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         }
         if (StringUtils.isNotBlank(searchForm.getAssetName())) {
             updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicationAssetCategory())) {
+            updateSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.LIKE, searchForm.getApplicationAssetCategory()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getStandards())) {
+            updateSearchFilter(new SearchFilter("standards", SearchFilter.Operator.LIKE, searchForm.getStandards()));
         }
     }
 

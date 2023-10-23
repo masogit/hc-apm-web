@@ -166,7 +166,7 @@
 
             <p:column headerText="是否采购进口产品">
                  <p:selectOneMenu  value="#{item.importedOr}" disabled="true">
-                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="t"
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
                                     itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
                  </p:selectOneMenu>
              </p:column>
@@ -220,14 +220,14 @@
              <p:column headerText="设备是否有放置场地">
                  <p:selectOneMenu  value="#{item.placeSite}" disabled="true">
                      <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="t"
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
                                     itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
                  </p:selectOneMenu>
              </p:column>
              <p:column headerText="是否在手术室使用">
                  <p:selectOneMenu  value="#{item.usedOperatingRoom}" disabled="true">
                      <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="t"
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
                                     itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
                  </p:selectOneMenu>
              </p:column>
@@ -235,14 +235,14 @@
              <p:column headerText="是否需要同院内信息系统对接">
                  <p:selectOneMenu  value="#{item.systemDocking}" disabled="true">
                      <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="t"
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
                                     itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
                  </p:selectOneMenu>
              </p:column>
              <p:column headerText="是否需要连接外网">
                  <p:selectOneMenu  value="#{item.connectNetwork}" disabled="true">
                      <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="t"
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
                                     itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
                  </p:selectOneMenu>
              </p:column>

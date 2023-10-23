@@ -277,38 +277,21 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         requestContext.addCallbackParam("url", url);
     }
     public void saveApplication() {
-        this.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString());
-        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.attachList,BudgetApplication.OrderType.BAY.toString());
-        this.editId = selected.getId();
+        persistService.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
+                account,crudActionName,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
+        boolean isOk = persistService.saveApplication(selected,this.attachList,BudgetApplication.OrderType.BAY.toString());
+        this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
 
-    public String submitApplication() {
-        this.handleCommonField(selected,selectedDept,2,BudgetApplication.applicationStep.PendingApproval.toString());
-        boolean isOk = persistService.submitApplication(selected, this.curSelectApplicationBudgetAsset,this.attachList,BudgetApplication.OrderType.BAY.toString());
-        return this.backList();
-    }
-    /**
-     * 取消申请单  审批不通
-     * @return
-     */
-    public String cancelApplicationN() {
-        this.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString());
-        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.attachList,BudgetApplication.OrderType.BAP.toString());
-        actionMessage(isOk);
-        return this.backList();
-    }
-    public String compaleteApplication() {
-        this.handleCommonField(selected,selectedDept,6,BudgetApplication.applicationStep.Complete.toString());
-        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.attachList,BudgetApplication.OrderType.BAY.toString());
-        actionMessage(isOk);
-        return this.backList();
-    }
-
-    public String cancelApplication() {
-        this.handleCommonField(selected,selectedDept,5,BudgetApplication.applicationStep.Complete.toString());
-        boolean isOk = persistService.saveApplication(selected, this.curSelectApplicationBudgetAsset,this.attachList,BudgetApplication.OrderType.BAY.toString());
-        actionMessage(isOk);
+    public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
+        persistService.handleCommonField(selected,selectedDept,applicationStatus,applicationStep,
+                account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
+        if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
+             persistService.submitApplication(selected,this.attachList,orderType);
+        }else{
+             persistService.saveApplication(selected,this.attachList,orderType);
+        }
         return this.backList();
     }
 
@@ -316,45 +299,15 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         return "List.xhtml?faces-redirect=true"+"&tabIndex="+tabIndexList;
     }
 
-    public BudgetApplication handleCommonField(BudgetApplication budgetApplication, OrgInfo curDept,
-                                               Integer applicationStatus,String applicationStep ){
-        budgetApplication.setLastModifiedBy(account.getLoginName());
-        budgetApplication.setLastModifiedDate(new Date());
-
-
-        budgetApplication.setApplicationDept(curDept);
-        budgetApplication.setApplicationDeptId(curDept.getId());
-        budgetApplication.setTenantUID(curDept.getTenantUID());
-        budgetApplication.setInstitutionUID(curDept.getInstitutionUID());
-        budgetApplication.setHospitalUID(curDept.getHospitalUID());
-        budgetApplication.setSiteUID(curDept.getSiteUID());
-        budgetApplication.setApplicationStatus(applicationStatus);
-        budgetApplication.setApplicationStep(applicationStep);
-        budgetApplication.setOrderType(BudgetApplication.OrderType.BAY.toString());
-        budgetApplication.setTotalAmount(this.curSelectApplicationBudgetAsset.getApplicationAmount());
-        //设备信息
-        if(this.curSelectApplicationBudgetAsset.getCreatedDate()== null){
-            this.curSelectApplicationBudgetAsset.setCreatedDate(new Date());
-        }
-        this.curSelectApplicationBudgetAsset.setCreatedBy(account.getLoginName());
-        this.curSelectApplicationBudgetAsset.setLastModifiedBy(account.getLoginName());
-        this.curSelectApplicationBudgetAsset.setLastModifiedDate(new Date());
-        this.curSelectApplicationBudgetAsset.setTenantUID(curDept.getTenantUID());
-        this.curSelectApplicationBudgetAsset.setInstitutionUID(curDept.getInstitutionUID());
-        this.curSelectApplicationBudgetAsset.setHospitalUID(curDept.getHospitalUID());
-        this.curSelectApplicationBudgetAsset.setSiteUID(curDept.getSiteUID());
-        if("Create".equals(crudActionName)){
-            this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
-        }
-        return budgetApplication;
-    }
 
     @Override
     public void delete() {
         BudgetApplication application = dao.findById(selected.getId());
-        boolean isOk = persistService.deleteApplication(selected);
+        boolean isOk = persistService.deleteApplication(application);
         selected = null;
-        WebUtil.addSuccessMessage("删除成功！");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetApplication") + WebUtil.getMessage("Blank")
+                + "删除" + WebUtil.getMessage("Blank")
+                + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
     }
 
     public void saveAsset() {
@@ -532,6 +485,11 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         crudActionName = "Create";
         selectedDept = null;
         selected = new BudgetApplication();
+
+        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
+        budgetApplicationAssetSet.add(this.curSelectApplicationBudgetAsset);
+        selected.setBudgetAssets(budgetApplicationAssetSet);
+
         selected.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
         selected.setApplicant(account);
         selected.setApplicantId(account.getId());
@@ -549,17 +507,16 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     @Override
     public void prepareEdit() {
         crudActionName = "Edit";
-        curDetail();
-    }
+        buildCurDetail(this.editId); }
 
     @Override
     public void prepareView() {
         crudActionName = "View";
-        curDetail();
+        buildCurDetail(this.editId);
     }
 
-    public void curDetail(){
-        this.selected = this.dao.findById(this.editId);
+    public void buildCurDetail(String id){
+        this.selected = this.dao.findById(id);
         this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
         this.selectedDept = this.selected.getApplicationDept();
         this.selected.setApplicationDeptName(this.selectedDept.getName());
