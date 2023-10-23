@@ -45,7 +45,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     public Map<String, String> filterMatchModes;
     public List<SearchFilter> searchFilters;
     protected boolean warnOnEmptySearchFilters = false;
-    public String crudActionName;
+    public String crudActionName = "Create";
     private UserAccountHistoryService userAccountHistoryService;
 
     public boolean hasFilterOnField(String fieldName) {
