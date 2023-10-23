@@ -4798,6 +4798,10 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'PendingApproval', '待审核', 'Pending Approval', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'PendingComplete', '待完成', 'Pending Complete', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'Complete', '完成', 'Complete', NULL, -1);
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationT_F', 'T', '是', 'T', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationT_F', 'F', '否', 'F', NULL, -1);
+
 --经费来源
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'SelfRaised', '自筹资金', 'Self raised funds', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'Appropriation', '拨款资金', 'Appropriation funds', NULL, -1);

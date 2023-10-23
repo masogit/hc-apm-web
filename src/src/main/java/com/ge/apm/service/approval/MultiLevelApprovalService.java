@@ -318,7 +318,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 // 预算管理 审批不通过
-                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.applicationStep.ToSubmitted.toString());
+                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.applicationStep.ToSubmitted.toString());
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
@@ -642,7 +642,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                                 // 预算管理
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.applicationStep.PendingComplete.toString());
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.applicationStep.PendingComplete.toString());
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
@@ -729,7 +729,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.applicationStep.PendingApproval.toString());
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.applicationStep.PendingApproval.toString());
                             }
                             String linkUrl;
                             switch (multiLevelApproval.getBusinessType()) {
@@ -941,8 +941,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
-    private void updateBudget(String businessUid, Integer approvalStatus,String applicationStep) {
-        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+    private void updateBudget(MultiLevelApproval multiLevelApproval, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(multiLevelApproval.getBusinessUid());
+        if(CollectionUtils.isNotEmpty(budget.getBudgetAssets())){
+            budget.getBudgetAssets().iterator().next().setSignatureNurse(multiLevelApproval.getSignatureNurse());
+        }
         budget.setApplicationStatus(approvalStatus);
         budget.setApplicationStep(applicationStep);
         //budget.setApprovalProgress(budget.getApprovalProgress() + 1);
@@ -952,8 +955,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
-    public void cancelApplication(String businessUid, Integer approvalStatus,String applicationStep) {
-        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+    public void cancelApplication(MultiLevelApproval multiLevelApproval, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(multiLevelApproval.getBusinessUid());
+        if(CollectionUtils.isNotEmpty(budget.getBudgetAssets())){
+            budget.getBudgetAssets().iterator().next().setSignatureNurse(multiLevelApproval.getSignatureNurse());
+        }
         budget.setApplicationStatus(approvalStatus);
         budget.setApplicationStep(applicationStep);
         budgetApplicationRepository.save(budget);

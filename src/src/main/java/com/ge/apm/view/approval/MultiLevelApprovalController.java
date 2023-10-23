@@ -17,6 +17,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,17 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private BudgetApplicationRepository budgetDao;
     private WorkflowService workflowService;
     private BlobFileService blobService;
+
+    private boolean signatureNurseRendered = false;
+    private String signatureNurse;
+
+    public String getSignatureNurse() {
+        return signatureNurse;
+    }
+
+    public void setSignatureNurse(String signatureNurse) {
+        this.signatureNurse = signatureNurse;
+    }
 
     private BlobObjectRepository blobObjectRepository;
     private AssetScrapRepository assetScrapDao;
@@ -170,6 +182,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 attachList = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
                 primaryApprovalData = budgetApplication;
                 secondaryApprovalData = budgetApplication.getBudgetAssets();
+                signatureNurseRendered = false;
+                if(BudgetApplication.OrderType.BAP.toString().equals(budgetApplication.getOrderType()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
+                    signatureNurseRendered = true;
+                }
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
@@ -200,13 +216,20 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public void getMultiLevelApprovalPersonByAgree() throws Exception {
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
         boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(signatureNurseRendered && "F".equals(this.signatureNurse)){
+            WebUtil.addWarnMessage("在手术室使用的设备，手术室护士长签名为否时，不允许通过审核！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -223,11 +246,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
          }
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -243,13 +268,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
-
-        multiLevelApprovalService.cancelApplication(multiLevelApproval.getBusinessUid(),BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING,BudgetApplication.applicationStep.ToSubmitted.toString());
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApprovalService.cancelApplication(multiLevelApproval,BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING,BudgetApplication.applicationStep.ToSubmitted.toString());
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -530,6 +556,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             return false;
         }
         return false;
+    }
+
+    public boolean isSignatureNurseRendered() {
+        return signatureNurseRendered;
+    }
+
+    public void setSignatureNurseRendered(boolean signatureNurseRendered) {
+        this.signatureNurseRendered = signatureNurseRendered;
     }
 
 }
