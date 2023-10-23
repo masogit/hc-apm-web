@@ -304,7 +304,7 @@
                     </c:if>
                     <c:if test="#{columnItem eq 'riskGrade'}">
                         <p:column headerText="#{msg.riskGrade}" >
-                            <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                         </p:column>
                     </c:if>
                     <c:if test="#{columnItem eq 'emergencyEquipment'}">

@@ -5076,3 +5076,5 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','2','审批通过','2',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','3','审批不通过','3',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','4','审批退回','4',NULL,	-1	);
+-- YHAAO-19745 风险等级
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','riskGrade','风险等级','riskGrade',NULL,-1);
