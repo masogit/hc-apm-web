@@ -679,14 +679,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 	}
 	public void batchSynchronizationConfig() {
-		saveDefaultValue("autoAck",4,"false",3,"工单完工不需要验收","工单完工不需要验收");
-		saveDefaultValue("autoAckDays",4,"3",2,"系统自动验收(天)","系统自动验收(天)");
-		saveDefaultValue("autoClose",4,"false",3,"工单完工自动关单","工单完工自动关单");
-		saveDefaultValue("closeWithoutParts",4,"false",3,"无备件自动关单","无备件自动关单");
-		saveLevelValue("autoAck","autoAck");
-		saveLevelValue("autoAckDays","autoAckDays");
-		saveLevelValue("autoClose","autoClose");
-		saveLevelValue("closeWithoutParts","closeWithoutParts");
+		saveDefaultValue("assetInstallApprove",3,"false",3,"安装入库完成是否审批","安装入库完成是否审批");
+		saveLevelValue("assetInstallApprove","assetApprover");
 	}
 
 	public void analyseMenus() {
@@ -901,7 +895,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							field.setAccessible(true);
 							Object o = field.get(item);
 							if(o != null){
-								return initConfigItemValue(item,key,o);
+								return initConfigItemValue(item,key,true);
 							}else{
 								return null;
 							}
@@ -920,7 +914,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							field.setAccessible(true);
 							Object o = field.get(item);
 							if(o != null){
-								return initConfigItemValue(item,key,o);
+								return initConfigItemValue(item,key,true);
 							}else{
 								return null;
 							}

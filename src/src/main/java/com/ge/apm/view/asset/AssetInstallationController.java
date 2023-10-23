@@ -41,7 +41,9 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -70,6 +72,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private ConfigItemRepository configItemRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -191,7 +195,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupTreeComponentController.registerController(this);
         assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded() + "#" + arrivalListItem.getArrivalList().getTenantUID());
-
+        configItemRepository = WebUtil.getBean(ConfigItemRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
             AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
@@ -386,8 +391,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
-
-        if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
+        //configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())
+        if (isApproved(arrivalListItem)) {
             //待审核
             arrivalListItem.setUsageStatus(2);
         } else {
@@ -574,7 +579,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 arrivalListItem.setFactoryWarrantyDate(calender.getTime());
             }
 
-            if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
+            if (isApproved(arrivalListItem)) {
                 //待审核
                 arrivalListItem.setUsageStatus(2);
             } else {
@@ -1090,5 +1095,50 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             }
         }
         return false;
+    }
+    private boolean  isApproved(ArrivalListItem arrivalListItem){
+        /**
+         * --  YHAAO-19736  远东宏信-完成安装验收后，进入资产审核流程
+         * insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '安装入库完成是否审批', 'AssetCreationApprover', '安装入库完成是否审批', 'f', 't', 3 where not exists (select * from config_item where key = 'AssetCreationApprover');
+          */
+        // TODO
+        boolean flag=false;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo tenantInfo = userContextService.getTenantInfo();
+        String featureList = tenantInfo.getFeatureList();
+        if (StringUtils.isNotBlank(featureList)) {
+             flag=featureList.contains("ASSET_APPROVE");
+             if(flag){
+                flag=getConfigItemAssetCreationApprover(arrivalListItem);
+             }
+        }
+        return flag;
+    }
+    private boolean getConfigItemAssetCreationApprover(ArrivalListItem arrivalListItem){
+        Boolean flag=null;
+        String key="assetInstallApprove";
+        ConfigItem byDefaultValueForKey = configItemRepository.findByDefaultValueForKey(key);
+        if(byDefaultValueForKey == null ) return Boolean.FALSE;
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ,key));
+        String siteUID = arrivalListItem.getSiteUid();
+        String hospitalUID = arrivalListItem.getHospitalUid();
+        String institutionUID = arrivalListItem.getInstitutionUid();
+        String tenantUID = arrivalListItem.getTenantUid();
+        List<String> value = Arrays.asList(siteUID, hospitalUID, institutionUID, tenantUID);
+        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, value));
+        List<ConfigItemValue> configItemValues = configItemValueRepository.findBySearchFilter(searchFilters);
+        if(!CollectionUtils.isEmpty(configItemValues)){
+            Map<String, Boolean> collect = configItemValues.stream().collect(Collectors.toMap(ConfigItemValue::getSiteUid, item ->Boolean.valueOf(item.getValue())));
+            if((flag=collect.get(siteUID)) == null
+                    && (flag=collect.get(hospitalUID)) == null
+                    && (flag=collect.get(institutionUID)) == null
+                    && (flag=collect.get(tenantUID)) == null){
+                flag = Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
+            }
+        }else{
+            flag=Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
+        }
+        return flag;
     }
 }
