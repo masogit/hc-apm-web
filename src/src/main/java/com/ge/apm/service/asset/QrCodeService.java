@@ -335,13 +335,8 @@ public class QrCodeService {
                         if(asset.getRiskGrade() == null){
                             itemObject.put("TextShowValue", textValue);
                         }else{
-                            if(configService.useNewRiskGrade()){
-                                itemObject.put("TextShowValue",
-                                        textValue.concat(FieldValueMessageController.fieldValue("riskGradeNew", asset.getRiskGrade().toString())));
-                            }else {
                                 itemObject.put("TextShowValue",
                                         textValue.concat(FieldValueMessageController.fieldValue("riskGrade", asset.getRiskGrade().toString())));
-                            }
                         }
                         break;
                     case "purchaseDate":
