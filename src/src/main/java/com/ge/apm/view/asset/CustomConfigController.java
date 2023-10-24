@@ -109,6 +109,15 @@ public class CustomConfigController {
         } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
+        JSONObject pageWorkOrder = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder");
+        JSONArray group = pageWorkOrder.getJSONArray("group");
+        JSONObject orderFields = group.getJSONObject(1);
+        JSONObject externalQuotation = orderFields.getJSONObject("externalQuotation");
+        if (externalQuotation == null) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("enable", "false");
+            orderFields.put("externalQuotation", jsonObject);
+        }
         updateConfigInfo();
     }
 
