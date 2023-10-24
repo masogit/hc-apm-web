@@ -402,6 +402,10 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "work_order_images_upload")
     private Boolean workOrderImagesUpload; //维修附件是否上传，当前只对图片限制
 
+
+    @Column(name = "is_enable_asset_scrap")
+    private Boolean isEnableAssetScrap=false; //是否开启设备报废
+
     public Boolean getPatProblems() { return patProblems; }
 
     public void setPatProblems(Boolean patProblems) { this.patProblems = patProblems; }
@@ -1709,4 +1713,11 @@ public class WorkflowConfig implements Serializable {
         }
     }
 
+    public Boolean getEnableAssetScrap() {
+        return isEnableAssetScrap!=null && isEnableAssetScrap;
+    }
+
+    public void setEnableAssetScrap(Boolean enableAssetScrap) {
+        isEnableAssetScrap = enableAssetScrap;
+    }
 }
