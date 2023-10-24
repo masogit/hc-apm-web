@@ -21,7 +21,7 @@
                                 <h:outputText value="#{budgetBayController.selected.applicationNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">#{msg.ApplicationDept}*</p:outputLabel>
+                                <p:outputLabel class="label">#{msg.ApplicationDept}<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText  id="dept" value="#{budgetBayController.selected.applicationDeptName}" readonly="true" required="true"  requiredMessage="申请科室 #{msg.ValidationRequire}" />
                                 <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton" rendered="#{!budgetBayController.curModelDisables()}" disabled="#{budgetBayController.selected.applicationStep eq 'PendingComplete'}" />
@@ -69,7 +69,7 @@
                                      rendered="#{budgetBayController.selected != null}">
 
                             <h:panelGroup rendered="#{budgetBayController.curModelCreate()}">
-                                <label class="label">设备名称</label>
+                                <label class="label">设备名称<span style="color: red">*</span></label>
                                     <p:autoComplete disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" dropdown="true" value="#{budgetBayController.curSelectBudgetAssetInfo}"
                                                     scrollHeight="300" forceSelection="true" completeMethod="#{budgetBayController.autoCompleteAssetName}"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" class="inputVendor3"  converter="budgetAssetInfoConverter" required="true" requiredMessage="设备名称 #{msg.ValidationRequire}">
@@ -77,49 +77,48 @@
                                         <p:ajax listener="#{budgetBayController.onBudgetAssetInfoChange()}" update="@(.budgetAssetInfoChange)"/>
                                     </p:autoComplete>
                                 <p:commandButton rendered="#{!budgetBayController.curModelDisables()}" disabled="#{budgetBayController.selected.applicationStep eq 'PendingComplete'}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetBayController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
-
                             </h:panelGroup>
-                                <h:panelGroup rendered="#{!budgetBayController.curModelCreate()}">
-                                    <label class="label">设备名称</label>
-                                    <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange"/>
-                                </h:panelGroup>
-                                 <h:panelGroup >
-                                        <p:outputLabel class="label">设备品类</p:outputLabel>
+                            <h:panelGroup rendered="#{!budgetBayController.curModelCreate()}">
+                                <label class="label">设备名称<span style="color: red">*</span></label>
+                                <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAssetCategory}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">推荐品牌</p:outputLabel>
+                                <p:outputLabel class="label">推荐品牌<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">规格</p:outputLabel>
+                                <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">型号</p:outputLabel>
+                                <p:outputLabel class="label">型号<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">数量</p:outputLabel>
+                                <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="数量 #{msg.ValidationRequire}"
                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationQuantity}">
                                     <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算单价</p:outputLabel>
+                                <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationPrice}">
                                     <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算总价</p:outputLabel>
+                                <p:outputLabel class="label">预算总价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAmount}" >
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">单位</p:outputLabel>
+                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>

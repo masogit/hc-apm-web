@@ -21,7 +21,7 @@
                                 <h:outputText value="#{budgetController.selected.applicationNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">#{msg.ApplicationDept}*</p:outputLabel>
+                                <p:outputLabel class="label">#{msg.ApplicationDept}<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText  id="dept" value="#{budgetController.selected.applicationDeptName}" readonly="true" required="true" requiredMessage="申请科室 #{msg.ValidationRequire}"/>
                                 <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton" rendered="#{!budgetController.curModelDisables()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}" />
@@ -63,7 +63,7 @@
                                      styleClass="ui-panelgrid-blank form-group"
                                      rendered="#{budgetController.selected != null}">
                             <h:panelGroup rendered="#{budgetController.curModelCreate()}">
-                                <label class="label">设备名称</label>
+                                <label class="label">设备名称<span style="color: red">*</span></label>
                                 <p:autoComplete disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" dropdown="true" value="#{budgetController.curSelectBudgetAssetInfo}"
                                                 scrollHeight="300" forceSelection="true" completeMethod="#{budgetController.autoCompleteAssetName}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" class="inputVendor3"  converter="budgetAssetInfoConverter" required="true" requiredMessage="设备名称 #{msg.ValidationRequire}">
@@ -73,46 +73,46 @@
                                 <p:commandButton rendered="#{!budgetController.curModelDisables()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{!budgetController.curModelCreate()}">
-                                <label class="label">设备名称</label>
+                                <label class="label">设备名称<span style="color: red">*</span></label>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">设备品类</p:outputLabel>
+                                <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetCategory}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">推荐品牌</p:outputLabel>
+                                <p:outputLabel class="label">推荐品牌<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">规格</p:outputLabel>
+                                <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">型号</p:outputLabel>
+                                <p:outputLabel class="label">型号<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">数量</p:outputLabel>
+                                <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="数量 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationQuantity}">
                                     <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算单价</p:outputLabel>
+                                <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationPrice}">
                                     <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算总价</p:outputLabel>
+                                <p:outputLabel class="label">预算总价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAmount}" >
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">单位</p:outputLabel>
+                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>

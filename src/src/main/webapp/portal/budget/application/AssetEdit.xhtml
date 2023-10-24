@@ -36,11 +36,13 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:outputLabel class="label">设备规格  <span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.standards}"/>
+                        <p:inputText value="#{budgetController.selectedAsset.standards}" required="true"
+                                     requiredMessage="设备规格#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.applicationAssetCategory}" />
+                        <p:inputText value="#{budgetController.selectedAsset.applicationAssetCategory}" required="true"
+                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
 
