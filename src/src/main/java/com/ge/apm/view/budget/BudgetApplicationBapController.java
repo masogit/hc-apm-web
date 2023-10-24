@@ -14,6 +14,7 @@ import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
@@ -30,6 +31,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -45,7 +47,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -203,6 +207,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }
     }
 
+
+
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
                 || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
@@ -213,6 +219,20 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }
         List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
         return new PageImpl(dataList,pageRequest,dataList.size());
+    }
+
+    public void exportExcel(String orderType){
+        this.searchFilters = this.getSearchFilter(this.tabIndex);
+        List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
+        List<Map<String, Object>> budgetDataList = persistService.createBudgeApplicationData(dataList,orderType);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/application/excel/APM_Budget_BAP_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            persistService.exportData(doc, budgetDataList,orderType);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Budget_BAP.xlsx");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public List<SearchFilter> getSearchFilter(Integer tabIndex) {

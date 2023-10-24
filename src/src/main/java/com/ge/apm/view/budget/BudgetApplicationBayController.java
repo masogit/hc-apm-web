@@ -14,12 +14,15 @@ import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -28,7 +31,9 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +47,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -215,6 +224,23 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         return new PageImpl(dataList,pageRequest,dataList.size());
     }
 
+    @Getter
+    @Setter
+    private StreamedContent exportFile;
+
+    public void exportExcel(String orderType){
+        this.searchFilters = this.getSearchFilter(this.tabIndex);
+        List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
+        List<Map<String, Object>> budgetDataList = persistService.createBudgeApplicationData(dataList,orderType);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/TemporallyPurchase/excel/APM_Budget_BAY_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            persistService.exportData(doc, budgetDataList,orderType);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Budget_BAY.xlsx");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBayController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public List<SearchFilter> getSearchFilter(Integer tabIndex) {
         if (searchFilters == null) {
