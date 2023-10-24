@@ -282,7 +282,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void saveApplication() {
-        persistService.handleCommonField(selected,selectedDept,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
+        persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAP.toString());
         boolean isOk = persistService.saveApplication(selected,this.attachList,BudgetApplication.OrderType.BAP.toString());
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
@@ -290,7 +290,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
-        persistService.handleCommonField(selected,selectedDept,applicationStatus,applicationStep,
+        persistService.handleCommonField(selected,applicationStatus,applicationStep,
                 account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
         if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
             persistService.submitApplication(selected,this.attachList,orderType);
@@ -439,38 +439,27 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return orgTree;
     }
 
+    /**
+     * 查询 区域部门选择
+     * @param event
+     */
     public void onSearchTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         searchForm.setDept(orgInfo);
     }
 
+    /**
+     * 编辑区域部门选择
+     * @param event
+     */
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         selectedDept = orgInfo;
         this.selected.setApplicationDeptName(selectedDept.getName());
+        this.selected.setApplicationDept(selectedDept);
     }
-
-    public boolean show(String fieldKey) {
-        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) {
-            return true;
-        }
-        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) {
-            return true;
-        }
-        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) {
-            return true;
-        }
-        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) {
-            return true;
-        }
-        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) {
-            return true;
-        }
-        return customConfig.getAssetsEditpageStatusFields().contains(fieldKey);
-    }
-
 
     public void clearSelected() {
         if (StringUtils.isEmpty(selected.getId())) {

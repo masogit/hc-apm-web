@@ -251,20 +251,20 @@
                  </h:outputText>
              </p:column>
         </p:dataTable>
+        <p:fieldset legend="附件信息"  >
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <p:dataList id="attachList"
+                                value="#{multiLevelApprovalController.attachList}"
+                                var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                        <f:facet name="header">附件详情</f:facet>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    </p:dataList>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
     </h:panelGroup>
-    <p:fieldset legend="附件信息"  >
-        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-            <h:panelGroup>
-                <p:dataList id="attachList"
-                            value="#{multiLevelApprovalController.attachList}"
-                            var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                            paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                    <f:facet name="header">附件详情</f:facet>
-                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                </p:dataList>
-            </h:panelGroup>
-        </p:panelGrid>
-    </p:fieldset>
 </p:fieldset>
 </ui:composition>
 </html>
