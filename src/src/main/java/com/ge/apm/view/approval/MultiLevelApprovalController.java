@@ -175,7 +175,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
-                BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+                BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
+                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(budgetApplication.getBudgetAssets())){
+                     budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+                }
                 budgetApplicationAsset.setApplicantName(budgetApplication.getApplicant().getName());//申请人
                 budgetApplicationAsset.setApplicationDeptName(budgetApplication.getApplicationDept().getName());//申请科室
                 budgetApplicationAsset.setApplicationDate(budgetApplication.getApplicationDate());//申请日期

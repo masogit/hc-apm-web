@@ -75,9 +75,9 @@ public class BudgetPersistService {
     }
 
 
-    public void handleCommonField(BudgetApplication budgetApplication, OrgInfo curDept,
+    public void handleCommonField(BudgetApplication budgetApplication,
                                                Integer applicationStatus,String applicationStep,UserAccount account,String crudActionName,BudgetAssetInfo budgetAssetInfo,String orderType){
-
+        OrgInfo curDept = budgetApplication.getApplicationDept();
         budgetApplication.setLastModifiedBy(account.getLoginName());
         budgetApplication.setLastModifiedDate(new Date());
         budgetApplication.setApplicationDept(curDept);
