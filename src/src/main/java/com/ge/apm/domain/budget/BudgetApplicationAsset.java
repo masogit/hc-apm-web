@@ -107,7 +107,7 @@ public class BudgetApplicationAsset implements Serializable {
     private String equipmentUsage;
 
     /**
-     * *需求说明
+     * *需求说明/情况说明
      */
     @Column(name = "description")
     @Size(max = 4000)
