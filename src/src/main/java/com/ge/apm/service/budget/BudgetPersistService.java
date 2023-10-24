@@ -97,7 +97,6 @@ public class BudgetPersistService {
         budgetApplication.setOrderType(orderType);
 
         BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
-        budgetApplication.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
         //设备信息
         if(budgetApplicationAsset.getCreatedDate()== null){
             budgetApplicationAsset.setCreatedDate(new Date());
@@ -114,6 +113,18 @@ public class BudgetPersistService {
             budgetApplicationAsset.setApplicationAssetName(budgetAssetInfo.getName());
         }
     }
+
+    public boolean checkMultiLevelApproval (BudgetApplication application){
+        boolean result = true;
+        MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
+        MultiLevelApproval approval = generateApproval(application, approvalConfig);
+        if (approval == null) {
+            result = false;
+            logger.info("budget message 001: new budget application, but no approval configuration is available");
+        }
+        return result;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList,String orderType) {
@@ -195,7 +206,7 @@ public class BudgetPersistService {
         return true;
     }
 
-    private MultiLevelApproval generateApproval(BudgetApplication application, MultiLevelApprovalConfig approvalConfig) {
+    public MultiLevelApproval generateApproval(BudgetApplication application, MultiLevelApprovalConfig approvalConfig) {
         UserAccount account = UserContextService.getCurrentUserAccount();
         AtomicReference<MultiLevelApproval> approval = new AtomicReference<>(null);
         Optional.ofNullable(approvalConfig).flatMap(config -> Optional.ofNullable(config.getApprovalItem())).ifPresent(item -> {

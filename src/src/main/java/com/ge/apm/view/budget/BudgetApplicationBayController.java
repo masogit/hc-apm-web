@@ -1,6 +1,4 @@
-
 package com.ge.apm.view.budget;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -311,11 +309,18 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
-        persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
         if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
+            boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
+            if(!resultMultiLevelApproval){
+                WebUtil.addSuccessMessage("无可用的审批流,请检查后重试！");
+                return "";
+            }
+            persistService.handleCommonField(selected,applicationStatus,applicationStep,
+                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
              persistService.submitApplication(selected,this.attachList,orderType);
         }else{
+            persistService.handleCommonField(selected,applicationStatus,applicationStep,
+                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
              persistService.saveApplication(selected,this.attachList,orderType);
         }
         return this.backList();
@@ -429,6 +434,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
+            this.selected.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
         }
     }
 
