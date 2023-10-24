@@ -326,7 +326,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
-                byId.setCurrentStatus(4);
+                byId.setCurrentStatus(3);
                 byId.setLastModifiedDate(new Date());
                 byId.setLastModifiedBy(userAccount.getLoginName());
                 byId.setApprovalReason(approvalOpinion);
@@ -652,9 +652,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 byId.setCurrentStatus(3);
                                 byId.setLastModifiedBy(userAccount.getLoginName());
                                 byId.setLastModifiedDate(new Date());
-                                byId.setTransferInName(userAccount.getLoginName());
+                                byId.setTransferInName(byId.getApprovalBy());
                                 byId.setTransferInAt(new Date());
-                                byId.setTransferInUid(userAccount.getUid());
+                                byId.setTransferInUid(byId.getApprovalUid());
                                 assetDepartmentConvertRepository.save(byId);
                                 AssetInfo assetInfoByUid = assetInfoDao.getByUid(byId.getAssetUid());
                                 OrgInfo orgInfo = orgInfoRepository.getByUid(byId.getInDeptUid());

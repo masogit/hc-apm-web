@@ -188,11 +188,22 @@ public class ExportTerminatedAppraisalService {
             map.put(used_lifecycle.name(), assetUsedLifecycle);
 
         }
-        map.put(lifecycle.name(), assetInfo.getLifecycle());
-        map.put(purchase_price.name(), assetInfo.getPurchasePrice());
+        if(assetInfo.getLifecycle()!=null){
+            double  lifecycleDouble= new Double(assetInfo.getLifecycle()) / 12.0;
+            map.put(lifecycle.name(),lifecycleDouble);
+        }
+        if(assetInfo.getPurchasePrice()!=null){
+            String normalNumber = new BigDecimal(assetInfo.getPurchasePrice()).toPlainString();
+
+//            DecimalFormat format = new DecimalFormat("0.00");
+//            String formattedNumber = format.format(normalNumber);
+            map.put(purchase_price.name(), normalNumber);
+
+        }
         map.put(clinical_dept_name.name(), assetInfo.getClinicalDeptName());
         map.put(apply_name.name(), assetScrap.getCreatedBy());
-        map.put(apply_date.name(), assetScrap.getCreatedDate());
+        String date = SDF.format(assetScrap.getCreatedDate());
+        map.put(apply_date.name(), date);
         map.put(applyResone.name(), assetScrap.getApplyReason());
         map.put(approvalResone.name(), assetScrap.getApprovalReason());
         byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
