@@ -20,6 +20,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<String> getAccessScope(String userUID);
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getByLoginName(String loginName);
+    List<UserAccount> getByLoginNameIn(Collection<String> loginNames);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getById(int userId);
