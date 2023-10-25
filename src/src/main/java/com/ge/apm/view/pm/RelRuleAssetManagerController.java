@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
@@ -67,10 +68,14 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private UserCommonService userCommonService;
 	private boolean deleteRule2 = false;
 	private boolean deleteRule3 = false;
+	private boolean deleteRule1 = false;
+	private boolean deleteRule4 = false;
 	private Map<String, Boolean> selectedMap;
 	private List<RelRuleAsset> currentPageAssets;
     private List<OrgInfo> clinicalDeptList;
     private  List<PmOrderRule> pmOrderRuleList;
+    private  List<RelRuleAsset> currentEditAssets;
+    private Map<String,String> deleteRuleMap;
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
@@ -685,32 +690,72 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	//@Transactional
 	public void deleteRule(){
-		if((!deleteRule2) && (!deleteRule3)){
+		if((!deleteRule2) && (!deleteRule3) && (!deleteRule1) && (!deleteRule4)){
 			return;
 		}
 	    String alert = null;
-		if(deleteRule3){
-            selected.setRuleUID(null);
-            alert = "三级规则成功删除！";
-		}
 		if(deleteRule2){
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID2(null);
+            });
+            alert = "二级规则";
+		}
+		if(deleteRule3){
 		    if(StringUtils.isEmpty(alert)){
-                alert = "二级规则成功删除！";
+                alert = "三级规则";
             }else{
-                alert = "二级规则和三级规则都已成功删除！";
+                alert += "、三级规则";
             }
-			selected.setRuleUID2(null);
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID(null);
+            });
 		}
-		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
-			dao.delete(selected);
-            WebUtil.addSuccessMessage(alert);
-            deleteRule3 = false;
-            deleteRule2 = false;
-			return;
-		}
-		dao.save(selected);
+        if(deleteRule1){
+            if(StringUtils.isEmpty(alert)){
+                alert = "巡检规则";
+            }else{
+                alert += "、巡检规则";
+            }
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID2(null);
+            });
+        }
+        if(deleteRule4){
+            if(StringUtils.isEmpty(alert)){
+                alert = "质量控制规则";
+            }else{
+                alert += "、质量控制规则";
+            }
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID2(null);
+            });
+        }
+        alert+="已成功删除！";
+        List<RelRuleAsset> deleteRelRuleAsset = currentEditAssets.stream()
+                .filter(item -> StringUtils.isBlank(item.getRuleUID())
+                        && StringUtils.isBlank(item.getRuleUID())
+                        && StringUtils.isBlank(item.getRuleUID())
+                        && StringUtils.isBlank(item.getRuleUID())).collect(Collectors.toList());
+
+        if(deleteRelRuleAsset.size() != currentEditAssets.size()){
+            List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
+                    .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
+                            || StringUtils.isBlank(item.getRuleUID())
+                            || StringUtils.isBlank(item.getRuleUID())
+                            || StringUtils.isBlank(item.getRuleUID())).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(saveRelRuleAsset)){
+                dao.save(saveRelRuleAsset);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(deleteRelRuleAsset)){
+            dao.delete(deleteRelRuleAsset);
+        }
 		deleteRule3 = false;
 		deleteRule2 = false;
+		deleteRule1 = false;
+		deleteRule4 = false;
+        currentEditAssets.clear();
+        deleteRuleMap.clear();
         WebUtil.addSuccessMessage(alert);
 	}
 
@@ -740,21 +785,28 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.currentPageAssets = currentPageAssets;
 	}
 
-	public boolean getDeleteRule2() {
-		return deleteRule2;
-	}
-
-	public void setDeleteRule2(boolean deleteRule2) {
-		this.deleteRule2 = deleteRule2;
-	}
-
-	public boolean getDeleteRule3() {
-		return deleteRule3;
-	}
-
-	public void setDeleteRule3(boolean deleteRule3) {
-		this.deleteRule3 = deleteRule3;
-	}
+    public void updateDeleteRule(Integer ruleNum){
+	    switch (ruleNum){
+            case 1:  //巡检
+                deleteRuleMap.remove("rule1");
+                deleteRule1 = true;
+                break;
+            case 2: // 三级
+                deleteRuleMap.remove("rule2");
+                deleteRule2 = true;
+                break;
+            case 3:  // 三级
+                deleteRuleMap.remove("rule");
+                deleteRule3 = true;
+                break;
+            case 4: // 质量控制
+                deleteRuleMap.remove("rule4");
+                deleteRule4 = true;
+                break;
+            default:
+                break;
+        }
+    }
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
 	 *
@@ -775,4 +827,71 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 *
 	 * @Override public void onAfterDataChanged(){ };
 	 */
+
+	public void prepareEditRule(){
+	    Set<String> rule=new HashSet<>();
+	    Set<String> rule1=new HashSet<>();
+	    Set<String> rule2=new HashSet<>();
+	    Set<String> rule4=new HashSet<>();
+        Map<String, Boolean> selectedMap = this.selectedMap;
+        Map<String, RelRuleAsset> relRuleAssetMap = currentPageAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, item -> item));
+        currentEditAssets = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> relRuleAssetMap.get(item.getKey())).collect(Collectors.toList());
+        for (RelRuleAsset relRuleAsset : currentEditAssets) {
+            String ruleUID = relRuleAsset.getRuleUID();
+            String ruleUID1 = relRuleAsset.getRuleUID1();
+            String ruleUID2 = relRuleAsset.getRuleUID2();
+            String ruleUID4 = relRuleAsset.getRuleUID4();
+            if(StringUtils.isNotBlank(ruleUID)){
+                rule.add(ruleUID);
+            }
+            if(StringUtils.isNotBlank(ruleUID1)){
+                rule1.add(ruleUID1);
+            }
+            if(StringUtils.isNotBlank(ruleUID2)){
+                rule2.add(ruleUID2);
+            }
+            if(StringUtils.isNotBlank(ruleUID4)){
+                rule4.add(ruleUID4);
+            }
+        }
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(rule.size() > 1 || rule1.size() > 1 || rule2.size() > 1 || rule4.size() > 1){
+            WebUtil.addErrorMessage("资产保养规则不一致无法批量解除");
+            requestContext.addCallbackParam("validationFailed", false);
+        }else{
+            requestContext.addCallbackParam("validationFailed", true);
+            if(deleteRuleMap == null){
+                deleteRuleMap = new HashMap<>();
+            }
+            deleteRuleMap.put("rule",getRule(rule));
+            deleteRuleMap.put("rule1",getRule(rule1));
+            deleteRuleMap.put("rule2",getRule(rule2));
+            deleteRuleMap.put("rule4",getRule(rule4));
+            this.prepareEdit();
+        }
+    }
+
+    private String getRule(Set<String> ruleSet){
+	    String rule=null;
+        Iterator<String> iterator = ruleSet.iterator();
+        if(iterator.hasNext()){
+            rule = iterator.next();
+        }
+        return rule;
+    }
+
+    public Map<String, String> getDeleteRuleMap() {
+        return deleteRuleMap;
+    }
+
+    public void setDeleteRuleMap(Map<String, String> deleteRuleMap) {
+        this.deleteRuleMap = deleteRuleMap;
+    }
+
+    public void setCurrentEditAssets(List<RelRuleAsset> currentEditAssets){
+         this.currentEditAssets = currentEditAssets;
+    }
+    public List<RelRuleAsset> getCurrentEditAssets(){
+	   return this.currentEditAssets;
+    }
 }

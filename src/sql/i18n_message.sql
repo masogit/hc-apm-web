@@ -5087,3 +5087,5 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','4','审批退回','4',NULL,	-1	);
 -- YHAAO-19745 风险等级
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','riskGrade','风险等级','riskGrade',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MultipleRulesRecordDel', '提示：二级规则、三级规则、巡检和质量控制都被删除时该条记录会被删除', 'Note: When the second level rule, third level rule, inspection, and quality control are all deleted, the record will be deleted.', NULL, '-1');
