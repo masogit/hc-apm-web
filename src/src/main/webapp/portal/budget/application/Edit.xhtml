@@ -314,20 +314,20 @@
                                      validateClient="true"
                                      actionListener="#{budgetController.saveApplication}" value="暂存" id="saveApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" validateClient="true"
-                                     action="#{budgetController.applicationDataFlow(2,'PendingApproval','BAP')}"
+                                     action="#{budgetController.applicationDataFlow(2,'PendingApproval')}"
                                      value="提交审批" rendered="#{budgetController.selected.applicationStep eq 'ToSubmitted' and !budgetController.curModelDisables()}" id="submitApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStep eq 'PendingComplete'}"
                                      validateClient="true"
-                                     action="#{budgetController.applicationDataFlow(6,'Complete','BAP')}" value="完成" id="compaleteApplication" />
+                                     action="#{budgetController.applicationDataFlow(6,'Complete')}" value="完成" id="compaleteApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStep eq 'PendingComplete'}"
                                      validateClient="true"
-                                     action="#{budgetController.applicationDataFlow(5,'Complete','BAP')}" value="取消" id="cancelApplicationC" />
+                                     action="#{budgetController.applicationDataFlow(5,'Complete')}" value="取消" id="cancelApplicationC" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetController.curModelDisables() and budgetController.selected.applicationStatus eq '4'}"
                                      validateClient="true"
-                                     action="#{budgetController.applicationDataFlow(1,'ToSubmitted','BAP')}" value="取消申请单" id="cancelApplicationN" />
+                                     action="#{budgetController.applicationDataFlow(1,'ToSubmitted')}" value="取消申请单" id="cancelApplicationN" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{budgetController.backList}" />
                     <p:commandLink process="@this" ajax="false"><a href="docTemplate/单价50万元以上（含50万）设备论证报告.docx" title="download">下载论证报告</a></p:commandLink>

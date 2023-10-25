@@ -303,13 +303,13 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void saveApplication() {
         persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
-                account,crudActionName,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAP.toString());
-        boolean isOk = persistService.saveApplication(selected,this.attachList,BudgetApplication.OrderType.BAP.toString());
+                account,crudActionName,this.curSelectBudgetAssetInfo);
+        boolean isOk = persistService.saveApplication(selected,this.attachList);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
 
-    public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
+    public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
         if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
@@ -318,12 +318,12 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
                 return "";
             }
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
-            persistService.submitApplication(selected,this.attachList,orderType);
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+            persistService.submitApplication(selected,this.attachList);
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
-            persistService.saveApplication(selected,this.attachList,orderType);
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+            persistService.saveApplication(selected,this.attachList);
         }
         return this.backList();
     }
@@ -507,23 +507,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         crudActionName = "Create";
         selectedDept = null;
         selected = new BudgetApplication();
-
-        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
-        budgetApplicationAssetSet.add(this.curSelectApplicationBudgetAsset);
-        selected.setBudgetAssets(budgetApplicationAssetSet);
-
-        selected.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
-        selected.setApplicant(account);
-        selected.setApplicantId(account.getId());
-        selected.setApplicationDate(new Date());
-        selected.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
-        selected.setBudgetApprovals(new HashSet<>());
-        selected.setIsDeleted(0);
-        selected.setCreatedBy(account.getLoginName());
-        selected.setCreatedDate(new Date());
-        selected.setLastModifiedBy(account.getLoginName());
-        selected.setLastModifiedDate(new Date());
-
+        persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAP.toString());
     }
 
     @Override
