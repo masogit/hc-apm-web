@@ -8,6 +8,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class DepartmentConvertService {
                     try {
                         byte[] bytes = generate(assetDepartmentConvert, templateBytes);
                         if (bytes != null) {
-                            String name = assetDepartmentConvert.getAssetName() + "-" + "调拨单" + ".docx";
+                            String name = assetDepartmentConvert.getAssetName() +assetDepartmentConvert.getBusinessNumber()+ "-" + "调拨单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();
@@ -128,6 +129,9 @@ public class DepartmentConvertService {
             if(i>3){
                 logger.info("审批节点大于三");
                 break;
+            }
+            if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
+                continue;
             }
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
             map.put(signature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));

@@ -133,6 +133,9 @@ public class ExportTerminatedAppraisalService {
                     } catch (Exception e) {
                         logger.error("assetUid:{},报废鉴定表导出异常：e", assetScrap.getAssetUid(), e);
                     }
+                }else{
+                    logger.info("assetUid:{},没有报废流", item);
+
                 }
 
             });
@@ -206,8 +209,10 @@ public class ExportTerminatedAppraisalService {
         map.put(apply_date.name(), date);
         map.put(applyResone.name(), assetScrap.getApplyReason());
         map.put(approvalResone.name(), assetScrap.getApprovalReason());
-        byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
-        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+        if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
+            byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
+            map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+        }
 
         List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
@@ -223,6 +228,9 @@ public class ExportTerminatedAppraisalService {
             if(i>3){
                 logger.info("审批节点大于三");
                 break;
+            }
+            if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
+                continue;
             }
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
             map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
