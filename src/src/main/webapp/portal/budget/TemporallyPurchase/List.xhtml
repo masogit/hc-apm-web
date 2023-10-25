@@ -91,7 +91,7 @@
                                     <p:ajax event="dateSelect" update="@this"/>
                                 </p:calendar>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}"><!--设备科主任ASSEThead临床科室主任 DeptHead-->
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
                                 <p:inputText value="#{budgetBayController.searchForm.applicantName}"/>
                             </h:panelGroup>

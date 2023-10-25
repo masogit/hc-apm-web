@@ -106,6 +106,10 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
+                                <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationPrice}">
@@ -117,10 +121,7 @@
                                 <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAmount}" >
                                 </p:inputNumber>
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
-                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <p:outputLabel class="label">经费来源</p:outputLabel>
                                 <p:selectOneMenu disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.sourceFunding}"  >
