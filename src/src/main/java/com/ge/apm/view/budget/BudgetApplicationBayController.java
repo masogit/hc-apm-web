@@ -302,13 +302,13 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
     public void saveApplication() {
         persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
-                account,crudActionName,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
-        boolean isOk = persistService.saveApplication(selected,this.attachList,BudgetApplication.OrderType.BAY.toString());
+                account,crudActionName,this.curSelectBudgetAssetInfo);
+        boolean isOk = persistService.saveApplication(selected,this.attachList);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
 
-    public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
+    public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
         if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
@@ -316,12 +316,12 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
                 return "";
             }
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
-             persistService.submitApplication(selected,this.attachList,orderType);
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+             persistService.submitApplication(selected,this.attachList);
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                    account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
-             persistService.saveApplication(selected,this.attachList,orderType);
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+             persistService.saveApplication(selected,this.attachList);
         }
         return this.backList();
     }
@@ -507,22 +507,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         selectedDept = null;
         selected = new BudgetApplication();
 
-        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
-        budgetApplicationAssetSet.add(this.curSelectApplicationBudgetAsset);
-        selected.setBudgetAssets(budgetApplicationAssetSet);
+        persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAY.toString());
 
-        selected.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
-        selected.setApplicant(account);
-        selected.setApplicantId(account.getId());
-        selected.setApplicationDate(new Date());
-        selected.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
-        selected.setApprovalProgress(0);
-        selected.setBudgetApprovals(new HashSet<>());
-        selected.setIsDeleted(0);
-        selected.setCreatedBy(account.getLoginName());
-        selected.setCreatedDate(new Date());
-        selected.setLastModifiedBy(account.getLoginName());
-        selected.setLastModifiedDate(new Date());
     }
 
     @Override

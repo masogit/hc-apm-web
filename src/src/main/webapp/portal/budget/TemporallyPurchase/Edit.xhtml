@@ -213,18 +213,18 @@
                     <p:commandButton update=":growl :BudgetApplicationEditForm" rendered="#{budgetBayController.selected.applicationStatus eq '1' and !budgetBayController.curModelDisables()}"
                                      validateClient="true"  actionListener="#{budgetBayController.saveApplication}" value="暂存" id="saveApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" validateClient="true"
-                                     action="#{budgetBayController.applicationDataFlow(2,'PendingApproval','BAY')}"
+                                     action="#{budgetBayController.applicationDataFlow(2,'PendingApproval')}"
                                      value="提交审批" rendered="#{budgetBayController.selected.applicationStep eq 'ToSubmitted' and !budgetBayController.curModelDisables()}"
                                      id="submitApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetBayController.curModelDisables() and budgetBayController.selected.applicationStep eq 'PendingComplete'}"
-                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(6,'Complete','BAY')}" value="完成" id="compaleteApplication" />
+                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(6,'Complete')}" value="完成" id="compaleteApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetBayController.curModelDisables() and budgetBayController.selected.applicationStep eq 'PendingComplete'}"
-                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(5,'Complete','BAY')}" value="取消" id="cancelApplication" />
+                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(5,'Complete')}" value="取消" id="cancelApplication" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      rendered="#{!budgetBayController.curModelDisables() and budgetBayController.selected.applicationStatus eq '4'}"
-                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(1,'ToSubmitted','BAY')}" value="取消申请单" id="cancelApplicationN" />
+                                     validateClient="true" action="#{budgetBayController.applicationDataFlow(1,'ToSubmitted')}" value="取消申请单" id="cancelApplicationN" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{budgetBayController.backList}" />
                 </h:panelGroup>
