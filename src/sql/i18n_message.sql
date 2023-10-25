@@ -4739,7 +4739,7 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApplication', '预算申请', 'Budget Application', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetInfo', '预算详情', 'Budget Details', NULL, -1);
 
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PurchaseBudgetConfig', '年度申购记录', 'PurchaseBudgetConfig', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PurchaseBudgetConfig', '年度申购开启记录', 'PurchaseBudgetConfig', NULL, -1);
 
 
 
