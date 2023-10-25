@@ -100,6 +100,10 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
+                                <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationPrice}">
@@ -110,10 +114,6 @@
                                 <p:outputLabel class="label">预算总价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAmount}" >
                                 </p:inputNumber>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">经费来源</p:outputLabel>
