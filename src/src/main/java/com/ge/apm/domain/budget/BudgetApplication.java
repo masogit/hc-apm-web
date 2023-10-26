@@ -130,6 +130,14 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "approval_config_id")
     private String approvalConfigId;
 
+    // 病区代码
+    @Column(name = "ward_code")
+    private String wardCode;
+
+    // 院区
+    @Column(name = "courtyard_area")
+    private String courtyardArea;
+
     // 审批流
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
@@ -176,6 +184,22 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     @Transient
     private String applicantName ;//申请人
+
+    public String getCourtyardArea() {
+        return courtyardArea;
+    }
+
+    public void setCourtyardArea(String courtyardArea) {
+        this.courtyardArea = courtyardArea;
+    }
+
+    public String getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
+    }
 
     /**
      * *设备名称
