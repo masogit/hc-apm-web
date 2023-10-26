@@ -323,7 +323,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetValueCategory','资产价值分类','Asset Value Category',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','locationName','安装位置','Installation Location',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','locationNotes','位置备注1(科室)','Installation Location Notes',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','maitananceTel','维修商电话','Maintainer Telephone',NULL,-1);
+--     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','maitananceTel','维修商电话','Maintainer Telephone',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','maitananceTel','维修商联系方式','Maintainer Telephone',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','manufactDate','出厂日期','Manufacture Date',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','modalityId','院内IT系统编号','Hospital-based IT Modality ID',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','nextTime','下次计划时间','Next Plan Time',NULL,-1);
@@ -364,7 +365,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','updatePersonId','变更人','Update Person',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','updatePersonName','变更人','Update Person',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','updateTime','处理时间','Update Time',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','vendorTel','供应商电话','Vendor Telephone',NULL,-1);
+--     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','vendorTel','供应商电话','Vendor Telephone',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','vendorTel','供应商联系方式','Vendor Telephone',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','warrantyDate','维保截止日期','Warranty Expiration Date',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','zipcode','邮编','Zip Code',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','contactPerson','联系人','Contact Person',NULL,-1);
@@ -5087,5 +5089,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('approvalNodeStatus','4','审批退回','4',NULL,	-1	);
 -- YHAAO-19745 风险等级
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','riskGrade','风险等级','riskGrade',NULL,-1);
+-- YHAAO-19724 供应商管理-增加批量导入功能
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','contactInformation','联系方式','Contact information',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MultipleRulesRecordDel', '提示：二级规则、三级规则、巡检和质量控制都被删除时该条记录会被删除', 'Note: When the second level rule, third level rule, inspection, and quality control are all deleted, the record will be deleted.', NULL, '-1');
