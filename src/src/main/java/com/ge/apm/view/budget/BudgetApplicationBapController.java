@@ -449,6 +449,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         selectedAsset.setCreatedDate(new Date());
         selectedAsset.setLastModifiedBy(account.getLoginName());
         selectedAsset.setLastModifiedDate(new Date());
+        searchAsset();
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -512,7 +513,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         crudActionName = "Create";
         selectedDept = null;
         selected = new BudgetApplication();
-        persistService.initCreateObject(selected,selectedDept,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAP.toString());
+        persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAP.toString());
+        this.selectedDept = selected.getApplicationDept();
     }
 
     @Override

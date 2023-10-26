@@ -125,7 +125,7 @@ public class BudgetPersistService {
         return result;
     }
 
-    public void initCreateObject(BudgetApplication application,OrgInfo selectedDept,BudgetApplicationAsset budgetApplicationAsset,UserAccount account,String orderType){
+    public void initCreateObject(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,UserAccount account,String orderType){
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         budgetApplicationAssetSet.add(budgetApplicationAsset);
         application.setBudgetAssets(budgetApplicationAssetSet);
@@ -136,13 +136,13 @@ public class BudgetPersistService {
         application.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
         application.setBudgetApprovals(new HashSet<>());
         application.setIsDeleted(0);
+        application.setProcureStatus(BudgetApplication.procureStatus.Unpurchased.toString());//采购状态
         application.setCreatedBy(account.getLoginName());
         application.setCreatedDate(new Date());
         application.setLastModifiedBy(account.getLoginName());
         application.setLastModifiedDate(new Date());
         application.setOrderType(orderType);
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        selectedDept = orgInfo;
         application.setApplicationDeptName(orgInfo.getName());
         application.setApplicationDept(orgInfo);
         application.setCourtyardArea(getCourtyardArea(orgInfo));

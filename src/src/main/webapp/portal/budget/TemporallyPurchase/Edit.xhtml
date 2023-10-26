@@ -76,7 +76,7 @@
                                      styleClass="ui-panelgrid-blank form-group"
                                      rendered="#{budgetBayController.selected != null}">
 
-                            <h:panelGroup rendered="#{budgetBayController.curModelCreate()}">
+                            <!--<h:panelGroup rendered="#{budgetBayController.curModelCreate()}">
                                 <label class="label">设备名称<span style="color: red">*</span></label>
                                     <p:autoComplete disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" dropdown="true" value="#{budgetBayController.curSelectBudgetAssetInfo}"
                                                     scrollHeight="300" forceSelection="true" completeMethod="#{budgetBayController.autoCompleteAssetName}"
@@ -85,10 +85,11 @@
                                         <p:ajax listener="#{budgetBayController.onBudgetAssetInfoChange()}" update="@(.budgetAssetInfoChange)"/>
                                     </p:autoComplete>
                                 <p:commandButton rendered="#{!budgetBayController.curModelDisables()}" disabled="#{budgetBayController.selected.applicationStep eq 'PendingComplete'}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetBayController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{!budgetBayController.curModelCreate()}">
+                            </h:panelGroup>-->
+                            <h:panelGroup >
                                 <label class="label">设备名称<span style="color: red">*</span></label>
                                 <p:inputText disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange"/>
+                                <p:commandButton rendered="#{!budgetBayController.curModelDisables()}" disabled="#{budgetBayController.selected.applicationStep eq 'PendingComplete'}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetBayController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                         <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
