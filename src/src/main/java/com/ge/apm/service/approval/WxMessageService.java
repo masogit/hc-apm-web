@@ -28,6 +28,7 @@ public class WxMessageService extends MicroServiceInvoker {
         approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason) {
         HashMap<String, Object> params = combineMsg(approvalName, approvableTarget, assetInfo,linkUrl,user,reason);
         List<WechatParam> paramList = new ArrayList<>();
+        userAccounts= userAccounts.stream().distinct().collect(Collectors.toList());
         for (UserAccount userAccount : userAccounts) {
             WechatParam wechatParam = JSON.parseObject(JSON.toJSONString(params), WechatParam.class);
             wechatParam.setOpenId(userAccount.getWeChatId());
