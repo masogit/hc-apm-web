@@ -1,9 +1,6 @@
 package com.ge.apm.view.pm;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.ConfigService;
@@ -76,6 +73,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     private  List<PmOrderRule> pmOrderRuleList;
     private  List<RelRuleAsset> currentEditAssets;
     private Map<String,String> deleteRuleMap;
+    private List<String> deleteRuleCache;
+    private V2_PmOrderRepository pmOrderRepository;
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
@@ -122,6 +121,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
 		this.selectedMap = new HashMap();
@@ -693,7 +693,19 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		if((!deleteRule2) && (!deleteRule3) && (!deleteRule1) && (!deleteRule4)){
 			return;
 		}
-	    String alert = null;
+
+        List<V2_PmOrder> pmOrder = getPmOrder();
+        if(CollectionUtils.isNotEmpty(pmOrder)){
+            StringBuilder tip= new StringBuilder("删除失败!");
+            for (V2_PmOrder v2_pmOrder : pmOrder) {
+                String assetName = v2_pmOrder.getAssetName();
+                String ruleName = v2_pmOrder.getRuleName();
+                tip.append(assetName).append(",保养工单："+ruleName).append("未完成");
+            }
+            WebUtil.addSuccessMessage(tip.toString());
+            return ;
+        }
+        String alert = null;
 		if(deleteRule2){
             currentEditAssets.stream().forEach(item->{
                 item.setRuleUID2(null);
@@ -733,16 +745,16 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         alert+="已成功删除！";
         List<RelRuleAsset> deleteRelRuleAsset = currentEditAssets.stream()
                 .filter(item -> StringUtils.isBlank(item.getRuleUID())
-                        && StringUtils.isBlank(item.getRuleUID())
-                        && StringUtils.isBlank(item.getRuleUID())
-                        && StringUtils.isBlank(item.getRuleUID())).collect(Collectors.toList());
+                        && StringUtils.isBlank(item.getRuleUID1())
+                        && StringUtils.isBlank(item.getRuleUID2())
+                        && StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
 
         if(deleteRelRuleAsset.size() != currentEditAssets.size()){
             List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
                     .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
-                            || StringUtils.isBlank(item.getRuleUID())
-                            || StringUtils.isBlank(item.getRuleUID())
-                            || StringUtils.isBlank(item.getRuleUID())).collect(Collectors.toList());
+                            || StringUtils.isBlank(item.getRuleUID1())
+                            || StringUtils.isBlank(item.getRuleUID2())
+                            || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
             if(CollectionUtils.isNotEmpty(saveRelRuleAsset)){
                 dao.save(saveRelRuleAsset);
             }
@@ -756,18 +768,22 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		deleteRule4 = false;
         currentEditAssets.clear();
         deleteRuleMap.clear();
+        selectedMap.clear();
+        deleteRuleCache.clear();
         WebUtil.addSuccessMessage(alert);
 	}
-
-	public void deleteRule2(){
-		this.selected.setRuleUID2(null);
-		this.deleteRule2 = true;
-	}
-
-	public void deleteRule3(){
-		this.selected.setRuleUID(null);
-		this.deleteRule3 = true;
-	}
+    public List<V2_PmOrder> getPmOrder(){
+	    if(CollectionUtils.isEmpty(currentEditAssets) || CollectionUtils.isEmpty(deleteRuleCache)){
+	        return null;
+        }
+        List<String> assetUid = currentEditAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN,assetUid));
+        searchFilters.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,deleteRuleCache));
+        searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ,false));
+        List<V2_PmOrder> pmOrdersList = pmOrderRepository.findBySearchFilter(searchFilters);
+        return pmOrdersList;
+    }
 
 	public Map<String, Boolean> getSelectedMap() {
 		return selectedMap;
@@ -788,19 +804,19 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     public void updateDeleteRule(Integer ruleNum){
 	    switch (ruleNum){
             case 1:  //巡检
-                deleteRuleMap.remove("rule1");
+                deleteRuleCache.add(deleteRuleMap.remove("rule1"));
                 deleteRule1 = true;
                 break;
             case 2: // 三级
-                deleteRuleMap.remove("rule2");
+                deleteRuleCache.add(deleteRuleMap.remove("rule2"));
                 deleteRule2 = true;
                 break;
             case 3:  // 三级
-                deleteRuleMap.remove("rule");
+                deleteRuleCache.add(deleteRuleMap.remove("rule"));
                 deleteRule3 = true;
                 break;
             case 4: // 质量控制
-                deleteRuleMap.remove("rule4");
+                deleteRuleCache.add(deleteRuleMap.remove("rule4"));
                 deleteRule4 = true;
                 break;
             default:
@@ -862,6 +878,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             requestContext.addCallbackParam("validationFailed", true);
             if(deleteRuleMap == null){
                 deleteRuleMap = new HashMap<>();
+                deleteRuleCache=new ArrayList<>();
             }
             deleteRuleMap.put("rule",getRule(rule));
             deleteRuleMap.put("rule1",getRule(rule1));
