@@ -581,16 +581,19 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 if (approvalNodes != null) {
                     MultiLevelApproval date = multiLevelApprovalNew;
                     int maxNodeId = approvalNodes.size();
+
+                    List<MultiLevelApproval> multiLevelApprovalList=new ArrayList<>();
+
                     if (level > maxNodeId) {//最后一个人审批通过 更新审批状态为通过 业务状态为审批通过
-                        List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
+                        multiLevelApprovalList = this.getMultiLevelApproval(multiLevelApproval);
                         //发起人UID
                         String initiateApproverUid = null;
                         String businessType = this.getBusinessType(multiLevelApproval.getBusinessType());
                         UserAccount user=null;
-                        if (null != list) {
+                        if (null != multiLevelApprovalList) {
 
-                            for (int i = 0; i < list.size(); i++) {
-                                MultiLevelApproval multi = list.get(i);
+                            for (int i = 0; i < multiLevelApprovalList.size(); i++) {
+                                MultiLevelApproval multi = multiLevelApprovalList.get(i);
                                 if (null != multi.getInitiateApproverUid() && !"".equals(multi.getInitiateApproverUid())) {
                                     initiateApproverUid = multi.getInitiateApproverUid();
                                 }
@@ -604,7 +607,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
                             }
                             String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
-                            if(multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP){
+                            if(multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP && multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT) {
                                 this.sendWxMsg(paramList, message,"审批通过","");
                             }
                         }
@@ -658,7 +661,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                                 AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
                                 byId.setCurrentStatus(3);
-                                byId.setLastModifiedBy(userAccount.getLoginName());
+                                byId.setLastModifiedBy(userAccount.getName());
                                 byId.setLastModifiedDate(new Date());
                                 byId.setTransferInName(byId.getApprovalBy());
                                 byId.setTransferInAt(new Date());
@@ -670,7 +673,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 assetInfoByUid.setClinicalDeptId(orgInfo.getId());
                                 assetInfoByUid.setClinicalDeptName(byId.getInDeptName());
                                 assetInfoByUid.setLastModifiedDate(new Date());
-                                assetInfoByUid.setLastModifiedBy(userAccount.getLoginName());
+                                assetInfoByUid.setLastModifiedBy(userAccount.getName());
                                 assetInfoDao.save(assetInfoByUid);
 
                                 MqContext mqContext = new MqContext();
@@ -681,6 +684,21 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
                                 mqUtils.sendAssetToMQ(assetInfoByUid,currentUserAccount,mqContext);
 
+
+                                Set<String> approverUids = multiLevelApprovalList.stream().map(MultiLevelApproval::getActualApproverUid).distinct().collect(Collectors.toSet());
+                                approverUids.add(byId.getTransferOutUid());
+                                List<UserAccount> userAccounts1=userAccountRepository.getByUids(approverUids);
+                                int roleId = roleDao.getIdByName("DeptHead");
+                                List<UserAccount> inUsers = userAccountRepository.findOrgUidByRoleId(byId.getInDeptUid(), roleId);
+                                List<UserAccount> outUsers = userAccountRepository.findOrgUidByRoleId(byId.getOutDeptUid(), roleId);
+                                if(CollectionUtils.isNotEmpty(inUsers)){
+                                    userAccounts1.addAll(inUsers);
+                                }
+                                if(CollectionUtils.isNotEmpty(outUsers)){
+                                    userAccounts1.addAll(outUsers);
+                                }
+                                userAccounts1= userAccounts1.stream().distinct().collect(Collectors.toList());
+                                wxMessageService.sendMessage(assetInfoByUid,"审批通过",byId,userAccounts1,"",userAccount,byId.getApplyReason());
                                 break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
