@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.CustomConfigConstant;
@@ -50,9 +51,8 @@ public class CustomConfigObject {
     List<String> assetAllocateFields;
 
     JSONObject mobilePage;
-
-
     JSONObject mobileMaintainPage;
+    JSONObject mobileBuildAssetPage;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -251,7 +251,7 @@ public class CustomConfigObject {
 
     public JSONObject getMobilePage() {
         if (mobilePage == null) {
-            mobilePage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+            mobilePage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
         return mobilePage;
     }
@@ -262,13 +262,24 @@ public class CustomConfigObject {
 
     public JSONObject getMobileMaintainPage() {
         if (mobileMaintainPage == null) {
-            mobileMaintainPage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+            mobileMaintainPage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
         return mobileMaintainPage;
     }
 
     public void setMobileMaintainPage(JSONObject mobileMaintainPage) {
         this.mobileMaintainPage = mobileMaintainPage;
+    }
+
+    public JSONObject getMobileBuildAssetPage() {
+        if (mobileBuildAssetPage == null) {
+            mobileBuildAssetPage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_BUILD_ASSET_PAGE_JSON);
+        }
+        return mobileBuildAssetPage;
+    }
+
+    public void setMobileBuildAssetPage(JSONObject mobileBuildAssetPage) {
+        this.mobileBuildAssetPage = mobileBuildAssetPage;
     }
 
     public List<String> getAssetsImportantFields() {
