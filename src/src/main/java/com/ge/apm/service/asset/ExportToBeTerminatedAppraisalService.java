@@ -205,7 +205,11 @@ public class ExportToBeTerminatedAppraisalService {
         AssetTerminationReportTemplate template = getPrioritizedTemplate(uids);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
-            templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
+            try {
+                templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
+            }catch (Exception e){
+                templateBytes=null;
+            }
         }
         if (templateBytes == null) {
             String fileName = "tobeterminated_template.docx";
