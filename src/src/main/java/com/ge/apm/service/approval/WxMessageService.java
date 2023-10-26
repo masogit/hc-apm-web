@@ -24,7 +24,6 @@ public class WxMessageService extends MicroServiceInvoker {
 
 
 
-    @Async
     public void sendMessage(AssetInfo assetInfo, String approvalName, ApprovableTarget
         approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason) {
         HashMap<String, Object> params = combineMsg(approvalName, approvableTarget, assetInfo,linkUrl,user,reason);
