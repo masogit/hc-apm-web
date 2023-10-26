@@ -51,10 +51,25 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
         ToSubmitted, PendingApproval,PendingComplete,Complete
     }
     /**
+     * 采购状态
+     *已采购未采购
+     */
+    public enum procureStatus {
+        Unpurchased, Purchased
+    }
+    /**
      * 申请步骤
      */
     @Column(name = "application_step")
     private String applicationStep;
+
+    /**
+     * 采购状态
+     */
+    @Column(name = "procure_Status")
+    private String procureStatus;
+
+
 
     // 申请日期
     @Column(name = "application_date")
@@ -184,6 +199,14 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     @Transient
     private String applicantName ;//申请人
+
+    public String getProcureStatus() {
+        return procureStatus;
+    }
+
+    public void setProcureStatus(String procureStatus) {
+        this.procureStatus = procureStatus;
+    }
 
     public String getCourtyardArea() {
         return courtyardArea;

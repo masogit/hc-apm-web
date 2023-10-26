@@ -66,6 +66,9 @@
                                            pattern="#{userContextService.timeFormat14()}"/>
                  </h:outputText>
             </p:column>
+            <p:column headerText="采购状态">
+                <h:outputText value="#{fieldMsg.fieldValue('procureStatus', item.procureStatus)}"/>
+            </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
