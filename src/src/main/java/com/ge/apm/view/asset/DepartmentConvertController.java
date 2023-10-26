@@ -40,6 +40,8 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private Date filterBeginTime;
     private Date returnAtTime;
 
+    private Integer status;
+
     private List<AssetDepartmentConvert> currentPageAssets;
 
     //复选的设备
@@ -188,7 +190,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         return result;
     }
 
-    public String getStatus(Integer status) {
+    public String getStatusName(Integer status) {
 
         String stringStatus = null;
         switch (status) {
@@ -232,5 +234,13 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
             logger.error("exportTransferOrderFile error:",e);
             WebUtil.addErrorMessage("Fail to download report");
         }
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

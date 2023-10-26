@@ -100,16 +100,13 @@
                 <p:ajax event="filter" listener="#{assetInfoTerminatedListController.onFilter}"
                         oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
-                <p:column width="36" id="checkBoxColumn">
-                    <p:selectBooleanCheckbox value="#{assetInfoTerminatedListController.selectedMap[item.uid]}"
-                                             class="selectCheckBox">
-                        <p:ajax process="@this" update="@this @(.batch-terminated)"
-                                oncomplete="updateSelectAllCheckBox();"/>
+                <p:column width="36"  id="checkBoxColumn">
+                    <p:selectBooleanCheckbox value="#{assetInfoTerminatedListController.selectedMap[item.uid]}"  class="selectCheckBox">
+                        <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                     </p:selectBooleanCheckbox>
-                    <f:facet name="header">
-                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax listener="#{assetInfoTerminatedListController.onSelectAllOfPage}"
-                                    update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                    <f:facet name="header"  >
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader1" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{assetInfoTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
@@ -737,7 +734,6 @@
                                      class="btn btn-sm btn-gray batch-terminated" title="报废鉴定表导出"
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
                                      disabled="#{not assetInfoTerminatedListController.isChecked()}"
-                                     rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}"
                     >
                         <p:fileDownload value="#{assetInfoTerminatedListController.terminatedAppraisalFile}"/>
 

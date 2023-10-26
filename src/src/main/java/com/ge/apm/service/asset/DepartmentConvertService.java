@@ -8,6 +8,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -66,7 +68,7 @@ public class DepartmentConvertService {
                     try {
                         byte[] bytes = generate(assetDepartmentConvert, templateBytes);
                         if (bytes != null) {
-                            String name = assetDepartmentConvert.getAssetName() + "-" + "调拨单" + ".docx";
+                            String name = assetDepartmentConvert.getAssetName() +assetDepartmentConvert.getBusinessNumber()+ "-" + "调拨单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();
@@ -100,6 +102,9 @@ public class DepartmentConvertService {
         }
         return out.toByteArray();
     }
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
     public Map<String, Object> getData(AssetDepartmentConvert assetDepartmentConvert) {
         Map<String, Object> map = new HashMap<>();
 
@@ -112,7 +117,10 @@ public class DepartmentConvertService {
         map.put(serial_num.name(), assetInfo.getSerialNum());
         map.put(out_dept_name.name(), assetDepartmentConvert.getOutDeptName());
         map.put(in_dept_name.name(), assetDepartmentConvert.getInDeptName());
-        map.put(out_date.name(), assetDepartmentConvert.getTransferInAt());
+        if(assetDepartmentConvert.getTransferInAt()!=null){
+            String date = SDF.format(assetDepartmentConvert.getTransferInAt());
+            map.put(out_date.name(), date);
+        }
         String statusName=getStatusName ("assetStatus",assetInfo.getStatus().toString());
         map.put(status.name(), statusName);
         List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
@@ -128,6 +136,9 @@ public class DepartmentConvertService {
             if(i>3){
                 logger.info("审批节点大于三");
                 break;
+            }
+            if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
+                continue;
             }
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
             map.put(signature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
