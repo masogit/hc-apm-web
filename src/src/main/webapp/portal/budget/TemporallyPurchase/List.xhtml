@@ -27,7 +27,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="临时采购申请"/>
+                <p:outputLabel class="pageTitle" value="临时申购申请"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -95,7 +95,12 @@
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
                                 <p:inputText value="#{budgetBayController.searchForm.applicantName}"/>
                             </h:panelGroup>
-
+                            <h:panelGroup>
+                                <label class="label">申购年份</label>
+                                <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="yyyy" value="#{budgetBayController.searchForm.applicantYear}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"  >
+                                </p:calendar>
+                            </h:panelGroup>
                             <h:panelGroup style="display: flex;">
                                 <p:commandButton value="#{msg.Search}"
                                                  actionListener="#{budgetBayController.search}"

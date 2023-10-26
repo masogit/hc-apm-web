@@ -7,7 +7,7 @@
                 template="/WEB-INF/template.xhtml">
     <ui:define name="content">
         <div class="ui-g-12 card cardTitle">
-            <p:outputLabel class="pageTitle" value="年度采购申请"/>
+            <p:outputLabel class="pageTitle" value="年度申购申请"/>
         </div>
         <div  class="ui-g-12 card">
             <h:form id="BudgetApplicationEditForm">
@@ -20,11 +20,15 @@
                                 <p:outputLabel class="label">#{msg.ApplicationNum}</p:outputLabel>
                                 <h:outputText value="#{budgetController.selected.applicationNum}"/>
                             </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">院区</label>
+                                <h:outputText value="#{budgetController.selected.courtyardArea}"/>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">#{msg.ApplicationDept}<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText  id="dept" value="#{budgetController.selected.applicationDeptName}" readonly="true" required="true" requiredMessage="申请科室 #{msg.ValidationRequire}"/>
                                 <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
-                                                 class="btn btn-sm popupIconButton" rendered="#{!budgetController.curModelDisables()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}" />
+                                                 class="btn btn-sm popupIconButton" rendered="#{false}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}" />
                                 <p:overlayPanel  id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit" hideEffect="fade"
                                                 style="position: absolute; left: 0; top: 0; width: 300px;"
                                                 dynamic="false" modal="false" dismissable="true"   >
@@ -45,6 +49,10 @@
                                 </p:overlayPanel>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">病区代码<span style="color: red">*</span></label>
+                                <p:inputText disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.selected.wardCode}" required="true" requiredMessage="病区代码 #{msg.ValidationRequire}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
                                 <h:outputText value="#{budgetController.selected.applicant.name}"/>
                             </h:panelGroup>
@@ -58,7 +66,7 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="#{msg.BudgetAssetInfo}" id="applicationDetail" rendered="#{budgetController.selectedDept ne null}">
+                    <p:fieldset legend="#{msg.BudgetAssetInfo}" id="applicationDetail" >
                         <p:panelGrid id="applicationBudgetAssetPanel" columns="4" layout="grid"
                                      styleClass="ui-panelgrid-blank form-group"
                                      rendered="#{budgetController.selected != null}">
@@ -245,6 +253,12 @@
                                </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="模板下载"  >
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <p:commandLink process="@this" ajax="false"><a href="docTemplate/单价50万元以上（含50万）设备论证报告.docx" title="download">单价50万元以上（含50万）设备论证报告</a></p:commandLink>
+
+                        </p:panelGrid>
+                    </p:fieldset>
                     <p:fieldset
                             legend="#{msg.BudgetApprovalInfo}: #{budgetController.selected.approvalConfig.approvalName}" rendered="#{budgetController.budgetApprovalsDisplay()}">
                         <p:dataTable id="budgetApprovallist" value="#{budgetController.selected.budgetApprovals}"
@@ -330,9 +344,6 @@
                                      action="#{budgetController.applicationDataFlow(1,'ToSubmitted')}" value="取消申请单" id="cancelApplicationN" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{budgetController.backList}" />
-                    <p:commandLink process="@this" ajax="false"><a href="docTemplate/单价50万元以上（含50万）设备论证报告.docx" title="download">下载论证报告</a></p:commandLink>
-
-
                 </h:panelGroup>
 
             </h:form>

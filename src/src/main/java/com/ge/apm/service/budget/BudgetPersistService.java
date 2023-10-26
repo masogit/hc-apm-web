@@ -125,7 +125,7 @@ public class BudgetPersistService {
         return result;
     }
 
-    public void initCreateObject(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,UserAccount account,String orderType){
+    public void initCreateObject(BudgetApplication application,OrgInfo selectedDept,BudgetApplicationAsset budgetApplicationAsset,UserAccount account,String orderType){
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         budgetApplicationAssetSet.add(budgetApplicationAsset);
         application.setBudgetAssets(budgetApplicationAssetSet);
@@ -141,8 +141,21 @@ public class BudgetPersistService {
         application.setLastModifiedBy(account.getLoginName());
         application.setLastModifiedDate(new Date());
         application.setOrderType(orderType);
+        OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
+        selectedDept = orgInfo;
+        application.setApplicationDeptName(orgInfo.getName());
+        application.setApplicationDept(orgInfo);
+        application.setCourtyardArea(getCourtyardArea(orgInfo));
     }
 
+    public String getCourtyardArea(OrgInfo orgInfo){
+        String orgName = new String();
+        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
+            orgName = orgInfo.getName();
+            return orgName;
+        }
+        return getCourtyardArea(orgInfo.getParentOrg());
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
@@ -338,8 +351,8 @@ public class BudgetPersistService {
             BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
             Map<String, Object> budgetApplicationMap = new HashMap<>();
             budgetApplicationMap.put("编号",budgetApplication.getApplicationNum());
-            budgetApplicationMap.put("院区",StringUtils.isBlank(budgetApplication.getHospitalUID())?"":orgDao.findByUid(budgetApplication.getHospitalUID()).getName());
-            budgetApplicationMap.put("病区代码","病区代码");
+            budgetApplicationMap.put("院区",budgetApplication.getCourtyardArea());
+            budgetApplicationMap.put("病区代码",budgetApplication.getWardCode());
             budgetApplicationMap.put("申请科室",budgetApplication.getApplicationDept()==null?"":budgetApplication.getApplicationDept().getName());
             budgetApplicationMap.put("设备名称",budgetApplicationAsset.getApplicationAssetName());
             budgetApplicationMap.put("设备品类",budgetApplicationAsset.getApplicationAssetCategory());

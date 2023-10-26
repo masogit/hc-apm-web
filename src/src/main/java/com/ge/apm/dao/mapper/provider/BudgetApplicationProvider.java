@@ -63,6 +63,9 @@ public class BudgetApplicationProvider {
                 if(SearchFilter.Operator.LT.toString().equals(searchFilter.operator.toString())){
                     sb.append(" and t.application_date <= to_date('"+value.toString()+"','yyyyMMdd')");
                 }
+                if(SearchFilter.Operator.EQ.toString().equals(searchFilter.operator.toString())){
+                    sb.append(" and to_char(t.application_date,'yyyy') = to_char(to_date('"+value.toString()+"','yyyyMMdd'),'yyyy')");
+                }
             }
             if("applicantName".equals(tempColumn)) {
                 sb.append(" and ua.name = '"+value.toString()+"'");
