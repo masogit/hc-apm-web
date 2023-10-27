@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -172,6 +173,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void onBudgetAssetInfoChange(){
+        this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
         this.curSelectApplicationBudgetAsset.setApplicationAssetCategory(this.curSelectBudgetAssetInfo.getApplicationAssetCategory());
         this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
         this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
@@ -355,6 +357,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
                 + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     private void actionMessage(boolean isOk) {
@@ -395,6 +398,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }
         if (null != searchForm.getDateEnd()) {
             this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.LT, formatter.format(new DateTime(searchForm.getDateEnd()).plusDays(1).toDate())));
+        }
+        if (null != searchForm.getApplicantYear()) {
+            this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.EQ, formatter.format(searchForm.getApplicantYear())));
         }
         if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
             updateSearchFilter(new SearchFilter("applicationNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
@@ -446,6 +452,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         selectedAsset.setCreatedDate(new Date());
         selectedAsset.setLastModifiedBy(account.getLoginName());
         selectedAsset.setLastModifiedDate(new Date());
+        searchAsset();
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -490,6 +497,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         this.selected.setApplicationDept(selectedDept);
     }
 
+
+
     public void clearSelected() {
         if (StringUtils.isEmpty(selected.getId())) {
             selected = null;
@@ -508,6 +517,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         selectedDept = null;
         selected = new BudgetApplication();
         persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAP.toString());
+        this.selectedDept = selected.getApplicationDept();
     }
 
     @Override
@@ -558,7 +568,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetAssets.clear();
-        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters);
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     public void resetAssetSearch() {

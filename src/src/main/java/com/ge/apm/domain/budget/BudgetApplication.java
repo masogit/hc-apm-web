@@ -51,10 +51,25 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
         ToSubmitted, PendingApproval,PendingComplete,Complete
     }
     /**
+     * 采购状态
+     *已采购未采购
+     */
+    public enum procureStatus {
+        Unpurchased, Purchased
+    }
+    /**
      * 申请步骤
      */
     @Column(name = "application_step")
     private String applicationStep;
+
+    /**
+     * 采购状态
+     */
+    @Column(name = "procure_Status")
+    private String procureStatus;
+
+
 
     // 申请日期
     @Column(name = "application_date")
@@ -130,6 +145,14 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "approval_config_id")
     private String approvalConfigId;
 
+    // 病区代码
+    @Column(name = "ward_code")
+    private String wardCode;
+
+    // 院区
+    @Column(name = "courtyard_area")
+    private String courtyardArea;
+
     // 审批流
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
@@ -176,6 +199,30 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     @Transient
     private String applicantName ;//申请人
+
+    public String getProcureStatus() {
+        return procureStatus;
+    }
+
+    public void setProcureStatus(String procureStatus) {
+        this.procureStatus = procureStatus;
+    }
+
+    public String getCourtyardArea() {
+        return courtyardArea;
+    }
+
+    public void setCourtyardArea(String courtyardArea) {
+        this.courtyardArea = courtyardArea;
+    }
+
+    public String getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
+    }
 
     /**
      * *设备名称
