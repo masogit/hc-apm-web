@@ -150,7 +150,6 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 			wrapper.andNew();
 		}
 		wrapper.in("nsmc.clinical_dept_uid", listOrgUid);
-		wrapper.eq("nsmc.deleted", false);
 		WrapperSearchFilterUtils.convert(searchFilters, wrapper, "nsmc");
 		wrapper.groupBy("nsmc.id");
 		List<NurseSiteMaintainConfigJN> list = configMapper.findJoinAssetList(pagination, wrapper);
