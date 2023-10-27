@@ -619,7 +619,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             if(this.curSelectApplicationBudgetAsset!=null ){
                 this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
             }
-            exportFile = budgetApplicationExportService.exportZip(selected, curSelectApplicationBudgetAsset, attachList);
+            exportFile = budgetApplicationExportService.exportZip(curSelectApplicationBudgetAsset, attachList);
 
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
