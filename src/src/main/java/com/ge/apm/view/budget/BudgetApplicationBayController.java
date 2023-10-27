@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -176,6 +177,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public void onBudgetAssetInfoChange(){
+        this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
         this.curSelectApplicationBudgetAsset.setApplicationAssetCategory(this.curSelectBudgetAssetInfo.getApplicationAssetCategory());
         this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
         this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
@@ -295,7 +297,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
+        String str = "action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -354,6 +356,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
                 + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     private void actionMessage(boolean isOk) {
@@ -394,6 +397,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         if (null != searchForm.getDateEnd()) {
             this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.LT, formatter.format(new DateTime(searchForm.getDateEnd()).plusDays(1).toDate())));
+        }
+        if (null != searchForm.getApplicantYear()) {
+            this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.EQ, formatter.format(searchForm.getApplicantYear())));
         }
         if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
             updateSearchFilter(new SearchFilter("applicationNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
@@ -445,6 +451,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         selectedAsset.setCreatedDate(new Date());
         selectedAsset.setLastModifiedBy(account.getLoginName());
         selectedAsset.setLastModifiedDate(new Date());
+        searchAsset();
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -489,6 +496,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         this.selected.setApplicationDept(selectedDept);
     }
 
+
+
     public void clearSelected() {
         if (StringUtils.isEmpty(selected.getId())) {
             selected = null;
@@ -506,9 +515,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         crudActionName = "Create";
         selectedDept = null;
         selected = new BudgetApplication();
-
         persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAY.toString());
-
+        this.selectedDept = selected.getApplicationDept();
     }
 
     @Override
@@ -559,7 +567,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetAssets.clear();
-        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters);
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     public void resetAssetSearch() {
