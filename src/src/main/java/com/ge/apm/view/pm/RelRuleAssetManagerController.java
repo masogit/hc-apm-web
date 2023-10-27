@@ -691,6 +691,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	//@Transactional
 	public void deleteRule(){
 		if((!deleteRule2) && (!deleteRule3) && (!deleteRule1) && (!deleteRule4)){
+            clearCache();
 			return;
 		}
 
@@ -705,6 +706,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 tip.append("设备：").append(assetName).append(",保养工单："+pmNum).append(" 未完成 \r\n");
             }
             WebUtil.addSuccessMessage(tip.toString());
+            clearCache();
             return ;
         }
         String alert = null;
@@ -751,29 +753,30 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                         && StringUtils.isBlank(item.getRuleUID2())
                         && StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
 
-        if(deleteRelRuleAsset.size() != currentEditAssets.size()){
-            List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
-                    .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
-                            || StringUtils.isBlank(item.getRuleUID1())
-                            || StringUtils.isBlank(item.getRuleUID2())
-                            || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(saveRelRuleAsset)){
-                dao.save(saveRelRuleAsset);
-            }
+        List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
+                        || StringUtils.isBlank(item.getRuleUID1())
+                        || StringUtils.isBlank(item.getRuleUID2())
+                        || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(saveRelRuleAsset)){
+            dao.save(saveRelRuleAsset);
         }
         if(CollectionUtils.isNotEmpty(deleteRelRuleAsset)){
             dao.delete(deleteRelRuleAsset);
         }
-		deleteRule3 = false;
-		deleteRule2 = false;
-		deleteRule1 = false;
-		deleteRule4 = false;
+        clearCache();
+        WebUtil.addSuccessMessage(alert);
+	}
+    public void clearCache(){
+        deleteRule3 = false;
+        deleteRule2 = false;
+        deleteRule1 = false;
+        deleteRule4 = false;
         currentEditAssets.clear();
         deleteRuleMap.clear();
         selectedMap.clear();
         deleteRuleCache.clear();
-        WebUtil.addSuccessMessage(alert);
-	}
+    }
     public List<V2_PmOrder> getPmOrder(){
 	    if(CollectionUtils.isEmpty(currentEditAssets) || CollectionUtils.isEmpty(deleteRuleCache)){
 	        return null;
@@ -814,7 +817,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 deleteRule2 = true;
                 break;
             case 3:  // 三级
-                deleteRuleCache.add(deleteRuleMap.remove("rule"));
+                 deleteRuleCache.add(deleteRuleMap.remove("rule"));
                 deleteRule3 = true;
                 break;
             case 4: // 质量控制
