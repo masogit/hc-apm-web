@@ -696,11 +696,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
         List<V2_PmOrder> pmOrder = getPmOrder();
         if(CollectionUtils.isNotEmpty(pmOrder)){
-            StringBuilder tip= new StringBuilder("删除失败!");
+            StringBuilder tip= new StringBuilder("删除失败!\r\n");
             for (V2_PmOrder v2_pmOrder : pmOrder) {
                 String assetName = v2_pmOrder.getAssetName();
-                String ruleName = v2_pmOrder.getRuleName();
-                tip.append(assetName).append(",保养工单："+ruleName).append("未完成");
+                assetName = StringUtils.isBlank(assetName)?"":assetName;
+                String pmNum = v2_pmOrder.getPmNum();
+                pmNum = StringUtils.isBlank(pmNum)?"":pmNum;
+                tip.append("设备：").append(assetName).append(",保养工单："+pmNum).append(" 未完成 \r\n");
             }
             WebUtil.addSuccessMessage(tip.toString());
             return ;
