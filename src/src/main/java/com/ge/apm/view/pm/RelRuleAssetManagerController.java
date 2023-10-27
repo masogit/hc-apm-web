@@ -10,6 +10,8 @@ import com.ge.apm.service.pm.RelRuleAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -23,6 +25,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
@@ -75,6 +78,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     private Map<String,String> deleteRuleMap;
     private List<String> deleteRuleCache;
     private V2_PmOrderRepository pmOrderRepository;
+    private List<AssetTypeGroup> assetTypeGroupList;
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
@@ -128,6 +132,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.currentPageAssets = new ArrayList<>();
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+         assetTypeGroupList = user.getAssetTypeGroupList();
         loadClinicalDeptList();
 	}
 
@@ -140,6 +145,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
 		assetMap.clear();
 		ruleMap.clear();
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         List<SearchFilter> searchFilterList = new ArrayList<>();
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -204,13 +212,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(searchFilterList);
         List<RelRuleAsset> relRuleAssetList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(relRuleAssets) && (StringUtils.isNotEmpty(assetName)|| StringUtils.isNotEmpty(departNum)|| assetGroup!=null || CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)||
+        if (CollectionUtils.isNotEmpty(relRuleAssets) && (CollectionUtils.isNotEmpty(assetTypeGroupList) || StringUtils.isNotEmpty(assetName)|| StringUtils.isNotEmpty(departNum)|| assetGroup!=null || CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)||
                 StringUtils.isNotEmpty(nationalStandardCode)|| StringUtils.isNotEmpty(makerShortName)|| StringUtils.isNotEmpty(manufacture)|| StringUtils.isNotEmpty(qrCode)||
                 StringUtils.isNotEmpty(startUsingDate) || StringUtils.isNotEmpty(purchaseDate))){
             for(RelRuleAsset relRuleAsset :relRuleAssets){
                 String assetUID = relRuleAsset.getAssetUID();
                 AssetInfo assetInfo = assetInfoService.selectAssetInfos(assetUID, assetName, departNum, assetGroup,  clinicalDeptOrgUidSet, nationalStandardCode, makerShortName, manufacture, qrCode,
-                        startUsingDate,purchaseDate);
+                        startUsingDate,purchaseDate,assetTypeGroupList);
                 if(assetInfo!=null){
                     relRuleAssetList.add(relRuleAsset);
                 }
@@ -571,17 +579,24 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportRelRuleAssets() {
 		try {
+
+            if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+                List<AssetInfoAndRelRule> assetInfoAndRelRules =new ArrayList<>();
+                excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);;
+                return ;
+            }
             searchFilters.addAll(getOrgFilter(user.getSiteUID()));
-			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
+            List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
             List<String> collect = relRuleAssets.stream().map(relRuleAsset -> {
                 return relRuleAsset.getAssetUID();
             }).collect(Collectors.toList());
             List<SearchFilter> assetSearchFilters=new ArrayList<>();
             assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,collect));
-//            addFilterAssetTypeGroup(assetSearchFilters);
+            addFilterAssetTypeGroup(assetSearchFilters);
             List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
-			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
-			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+            List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
+            excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
@@ -593,6 +608,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportAllAssets() {
 		try {
+            if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+                List<AssetInfoAndRelRule> assetInfoAndRelRules =new ArrayList<>();
+                 excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);;
+                 return ;
+            }
 			List<AssetInfo> assetInfos = findAllAssets();
 			List<RelRuleAsset> relRuleAssets = dao.findByAssetUids(assetInfos.stream().map(assetInfo -> {return assetInfo.getUid();}).collect(Collectors.toList()));
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
@@ -621,14 +641,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} else {
 			searchFilters.add(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
 		}
-//        addFilterAssetTypeGroup(searchFilters);
+        addFilterAssetTypeGroup(searchFilters);
         List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
 		return allAssets;
 	}
 
     private void addFilterAssetTypeGroup(List<SearchFilter> searchFilters) {
-        List<AssetTypeGroup> assetTypeGroupList = null;
-        if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+        if(user != null && user.isEnableAssetTypeGroup() && CollectionUtils.isNotEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
@@ -733,7 +752,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 alert += "、巡检规则";
             }
             currentEditAssets.stream().forEach(item->{
-                item.setRuleUID2(null);
+                item.setRuleUID1(null);
             });
         }
         if(deleteRule4){
@@ -743,7 +762,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 alert += "、质量控制规则";
             }
             currentEditAssets.stream().forEach(item->{
-                item.setRuleUID2(null);
+                item.setRuleUID4(null);
             });
         }
         alert+="已成功删除！";
