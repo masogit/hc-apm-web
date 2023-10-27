@@ -332,7 +332,7 @@
                             </p:panelGrid>
                         </p:tab>
 
-                        <p:tab title="微信端扫码建档页面">
+                        <p:tab title="微信端扫码建档页面" rendered="false">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <p:dataList id="MobileBuildAssetFieldsList" value="#{customConfigController.customConfigObject.mobileBuildAssetPage.pageBuildAsset.group}" var="groupItem" varStatus="groupIndex" type="definition" >
                                     <p:fieldset legend="扫码建档字段组" rendered="#{groupItem.type eq 'buildAsset'}">
