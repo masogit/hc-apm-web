@@ -1891,9 +1891,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
-        /*if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-        }*/
+        }
         this.setSearchFilter();
 
         if(queryIndex == 20){
