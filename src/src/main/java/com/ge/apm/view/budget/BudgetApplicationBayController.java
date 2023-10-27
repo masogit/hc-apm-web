@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -176,6 +177,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public void onBudgetAssetInfoChange(){
+        this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
         this.curSelectApplicationBudgetAsset.setApplicationAssetCategory(this.curSelectBudgetAssetInfo.getApplicationAssetCategory());
         this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
         this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
@@ -354,6 +356,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
                 + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     private void actionMessage(boolean isOk) {
@@ -564,7 +567,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetAssets.clear();
-        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters);
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     public void resetAssetSearch() {
