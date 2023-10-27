@@ -15,7 +15,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
@@ -55,6 +61,7 @@ public class MaintainController implements ServerEventInterface{
 	private List<AssetInfo> listCheckAssets;
 	private List<OrgInfo> listCheckClinicalOrgInfo;
 	private OrgInfo selectedParentOrgInfo;
+	private NurseSiteMaintainConfigMapper configMapper;
 
 	private List<Integer> listSequence;
 	private Integer selectSequence = 1;
@@ -93,6 +100,7 @@ public class MaintainController implements ServerEventInterface{
 		nurseSiteMaintainService.init();
 		searchController = WebUtil.getBean(SearchController.class);
 		maintainItemController = WebUtil.getBean(MaintainItemController.class);
+		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
@@ -101,8 +109,20 @@ public class MaintainController implements ServerEventInterface{
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
-		listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigByOrgUids(orgUidList);
-		showListNurseSiteMaintainConfig = new ArrayList<NurseSiteMaintainConfig>();
+		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
+		wrapper.in("nsmc.clinical_dept_uid", orgUidList);
+		wrapper.eq("nsmc.deleted", false);
+		wrapper.groupBy("nsmc.id");
+		wrapper.orderBy("nsmc.modify_date", false);
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			listNurseSiteMaintainConfig = ListUtil.empty();
+		} else if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(), wrapper);
+		} else {
+			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(), wrapper);
+		}
+		showListNurseSiteMaintainConfig = new ArrayList<>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
@@ -122,22 +142,30 @@ public class MaintainController implements ServerEventInterface{
 			ca.add(Calendar.MONTH, 1);
 			end = ca.getTime();
 		}
-		if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
-			listData = findDefaultMaintain(start, end);
+
+		Wrapper<NurseSiteMaintain> wrapper = new EntityWrapper<>();
+		if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+		}
+		wrapper.ge("nsm.schedule_date", start);
+		wrapper.le("nsm.schedule_date", end);
+		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
+			wrapper.in("nsm.clinical_dept_uid", orgUidList);
 		} else {
 			List<String> listUidTemp = new ArrayList<String>();
 			for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
 				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
 			}
-			listData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
+			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
 		}
+		wrapper.groupBy("nsm.id");
+		wrapper.orderBy("nsm.schedule_date");
+		listData = nurseSiteMaintainService.findJoinAssetList(wrapper);
 		return listData;
 	}
 
 	private List<NurseSiteMaintain> findDefaultMaintain(Date startDate, Date endDate) {
-		List<NurseSiteMaintain> listResult = null;
-		listResult = nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
-		return listResult;
+		return nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
 	}
 
 	private void loadMaintainData() {
