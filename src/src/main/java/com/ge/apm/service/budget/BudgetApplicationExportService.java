@@ -7,6 +7,7 @@ import com.deepoove.poi.data.style.Style;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.BudgetApplicationAssetRepository;
 import com.ge.apm.dao.BudgetApplicationRepository;
+import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
@@ -60,18 +61,35 @@ public class BudgetApplicationExportService {
         msService = WebUtil.getBean(MicroServiceUtil.class);
     }
 
-    public StreamedContent exportZip(String budgetApplicationId,String budgetApplicationAssetId) throws IOException {
-        BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationId);
-        BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetApplicationAssetId);
-
-        return exportZip(budgetApplication, budgetApplicationAsset, null);
+    /**
+     * 导出多个申购单
+     */
+    public StreamedContent exportZip(List<BudgetApplicationAsset> budgetApplicationAssetList) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(bout);
+        for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
+            List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
+            exportZipStream(budgetApplicationAsset,blobObjects, zout);
+        }
+        zout.close();
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", "Export_Purchase.zip");
+        return streamedContent;
     }
 
-    public StreamedContent exportZip(BudgetApplication budgetApplication, BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException {
-        String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
 
+    public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException {
+        String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(bout);
+        exportZipStream(budgetApplicationAsset, blobObjects,zout);
+        zout.close();
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
+        return streamedContent;
+    }
+
+    public void exportZipStream(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects, ZipOutputStream zout) throws IOException {
         //1、doc模板部分
-        Map<String, Object> data = createReportData(budgetApplication, budgetApplicationAsset);
+        Map<String, Object> data = createReportData(budgetApplicationAsset);
         byte[] templateBytes;
         if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
@@ -81,8 +99,7 @@ public class BudgetApplicationExportService {
 
         byte[] bytes = this.renderDocx(data, templateBytes);
 
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
+
         String fileName = buildFileName(data, false);
         zout.putNextEntry(new ZipEntry(FILE_NAME_ROOT +"/" + fileName));
         IOUtils.write(bytes, zout);
@@ -96,7 +113,7 @@ public class BudgetApplicationExportService {
                 String fn = v.getObjectName();
                 String newFileName = handleRepeatFileName(nameMap, fn);
                 StreamedContent sf = msService.downloadSingleFile(v.getObjectStorageId());
-                zout.putNextEntry(new ZipEntry(base +"-附件" + "/" + newFileName));
+                zout.putNextEntry(new ZipEntry("附件" + "/" + newFileName));
                 byte[] bys = new byte[1024 * 5];
                 BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream());
                 int rd = 0;
@@ -106,11 +123,6 @@ public class BudgetApplicationExportService {
                 zout.closeEntry();
             }
         }
-
-        zout.close();
-
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
-        return streamedContent;
     }
 
     /**
@@ -138,10 +150,13 @@ public class BudgetApplicationExportService {
     /**
       * 获取导出的doc模板数据
      */
-    public Map<String, Object> createReportData(BudgetApplication budgetApplication, BudgetApplicationAsset budgetApplicationAsset) throws IOException {
+    public Map<String, Object> createReportData(BudgetApplicationAsset budgetApplicationAsset) throws IOException {
+        BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
         Map<String, Object> mm = new HashMap<>();
         if(budgetApplicationAsset != null){
-            mm.put("deptName", budgetApplication.getApplicationDeptName());
+            if(budgetApplication.getApplicationDept() != null){
+                mm.put("deptName", budgetApplication.getApplicationDept().getName());
+            }
             mm.put("assetName", budgetApplicationAsset.getApplicationAssetName());
             mm.put("num", budgetApplicationAsset.getApplicationQuantity());
             mm.put("price", budgetApplicationAsset.getApplicationPrice());
@@ -150,6 +165,12 @@ public class BudgetApplicationExportService {
             calendar.setTime(budgetApplication.getApplicationDate());
             int year = calendar.get(Calendar.YEAR);
             mm.put("year", year);
+            int applyYear = calendar.get(Calendar.YEAR);
+            int applyMonth = calendar.get(Calendar.MONTH);
+            int applyDay = calendar.get(Calendar.DAY_OF_MONTH);
+            mm.put("applyYear", applyYear);
+            mm.put("applyMonth", applyMonth);
+            mm.put("applyDay", applyDay);
             mm.put("similarDevicesUse", budgetApplicationAsset.getSimilarDevicesUse());
             mm.put("majorFunction", budgetApplicationAsset.getMajorFunction());
             mm.put("technicalParameter", budgetApplicationAsset.getTechnicalParameter());
@@ -163,65 +184,59 @@ public class BudgetApplicationExportService {
             mm.put("description", budgetApplicationAsset.getDescription());
             mm.put("applicationReason", budgetApplicationAsset.getApplicationReason());
             mm.put("equipmentUsage", budgetApplicationAsset.getEquipmentUsage());
+            mm.put("offlineApprovalOpinions", budgetApplicationAsset.getOfflineApprovalOpinions());
 
-            TextRenderData noTx = new TextRenderData("□");
-            noTx.setStyle(new Style("宋体",11));
-            TextRenderData yesTx = new TextRenderData("☑");
-            yesTx.setStyle(new Style("宋体",12));
+            if(budgetApplication.getBudgetApprovals() != null){
+                MultiLevelApproval a = budgetApplication.getBudgetApprovals().iterator().next();
+                if(a != null){
+                    mm.put("machineDeptOpinions", a.getApprovalOpinion());
+                }else{
+                    mm.put("machineDeptOpinions", "");
+                }
+            }else{
+                mm.put("machineDeptOpinions", "");
+            }
+
+
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", noTx);
-                mm.put("importedOrNo", yesTx);
+                mm.put("importedOrYes", "");
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", yesTx);
-                mm.put("importedOrNo", noTx);
+                mm.put("importedOrYes", "是");
             }else {
-                mm.put("importedOrYes", noTx);
-                mm.put("importedOrNo", yesTx);
+                mm.put("importedOrYes", "否");
             }
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
-                mm.put("pyes", noTx);
-                mm.put("pno", yesTx);
+                mm.put("placeSite", "");
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getPlaceSite())){
-                mm.put("pyes", yesTx);
-                mm.put("pno", noTx);
+                mm.put("placeSite", "是");
             }else {
-                mm.put("pyes", noTx);
-                mm.put("pno", yesTx);
+                mm.put("placeSite", "否");
             }
             //是否在手术室使用
             if(StringUtils.isEmpty(budgetApplicationAsset.getUsedOperatingRoom())){
-                mm.put("roomYes", noTx);
-                mm.put("roomNo", yesTx);
+                mm.put("usedOperatingRoom", "");
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getUsedOperatingRoom())){
-                mm.put("roomYes", yesTx);
-                mm.put("roomNo", noTx);
+                mm.put("usedOperatingRoom", "是");
             }else {
-                mm.put("roomYes", noTx);
-                mm.put("roomNo", yesTx);
+                mm.put("usedOperatingRoom", "否");
             }
             //是否需要同院内信息系统对接
             if(StringUtils.isEmpty(budgetApplicationAsset.getSystemDocking())){
-                mm.put("systemDockingYes", noTx);
-                mm.put("systemDockingNo", noTx);
+                mm.put("systemDocking", "");
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getSystemDocking())){
-                mm.put("systemDockingYes", yesTx);
-                mm.put("systemDockingNo", noTx);
+                mm.put("systemDocking", "是");
             }else {
-                mm.put("systemDockingYes", noTx);
-                mm.put("systemDockingNo", yesTx);
+                mm.put("systemDocking", "否");
             }
             //是否需要连接外网
             if(StringUtils.isEmpty(budgetApplicationAsset.getConnectNetwork())){
-                mm.put("connectNetworkYes", noTx);
-                mm.put("connectNetworkNo", yesTx);
+                mm.put("connectNetwork", "");
             }else if(CopyByInvok.T.equals(budgetApplicationAsset.getConnectNetwork())){
-                mm.put("connectNetworkYes", yesTx);
-                mm.put("connectNetworkNo", noTx);
+                mm.put("connectNetwork", "是");
             }else {
-                mm.put("connectNetworkYes", noTx);
-                mm.put("connectNetworkNo", yesTx);
+                mm.put("connectNetwork", "否");
             }
 
             /*V2_BlobObject blobObject = blobObjectRepository.findById("402886818b3c5660018b3cc6b6000002");
