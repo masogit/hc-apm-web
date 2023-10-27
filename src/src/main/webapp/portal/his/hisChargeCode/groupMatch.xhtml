@@ -90,10 +90,16 @@
                     <p:commandButton validateClient="true" actionListener="#{hisChargeCodeMatchController.submmitOrder}"
                                      value="匹配" style="float:left" icon="ui-icon-check" update=":HisGroupTab:transferAssetEditForm :HisGroupTab:IouListForm @(form) :HisGroupTab:SharedAssetReqTypeEditForm"/>
                 </div>
+                <div  style="width: 210px;float: left;margin: 25px -80px 0px 510px;">
+                    <p:commandButton  validateClient="true"     actionListener="#{hisChargeCodeMatchController.hisGroupByName}"
+                                      value="匹配并应用到其他" style="float:left" icon="ui-icon-check"  update=":HisGroupTab:transferAssetEditForm :HisGroupTab:IouListForm @(form) :HisGroupTab:hisGroupByNameDialongForm" oncomplete="PF('hisGroupByNameDialog').show()" />
+
+                </div>
             </p:fieldset>
 
         </h:form>
         <ui:include src="Detail_Edit.xhtml" />
+        <ui:include src="hisGroupByName.xhtml" />
     </div>
 </div>
 </body>
