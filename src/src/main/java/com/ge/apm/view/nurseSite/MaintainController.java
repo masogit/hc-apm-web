@@ -130,6 +130,9 @@ public class MaintainController implements ServerEventInterface{
 		return nurseSiteMaintainService.getMaintainDataList(assetUid);
 	}
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return ListUtil.empty();
+		}
 		Calendar ca = Calendar.getInstance();
 		if (start == null) {
 			ca.set(Calendar.DAY_OF_MONTH, 1);
