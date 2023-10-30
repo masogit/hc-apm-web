@@ -1,7 +1,10 @@
 package com.ge.apm.domain.budget;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -253,6 +256,15 @@ public class BudgetApplicationAsset implements Serializable {
     // 申请日期
     @Transient
     private Date applicationDate;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "application_id",
+            referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private BudgetApplication budgetApplication;
+
 
     public Integer getApplicationAssetId() {
         return applicationAssetId;
@@ -582,46 +594,6 @@ public class BudgetApplicationAsset implements Serializable {
         this.applicationId = applicationId;
     }
 
-  /*  public Integer getStockType() {
-        return stockType;
-    }
-
-    public void setStockType(Integer stockType) {
-        this.stockType = stockType;
-    }*/
-
-/*
-    public String getAssetName() {
-        return assetName;
-    }
-
-    public void setAssetName(String assetName) {
-        this.assetName = assetName;
-    }
-
-    public Integer getAssetGroup() {
-        return assetGroup;
-    }
-
-    public void setAssetGroup(Integer assetGroup) {
-        this.assetGroup = assetGroup;
-    }
-
-    public Integer getAssetGroupSecondary() {
-        return assetGroupSecondary;
-    }
-
-    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
-        this.assetGroupSecondary = assetGroupSecondary;
-    }
-
-    public BudgetAssetInfo getAsset() {
-        return asset;
-    }
-
-    public void setAsset(BudgetAssetInfo asset) {
-        this.asset = asset;
-    }*/
 
     public Integer getApplicationQuantity() {
         return applicationQuantity;
@@ -734,5 +706,13 @@ public class BudgetApplicationAsset implements Serializable {
 
     public void setIsDeleted(Integer isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public BudgetApplication getBudgetApplication() {
+        return budgetApplication;
+    }
+
+    public void setBudgetApplication(BudgetApplication budgetApplication) {
+        this.budgetApplication = budgetApplication;
     }
 }
