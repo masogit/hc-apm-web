@@ -123,14 +123,6 @@ public class PurchaseOrderService {
         return "CG".concat(date.format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
     }
 
-    public String getCourtyardArea(OrgInfo orgInfo){
-        String orgName = new String();
-        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
-            orgName = orgInfo.getName();
-            return orgName;
-        }
-        return getCourtyardArea(orgInfo.getParentOrg());
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteApplication(PurchaseOrderInfo purchaseOrderInfo) {

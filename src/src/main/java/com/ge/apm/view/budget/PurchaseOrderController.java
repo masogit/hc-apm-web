@@ -145,7 +145,9 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     protected GenericRepositoryUUID<PurchaseOrderInfo> getDAO() {
         return dao;
     }
-
+    public String backList() {
+        return "List.xhtml?faces-redirect=true";
+    }
     public void addBudgetAsset() {
         curApplicationBudgetAssets.addAll(selectApplicationBudgetAssets);
         calcTotalAmount(curApplicationBudgetAssets);
