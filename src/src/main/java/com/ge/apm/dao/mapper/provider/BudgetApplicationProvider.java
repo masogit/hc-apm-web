@@ -23,6 +23,7 @@ public class BudgetApplicationProvider {
                 "  t.application_date," +
                 "  t.application_status," +
                 "  t.application_step," +
+                "  t.procure_status," +
                 "  uap.name as approveName," +
                 "  t.approval_date" +
                 "  from budget_application t" +

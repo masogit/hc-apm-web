@@ -129,14 +129,13 @@ public class BudgetPersistService {
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         budgetApplicationAssetSet.add(budgetApplicationAsset);
         application.setBudgetAssets(budgetApplicationAssetSet);
-        application.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
+        application.setApplicationStep(BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
         application.setApplicant(account);
         application.setApplicantId(account.getId());
         application.setApplicationDate(new Date());
         application.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
         application.setBudgetApprovals(new HashSet<>());
         application.setIsDeleted(0);
-        application.setProcureStatus(BudgetApplication.procureStatus.Unpurchased.toString());//采购状态
         application.setCreatedBy(account.getLoginName());
         application.setCreatedDate(new Date());
         application.setLastModifiedBy(account.getLoginName());
