@@ -317,6 +317,14 @@ public class NurseSiteMaintainService {
 		return nurseSiteMaintainMapper.findJoinAssetList(wrapper);
 	}
 
+	public List<NurseSiteMaintainItem> findItemJoinAssetList(Pagination pagination, Wrapper<NurseSiteMaintainItem> wrapper) {
+		return nurseSiteMaintainItemMapper.findJoinAssetList(pagination, wrapper);
+	}
+
+	public List<NurseSiteMaintain> findByIds(Set<String> ids) {
+		return nurseSiteMaintainRepository.findByIds(ids);
+	}
+
 	public AssetInfo getAssetInfoByUid(String uid) {
 		return assetInfoRepository.getByUid(uid);
 	}
@@ -894,7 +902,12 @@ public class NurseSiteMaintainService {
 			pagination = new Pagination(page + 1, pageSize);
 //			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);
 		}
-		listItem = nurseSiteMaintainItemMapper.findJoinAssetList(pagination, wrapper);
+		List<NurseSiteMaintainItem> joinAssetList = nurseSiteMaintainItemMapper.findJoinAssetList(pagination, wrapper);
+
+		if (ObjectUtil.isNotEmpty(joinAssetList)) {
+			Set<String> ids = joinAssetList.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
+			listItem = nurseSiteMaintainItemRepository.findByIdIn(ids);
+		}
 		tempMaintain.setListNurseSiteMaintainItem(listItem);
 		supplementMaintainItem(listItem);
 	}
