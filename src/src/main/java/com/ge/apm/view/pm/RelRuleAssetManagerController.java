@@ -1,9 +1,6 @@
 package com.ge.apm.view.pm;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.ConfigService;
@@ -13,6 +10,8 @@ import com.ge.apm.service.pm.RelRuleAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -22,9 +21,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
@@ -67,10 +68,17 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private UserCommonService userCommonService;
 	private boolean deleteRule2 = false;
 	private boolean deleteRule3 = false;
+	private boolean deleteRule1 = false;
+	private boolean deleteRule4 = false;
 	private Map<String, Boolean> selectedMap;
 	private List<RelRuleAsset> currentPageAssets;
     private List<OrgInfo> clinicalDeptList;
     private  List<PmOrderRule> pmOrderRuleList;
+    private  List<RelRuleAsset> currentEditAssets;
+    private Map<String,String> deleteRuleMap;
+    private List<String> deleteRuleCache;
+    private V2_PmOrderRepository pmOrderRepository;
+    private List<AssetTypeGroup> assetTypeGroupList;
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
@@ -117,12 +125,14 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
 		this.selectedMap = new HashMap();
 		this.currentPageAssets = new ArrayList<>();
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+         assetTypeGroupList = user.getAssetTypeGroupList();
         loadClinicalDeptList();
 	}
 
@@ -135,6 +145,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
 		assetMap.clear();
 		ruleMap.clear();
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         List<SearchFilter> searchFilterList = new ArrayList<>();
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -199,13 +212,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(searchFilterList);
         List<RelRuleAsset> relRuleAssetList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(relRuleAssets) && (StringUtils.isNotEmpty(assetName)|| StringUtils.isNotEmpty(departNum)|| assetGroup!=null || CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)||
+        if (CollectionUtils.isNotEmpty(relRuleAssets) && (CollectionUtils.isNotEmpty(assetTypeGroupList) || StringUtils.isNotEmpty(assetName)|| StringUtils.isNotEmpty(departNum)|| assetGroup!=null || CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)||
                 StringUtils.isNotEmpty(nationalStandardCode)|| StringUtils.isNotEmpty(makerShortName)|| StringUtils.isNotEmpty(manufacture)|| StringUtils.isNotEmpty(qrCode)||
                 StringUtils.isNotEmpty(startUsingDate) || StringUtils.isNotEmpty(purchaseDate))){
             for(RelRuleAsset relRuleAsset :relRuleAssets){
                 String assetUID = relRuleAsset.getAssetUID();
                 AssetInfo assetInfo = assetInfoService.selectAssetInfos(assetUID, assetName, departNum, assetGroup,  clinicalDeptOrgUidSet, nationalStandardCode, makerShortName, manufacture, qrCode,
-                        startUsingDate,purchaseDate);
+                        startUsingDate,purchaseDate,assetTypeGroupList);
                 if(assetInfo!=null){
                     relRuleAssetList.add(relRuleAsset);
                 }
@@ -566,17 +579,24 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportRelRuleAssets() {
 		try {
+
+            if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+                List<AssetInfoAndRelRule> assetInfoAndRelRules =new ArrayList<>();
+                excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);;
+                return ;
+            }
             searchFilters.addAll(getOrgFilter(user.getSiteUID()));
-			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
+            List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
             List<String> collect = relRuleAssets.stream().map(relRuleAsset -> {
                 return relRuleAsset.getAssetUID();
             }).collect(Collectors.toList());
             List<SearchFilter> assetSearchFilters=new ArrayList<>();
             assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,collect));
-//            addFilterAssetTypeGroup(assetSearchFilters);
+            addFilterAssetTypeGroup(assetSearchFilters);
             List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
-			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
-			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+            List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
+            excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
@@ -588,6 +608,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportAllAssets() {
 		try {
+            if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+                List<AssetInfoAndRelRule> assetInfoAndRelRules =new ArrayList<>();
+                 excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);;
+                 return ;
+            }
 			List<AssetInfo> assetInfos = findAllAssets();
 			List<RelRuleAsset> relRuleAssets = dao.findByAssetUids(assetInfos.stream().map(assetInfo -> {return assetInfo.getUid();}).collect(Collectors.toList()));
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
@@ -616,14 +641,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} else {
 			searchFilters.add(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
 		}
-//        addFilterAssetTypeGroup(searchFilters);
+        addFilterAssetTypeGroup(searchFilters);
         List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
 		return allAssets;
 	}
 
     private void addFilterAssetTypeGroup(List<SearchFilter> searchFilters) {
-        List<AssetTypeGroup> assetTypeGroupList = null;
-        if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+        if(user != null && user.isEnableAssetTypeGroup() && CollectionUtils.isNotEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
@@ -685,44 +709,105 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	//@Transactional
 	public void deleteRule(){
-		if((!deleteRule2) && (!deleteRule3)){
+		if((!deleteRule2) && (!deleteRule3) && (!deleteRule1) && (!deleteRule4)){
+            clearCache();
 			return;
 		}
-	    String alert = null;
-		if(deleteRule3){
-            selected.setRuleUID(null);
-            alert = "三级规则成功删除！";
-		}
-		if(deleteRule2){
-		    if(StringUtils.isEmpty(alert)){
-                alert = "二级规则成功删除！";
-            }else{
-                alert = "二级规则和三级规则都已成功删除！";
+
+        List<V2_PmOrder> pmOrder = getPmOrder();
+        if(CollectionUtils.isNotEmpty(pmOrder)){
+            StringBuilder tip= new StringBuilder("删除失败!\r\n");
+            for (V2_PmOrder v2_pmOrder : pmOrder) {
+                String assetName = v2_pmOrder.getAssetName();
+                assetName = StringUtils.isBlank(assetName)?"":assetName;
+                String pmNum = v2_pmOrder.getPmNum();
+                pmNum = StringUtils.isBlank(pmNum)?"":pmNum;
+                tip.append("设备：").append(assetName).append(",保养工单："+pmNum).append(" 未完成 \r\n");
             }
-			selected.setRuleUID2(null);
+            WebUtil.addSuccessMessage(tip.toString());
+            clearCache();
+            return ;
+        }
+        String alert = null;
+		if(deleteRule2){
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID2(null);
+            });
+            alert = "二级规则";
 		}
-		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
-			dao.delete(selected);
-            WebUtil.addSuccessMessage(alert);
-            deleteRule3 = false;
-            deleteRule2 = false;
-			return;
+		if(deleteRule3){
+		    if(StringUtils.isEmpty(alert)){
+                alert = "三级规则";
+            }else{
+                alert += "、三级规则";
+            }
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID(null);
+            });
 		}
-		dao.save(selected);
-		deleteRule3 = false;
-		deleteRule2 = false;
+        if(deleteRule1){
+            if(StringUtils.isEmpty(alert)){
+                alert = "巡检规则";
+            }else{
+                alert += "、巡检规则";
+            }
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID1(null);
+            });
+        }
+        if(deleteRule4){
+            if(StringUtils.isEmpty(alert)){
+                alert = "质量控制规则";
+            }else{
+                alert += "、质量控制规则";
+            }
+            currentEditAssets.stream().forEach(item->{
+                item.setRuleUID4(null);
+            });
+        }
+        alert+="已成功删除！";
+        List<RelRuleAsset> deleteRelRuleAsset = currentEditAssets.stream()
+                .filter(item -> StringUtils.isBlank(item.getRuleUID())
+                        && StringUtils.isBlank(item.getRuleUID1())
+                        && StringUtils.isBlank(item.getRuleUID2())
+                        && StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
+
+        List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
+                        || StringUtils.isBlank(item.getRuleUID1())
+                        || StringUtils.isBlank(item.getRuleUID2())
+                        || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(saveRelRuleAsset)){
+            dao.save(saveRelRuleAsset);
+        }
+        if(CollectionUtils.isNotEmpty(deleteRelRuleAsset)){
+            dao.delete(deleteRelRuleAsset);
+        }
+        clearCache();
         WebUtil.addSuccessMessage(alert);
 	}
-
-	public void deleteRule2(){
-		this.selected.setRuleUID2(null);
-		this.deleteRule2 = true;
-	}
-
-	public void deleteRule3(){
-		this.selected.setRuleUID(null);
-		this.deleteRule3 = true;
-	}
+    public void clearCache(){
+        deleteRule3 = false;
+        deleteRule2 = false;
+        deleteRule1 = false;
+        deleteRule4 = false;
+        currentEditAssets.clear();
+        deleteRuleMap.clear();
+        selectedMap.clear();
+        deleteRuleCache.clear();
+    }
+    public List<V2_PmOrder> getPmOrder(){
+	    if(CollectionUtils.isEmpty(currentEditAssets) || CollectionUtils.isEmpty(deleteRuleCache)){
+	        return null;
+        }
+        List<String> assetUid = currentEditAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN,assetUid));
+        searchFilters.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,deleteRuleCache));
+        searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ,false));
+        List<V2_PmOrder> pmOrdersList = pmOrderRepository.findBySearchFilter(searchFilters);
+        return pmOrdersList;
+    }
 
 	public Map<String, Boolean> getSelectedMap() {
 		return selectedMap;
@@ -740,21 +825,28 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.currentPageAssets = currentPageAssets;
 	}
 
-	public boolean getDeleteRule2() {
-		return deleteRule2;
-	}
-
-	public void setDeleteRule2(boolean deleteRule2) {
-		this.deleteRule2 = deleteRule2;
-	}
-
-	public boolean getDeleteRule3() {
-		return deleteRule3;
-	}
-
-	public void setDeleteRule3(boolean deleteRule3) {
-		this.deleteRule3 = deleteRule3;
-	}
+    public void updateDeleteRule(Integer ruleNum){
+	    switch (ruleNum){
+            case 1:  //巡检
+                deleteRuleCache.add(deleteRuleMap.remove("rule1"));
+                deleteRule1 = true;
+                break;
+            case 2: // 三级
+                deleteRuleCache.add(deleteRuleMap.remove("rule2"));
+                deleteRule2 = true;
+                break;
+            case 3:  // 三级
+                 deleteRuleCache.add(deleteRuleMap.remove("rule"));
+                deleteRule3 = true;
+                break;
+            case 4: // 质量控制
+                deleteRuleCache.add(deleteRuleMap.remove("rule4"));
+                deleteRule4 = true;
+                break;
+            default:
+                break;
+        }
+    }
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
 	 *
@@ -775,4 +867,72 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 *
 	 * @Override public void onAfterDataChanged(){ };
 	 */
+
+	public void prepareEditRule(){
+	    Set<String> rule=new HashSet<>();
+	    Set<String> rule1=new HashSet<>();
+	    Set<String> rule2=new HashSet<>();
+	    Set<String> rule4=new HashSet<>();
+        Map<String, Boolean> selectedMap = this.selectedMap;
+        Map<String, RelRuleAsset> relRuleAssetMap = currentPageAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, item -> item));
+        currentEditAssets = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> relRuleAssetMap.get(item.getKey())).collect(Collectors.toList());
+        for (RelRuleAsset relRuleAsset : currentEditAssets) {
+            String ruleUID = relRuleAsset.getRuleUID();
+            String ruleUID1 = relRuleAsset.getRuleUID1();
+            String ruleUID2 = relRuleAsset.getRuleUID2();
+            String ruleUID4 = relRuleAsset.getRuleUID4();
+            if(StringUtils.isNotBlank(ruleUID)){
+                rule.add(ruleUID);
+            }
+            if(StringUtils.isNotBlank(ruleUID1)){
+                rule1.add(ruleUID1);
+            }
+            if(StringUtils.isNotBlank(ruleUID2)){
+                rule2.add(ruleUID2);
+            }
+            if(StringUtils.isNotBlank(ruleUID4)){
+                rule4.add(ruleUID4);
+            }
+        }
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(rule.size() > 1 || rule1.size() > 1 || rule2.size() > 1 || rule4.size() > 1){
+            WebUtil.addErrorMessage("资产保养规则不一致无法批量解除");
+            requestContext.addCallbackParam("validationFailed", false);
+        }else{
+            requestContext.addCallbackParam("validationFailed", true);
+            if(deleteRuleMap == null){
+                deleteRuleMap = new HashMap<>();
+                deleteRuleCache=new ArrayList<>();
+            }
+            deleteRuleMap.put("rule",getRule(rule));
+            deleteRuleMap.put("rule1",getRule(rule1));
+            deleteRuleMap.put("rule2",getRule(rule2));
+            deleteRuleMap.put("rule4",getRule(rule4));
+            this.prepareEdit();
+        }
+    }
+
+    private String getRule(Set<String> ruleSet){
+	    String rule=null;
+        Iterator<String> iterator = ruleSet.iterator();
+        if(iterator.hasNext()){
+            rule = iterator.next();
+        }
+        return rule;
+    }
+
+    public Map<String, String> getDeleteRuleMap() {
+        return deleteRuleMap;
+    }
+
+    public void setDeleteRuleMap(Map<String, String> deleteRuleMap) {
+        this.deleteRuleMap = deleteRuleMap;
+    }
+
+    public void setCurrentEditAssets(List<RelRuleAsset> currentEditAssets){
+         this.currentEditAssets = currentEditAssets;
+    }
+    public List<RelRuleAsset> getCurrentEditAssets(){
+	   return this.currentEditAssets;
+    }
 }

@@ -332,6 +332,18 @@
                             </p:panelGrid>
                         </p:tab>
 
+                        <p:tab title="微信端扫码建档页面" rendered="false">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:dataList id="MobileBuildAssetFieldsList" value="#{customConfigController.customConfigObject.mobileBuildAssetPage.pageBuildAsset.group}" var="groupItem" varStatus="groupIndex" type="definition" >
+                                    <p:fieldset legend="扫码建档字段组" rendered="#{groupItem.type eq 'buildAsset'}">
+                                        <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BuildAssetFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                        <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveBuildAssetFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                    </p:fieldset>
+                                </p:dataList>
+                            </p:panelGrid>
+                        </p:tab>
+
                         <p:tab title="#{msg.AssetImportant}">
                             <p:dataTable id="assetImportantFieldsTable" var='item' value="#{customConfigController.assetsImportantFieldsAll}" draggableRows="true">
                                 <p:growl id="msgss" />

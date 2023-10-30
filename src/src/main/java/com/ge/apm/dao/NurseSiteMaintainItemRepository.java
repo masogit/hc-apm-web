@@ -170,4 +170,6 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value = "SELECT count(*) FROM nurse_site_maintain_item WHERE is_finish = FALSE AND parent_id = ?1",nativeQuery = true)
 	int noCheckCount(String parentId);
 
+	List<NurseSiteMaintainItem> findByIdIn(Collection<String> ids);
+
 }

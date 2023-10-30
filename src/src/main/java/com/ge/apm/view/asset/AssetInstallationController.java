@@ -392,7 +392,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
         //configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())
-        if (isApproved(arrivalListItem)) {
+        if (isApproved()) {
             //待审核
             arrivalListItem.setUsageStatus(2);
         } else {
@@ -579,7 +579,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 arrivalListItem.setFactoryWarrantyDate(calender.getTime());
             }
 
-            if (isApproved(arrivalListItem)) {
+            if (isApproved()) {
                 //待审核
                 arrivalListItem.setUsageStatus(2);
             } else {
@@ -1096,7 +1096,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         return false;
     }
-    private boolean  isApproved(ArrivalListItem arrivalListItem){
+    private boolean  isApproved(){
         /**
          * --  YHAAO-19736  远东宏信-完成安装验收后，进入资产审核流程
          * insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '安装入库完成是否审批', 'AssetCreationApprover', '安装入库完成是否审批', 'f', 't', 3 where not exists (select * from config_item where key = 'AssetCreationApprover');
@@ -1109,22 +1109,22 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         if (StringUtils.isNotBlank(featureList)) {
              flag=featureList.contains("ASSET_APPROVE");
              if(flag){
-                flag=getConfigItemAssetCreationApprover(arrivalListItem);
+                flag=getConfigItemAssetCreationApprover(userContextService.getLoginUser());
              }
         }
         return flag;
     }
-    private boolean getConfigItemAssetCreationApprover(ArrivalListItem arrivalListItem){
+    private boolean getConfigItemAssetCreationApprover(UserAccount loginUser ){
         Boolean flag=null;
         String key="assetInstallApprove";
         ConfigItem byDefaultValueForKey = configItemRepository.findByDefaultValueForKey(key);
         if(byDefaultValueForKey == null ) return Boolean.FALSE;
         List<SearchFilter> searchFilters=new ArrayList<>();
         searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ,key));
-        String siteUID = arrivalListItem.getSiteUid();
-        String hospitalUID = arrivalListItem.getHospitalUid();
-        String institutionUID = arrivalListItem.getInstitutionUid();
-        String tenantUID = arrivalListItem.getTenantUid();
+        String siteUID = loginUser.getSiteUID();
+        String hospitalUID = loginUser.getHospitalUID();
+        String institutionUID = loginUser.getInstitutionUID();
+        String tenantUID = loginUser.getTenantUID();
         List<String> value = Arrays.asList(siteUID, hospitalUID, institutionUID, tenantUID);
         searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, value));
         List<ConfigItemValue> configItemValues = configItemValueRepository.findBySearchFilter(searchFilters);

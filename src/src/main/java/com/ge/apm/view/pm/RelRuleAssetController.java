@@ -12,6 +12,8 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -28,6 +30,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -92,6 +95,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private boolean isYmyg = false;
     private OrgInfo userOrgInfo;
     private String zkbBatch;
+    private List<AssetTypeGroup> assetTypeGroupList;
     @Override
     protected void init() {
         this.filterByHospital = false;
@@ -123,6 +127,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         userOrgInfo = orgInfoRepository.getByUid(user.getSiteUID());
         selectedUserOrg.add(userOrgInfo);
         isYmyg = UserContextService.isYiMaiYangGuangTenantForServer();
+        assetTypeGroupList=user.getAssetTypeGroupList();
         //initTree(user.getTenantUID());
         initOrgTree();
         if (isYmyg) {
@@ -298,6 +303,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     }
 
     public List<AssetInfo> getAssetList() {
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new ArrayList<>();
+        }
         List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
         List<String> uids = null;
         if (queryAsset.getPurchaseDateStart() != null) {
@@ -418,14 +426,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             }
             List<SearchFilter> userFilter = getAssetFilter();
             assetFilters.addAll(userFilter);
-//            addFilterAssetTypeGroup(assetFilters);
+            addFilterAssetTypeGroup(assetFilters);
             return assetInfoRepository.findBySearchFilter(assetFilters);
         }
         return new ArrayList<>();
     }
     private void addFilterAssetTypeGroup(List<SearchFilter> assetFilters){
-        List<AssetTypeGroup> assetTypeGroupList = null;
-        if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+        if(user != null && user.isEnableAssetTypeGroup() && CollectionUtils.isNotEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             assetFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }

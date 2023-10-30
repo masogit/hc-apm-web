@@ -1,6 +1,4 @@
-
 package com.ge.apm.view.budget;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -14,12 +12,15 @@ import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -28,13 +29,16 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -42,10 +46,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -169,6 +177,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public void onBudgetAssetInfoChange(){
+        this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
         this.curSelectApplicationBudgetAsset.setApplicationAssetCategory(this.curSelectBudgetAssetInfo.getApplicationAssetCategory());
         this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
         this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
@@ -215,6 +224,23 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         return new PageImpl(dataList,pageRequest,dataList.size());
     }
 
+    @Getter
+    @Setter
+    private StreamedContent exportFile;
+
+    public void exportExcel(String orderType){
+        this.searchFilters = this.getSearchFilter(this.tabIndex);
+        List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
+        List<Map<String, Object>> budgetDataList = persistService.createBudgeApplicationData(dataList,orderType);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/TemporallyPurchase/excel/APM_Budget_BAY_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            persistService.exportData(doc, budgetDataList,orderType);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Budget_BAY.xlsx");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBayController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public List<SearchFilter> getSearchFilter(Integer tabIndex) {
         if (searchFilters == null) {
@@ -271,26 +297,33 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
+        String str = "action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
     public void saveApplication() {
-        persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
-                account,crudActionName,this.curSelectBudgetAssetInfo,BudgetApplication.OrderType.BAY.toString());
-        boolean isOk = persistService.saveApplication(selected,this.attachList,BudgetApplication.OrderType.BAY.toString());
+        persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
+                account,crudActionName,this.curSelectBudgetAssetInfo);
+        boolean isOk = persistService.saveApplication(selected,this.attachList);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
 
-    public String applicationDataFlow(Integer applicationStatus,String applicationStep,String orderType) {
-        persistService.handleCommonField(selected,applicationStatus,applicationStep,
-                account,crudActionName,this.curSelectBudgetAssetInfo,orderType);
-        if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
-             persistService.submitApplication(selected,this.attachList,orderType);
+    public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
+        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
+            boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
+            if(!resultMultiLevelApproval){
+                WebUtil.addSuccessMessage("无可用的审批流,请检查后重试！");
+                return "";
+            }
+            persistService.handleCommonField(selected,applicationStatus,applicationStep,
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+             persistService.submitApplication(selected,this.attachList);
         }else{
-             persistService.saveApplication(selected,this.attachList,orderType);
+            persistService.handleCommonField(selected,applicationStatus,applicationStep,
+                    account,crudActionName,this.curSelectBudgetAssetInfo);
+             persistService.saveApplication(selected,this.attachList);
         }
         return this.backList();
     }
@@ -323,6 +356,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
                 + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     private void actionMessage(boolean isOk) {
@@ -364,6 +398,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         if (null != searchForm.getDateEnd()) {
             this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.LT, formatter.format(new DateTime(searchForm.getDateEnd()).plusDays(1).toDate())));
         }
+        if (null != searchForm.getApplicantYear()) {
+            this.searchFilters.add(new SearchFilter("applicationDate", SearchFilter.Operator.EQ, formatter.format(searchForm.getApplicantYear())));
+        }
         if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
             updateSearchFilter(new SearchFilter("applicationNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
         }
@@ -403,6 +440,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
+            this.selected.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
         }
     }
 
@@ -413,6 +451,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         selectedAsset.setCreatedDate(new Date());
         selectedAsset.setLastModifiedBy(account.getLoginName());
         selectedAsset.setLastModifiedDate(new Date());
+        searchAsset();
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -457,6 +496,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         this.selected.setApplicationDept(selectedDept);
     }
 
+
+
     public void clearSelected() {
         if (StringUtils.isEmpty(selected.getId())) {
             selected = null;
@@ -474,23 +515,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         crudActionName = "Create";
         selectedDept = null;
         selected = new BudgetApplication();
-
-        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
-        budgetApplicationAssetSet.add(this.curSelectApplicationBudgetAsset);
-        selected.setBudgetAssets(budgetApplicationAssetSet);
-
-        selected.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
-        selected.setApplicant(account);
-        selected.setApplicantId(account.getId());
-        selected.setApplicationDate(new Date());
-        selected.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
-        selected.setApprovalProgress(0);
-        selected.setBudgetApprovals(new HashSet<>());
-        selected.setIsDeleted(0);
-        selected.setCreatedBy(account.getLoginName());
-        selected.setCreatedDate(new Date());
-        selected.setLastModifiedBy(account.getLoginName());
-        selected.setLastModifiedDate(new Date());
+        persistService.initCreateObject(selected,this.curSelectApplicationBudgetAsset,account,BudgetApplication.OrderType.BAY.toString());
+        this.selectedDept = selected.getApplicationDept();
     }
 
     @Override
@@ -541,7 +567,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetAssets.clear();
-        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters);
+        this.optionalBudgetAssets = budgetAssetDao.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
     public void resetAssetSearch() {

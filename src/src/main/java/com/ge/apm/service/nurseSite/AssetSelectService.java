@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ public class AssetSelectService {
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
+
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
@@ -86,18 +91,23 @@ public class AssetSelectService {
     }
 
     public List<AssetInfo> loadAssetsBySearchFilter(List<SearchFilter> searchFilters) {
-        List<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFilters);
-        return assetInfoList;
+        return assetInfoRepository.findBySearchFilter(searchFilters);
     }
 
     public List<AssetInfo> loadSelectedAssetByConfig(String configParentId) {
-        List<AssetInfo> assetInfoList = assetInfoRepository.findAssetByMaintainConfigParentId(configParentId);
-        return assetInfoList;
+        return assetInfoRepository.findAssetByMaintainConfigParentId(configParentId);
+    }
+
+    public List<AssetInfo> loadSelectedAssetByConfig(Wrapper<AssetInfo> wrapper) {
+        return assetInfoMapper.findAssetByMaintainConfigParentId(wrapper);
     }
 
     public List<AssetInfo> loadSelectedAssetByConfigJN(String configParentId) {
-        List<AssetInfo> assetInfoList = assetInfoRepository.findAssetByMaintainConfigJNParentId(configParentId);
-        return assetInfoList;
+        return assetInfoRepository.findAssetByMaintainConfigJNParentId(configParentId);
+    }
+
+    public List<AssetInfo> loadSelectedAssetByConfigJN(Wrapper<AssetInfo> wrapper) {
+        return assetInfoMapper.findAssetByMaintainConfigJNParentId(wrapper);
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -108,8 +118,7 @@ public class AssetSelectService {
         List<String> clinicalDeptsWithAsset = assetInfoRepository.findDistinctClinicalDeptUids(selectedOrg.getSiteUID());
         List<String> assetDeptsWithAsset = assetInfoRepository.findDistinctAssetDeptUids(selectedOrg.getSiteUID());
         clinicalDeptsWithAsset.addAll(assetDeptsWithAsset);
-        List<String> validDeptUids = clinicalDeptsWithAsset.stream().distinct().collect(Collectors.toList());
-        return validDeptUids;
+        return clinicalDeptsWithAsset.stream().distinct().collect(Collectors.toList());
     }
 
 }

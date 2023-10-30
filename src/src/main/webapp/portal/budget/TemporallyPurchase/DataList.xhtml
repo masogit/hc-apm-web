@@ -66,6 +66,9 @@
                                            pattern="#{userContextService.timeFormat14()}"/>
                  </h:outputText>
             </p:column>
+            <p:column headerText="采购状态" rendered="#{budgetBayController.tabIndex eq 3}">
+                <h:outputText value="#{fieldMsg.fieldValue('procureStatus', item.procureStatus)}"/>
+            </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
@@ -82,6 +85,9 @@
                                   ajax="false">
                     <p:dataExporter type="xls" target="datalist" fileName="Budget_Application_Export"/>
                 </p:commandButton>
+                <!-- <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" class="btn btn-sm btn-gray" actionListener="#{budgetBayController.exportExcel('BAY')}" icon="ui-icon-arrowstop-1-s">
+                    <p:fileDownload value="#{budgetBayController.exportFile}"/>
+                </p:commandButton>-->
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
                                  disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStatus ne 1}" actionListener="#{budgetBayController.delete}"  rendered="#{budgetBayController.tabIndex eq 0 }">
                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
