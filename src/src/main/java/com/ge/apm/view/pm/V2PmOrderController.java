@@ -546,12 +546,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
-        if(orderRule == null){
-            return new PmOrderRule();
-        }else {
-            return orderRule;
-        }
+       //根据设备查找规则
+        return Optional.ofNullable(pmOrderService.acqPmOrderRule(v2_pmOrder)).orElse(new PmOrderRule());
+//        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+//        if(orderRule == null){
+//            return new PmOrderRule();
+//        }else {
+//            return orderRule;
+//        }
 //            return new PmOrderRule();
 //        }
 //        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
