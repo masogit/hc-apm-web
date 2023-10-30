@@ -1,9 +1,13 @@
 package com.ge.apm.view.nurseSite;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -127,8 +131,13 @@ public class AssetSelectJNController extends GenericCRUDUUIDController<AssetInfo
         this.orgTree = assetSelectService.loadOrgTree();
         this.selectedOrg = assetSelectService.loadSelectedOrg();
 
-        this.selectedAssets = assetSelectService.loadSelectedAssetByConfigJN(config.getId()).stream().collect(Collectors.toSet());
-        this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
+        Wrapper<AssetInfo> wrapper = new EntityWrapper<>();
+        wrapper.eq("nsmci.parent_id", config.getId());
+        if (currentUser.isEnableAssetTypeGroup()) {
+            wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+        }
+        this.selectedAssets = new HashSet<>(assetSelectService.loadSelectedAssetByConfigJN(wrapper));
+        this.selectedAssets.forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
         OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
         this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
 		if (this.listCheckOrgInfo == null) {
@@ -166,9 +175,15 @@ public class AssetSelectJNController extends GenericCRUDUUIDController<AssetInfo
         int filterCount=this.buildAdvancedSearchFilters();
         if(filterCount==0){
         	WebUtil.addErrorMessage("缺少筛选条件！");
-        }
-        else{
-        	assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+        } else{
+            if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+                assets4Maintain = ListUtil.empty();
+            } else {
+                if (currentUser.isEnableAssetTypeGroup()) {
+                    searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+                }
+                assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+            }
         }
         this.searchFilters.clear();
     }
@@ -281,7 +296,15 @@ public class AssetSelectJNController extends GenericCRUDUUIDController<AssetInfo
         log.debug("loadAssets4EditView");
         this.buildBaseSearchFilters();
         this.buildAdvancedSearchFilters();
-        List<AssetInfo> assetInfos = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+        List<AssetInfo> assetInfos;
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            assetInfos = ListUtil.empty();
+        } else {
+            if (currentUser.isEnableAssetTypeGroup()) {
+                searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+            }
+            assetInfos = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+        }
         log.debug("{} assets has been loaded", assetInfos.size());
         this.searchFilters.clear();
         return assetInfos;

@@ -31,16 +31,16 @@
                     <h:form id="searchForm">
                         <h:panelGrid id="searchPanel" columns="2">
                             <p:inputText id="searchText" value="#{departmentConvertController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
-                                <p:ajax event="keyup" delay="1200" update=":IouListForm searchButtons" />
+                                <p:ajax event="keyup" delay="1200" update=":AssetDepartmentConvertForm searchButtons" />
                             </p:inputText>
                             <h:panelGroup id='searchButtons'>
-                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty departmentConvertController.oneSearchStr}"/>
-                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentConvertController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetDepartmentConvertForm :searchForm"  rendered="#{empty departmentConvertController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetDepartmentConvertForm :searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentConvertController.oneSearchStr}"/>
                             </h:panelGroup>
 
                         </h:panelGrid>
                     </h:form>
-                    <h:form id="IouListForm">
+                    <h:form id="AssetDepartmentConvertForm">
 
                         <p:dataTable id="datalist" value="#{departmentConvertController.lazyModel}" var="item" widgetVar="varDataList"
                                      selectionMode="single" selection="#{departmentConvertController.selected}"
@@ -51,7 +51,19 @@
                                      rows="20" emptyMessage="#{msg.noRecordFound}"
                                      rowsPerPageTemplate="20,50,100,500">
 
-                            <p:ajax event="filter" listener="#{departmentConvertController.onFilter}" update=""/>
+                            <p:ajax event="filter" listener="#{departmentConvertController.onFilter}" update="" oncomplete="updateSelectAllCheckBox();"/>
+                            <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+
+                            <p:column width="36"  id="checkBoxColumn">
+                                <p:selectBooleanCheckbox value="#{departmentConvertController.selectedMap[item.id]}"  class="selectCheckBox">
+                                    <p:ajax process="@this" update="@this @(.batch-terminated)"   oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                                <f:facet name="header"  >
+                                    <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetDepartmentConvertForm:datalist reportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                    </p:selectBooleanCheckbox>
+                                </f:facet>
+                            </p:column>
                             <!--sharedId-->
                             <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.assetName}"/>
@@ -105,15 +117,32 @@
                                 </h:outputText>
                             </p:column>
 
-                            <p:column headerText="转科状态"   filterBy="#{item.currentStatus}" filterMatchMode="LIKE">
-                                <h:outputText value="#{departmentConvertController.getStatus(item.currentStatus)}"/>
+                            <p:column headerText="转科状态"   filterBy="#{item.currentStatus}" filterMatchMode="EQ">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()"  value="#{departmentConvertController.status}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="转入确认中" itemValue="1" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="审批中" itemValue="2" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="已完成" itemValue="3" noSelectionOption="true" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{departmentConvertController.getStatusName(item.currentStatus)}"/>
                             </p:column>
 
                             <f:facet name="{Toolbar}">
 <!--                                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" actionListener="#{departmentSecondmentController.fileName()}" />-->
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"
-                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}"/>
+                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentConvertController.fileName}"
+                                                    postProcessor="#{departmentConvertController.postProcessXLS}"/>
+                                </p:commandButton>
+                                <p:commandButton id="reportButton" icon="ui-icon-arrow-1-s"
+                                                 actionListener="#{departmentConvertController.exportTransferOrderFile}"
+                                                 class="btn btn-sm btn-gray batch-terminated" title="调拨单导出"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
+                                                 disabled="#{not departmentConvertController.isChecked()}"
+                                >
+                                    <p:fileDownload value="#{departmentConvertController.transferOrderFile}"/>
+
                                 </p:commandButton>
 <!--                                <p:commandButton title="导出当前页" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" ajax="false">-->
 <!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
@@ -148,11 +177,25 @@
                         setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
                     }
                 }
-                $("#IouListForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
-                $("#IouListForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
+                $("#AssetDepartmentConvertForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
+                $("#AssetDepartmentConvertForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
             })
             function getDate(){
                 return Date.now();
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#AssetDepartmentConvertForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
             }
         </script>
     </ui:define>

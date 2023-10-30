@@ -1670,7 +1670,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
-//        assetTypeGroupList = loginUser.getAssetTypeGroupList();
+        assetTypeGroupList = loginUser.getAssetTypeGroupList();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1891,9 +1891,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
-        /*if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-        }*/
+        }
         this.setSearchFilter();
 
         if(queryIndex == 20){
@@ -2517,10 +2517,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         // 资产分类权限
-//        if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
-//            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-//            filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
-//        }
+        if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }
     }
 
     public void searchList(Integer buttonIndex) {

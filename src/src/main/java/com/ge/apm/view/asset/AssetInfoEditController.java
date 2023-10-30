@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
@@ -83,10 +84,36 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private AssetTypeGroupRepository assetTypeGroupRepository;
 
+    private BuildManagementRepository buildManagementRepository;
+
+
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
+
+    public List<BuildManagement> getManagementList() {
+        return managementList;
+    }
+
+
+    public List<String> managementListString(String query) {
+        if(CollectionUtils.isNotEmpty(managementList)){
+            List<String> list = managementList.stream().map(BuildManagement::getNamePyCode).filter(item->item.contains(query)).collect(Collectors.toList());
+            Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getNamePyCode));
+            managementMap=collect;
+            return list;
+        }
+        return new ArrayList<>();
+
+    }
+
+    public void setManagementList(List<BuildManagement> managementList) {
+        this.managementList = managementList;
+    }
+
+    private List<BuildManagement>  managementList=new ArrayList<>();
+    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
 
@@ -261,6 +288,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
+        buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -354,6 +382,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initOrgTree();
 
         updateClinicalDeptOnSiteChange();
+        updateManagementOnSiteChange();
         updateAssetStatusList();
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -597,6 +626,41 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
     }
 
+    private void updateManagementOnSiteChange() {
+        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
+        if(CollectionUtils.isEmpty(managementList)){
+            return;
+        }
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        if (!org.apache.commons.collections4.CollectionUtils.isEmpty(managementList)) {
+            managementList.forEach(val -> root.getChildren().add(new DefaultTreeNode("org", val, null)));
+            componentFloor(root);
+        }
+    }
+
+
+    private void componentFloor(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            componentRoom(val);
+        });
+    }
+
+    private void componentRoom(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            managementList.addAll(buildFloorList);
+        });
+    }
+
+
+
+
+
     public void onParentAssetChange() {
         AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
         selected.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
@@ -664,6 +728,37 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+
+
+
+
+    public void locationCodechangeSelect(SelectEvent event){
+        selected.setLocationName(null);
+        if(event==null){
+            return;
+        }
+        String code =(String) event.getObject();
+        if(StringUtils.isNotBlank(code)){
+            List<BuildManagement> list = managementMap.get(code);
+            if(CollectionUtils.isNotEmpty(list)){
+                BuildManagement buildManagement = list.get(0);
+                selected.setLocationName(buildManagement.getName());
+            }
+        }
+    }
+//        Map<Integer, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getId));
+//        List<BuildManagement> list = collect.get(idx);
+//        if(CollectionUtils.isNotEmpty(list)){
+//            BuildManagement buildManagement = list.get(0);
+//            selected.setLocationCode(buildManagement.getNamePyCode());
+//            selected.setLocationName(buildManagement.getName());
+//        }
+
+
+    public void locationCodechange(){
+        locationCodechangeSelect(null);
+
+    }
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null) {
@@ -1705,4 +1800,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setApproval(boolean approval) {
         this.approval = approval;
     }
+
+
 }

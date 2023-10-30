@@ -1,6 +1,7 @@
 package com.ge.apm.view.secondment;
 
 import com.ge.apm.dao.SiteToSiteAllocationRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.SiteToSiteAllocation;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -9,9 +10,13 @@ import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.*;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -19,8 +24,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +37,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     private UaaService uuaService;
     private Date filterBeginTime;
     private Date returnAtTime;
+    private List<DepartmentSecondmentProcess> process;
+    private UserAccountRepository userAccountRepository;
     @Override
     protected SiteToSiteAllocationRepository getDAO() {
         return dao;
@@ -42,6 +48,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     protected void init() {
         dao=WebUtil.getBean(SiteToSiteAllocationRepository.class);
         uuaService=WebUtil.getBean(UaaService.class);
+        userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -145,40 +152,51 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         }
         return result;
     }
-//    public void saveDate(){
-//        for(int i=0;i<100;i++){
-//
-//            dao.save(getOne(i));
-//        }
-//
-//    }
-//    String [] arr={
-//            "722c8ebf796944c69955e5f6e795ffc4",
-//            "3542446d2da14beebf3a2c2b9438f33e",
-//            "4460fa2cc1ad466db350595560e21cd9",
-//            "f0db6e2d3aaa4d758db050b1abd62db0",
-//            "70171ae7bc80454dbc838414ae71f1d6",
-//            "acc233e9194f4824b39d13e80cef3798",
-//            "b53bcdf702a94e61b581d1e2ed88387a",
-//            "8339d3aad54540fda2656be07c5fbf65",
-//            "3d261042ef454b83934c0c396569d283",
-//            "836b3624c0764a9fb9904d7c6d3ce0bc",
-//            "e910eb063f344728860fc466190282d8",
-//            "48f3d575e77a4305832c3f305356b185",
-//            "58cc25ad221a44f1bec21691a4001018",
-//            "f40c60c94df14a96aec3aa2474ea70f2"};
-//    private SiteToSiteAllocation getOne(int i){
-//        Random random = new Random();
-//        String s = String.valueOf(i);
-//        SiteToSiteAllocation siteToSiteAllocation = new SiteToSiteAllocation();
-//        siteToSiteAllocation.setAssetUid(s);
-//        siteToSiteAllocation.setAssetName(s);
-//        siteToSiteAllocation.setReturnAt(new Date());
-//        siteToSiteAllocation.setBorrowedAt(new Date());
-//        siteToSiteAllocation.setInDeptUid(arr[random.nextInt(14)]);
-//        siteToSiteAllocation.setOutDeptUid(arr[random.nextInt(14)]);
-//        siteToSiteAllocation.setInSiteUid(arr[random.nextInt(14)]);
-//        siteToSiteAllocation.setOutSiteUid(arr[random.nextInt(14)]);
-//        return siteToSiteAllocation;
-//    }
+
+
+    public void onRowSelect(SelectEvent event){
+        System.out.println(event);
+        process=new ArrayList<>();
+        SiteToSiteAllocation target = selected;
+        List<String> strings = conditionList(target);
+        if(!CollectionUtils.isEmpty(strings)){
+            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
+            Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
+            addNode("借出待确认",collect.get(target.getBorrowerAck()),target.getLenderSignatureDate());
+            addNode("借出待确认（主任）",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
+            addNode("借入待确认",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
+            addNode("归还确认 ",collect.get(target.getReturnerAck()),target.getReturnAt());
+            addNode("归还确认(主任) ",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
+            addNode("收回待确认 ",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
+        }
+    }
+    private List<String> conditionList(SiteToSiteAllocation target ){
+        Set<String> condition = new HashSet<>();
+        condition.add(target.getBorrowerAck()); // 借用确认
+        condition.add(target.getLenderSignatureUid()); //借出方主任确认
+        condition.add(target.getBorrowerSignatureUid()); // 接受方确认
+        condition.add(target.getReturnerAck());
+        condition.add(target.getReceiverSignatureUid());
+        condition.add(target.getReturnerSignatureUid());
+        return condition.stream().filter(item -> StringUtils.hasText(item)).collect(Collectors.toList());
+    }
+    private void addNode(String nodeName,UserAccount operator, Date operatorTime){
+        String loginName = "";
+        if(operator != null){
+             loginName = operator.getLoginName();
+        };
+        DepartmentSecondmentProcess processNode=new DepartmentSecondmentProcess();
+        processNode.setNodeName(nodeName);
+        processNode.setOperator(loginName);
+        processNode.setOperatorTime(operatorTime);
+        process.add(processNode);
+    }
+
+    public List<DepartmentSecondmentProcess> getProcess() {
+        return process;
+    }
+
+    public void setProcess(List<DepartmentSecondmentProcess> process) {
+        this.process = process;
+    }
 }

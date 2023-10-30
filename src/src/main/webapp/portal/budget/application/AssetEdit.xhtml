@@ -11,18 +11,11 @@
 
     <p:dialog id="AssetEditDlg" widgetVar="AssetEditDialog" modal="true" resizable="false"
               draggable="true" appendTo="@(body)" width="920"
-              header="#{msg.Create}#{msg.Blank}#{msg.BudgetAsset}">
+              header="新增设备">
         <h:form id="AssetEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid id="editPanel" columns="4" layout="grid"
-                             styleClass="ui-panelgrid-blank form-group"
-                             rendered="#{budgetController.selectedAsset != null}">
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.ProductNumber}
-                            <span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.financingNum}" required="true"
-                                     requiredMessage="#{msg.ProductNumber}#{msg.Blank}#{msg.ValidationRequire}"/>
-                    </h:panelGroup>
+                             styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <p:outputLabel class="label">#{msg.EquipmentName}
                             <span style="color: red">*</span></p:outputLabel>
@@ -30,30 +23,7 @@
                                      requiredMessage="#{msg.EquipmentName}#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetGroup}
-                            <span style="color: red">*</span></p:outputLabel>
-                        <p:selectOneMenu value="#{budgetController.selectedAsset.assetGroup}" required="true"
-                                         requiredMessage="#{msg.AssetGroup}#{msg.Blank}#{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
-                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
-                                    update="@this assetGroupSecondary"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
-                        <p:outputLabel class="label">#{msg.AssetGroupSecondary}
-                            <span style="color: red">*</span></p:outputLabel>
-                        <p:selectOneMenu id="assetGroupSecondary" required="true"
-                                         requiredMessage="#{msg.AssetGroupSecondary}#{msg.Blank}#{msg.ValidationRequire}"
-                                         value="#{budgetController.selectedAsset.assetGroupSecondary}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{budgetController.assetCreateAssetGroupSecondaryList}" var="item"
-                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetBrand}
+                        <p:outputLabel class="label">推荐#{msg.AssetBrand}
                             <span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.assetBrand}" required="true"
                                      requiredMessage="#{msg.AssetBrand}#{msg.Blank}#{msg.ValidationRequire}"/>
@@ -65,42 +35,21 @@
                                      requiredMessage="#{msg.EquipmentModel}#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.Unit}
-                            <span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.unit}" required="true"
-                                     requiredMessage="#{msg.Unit}#{msg.Blank}#{msg.ValidationRequire}"/>
+                        <p:outputLabel class="label">设备规格  <span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetController.selectedAsset.standards}" required="true"
+                                     requiredMessage="设备规格#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.Price}</p:outputLabel>
-                        <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
-                                       value="#{budgetController.selectedAsset.price}">
-                        </p:inputNumber>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">要求</p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.requirement}" />
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">是否需要进口</p:outputLabel>
-                        <p:selectOneMenu id="importedOrNot"
-                                         value="#{budgetController.selectedAsset.importedOrNot}">
-                            <f:selectItem itemValue="否" itemLabel="否" />
-                            <f:selectItem itemValue="是" itemLabel="是" />
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">是否为特种设备</p:outputLabel>
-                        <p:selectOneMenu id="specialOrNot" value="#{budgetController.selectedAsset.specialOrNot}">
-                            <f:selectItem itemValue="否" itemLabel="否" />
-                            <f:selectItem itemValue="是" itemLabel="是" />
-                        </p:selectOneMenu>
+                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetController.selectedAsset.applicationAssetCategory}" required="true"
+                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
 
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{budgetController.saveAsset}"
                                  value="#{msg.Save}" id="saveButton"
-                                 update="display :AssetEditDlg :growl"
+                                 update="display :AssetEditDlg AssetSelectForm:assetDatalist :growl"
                                  oncomplete="handleSubmit(args, 'AssetEditDialog');"
                                  disabled="#{empty budgetController.selectedDept}"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}"

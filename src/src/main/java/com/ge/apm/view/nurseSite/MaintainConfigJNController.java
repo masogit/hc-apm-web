@@ -2,13 +2,21 @@ package com.ge.apm.view.nurseSite;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigJNRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.mapper.NurseSiteMaintainConfigJNMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainJNService;
+import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +27,7 @@ import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -44,6 +53,8 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
     private UserAccount currentUser;
     private NurseSiteMaintainJNService nurseSiteMaintainJNService;
     private NurseSiteMaintainConfigJNRepository dao;
+	private NurseSiteMaintainConfigJNMapper configMapper;
+	private UserAccountRepository userAccountRepository;
     private List<NurseSiteMaintainConfigJN> listNurseSiteMaintainConfig;
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
     private List<NurseSiteMaintainConfigJN> listSelected;
@@ -99,6 +110,8 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		assetSelectJNController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainJNService = WebUtil.getBean(NurseSiteMaintainJNService.class);
+		configMapper = WebUtil.getBean(NurseSiteMaintainConfigJNMapper.class);
+		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         nurseSiteMaintainJNService.init();
         dao=nurseSiteMaintainJNService.getNurseSiteMaintainConfigJNRepository();
         setOrgUid = nurseSiteMaintainJNService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -117,21 +130,42 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
     }
 
     @Override
-    protected Page<NurseSiteMaintainConfigJN> loadData(PageRequest pageRequest) {
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        }
-		if(selectSite!=null) {
-			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+	protected Page<NurseSiteMaintainConfigJN> loadData(PageRequest pageRequest) {
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return new PageImpl<>(ListUtil.empty());
 		}
-		//need list or set
-		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
-        Page<NurseSiteMaintainConfigJN> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
-        return pageResult;
-    }
+		if (searchFilters == null) {
+			searchFilters = new ArrayList<>();
+		}
+		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+		Wrapper<NurseSiteMaintainConfigJN> wrapper = new EntityWrapper<>();
+		if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+		}
+		if(selectSite!=null) {
+			wrapper.andNew().eq("nsmc.site_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.hospital_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.institution_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.tenant_uid", selectSite.getUid());
+			wrapper.andNew();
+		}
+		wrapper.in("nsmc.clinical_dept_uid", listOrgUid);
+		WrapperSearchFilterUtils.convert(searchFilters, wrapper, "nsmc");
+		wrapper.groupBy("nsmc.id");
+		List<NurseSiteMaintainConfigJN> list = configMapper.findJoinAssetList(pagination, wrapper);
+		List<String> createBy = list.stream().map(NurseSiteMaintainConfigJN::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+		List<String> modifyBy = list.stream().map(NurseSiteMaintainConfigJN::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+		modifyBy.addAll(createBy);
+		if (ObjectUtil.isNotEmpty(modifyBy)) {
+			List<UserAccount> userAccounts = userAccountRepository.getByUids(new HashSet<>(modifyBy));
+			Map<String, UserAccount> userAccountMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, t -> t));
+			for (NurseSiteMaintainConfigJN maintainConfig : list) {
+				maintainConfig.setCreateBy(userAccountMap.get(maintainConfig.getCreateByUid()));
+				maintainConfig.setModifyBy(userAccountMap.get(maintainConfig.getModifyByUid()));
+			}
+		}
+		return new PageImpl<>(list, pageRequest, pagination.getTotal());
+	}
 
 	public List<NurseSiteMaintainConfigJN> getConfigList(String clinicalDeptUid) {
     	if(clinicalDeptUid==null) return new ArrayList<>();

@@ -8,26 +8,20 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-
-    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag eq 14}">
-        <label class="label">#{msg.BudgetInfo}</label>
-        <p:dataTable id="budgetlist" value="#{multiLevelApprovalController.primaryApprovalData}"
-                     var="item" widgetVar="varbudgetDatalist"
+<p:fieldset legend="#{msg.BudgetInfo}" rendered="#{multiLevelApprovalController.businessTypeFlag eq 14 }">
+    <h:panelGroup rendered="#{multiLevelApprovalController.primaryApprovalData.orderType eq 'BAY'}">
+        <p:dataTable id="budgetAssetlistOneBAY" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
                      lazy="true" rowKey="#{item.id}" sortOrder="descending"
-                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">222242842485274
             <p:column headerText="#{msg.ApplicationNum}">
                 <h:outputText value="#{item.applicationNum}"/>
             </p:column>
             <p:column headerText="#{msg.Applicant}">
-                <h:outputText value="#{item.applicant.name}"/>
+                <h:outputText value="#{item.applicantName}"/>
             </p:column>
             <p:column headerText="#{msg.ApplicationDept}">
-                <h:outputText value="#{item.applicationDept.name}"/>
-            </p:column>
-            <p:column headerText="#{msg.ApplicationTotalAmount}">
-                <h:outputText value="#{item.totalAmount}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
-                </h:outputText>
+                <h:outputText value="#{item.applicationDeptName}"/>
             </p:column>
             <p:column headerText="#{msg.ApplicationDate}">
                 <h:outputText value="#{item.applicationDate}">
@@ -36,47 +30,241 @@
                                        pattern="#{userContextService.timeFormat14()}"/>
                 </h:outputText>
             </p:column>
-        </p:dataTable>
-        <br/>
+            <p:column headerText="#{msg.EquipmentName}">
+                <h:outputText value="#{item.applicationAssetName}"/>
+            </p:column>
+            <p:column headerText="设备品类">
+                <h:outputText value="#{item.applicationAssetCategory}"/>
+            </p:column>
+            <p:column headerText="推荐设备品牌">
+                <h:outputText value="#{item.recommendedBrand}"/>
+            </p:column>
+            <p:column headerText="设备规格">
+                <h:outputText value="#{item.standards}"/>
+            </p:column>
 
-        <label class="label">#{msg.BudgetAssetInfo}</label>
-        <p:dataTable id="budgetAssetlist" value="#{multiLevelApprovalController.secondaryApprovalData}"
+        </p:dataTable>
+        <p:dataTable id="budgetAssetlistSecBAY" value="#{multiLevelApprovalController.secondaryApprovalData}"
                      var="item" widgetVar="varbudgetAssetDatalist"
                      lazy="true" rowKey="#{item.id}" sortOrder="descending"
                      sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
-            <p:column headerText="#{msg.StockType}">
-                <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>
-            </p:column>
-            <p:column headerText="#{msg.ProductNumber}">
-                <h:outputText value="#{item.asset.financingNum}"/>
-            </p:column>
-            <p:column headerText="#{msg.EquipmentName}">
-                <h:outputText value="#{item.asset.name}"/>
-            </p:column>
-            <p:column headerText="#{msg.AssetBrand}">
-                <h:outputText value="#{item.asset.assetBrand}"/>
-            </p:column>
             <p:column headerText="#{msg.EquipmentModel}">
-                <h:outputText value="#{item.asset.assetModel}"/>
-            </p:column>
-            <p:column headerText="#{msg.Unit}">
-                <h:outputText value="#{item.asset.unit}"/>
+                <h:outputText value="#{item.model}"/>
             </p:column>
             <p:column headerText="#{msg.ApplicationQuantity}">
                 <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
             </p:column>
-            <p:column headerText="#{msg.ApplicationPrice}">
+            <p:column headerText="预算单价">
                 <h:outputText value="#{item.applicationPrice}">
                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                 </h:outputText>
             </p:column>
-            <p:column headerText="#{msg.ApplicationAmount}">
+            <p:column headerText="预算总价">
                 <h:outputText value="#{item.applicationAmount}">
                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                 </h:outputText>
             </p:column>
+            <p:column headerText="#{msg.Unit}">
+                <h:outputText value="#{item.unit}"/>
+            </p:column>
+            <p:column headerText="经费来源">
+                <p:selectOneMenu  value="#{item.sourceFunding}" disabled="true">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('sourceFunding')}" var="t"
+                                   itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column headerText="拟购设备的用途">
+                <h:outputText value="#{item.equipmentUsage}"/>
+            </p:column>
+            <p:column headerText="情况说明">
+                <h:outputText value="#{item.description}"/>
+            </p:column>
+            <p:column headerText="申请理由">
+                <h:outputText value="#{item.applicationReason}"/>
+            </p:column>
         </p:dataTable>
     </h:panelGroup>
+    <h:panelGroup rendered="#{multiLevelApprovalController.primaryApprovalData.orderType eq 'BAP'}">
+        <p:dataTable id="budgetAssetlistOneBAP" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="#{msg.ApplicationNum}">
+                <h:outputText value="#{item.applicationNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.Applicant}">
+                <h:outputText value="#{item.applicantName}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDept}">
+                <h:outputText value="#{item.applicationDeptName}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDate}">
+                <h:outputText value="#{item.applicationDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat14()}"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.EquipmentName}">
+                <h:outputText value="#{item.applicationAssetName}"/>
+            </p:column>
+            <p:column headerText="设备品类">
+                <h:outputText value="#{item.applicationAssetCategory}"/>
+            </p:column>
+            <p:column headerText="推荐设备品牌">
+                <h:outputText value="#{item.recommendedBrand}"/>
+            </p:column>
+            <p:column headerText="设备规格">
+                <h:outputText value="#{item.standards}"/>
+            </p:column>
 
+        </p:dataTable>
+        <p:dataTable id="budgetAssetlistSecBAP" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="#{msg.EquipmentModel}">
+                <h:outputText value="#{item.model}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationQuantity}">
+                <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
+            </p:column>
+            <p:column headerText="预算单价">
+                <h:outputText value="#{item.applicationPrice}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="预算总价">
+                <h:outputText value="#{item.applicationAmount}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.Unit}">
+                <h:outputText value="#{item.unit}"/>
+            </p:column>
+            <p:column headerText="经费来源">
+                <p:selectOneMenu  value="#{item.sourceFunding}" disabled="true">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('sourceFunding')}" var="t"
+                                   itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column headerText="科室现有同类设备数量">
+                <h:outputText value="#{item.similarDevicesNumber}">
+                </h:outputText>
+            </p:column>
+            <p:column headerText="科室现有同类设备利用情况">
+                <h:outputText value="#{item.similarDevicesUse}">
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+        <p:dataTable id="budgetAssetlistThrBAP" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+
+            <p:column headerText="是否采购进口产品">
+                 <p:selectOneMenu  value="#{item.importedOr}" disabled="true">
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
+                                    itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                 </p:selectOneMenu>
+             </p:column>
+             <p:column headerText="申购仪器设备的主要功能">
+                 <h:outputText value="#{item.majorFunction}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="申购仪器设备的配置">
+                 <h:outputText value="#{item.deviceConfiguration}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="申购仪器设备的主要技术参数及要求">
+                 <h:outputText value="#{item.technicalParameter}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="申购仪器设备在本单位医疗、教学、科研工作中的利用">
+                 <h:outputText value="#{item.equipmentUtilization}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="社会,经济效益分析">
+                 <h:outputText value="#{item.benefitAnalysis}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="同类产品比较">
+                 <h:outputText value="#{item.productComparison}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="使用年限">
+                 <h:outputText value="#{item.serviceLife}">
+                 </h:outputText>
+             </p:column>
+        </p:dataTable>
+        <p:dataTable id="budgetAssetlistForBAP" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="收费标准">
+                 <h:outputText value="#{item.chargingStandards}">
+                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="年预估收入">
+                 <h:outputText value="#{item.yearIncome}">
+                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="所需耗材及使用量">
+                 <h:outputText value="#{item.usage}">
+                 </h:outputText>
+             </p:column>
+             <p:column headerText="设备是否有放置场地">
+                 <p:selectOneMenu  value="#{item.placeSite}" disabled="true">
+                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
+                                    itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                 </p:selectOneMenu>
+             </p:column>
+             <p:column headerText="是否在手术室使用">
+                 <p:selectOneMenu  value="#{item.usedOperatingRoom}" disabled="true">
+                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
+                                    itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                 </p:selectOneMenu>
+             </p:column>
+
+             <p:column headerText="是否需要同院内信息系统对接">
+                 <p:selectOneMenu  value="#{item.systemDocking}" disabled="true">
+                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
+                                    itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                 </p:selectOneMenu>
+             </p:column>
+             <p:column headerText="是否需要连接外网">
+                 <p:selectOneMenu  value="#{item.connectNetwork}" disabled="true">
+                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="t"
+                                    itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                 </p:selectOneMenu>
+             </p:column>
+             <p:column headerText="情况说明">
+                 <h:outputText value="#{item.description}">
+                 </h:outputText>
+             </p:column>
+        </p:dataTable>
+        <p:fieldset legend="附件信息"  >
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <p:dataList id="attachList"
+                                value="#{multiLevelApprovalController.attachList}"
+                                var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                        <f:facet name="header">附件详情</f:facet>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    </p:dataList>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+    </h:panelGroup>
+</p:fieldset>
 </ui:composition>
 </html>

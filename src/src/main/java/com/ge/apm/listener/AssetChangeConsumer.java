@@ -27,6 +27,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.context.LocaleHolder;
 
@@ -81,6 +82,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                     return;
                 }
                 AssetHistory assetHistory = list.get(0);
+                LOGGER.info("mq 查询出history最近记录 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(assetHistory));
+
                 String assetJson = assetHistory.getAssetJson();
                 if(StringUtils.isEmpty(assetJson)){
                     LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());
@@ -89,6 +92,7 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 }
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
+//                LOGGER.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
                 String localeString = mqContext.getLocale();
                 if(StringUtils.isBlank(localeString)  ||  localeString.equalsIgnoreCase("zh")){
                     Locale locale = new Locale("zh", "CN");
@@ -169,6 +173,7 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
     private void saveAssetHistory(AssetHistory assetHistory) {
         AssetHistory assetHistoryResult = assetHistoryRepository.save(assetHistory);
+//        LOGGER.info("asset update success save es send mq assetuid:{}",assetHistory.getAssetUid());
 
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());

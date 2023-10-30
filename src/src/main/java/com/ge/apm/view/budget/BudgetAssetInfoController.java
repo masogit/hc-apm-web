@@ -10,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -136,11 +137,11 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
 
     @Override
     public void delete() {
-        int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
+        /*int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
         if (usingAssetsCount > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("BudgetAssetAlreadyInUsing"));
             return;
-        }
+        }*/
         boolean isOk = persistService.deleteAsset(selected);
         selected = null;
         actionMessage(isOk);
@@ -192,6 +193,12 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         }
         if (StringUtils.isNotBlank(searchForm.getAssetName())) {
             updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicationAssetCategory())) {
+            updateSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.LIKE, searchForm.getApplicationAssetCategory()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getStandards())) {
+            updateSearchFilter(new SearchFilter("standards", SearchFilter.Operator.LIKE, searchForm.getStandards()));
         }
     }
 

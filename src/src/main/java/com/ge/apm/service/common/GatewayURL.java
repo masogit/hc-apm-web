@@ -127,6 +127,8 @@ public enum GatewayURL {
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
     PART_ORDER_QR_CODE_JOB_SCHEDULE("/hc-apm-schedule/job/api/929"),
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
+    PURCHASE_BUDGET_CONFIG_SEND_WX_MESSAGE("/hcapmassetservice/api/apm/budget/config/sendWeChatMessages"),
+
     SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/sendWeChat"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
