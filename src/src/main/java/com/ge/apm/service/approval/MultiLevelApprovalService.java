@@ -321,7 +321,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 // 预算管理 审批不通过
-                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.applicationStep.ToSubmitted.toString());
+                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
@@ -653,7 +653,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                                 // 预算管理
-                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.applicationStep.PendingComplete.toString());
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.APPLICATIONSTEP.PendingComplete.toString());
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
@@ -755,7 +755,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
-                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.applicationStep.PendingApproval.toString());
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.APPLICATIONSTEP.PendingApproval.toString());
                             }
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             AssetInfo assetInfo=null;

@@ -304,7 +304,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void saveApplication() {
-        persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
+        persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
         boolean isOk = persistService.saveApplication(selected,this.attachList);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
@@ -312,7 +312,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
-        if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
+        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){

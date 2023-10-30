@@ -303,7 +303,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         requestContext.addCallbackParam("url", url);
     }
     public void saveApplication() {
-        persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
+        persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
         boolean isOk = persistService.saveApplication(selected,this.attachList);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
@@ -311,7 +311,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
-        if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
+        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
                 WebUtil.addSuccessMessage("无可用的审批流,请检查后重试！");

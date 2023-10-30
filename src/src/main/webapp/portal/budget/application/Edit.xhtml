@@ -104,7 +104,7 @@
                                 <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="数量 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationQuantity}">
-                                    <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
+                                    <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount "/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -115,7 +115,7 @@
                                 <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetController.curModelDisables() or budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationPrice}">
-                                    <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
+                                    <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
