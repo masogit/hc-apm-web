@@ -190,8 +190,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 //				mapCheckData.put(showLables.get(i).getName(), true);
 //			}
 		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error("getLables error" + e.getMessage());
+			LOGGER.error("getLables error {}", e.getMessage(), e);
 		}
 	}
 	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){

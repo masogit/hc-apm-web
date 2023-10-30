@@ -10,16 +10,22 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper;
+import com.ge.apm.dao.mapper.NurseSiteMaintainMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExportUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -70,6 +76,12 @@ public class NurseSiteMaintainService {
 	private static final String SHEET_Maintain = "Maintain List";
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
+
+	@Autowired
+	NurseSiteMaintainMapper nurseSiteMaintainMapper;
+
+	@Autowired
+	NurseSiteMaintainItemMapper nurseSiteMaintainItemMapper;
 
 	@Autowired
 	NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
@@ -300,10 +312,22 @@ public class NurseSiteMaintainService {
 	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid, Date startDate, Date endDate) {
 		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
 	}
+
+	public List<NurseSiteMaintain> findJoinAssetList(Wrapper<NurseSiteMaintain> wrapper) {
+		return nurseSiteMaintainMapper.findJoinAssetList(wrapper);
+	}
+
+	public List<NurseSiteMaintainItem> findItemJoinAssetList(Pagination pagination, Wrapper<NurseSiteMaintainItem> wrapper) {
+		return nurseSiteMaintainItemMapper.findJoinAssetList(pagination, wrapper);
+	}
+
+	public List<NurseSiteMaintain> findByIds(Set<String> ids) {
+		return nurseSiteMaintainRepository.findByIds(ids);
+	}
+
 	public AssetInfo getAssetInfoByUid(String uid) {
 		return assetInfoRepository.getByUid(uid);
 	}
-
 
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids) {
 		return assetInfoRepository.findByUidIn(assetUids);
@@ -860,12 +884,29 @@ public class NurseSiteMaintainService {
 		tempMaintain.setModifyBy(modifyBy);
 		tempMaintain.setCreateBy(createBy);
 		//items
-		List<NurseSiteMaintainItem> listItem=null;
-		if(all){
-			listItem = findMaintainItemByParentId(tempMaintain.getId());
+		List<NurseSiteMaintainItem> listItem = ListUtil.empty();
+		UserAccount currentUser = UserContextService.getCurrentUserAccount();
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return;
 		}
-		else{
-			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);
+		Wrapper<NurseSiteMaintainItem> wrapper = new EntityWrapper<>();
+		if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+		}
+		wrapper.eq("nsmi.parent_id", tempMaintain.getId());
+		Pagination pagination;
+		if(all){
+//			listItem = findMaintainItemByParentId(tempMaintain.getId());
+			pagination = new Pagination();
+		} else{
+			pagination = new Pagination(page + 1, pageSize);
+//			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);
+		}
+		List<NurseSiteMaintainItem> joinAssetList = nurseSiteMaintainItemMapper.findJoinAssetList(pagination, wrapper);
+
+		if (ObjectUtil.isNotEmpty(joinAssetList)) {
+			Set<String> ids = joinAssetList.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
+			listItem = nurseSiteMaintainItemRepository.findByIdIn(ids);
 		}
 		tempMaintain.setListNurseSiteMaintainItem(listItem);
 		supplementMaintainItem(listItem);

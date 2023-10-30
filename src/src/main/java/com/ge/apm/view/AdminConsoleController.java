@@ -260,8 +260,8 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
-	public void  batchUpdateAssetDeptId(){
-		new Thread(() -> adminConsoleService.batchUpdateAssetDeptId()).start();
+	public void  batchUpdateI18nMsgType(){
+		new Thread(() -> adminConsoleService.batchUpdateI18nMsgType()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 }

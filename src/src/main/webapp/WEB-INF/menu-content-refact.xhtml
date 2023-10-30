@@ -16,7 +16,7 @@
                 <p:menuitem value="资产批量修改院区" outcome="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_EDIT')}"/>
                 <p:menuitem id="um1002" value="#{msg.EquipmentLocation}" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_LOCATION_VIEW') and userContextService.getTenantInfo().locationEn ne null}"/>
                 <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_VIEW')}"/>
-                <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}"/>
+                <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/supplierMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}"/>
                 <p:menuitem id="um0889" value="供应商负责人赋权" outcome="/portal/supplier/empowerment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EMPOWERMENT_VIEW') and customConfigController.showSupplierViewAndEditFieldsTable()}"/>
                 <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/AssetTerminateEntryList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_VIEW') or userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_VIEW')}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CREATE_VIEW')}"/>
@@ -30,6 +30,7 @@
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
                 <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_KEYASSETDATAINPUT_EDIT')}"/>
                 <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
+                <p:menuitem id="um096" value="资产转科情况" outcome="/portal/asset/departmentConvert.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEPARTMENT_CONVERT')}"/>
                 <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
             </p:submenu>
 
@@ -139,13 +140,12 @@
             </p:submenu>
 
             <!-- 预算管理 -->
-            <!--<p:submenu label="#{msg.BudgetMgr}" icon="fa fa-university" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_')}">
-                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_APPLY_VIEW_EDIT')}"/>
-                <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMP_APPLY_EDIT')}"/>
-                <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ANNUM_PURCHASE_EDIT')}"/>
-                <p:menuitem value="#{msg.DeptPurchaseManage}" outcome="/portal/budget/deptPurchase/deptPurchaseManage.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_DEPT_VIEW')}"/>
-                <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_PRESUPPLIER_EDIT')}"/>
-            </p:submenu>-->
+            <p:submenu label="#{msg.BudgetMgr}" icon="fa fa-university" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_')}">
+                <p:menuitem value="年度采购预算入口" outcome="/portal/budget/config/List.xhtml" />
+                <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/application/List.xhtml" />
+                <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" />
+                <p:menuitem  value="预算设备管理" outcome="/portal/budget/asset/List.xhtml" />
+            </p:submenu>
 
             <!-- 计量 -->
             <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-clock-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('MEASURE_')}">

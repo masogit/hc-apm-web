@@ -27,6 +27,8 @@ public class BudgetSearchForm {
     private String applicantName;
     // 设备名称
     private String assetName;
+    //申购年份
+    private Date applicantYear;
 
     public OrgInfo getDept() {
         return dept;
@@ -98,5 +100,13 @@ public class BudgetSearchForm {
 
     public void setAssetName(String assetName) {
         this.assetName = assetName == null ? null : assetName.trim();
+    }
+
+    public Date getApplicantYear() {
+        return applicantYear;
+    }
+
+    public void setApplicantYear(Date applicantYear) {
+        this.applicantYear = applicantYear;
     }
 }

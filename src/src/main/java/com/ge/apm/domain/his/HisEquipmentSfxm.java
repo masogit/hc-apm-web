@@ -36,6 +36,10 @@ public class HisEquipmentSfxm implements Serializable {
     @Column(name = "is_matched")//是否匹配过,默认是false
     private Boolean isMatched;
 
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
     //excel行数
     @Transient
     private int lineNum;

@@ -13,4 +13,7 @@ public interface AssetScrapRepository extends GenericRepositoryUUID<AssetScrap> 
     @Query(value="select * from asset_scrap where asset_uid=?1 and current_status in ?2 limit 1",nativeQuery=true)
     AssetScrap getByAssetUidAndStatus(String assetUid, List<Integer> status);
 
+
+    @Query(value="select * from asset_scrap where asset_uid=?1 order by created_date desc limit 1",nativeQuery=true)
+    AssetScrap findByAssetUid(String item);
 }

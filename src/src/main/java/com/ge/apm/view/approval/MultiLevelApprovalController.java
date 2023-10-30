@@ -6,21 +6,21 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
+import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.core.WechatParam;
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -53,7 +53,18 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private WorkflowService workflowService;
     private BlobFileService blobService;
 
+    private boolean signatureNurseRendered = false;
+    private String signatureNurse;
 
+    public String getSignatureNurse() {
+        return signatureNurse;
+    }
+
+    public void setSignatureNurse(String signatureNurse) {
+        this.signatureNurse = signatureNurse;
+    }
+
+    private BlobObjectRepository blobObjectRepository;
     private AssetScrapRepository assetScrapDao;
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
 
@@ -74,6 +85,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     @Getter
     @Setter
     private Integer approvalResult;// 不良事件审核结果 1-同意上报 2-同意不上报
+
+    @Getter
+    @Setter
+    private List<V2_BlobObject> attachList;
 
     @Getter
     private Object primaryApprovalData;
@@ -116,6 +131,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
         assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -158,8 +175,20 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
+                BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
+                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(budgetApplication.getBudgetAssets())){
+                     budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+                }
+                budgetApplicationAsset.setApplicantName(budgetApplication.getApplicant().getName());//申请人
+                budgetApplicationAsset.setApplicationDeptName(budgetApplication.getApplicationDept().getName());//申请科室
+                budgetApplicationAsset.setApplicationDate(budgetApplication.getApplicationDate());//申请日期
+                attachList = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
                 primaryApprovalData = budgetApplication;
                 secondaryApprovalData = budgetApplication.getBudgetAssets();
+                signatureNurseRendered = false;
+                if(BudgetApplication.OrderType.BAP.toString().equals(budgetApplication.getOrderType()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
+                    signatureNurseRendered = true;
+                }
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
@@ -190,18 +219,26 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public void getMultiLevelApprovalPersonByAgree() throws Exception {
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
         boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(signatureNurseRendered && "F".equals(this.signatureNurse)){
+            WebUtil.addWarnMessage("在手术室使用的设备，手术室护士长签名为否时，不允许通过审核！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
         this.resetSignature();
     }
+
 
     /**
      * 供备件审批使用--审批不同意
@@ -212,12 +249,36 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
          }
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        selected = null;
+        this.needSignature = false;
+        this.resetSignature();
+    }
+
+    /**
+     * 预算审批取消
+     * @return
+     */
+    public void cancelApplicationMultiLevelApproval() {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApprovalService.cancelApplication(multiLevelApproval,BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING,BudgetApplication.applicationStep.ToSubmitted.toString());
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -498,6 +559,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             return false;
         }
         return false;
+    }
+
+    public boolean isSignatureNurseRendered() {
+        return signatureNurseRendered;
+    }
+
+    public void setSignatureNurseRendered(boolean signatureNurseRendered) {
+        this.signatureNurseRendered = signatureNurseRendered;
     }
 
 }

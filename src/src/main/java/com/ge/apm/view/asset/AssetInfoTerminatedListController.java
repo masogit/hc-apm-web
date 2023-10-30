@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -115,6 +116,13 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     private Integer assetId;
 
     private Map<String, Object> selectedObject;
+    private UserAccount user;
+
+    private Boolean isInsulate;
+    private TenantInfoRepository tenantInfoRepository;
+
+    private ExportTerminatedAppraisalService exportTerminatedAppraisalService;
+    private StreamedContent terminatedAppraisalFile;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -123,6 +131,8 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     @Override
     protected void init() {
+        user = UserContextService.getCurrentUserAccount();
+
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
@@ -134,12 +144,17 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        exportTerminatedAppraisalService = WebUtil.getBean(ExportTerminatedAppraisalService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
     }
 
     private void loadCustomConfig() {
@@ -780,5 +795,23 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
+
+
+    public StreamedContent getTerminatedAppraisalFile() {
+        return terminatedAppraisalFile;
+    }
+    public void exportTerminatedAppraisalFile() {
+        try {
+            terminatedAppraisalFile = null;
+            List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+            byte[] activeTemplateBytes = exportTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            terminatedAppraisalFile = exportTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
+        } catch (IllegalStateException e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("exportTerminatedAppraisalFile error:",e);
+            WebUtil.addErrorMessage("Fail to download report");
+        }
     }
 }

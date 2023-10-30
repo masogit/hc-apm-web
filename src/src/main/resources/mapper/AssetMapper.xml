@@ -49,5 +49,15 @@
         <where>${ew.sqlSegment}</where>
     </select>
 
+    <select id="findAssetByMaintainConfigParentId" resultType="com.ge.apm.domain.AssetInfo">
+        select ai.* from asset_info ai left join nurse_site_maintain_config_item nsmci on ai.uid = nsmci.asset_uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+    <select id="findAssetByMaintainConfigJNParentId" resultType="com.ge.apm.domain.AssetInfo">
+        select ai.* from asset_info ai left join nurse_site_maintain_config_item_jn nsmci on ai.uid = nsmci.asset_uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+
 
 </mapper>
