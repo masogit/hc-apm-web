@@ -102,6 +102,23 @@ public class SiteToSiteAllocation implements Serializable {
     @JsonProperty
     private String duration; //借用时长
 
+    @Column(name = "borrower_signature_uid")
+    private String borrowerSignatureUid;
+    @Column(name = "lender_signature_uid")
+    private String lenderSignatureUid;
+    @Column(name = "returner_signature_uid")
+    private String returnerSignatureUid;
+    @Column(name = "receiver_signature_uid")
+    private String receiverSignatureUid;
+    @Column(name = "borrower_signature_date")
+    private Date borrowerSignatureDate;
+    @Column(name = "lender_signature_date")
+    private Date lenderSignatureDate;
+    @Column(name = "returner_signature_date")
+    private Date returnerSignatureDate;
+    @Column(name = "receiver_signature_date")
+    private Date receiverSignatureDate;
+
     public String getId() {
         return id;
     }
@@ -404,5 +421,69 @@ public class SiteToSiteAllocation implements Serializable {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public String getBorrowerSignatureUid() {
+        return borrowerSignatureUid;
+    }
+
+    public void setBorrowerSignatureUid(String borrowerSignatureUid) {
+        this.borrowerSignatureUid = borrowerSignatureUid;
+    }
+
+    public String getLenderSignatureUid() {
+        return lenderSignatureUid;
+    }
+
+    public void setLenderSignatureUid(String lenderSignatureUid) {
+        this.lenderSignatureUid = lenderSignatureUid;
+    }
+
+    public String getReturnerSignatureUid() {
+        return returnerSignatureUid;
+    }
+
+    public void setReturnerSignatureUid(String returnerSignatureUid) {
+        this.returnerSignatureUid = returnerSignatureUid;
+    }
+
+    public String getReceiverSignatureUid() {
+        return receiverSignatureUid;
+    }
+
+    public void setReceiverSignatureUid(String receiverSignatureUid) {
+        this.receiverSignatureUid = receiverSignatureUid;
+    }
+
+    public Date getBorrowerSignatureDate() {
+        return borrowerSignatureDate;
+    }
+
+    public void setBorrowerSignatureDate(Date borrowerSignatureDate) {
+        this.borrowerSignatureDate = borrowerSignatureDate;
+    }
+
+    public Date getLenderSignatureDate() {
+        return lenderSignatureDate;
+    }
+
+    public void setLenderSignatureDate(Date lenderSignatureDate) {
+        this.lenderSignatureDate = lenderSignatureDate;
+    }
+
+    public Date getReturnerSignatureDate() {
+        return returnerSignatureDate;
+    }
+
+    public void setReturnerSignatureDate(Date returnerSignatureDate) {
+        this.returnerSignatureDate = returnerSignatureDate;
+    }
+
+    public Date getReceiverSignatureDate() {
+        return receiverSignatureDate;
+    }
+
+    public void setReceiverSignatureDate(Date receiverSignatureDate) {
+        this.receiverSignatureDate = receiverSignatureDate;
     }
 }

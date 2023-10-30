@@ -203,10 +203,19 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             return;
         }
 
-        Double rate = startList.stream().mapToDouble(HisAssetGroupAssetMatch::getGroupRate).sum();
-        if(rate != 100.0){
-            WebUtil.addErrorMessageKey("分摊必须是100%！");
-            return;
+        Map<String,List<HisAssetGroupAssetMatch>> map = startList.stream().collect(Collectors.groupingBy(HisAssetGroupAssetMatch::getAssetGroupName));
+        if(map.size()>1){
+            Double rate = startList.stream().mapToDouble(HisAssetGroupAssetMatch::getGroupRate).sum();
+            if(rate != 100.0){
+                WebUtil.addErrorMessageKey("分摊必须是100%！");
+                return;
+            }
+        }else{
+            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() != 100.0).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(collect)){
+                WebUtil.addErrorMessageKey("多设备分组必须都是100%！");
+                return;
+            }
         }
         Set<String> sfxmIdList = targetAssets.stream().filter(item -> StringUtils.isNotEmpty(item.getSfxmId())).map(HisEquipmentSfxm::getSfxmId).collect(Collectors.toSet());
         if(sfxmIdList.isEmpty()){

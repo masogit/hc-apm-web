@@ -23,6 +23,7 @@ public class BudgetApplicationProvider {
                 "  t.application_date," +
                 "  t.application_status," +
                 "  t.application_step," +
+                "  t.procure_status," +
                 "  uap.name as approveName," +
                 "  t.approval_date" +
                 "  from budget_application t" +
@@ -62,6 +63,9 @@ public class BudgetApplicationProvider {
                 }
                 if(SearchFilter.Operator.LT.toString().equals(searchFilter.operator.toString())){
                     sb.append(" and t.application_date <= to_date('"+value.toString()+"','yyyyMMdd')");
+                }
+                if(SearchFilter.Operator.EQ.toString().equals(searchFilter.operator.toString())){
+                    sb.append(" and to_char(t.application_date,'yyyy') = to_char(to_date('"+value.toString()+"','yyyyMMdd'),'yyyy')");
                 }
             }
             if("applicantName".equals(tempColumn)) {

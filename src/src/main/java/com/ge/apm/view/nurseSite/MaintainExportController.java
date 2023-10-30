@@ -3,11 +3,7 @@ package com.ge.apm.view.nurseSite;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -16,9 +12,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,7 @@ public class MaintainExportController {
     private List<NurseSiteMaintain> listMaintainData;
     private List<NurseSiteMaintain> selectedListMaintain;
     private OrgInfo selectedParentOrgInfo;
+    private NurseSiteMaintainItemRepository maintainItemRepository;
     //show
     private List<OrgInfo> listOrgInfo;
     private List<String> orgUidList;
@@ -74,6 +77,7 @@ public class MaintainExportController {
         currentUser = UserContextService.getCurrentUserAccount();
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
+        maintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
         loadUserParentOrgInfo();
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -86,6 +90,10 @@ public class MaintainExportController {
     }
 
     private void searchMaintainData(Date start, Date end) {
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            listMaintainData = ListUtil.empty();
+            return;
+        }
         Calendar ca = Calendar.getInstance();
         if (start == null) {
             ca.set(Calendar.DAY_OF_MONTH, 1);
@@ -95,10 +103,17 @@ public class MaintainExportController {
             ca.add(Calendar.MONTH, 1);
             end = ca.getTime();
         }
+        Wrapper<NurseSiteMaintain> wrapper = new EntityWrapper<>();
+        if (currentUser.isEnableAssetTypeGroup()) {
+            wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+        }
+        wrapper.ge("nsm.schedule_date", start);
+        wrapper.le("nsm.schedule_date", end);
         if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
-            listMaintainData = findDefaultMaintain(start, end);
+            wrapper.in("nsm.clinical_dept_uid", orgUidList);
+//            listMaintainData = findDefaultMaintain(start, end);
         } else {
-            List<String> listUidTemp = new ArrayList<String>();
+            List<String> listUidTemp = new ArrayList<>();
 
             if(this.selectedOrg != null){
                 listUidTemp.add(this.selectedOrg.getUid());
@@ -114,17 +129,30 @@ public class MaintainExportController {
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
                 listUidTemp.add(this.selectedOrgDepart.getUid());
             }
-            listMaintainData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
+            wrapper.in("nsm.clinical_dept_uid", listUidTemp);
+//            listMaintainData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
         }
-        if (listMaintainData != null) {
+
+        wrapper.groupBy("nsm.id");
+        wrapper.orderBy("nsm.schedule_date");
+        listMaintainData = nurseSiteMaintainService.findJoinAssetList(wrapper);
+        if (ObjectUtil.isNotEmpty(listMaintainData)) {
+            Set<String> maintainIds = listMaintainData.stream().map(NurseSiteMaintain::getId).collect(Collectors.toSet());
+            Wrapper<NurseSiteMaintainItem> itemWrapper = new EntityWrapper<>();
+            itemWrapper.in("nsmi.parent_id", maintainIds);
+            if (currentUser.isEnableAssetTypeGroup()) {
+                itemWrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+            }
+            Map<String, List<NurseSiteMaintainItem>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
+            for (NurseSiteMaintain maintain : listMaintainData) {
+                maintain.setListNurseSiteMaintainItem(itemMap.get(maintain.getId()));
+            }
             nurseSiteMaintainService.supplementMaintainWithoutItem(listMaintainData);
         }
     }
 
     private List<NurseSiteMaintain> findDefaultMaintain(Date startDate, Date endDate) {
-        List<NurseSiteMaintain> listResult = null;
-        listResult = nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
-        return listResult;
+        return nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
     }
 
     private void loadUserParentOrgInfo() {

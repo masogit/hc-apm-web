@@ -11,18 +11,22 @@ import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,14 +56,17 @@ public class BudgetPersistService {
     private BudgetApplicationMapper budgetApplicationMapper;
     @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private OrgInfoRepository orgDao;
+
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList,String orderType) {
+    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
         if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
             // 保存以获得ID
-            this.genApplicationNum(application,orderType);
+            this.genApplicationNum(application,application.getOrderType());
         }
         BudgetApplicationAsset budgetApplicationAsset = application.getBudgetAssets().iterator().next();
         budgetApplicationAsset.setApplicationNum(application.getApplicationNum());
@@ -76,7 +83,7 @@ public class BudgetPersistService {
 
 
     public void handleCommonField(BudgetApplication budgetApplication,
-                                               Integer applicationStatus,String applicationStep,UserAccount account,String crudActionName,BudgetAssetInfo budgetAssetInfo,String orderType){
+                                               Integer applicationStatus,String applicationStep,UserAccount account,String crudActionName,BudgetAssetInfo budgetAssetInfo){
         OrgInfo curDept = budgetApplication.getApplicationDept();
         budgetApplication.setLastModifiedBy(account.getLoginName());
         budgetApplication.setLastModifiedDate(new Date());
@@ -88,10 +95,8 @@ public class BudgetPersistService {
         budgetApplication.setSiteUID(curDept.getSiteUID());
         budgetApplication.setApplicationStatus(applicationStatus);
         budgetApplication.setApplicationStep(applicationStep);
-        budgetApplication.setOrderType(orderType);
 
         BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
-        budgetApplication.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
         //设备信息
         if(budgetApplicationAsset.getCreatedDate()== null){
             budgetApplicationAsset.setCreatedDate(new Date());
@@ -109,9 +114,51 @@ public class BudgetPersistService {
         }
     }
 
+    public boolean checkMultiLevelApproval (BudgetApplication application){
+        boolean result = true;
+        MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
+        MultiLevelApproval approval = generateApproval(application, approvalConfig);
+        if (approval == null) {
+            result = false;
+            logger.info("budget message 001: new budget application, but no approval configuration is available");
+        }
+        return result;
+    }
+
+    public void initCreateObject(BudgetApplication application,BudgetApplicationAsset budgetApplicationAsset,UserAccount account,String orderType){
+        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
+        budgetApplicationAssetSet.add(budgetApplicationAsset);
+        application.setBudgetAssets(budgetApplicationAssetSet);
+        application.setApplicationStep(BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
+        application.setApplicant(account);
+        application.setApplicantId(account.getId());
+        application.setApplicationDate(new Date());
+        application.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
+        application.setBudgetApprovals(new HashSet<>());
+        application.setIsDeleted(0);
+        application.setCreatedBy(account.getLoginName());
+        application.setCreatedDate(new Date());
+        application.setLastModifiedBy(account.getLoginName());
+        application.setLastModifiedDate(new Date());
+        application.setOrderType(orderType);
+        OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
+        application.setApplicationDeptName(orgInfo.getName());
+        application.setApplicationDept(orgInfo);
+        application.setCourtyardArea(getCourtyardArea(orgInfo));
+    }
+
+    public String getCourtyardArea(OrgInfo orgInfo){
+        String orgName = new String();
+        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
+            orgName = orgInfo.getName();
+            return orgName;
+        }
+        return getCourtyardArea(orgInfo.getParentOrg());
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList,String orderType) {
-        this.saveApplication(application,attachList,orderType);
+    public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
+        this.saveApplication(application,attachList);
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
        /* if (true) {*/
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
@@ -189,7 +236,7 @@ public class BudgetPersistService {
         return true;
     }
 
-    private MultiLevelApproval generateApproval(BudgetApplication application, MultiLevelApprovalConfig approvalConfig) {
+    public MultiLevelApproval generateApproval(BudgetApplication application, MultiLevelApprovalConfig approvalConfig) {
         UserAccount account = UserContextService.getCurrentUserAccount();
         AtomicReference<MultiLevelApproval> approval = new AtomicReference<>(null);
         Optional.ofNullable(approvalConfig).flatMap(config -> Optional.ofNullable(config.getApprovalItem())).ifPresent(item -> {
@@ -295,4 +342,74 @@ public class BudgetPersistService {
         return budgetApplicationMapper.loadDataList(searchFilters);
     }
 
+
+    public List<Map<String, Object>> createBudgeApplicationData(List<BudgetApplication> budgetApplicationList,String orderType) {
+        List<Map<String, Object>> budgeApplicationDataList = new ArrayList<>();
+        for (BudgetApplication budgetApplication : budgetApplicationList) {
+            budgetApplication = budgetApplicationDao.findById(budgetApplication.getId());
+            BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+            Map<String, Object> budgetApplicationMap = new HashMap<>();
+            budgetApplicationMap.put("编号",budgetApplication.getApplicationNum());
+            budgetApplicationMap.put("院区",budgetApplication.getCourtyardArea());
+            budgetApplicationMap.put("病区代码",budgetApplication.getWardCode());
+            budgetApplicationMap.put("申请科室",budgetApplication.getApplicationDept()==null?"":budgetApplication.getApplicationDept().getName());
+            budgetApplicationMap.put("设备名称",budgetApplicationAsset.getApplicationAssetName());
+            budgetApplicationMap.put("设备品类",budgetApplicationAsset.getApplicationAssetCategory());
+            budgetApplicationMap.put("推荐品牌",budgetApplicationAsset.getRecommendedBrand());
+            budgetApplicationMap.put("规格",budgetApplicationAsset.getStandards());
+            budgetApplicationMap.put("型号",budgetApplicationAsset.getModel());
+            budgetApplicationMap.put("数量",budgetApplicationAsset.getApplicationQuantity()==null?0:budgetApplicationAsset.getApplicationQuantity());
+            budgetApplicationMap.put("单位",budgetApplicationAsset.getUnit());
+            budgetApplicationMap.put("预算单价",budgetApplicationAsset.getApplicationPrice()==null?0:budgetApplicationAsset.getApplicationPrice().toString());
+            budgetApplicationMap.put("预算总价",budgetApplicationAsset.getApplicationAmount()==null?0:budgetApplicationAsset.getApplicationAmount().toString());
+            budgetApplicationMap.put("经费来源",StringUtils.isBlank(budgetApplicationAsset.getSourceFunding())?"":WebUtil.getFieldValueMessage("sourceFunding", budgetApplicationAsset.getSourceFunding()));
+            if(BudgetApplication.OrderType.BAY.toString().equals(orderType)){
+                budgetApplicationMap.put("申请人",budgetApplication.getApplicant()==null?"":budgetApplication.getApplicant().getName());
+                budgetApplicationMap.put("申请理由", budgetApplicationAsset.getApplicationReason());
+                budgetApplicationMap.put("拟购设备的用途", budgetApplicationAsset.getEquipmentUsage());
+                budgetApplicationMap.put("需求说明", budgetApplicationAsset.getDescription());
+            }else {
+                budgetApplicationMap.put("科室现有同类设备数量", budgetApplicationAsset.getSimilarDevicesNumber()==null?0:budgetApplicationAsset.getSimilarDevicesNumber());
+                budgetApplicationMap.put("科室现有同类设备利用情况", budgetApplicationAsset.getSimilarDevicesUse());
+                budgetApplicationMap.put("是否采购进口产品",StringUtils.isBlank(budgetApplicationAsset.getImportedOr())?"": WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getImportedOr()));
+                budgetApplicationMap.put("申购仪器设备的主要功能",  budgetApplicationAsset.getMajorFunction());
+                budgetApplicationMap.put("申购仪器设备的配置",  budgetApplicationAsset.getDeviceConfiguration());
+                budgetApplicationMap.put("申购仪器设备的主要技术参数及要求",  budgetApplicationAsset.getTechnicalParameter());
+                budgetApplicationMap.put("申购仪器设备在本单位医疗、教学、科研工作中的利用",  budgetApplicationAsset.getEquipmentUtilization());
+                budgetApplicationMap.put("社会、经济效益分析",  budgetApplicationAsset.getBenefitAnalysis());
+                budgetApplicationMap.put("同类产品比较",  budgetApplicationAsset.getProductComparison());
+                budgetApplicationMap.put("使用年限",  budgetApplicationAsset.getServiceLife());
+                budgetApplicationMap.put("收费标准",  budgetApplicationAsset.getChargingStandards()==null?0:budgetApplicationAsset.getChargingStandards().toString());
+                budgetApplicationMap.put("年预估收入",  budgetApplicationAsset.getYearIncome()==null?0:budgetApplicationAsset.getYearIncome().toString());
+                budgetApplicationMap.put("所需耗材及使用量",  budgetApplicationAsset.getUsage());
+                budgetApplicationMap.put("设备是否有放置场地", StringUtils.isBlank(budgetApplicationAsset.getPlaceSite())?"": WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getPlaceSite()));
+                budgetApplicationMap.put("是否在手术室使用",StringUtils.isBlank(budgetApplicationAsset.getUsedOperatingRoom())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getUsedOperatingRoom()));
+                budgetApplicationMap.put("手术室护士长签名",StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSignatureNurse()));
+                budgetApplicationMap.put("是否需要同院内信息系统对接",StringUtils.isBlank(budgetApplicationAsset.getSystemDocking())?"":   WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSystemDocking()));
+                budgetApplicationMap.put("是否需要连接外网",StringUtils.isBlank(budgetApplicationAsset.getConnectNetwork())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getConnectNetwork()));
+                budgetApplicationMap.put("情况说明",  budgetApplicationAsset.getDescription());
+            }
+            budgetApplicationMap.put("审批时间", budgetApplicationAsset.getOfflineApprovalDate()==null?null:DateFormatUtils.format(budgetApplicationAsset.getOfflineApprovalDate(),"yyyy-MM-dd"));
+            budgetApplicationMap.put("审批意见", budgetApplicationAsset.getOfflineApprovalOpinions());
+            budgetApplicationMap.put("审批结论", budgetApplicationAsset.getOfflineApprovalConclusion());
+            budgetApplicationMap.put("备注", budgetApplicationAsset.getOfflineApprovalRemark());
+            budgetApplicationMap.put("记录人", budgetApplicationAsset.getOfflineApprovalRecorder());
+            budgeApplicationDataList.add(budgetApplicationMap);
+        }
+        return budgeApplicationDataList;
+    }
+
+    public void exportData(ExcelDocument doc, List<Map<String, Object>> budgetApplicationData,String orderType) {
+        Integer keyRow_budget = 1;
+        Integer dataRow_budget = 2;
+        if(BudgetApplication.OrderType.BAY.toString().equals(orderType)){
+            for (Map<String, Object> item : budgetApplicationData) {
+                doc.writeRowData("临时采购申请", keyRow_budget, dataRow_budget++, item);
+            }
+        }else{
+            for (Map<String, Object> item : budgetApplicationData) {
+                doc.writeRowData("年度采购申请", keyRow_budget, dataRow_budget++, item);
+            }
+        }
+    }
 }
