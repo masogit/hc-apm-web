@@ -67,9 +67,6 @@ public class PurchaseOrderService {
     @Autowired
     private OrgInfoRepository orgDao;
 
-
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-
     @Transactional(rollbackFor = Exception.class)
     public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList) {
         //先去掉之前的关联数据

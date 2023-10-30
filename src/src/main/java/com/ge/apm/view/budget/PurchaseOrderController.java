@@ -10,28 +10,20 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
-import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.budget.PurchaseOrderService;
-import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -48,18 +40,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -94,15 +77,11 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     private List<V2_BlobObject> attachList;
 
-
-
     private List<SearchFilter> assetSearchFilters;
 
     private PurchaseOrderInfoRepository dao;
 
     private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
-
-
 
     private BudgetApplicationRepository budgetApplicationRepository;
     private BudgetAssetInfoRepository budgetAssetDao;
@@ -144,9 +123,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         //todo 可以控制检索数据范围
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
-        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         orgTree = initOrgTree(treeNode);
-        orgTreeEdit = initOrgTree(treeNodeEdit);
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
@@ -180,17 +157,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             searchFilters = new ArrayList<>();
         }
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-       /* if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
-                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
-                ||userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
-            // 临床科室主任, 医学工程处主任   // 临床科室人员
-            queryScope(org);
-        } else {
-            return emptyPage;
-        }*/
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
-
 
     /**
      * 跳转新增模式
@@ -208,6 +176,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     public String intoEditModel() {
         return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId());
     }
+
     public void doubleClick(SelectEvent event) {
         String str = "action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId();
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
@@ -216,19 +185,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public String savePurchase() {
-        if(CollectionUtils.isEmpty(curApplicationBudgetAssets)){
-            WebUtil.addSuccessMessage("请先选择申购单信息！");
-            return "";
-        }
         purchaseOrderService.handleCommonField(selected,account);
         purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets);
-        return this.backList();
+        return purchaseOrderService.backList();
     }
-
-    public String backList() {
-        return "List.xhtml?faces-redirect=true";
-    }
-
 
     @Override
     public void delete() {
@@ -269,34 +229,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
         }
         if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
-            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
+            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
         }
     }
 
-    private void queryScope(OrgInfo org){
-        if(org == null) return;
-        switch (org.getOrgType()) {
-           case 4:
-                // 科室
-                searchFilters.add(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, org.getId()));
-                break;
-            case 3:
-                // 院区
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
-                break;
-            case 2:
-                // 医院
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
-                break;
-            case 1:
-                // 集团
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
-                break;
-            default:
-                // 租户
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
-        }
-    }
 
     private void calcTotalAmount(List<BudgetApplicationAsset> curApplicationBudgetAssets) {
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
@@ -370,10 +306,11 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     }
 
-    public void searchAsset() {
+    public void searchBudgetApplication() {
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetApplications.clear();
+        selectApplicationBudgetAssets.clear();
         this.optionalBudgetApplications = budgetApplicationAssetRepository.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
@@ -385,12 +322,13 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
         dataListSelectApplicationAssetBudget = null;
+        calcTotalAmount(curApplicationBudgetAssets);
     }
 
 
     public void resetAssetSearch() {
         assetSearchForm = new BudgetAssetSearchForm();
-        searchAsset();
+        searchBudgetApplication();
     }
 
     private void clearAssetSearchFilter() {
@@ -460,10 +398,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
     }*/
 
-    @Override
-    public void prepareDelete() {
-        crudActionName = "Delete";
-    }
 
     public BudgetSearchForm getSearchForm() {
         return searchForm;
