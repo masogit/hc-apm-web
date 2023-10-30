@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
@@ -95,11 +96,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return managementList;
     }
 
+
+    public List<String> managementListString(String query) {
+        if(CollectionUtils.isNotEmpty(managementList)){
+            List<String> list = managementList.stream().map(BuildManagement::getNamePyCode).filter(item->item.contains(query)).collect(Collectors.toList());
+            Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getNamePyCode));
+            managementMap=collect;
+            return list;
+        }
+        return new ArrayList<>();
+
+    }
+
     public void setManagementList(List<BuildManagement> managementList) {
         this.managementList = managementList;
     }
 
     private List<BuildManagement>  managementList=new ArrayList<>();
+    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
 
@@ -714,6 +728,37 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+
+
+
+
+    public void locationCodechangeSelect(SelectEvent event){
+        selected.setLocationName(null);
+        if(event==null){
+            return;
+        }
+        String code =(String) event.getObject();
+        if(StringUtils.isNotBlank(code)){
+            List<BuildManagement> list = managementMap.get(code);
+            if(CollectionUtils.isNotEmpty(list)){
+                BuildManagement buildManagement = list.get(0);
+                selected.setLocationName(buildManagement.getName());
+            }
+        }
+    }
+//        Map<Integer, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getId));
+//        List<BuildManagement> list = collect.get(idx);
+//        if(CollectionUtils.isNotEmpty(list)){
+//            BuildManagement buildManagement = list.get(0);
+//            selected.setLocationCode(buildManagement.getNamePyCode());
+//            selected.setLocationName(buildManagement.getName());
+//        }
+
+
+    public void locationCodechange(){
+        locationCodechangeSelect(null);
+
+    }
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null) {
