@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +17,10 @@ public interface NurseSiteMaintainItemHistoryRepository extends GenericRepositor
 	
 	@Query(value="select o.* from nurse_site_maintain_item_history o where o.parent_id=?1",nativeQuery=true)
 	public List<NurseSiteMaintainItemHistory> findMaintainItemByParentId(String parentId);
-	
+
+	@Query(value="select o.* from nurse_site_maintain_item_history o where o.parent_id in ?1",nativeQuery=true)
+	public List<NurseSiteMaintainItemHistory> findMaintainItemByParentId(Collection<String> parentIds);
+
 	@Query(value="select o.* from nurse_site_maintain_item_history o where o.parent_id=?1 order by o.id limit ?2 offset ?3*?2",nativeQuery=true)
 	public List<NurseSiteMaintainItemHistory> findMaintainItemByParentId(String parentId,int pageSize,int page);
 	

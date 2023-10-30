@@ -14,6 +14,7 @@ import javax.faces.context.FacesContext;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInstallationService;
@@ -137,7 +138,12 @@ public class MaintainExportController {
         listMaintainData = nurseSiteMaintainService.findJoinAssetList(wrapper);
         if (ObjectUtil.isNotEmpty(listMaintainData)) {
             Set<String> maintainIds = listMaintainData.stream().map(NurseSiteMaintain::getId).collect(Collectors.toSet());
-            Map<String, List<NurseSiteMaintainItem>> itemMap = maintainItemRepository.findMaintainItemByParentId(maintainIds).stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
+            Wrapper<NurseSiteMaintainItem> itemWrapper = new EntityWrapper<>();
+            itemWrapper.in("nsmi.parent_id", maintainIds);
+            if (currentUser.isEnableAssetTypeGroup()) {
+                itemWrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+            }
+            Map<String, List<NurseSiteMaintainItem>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
             for (NurseSiteMaintain maintain : listMaintainData) {
                 maintain.setListNurseSiteMaintainItem(itemMap.get(maintain.getId()));
             }

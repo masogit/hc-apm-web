@@ -1,13 +1,8 @@
 package com.ge.apm.view.nurseSite;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -18,6 +13,7 @@ import javax.faces.context.FacesContext;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -62,6 +58,7 @@ public class MaintainController implements ServerEventInterface{
 	private List<OrgInfo> listCheckClinicalOrgInfo;
 	private OrgInfo selectedParentOrgInfo;
 	private NurseSiteMaintainConfigMapper configMapper;
+	private NurseSiteMaintainItemRepository maintainItemRepository;
 
 	private List<Integer> listSequence;
 	private Integer selectSequence = 1;
@@ -101,6 +98,7 @@ public class MaintainController implements ServerEventInterface{
 		searchController = WebUtil.getBean(SearchController.class);
 		maintainItemController = WebUtil.getBean(MaintainItemController.class);
 		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
+		maintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
@@ -132,7 +130,6 @@ public class MaintainController implements ServerEventInterface{
 		return nurseSiteMaintainService.getMaintainDataList(assetUid);
 	}
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
-		List<NurseSiteMaintain> listData = null;
 		Calendar ca = Calendar.getInstance();
 		if (start == null) {
 			ca.set(Calendar.DAY_OF_MONTH, 1);
@@ -152,15 +149,17 @@ public class MaintainController implements ServerEventInterface{
 		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
 			wrapper.in("nsm.clinical_dept_uid", orgUidList);
 		} else {
-			List<String> listUidTemp = new ArrayList<String>();
-			for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
-			}
+			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
 		}
 		wrapper.groupBy("nsm.id");
 		wrapper.orderBy("nsm.schedule_date");
-		listData = nurseSiteMaintainService.findJoinAssetList(wrapper);
+		List<NurseSiteMaintain> joinAssetList = nurseSiteMaintainService.findJoinAssetList(wrapper);
+		List<NurseSiteMaintain> listData = ListUtil.empty();
+		if (ObjectUtil.isNotEmpty(joinAssetList)) {
+			Set<String> maintainIds = joinAssetList.stream().map(NurseSiteMaintain::getId).collect(Collectors.toSet());
+			listData = nurseSiteMaintainService.findByIds(maintainIds);
+		}
 		return listData;
 	}
 
