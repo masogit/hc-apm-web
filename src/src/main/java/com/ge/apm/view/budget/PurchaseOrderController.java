@@ -156,17 +156,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void addBudgetAsset() {
-        List<String> assetName = new ArrayList<String>();
-        if(CollectionUtils.isNotEmpty(curApplicationBudgetAssets)){
-            List<String>  assetNameFirest = curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
-            assetName.addAll(assetNameFirest);
-        }
-        if(CollectionUtils.isNotEmpty(selectApplicationBudgetAssets)){
-            List<String>  assetNameSec = selectApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
-            assetName.addAll(assetNameSec);
-        }
-        long num = assetName.stream().distinct().count();
-        if (num != 1) {
+        if (purchaseOrderService.checkDistinct(curApplicationBudgetAssets,selectApplicationBudgetAssets)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("同一个采购单所采购的设备名称需相同！"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
@@ -182,6 +172,22 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+
+    private void addSearchFilter() {
+        if (null != searchForm.getDateStart()) {
+            updateSearchFilter(new SearchFilter("createdDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
+        }
+        if (null != searchForm.getDateEnd()) {
+            this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getPurchaseNum())) {
+            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicantName())) {
+            updateSearchFilter(new SearchFilter("operator.name", SearchFilter.Operator.LIKE, searchForm.getApplicantName()));
+        }
     }
 
     /**
@@ -245,17 +251,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
     }
 
-    private void addSearchFilter() {
-        if (null != searchForm.getDateStart()) {
-            updateSearchFilter(new SearchFilter("createdDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
-        }
-        if (null != searchForm.getDateEnd()) {
-            this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
-        }
-        if (StringUtils.isNotBlank(searchForm.getPurchaseNum())) {
-            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
-        }
-    }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -364,13 +359,14 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void delBudgetApplication() {
+        //删除 明细信息 第一步先删除当前明细
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
+        //第二步处理状态
         if(dataListSelectApplicationAssetBudget.getBudgetApplication() !=null &&
                 StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
                 StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
-            dataListSelectApplicationAssetBudget.getBudgetApplication().setProcureStatus(null);
-            dataListSelectApplicationAssetBudget.getBudgetApplication().setPurchaseId(null);
+            purchaseOrderService.setPurchaseInfoNull(dataListSelectApplicationAssetBudget.getBudgetApplication());
             budgetApplicationRepository.save(dataListSelectApplicationAssetBudget.getBudgetApplication());
         }
         dataListSelectApplicationAssetBudget = null;
