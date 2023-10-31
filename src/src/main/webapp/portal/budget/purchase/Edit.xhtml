@@ -31,7 +31,11 @@
                                 </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">采购单申请时间</p:outputLabel>
+                                <p:outputLabel class="label">操作人</p:outputLabel>
+                                <h:outputText value="#{purchaseOrderController.selected.operator.name}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">操作日期</p:outputLabel>
                                 <h:outputText value="#{purchaseOrderController.selected.createdDate}">
                                     <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                        locale="#{userContextService.getCalendarLocale()}"
@@ -99,6 +103,27 @@
                          </f:facet>
                      </p:dataTable>
                     </p:fieldset>
+
+                    <p:fieldset legend="附件信息"  >
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <p:dataList id="attachList"
+                                            value="#{purchaseOrderController.getAttachList()}"
+                                            var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                            paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                    <f:facet name="header">附件详情</f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton actionListener="#{purchaseOrderController.removeAttachmentById(fileitem.id)}" update="attachList" icon="ui-icon-clear" title="#{msg.Delete}"
+                                                     class="popupIconButton" process="@this" >
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload   allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{purchaseOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                               multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
                     <br/>
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
                                      validateClient="true" action="#{purchaseOrderController.savePurchase}" value="保存" id="savePurchase" />
