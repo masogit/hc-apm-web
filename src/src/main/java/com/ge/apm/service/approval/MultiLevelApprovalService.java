@@ -815,6 +815,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 userAccounts.add(approvalUser);
             }
             wxMessageService.sendMessage(assetInfo,"审批通过",assetScrap,userAccounts,null,userAccount,assetScrap.getApplyReason());
+        }else{
+            if(assetScrap.getAssetStatus()!=null){
+                assetInfo.setStatus(assetScrap.getAssetStatus());
+            }else{
+                assetInfo.setStatus(1);
+            }
+            assetInfoDao.save(assetInfo);
         }
 
     }
