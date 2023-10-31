@@ -1235,8 +1235,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
-    public void applyAssetScrap(){
+    public String applyAssetScrap(){
         assetScrapService.apply(selected.getId(),applyReason,approvalReason);
+        return "AssetList?faces-redirect=true";
     }
 
     //重新启用
