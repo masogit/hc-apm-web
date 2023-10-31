@@ -19,10 +19,11 @@ public class AssetScrapService  extends MicroServiceInvoker {
 
 
 
-    public void apply(Integer assetId,String applyReason) {
+    public void apply(Integer assetId,String applyReason,String approvalReason) {
         HashMap<String, String> map = new HashMap<>();
         map.put("assetId",String.valueOf(assetId));
         map.put("applyReason",applyReason);
+        map.put("approvalReason",approvalReason);
         String token = UserContextService.getAccessToken();
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_APPLY);

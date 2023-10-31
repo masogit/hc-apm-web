@@ -85,6 +85,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupRepository assetTypeGroupRepository;
 
     private BuildManagementRepository buildManagementRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
 
     private Boolean terminate = false;
@@ -241,6 +242,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean approval=false;
+    @Getter @Setter
+    private String applyReason;
+    @Getter @Setter
+    private String approvalReason;
 
     @Override
     protected void init() {
@@ -289,6 +294,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -1229,6 +1235,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
+    public void applyAssetScrap(){
+        assetScrapService.apply(selected.getId(),applyReason,approvalReason);
+    }
+
     //重新启用
     public String processToBeValid() {
         int originStatus = selected.getStatus();
@@ -1765,6 +1775,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void filterTreeNode(){
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
+    }
+
+    public boolean getAssetScrapEnable(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(userAccount.getSiteUID(),userAccount.getHospitalUID(),userAccount.getInstitutionUID(),userAccount.getTenantUID(),"assetScrap");
+        return  value.equals("true")?true:false;
+
     }
 
     public boolean getUploadFlag() {
