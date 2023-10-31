@@ -40,6 +40,10 @@
                                 <p:inputText value="#{purchaseOrderController.searchForm.purchaseNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <p:outputLabel class="label" value="操作人"/>
+                                <p:inputText value="#{purchaseOrderController.searchForm.applicantName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateStart}"
@@ -96,6 +100,10 @@
                             <h:outputText value="#{item.totalPrice}">
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
+                        </p:column>
+                        <p:column headerText="操作人" >
+                            <h:outputText value="#{item.operator.name}"/>
+
                         </p:column>
                         <p:column headerText="操作日期" >
                             <h:outputText value="#{item.createdDate}">
