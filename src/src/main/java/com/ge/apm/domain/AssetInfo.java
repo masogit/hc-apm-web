@@ -965,6 +965,13 @@ public class AssetInfo implements ChineseName,Serializable {
     private String tubeWatchStatus;
 
 
+    /**
+     * 当前位置
+     */
+    @Column(name = "asset_location")
+    private String  assetLocation;
+
+
     public void setSupplierPyCode(String supplierPyCode) {
         this.supplierPyCode = supplierPyCode;
     }
@@ -3062,5 +3069,13 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isPm=null;
         this.isUseRegistration=null;
         this.networkingStatus=null;
+    }
+
+    public String getAssetLocation() {
+        return assetLocation;
+    }
+
+    public void setAssetLocation(String assetLocation) {
+        this.assetLocation = assetLocation;
     }
 }
