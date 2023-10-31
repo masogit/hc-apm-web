@@ -22,6 +22,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -148,6 +149,14 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     public String backList() {
         return "List.xhtml?faces-redirect=true";
     }
+
+    public List<V2_BlobObject> getAttachList() {
+        if(this.selected!=null && StringUtils.isNotBlank(this.selected.getId())){
+            attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
+        }
+        return attachList;
+    }
+
     public void addBudgetAsset() {
         curApplicationBudgetAssets.addAll(selectApplicationBudgetAssets);
         calcTotalAmount(curApplicationBudgetAssets);
@@ -188,7 +197,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     public String savePurchase() {
         purchaseOrderService.handleCommonField(selected,account);
-        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets);
+        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.attachList);
         return purchaseOrderService.backList();
     }
 
@@ -230,11 +239,28 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         if (null != searchForm.getDateEnd()) {
             this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
         }
-        if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
+        if (StringUtils.isNotBlank(searchForm.getPurchaseNum())) {
             updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
         }
     }
 
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject ) {
+            attachList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET_PURCHASE);
+            //blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
 
     private void calcTotalAmount(List<BudgetApplicationAsset> curApplicationBudgetAssets) {
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);

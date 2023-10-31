@@ -40,7 +40,7 @@
                                 <p:inputText value="#{purchaseOrderController.searchForm.purchaseNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label" value="采购单申请时间(#{msg.From})"/>
+                                <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateStart}"
                                             timeZone="#{userContextService.getTimeZone()}"
@@ -52,7 +52,7 @@
                                 </p:calendar>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label" value="采购单申请时间(#{msg.To})"/>
+                                <p:outputLabel class="label" value="操作日期(#{msg.To})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateEnd}"
                                             timeZone="#{userContextService.getTimeZone()}"
@@ -94,7 +94,7 @@
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="采购单申请时间" >
+                        <p:column headerText="操作日期" >
                             <h:outputText value="#{item.createdDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                    locale="#{userContextService.getCalendarLocale()}"
