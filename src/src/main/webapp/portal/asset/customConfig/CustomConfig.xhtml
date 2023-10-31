@@ -191,7 +191,14 @@
                                         <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveWebWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
 
                                     </p:fieldset>
+                                    <p:fieldset legend="维修信息字段控制" rendered="#{groupItem.type eq 'assetInfo'}">
+                                        <h:panelGroup >
+                                            <label class="label">外部报价</label>
+                                            <p:selectBooleanCheckbox value="#{groupItem.externalQuotation.enable}" >
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
 
+                                    </p:fieldset>
                                 </p:dataList>
                             </p:panelGrid>
 
@@ -235,13 +242,7 @@
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
                                         </p:panelGrid>
-                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="externalQuotationGroup">
-                                            <h:panelGroup >
-                                                <label class="label">外部报价</label>
-                                                <p:selectBooleanCheckbox value="#{groupItem.externalQuotation.enable}" >
-                                                </p:selectBooleanCheckbox>
-                                            </h:panelGroup>
-                                        </p:panelGrid>
+
                                         <h:panelGroup style="float:right;padding-left: 5px">
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="#{msg.ShiftUp}"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}"/>
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="#{msg.ShiftDown}"  update=":customConfigForm "  disabled="#{groupIndex.index eq 2}"/>

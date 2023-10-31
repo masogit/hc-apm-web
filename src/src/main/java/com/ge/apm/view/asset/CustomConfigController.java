@@ -109,14 +109,18 @@ public class CustomConfigController {
         } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
-        JSONObject pageWorkOrder = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder");
+        JSONObject pageWorkOrder = customConfigObject.getMobileMaintainPage().getJSONObject("pageWorkOrder");
         JSONArray group = pageWorkOrder.getJSONArray("group");
-        JSONObject orderFields = group.getJSONObject(1);
-        JSONObject externalQuotation = orderFields.getJSONObject("externalQuotation");
-        if (externalQuotation == null) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("enable", "false");
-            orderFields.put("externalQuotation", jsonObject);
+        for (int i = 0; i < group.size(); i++) {
+            JSONObject obj = group.getJSONObject(i);
+            if ("assetInfo".equals(obj.get("type"))) {
+                JSONObject externalQuotation = obj.getJSONObject("externalQuotation");
+                if (externalQuotation == null) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("enable", "false");
+                    obj.put("externalQuotation", jsonObject);
+                }
+            }
         }
         updateConfigInfo();
     }
