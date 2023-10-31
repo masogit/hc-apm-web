@@ -117,7 +117,7 @@ public class CustomConfigController {
                 JSONObject externalQuotation = obj.getJSONObject("externalQuotation");
                 if (externalQuotation == null) {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("enable", "false");
+                    jsonObject.put("enable", false);
                     obj.put("externalQuotation", jsonObject);
                 }
             }
