@@ -242,9 +242,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean approval=false;
-    @Getter @Setter
     private String applyReason;
-    @Getter @Setter
     private String approvalReason;
 
     @Override
@@ -1819,5 +1817,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.approval = approval;
     }
 
+    public String getApplyReason() {
+        return applyReason;
+    }
 
+    public void setApplyReason(String applyReason) {
+        this.applyReason = applyReason;
+    }
+
+    public String getApprovalReason() {
+        return approvalReason;
+    }
+
+    public void setApprovalReason(String approvalReason) {
+        this.approvalReason = approvalReason;
+    }
 }

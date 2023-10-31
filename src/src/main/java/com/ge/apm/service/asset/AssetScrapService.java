@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.WebUtil;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +33,7 @@ public class AssetScrapService  extends MicroServiceInvoker {
         if (isOkay(response)) {
             logger.info("AssetScrapService apply assetId:{},result:{}", assetId , responseMap.get("data"));
         }else {
+            WebUtil.addErrorMessage((String)responseMap.get("message"));
             logger.error("AssetScrapService apply error  assetId:{},result:{}", assetId , responseMap.get("data"));
         }
     }
