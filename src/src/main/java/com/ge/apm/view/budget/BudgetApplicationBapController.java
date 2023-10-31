@@ -556,7 +556,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         if (null != blobObject ) {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET);
-                //blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
+                blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            }
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -715,9 +717,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public List<V2_BlobObject> getAttachList() {
-        if(this.curSelectApplicationBudgetAsset!=null && StringUtils.isNotBlank(this.curSelectApplicationBudgetAsset.getId())){
-            attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
-        }
         return attachList;
     }
 

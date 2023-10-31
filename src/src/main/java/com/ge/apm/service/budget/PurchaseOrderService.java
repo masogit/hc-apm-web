@@ -75,6 +75,7 @@ public class PurchaseOrderService {
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
         }
+
         List<BudgetApplication> lastBudgetApplications = budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
         if(CollectionUtils.isNotEmpty(lastBudgetApplications)){
             lastBudgetApplications.stream().forEach(budget -> {
@@ -83,8 +84,8 @@ public class PurchaseOrderService {
             });
         }
         budgetApplicationDao.save(lastBudgetApplications);
-
         //保存采购单数据
+        purchaseOrderInfo.setApplicationAssetName(budgetApplicationAssetList.get(0).getApplicationAssetName());
         PurchaseOrderInfo purchaseOrderInfoPersistent = purchaseOrderInfoRepository.save(purchaseOrderInfo);
 
        //处理申购单数据
@@ -148,8 +149,7 @@ public class PurchaseOrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteApplication(PurchaseOrderInfo purchaseOrderInfo) {
-        purchaseOrderInfo.setIsDeleted(1);
-        purchaseOrderInfoRepository.save(purchaseOrderInfo);
+        purchaseOrderInfoRepository.delete(purchaseOrderInfo);
         List<BudgetApplication> budgetApplicationList =  budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
         budgetApplicationList.stream().forEach(budget -> {
             budget.setPurchaseId(null);
