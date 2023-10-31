@@ -652,7 +652,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetLocation}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetLocation'].required? '*':''}</span></label>
             <p:inputText id="assetLocation" value="#{assetInfoEditController.selected.assetLocation}" required="#{assetInfoEditController.customConfig.assetFields['assetLocation'].required}"
-                         requiredMessage="#{msg.assetLocation} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('assetLocation')}" disabled="true" />
+                         requiredMessage="#{msg.assetLocation} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('assetLocation')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'status')}" >
