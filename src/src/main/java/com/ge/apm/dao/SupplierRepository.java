@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 
@@ -51,6 +52,4 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     Supplier findByTenantUIDAndName(String tenantUid, String name);
 
     List<Supplier> findByIdIn(Collection<Integer> ids);
-
-    List<Supplier> findByUidIn(Collection<String> uidList);
 }

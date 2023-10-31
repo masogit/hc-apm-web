@@ -271,7 +271,7 @@
                                       multiple="true"  sizeLimit="100000000"  update="productRegistrationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update="supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
+                <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>
             </h:form>
         </p:dialog>
