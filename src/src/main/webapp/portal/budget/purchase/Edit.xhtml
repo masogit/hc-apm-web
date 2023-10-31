@@ -94,7 +94,7 @@
                                               icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
                                               actionListener="#{purchaseOrderController.preAddBudgetApplication()}"
                                               oncomplete="PF('BudgetSelectDialog').show()"/>
-                             <p:commandButton title="删除" id="delButton" update="budgetApplicationlist BudgetApplicationEditForm:purchaseQuantity BudgetApplicationEditForm:totalPrice"
+                             <p:commandButton title="删除" id="delButton" update="budgetApplicationlist BudgetApplicationEditForm:purchaseQuantity BudgetApplicationEditForm:totalPrice BudgetApplicationEditForm:savePurchase"
                                               disabled="#{empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
                                               icon="ui-icon-close" class="btn btn-sm btn-gray zoom-08"
                                               actionListener="#{purchaseOrderController.delBudgetApplication()}">
@@ -125,7 +125,7 @@
                     </p:fieldset>
 
                     <br/>
-                    <p:commandButton update=":growl :BudgetApplicationEditForm"
+                    <p:commandButton update=":growl :BudgetApplicationEditForm" disabled="#{empty purchaseOrderController.curApplicationBudgetAssets}"
                                      validateClient="true" action="#{purchaseOrderController.savePurchase}" value="保存" id="savePurchase" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{purchaseOrderController.backList}" />
