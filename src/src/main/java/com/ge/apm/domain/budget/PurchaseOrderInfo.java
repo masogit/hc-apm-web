@@ -1,7 +1,11 @@
 package com.ge.apm.domain.budget;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ge.apm.domain.UserAccount;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,6 +29,13 @@ public class PurchaseOrderInfo implements Serializable {
     // 采购编号
     @Column(name = "purchase_num")
     private String purchaseNum;
+
+    /**
+     * 申请编号索引
+     */
+    @Column(name = "purchase_num_index")
+    private Integer purchaseNumIndex;
+
 
     // 采购数量
     @Column(name = "purchase_quantity")
@@ -66,6 +77,43 @@ public class PurchaseOrderInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+    // 申请人id
+    @Column(name = "operator_id")
+    private Integer operatorId;
+
+    // 申请人
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "operator_id",
+            referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private UserAccount operator;
+
+    public Integer getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(Integer operatorId) {
+        this.operatorId = operatorId;
+    }
+
+    public UserAccount getOperator() {
+        return operator;
+    }
+
+    public void setOperator(UserAccount operator) {
+        this.operator = operator;
+    }
+
+    public Integer getPurchaseNumIndex() {
+        return purchaseNumIndex;
+    }
+
+    public void setPurchaseNumIndex(Integer purchaseNumIndex) {
+        this.purchaseNumIndex = purchaseNumIndex;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -81,6 +129,8 @@ public class PurchaseOrderInfo implements Serializable {
         PurchaseOrderInfo other = (PurchaseOrderInfo) object;
         return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
     }
+
+
 
     public String getPurchaseNum() {
         return purchaseNum;

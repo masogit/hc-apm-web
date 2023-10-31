@@ -67,12 +67,14 @@ public class PurchaseOrderService {
     @Autowired
     private OrgInfoRepository orgDao;
 
-
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList) {
+    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<V2_BlobObject> attachList) {
         //先去掉之前的关联数据
+        if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
+            this.generatePurchaseNum(purchaseOrderInfo);
+        }
         List<BudgetApplication> lastBudgetApplications = budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
         if(CollectionUtils.isNotEmpty(lastBudgetApplications)){
             lastBudgetApplications.stream().forEach(budget -> {
@@ -96,6 +98,12 @@ public class PurchaseOrderService {
             });
         }
         budgetApplicationDao.save(curBudgetApplications);
+
+        //附件信息保存
+        if(CollectionUtils.isNotEmpty(attachList)){
+            attachList.stream().forEach(att -> att.setBoUuid(purchaseOrderInfoPersistent.getId()));
+        }
+        blobService.saveBlobObject(attachList);
         return true;
     }
 
@@ -112,7 +120,8 @@ public class PurchaseOrderService {
     }
 
     public void initCreateObject(PurchaseOrderInfo purchaseOrderInfo,UserAccount account){
-        purchaseOrderInfo.setPurchaseNum(generateApplicationNum());
+        purchaseOrderInfo.setOperator(account);
+        purchaseOrderInfo.setOperatorId(account.getId());
         purchaseOrderInfo.setPurchaseQuantity(0);
         purchaseOrderInfo.setTotalPrice(new BigDecimal(0));
         purchaseOrderInfo.setCreatedBy(account.getLoginName());
@@ -121,18 +130,20 @@ public class PurchaseOrderService {
         purchaseOrderInfo.setLastModifiedDate(new Date());
     }
 
-    private String generateApplicationNum() {
-        LocalDateTime date = LocalDateTime.now(ZoneId.of("GMT+8"));
-        return "CG".concat(date.format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
-    }
-
-    public String getCourtyardArea(OrgInfo orgInfo){
-        String orgName = new String();
-        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
-            orgName = orgInfo.getName();
-            return orgName;
-        }
-        return getCourtyardArea(orgInfo.getParentOrg());
+    /**
+     * 给申请单添加单号和索引
+     *
+     * @param
+     * @return
+     */
+    private PurchaseOrderInfo generatePurchaseNum(PurchaseOrderInfo purchaseOrderInfo) {
+        Object o = purchaseOrderInfoRepository.getMaxIndex();
+        int index = o == null ? 0 : Integer.parseInt(o.toString());
+        index++;
+        String purchaseNum = "PUR" + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        purchaseOrderInfo.setPurchaseNum(purchaseNum);
+        purchaseOrderInfo.setPurchaseNumIndex(index);
+        return purchaseOrderInfo;
     }
 
     @Transactional(rollbackFor = Exception.class)
