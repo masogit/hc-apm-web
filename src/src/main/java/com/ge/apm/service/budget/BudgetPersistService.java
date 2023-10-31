@@ -232,7 +232,7 @@ public class BudgetPersistService {
         if(CollectionUtils.isNotEmpty(application.getBudgetAssets())){
             application.getBudgetAssets().iterator().next().setIsDeleted(1);
         }
-        budgetApplicationDao.save(application);
+        budgetApplicationDao.delete(application);
         return true;
     }
 

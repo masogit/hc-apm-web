@@ -19,6 +19,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -151,13 +152,25 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public List<V2_BlobObject> getAttachList() {
-        if(this.selected!=null && StringUtils.isNotBlank(this.selected.getId())){
-            attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
-        }
         return attachList;
     }
 
     public void addBudgetAsset() {
+        List<String> assetName = new ArrayList<String>();
+        if(CollectionUtils.isNotEmpty(curApplicationBudgetAssets)){
+            List<String>  assetNameFirest = curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
+            assetName.addAll(assetNameFirest);
+        }
+        if(CollectionUtils.isNotEmpty(selectApplicationBudgetAssets)){
+            List<String>  assetNameSec = selectApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
+            assetName.addAll(assetNameSec);
+        }
+        long num = assetName.stream().distinct().count();
+        if (num != 1) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("同一个采购单所采购的设备名称需相同！"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
         curApplicationBudgetAssets.addAll(selectApplicationBudgetAssets);
         calcTotalAmount(curApplicationBudgetAssets);
     }
@@ -255,6 +268,9 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET_PURCHASE);
             //blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            if (Optional.ofNullable(selected.getId()).isPresent()) { // 新增
+                blobObject.setBoUuid(selected.getId());
+            }
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -330,7 +346,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ,this.selected.getId()));
         this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
-
+        this.attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
 
     }
 
@@ -339,6 +355,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         addAssetSearchFilter();
         optionalBudgetApplications.clear();
         selectApplicationBudgetAssets.clear();
+
         this.optionalBudgetApplications = budgetApplicationAssetRepository.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
     }
 
@@ -349,6 +366,13 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     public void delBudgetApplication() {
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
+        if(dataListSelectApplicationAssetBudget.getBudgetApplication() !=null &&
+                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
+                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
+            dataListSelectApplicationAssetBudget.getBudgetApplication().setProcureStatus(null);
+            dataListSelectApplicationAssetBudget.getBudgetApplication().setPurchaseId(null);
+            budgetApplicationRepository.save(dataListSelectApplicationAssetBudget.getBudgetApplication());
+        }
         dataListSelectApplicationAssetBudget = null;
         calcTotalAmount(curApplicationBudgetAssets);
     }
@@ -397,7 +421,9 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         if (StringUtils.isNotBlank(assetSearchForm.getAssetName())) {
             updateAssetSearchFilter(new SearchFilter("applicationAssetName", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
         }
-
+        if (CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)) {//每次选择去掉之前的
+            updateAssetSearchFilter(new SearchFilter("id", SearchFilter.Operator.NotIN, this.curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getId).collect(Collectors.toList())));
+        }
         updateAssetSearchFilter(new SearchFilter("budgetApplication.procureStatus",
                 SearchFilter.Operator.IsNull,null));//采购状态未采购的数据
         updateAssetSearchFilter(new SearchFilter("budgetApplication.applicationStatus", SearchFilter.Operator.IN, Arrays.asList(6)));//状态已完成

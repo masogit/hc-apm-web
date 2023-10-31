@@ -49,6 +49,12 @@ public class PurchaseOrderInfo implements Serializable {
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
+    /**
+     * *设备名称
+     */
+    @Column(name = "application_asset_name")
+    private String applicationAssetName;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -89,6 +95,14 @@ public class PurchaseOrderInfo implements Serializable {
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action = NotFoundAction.IGNORE)
     private UserAccount operator;
+
+    public String getApplicationAssetName() {
+        return applicationAssetName;
+    }
+
+    public void setApplicationAssetName(String applicationAssetName) {
+        this.applicationAssetName = applicationAssetName;
+    }
 
     public Integer getOperatorId() {
         return operatorId;
