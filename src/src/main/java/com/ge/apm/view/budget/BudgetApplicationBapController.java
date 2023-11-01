@@ -266,36 +266,33 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return searchFilters;
     }
 
+
     /**
-     * 跳转新增模式
+     * 根据参数跳转相关模式
      *
      * @return
      */
-    public String intoCreateModel(){
-        List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),new Date());
-        String url = new String();
-        if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
-            url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+    public String intoActionModel(String action){
+        if(BudgetApplicationBapController.CREATE_ACTION.equals(action)){
+            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),new Date());
+            String url = new String();
+            if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
+                url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+            }
+            WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
+            return url;
+        }else if(BudgetApplicationBapController.EDIT_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION
+                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+
+        }else if(BudgetApplicationBapController.VIEW_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.VIEW_ACTION
+                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+        }else{
+            return null;
         }
-        WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
-        return url;
     }
-    /**
-     * 跳转编辑模式
-     *
-     * @return
-     */
-    public String intoEditModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
-    /**
-     * 跳转查看模式
-     *
-     * @return
-     */
-    public String intoViewModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
+
     public void doubleClick(SelectEvent event) {
         String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);

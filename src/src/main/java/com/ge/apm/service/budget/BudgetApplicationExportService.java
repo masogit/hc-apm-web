@@ -186,7 +186,7 @@ public class BudgetApplicationExportService {
             mm.put("equipmentUsage", budgetApplicationAsset.getEquipmentUsage());
             mm.put("offlineApprovalOpinions", budgetApplicationAsset.getOfflineApprovalOpinions());
 
-            if(budgetApplication.getBudgetApprovals() != null){
+            if(budgetApplication.getBudgetApprovals() != null && budgetApplication.getBudgetApprovals().size()>0){
                 MultiLevelApproval a = budgetApplication.getBudgetApprovals().iterator().next();
                 if(a != null){
                     mm.put("machineDeptOpinions", a.getApprovalOpinion());
