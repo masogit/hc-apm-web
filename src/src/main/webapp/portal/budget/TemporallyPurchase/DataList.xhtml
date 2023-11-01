@@ -72,14 +72,14 @@
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
-                                 action="#{budgetBayController.intoCreateModel}"/>
+                                 action="#{budgetBayController.intoActionModel('Create')}"/>
                 <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                  title="#{msg.Edit}"
-                                 action="#{budgetBayController.intoEditModel}"
+                                 action="#{budgetBayController.intoActionModel('Edit')}"
                                  disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStep eq 'Complete' or budgetBayController.selected.applicationStep eq 'PendingApproval'}"/>
                 <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
                                  title="#{msg.View}"
-                                 action="#{budgetBayController.intoViewModel}"
+                                 action="#{budgetBayController.intoActionModel('View')}"
                                  disabled="#{empty budgetBayController.selected}"/>
                 <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                   ajax="false">

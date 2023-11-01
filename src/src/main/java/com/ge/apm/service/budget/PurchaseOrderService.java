@@ -109,6 +109,14 @@ public class PurchaseOrderService {
         return true;
     }
 
+    public List<SearchFilter> initSearchFilter(List<SearchFilter> searchFilters) {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        } else {
+            searchFilters.clear();
+        }
+        return searchFilters;
+    }
 
     public void handleCommonField(PurchaseOrderInfo purchaseOrderInfo, UserAccount account){
         purchaseOrderInfo.setLastModifiedBy(account.getLoginName());
