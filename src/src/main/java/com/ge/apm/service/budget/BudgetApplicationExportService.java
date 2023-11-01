@@ -45,6 +45,7 @@ public class BudgetApplicationExportService {
     public static final String FILE_NAME_ROOT = "年度采购申报表";
 
 
+
     @Autowired
     BudgetApplicationRepository budgetApplicationRepository;
 
@@ -201,7 +202,7 @@ public class BudgetApplicationExportService {
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
                 mm.put("importedOrYes", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getImportedOr())){
+            }else if("T".equals(budgetApplicationAsset.getImportedOr())){
                 mm.put("importedOrYes", "是");
             }else {
                 mm.put("importedOrYes", "否");
@@ -209,7 +210,7 @@ public class BudgetApplicationExportService {
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getPlaceSite())){
+            }else if("T".equals(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "是");
             }else {
                 mm.put("placeSite", "否");
@@ -217,7 +218,7 @@ public class BudgetApplicationExportService {
             //是否在手术室使用
             if(StringUtils.isEmpty(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getUsedOperatingRoom())){
+            }else if("T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "是");
             }else {
                 mm.put("usedOperatingRoom", "否");
@@ -225,7 +226,7 @@ public class BudgetApplicationExportService {
             //是否需要同院内信息系统对接
             if(StringUtils.isEmpty(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getSystemDocking())){
+            }else if("T".equals(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "是");
             }else {
                 mm.put("systemDocking", "否");
@@ -233,7 +234,7 @@ public class BudgetApplicationExportService {
             //是否需要连接外网
             if(StringUtils.isEmpty(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getConnectNetwork())){
+            }else if("T".equals(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "是");
             }else {
                 mm.put("connectNetwork", "否");
