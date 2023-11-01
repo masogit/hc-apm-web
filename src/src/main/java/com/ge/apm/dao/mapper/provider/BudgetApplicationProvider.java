@@ -80,7 +80,7 @@ public class BudgetApplicationProvider {
             }
             //临床只能看自己创建
             if("applicantId".equals(tempColumn)) {
-                sb.append(" and t.application_id = '"+value.toString()+"'");
+                sb.append(" and t.applicant_id = '"+value.toString()+"'");
             }
             //科室主任  医学工程主任
             if("applicationDeptId".equals(tempColumn)) {
@@ -93,7 +93,7 @@ public class BudgetApplicationProvider {
                 sb.append(" and t.hospital_uid = '"+value.toString()+"'");
             }
 
-            if("hospitalUID".equals(tempColumn)) {
+            if("institutionUID".equals(tempColumn)) {
                 sb.append(" and t.institution_uid = '"+value.toString()+"'");
             }
             if("tenantUID".equals(tempColumn)) {
