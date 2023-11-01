@@ -308,8 +308,7 @@ public class BudgetPersistService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAsset(BudgetAssetInfo assetInfo) {
-        assetInfo.setIsDeleted(1);
-        budgetAssetInfoDao.save(assetInfo);
+        budgetAssetInfoDao.delete(assetInfo);
         return true;
     }
     /**
