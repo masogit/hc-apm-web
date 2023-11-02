@@ -428,6 +428,9 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                 ExcelDocument.ValueWrapper uidWrapper = (ExcelDocument.ValueWrapper) dataRow.get("uid");
                 if (ObjectUtil.isNotEmpty(uidWrapper.value)) {
                     supplier = updateMap.get(uidWrapper.value);
+                } else {
+                    supplier.setCreatedDate(new Date());
+                    supplier.setCreatedBy(currentUser.getLoginName());
                 }
                 for (Map.Entry<String, Object> dataEntry : dataRow.entrySet()) {
                     ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper) dataEntry.getValue();
