@@ -393,6 +393,27 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
     public List<Map<String, Object>> getErrorList() {
         return errorList;
     }
+
+
+
+
+    @Getter @Setter
+    private List<HisAssetGroupAssetMatch> assetGroupByGroupName=new ArrayList<>();
+
+    public void hisGroupByName() {
+        assetGroupByGroupName.clear();
+        if(CollectionUtils.isNotEmpty(startList)){
+            HisAssetGroupAssetMatch hisAssetGroupAssetMatch = startList.get(0);
+            String assetGroupName = hisAssetGroupAssetMatch.getAssetGroupName();
+            List<SearchFilter> searchFilters=new ArrayList<>();
+            searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.EQ,assetGroupName));
+            List<HisAssetGroupAssetMatch> bySearchFilter = groupAssetMatchRepository.findBySearchFilter(searchFilters);
+            if(CollectionUtils.isNotEmpty(bySearchFilter)){
+                assetGroupByGroupName.addAll(bySearchFilter);
+
+            }
+        }
+    }
 }
 
 

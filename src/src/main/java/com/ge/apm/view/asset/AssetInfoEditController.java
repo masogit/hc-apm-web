@@ -86,6 +86,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private BuildManagementRepository buildManagementRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private AssetScrapRepository assetScrapRepository;
 
 
     private Boolean terminate = false;
@@ -294,6 +295,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -853,6 +855,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
+        if(!checkAssetScrap()){
+            WebUtil.addErrorMessage("设备在报废流程中,不允许修改状态");
+            return "";
+        }
+
         if(selected.getUnitPriceElectricity()==null){
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
             selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
@@ -969,6 +976,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else {
             return "";
         }
+    }
+
+    private boolean checkAssetScrap() {
+        if(selected.getId()!=null){
+            AssetInfo assetInfo = dao.getById(selected.getId());
+            if(assetInfo.getStatus()!=selected.getStatus()){
+                AssetScrap assetScrap = assetScrapRepository.findByAssetId(selected.getId());
+                if(assetScrap==null){
+                    return true ;
+                }else{
+                    if(assetScrap.getCurrentStatus()==2){
+                        return false ;
+                    }
+                }
+            }
+        }
+        return true;
+
     }
 
     private void creteRule() {
