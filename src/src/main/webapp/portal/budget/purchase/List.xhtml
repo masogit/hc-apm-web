@@ -40,6 +40,10 @@
                                 <p:inputText value="#{purchaseOrderController.searchForm.purchaseNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <p:outputLabel class="label" value="操作人"/>
+                                <p:inputText value="#{purchaseOrderController.searchForm.applicantName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateStart}"
@@ -97,6 +101,10 @@
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="操作人" >
+                            <h:outputText value="#{item.operator.name}"/>
+
+                        </p:column>
                         <p:column headerText="操作日期" >
                             <h:outputText value="#{item.createdDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
@@ -107,10 +115,10 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                              title="#{msg.Create}"
-                                             action="#{purchaseOrderController.intoCreateModel}"/>
+                                             action="#{purchaseOrderController.intoActionModel('Create')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                              title="#{msg.Edit}"
-                                             action="#{purchaseOrderController.intoEditModel}"
+                                             action="#{purchaseOrderController.intoActionModel('Edit')}"
                                              disabled="#{empty purchaseOrderController.selected }"/>
                             <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                               ajax="false">

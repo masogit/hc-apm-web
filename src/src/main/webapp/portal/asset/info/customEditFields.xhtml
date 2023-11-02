@@ -632,20 +632,23 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.locationCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationCode'].required? '*':''}</span></label>
-            <p:autoComplete dropdown="true" value="#{assetInfoEditController.selected.locationCode}"
-                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['locationCode'].required}" requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.managementListString}"
-                            class="locationCodeChange" >
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.locationCodechangeSelect}" update="locationName"/>
-                <p:ajax listener="#{assetInfoEditController.locationCodechange}" process="@this" update="locationName" />
-            </p:autoComplete>
+            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" />
+
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationName')}" >
         <h:panelGroup>
             <label class="label">#{msg.locationName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationName'].required? '*':''}</span></label>
             <p:inputText id="locationName" value="#{assetInfoEditController.selected.locationName}" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}"
-                         requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" disabled="true" />
+                         requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" /> <p/>
+            <p:autoComplete dropdown="true" value="#{assetInfoEditController.locationName}"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}" requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.managementListString}"
+                            class="locationNameChange" id="locationNameChange" >
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.locationNamechangeSelect}" update="locationCode locationName locationNameChange" />
+                <p:ajax listener="#{assetInfoEditController.locationNamechange}" process="@this" update="locationCode locationName locationNameChange" />
+            </p:autoComplete>
         </h:panelGroup>
+
     </c:if>
 
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetLocation')}" >

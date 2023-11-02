@@ -52,6 +52,7 @@ public class BudgetApplicationExportService {
     public static final String ATTACHMENT = "附件";
 
 
+
     @Autowired
     BudgetApplicationRepository budgetApplicationRepository;
 
@@ -193,7 +194,7 @@ public class BudgetApplicationExportService {
             mm.put("equipmentUsage", budgetApplicationAsset.getEquipmentUsage());
             mm.put("offlineApprovalOpinions", budgetApplicationAsset.getOfflineApprovalOpinions());
 
-            if(budgetApplication.getBudgetApprovals() != null){
+            if(budgetApplication.getBudgetApprovals() != null && budgetApplication.getBudgetApprovals().size()>0){
                 MultiLevelApproval a = budgetApplication.getBudgetApprovals().iterator().next();
                 if(a != null){
                     mm.put("machineDeptOpinions", a.getApprovalOpinion());
@@ -207,16 +208,16 @@ public class BudgetApplicationExportService {
 
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "是");
+                mm.put("importedOr", "");
+            }else if("T".equals(budgetApplicationAsset.getImportedOr())){
+                mm.put("importedOr", "是");
             }else {
-                mm.put("importedOrYes", "否");
+                mm.put("importedOr", "否");
             }
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getPlaceSite())){
+            }else if("T".equals(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "是");
             }else {
                 mm.put("placeSite", "否");
@@ -224,7 +225,7 @@ public class BudgetApplicationExportService {
             //是否在手术室使用
             if(StringUtils.isEmpty(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getUsedOperatingRoom())){
+            }else if("T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "是");
             }else {
                 mm.put("usedOperatingRoom", "否");
@@ -232,7 +233,7 @@ public class BudgetApplicationExportService {
             //是否需要同院内信息系统对接
             if(StringUtils.isEmpty(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getSystemDocking())){
+            }else if("T".equals(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "是");
             }else {
                 mm.put("systemDocking", "否");
@@ -240,7 +241,7 @@ public class BudgetApplicationExportService {
             //是否需要连接外网
             if(StringUtils.isEmpty(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getConnectNetwork())){
+            }else if("T".equals(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "是");
             }else {
                 mm.put("connectNetwork", "否");
