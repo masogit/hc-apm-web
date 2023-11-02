@@ -308,8 +308,7 @@ public class BudgetPersistService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAsset(BudgetAssetInfo assetInfo) {
-        assetInfo.setIsDeleted(1);
-        budgetAssetInfoDao.save(assetInfo);
+        budgetAssetInfoDao.delete(assetInfo);
         return true;
     }
     /**
@@ -384,7 +383,7 @@ public class BudgetPersistService {
                 budgetApplicationMap.put("所需耗材及使用量",  budgetApplicationAsset.getUsage());
                 budgetApplicationMap.put("设备是否有放置场地", StringUtils.isBlank(budgetApplicationAsset.getPlaceSite())?"": WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getPlaceSite()));
                 budgetApplicationMap.put("是否在手术室使用",StringUtils.isBlank(budgetApplicationAsset.getUsedOperatingRoom())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getUsedOperatingRoom()));
-                budgetApplicationMap.put("手术室护士长签名",StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSignatureNurse()));
+                budgetApplicationMap.put("手术室护士长是否已签名",StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSignatureNurse()));
                 budgetApplicationMap.put("是否需要同院内信息系统对接",StringUtils.isBlank(budgetApplicationAsset.getSystemDocking())?"":   WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSystemDocking()));
                 budgetApplicationMap.put("是否需要连接外网",StringUtils.isBlank(budgetApplicationAsset.getConnectNetwork())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getConnectNetwork()));
                 budgetApplicationMap.put("情况说明",  budgetApplicationAsset.getDescription());

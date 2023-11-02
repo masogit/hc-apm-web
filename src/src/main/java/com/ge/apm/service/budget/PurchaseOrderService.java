@@ -84,17 +84,18 @@ public class PurchaseOrderService {
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
         }
-
         List<BudgetApplication> lastBudgetApplications = budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
         if(CollectionUtils.isNotEmpty(lastBudgetApplications)){
             lastBudgetApplications.stream().forEach(budget -> {
-                budget.setPurchaseId(null);
-                budget.setProcureStatus(null);
+                setPurchaseInfoNull(budget);
             });
         }
         budgetApplicationDao.save(lastBudgetApplications);
         //保存采购单数据
-        purchaseOrderInfo.setApplicationAssetName(budgetApplicationAssetList.get(0).getApplicationAssetName());
+        purchaseOrderInfo.setApplicationAssetName(null);
+        if(CollectionUtils.isNotEmpty(budgetApplicationAssetList)){
+            purchaseOrderInfo.setApplicationAssetName(budgetApplicationAssetList.get(0).getApplicationAssetName());
+        }
         PurchaseOrderInfo purchaseOrderInfoPersistent = purchaseOrderInfoRepository.save(purchaseOrderInfo);
 
        //处理申购单数据
@@ -117,6 +118,14 @@ public class PurchaseOrderService {
         return true;
     }
 
+    public List<SearchFilter> initSearchFilter(List<SearchFilter> searchFilters) {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        } else {
+            searchFilters.clear();
+        }
+        return searchFilters;
+    }
 
     public void handleCommonField(PurchaseOrderInfo purchaseOrderInfo, UserAccount account){
         purchaseOrderInfo.setLastModifiedBy(account.getLoginName());
@@ -161,11 +170,15 @@ public class PurchaseOrderService {
         purchaseOrderInfoRepository.delete(purchaseOrderInfo);
         List<BudgetApplication> budgetApplicationList =  budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
         budgetApplicationList.stream().forEach(budget -> {
-            budget.setPurchaseId(null);
-            budget.setProcureStatus(null);
+            setPurchaseInfoNull(budget);
         });
         budgetApplicationDao.save(budgetApplicationList);
         return true;
+    }
+
+    public void setPurchaseInfoNull(BudgetApplication budgetApplication){
+        budgetApplication.setPurchaseId(null);
+        budgetApplication.setProcureStatus(null);
     }
 
     /**
@@ -178,6 +191,23 @@ public class PurchaseOrderService {
         return "List.xhtml?faces-redirect=true";
     }
 
+    public boolean checkDistinct(List<BudgetApplicationAsset> curApplicationBudgetAssets,List<BudgetApplicationAsset> selectApplicationBudgetAssets){
+        boolean arg = false;
+        List<String> assetName = new ArrayList<String>();
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(curApplicationBudgetAssets)){
+            List<String>  assetNameFirest = curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
+            assetName.addAll(assetNameFirest);
+        }
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(selectApplicationBudgetAssets)){
+            List<String>  assetNameSec = selectApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
+            assetName.addAll(assetNameSec);
+        }
+        long num = assetName.stream().distinct().count();
+        if (num != 1) {
+            arg = true;
+        }
+        return arg;
+    }
 
     public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException {
         String base = "采购单" + purchaseOrderInfo.getPurchaseNum();

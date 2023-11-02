@@ -162,10 +162,10 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         if(!CollectionUtils.isEmpty(strings)){
             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
             Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
-            addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowedAt());
-            addNode("借入待确认（主任）",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
-            addNode("借出待确认（主任） ",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
-            addNode("送还待确认",collect.get(target.getReturnerAck()),target.getReturnAt());
+            addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
+            addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
+            addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
+            addNode("送还待确认",collect.get(target.getReceiverUid()),target.getReceiverDate());
             addNode("送还待确认(主任)",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
             addNode("收回待确认(主任) ",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
         }
@@ -178,6 +178,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         condition.add(target.getReturnerAck());
         condition.add(target.getReceiverSignatureUid());
         condition.add(target.getReturnerSignatureUid());
+        condition.add(target.getReceiverUid());
         return condition.stream().filter(item -> StringUtils.hasText(item)).collect(Collectors.toList());
     }
     private void addNode(String nodeName,UserAccount operator, Date operatorTime){

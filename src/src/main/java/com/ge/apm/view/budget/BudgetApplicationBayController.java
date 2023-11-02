@@ -57,7 +57,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
- * @author Yangfan, Liu
+ * @author lyj
  */
 @ViewScoped
 @ManagedBean(name = "budgetBayController")
@@ -272,30 +272,23 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
 
     /**
-     * 跳转新增模式
+     * 根据参数跳转相关模式
      *
      * @return
      */
-    public String intoCreateModel(){
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+    public String intoActionModel(String action){
+        if(BudgetApplicationBayController.CREATE_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+        }else if(BudgetApplicationBayController.EDIT_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.EDIT_ACTION + "&editId="
+                    + this.selected.getId()+"&tabIndexList="+tabIndex);
+        }else if(BudgetApplicationBayController.VIEW_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.VIEW_ACTION
+                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+        }else{
+            return null;
+        }
     }
-    /**
-     * 跳转编辑模式
-     *
-     * @return
-     */
-    public String intoEditModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
-    /**
-     * 跳转查看模式
-     *
-     * @return
-     */
-    public String intoViewModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
-
     public void doubleClick(SelectEvent event) {
         String str = "action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);

@@ -158,17 +158,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void addBudgetAsset() {
-        List<String> assetName = new ArrayList<String>();
-        if(CollectionUtils.isNotEmpty(curApplicationBudgetAssets)){
-            List<String>  assetNameFirest = curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
-            assetName.addAll(assetNameFirest);
-        }
-        if(CollectionUtils.isNotEmpty(selectApplicationBudgetAssets)){
-            List<String>  assetNameSec = selectApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getApplicationAssetName).collect(Collectors.toList());
-            assetName.addAll(assetNameSec);
-        }
-        long num = assetName.stream().distinct().count();
-        if (num != 1) {
+        if (purchaseOrderService.checkDistinct(curApplicationBudgetAssets,selectApplicationBudgetAssets)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("同一个采购单所采购的设备名称需相同！"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
@@ -186,21 +176,35 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
-    /**
-     * 跳转新增模式
-     *
-     * @return
-     */
-    public String intoCreateModel(){
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.CREATE_ACTION);
+
+    private void addSearchFilter() {
+        if (null != searchForm.getDateStart()) {
+            updateSearchFilter(new SearchFilter("createdDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
+        }
+        if (null != searchForm.getDateEnd()) {
+            this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getPurchaseNum())) {
+            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicantName())) {
+            updateSearchFilter(new SearchFilter("operator.name", SearchFilter.Operator.LIKE, searchForm.getApplicantName()));
+        }
     }
+
     /**
-     * 跳转编辑模式
+     * 根据参数跳转
      *
      * @return
      */
-    public String intoEditModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId());
+    public String intoActionModel(String action){
+        if(PurchaseOrderController.CREATE_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.CREATE_ACTION);
+        }else if(PurchaseOrderController.EDIT_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId());
+        }else {
+            return null;
+        }
     }
 
     public void doubleClick(SelectEvent event) {
@@ -227,37 +231,20 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void search() {
-        selected = null;
-        clearSearchFilter();
-        addSearchFilter();
+        clearSearchFilterInitSearchFilter(this.selected);
     }
 
     public void resetSearch() {
-        selected = null;
-        clearSearchFilter();
         searchForm = new BudgetSearchForm();
+        clearSearchFilterInitSearchFilter(this.selected);
+    }
+
+    private void clearSearchFilterInitSearchFilter(PurchaseOrderInfo selectPurchaseOrderInfo) {
+        selectPurchaseOrderInfo = null;
+        this.searchFilters = purchaseOrderService.initSearchFilter(this.searchFilters);
         addSearchFilter();
     }
 
-    private void clearSearchFilter() {
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        } else {
-            searchFilters.clear();
-        }
-    }
-
-    private void addSearchFilter() {
-        if (null != searchForm.getDateStart()) {
-            updateSearchFilter(new SearchFilter("createdDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
-        }
-        if (null != searchForm.getDateEnd()) {
-            this.searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, new DateTime(searchForm.getDateEnd()).plusDays(1).toDate()));
-        }
-        if (StringUtils.isNotBlank(searchForm.getPurchaseNum())) {
-            updateSearchFilter(new SearchFilter("purchaseNum", SearchFilter.Operator.LIKE, searchForm.getPurchaseNum()));
-        }
-    }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -269,7 +256,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         if (null != blobObject ) {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET_PURCHASE);
-            //blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
             if (Optional.ofNullable(selected.getId()).isPresent()) { // 新增
                 blobObject.setBoUuid(selected.getId());
             }
@@ -352,46 +338,41 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     }
 
-    public void searchBudgetApplication() {
-        clearAssetSearchFilter();
-        addAssetSearchFilter();
-        optionalBudgetApplications.clear();
-        selectApplicationBudgetAssets.clear();
 
-        this.optionalBudgetApplications = budgetApplicationAssetRepository.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
-    }
 
     public void preAddBudgetApplication() {
         resetAssetSearch();
     }
 
     public void delBudgetApplication() {
+        //删除 明细信息 第一步先删除当前明细
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
+        //第二步处理状态
         if(dataListSelectApplicationAssetBudget.getBudgetApplication() !=null &&
                 StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
                 StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
-            dataListSelectApplicationAssetBudget.getBudgetApplication().setProcureStatus(null);
-            dataListSelectApplicationAssetBudget.getBudgetApplication().setPurchaseId(null);
+            purchaseOrderService.setPurchaseInfoNull(dataListSelectApplicationAssetBudget.getBudgetApplication());
             budgetApplicationRepository.save(dataListSelectApplicationAssetBudget.getBudgetApplication());
         }
         dataListSelectApplicationAssetBudget = null;
         calcTotalAmount(curApplicationBudgetAssets);
     }
 
+    public void searchBudgetApplication() {
+        this.dataListSelectApplicationAssetBudget = null;
+        this.assetSearchFilters = purchaseOrderService.initSearchFilter(this.assetSearchFilters);
+        addAssetSearchFilter();
+        optionalBudgetApplications.clear();
+        selectApplicationBudgetAssets.clear();
+        this.optionalBudgetApplications = budgetApplicationAssetRepository.findBySearchFilter(assetSearchFilters,new Sort(Sort.Direction.DESC, "createdDate"));
+    }
 
     public void resetAssetSearch() {
         assetSearchForm = new BudgetAssetSearchForm();
         searchBudgetApplication();
     }
 
-    private void clearAssetSearchFilter() {
-        if (assetSearchFilters == null) {
-            assetSearchFilters = new ArrayList<>();
-        } else {
-            assetSearchFilters.clear();
-        }
-    }
     private void updateAssetSearchFilter(SearchFilter searchFilter) {
         removeAssetFilterOnField(searchFilter.fieldName);
         assetSearchFilters.add(searchFilter);
