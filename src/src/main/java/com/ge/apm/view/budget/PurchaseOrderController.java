@@ -42,9 +42,11 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -436,21 +438,13 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private StreamedContent exportFile;
 
 
-    /*public void exportAll()  {
+    public void exportAll()  {
         try {
-            this.selected = this.dao.findById(selected.getId());
-            this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
-            this.selectedDept = this.selected.getApplicationDept();
-            this.selected.setApplicationDeptName(this.selectedDept.getName());
-            if(this.curSelectApplicationBudgetAsset!=null ){
-                this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
-            }
-            exportFile = budgetApplicationExportService.exportZip(selected, curSelectApplicationBudgetAsset, attachList);
-
+            exportFile = purchaseOrderService.exportPurchaseZip(selected);
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(PurchaseOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }*/
+    }
 
 
     public BudgetSearchForm getSearchForm() {

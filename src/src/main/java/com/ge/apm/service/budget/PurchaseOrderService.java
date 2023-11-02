@@ -21,6 +21,8 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -37,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.zip.ZipOutputStream;
 
 /**
  * LYJ
@@ -66,6 +72,9 @@ public class PurchaseOrderService {
     private BlobFileService blobService;
     @Autowired
     private OrgInfoRepository orgDao;
+
+    @Autowired
+    private BudgetApplicationExportService budgetApplicationExportService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -167,6 +176,21 @@ public class PurchaseOrderService {
      */
     public String backList() {
         return "List.xhtml?faces-redirect=true";
+    }
+
+
+    public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException {
+        String base = "采购单" + purchaseOrderInfo.getPurchaseNum();
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(bout);
+
+        budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
+        budgetApplicationExportService.generateBudgetFiles(zout, purchaseOrderInfo);
+        budgetApplicationExportService.generateSupplierFiles(zout, purchaseOrderInfo);
+
+        zout.close();
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
+        return streamedContent;
     }
 
 
