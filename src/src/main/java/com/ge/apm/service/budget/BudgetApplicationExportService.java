@@ -201,11 +201,11 @@ public class BudgetApplicationExportService {
 
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "");
+                mm.put("importedOr", "");
             }else if("T".equals(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "是");
+                mm.put("importedOr", "是");
             }else {
-                mm.put("importedOrYes", "否");
+                mm.put("importedOr", "否");
             }
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
