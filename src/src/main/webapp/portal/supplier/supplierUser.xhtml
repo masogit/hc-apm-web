@@ -13,7 +13,7 @@
             <p:fieldset legend="待审批供应商责任人">
                 <h:form>
                     <p:inputText id="queryStrPending" placeholder="用户名/手机号" value="#{supplierController.queryStrPending}" maxlength="100" required="false"/>
-                    <p:commandButton id="searchButton_pending" value="查询" title="查询" actionListener="#{supplierController.queryByPending}" update=":pendingApprovalSupplierUserForm"/>
+                    <p:commandButton id="searchButton_pending" value="查询" title="查询" actionListener="#{supplierController.queryByPending}" update="supplierTab:pendingApprovalSupplierUserForm"/>
                 </h:form>
                 <p:dataTable id="datalist_pendingSupplierUser" value="#{supplierController.pendingApprovalUserList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -44,13 +44,9 @@
                     <p:column headerText="职务">
                         <h:outputText value="#{fieldMsg.fieldValue('userPosition', item.userAccount.position)}"/>
                     </p:column>
-                    <!--<p:column width="140"  headerText="操作" exportable="false">
-                        <p:commandButton value="通过" actionListener="#{supplierController.onApprove(item)}" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>
-                        <p:commandButton validateClient="false" value="拒绝" actionListener="#{supplierController.onRefuse(item)}" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>
-                    </p:column>-->
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="passButton" value="通过" actionListener="#{supplierController.onApprove}" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>
-                        <p:commandButton id="rejectButton" validateClient="false" value="拒绝" actionListener="#{supplierController.onRefuse}" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>
+                        <p:commandButton id="passButton" value="通过" actionListener="#{supplierController.onApprove}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
+                        <p:commandButton id="rejectButton" validateClient="false" value="拒绝" actionListener="#{supplierController.onRefuse}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
                     </f:facet>
 
                 </p:dataTable>
@@ -61,7 +57,7 @@
             <p:fieldset legend="已审批供应商责任人">
                 <h:form>
                     <p:inputText id="queryStrApproved" placeholder="用户名/手机号" value="#{supplierController.queryStrApproved}" maxlength="100" required="false"/>
-                    <p:commandButton id="searchButton_approved" value="查询" title="查询" actionListener="#{supplierController.queryByApproved}" update=":approvedSupplierUserForm"/>
+                    <p:commandButton id="searchButton_approved" value="查询" title="查询" actionListener="#{supplierController.queryByApproved}" update="supplierTab:approvedSupplierUserForm"/>
                 </h:form>
                 <p:dataTable id="datalist_approvedSupplierUser" value="#{supplierController.approvedUserList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -83,10 +79,9 @@
                         <h:outputText value="#{fieldMsg.fieldValue('userPosition', item.userAccount.position)}"/>
                     </p:column>
                     <p:column width="140"  headerText="操作" exportable="false">
-                        <p:commandButton validateClient="false" value="停用" actionListener="#{supplierController.onRefuse(item)}" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>
+                        <p:commandButton validateClient="false" value="停用" actionListener="#{supplierController.onRefuse(item)}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <!--<p:commandButton validateClient="false" value="停用" update=":approvedSupplierUserForm :pendingApprovalSupplierUserForm"></p:commandButton>-->
                     </f:facet>
                 </p:dataTable>
             </p:fieldset>
