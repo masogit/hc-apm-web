@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="采购模板管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="listForm">
+
+                    <p:dataTable id="datalist" value="#{budgetPurchaseTemplateManageController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{budgetPurchaseTemplateManageController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+                        <p:ajax event="rowSelect" update="deleteButton editButton"/>
+                        <p:column headerText="模板名称" >
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="创建时间">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" update="budgetPurchaseTemplateEditDlg"
+                                             title="#{msg.Create}" actionListener="#{budgetPurchaseTemplateManageController.prepareCreate()}" oncomplete="PF('budgetPurchaseTemplateEditDlg').show()"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{budgetPurchaseTemplateManageController.prepareEdit}" update=":budgetPurchaseTemplateEditDlg" oncomplete="PF('budgetPurchaseTemplateEditDlg').show()" disabled="#{empty budgetPurchaseTemplateManageController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
+                                             disabled="#{empty budgetPurchaseTemplateManageController.selected}" actionListener="#{budgetPurchaseTemplateManageController.deleteData}"  >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>
