@@ -172,6 +172,11 @@
                                     <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
+                                <p:fieldset legend="#{msg.FilterCondition}">
+                                    <p:orderList id="MobileFilterFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageFilterFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileFilterFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileFilterFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
                         <!--<p:tab title="xxx">

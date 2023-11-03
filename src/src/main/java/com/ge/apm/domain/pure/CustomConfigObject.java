@@ -45,6 +45,7 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    List<String> assetsMobilepageFilterFields;
     List<String> assetsWebMaintainDetailFields;
 
     List<String> assetsImportantFields;
@@ -224,6 +225,17 @@ public class CustomConfigObject {
             assetsMobilepageDetailFields = CustomConfigConstant.getAssetsMobilepageDetailFields();
         }
         return assetsMobilepageDetailFields;
+    }
+
+    public List<String> getAssetsMobilepageFilterFields() {
+        if (assetsMobilepageFilterFields == null) {
+            assetsMobilepageFilterFields = CustomConfigConstant.getAssetsMobilepageFilterFields();
+        }
+        return assetsMobilepageFilterFields;
+    }
+
+    public void setAssetsMobilepageFilterFields(List<String> assetsMobilepageFilterFields) {
+        this.assetsMobilepageFilterFields = assetsMobilepageFilterFields;
     }
 
     public List<String> getAssetsWebMaintainDetailFields() {
