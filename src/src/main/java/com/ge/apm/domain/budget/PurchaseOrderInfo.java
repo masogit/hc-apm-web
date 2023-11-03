@@ -78,6 +78,20 @@ public class PurchaseOrderInfo implements Serializable {
     @Column(name = "last_modified_by", length = 50)
     private String lastModifiedBy;
 
+    @Column(name = "start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startDate;
+
+    @Column(name = "end_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endDate;
+
+    @Column(name = "status")
+    private String status;
+
+
     @Column(name = "last_modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -95,6 +109,30 @@ public class PurchaseOrderInfo implements Serializable {
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action = NotFoundAction.IGNORE)
     private UserAccount operator;
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getApplicationAssetName() {
         return applicationAssetName;

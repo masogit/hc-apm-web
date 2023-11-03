@@ -1,9 +1,13 @@
 package com.ge.apm.view;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
@@ -11,11 +15,17 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.BooleanUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -185,12 +195,12 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public void batchDeleteSupplier() {
-        selectedMap.forEach((k,v) -> {
-            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
-            if (selected != null) {
-                deleteSupplier();
-            }
-        });
+//        selectedMap.forEach((k,v) -> {
+//            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
+//            if (selected != null) {
+//                deleteSupplier();
+//            }
+//        });
         selectedMap.clear();
     }
 
@@ -307,20 +317,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         }
     }
 
-    /*public void onSelectAllOfPageApproved() {
-        boolean isSelectedAll = !approvedUserList.stream().anyMatch(item -> !selectedMapApproved.containsKey(item.getId()) || !selectedMapApproved.get(item.getId()));
-        for (SupplierUser item : approvedUserList) {
-            selectedMapApproved.put(item.getId(), !isSelectedAll);
-        }
-    }*/
-
-    /*public void querySupplierUser(){
-        //approvedUserList = supplierService.getSupplierUserList(this.selected.getId(), SupplierUser.Status.Approved.name());
-        //pendingApprovalUserList = supplierService.getSupplierUserList(this.selected.getId(), SupplierUser.Status.PendingApproval.name());
-        approvedUserList = supplierService.getSupplierUserList(null, SupplierUser.Status.Approved.name(), queryStrApproved);
-        pendingApprovalUserList = supplierService.getSupplierUserList(null, SupplierUser.Status.PendingApproval.name(), queryStrPending);
-    }*/
-
     //供应商责任人通过
     public void onApprove(){
         selectedMapPending.forEach((key, value) -> {
@@ -371,6 +367,155 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             return "";
         }
 
+    }
+
+    private UploadedFile file;
+    private StreamedContent exportFile;
+    private List<Supplier> noFoundList;
+
+    public void exportAssetExcel() throws IOException {
+        List<Integer> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<Supplier> exportList;
+        if (ObjectUtil.isNotEmpty(selectedIds)) {
+            exportList = dao.findBySearchFilter(ListUtil.newArrayList(new SearchFilter("id", SearchFilter.Operator.IN, selectedIds)));
+        } else {
+            exportList = dao.findBySearchFilter(this.searchFilters);
+        }
+        exportList = exportList.stream().sorted(Comparator.comparing(Supplier::getId).reversed()).collect(Collectors.toList());
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (Supplier supplier : exportList) {
+            Map<String, Object> map = MapUtil.newHashMap();
+            map.put("uid", supplier.getUid());
+            map.put("名称", supplier.getName());
+            map.put("城市", supplier.getCity());
+            map.put("地址", supplier.getAddress());
+            map.put("邮编", supplier.getZipcode());
+            map.put("联系人姓名", supplier.getContactor());
+            map.put("联系方式", supplier.getTel());
+            map.put("类型", getGongyingshangLeixing(supplier));
+            resultList.add(map);
+        }
+        InputStream stream = SupplierController.class.getClassLoader().getResourceAsStream("template/APM_Supplier.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+        String[] columnKeys = doc.getKeyRow(0, 1);
+        int startNum = 1;
+        for (Map<String, Object> map : resultList) {
+            doc.writeRowData(0, columnKeys, ++startNum, map);
+        }
+        exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Supplier_export.xlsx");
+    }
+
+    public void handleExcelUpload(FileUploadEvent event) {
+        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.file = event.getFile();
+        handleExcel(file);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    private List<Supplier> handleExcel(UploadedFile file) {
+        int rowNum = 1;
+        noFoundList = ListUtil.newArrayList();
+        try (ExcelDocument doc = new ExcelDocument(file.getInputstream(), Objects.requireNonNull(ExcelDocument.parseTypeByFileName(file.getFileName())))) {
+            List<Map<String, Object>> dataRows = doc.getAllDataRows(0, 1, 2);
+            List<Supplier> saveList = ListUtil.newArrayList();
+            List<String> updateUidList = dataRows.stream().map(map -> (ExcelDocument.ValueWrapper) map.get("uid")).map(wrapper -> (String) wrapper.getValue()).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+            Map<String, Supplier> updateMap = dao.findByUidIn(updateUidList).stream().collect(Collectors.toMap(Supplier::getUid, t -> t));
+            for (Map<String, Object> dataRow : dataRows) {
+                StringBuilder sb = new StringBuilder();
+                ++rowNum;
+                Supplier supplier = new Supplier();
+                ExcelDocument.ValueWrapper uidWrapper = (ExcelDocument.ValueWrapper) dataRow.get("uid");
+                Supplier temp = null;
+                if (ObjectUtil.isNotEmpty(uidWrapper.value)) {
+                    temp = updateMap.get(uidWrapper.value);
+                    if (ObjectUtil.isNotEmpty(temp)) {
+                        supplier = updateMap.get(uidWrapper.value);
+                    }
+                } else {
+                    supplier.setCreatedDate(new Date());
+                    supplier.setCreatedBy(currentUser.getLoginName());
+                }
+                if (ObjectUtil.isEmpty(temp)) {
+                    supplier.setCreatedDate(new Date());
+                    supplier.setCreatedBy(currentUser.getLoginName());
+                }
+                supplier.setExcelIndex(rowNum);
+                for (Map.Entry<String, Object> dataEntry : dataRow.entrySet()) {
+                    ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper) dataEntry.getValue();
+                    Object value = valueWrapper.value;
+                    switch (dataEntry.getKey()) {
+                        case "名称":
+                            if (ObjectUtil.isNotEmpty(value)) {
+                                supplier.setName((String) value);
+                            } else {
+                                sb.append("名称为必填！");
+                                supplier.setName(null);
+                            }
+                            break;
+                        case "城市":
+                            supplier.setCity((String) value);
+                            break;
+                        case "地址":
+                            supplier.setAddress((String) value);
+                            break;
+                        case "邮编":
+                            supplier.setZipcode((String) value);
+                            break;
+                        case "联系人姓名":
+                            supplier.setContactor((String) value);
+                            break;
+                        case "联系方式":
+                            supplier.setTel((String) value);
+                            break;
+                        case "类型":
+                            if (ObjectUtil.isNotEmpty(value)) {
+                                String strValue = (String) value;
+                                supplier.setSupplierT(strValue.contains("供应商"));
+                                supplier.setMaintainerT(strValue.contains("维修商"));
+                                supplier.setManufacturerT(strValue.contains("制造商"));
+                            } else {
+                                sb.append("类型为必填！");
+                                supplier.setSupplierT(null);
+                                supplier.setMaintainerT(null);
+                                supplier.setManufacturerT(null);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (sb.length() > 0) {
+                    supplier.setErrorInfo(sb.toString());
+                    noFoundList.add(supplier);
+                } else {
+                    supplier.setLastModifiedDate(new Date());
+                    supplier.setLastModifiedBy(currentUser.getLoginName());
+                    if (ObjectUtil.isEmpty(supplier.getUid())) {
+                        selected = supplier;
+                        onBeforeNewObject(supplier);
+                    } else {
+                        updateUidList.add(supplier.getUid());
+                    }
+                    saveList.add(supplier);
+                }
+            }
+            if (ObjectUtil.isEmpty(noFoundList)) {
+                for (Supplier supplier : saveList) {
+                    supplierService.saveSupplier(supplier);
+                }
+            } else {
+                noFoundList.addAll(saveList);
+                noFoundList = noFoundList.stream().sorted(Comparator.comparing(Supplier::getExcelIndex)).collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            Supplier supplier = new Supplier();
+            supplier.setExcelIndex(rowNum);
+            supplier.setErrorInfo(e.getMessage());
+            noFoundList.add(supplier);
+        }
+        return noFoundList;
     }
 
     public boolean activeSupplier(){
@@ -452,6 +597,14 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         isShowQrCode = showQrCode;
     }
 
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
     public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
         String[] fileSuffixNames = fileSuffixName.toUpperCase().split("\\|");
         for(int i=0;i<fileSuffixNames.length;i++){
@@ -460,5 +613,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             }
         }
         return false;
+    }
+
+    public List<Supplier> getNoFoundList() {
+        return noFoundList;
+    }
+
+    public void setNoFoundList(List<Supplier> noFoundList) {
+        this.noFoundList = noFoundList;
     }
 }

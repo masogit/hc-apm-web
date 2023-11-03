@@ -22,6 +22,7 @@ public enum DownloadTemplateFileType {
     HIS_CLINICAL("His_clinical.xlsx", "His_clinical.xlsx"),
     HIS_EQUIPMENT_SFXM("His_sfxm.xlsx", "His_sfxm.xlsx"),
     HIS_EQUIPMENT_DATA_SOURCE("His_data_source_Template.xlsx", "His_data_source_Template.xlsx"),
+    SUPPLIER("APM_Supplier.xlsx", "APM_Supplier.xlsx"),
 
     ;
 

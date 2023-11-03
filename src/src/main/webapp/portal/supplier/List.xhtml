@@ -1,23 +1,21 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:define name="content">
+<ui:composition>
+
+<!--    <ui:define name="content">-->
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-        <div class="ui-g clearfix">
-            <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.Supplier}"/>
-            </div>
 
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
-                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update=":supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
                 </h:form>
 
                 <h:form id="SupplierListForm">
@@ -32,7 +30,7 @@
                         <p:ajax event="rowSelect" update="createButton editButton editSupplierUserButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column width="36" id="checkBox">
+                        <p:column width="36" id="checkBox" exportable="false">
                             <p:selectBooleanCheckbox value="#{supplierController.selectedMap[item.id]}" class="selectCheckBox">
                                 <p:ajax update=" @(.selectCheckBoxHeader) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
@@ -57,7 +55,7 @@
                         <p:column headerText="#{msg.contactor}" sortBy="#{item.contactor}" filterBy="#{item.contactor}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.contactor}"/>
                         </p:column>
-                        <p:column headerText="#{msg.tel}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.contactInformation}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.tel}"/>
                         </p:column>
                         <p:column headerText="#{msg.type}" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
@@ -70,14 +68,18 @@
                             <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update=":supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update="supplierTab:SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
                             <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="Supplier_export"/>
+<!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">-->
+<!--                                <p:dataExporter type="xlsx" target="supplierTab:SupplierListForm:datalist" fileName="Supplier_export"/>-->
+<!--                            </p:commandButton>-->
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{supplierController.exportAssetExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{supplierController.exportFile}" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
@@ -88,7 +90,6 @@
                 <ui:include src="supplierUser.xhtml"/>
                 <ui:include src="supplierQrCode.xhtml"/>
             </div>
-        </div>
 
         <script>
             //<![CDATA[
@@ -120,22 +121,23 @@
                 }
             }
 
-            function updateSelectAllCheckBox() {
-                var checkboxlist = $(".selectCheckBox");
-                var selectAllstatus = true;
-                checkboxlist.each(function () {
-                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
-                });
-                $("#SupplierListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
-                if (selectAllstatus) {
-                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
-                } else {
-                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
-                }
-            }
+            // function updateSelectAllCheckBox() {
+            //     var checkboxlist = $(".selectCheckBox");
+            //     var selectAllstatus = true;
+            //     checkboxlist.each(function () {
+            //         selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+            //     });
+            //     $("#SupplierListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+            //     if (selectAllstatus) {
+            //         $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+            //     } else {
+            //         $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+            //     }
+            // }
             //]]>
         </script>
 
-    </ui:define>
+<!--    </ui:define>-->
 
 </ui:composition>
+</html>
