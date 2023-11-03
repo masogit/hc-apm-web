@@ -1133,7 +1133,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         uaaService.setDefaultScope(selected);
 
         //绑定新建用户和该用户所在层级的以下层级
-        if (46 != selected.getSiteId()) {
+/*        if (46 != selected.getSiteId()) {
             userOrgInfoList = new ArrayList<>();
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
@@ -1141,7 +1141,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             prePareForScopeForNewUser(selected, accessOrgTree);
             userOrgInfoList = userOrgInfoList.stream().filter(item -> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
             userOrgInfoRepository.save(userOrgInfoList);
-        }
+        }*/
 
     }
 
