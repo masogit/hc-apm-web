@@ -15,7 +15,7 @@
 
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
-                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update=":supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
                 </h:form>
 
                 <h:form id="SupplierListForm">

@@ -2,11 +2,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
     <div class="ui-g">
         <div class="ui-g-12 card">
-            <h:form enctype="multipart/form-data" rendered="#{measureFromExcelController.customRoleAuth.authSearch}">
+            <h:form enctype="multipart/form-data">
                 <p:fieldset  legend="批量导入供应商数据" id="uploaderContainer">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <p:fileUpload fileUploadListener="#{supplierController.handleExcelUpload}" mode="advanced"
@@ -14,7 +15,7 @@
                                       invalidFileMessage="只支持xls或xlsx格式的文件"
                                       invalidSizeMessage="文件大小不得超过5M"
                                       sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
-                                      update="supplierTab:SupplierListForm"
+                                      update="supplierTab:dataListForm supplierTab:SupplierListForm"
                                       label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
                         <p:growl id="messages" showDetail="true"/>
                     </p:panelGrid>
@@ -24,6 +25,52 @@
                         <p>2. 文件中填入要导入的供应商数据</p>
                         <p>3. 上传文件进行导入</p>
                     </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="dataListForm">
+                <p:fieldset  legend="导入失败数据">
+                    <p:dataTable id="datalist" rendered="#{not empty supplierController.noFoundList}" value="#{supplierController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="EXCEL行数">
+                            <h:outputText value="#{item.excelIndex}" />
+                        </p:column>
+                        <p:column headerText="名称">
+                            <h:outputText value="#{item.name}" />
+                        </p:column>
+                        <p:column headerText="城市">
+                            <h:outputText value="#{item.city}" />
+                        </p:column>
+                        <p:column headerText="地址">
+                            <h:outputText value="#{item.address}" />
+                        </p:column>
+                        <p:column headerText="邮编">
+                            <h:outputText value="#{item.zipcode}" />
+                        </p:column>
+                        <p:column headerText="联系人姓名">
+                            <h:outputText value="#{item.contactor}" />
+                        </p:column>
+                        <p:column headerText="联系方式">
+                            <h:outputText value="#{item.tel}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="类型">
+                            <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="导入失败信息">
+                            <h:outputText value="#{item.errorInfo}" />
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xlsx" target="datalist" fileName="Supplier_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
                 </p:fieldset>
             </h:form>
         </div>

@@ -371,6 +371,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     private UploadedFile file;
     private StreamedContent exportFile;
+    private List<Supplier> noFoundList;
 
     public void exportAssetExcel() throws IOException {
         List<Integer> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
@@ -401,34 +402,41 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         for (Map<String, Object> map : resultList) {
             doc.writeRowData(0, columnKeys, ++startNum, map);
         }
-        exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "供应商信息.xlsx");
+        exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Supplier_export.xlsx");
     }
 
     public void handleExcelUpload(FileUploadEvent event) {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
-        String resultMessage = handleExcel(file);
-        if (ObjectUtil.isNotEmpty(resultMessage)) {
-            message = new FacesMessage(resultMessage, event.getFile().getFileName() + " 处理完成！");
-        }
+        handleExcel(file);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
-    private String handleExcel(UploadedFile file) {
-        StringBuilder sb = new StringBuilder();
+    private List<Supplier> handleExcel(UploadedFile file) {
         int rowNum = 1;
+        noFoundList = ListUtil.newArrayList();
         try (ExcelDocument doc = new ExcelDocument(file.getInputstream(), Objects.requireNonNull(ExcelDocument.parseTypeByFileName(file.getFileName())))) {
             List<Map<String, Object>> dataRows = doc.getAllDataRows(0, 1, 2);
             List<Supplier> saveList = ListUtil.newArrayList();
             List<String> updateUidList = dataRows.stream().map(map -> (ExcelDocument.ValueWrapper) map.get("uid")).map(wrapper -> (String) wrapper.getValue()).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
             Map<String, Supplier> updateMap = dao.findByUidIn(updateUidList).stream().collect(Collectors.toMap(Supplier::getUid, t -> t));
             for (Map<String, Object> dataRow : dataRows) {
+                StringBuilder sb = new StringBuilder();
                 ++rowNum;
                 Supplier supplier = new Supplier();
+                supplier.setExcelIndex(rowNum);
                 ExcelDocument.ValueWrapper uidWrapper = (ExcelDocument.ValueWrapper) dataRow.get("uid");
+                Supplier temp = null;
                 if (ObjectUtil.isNotEmpty(uidWrapper.value)) {
-                    supplier = updateMap.get(uidWrapper.value);
+                    temp = updateMap.get(uidWrapper.value);
+                    if (ObjectUtil.isNotEmpty(temp)) {
+                        supplier = updateMap.get(uidWrapper.value);
+                    }
                 } else {
+                    supplier.setCreatedDate(new Date());
+                    supplier.setCreatedBy(currentUser.getLoginName());
+                }
+                if (ObjectUtil.isEmpty(temp)) {
                     supplier.setCreatedDate(new Date());
                     supplier.setCreatedBy(currentUser.getLoginName());
                 }
@@ -440,7 +448,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                             if (ObjectUtil.isNotEmpty(value)) {
                                 supplier.setName((String) value);
                             } else {
-                                sb.append("第").append(rowNum).append("行：名称为必填！");
+                                sb.append("名称为必填！");
+                                supplier.setName(null);
                             }
                             break;
                         case "城市":
@@ -465,30 +474,40 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                                 supplier.setMaintainerT(strValue.contains("维修商"));
                                 supplier.setManufacturerT(strValue.contains("制造商"));
                             } else {
-                                sb.append("第").append(rowNum).append("行：类型为必填！");
+                                sb.append("类型为必填！");
+                                supplier.setSupplierT(null);
+                                supplier.setMaintainerT(null);
+                                supplier.setManufacturerT(null);
                             }
                             break;
                         default:
                             break;
                     }
                 }
-                supplier.setLastModifiedDate(new Date());
-                supplier.setLastModifiedBy(currentUser.getLoginName());
-                if (ObjectUtil.isEmpty(supplier.getUid())) {
-                    selected = supplier;
-                    onBeforeNewObject(supplier);
+                if (sb.length() > 0) {
+                    supplier.setErrorInfo(sb.toString());
+                    noFoundList.add(supplier);
                 } else {
-                    updateUidList.add(supplier.getUid());
+                    supplier.setLastModifiedDate(new Date());
+                    supplier.setLastModifiedBy(currentUser.getLoginName());
+                    if (ObjectUtil.isEmpty(supplier.getUid())) {
+                        selected = supplier;
+                        onBeforeNewObject(supplier);
+                    } else {
+                        updateUidList.add(supplier.getUid());
+                    }
+                    saveList.add(supplier);
                 }
-                saveList.add(supplier);
             }
-            for (Supplier supplier : saveList) {
-                supplierService.saveSupplier(supplier);
+            if (ObjectUtil.isEmpty(noFoundList)) {
+                for (Supplier supplier : saveList) {
+                    supplierService.saveSupplier(supplier);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return sb.toString();
+        return noFoundList;
     }
 
     public boolean activeSupplier(){
@@ -586,5 +605,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             }
         }
         return false;
+    }
+
+    public List<Supplier> getNoFoundList() {
+        return noFoundList;
+    }
+
+    public void setNoFoundList(List<Supplier> noFoundList) {
+        this.noFoundList = noFoundList;
     }
 }
