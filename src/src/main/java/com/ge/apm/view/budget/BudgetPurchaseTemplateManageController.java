@@ -8,6 +8,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -78,7 +79,11 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
         removeFile.add(v2_blobObject);
     }
 
-    public void saveData(){
+    public String saveData(){
+        if(blobObjectList == null || blobObjectList.size() == 0){
+            WebUtil.addErrorMessage("附件不能为空！");
+            return "";
+        }
         if(CREATE.equals(crudActionName)){
             selected.setTemplateType(BudgetPurchaseTemplateManage.TemplateTypeEnum.PurchaseTemplate.toString());
             selected.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
@@ -107,6 +112,8 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
                 blobService.deleteBlobFile(v);
             }
         }
+        return "List?faces-redirect=true";
+
     }
 
     public void deleteData(){
