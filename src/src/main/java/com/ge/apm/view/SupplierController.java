@@ -424,7 +424,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                 StringBuilder sb = new StringBuilder();
                 ++rowNum;
                 Supplier supplier = new Supplier();
-                supplier.setExcelIndex(rowNum);
                 ExcelDocument.ValueWrapper uidWrapper = (ExcelDocument.ValueWrapper) dataRow.get("uid");
                 Supplier temp = null;
                 if (ObjectUtil.isNotEmpty(uidWrapper.value)) {
@@ -440,6 +439,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                     supplier.setCreatedDate(new Date());
                     supplier.setCreatedBy(currentUser.getLoginName());
                 }
+                supplier.setExcelIndex(rowNum);
                 for (Map.Entry<String, Object> dataEntry : dataRow.entrySet()) {
                     ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper) dataEntry.getValue();
                     Object value = valueWrapper.value;
@@ -503,9 +503,17 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                 for (Supplier supplier : saveList) {
                     supplierService.saveSupplier(supplier);
                 }
+            } else {
+                noFoundList.addAll(saveList);
+                noFoundList = noFoundList.stream().sorted(Comparator.comparing(Supplier::getExcelIndex)).collect(Collectors.toList());
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            Supplier supplier = new Supplier();
+            supplier.setExcelIndex(rowNum);
+            supplier.setErrorInfo(e.getMessage());
+            noFoundList.add(supplier);
         }
         return noFoundList;
     }
