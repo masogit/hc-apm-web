@@ -583,6 +583,12 @@
                                     <h:outputText value="#{item.locationName}"/>
                                 </p:column>
                             </c:if>
+
+                            <c:if test="#{columnItem eq 'assetLocation'}">
+                                <p:column headerText="#{msg.assetLocation}" sortBy="#{item.assetLocation}" filterBy="#{item.assetLocation}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetLocation}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'registrationNo'}">
                                 <p:column headerText="#{msg.registrationNo}" sortBy="#{item.registrationNo}" filterBy="#{item.registrationNo}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.registrationNo}"/>

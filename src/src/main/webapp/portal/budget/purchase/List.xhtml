@@ -43,7 +43,7 @@
                                 <p:outputLabel class="label" value="操作人"/>
                                 <p:inputText value="#{purchaseOrderController.searchForm.applicantName}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+                           <!-- <h:panelGroup>
                                 <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateStart}"
@@ -66,7 +66,7 @@
                                             navigator="true" mask="true">
                                     <p:ajax event="dateSelect" update="@this"/>
                                 </p:calendar>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                          <h:panelGroup style="display: flex;">
                                 <p:commandButton value="#{msg.Search}"
                                                  actionListener="#{purchaseOrderController.search}"
@@ -105,11 +105,18 @@
                             <h:outputText value="#{item.operator.name}"/>
 
                         </p:column>
-                        <p:column headerText="操作日期" >
-                            <h:outputText value="#{item.createdDate}">
+                        <p:column headerText="采购开始时间" >
+                            <h:outputText value="#{item.startDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                    locale="#{userContextService.getCalendarLocale()}"
-                                                   pattern="#{userContextService.timeFormat14()}"/>
+                                                   pattern="#{userContextService.timeFormat()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="采购截止时间" >
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat()}"/>
                             </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">

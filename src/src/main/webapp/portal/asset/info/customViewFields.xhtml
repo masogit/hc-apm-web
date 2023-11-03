@@ -371,10 +371,16 @@
             <p:inputText  value="#{assetInfoDetailController.selected.subjectProject}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationName')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationName')}">55555555555555555
         <h:panelGroup >
             <label class="label">#{msg.locationName}</label>
             <p:inputText id="locationName" value="#{assetInfoDetailController.selected.locationName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLocation')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetLocation}</label>
+            <p:inputText id="assetLocation" value="#{assetInfoDetailController.selected.assetLocation}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status')}">
