@@ -173,6 +173,10 @@ public class CustomConfigConstant {
         return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
     }
 
+    public static List<String> getAssetsMobilepageFilterFields() {
+        return Arrays.asList("siteUID", "assetGroup", "status");
+    }
+
     /**
      * the below fields are only used by wechat, no need to export in asset
      * @return
