@@ -35,14 +35,29 @@
                                 <h:outputText value="#{purchaseOrderController.selected.operator.name}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">操作日期</p:outputLabel>
-                                <h:outputText value="#{purchaseOrderController.selected.createdDate}">
-                                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
-                                                       locale="#{userContextService.getCalendarLocale()}"
-                                                       pattern="#{userContextService.timeFormat14()}"/>
-                                </h:outputText>
+                                <p:outputLabel class="label">采购开始时间</p:outputLabel>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{purchaseOrderController.selected.startDate}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            showButtonPanel="true" required="true"  requiredMessage="采购开始时间 #{msg.ValidationRequire}"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
                             </h:panelGroup>
-
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购截止时间</p:outputLabel>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{purchaseOrderController.selected.endDate}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            showButtonPanel="true" required="true" requiredMessage="采购截止时间 #{msg.ValidationRequire}"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset legend="申购单信息" id="applicationDetail" >
