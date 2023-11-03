@@ -773,6 +773,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     @Override
     public void onAfterNewObject(UserAccount userAccount, boolean isOk) {
+        if (isOk && "Create".equals(this.crudActionName)) {
+            updateUserRole(loginUser.getType());
+        }
 /*        if (isOk && this.crudActionName.equals("Create")) {
             List<String> role = new ArrayList<String>();
             role.add(DEFAULT_USER_ROLE);
@@ -801,8 +804,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             //YHAAO-4354 keep user scope on edit
             //if org change, delete old user org
             if (!object.getOrgInfoUID().equals(previousOrgUid)) {
-                uaaService.clearUserScope(object.getUid());
-                uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
+//                uaaService.clearUserScope(object.getUid());
+//                uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
                 uaaService.setDefaultScope(object);
             }
         }
@@ -1085,9 +1088,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         saveTags();
         log.info("add new tags to user_tags successful, uid: {}", selected.getUid());
 
-        if (this.crudActionName.equals("Create")) {
-            updateUserRole(loginUser.getType());
-        }
+//        if (this.crudActionName.equals("Create")) {
+//            updateUserRole(loginUser.getType());
+//        }
     }
 
     private void saveTags() {
@@ -1113,7 +1116,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         removeTags.stream().distinct().forEach(item -> userTagsMapper.removeTag(this.selected.getUid(), item));
     }
 
-    @Transactional
+    //    @Transactional
     public void updateUserRole(Integer creatorUserType) {
         List<String> role = new ArrayList<>();
         if (creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)) {
