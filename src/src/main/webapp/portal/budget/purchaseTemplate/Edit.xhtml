@@ -12,7 +12,7 @@
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{budgetPurchaseTemplateManageController.selected != null}">
                 <h:panelGroup>
                     <label class="label">模板名称*</label>
-                    <p:inputText id="name" value="#{budgetPurchaseTemplateManageController.selected.name}" style="width: 350px;" required="true" />
+                    <p:inputText id="name" value="#{budgetPurchaseTemplateManageController.selected.name}" style="width: 350px;" required="true"  requiredMessage="模板名称不能为空"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
@@ -28,7 +28,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{budgetPurchaseTemplateManageController.saveData}" update=":growl" icon="ui-icon-check" oncomplete="PF('budgetPurchaseTemplateEditDlg').hide()"/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{budgetPurchaseTemplateManageController.saveData}" update=":growl" icon="ui-icon-check" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('budgetPurchaseTemplateEditDlg').hide()"/>
         </h:form>
     </p:dialog>
