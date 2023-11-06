@@ -7,9 +7,7 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
@@ -59,7 +57,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
- * @author Yangfan, Liu
+ * @author lyj
  */
 @ViewScoped
 @ManagedBean(name = "budgetController")
@@ -68,31 +66,28 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     private Page<BudgetApplication> emptyPage = new PageImpl<>(Collections.emptyList());
     private UserAccount account = UserContextService.getCurrentUserAccount();
+    @Getter  @Setter
     private Integer tabIndex = 0;
     private Integer tabIndexList = 0;
-
-
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
     public final static String VIEW_ACTION = "View";
-
     private BlobFileService blobService;
     /**
      * 编辑数据主键
      */
+    @Getter  @Setter
     private String editId;
-
+    @Getter  @Setter
     private BudgetApplicationAsset curSelectApplicationBudgetAsset = new BudgetApplicationAsset();
-
+    @Getter  @Setter
     private BudgetAssetInfo curSelectBudgetAssetInfo;
-
+    @Getter  @Setter
     private List<V2_BlobObject> attachList;
-
     // 弹窗列表
+    @Getter  @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
-
     private List<SearchFilter> assetSearchFilters;
-
     private BudgetApplicationRepository dao;
     private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
@@ -102,17 +97,22 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private UserContextService userContextService;
     private BudgetPersistService persistService;
     private BudgetApplicationExportService budgetApplicationExportService;
-
+    @Getter  @Setter
     private BudgetSearchForm searchForm = new BudgetSearchForm();
+    @Getter  @Setter
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
-
+    @Getter  @Setter
     private BudgetAssetInfo selectedAsset;
-
+    @Getter  @Setter
     private OrgInfo org;
-    private CustomConfigObject customConfig;
+    @Getter  @Setter
     private TreeNode orgTree;
+    @Getter  @Setter
     private TreeNode orgTreeEdit;
+    @Getter  @Setter
     private OrgInfo selectedDept;
+    @Getter @Setter
+    private StreamedContent exportFile;
 
     @Override
     protected void init() {
@@ -126,8 +126,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         persistService = WebUtil.getBean(BudgetPersistService.class);
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-        CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
@@ -274,7 +272,13 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
      */
     public String intoActionModel(String action){
         if(BudgetApplicationBapController.CREATE_ACTION.equals(action)){
-            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),new Date());
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date modifiedDate = calendar.getTime();
+            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),modifiedDate);
             String url = new String();
             if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
                 url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
@@ -614,11 +618,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
-    @Getter
-    @Setter
-    private StreamedContent exportFile;
-
-
     public void exportAll()  {
         try {
             this.selected = this.dao.findById(selected.getId());
@@ -641,99 +640,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
 
-    public Integer getTabIndex() {
-        return tabIndex;
-    }
 
-    public void setTabIndex(Integer tabIndex) {
-        this.tabIndex = tabIndex;
-    }
 
-    public BudgetSearchForm getSearchForm() {
-        return searchForm;
-    }
 
-    public void setSearchForm(BudgetSearchForm searchForm) {
-        this.searchForm = searchForm;
-    }
-
-    public BudgetAssetSearchForm getAssetSearchForm() {
-        return assetSearchForm;
-    }
-
-    public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
-        this.assetSearchForm = assetSearchForm;
-    }
-
-    public BudgetAssetInfo getSelectedAsset() {
-        return selectedAsset;
-    }
-
-    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
-        this.selectedAsset = selectedAsset;
-    }
-
-    public TreeNode getOrgTree() {
-        return orgTree;
-    }
-
-    public void setOrgTree(TreeNode orgTree) {
-        this.orgTree = orgTree;
-    }
-
-    public TreeNode getOrgTreeEdit() {
-        return orgTreeEdit;
-    }
-
-    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
-        this.orgTreeEdit = orgTreeEdit;
-    }
-
-    public OrgInfo getSelectedDept() {
-        return selectedDept;
-    }
-
-    public void setSelectedDept(OrgInfo selectedDept) {
-        this.selectedDept = selectedDept;
-    }
-
-    public String getEditId() {
-        return editId;
-    }
-
-    public void setEditId(String editId) {
-        this.editId = editId;
-    }
-
-    public BudgetApplicationAsset getCurSelectApplicationBudgetAsset() {
-        return curSelectApplicationBudgetAsset;
-    }
-
-    public void setCurSelectApplicationBudgetAsset(BudgetApplicationAsset curSelectApplicationBudgetAsset) {
-        this.curSelectApplicationBudgetAsset = curSelectApplicationBudgetAsset;
-    }
-
-    public List<V2_BlobObject> getAttachList() {
-        return attachList;
-    }
-
-    public void setAttachList(List<V2_BlobObject> attachList) {
-        this.attachList = attachList;
-    }
-
-    public BudgetAssetInfo getCurSelectBudgetAssetInfo() {
-        return curSelectBudgetAssetInfo;
-    }
-
-    public void setCurSelectBudgetAssetInfo(BudgetAssetInfo curSelectBudgetAssetInfo) {
-        this.curSelectBudgetAssetInfo = curSelectBudgetAssetInfo;
-    }
-
-    public List<BudgetAssetInfo> getOptionalBudgetAssets() {
-        return optionalBudgetAssets;
-    }
-
-    public void setOptionalBudgetAssets(List<BudgetAssetInfo> optionalBudgetAssets) {
-        this.optionalBudgetAssets = optionalBudgetAssets;
-    }
 }
