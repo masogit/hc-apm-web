@@ -449,9 +449,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                             if (ObjectUtil.isNotEmpty(value)) {
                                 if (nameList.contains(value)) {
                                     sb.append("名称重复！");
-                                } else {
-                                    supplier.setName(value);
                                 }
+                                supplier.setName(value);
                             } else {
                                 sb.append("名称为必填！");
                                 supplier.setName(null);
