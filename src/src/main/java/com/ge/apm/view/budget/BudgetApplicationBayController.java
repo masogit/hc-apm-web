@@ -6,9 +6,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -43,7 +41,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -78,15 +75,17 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     /**
      * 编辑数据主键
      */
+    @Getter @Setter
     private String editId;
-
+    @Getter @Setter
     private BudgetApplicationAsset curSelectApplicationBudgetAsset = new BudgetApplicationAsset();
-
+    @Getter @Setter
     private BudgetAssetInfo curSelectBudgetAssetInfo;
-
+    @Getter @Setter
     private List<V2_BlobObject> attachList;
 
     // 弹窗列表
+    @Getter @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
@@ -95,38 +94,34 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
 
-    private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
 
     private UserContextService userContextService;
     private BudgetPersistService persistService;
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
-
+    @Getter @Setter
     private BudgetAssetInfo selectedAsset;
-
+    @Getter @Setter
     private OrgInfo org;
-    private CustomConfigObject customConfig;
+    @Getter @Setter
     private TreeNode orgTree;
+    @Getter @Setter
     private TreeNode orgTreeEdit;
+    @Getter @Setter
     private OrgInfo selectedDept;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
         budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
-        budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
 
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-
-        CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
@@ -187,6 +182,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     public boolean curModelDisables(){
         return "View".equals(crudActionName)?true:false;
     }
+
     public boolean curModelCreate(){
         return "Create".equals(crudActionName)?true:false;
     }
@@ -647,67 +643,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         this.selectedAsset = selectedAsset;
     }
 
-    public TreeNode getOrgTree() {
-        return orgTree;
-    }
 
-    public void setOrgTree(TreeNode orgTree) {
-        this.orgTree = orgTree;
-    }
 
-    public TreeNode getOrgTreeEdit() {
-        return orgTreeEdit;
-    }
 
-    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
-        this.orgTreeEdit = orgTreeEdit;
-    }
-
-    public OrgInfo getSelectedDept() {
-        return selectedDept;
-    }
-
-    public void setSelectedDept(OrgInfo selectedDept) {
-        this.selectedDept = selectedDept;
-    }
-
-    public String getEditId() {
-        return editId;
-    }
-
-    public void setEditId(String editId) {
-        this.editId = editId;
-    }
-
-    public BudgetApplicationAsset getCurSelectApplicationBudgetAsset() {
-        return curSelectApplicationBudgetAsset;
-    }
-
-    public void setCurSelectApplicationBudgetAsset(BudgetApplicationAsset curSelectApplicationBudgetAsset) {
-        this.curSelectApplicationBudgetAsset = curSelectApplicationBudgetAsset;
-    }
-
-    public List<V2_BlobObject> getAttachList() {
-        return attachList;
-    }
-
-    public void setAttachList(List<V2_BlobObject> attachList) {
-        this.attachList = attachList;
-    }
-
-    public BudgetAssetInfo getCurSelectBudgetAssetInfo() {
-        return curSelectBudgetAssetInfo;
-    }
-
-    public void setCurSelectBudgetAssetInfo(BudgetAssetInfo curSelectBudgetAssetInfo) {
-        this.curSelectBudgetAssetInfo = curSelectBudgetAssetInfo;
-    }
-
-    public List<BudgetAssetInfo> getOptionalBudgetAssets() {
-        return optionalBudgetAssets;
-    }
-
-    public void setOptionalBudgetAssets(List<BudgetAssetInfo> optionalBudgetAssets) {
-        this.optionalBudgetAssets = optionalBudgetAssets;
-    }
 }

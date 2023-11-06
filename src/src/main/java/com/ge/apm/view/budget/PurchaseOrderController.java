@@ -6,10 +6,8 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.*;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.PurchaseOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -69,16 +67,24 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     /**
      * 编辑数据主键
      */
+    @Getter @Setter
     private String editId;
     //当前设备列表
+    @Getter @Setter
     private List<BudgetApplicationAsset> curApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
+    @Getter @Setter
     private BudgetApplicationAsset dataListSelectApplicationAssetBudget ;
-
     // 弹窗列表
+    @Getter @Setter
     private List<BudgetApplicationAsset> optionalBudgetApplications = new ArrayList<BudgetApplicationAsset>();
     // 已选择的设备列表
+    @Getter @Setter
     private List<BudgetApplicationAsset> selectApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
 
+    @Getter @Setter
+    private StreamedContent exportFile;
+
+    @Getter @Setter
     private List<V2_BlobObject> attachList;
 
     private List<SearchFilter> assetSearchFilters;
@@ -88,24 +94,24 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
 
     private BudgetApplicationRepository budgetApplicationRepository;
-    private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
 
-    private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
 
-    private UserContextService userContextService;
     private PurchaseOrderService purchaseOrderService;
-    private BudgetApplicationExportService budgetApplicationExportService;
 
+    @Getter @Setter
     private BudgetSearchForm searchForm = new BudgetSearchForm();
+    @Getter @Setter
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
-
+    @Getter @Setter
     private BudgetAssetInfo selectedAsset;
-
+    @Getter @Setter
     private OrgInfo org;
-    private CustomConfigObject customConfig;
+    @Getter @Setter
     private TreeNode orgTree;
+    @Getter @Setter
     private TreeNode orgTreeEdit;
+    @Getter @Setter
     private OrgInfo selectedDept;
 
     @Override
@@ -113,17 +119,12 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         dao = WebUtil.getBean(PurchaseOrderInfoRepository.class);
         budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         budgetApplicationRepository = WebUtil.getBean(BudgetApplicationRepository.class);
-        budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
-        purchaseBudgetConfigRepository = WebUtil.getBean(PurchaseBudgetConfigRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        budgetApplicationExportService = WebUtil.getBean(BudgetApplicationExportService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
-        userContextService = WebUtil.getBean(UserContextService.class);
         purchaseOrderService = WebUtil.getBean(PurchaseOrderService.class);
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         //todo 可以控制检索数据范围
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
@@ -151,10 +152,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
     public String backList() {
         return "List.xhtml?faces-redirect=true";
-    }
-
-    public List<V2_BlobObject> getAttachList() {
-        return attachList;
     }
 
     public void addBudgetAsset() {
@@ -357,6 +354,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
         dataListSelectApplicationAssetBudget = null;
         calcTotalAmount(curApplicationBudgetAssets);
+        savePurchase();
     }
 
     public void searchBudgetApplication() {
@@ -414,11 +412,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     }
 
-    @Getter
-    @Setter
-    private StreamedContent exportFile;
-
-
     public void exportAll()  {
         try {
             exportFile = purchaseOrderService.exportPurchaseZip(selected);
@@ -428,96 +421,4 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
 
-    public BudgetSearchForm getSearchForm() {
-        return searchForm;
-    }
-
-    public void setSearchForm(BudgetSearchForm searchForm) {
-        this.searchForm = searchForm;
-    }
-
-    public BudgetAssetSearchForm getAssetSearchForm() {
-        return assetSearchForm;
-    }
-
-    public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
-        this.assetSearchForm = assetSearchForm;
-    }
-
-    public BudgetAssetInfo getSelectedAsset() {
-        return selectedAsset;
-    }
-
-    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
-        this.selectedAsset = selectedAsset;
-    }
-
-    public TreeNode getOrgTree() {
-        return orgTree;
-    }
-
-    public void setOrgTree(TreeNode orgTree) {
-        this.orgTree = orgTree;
-    }
-
-    public TreeNode getOrgTreeEdit() {
-        return orgTreeEdit;
-    }
-
-    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
-        this.orgTreeEdit = orgTreeEdit;
-    }
-
-    public OrgInfo getSelectedDept() {
-        return selectedDept;
-    }
-
-    public void setSelectedDept(OrgInfo selectedDept) {
-        this.selectedDept = selectedDept;
-    }
-
-    public String getEditId() {
-        return editId;
-    }
-
-    public void setEditId(String editId) {
-        this.editId = editId;
-    }
-
-    public void setAttachList(List<V2_BlobObject> attachList) {
-        this.attachList = attachList;
-    }
-
-
-    public List<BudgetApplicationAsset> getOptionalBudgetApplications() {
-        return optionalBudgetApplications;
-    }
-
-    public void setOptionalBudgetApplications(List<BudgetApplicationAsset> optionalBudgetApplications) {
-        this.optionalBudgetApplications = optionalBudgetApplications;
-    }
-
-    public List<BudgetApplicationAsset> getCurApplicationBudgetAssets() {
-        return curApplicationBudgetAssets;
-    }
-
-    public void setCurApplicationBudgetAssets(List<BudgetApplicationAsset> curApplicationBudgetAssets) {
-        this.curApplicationBudgetAssets = curApplicationBudgetAssets;
-    }
-
-    public BudgetApplicationAsset getDataListSelectApplicationAssetBudget() {
-        return dataListSelectApplicationAssetBudget;
-    }
-
-    public void setDataListSelectApplicationAssetBudget(BudgetApplicationAsset dataListSelectApplicationAssetBudget) {
-        this.dataListSelectApplicationAssetBudget = dataListSelectApplicationAssetBudget;
-    }
-
-    public List<BudgetApplicationAsset> getSelectApplicationBudgetAssets() {
-        return selectApplicationBudgetAssets;
-    }
-
-    public void setSelectApplicationBudgetAssets(List<BudgetApplicationAsset> selectApplicationBudgetAssets) {
-        this.selectApplicationBudgetAssets = selectApplicationBudgetAssets;
-    }
 }
