@@ -165,9 +165,9 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
             addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
             addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
             addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
-            addNode("送还待确认",collect.get(target.getReceiverUid()),target.getReceiverDate());
-            addNode("送还待确认(主任)",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
-            addNode("收回待确认(主任) ",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
+            addNode("送还待确认",collect.get(target.getReturnerUid()),target.getReturnAt());
+            addNode("送还待确认(主任)",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
+            addNode("收回待确认(主任) ",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
         }
     }
     private List<String> conditionList(SiteToSiteAllocation target ){
