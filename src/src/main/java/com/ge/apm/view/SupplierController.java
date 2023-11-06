@@ -420,6 +420,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             List<Supplier> saveList = ListUtil.newArrayList();
             List<String> updateUidList = dataRows.stream().map(map -> (ExcelDocument.ValueWrapper) map.get("uid")).map(wrapper -> (String) wrapper.getValue()).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
             Map<String, Supplier> updateMap = dao.findByUidIn(updateUidList).stream().collect(Collectors.toMap(Supplier::getUid, t -> t));
+            List<String> nameList = dao.findNameByTenantUid(currentUser.getTenantUID());
             for (Map<String, Object> dataRow : dataRows) {
                 StringBuilder sb = new StringBuilder();
                 ++rowNum;
@@ -446,7 +447,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                     switch (dataEntry.getKey()) {
                         case "名称":
                             if (ObjectUtil.isNotEmpty(value)) {
-                                supplier.setName(value);
+                                if (nameList.contains(value)) {
+                                    sb.append("名称重复！");
+                                } else {
+                                    supplier.setName(value);
+                                }
                             } else {
                                 sb.append("名称为必填！");
                                 supplier.setName(null);
