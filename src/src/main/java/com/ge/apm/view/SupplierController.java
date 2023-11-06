@@ -442,37 +442,36 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                 supplier.setExcelIndex(rowNum);
                 for (Map.Entry<String, Object> dataEntry : dataRow.entrySet()) {
                     ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper) dataEntry.getValue();
-                    Object value = valueWrapper.value;
+                    String value = valueWrapper.rawValue;
                     switch (dataEntry.getKey()) {
                         case "名称":
                             if (ObjectUtil.isNotEmpty(value)) {
-                                supplier.setName((String) value);
+                                supplier.setName(value);
                             } else {
                                 sb.append("名称为必填！");
                                 supplier.setName(null);
                             }
                             break;
                         case "城市":
-                            supplier.setCity((String) value);
+                            supplier.setCity(value);
                             break;
                         case "地址":
-                            supplier.setAddress((String) value);
+                            supplier.setAddress(value);
                             break;
                         case "邮编":
-                            supplier.setZipcode((String) value);
+                            supplier.setZipcode(value);
                             break;
                         case "联系人姓名":
-                            supplier.setContactor((String) value);
+                            supplier.setContactor(value);
                             break;
                         case "联系方式":
-                            supplier.setTel((String) value);
+                            supplier.setTel(value);
                             break;
                         case "类型":
                             if (ObjectUtil.isNotEmpty(value)) {
-                                String strValue = (String) value;
-                                supplier.setSupplierT(strValue.contains("供应商"));
-                                supplier.setMaintainerT(strValue.contains("维修商"));
-                                supplier.setManufacturerT(strValue.contains("制造商"));
+                                supplier.setSupplierT(value.contains("供应商"));
+                                supplier.setMaintainerT(value.contains("维修商"));
+                                supplier.setManufacturerT(value.contains("制造商"));
                             } else {
                                 sb.append("类型为必填！");
                                 supplier.setSupplierT(null);
