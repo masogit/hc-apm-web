@@ -897,7 +897,7 @@ public class NurseSiteMaintainService {
 		Pagination pagination;
 		if(all){
 //			listItem = findMaintainItemByParentId(tempMaintain.getId());
-			pagination = new Pagination();
+			pagination = new Pagination(1, 5000);
 		} else{
 			pagination = new Pagination(page + 1, pageSize);
 //			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);

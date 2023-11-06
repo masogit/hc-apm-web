@@ -145,7 +145,7 @@ public class MaintainHistoryController {
             if (currentUser.isEnableAssetTypeGroup()) {
                 itemWrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
             }
-            Map<String, List<NurseSiteMaintainItemHistory>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItemHistory::getParentId));
+            Map<String, List<NurseSiteMaintainItemHistory>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(1, 5000), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItemHistory::getParentId));
             for (NurseSiteMaintainHistory maintain : listMaintainData) {
                 maintain.setListNurseSiteMaintainItem(itemMap.get(maintain.getId()));
             }
