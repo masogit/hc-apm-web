@@ -6,6 +6,11 @@
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
     <ui:define name="content">
+        <style>
+            .ui-chkbox{
+                width: 18px !IMPORTANT;
+            }
+        </style>
         <div class="ui-g-12 card cardTitle">
             <p:outputLabel class="pageTitle" value="采购单信息"/>
         </div>
@@ -120,23 +125,11 @@
                     </p:fieldset>
 
                     <p:fieldset legend="采购单模板"  >
-                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <h:panelGroup>
-                                <p:dataList id="attachList"
-                                            value="#{purchaseOrderController.getAttachList()}"
-                                            var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                                            paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                    <f:facet name="header">模板详情</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton actionListener="#{purchaseOrderController.removeAttachmentById(fileitem.id)}" update="attachList" icon="ui-icon-clear" title="#{msg.Delete}"
-                                                     class="popupIconButton" process="@this" >
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload   allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{purchaseOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                               multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:selectManyMenu  styleClass="manymenu-advanced"   style="width: 400px"  value="#{purchaseOrderController.templateIds}" filter="true" filterMatchMode="contains" showCheckbox="true">
+                                <f:selectItems value="#{purchaseOrderController.budgetPurchaseTemplateManageList}" var="template" itemLabel="#{template.name}" itemValue="#{template.id}"   />
+                            </p:selectManyMenu>
+                        </h:panelGroup>
                     </p:fieldset>
 
                     <br/>

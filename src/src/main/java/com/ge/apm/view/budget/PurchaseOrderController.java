@@ -94,8 +94,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
 
     private BudgetApplicationRepository budgetApplicationRepository;
-    private BlobObjectRepository blobObjectRepository;
+    //private BlobObjectRepository blobObjectRepository;
 
+    private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
+    private PurchaseTemplateRepository purchaseTemplateRepository;
 
     private PurchaseOrderService purchaseOrderService;
 
@@ -113,6 +115,11 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private TreeNode orgTreeEdit;
     @Getter @Setter
     private OrgInfo selectedDept;
+    @Getter @Setter
+    private List<BudgetPurchaseTemplateManage> budgetPurchaseTemplateManageList;
+    @Getter @Setter
+    private List<String> templateIds = new ArrayList<>();
+
 
     @Override
     protected void init() {
@@ -120,8 +127,9 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         budgetApplicationRepository = WebUtil.getBean(BudgetApplicationRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        purchaseTemplateRepository = WebUtil.getBean(PurchaseTemplateRepository.class);
         purchaseOrderService = WebUtil.getBean(PurchaseOrderService.class);
+        budgetPurchaseTemplateManageRepository = WebUtil.getBean(BudgetPurchaseTemplateManageRepository.class);
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
@@ -133,6 +141,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
         try {
+            budgetPurchaseTemplateManageList = budgetPurchaseTemplateManageRepository.find();
             curApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
             if (PurchaseOrderController.CREATE_ACTION.equals(action)) {
                 this.prepareCreate();
@@ -173,7 +182,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
-
     private void addSearchFilter() {
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("createdDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
@@ -213,7 +221,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     public String savePurchase() {
         purchaseOrderService.handleCommonField(selected,account);
-        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.attachList);
+        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.attachList,this.templateIds);
         return purchaseOrderService.backList();
     }
 
@@ -331,11 +339,12 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ,this.selected.getId()));
         this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
-        this.attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
-
+        //this.attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
+        List<PurchaseTemplate> purchaseTemplateList = purchaseTemplateRepository.findByPurchaseId(id);
+        if(CollectionUtils.isNotEmpty(purchaseTemplateList)){
+            this.templateIds = purchaseTemplateList.stream().map(PurchaseTemplate::getTemplateId).collect(Collectors.toList());
+        }
     }
-
-
 
     public void preAddBudgetApplication() {
         resetAssetSearch();

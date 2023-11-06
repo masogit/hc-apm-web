@@ -1,26 +1,12 @@
 package com.ge.apm.service.budget;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.BudgetApplicationMapper;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.BudgetAssetInfo;
-import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.constant.ApprovalConstant;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.budget.BudgetConstant;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.core.WechatParam;
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -29,18 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 
@@ -56,6 +37,8 @@ public class PurchaseOrderService {
     private PurchaseOrderInfoRepository purchaseOrderInfoRepository;
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
+    @Autowired
+    private PurchaseTemplateRepository purchaseTemplateRepository;
     @Autowired
     private BudgetApplicationAssetRepository budgetApplicationAssetDao;
     @Autowired
@@ -79,7 +62,7 @@ public class PurchaseOrderService {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<V2_BlobObject> attachList) {
+    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<V2_BlobObject> attachList,List<String> templateIds) {
         //先去掉之前的关联数据
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
@@ -110,11 +93,17 @@ public class PurchaseOrderService {
         }
         budgetApplicationDao.save(curBudgetApplications);
 
-        //附件信息保存
-        if(CollectionUtils.isNotEmpty(attachList)){
-            attachList.stream().forEach(att -> att.setBoUuid(purchaseOrderInfoPersistent.getId()));
+        //处理关联模板信息附件信息保存
+        List<PurchaseTemplate> purchaseTemplateList = purchaseTemplateRepository.findByPurchaseId(purchaseOrderInfoPersistent.getId());
+        purchaseTemplateRepository.delete(purchaseTemplateList);
+        if(CollectionUtils.isNotEmpty(templateIds)){
+            templateIds.stream().forEach(tempId -> {
+                PurchaseTemplate purchaseTemplate = new PurchaseTemplate();
+                purchaseTemplate.setTemplateId(tempId);
+                purchaseTemplate.setPurchaseId(purchaseOrderInfoPersistent.getId());
+                purchaseTemplateRepository.save(purchaseTemplate);
+            });
         }
-        blobService.saveBlobObject(attachList);
         return true;
     }
 
