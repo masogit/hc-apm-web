@@ -397,7 +397,7 @@ public class ExcelDocument implements AutoCloseable{
                 }
                 return null;
             case STRING:
-                return null;
+                return cell.getStringCellValue();
             case FORMULA:
                 return null;
             default:
