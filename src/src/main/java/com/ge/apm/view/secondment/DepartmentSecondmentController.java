@@ -165,7 +165,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
             addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
             addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
             addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
-            addNode("送还待确认",collect.get(target.getReturnerUid()),target.getReturnAt());
+            addNode("送还待确认",collect.get(target.getReturnerAck()),target.getReturnerAckDate());
             addNode("送还待确认(主任)",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
             addNode("收回待确认(主任) ",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
         }
@@ -179,6 +179,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         condition.add(target.getReceiverSignatureUid());
         condition.add(target.getReturnerSignatureUid());
         condition.add(target.getReceiverUid());
+        condition.add(target.getReturnerUid());
         return condition.stream().filter(item -> StringUtils.hasText(item)).collect(Collectors.toList());
     }
     private void addNode(String nodeName,UserAccount operator, Date operatorTime){

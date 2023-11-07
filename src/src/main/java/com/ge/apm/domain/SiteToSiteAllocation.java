@@ -122,6 +122,8 @@ public class SiteToSiteAllocation implements Serializable {
     private Date borrowerAckDate;
     @Column(name = "receiver_date")
     private Date receiverDate;
+    @Column(name = "returner_ack_date")
+    private Date returnerAckDate;
     public String getId() {
         return id;
     }
@@ -504,5 +506,13 @@ public class SiteToSiteAllocation implements Serializable {
 
     public void setReceiverDate(Date receiverDate) {
         this.receiverDate = receiverDate;
+    }
+
+    public Date getReturnerAckDate() {
+        return returnerAckDate;
+    }
+
+    public void setReturnerAckDate(Date returnerAckDate) {
+        this.returnerAckDate = returnerAckDate;
     }
 }
