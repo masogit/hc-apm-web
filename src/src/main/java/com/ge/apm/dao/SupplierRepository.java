@@ -54,6 +54,4 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
 
     List<Supplier> findByUidIn(Collection<String> uidList);
 
-    @Query(value="select name from supplier  where tenant_uid = ?1",nativeQuery=true)
-    List<String> findNameByTenantUid(String tenantUid);
 }
