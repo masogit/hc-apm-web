@@ -24,6 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -544,7 +545,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return (CollectionUtils.isNotEmpty(this.selected.getBudgetApprovals())&&this.selected.getBudgetApprovals().size()>0)?true:false;
     }
 
-    /*public void removeAttachmentById(String blobId) {
+    public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
@@ -554,16 +555,15 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         if (null != blobObject ) {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET);
-            if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
+           /* if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
                 blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
-            }
+            }*/
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-    }*/
-
+    }
     public void searchAsset() {
         clearAssetSearchFilter();
         addAssetSearchFilter();
