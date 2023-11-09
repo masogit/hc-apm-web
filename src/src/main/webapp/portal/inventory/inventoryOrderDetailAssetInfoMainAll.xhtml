@@ -12,7 +12,7 @@
                 <p:commandButton value="全院视图" rendered="#{userContextService.hasCurrentTenantName('')}" action="#{inventoryOrderDetailAssetInfoAllController.changePage(false)}" disabled="true"/>
             </h:panelGrid>
 			<div class="ui-g-12 card ">
-				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0">
+				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0" dynamic="true" cache="true">
 					<p:ajax event="tabChange"/>
 					<p:tab title="#{msg.WholeHospitalView}" id="tab4">
 						<ui:include src="inventoryOrderDetailAssetInfoAll.xhtml" />

@@ -2,14 +2,20 @@ package com.ge.apm.view.inventory;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
+import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InventoryOrderDetail;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -21,6 +27,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +46,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
 	private static final String ORG_NAME = "orgName";
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
+    private InventoryOrderMapper inventoryOrderMapper;
 
 	@Override
 	protected void init() {
@@ -47,6 +55,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
@@ -60,6 +69,43 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
     }
 
     @Override
+    protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        Map<String, Object> param = MapUtil.newHashMap();
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+        List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        if (ObjectUtil.isNotEmpty(orderIdList)) {
+            param.put("orderIdList", orderIdList);
+        }
+        if (ObjectUtil.isNotEmpty(orgUidList)) {
+            param.put("orgUidList", orgUidList);
+        }
+        List<Map<String, Object>> detailOrderList = inventoryOrderMapper.findDetailOrder(param);
+        List<Integer> detailAssetList = detailOrderList.stream().map(map -> Integer.parseInt(map.get("assetid").toString())).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(detailAssetList)) {
+            param.put("detailAssetList", detailAssetList);
+        }
+        Long count = inventoryOrderMapper.findNoneOrderCount(param);
+        Sort sort = pageRequest.getSort();
+        StringBuilder orderBy = new StringBuilder();
+        for (Sort.Order order : sort) {
+            String property = order.getProperty();
+            boolean ascending = order.isAscending();
+            orderBy.append(ZipUtil.camelToUnderline(property)).append(ascending ? " ASC" : " DESC").append(",");
+        }
+        param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+        inventoryOrderService.covQueryCondition(searchFilters, param);
+        List<AssetInfo> resultList = inventoryOrderMapper.findNoneOrderList(param);
+        return new PageImpl<>(resultList, pageRequest, count);
+    }
+
+/*    @Override
 	protected Page<AssetInfo> loadData(PageRequest pageRequest) {
 		//before
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -104,7 +150,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         Page<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFilters,pageRequest);
 		//after
 		return assetInfoList;
-	}
+	}*/
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {

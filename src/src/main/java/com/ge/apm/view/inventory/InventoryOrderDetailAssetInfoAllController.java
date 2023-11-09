@@ -1,59 +1,53 @@
 package com.ge.apm.view.inventory;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDController<InventoryOrderDetail> implements Serializable, ServerEventInterface {
 
-    private PageUtil<InventoryOrderDetail> pageUtil = new PageUtil();
-
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-    private InventoryIssueRepository inventoryIssueRepository;
-	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryOrderService inventoryOrderService;
-	private AssetInfoRepository assetInfoRepository;
     private UserAccountRepository userAccountRepository;
+    private InventoryOrderMapper inventoryOrderMapper;
     private UaaService uaaService;
-	private InventoryOrderService service;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
     private String queryAssetUid;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-        inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
-        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-		service=WebUtil.getBean(InventoryOrderService.class);
+        inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -75,9 +69,50 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         return "inventoryOrderDetailAssetInfoMainAll?faces-redirect=true";
     }
 
-	@Override
+    @Override
+    protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
+        //before
+        Map<String, Object> param = MapUtil.newHashMap();
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+        List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        if (ObjectUtil.isNotEmpty(orderIdList)) {
+            param.put("orderIdList", orderIdList);
+        }
+        if (ObjectUtil.isNotEmpty(orgUidList)) {
+            param.put("orgUidList", orgUidList);
+        }
+        if (ObjectUtil.isNotEmpty(queryAssetUid)) {
+            param.put("queryAssetUid", queryAssetUid);
+        }
+        inventoryOrderService.covQueryCondition(searchFilters, param);
+
+        List<Map<String, Object>> issueOrderList = inventoryOrderMapper.findIssueOrder(param);
+        List<Map<String, Object>> detailOrderList = inventoryOrderMapper.findDetailOrder(param);
+        List<Integer> issueAssetIdList = issueOrderList.stream().map(map -> Integer.parseInt(map.get("assetid").toString())).collect(Collectors.toList());
+        List<Integer> detailAssetList = detailOrderList.stream().map(map -> Integer.parseInt(map.get("assetid").toString())).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(issueAssetIdList)) {
+            param.put("issueAssetIdList", issueAssetIdList);
+        }
+        if (ObjectUtil.isNotEmpty(detailAssetList)) {
+            param.put("detailAssetList", detailAssetList);
+        }
+        List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+        Long count = inventoryOrderMapper.findJoinAssetCount(param);
+        List<InventoryOrderDetail> resultList = joinAssetList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+        return new PageImpl<>(resultList, pageRequest, count);
+    }
+
+/*	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
+        loadData1(pageRequest);
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -273,7 +308,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         Page<InventoryOrderDetail>  inventoryOrderDetailPage = pageUtil.pageNum(inventoryOrderDetailList, pageRequest);
 		return inventoryOrderDetailPage;
-	}
+	}*/
     public String  getUserName(String loginName){
 	    if( null == loginName){
 	        return null;
