@@ -17,6 +17,7 @@ import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -163,6 +164,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Boolean approveFlag = false;
     private List<V2_WorkOrderCoworker> coWorkerList;
 
+    private List<MultiLevelApproval> approveList;
+
     private V2_WorkOrder_Detail itemDetail;
     private V2_WorkOrderCoworker coWorkerDetail;
 
@@ -239,6 +242,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     private SimplePartsConfigService partsConfigService;
     private MultiLevelApprovalService multiLevelApprovalService;
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -313,6 +317,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+            multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
             detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
@@ -1258,8 +1263,52 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return CollectionUtils.isEmpty(v2WorkOrderStep)?"":v2WorkOrderStep.get(0).getOwnerName();
     }
 
+    public V2_WorkOrder_Step getRepairPerson(String woId, Integer step){
+        List<V2_WorkOrder_Step> v2WorkOrderStep = woService.getMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
+        return CollectionUtils.isEmpty(v2WorkOrderStep)?null:v2WorkOrderStep.get(0);
+    }
+
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
+        //获取多级备件审批节点详情
+        try {
+            approveList = multiLevelApprovalRepository.getByBusinessUidList(woId);
+            if (!CollectionUtils.isEmpty(approveList)) {
+                MultiLevelApprovalConfig config = multiLevelApprovalService.getApproveWorkflowConfig(approveList.get(0).getWorkflowConfigApproveUid());
+                List<ApprovalNode> approvalNodes = JSON.parseObject(config.getApprovalItem(), new TypeReference<List<ApprovalNode>>(){});
+                boolean isOwner = isOwner();
+                approveList.forEach(v -> {
+                    ApprovalNode node = approvalNodes.get(v.getApprovalLevel() - 1);
+                    if (isOwner) {
+                        switch (v.getApprovalNodeStatus()) {
+                            case 0:
+                            case 1:
+                                v.setActualApproverName(userDao.findByUidIn(Arrays.stream(v.getApprovalUid().split(",")).filter(c -> StringUtils.isNotEmpty(c)).collect(Collectors.toList())).stream().map(UserAccount::getName).collect(Collectors.joining(",")));
+                                break;
+                        }
+                    } else {
+                        v.setActualApproverName(node.getNodeName());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return woService.getWorkOrderDetails(woId);
+    }
+
+    public boolean isOwner() {
+        if (null != selected.getRepairPersonId() && selected.getRepairPersonId().compareTo(UserContextService.getCurrentUserAccount().getId()) == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<MultiLevelApproval> getApproveList() {
+        return approveList;
+    }
+
+    public void setApproveList(List<MultiLevelApproval> approveList) {
+        this.approveList = approveList;
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
@@ -3672,11 +3721,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public boolean needTwoSubStatus(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
         return isConfigNeedTwoSubStatus(workOrder.getAssetId())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
-
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
-        workOrders.forEach(workOrder -> workOrder.setRepairName(isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairNameRefract(workOrder.getId(), 10):getRepairNameRefract(workOrder.getId(), 4)));
+        workOrders.forEach(workOrder -> {
+            V2_WorkOrder_Step workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
+            workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());
+        });
     }
 
     public Boolean isConfigNeedTwoSubBySiteUid(String siteUid) {
