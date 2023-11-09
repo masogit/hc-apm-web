@@ -780,6 +780,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
                         Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else {
+                        this.selected.setRemainQty(null);
                     }
                 }else if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
                     if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
@@ -1289,7 +1291,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "";
         }
 
-        //selected.setOrderType(orderType);
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }

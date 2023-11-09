@@ -159,7 +159,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.riskGrade}</label>
-                                <h:outputText  value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', assetInstallationController.arrivalListItem.riskGrade) : fieldMsg.fieldValue('riskGrade', assetInstallationController.arrivalListItem.riskGrade)}"/>
+                                <h:outputText  value="#{fieldMsg.fieldValue('riskGrade', assetInstallationController.arrivalListItem.riskGrade)}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.emergencyEquipment}</label>

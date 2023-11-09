@@ -1,11 +1,7 @@
 package com.ge.apm.view.nurseSite;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -13,7 +9,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.service.utils.WrapperSearchFilterUtils;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -26,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -61,6 +66,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainConfigRepository dao;
+    private NurseSiteMaintainConfigMapper configMapper;
+    private UserAccountRepository userAccountRepository;
     private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
     private List<NurseSiteMaintainConfig> listSelected;
@@ -116,6 +123,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         assetSelectController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
+		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         nurseSiteMaintainService.init();
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         setOrgUid = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -135,20 +144,41 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     protected Page<NurseSiteMaintainConfig> loadData(PageRequest pageRequest) {
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return new PageImpl<>(ListUtil.empty());
+		}
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-		if(selectSite!=null) {
-			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
+		if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
 		}
-		//need list or set
-		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
-		searchFilters.add(new SearchFilter("deleted", SearchFilter.Operator.EQ, false));
-        Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
-        return pageResult;
+		if(selectSite!=null) {
+			wrapper.andNew().eq("nsmc.site_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.hospital_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.institution_uid", selectSite.getUid());
+			wrapper.or().eq("nsmc.tenant_uid", selectSite.getUid());
+			wrapper.andNew();
+		}
+		wrapper.in("nsmc.clinical_dept_uid", listOrgUid);
+		wrapper.eq("nsmc.deleted", false);
+		WrapperSearchFilterUtils.convert(searchFilters, wrapper, "nsmc");
+		wrapper.groupBy("nsmc.id");
+		List<NurseSiteMaintainConfig> list = configMapper.findJoinAssetList(pagination, wrapper);
+		List<String> createBy = list.stream().map(NurseSiteMaintainConfig::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+		List<String> modifyBy = list.stream().map(NurseSiteMaintainConfig::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+		modifyBy.addAll(createBy);
+		if (ObjectUtil.isNotEmpty(modifyBy)) {
+			List<UserAccount> userAccounts = userAccountRepository.getByUids(new HashSet<>(modifyBy));
+			Map<String, UserAccount> userAccountMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, t -> t));
+			for (NurseSiteMaintainConfig maintainConfig : list) {
+				maintainConfig.setCreateBy(userAccountMap.get(maintainConfig.getCreateByUid()));
+				maintainConfig.setModifyBy(userAccountMap.get(maintainConfig.getModifyByUid()));
+			}
+		}
+		return new PageImpl<>(list, pageRequest, pagination.getTotal());
     }
 
     public List<NurseSiteMaintainConfig> getConfigList(String clinicalDeptUid) {
@@ -444,8 +474,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
 			nurseSiteMaintainConfig.setModifyDate(currentDate);
 			nurseSiteMaintainConfig.setDeleted(false);
-		}
-		else{
+		} else{
 			nurseSiteMaintainConfig.setModifyBy(currentUser);
 			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
 			nurseSiteMaintainConfig.setModifyDate(currentDate);

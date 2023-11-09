@@ -42,9 +42,9 @@ public class FieldValueMessageController implements Serializable {
     }
 
     public static String fieldValue(String fieldName, String msgKey) {
-        if(fieldName.equals("riskGradeNew") && msgKey.equals("40")) {  //风险等级新旧规则映射
-            msgKey = "30";
-        }
+//        if(fieldName.equals("riskGradeNew") && msgKey.equals("40")) {  //风险等级新旧规则映射
+//            msgKey = "30";
+//        }
         return doGetFieldValue(fieldName, msgKey);
     }
 

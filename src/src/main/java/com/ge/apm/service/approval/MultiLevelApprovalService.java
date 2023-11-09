@@ -320,8 +320,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
-                // 预算管理
-                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED);
+                // 预算管理 审批不通过
+                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
@@ -414,6 +414,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * @return MultiLevelApprovalConfig
      * @date 2020/7/30 16:00
      * 根据金额查询审批配置信息
+     *
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
@@ -652,7 +653,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                                 // 预算管理
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED);
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED,BudgetApplication.APPLICATIONSTEP.PendingComplete.toString());
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
@@ -754,7 +755,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
-                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS);
+                                updateBudget(multiLevelApproval, BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS,BudgetApplication.APPLICATIONSTEP.PendingApproval.toString());
                             }
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             AssetInfo assetInfo=null;
@@ -814,6 +815,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 userAccounts.add(approvalUser);
             }
             wxMessageService.sendMessage(assetInfo,"审批通过",assetScrap,userAccounts,null,userAccount,assetScrap.getApplyReason());
+        }else{
+            if(assetScrap.getAssetStatus()!=null){
+                assetInfo.setStatus(assetScrap.getAssetStatus());
+            }else{
+                assetInfo.setStatus(1);
+            }
+            assetInfoDao.save(assetInfo);
         }
 
     }
@@ -966,13 +974,31 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
-    private void updateBudget(String businessUid, Integer approvalStatus) {
-        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+    private void updateBudget(MultiLevelApproval multiLevelApproval, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(multiLevelApproval.getBusinessUid());
+        if(CollectionUtils.isNotEmpty(budget.getBudgetAssets())){
+            budget.getBudgetAssets().iterator().next().setSignatureNurse(multiLevelApproval.getSignatureNurse());
+        }
         budget.setApplicationStatus(approvalStatus);
-        budget.setApprovalProgress(budget.getApprovalProgress() + 1);
+        budget.setApplicationStep(applicationStep);
+        //budget.setApprovalProgress(budget.getApprovalProgress() + 1);
         budget.setApproverId(UserContextService.getCurrentUserAccount().getId());
         budget.setApprovalDate(new Date());
         budgetApplicationRepository.save(budget);
+    }
+
+    // 预算管理
+    public void cancelApplication(MultiLevelApproval multiLevelApproval, Integer approvalStatus,String applicationStep) {
+        BudgetApplication budget = budgetApplicationRepository.findById(multiLevelApproval.getBusinessUid());
+        if(CollectionUtils.isNotEmpty(budget.getBudgetAssets())){
+            budget.getBudgetAssets().iterator().next().setSignatureNurse(multiLevelApproval.getSignatureNurse());
+        }
+        budget.setApplicationStatus(approvalStatus);
+        budget.setApplicationStep(applicationStep);
+        budgetApplicationRepository.save(budget);
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(budget.getBudgetApprovals())){
+            multiLevelApprovalRepository.delete(budget.getBudgetApprovals());
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

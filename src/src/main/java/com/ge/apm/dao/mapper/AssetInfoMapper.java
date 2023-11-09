@@ -88,4 +88,8 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 	List<AssetInfo> selectMeasureResult(Pagination pagination, @Param("ew") Wrapper<AssetInfo> wrapper);
 
 	List<AssetInfo> selectMeasureResult(@Param("ew") Wrapper<AssetInfo> wrapper);
+
+    List<AssetInfo> findAssetByMaintainConfigParentId(@Param("ew") Wrapper<AssetInfo> wrapper);
+
+	List<AssetInfo> findAssetByMaintainConfigJNParentId(@Param("ew") Wrapper<AssetInfo> wrapper);
 }

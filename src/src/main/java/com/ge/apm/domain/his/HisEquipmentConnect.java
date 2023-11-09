@@ -43,6 +43,10 @@ public class HisEquipmentConnect implements Serializable {
     private Boolean isMatched;
 
 
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
     //excel行数
     @Transient
     private int lineNum;

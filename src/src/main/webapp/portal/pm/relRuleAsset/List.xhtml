@@ -29,7 +29,7 @@
             	
             <h:form id="RelRuleAssetListForm">
                 <p:dataTable id="datalist" value="#{relRuleAssetManagerController.lazyModel}" var="item" widgetVar="varDataList"
-                    selectionMode="single" selection="#{relRuleAssetManagerController.selected}"
+                    selection="#{relRuleAssetManagerController.selected}"
                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -37,7 +37,6 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,50,100,500">
 
-                     <p:ajax event="rowSelect" update="editButton"/>
                      <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}"/>
                     <p:column width="36" id="checkBoxColumn">
@@ -46,7 +45,7 @@
                         </p:selectBooleanCheckbox>
                         <f:facet name="header"  >
                             <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                <p:ajax listener="#{relRuleAssetManagerController.onSelectAllOfPage}" update="@(.selectCheckBox) :RelRuleAssetListForm:datalist:batchToBeTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
+                                <p:ajax listener="#{relRuleAssetManagerController.onSelectAllOfPage}" update="@(.selectCheckBox) :RelRuleAssetListForm:datalist:batchToBeTerminatedButton :RelRuleAssetListForm:datalist:editButton" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
@@ -184,8 +183,8 @@
                             <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
                         </p:commandButton>
 
-                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"
-                                         update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDeleRuleConfig}" actionListener="#{relRuleAssetManagerController.prepareEditRule}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"
+                                         update=":RelRuleAssetEditDlg" oncomplete="handleSubmit(args, 'RelRuleAssetEditDialog')" disabled="#{not relRuleAssetManagerController.isChecked()}"/>
                         <ui:fragment >
                             <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_DELETE')}"
                                              actionListener="#{relRuleAssetManagerController.batchDelete}" update=":RelRuleAssetListForm" disabled="#{not relRuleAssetManagerController.isChecked()}">

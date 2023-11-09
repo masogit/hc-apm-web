@@ -109,6 +109,9 @@ public class AssetOperationRecordProvider {
 			if ("assetInfo.clinicalDeptUID".equals(tempColumn)) {
 				sb.append("b.clinical_dept_uid in ").append(strValue).append(" and ");
 			}
+			if ("assetInfo.assetType".equals(tempColumn)) {
+				sb.append("b.asset_type in ").append(strValue).append(" and ");
+			}
 		} else {
 			switch (tempColumn) {
 				case "assetInfo.siteUID":

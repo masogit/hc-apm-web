@@ -99,6 +99,8 @@ public class AssetOptRecordProvider {
 			String strValue = getSetValue(value);
 			if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
 				sb.append("b.clinical_dept_uid in " + strValue + " and ");
+			} else if (tempColumn.equals("assetInfo.assetType")) {
+				sb.append("b.asset_type in " + strValue + " and ");
 			}
 		} else {
 			if (tempColumn.equals("assetInfo.siteUID")) {

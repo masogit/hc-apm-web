@@ -254,6 +254,10 @@
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>
                                 </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">外部报价</label>
+                                    <p:outputLabel value="#{woItem.externalQuotation}"/>
+                                </h:panelGroup>
                                 <c:if test="#{userContextService.countyArea}">
                                     <h:panelGroup>
                                         <label class="label">#{msg.siebleNumber}</label>

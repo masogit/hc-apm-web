@@ -52,6 +52,10 @@ public class HisAdministrativeOfficesMatch implements Serializable {
     @Column(name = "modify_date")
     private Date modifyDate;//修改日期
 
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
     public HisAdministrativeOfficesMatch() {
     }
 

@@ -192,9 +192,7 @@ public class ExportTerminatedAppraisalService {
 
         }
         if(assetInfo.getLifecycle()!=null){
-            Double aDouble = assetInfo.getLifecycleInYear();
-            String lifecycleInYear = String.format("%.1f", aDouble);
-            map.put(lifecycle.name(),lifecycleInYear);
+            map.put(lifecycle.name(),assetInfo.getLifecycleInYear());
         }
         if(assetInfo.getPurchasePrice()!=null){
             String normalNumber = new BigDecimal(assetInfo.getPurchasePrice()).toPlainString();

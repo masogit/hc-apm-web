@@ -17,6 +17,8 @@ public class BudgetSearchForm {
     private Date dateEnd;
     // 申请编号
     private String applicationNum;
+    // 采购编号
+    private String purchaseNum;
     // 设备分类
     private Integer assetGroup;
     // 设备二级分类
@@ -27,9 +29,19 @@ public class BudgetSearchForm {
     private String applicantName;
     // 设备名称
     private String assetName;
+    //申购年份
+    private Date applicantYear;
 
     public OrgInfo getDept() {
         return dept;
+    }
+
+    public String getPurchaseNum() {
+        return purchaseNum;
+    }
+
+    public void setPurchaseNum(String purchaseNum) {
+        this.purchaseNum = purchaseNum;
     }
 
     public void setDept(OrgInfo dept) {
@@ -98,5 +110,13 @@ public class BudgetSearchForm {
 
     public void setAssetName(String assetName) {
         this.assetName = assetName == null ? null : assetName.trim();
+    }
+
+    public Date getApplicantYear() {
+        return applicantYear;
+    }
+
+    public void setApplicantYear(Date applicantYear) {
+        this.applicantYear = applicantYear;
     }
 }

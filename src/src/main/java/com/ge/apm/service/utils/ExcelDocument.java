@@ -302,15 +302,15 @@ public class ExcelDocument implements AutoCloseable{
                 break;
             }
 
-            Map<String, Object> dataMap = new LinkedHashMap();
+            Map<String, Object> dataMap = new LinkedHashMap<>();
             for (int cellIndex = 0; cellIndex < colKeys.length; cellIndex++) {
                 Cell cell = dataRow.getCell(cellIndex);
-                if (cell == null) {
-                    continue;
+                ValueWrapper wrapper = new ValueWrapper(null, null);
+                if (cell != null) {
+                    Object v = getCellValue(cell);
+                    String rawValue = getRawValue(cell);
+                    wrapper = new ValueWrapper(v, rawValue);
                 }
-                Object v = getCellValue(cell);
-                String rawValue = getRawValue(cell);
-                ValueWrapper wrapper = new ValueWrapper(v, rawValue);
 
                 dataMap.put(colKeys[cellIndex], wrapper);
             }
@@ -397,7 +397,7 @@ public class ExcelDocument implements AutoCloseable{
                 }
                 return null;
             case STRING:
-                return null;
+                return cell.getStringCellValue();
             case FORMULA:
                 return null;
             default:
@@ -854,6 +854,22 @@ public class ExcelDocument implements AutoCloseable{
 
         public ValueWrapper(Object value, String rawValue) {
             this.value = value;
+            this.rawValue = rawValue;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+
+        public String getRawValue() {
+            return rawValue;
+        }
+
+        public void setRawValue(String rawValue) {
             this.rawValue = rawValue;
         }
     }

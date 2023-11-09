@@ -286,6 +286,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("TotalPartPrice_xlsx"), workOrderExportPojo.getPartsTotalPrice());
             workOrderMap.put(WebUtil.getMessage("OtherExpenses_xlsx"), workOrderExportPojo.getOtherExpense());
             workOrderMap.put(WebUtil.getMessage("ExternalExpenses_xlsx"), workOrderExportPojo.getExternalExpense());
+            workOrderMap.put("外部报价", workOrderExportPojo.getExternalQuotation());
             workOrderMap.put(WebUtil.getMessage("TotalRepairPrice_xlsx"), workOrderExportPojo.getTotalPrice());
             workOrderMap.put(WebUtil.getMessage("AcknowledgedBy_xlsx"), workOrderExportPojo.getEvaluateStepOwnerName());
             workOrderMap.put(WebUtil.getMessage("maintanenceValue_xlsx"), workOrderExportPojo.getMaintenanceValue());
@@ -417,11 +418,9 @@ public class WorkOrderExportService {
             m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a-> a.getPurchasePrice()==null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
             m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a->a.getPurchaseDate()).orElse(null));
-
             m.put("auditSignatureList",Optional.ofNullable(approvalsMap.get(woid))
                     .map(o-> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
-
 
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                 m.put("partsSignature", partsSignatureMap.get(woid));

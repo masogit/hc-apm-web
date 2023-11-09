@@ -624,7 +624,7 @@
         <h:panelGroup>
             <label class="label">#{msg.repairForm}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['repairForm'].required? '*':''}</span></label>
             <p:selectOneMenu id="repairForm" value="#{assetInfoEditController.selected.repairForm}" required="#{assetInfoEditController.customConfig.assetFields['repairForm'].required}"
-                             requiredMessage="#{msg.repairForm} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('repairForm')}" >
+                             requiredMessage="#{msg.repairForm} #{msg.ValidationRequire}"  >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>
@@ -632,15 +632,30 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.locationCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationCode'].required? '*':''}</span></label>
-            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" required="#{assetInfoEditController.customConfig.assetFields['locationCode'].required}"
-                         requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" />
+            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" />
+
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationName')}" >
         <h:panelGroup>
             <label class="label">#{msg.locationName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationName'].required? '*':''}</span></label>
             <p:inputText id="locationName" value="#{assetInfoEditController.selected.locationName}" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}"
-                         requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" />
+                         requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" /> <p/>
+            <p:autoComplete dropdown="true" value="#{assetInfoEditController.locationName}"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}" requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.managementListString}"
+                            class="locationNameChange" id="locationNameChange" >
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.locationNamechangeSelect}" update="locationCode locationName locationNameChange" />
+                <p:ajax listener="#{assetInfoEditController.locationNamechange}" process="@this" update="locationCode locationName locationNameChange" />
+            </p:autoComplete>
+        </h:panelGroup>
+
+    </c:if>
+
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetLocation')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetLocation}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetLocation'].required? '*':''}</span></label>
+            <p:inputText id="assetLocation" value="#{assetInfoEditController.selected.assetLocation}" required="#{assetInfoEditController.customConfig.assetFields['assetLocation'].required}"
+                         requiredMessage="#{msg.assetLocation} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('assetLocation')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'status')}" >
@@ -780,7 +795,7 @@
             <p:selectOneMenu id="riskGrade" value="#{assetInfoEditController.selected.riskGrade}" required="#{assetInfoEditController.customConfig.assetFields['riskGrade'].required}"
                              requiredMessage="#{msg.riskGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('riskGrade')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
