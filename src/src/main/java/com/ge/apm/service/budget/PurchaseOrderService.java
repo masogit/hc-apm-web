@@ -40,23 +40,6 @@ public class PurchaseOrderService {
     @Autowired
     private PurchaseTemplateRepository purchaseTemplateRepository;
     @Autowired
-    private BudgetApplicationAssetRepository budgetApplicationAssetDao;
-    @Autowired
-    private BudgetAssetInfoRepository budgetAssetInfoDao;
-    @Autowired
-    private UserAccountRepository userDao;
-    @Autowired
-    private MultiLevelApprovalRepository approvalDao;
-    @Autowired
-    private MultiLevelApprovalService approvalService;
-    @Autowired
-    private BudgetApplicationMapper budgetApplicationMapper;
-    @Autowired
-    private BlobFileService blobService;
-    @Autowired
-    private OrgInfoRepository orgDao;
-
-    @Autowired
     private BudgetApplicationExportService budgetApplicationExportService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");

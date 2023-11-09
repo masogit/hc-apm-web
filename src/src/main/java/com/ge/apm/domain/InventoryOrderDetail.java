@@ -8,6 +8,8 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -100,6 +102,30 @@ public class InventoryOrderDetail implements Serializable {
 
     @Transient
     private Date planStartTime;
+
+    @Transient
+    @Getter @Setter
+    private Integer assetId;
+
+    @Transient
+    @Getter @Setter
+    private String functionType;
+
+    @Transient
+    @Getter @Setter
+    private String financingNum;
+
+    @Transient
+    @Getter @Setter
+    private String assetStatus;
+
+    @Transient
+    @Getter @Setter
+    private String locationName;
+
+    @Transient
+    @Getter @Setter
+    private String name;
 
 
     public String getClinicalDeptUID() {

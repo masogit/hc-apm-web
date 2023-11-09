@@ -865,7 +865,7 @@ public class WorkOrderExportService {
             part.put(WebUtil.getMessage("PartName_xlsx"), workOrderDetail.getParts());
             part.put(WebUtil.getMessage("ContractPrice_xlsx"), workOrderDetail.getClosedPrice());
             part.put(WebUtil.getMessage("Quantity"), workOrderDetail.getApartsQuantity());
-            part.put(WebUtil.getMessage("type"), workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
+            part.put(WebUtil.getMessage("PartType"), workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
             part.put(WebUtil.getMessage("SerialNumber_xlsx"), workOrderDetail.getSerialNum());
             part.put(WebUtil.getMessage("WarrantyDate_xlsx"), workOrderDetail.getWarrantyDate());
             part.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetail.getContractNum());
