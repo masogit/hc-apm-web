@@ -305,11 +305,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public List<AssetInfo> getAssetList() {
 		List<SearchFilter> assetFilters = new ArrayList<>();
-		if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
-			return new ArrayList<>();
-		}else{
-			List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-			assetFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList)));
+		if (user.isEnableAssetTypeGroup()) {
+			if(ObjectUtil.isEmpty(assetTypeGroupList)){
+				return new ArrayList<>();
+			}else{
+				List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+				assetFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList)));
+			}
 		}
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
