@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper">
+
+    <resultMap type="com.ge.apm.domain.NurseSiteMaintainItem" id="maintainBean" autoMapping="true">
+        <result column="id" property="id"/>
+        <result column="create_date" property="createDate"/>
+        <result column="modify_date" property="modifyDate"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="schedule_date" property="scheduleDate"/>
+        <result column="create_by" property="createByUid"/>
+        <result column="modify_by" property="modifyByUid"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="asset_uid" property="assetUid"/>
+        <result column="status" property="status"/>
+        <result column="is_finish" property="isFinish"/>
+        <result column="asset_uid" property="assetUid"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+        <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="name" property="name"/>
+        <result column="config_id" property="configId"/>
+        <result column="signature_id" property="signatureId"/>
+        <result column="signature_source_type" property="signatureSourceType"/>
+        <result column="sequence" property="sequence"/>
+        <result column="comment" property="comment"/>
+    </resultMap>
+
+    <select id="findJoinAssetList" resultMap="maintainBean">
+        select nsmi.* from nurse_site_maintain_item nsmi left join asset_info ai on nsmi.asset_uid = ai.uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+</mapper>

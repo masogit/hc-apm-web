@@ -3,7 +3,6 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
                 template="/WEB-INF/template.xhtml">
-
     <ui:define name="content">
         <style>
             .zoom-06 {
@@ -28,7 +27,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.BudgetApplication}"/>
+                <p:outputLabel class="pageTitle" value="年度申购申请"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -36,6 +35,14 @@
                     <p:fieldset legend="#{msg.AdvancedSearch}">
                         <p:panelGrid id="searchPanel" columns="4" layout="grid"
                                      styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationNum}"/>
+                                <p:inputText value="#{budgetController.searchForm.applicationNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.EquipmentName}"/>
+                                <p:inputText value="#{budgetController.searchForm.assetName}"/>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.ApplicationDept}</label>
                                 <p:inputText id="dept" readonly="true"
@@ -84,40 +91,18 @@
                                     <p:ajax event="dateSelect" update="@this"/>
                                 </p:calendar>
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label" value="#{msg.ApplicationNum}"/>
-                                <p:inputText value="#{budgetController.searchForm.applicationNum}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
-                                <p:selectOneMenu value="#{budgetController.searchForm.assetGroup}">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
-                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
-                                            update="@this assetGroupSecondary"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
-                                <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
-                                <p:selectOneMenu id="assetGroupSecondary"
-                                                 value="#{budgetController.searchForm.assetGroupSecondary}">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{budgetController.budgetFilterAssetGroupSecondaryList}" var="item"
-                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
-                                <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"-->
-                                <!--                                                scrollHeight="250" forceSelection="false">-->
-                                <!--                                </p:autoComplete>-->
                                 <p:inputText value="#{budgetController.searchForm.applicantName}"/>
                             </h:panelGroup>
+
                             <h:panelGroup>
-                                <p:outputLabel class="label" value="#{msg.EquipmentName}"/>
-                                <p:inputText value="#{budgetController.searchForm.assetName}"/>
+                                <label class="label">申购年份</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="yyyy" value="#{budgetController.searchForm.applicantYear}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"  >
+                                </p:calendar>
                             </h:panelGroup>
+
                             <h:panelGroup style="display: flex;">
                                 <p:commandButton value="#{msg.Search}"
                                                  actionListener="#{budgetController.search}"
@@ -133,31 +118,40 @@
                 <p:tabView class="ui-g-12" id="budgetTabView" dynamic="true" cache="false"
                            activeIndex="#{budgetController.tabIndex}">
                     <p:ajax event="tabChange" listener="#{budgetController.onTabChange}"/>
-                    <p:tab id="s0" title="#{msg.All}">
+                    <p:tab id="s0" title="待提交">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s1" title="#{msg.PendingApproval}">
+                    <p:tab id="s1" title="待审核">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s2" title="#{msg.ApprovalInProgress}">
+                    <p:tab id="s2" title="待完成">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s3" title="#{msg.Approved4}">
+                    <p:tab id="s3" title="完成">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s4" title="#{msg.NotApproved}">
+                    <p:tab id="s4" title="#{msg.All}">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
                 </p:tabView>
 
-                <ui:include src="Edit.xhtml"/>
-                <ui:include src="View.xhtml"/>
-                <ui:include src="AssetSelect.xhtml"/>
-                <ui:include src="AssetEdit.xhtml"/>
-
             </div>
         </div>
-
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+        <script type="text/javascript">
+            function selectTab(index) {
+                if(typeof tabWidget != 'undefined') {
+                    tabWidget.select(index);
+                } else {
+                    alert("Can't select tab " + index);
+                }
+            }
+        </script>
     </ui:define>
 
 </ui:composition>

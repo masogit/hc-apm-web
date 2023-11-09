@@ -5,12 +5,9 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysAuthGroup;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -232,8 +229,8 @@ public class AssetInfoService {
         rootNode.setExpanded(true);
         return rootNode;
     }
-    public AssetInfo selectAssetInfos(String uid,String name, String departNum,Integer assetGroup,Set<String> clinicalDeptOrgUidSet,String nationalStandardCode,
-                                      String makerShortName,String manufacture,String qrCode,String startUsingDate,String purchaseDate){
+    public AssetInfo selectAssetInfos(String uid, String name, String departNum, Integer assetGroup, Set<String> clinicalDeptOrgUidSet, String nationalStandardCode,
+                                      String makerShortName, String manufacture, String qrCode, String startUsingDate, String purchaseDate, List<AssetTypeGroup> assetTypeGroupList){
         StringBuffer sqlStringBuffer = new StringBuffer();
         sqlStringBuffer.append(" select a.* from asset_info a where  a.uid = '"+ uid+"'");
         if(name!=null) sqlStringBuffer.append(" and a.name like '%"+name+"%'");
@@ -252,6 +249,16 @@ public class AssetInfoService {
             clinicalDeptUidStr.deleteCharAt(clinicalDeptUidStr .length() - 1);
             clinicalDeptUidStr.append(" )");
             sqlStringBuffer.append(" and a.clinical_dept_uid in "+clinicalDeptUidStr);
+        }
+        if(CollectionUtils.isNotEmpty(assetTypeGroupList)) {
+            StringBuffer assetTypeGroupListStr=new StringBuffer();
+            assetTypeGroupListStr.append("( ");
+            for (AssetTypeGroup assetTypeGroup : assetTypeGroupList) {
+                assetTypeGroupListStr.append("'"+assetTypeGroup.getEncoded()+"' ,");
+            }
+            assetTypeGroupListStr.deleteCharAt(assetTypeGroupListStr .length() - 1);
+            assetTypeGroupListStr.append(" )");
+            sqlStringBuffer.append(" and a.asset_type in "+assetTypeGroupListStr);
         }
         if (StringUtils.isNotEmpty(startUsingDate)){
             String startUsingDateStart = startUsingDate.substring(0, 10);

@@ -465,10 +465,10 @@
                                     <f:facet name="filter">
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </f:facet>
-                                    <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'emergencyEquipment'}">
@@ -581,6 +581,12 @@
                             <c:if test="#{columnItem eq 'locationName'}">
                                 <p:column headerText="#{msg.locationName}" sortBy="#{item.locationName}" filterBy="#{item.locationName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.locationName}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'assetLocation'}">
+                                <p:column headerText="#{msg.assetLocation}" sortBy="#{item.assetLocation}" filterBy="#{item.assetLocation}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetLocation}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'registrationNo'}">

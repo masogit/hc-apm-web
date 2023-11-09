@@ -1,12 +1,22 @@
 package com.ge.apm.service.nurseSite;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.NurseSiteMaintainHistoryMapper;
+import com.ge.apm.dao.mapper.NurseSiteMaintainItemHistoryMapper;
+import com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper;
+import com.ge.apm.dao.mapper.NurseSiteMaintainMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.NurseSiteMaintainHistoryComparator;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.primefaces.model.DefaultStreamedContent;
@@ -30,6 +40,12 @@ public class NurseSiteMaintainHistoryService {
 	private static final String SHEET_Maintain = "Maintain List";
 	@Autowired
 	NurseSiteMaintainHistoryRepository nurseSiteMaintainRepository;
+
+	@Autowired
+	NurseSiteMaintainHistoryMapper nurseSiteMaintainHistoryMapper;
+
+	@Autowired
+	NurseSiteMaintainItemHistoryMapper nurseSiteMaintainHistoryItemMapper;
 
 	@Autowired
 	NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
@@ -242,13 +258,26 @@ public class NurseSiteMaintainHistoryService {
 		tempMaintain.setModifyBy(modifyBy);
 		tempMaintain.setCreateBy(createBy);
 		//items
-		List<NurseSiteMaintainItemHistory> listItem=null;
+		List<NurseSiteMaintainItemHistory> listItem;
+		UserAccount currentUser = UserContextService.getCurrentUserAccount();
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return;
+		}
+		Wrapper<NurseSiteMaintainItemHistory> wrapper = new EntityWrapper<>();
+		if (currentUser.isEnableAssetTypeGroup()) {
+			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+		}
+		wrapper.eq("nsmi.parent_id", tempMaintain.getId());
+		Pagination pagination;
 		if(all){
-			listItem = findMaintainItemByParentId(tempMaintain.getId());
+//			listItem = findMaintainItemByParentId(tempMaintain.getId());
+			pagination = new Pagination();
 		}
 		else{
-			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);
+//			listItem = findMaintainItemByParentId(tempMaintain.getId(),pageSize,page);
+			pagination = new Pagination(page + 1, pageSize);
 		}
+		listItem = nurseSiteMaintainHistoryItemMapper.findJoinAssetList(pagination, wrapper);
 		tempMaintain.setListNurseSiteMaintainItem(listItem);
 		supplementMaintainItem(listItem);
 	}
@@ -634,4 +663,11 @@ public class NurseSiteMaintainHistoryService {
 		return Boolean.TRUE;
 	}
 
+	public List<NurseSiteMaintainHistory> findJoinAssetList(Wrapper<NurseSiteMaintainHistory> wrapper) {
+		return nurseSiteMaintainHistoryMapper.findJoinAssetList(wrapper);
+	}
+
+	public List<NurseSiteMaintainItemHistory> findItemJoinAssetList(Pagination pagination, Wrapper<NurseSiteMaintainItemHistory> wrapper) {
+		return nurseSiteMaintainHistoryItemMapper.findJoinAssetList(pagination, wrapper);
+	}
 }

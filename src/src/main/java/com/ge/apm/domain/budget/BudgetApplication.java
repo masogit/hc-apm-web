@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
@@ -40,9 +41,40 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "application_num")
     private String applicationNum;
 
-    // 申请状态 1: 待审核, 2: 审核中, 3: 审核通过, 4: 审核未通过
+    //1暂存 2 通过  3 不通过
     @Column(name = "application_status")
     private Integer applicationStatus;
+    /**
+     * 申请步骤APPLICATIONSTEP
+     *已完成   待审核   已完成
+     */
+    public enum APPLICATIONSTEP {
+        ToSubmitted, PendingApproval,PendingComplete,Complete
+    }
+    /**
+     * 采购状态
+     *已采购未采购
+     */
+    public enum PROCURESTATUS {
+        Unpurchased, Purchased
+    }
+    /**
+     * 申请步骤
+     */
+    @Column(name = "application_step")
+    private String applicationStep;
+
+    /**
+     * 采购状态
+     */
+    @Column(name = "procure_Status")
+    private String procureStatus;
+
+    /**
+     * 采购单id
+     */
+    @Column(name = "purchase_id")
+    private String purchaseId;
 
     // 申请日期
     @Column(name = "application_date")
@@ -118,6 +150,14 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "approval_config_id")
     private String approvalConfigId;
 
+    // 病区代码
+    @Column(name = "ward_code")
+    private String wardCode;
+
+    // 院区
+    @Column(name = "courtyard_area")
+    private String courtyardArea;
+
     // 审批流
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
@@ -158,6 +198,158 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
+
+    @Transient
+    private String approveName ;    //审批人
+
+    @Transient
+    private String applicantName ;//申请人
+
+    public String getProcureStatus() {
+        return StringUtils.isBlank(procureStatus)?BudgetApplication.PROCURESTATUS.Unpurchased.toString(): procureStatus;
+    }
+
+    public void setProcureStatus(String procureStatus) {
+        this.procureStatus = procureStatus;
+    }
+
+    public String getCourtyardArea() {
+        return courtyardArea;
+    }
+
+    public void setCourtyardArea(String courtyardArea) {
+        this.courtyardArea = courtyardArea;
+    }
+
+    public String getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
+    }
+
+    /**
+     * *设备名称
+     */
+    @Transient
+    private String applicationAssetName;
+
+    // 预算单价
+    @Transient
+    private BigDecimal applicationPrice;
+
+    // 预算总价
+    @Transient
+    private BigDecimal applicationAmount;
+
+    // 申请数量
+    @Transient
+    private Integer applicationQuantity;
+
+    // 申请科室
+    @Transient
+    private String applicationDeptName;
+
+    public String getApplicationDeptName() {
+        return applicationDeptName;
+    }
+
+    public void setApplicationDeptName(String applicationDeptName) {
+        this.applicationDeptName = applicationDeptName;
+    }
+
+    public Integer getApplicationQuantity() {
+        return applicationQuantity;
+    }
+
+    public void setApplicationQuantity(Integer applicationQuantity) {
+        this.applicationQuantity = applicationQuantity;
+    }
+
+    public String getApplicationAssetName() {
+        return applicationAssetName;
+    }
+
+    public void setApplicationAssetName(String applicationAssetName) {
+        this.applicationAssetName = applicationAssetName;
+    }
+
+    public BigDecimal getApplicationPrice() {
+        return applicationPrice;
+    }
+
+    public void setApplicationPrice(BigDecimal applicationPrice) {
+        this.applicationPrice = applicationPrice;
+    }
+
+    public BigDecimal getApplicationAmount() {
+        return applicationAmount;
+    }
+
+    public void setApplicationAmount(BigDecimal applicationAmount) {
+        this.applicationAmount = applicationAmount;
+    }
+
+    public String getApproveName() {
+        return approveName;
+    }
+
+    public void setApproveName(String approveName) {
+        this.approveName = approveName;
+    }
+
+    public String getApplicantName() {
+        return applicantName;
+    }
+
+    public void setApplicantName(String applicantName) {
+        this.applicantName = applicantName;
+    }
+
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    public enum OrderType {
+        BAY, BAP
+    }
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    @Column(name = "order_type")
+    private String orderType;
+
+    public String getApplicationStep() {
+        return applicationStep;
+    }
+
+    public void setApplicationStep(String applicationStep) {
+        this.applicationStep = applicationStep;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    /**
+     * 申请编号索引
+     */
+    @Column(name = "application_num_index")
+    private Integer applicationNumIndex;
+
+    public Integer getApplicationNumIndex() {
+        return applicationNumIndex;
+    }
+
+    public void setApplicationNumIndex(Integer applicationNumIndex) {
+        this.applicationNumIndex = applicationNumIndex;
+    }
 
     @Override
     public int hashCode() {
@@ -424,5 +616,13 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Override
     public int getBusinessType() {
         return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT;
+    }
+
+    public String getPurchaseId() {
+        return purchaseId;
+    }
+
+    public void setPurchaseId(String purchaseId) {
+        this.purchaseId = purchaseId;
     }
 }

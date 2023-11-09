@@ -154,6 +154,19 @@ public class MultiLevelApproval implements Serializable {
     @Column(name = "audit_signature")
     private String auditSignature;
 
+    //护士长是否已签名
+    @Transient
+    private String signatureNurse;
+
+
+    public String getSignatureNurse() {
+        return signatureNurse;
+    }
+
+    public void setSignatureNurse(String signatureNurse) {
+        this.signatureNurse = signatureNurse;
+    }
+
     public boolean getApprovalIng() {
         return approvalIng;
     }

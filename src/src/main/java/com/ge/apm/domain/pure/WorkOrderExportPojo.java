@@ -82,6 +82,8 @@ public class WorkOrderExportPojo {
     private Double otherExpense;
     //外修费用
     private Double externalExpense;
+    //外修报价
+    private Double externalQuotation;
     //维修总费用
     private Double totalPrice;
     //验收人
@@ -194,6 +196,13 @@ public class WorkOrderExportPojo {
     //维修价值
     private Double maintenanceValue;
 
+    public Double getExternalQuotation() {
+        return externalQuotation;
+    }
+
+    public void setExternalQuotation(Double externalQuotation) {
+        this.externalQuotation = externalQuotation;
+    }
 
     public String getId() {
         return Id;
