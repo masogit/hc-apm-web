@@ -18,6 +18,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.ge.apm.dao.*;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,11 +36,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
-import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -65,8 +64,8 @@ public class InventoryOrderService {
 	private OrgInfoRepository orgInfoDao;
 	@Autowired
 	private I18nMessageRepository i18nMessageDao;
-	// @Autowired
-	// private ObjectHubRepository objectHubRepository;
+	@Autowired
+	private UserAccountRepository userAccountRepository;
 
 	private final Integer INVENTORY_NOT_FINISHED = 0; // 未盘点
 	private final Integer INVENTORY_FINISHED = 1; // 已盘点色弱
@@ -454,6 +453,65 @@ public class InventoryOrderService {
         }
 
 		return listClinicalDeptName;
+	}
+
+	public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+		for (SearchFilter searchFilter :searchFilters) {
+			String fieldName = searchFilter.fieldName;
+			switch (fieldName) {
+				case "name":
+					param.put("name", searchFilter.value);
+					break;
+				case "clinicalDeptName":
+					param.put("clinicalDeptName", searchFilter.value);
+					break;
+				case "qrCode":
+					param.put("qrCode", searchFilter.value);
+					break;
+				case "departNum":
+					param.put("departNum", searchFilter.value);
+					break;
+				case "functionType":
+					param.put("functionType", searchFilter.value);
+					break;
+				case "financingNum":
+					param.put("financingNum", searchFilter.value);
+					break;
+				case "assetStatus":
+					param.put("assetStatus", Integer.parseInt(searchFilter.value.toString()));
+					break;
+				case "locationName":
+					param.put("locationName", searchFilter.value);
+					break;
+				case "isSolved":
+					boolean isSolved = Boolean.parseBoolean(searchFilter.value.toString());
+					if (isSolved) {
+						param.put("isSolved", "是");
+					} else {
+						param.put("isSolved", "否");
+					}
+					break;
+				case "lastModifiedBy":
+					List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(UserContextService.getCurrentUserAccount().getTenantUID(), searchFilter.value.toString());
+					List<String> loginNamList = userAccountList.stream().map(UserAccount::getLoginName).collect(Collectors.toList());
+					if (ObjectUtil.isNotEmpty(loginNamList)) {
+						param.put("lastModifiedBy", loginNamList);
+					}
+					break;
+				case "status":
+					param.put("status", Integer.parseInt(searchFilter.value.toString()));
+					break;
+				case "lastModifiedDate":
+					if (searchFilter.operator.name().equals("GTE")) {
+						param.put("startDate", searchFilter.value);
+					} else {
+						param.put("endDate", searchFilter.value);
+					}
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 }
