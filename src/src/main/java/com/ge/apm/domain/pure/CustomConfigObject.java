@@ -234,6 +234,10 @@ public class CustomConfigObject {
         return assetsMobilepageFilterFields;
     }
 
+    public List<String> getDefaultAssetsMobilepageFilterFields() {
+        return CustomConfigConstant.getDefaultAssetsMobilepageFilterFields();
+    }
+
     public void setAssetsMobilepageFilterFields(List<String> assetsMobilepageFilterFields) {
         this.assetsMobilepageFilterFields = assetsMobilepageFilterFields;
     }

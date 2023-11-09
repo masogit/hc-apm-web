@@ -177,6 +177,10 @@ public class CustomConfigConstant {
         return Arrays.asList("siteUID", "assetGroup", "status");
     }
 
+    public static List<String> getDefaultAssetsMobilepageFilterFields() {
+        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked");
+    }
+
     /**
      * the below fields are only used by wechat, no need to export in asset
      * @return
