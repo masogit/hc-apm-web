@@ -150,7 +150,7 @@ public class CustomConfigController {
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
                 break;
             case "MobileFilterFields":
-                addFieldsList = customConfigObject.getDefaultAssetsMobilepageFilterFields().stream().filter(item -> !customConfigObject.getAssetsMobilepageFilterFields().contains(item)).collect(Collectors.toList());
+                addFieldsList = customConfigObject.defaultAssetsMobilepageFilterFields().stream().filter(item -> !customConfigObject.getAssetsMobilepageFilterFields().contains(item)).collect(Collectors.toList());
                 break;
             case "MobileHeaderFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
