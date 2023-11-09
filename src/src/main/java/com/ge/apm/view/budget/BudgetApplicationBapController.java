@@ -18,14 +18,12 @@ import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -163,12 +161,12 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return dao;
     }
 
-    public List<BudgetAssetInfo> autoCompleteAssetName(String query) {
+   /* public List<BudgetAssetInfo> autoCompleteAssetName(String query) {
         optionalBudgetAssets.clear();
         List<BudgetAssetInfo> assetInfoList = budgetAssetDao.findByTenantUIDAndIsDeleted(selectedDept.getTenantUID(),0);
         assetInfoList = assetInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
         return CollectionUtils.isNotEmpty(assetInfoList)?assetInfoList:new ArrayList<BudgetAssetInfo>();
-    }
+    }*/
 
     public void onBudgetAssetInfoChange(){
         this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
@@ -182,9 +180,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return "View".equals(crudActionName)?true:false;
     }
 
-    public boolean curModelCreate(){
-        return "Create".equals(crudActionName)?true:false;
-    }
 
     public void onTabChange(TabChangeEvent event) {
         selected = null;
@@ -239,7 +234,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ, BudgetApplication.OrderType.BAP.toString()));
+        updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ,
+                BudgetApplication.OrderType.BAP.toString()));
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
         removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");
         if (tabIndex == 0) {//待办
@@ -348,12 +344,12 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void saveAsset() {
         // 保存时设置科室·
-        selectedAsset.setDept(selectedDept);
-        selectedAsset.setDeptId(selectedDept.getId());
-        selectedAsset.setTenantUID(selectedDept.getTenantUID());
-        selectedAsset.setInstitutionUID(selectedDept.getInstitutionUID());
-        selectedAsset.setHospitalUID(selectedDept.getHospitalUID());
-        selectedAsset.setSiteUID(selectedDept.getSiteUID());
+        //selectedAsset.setDept(selectedDept);
+        //selectedAsset.setDeptId(selectedDept.getId());
+        selectedAsset.setTenantUID(account.getTenantUID());
+        selectedAsset.setInstitutionUID(account.getTenantUID());
+        selectedAsset.setHospitalUID(account.getTenantUID());
+        selectedAsset.setSiteUID(account.getTenantUID());
         boolean isOk = persistService.saveAsset(selectedAsset);
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
@@ -535,7 +531,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void buildCurDetail(String id){
         this.selected = this.dao.findById(id);
-        this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
+        this.curSelectApplicationBudgetAsset = CollectionUtils.isNotEmpty(this.selected.getBudgetAssets())?
+                this.selected.getBudgetAssets().iterator().next():new BudgetApplicationAsset();
         this.selectedDept = this.selected.getApplicationDept();
         this.selected.setApplicationDeptName(this.selectedDept.getName());
         if(this.curSelectApplicationBudgetAsset!=null ){
@@ -547,7 +544,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return (CollectionUtils.isNotEmpty(this.selected.getBudgetApprovals())&&this.selected.getBudgetApprovals().size()>0)?true:false;
     }
 
-    public void removeAttachmentById(String blobId) {
+    /*public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
@@ -565,7 +562,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-    }
+    }*/
 
     public void searchAsset() {
         clearAssetSearchFilter();
@@ -620,10 +617,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void exportAll()  {
         try {
-            this.selected = this.dao.findById(selected.getId());
-            this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
-            this.selectedDept = this.selected.getApplicationDept();
-            this.selected.setApplicationDeptName(this.selectedDept.getName());
+            buildCurDetail(selected.getId());
             if(this.curSelectApplicationBudgetAsset!=null ){
                 this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
             }
@@ -633,14 +627,4 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    @Override
-    public void prepareDelete() {
-        crudActionName = "Delete";
-    }
-
-
-
-
-
 }

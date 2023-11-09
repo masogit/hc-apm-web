@@ -29,7 +29,7 @@ public class BudgetApplicationAsset implements Serializable {
     private String id;
 
     // 申请id
-    @Column(name = "application_id", columnDefinition = "CHAR(32)")
+    @Column(name = "application_id",updatable = false,columnDefinition = "CHAR(32)")
     private String applicationId;
 
     // 申请编号

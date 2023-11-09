@@ -43,8 +43,6 @@ public class BudgetPersistService {
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
     @Autowired
-    private BudgetApplicationAssetRepository budgetApplicationAssetDao;
-    @Autowired
     private BudgetAssetInfoRepository budgetAssetInfoDao;
     @Autowired
     private UserAccountRepository userDao;
@@ -59,7 +57,6 @@ public class BudgetPersistService {
     @Autowired
     private OrgInfoRepository orgDao;
 
-
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
@@ -73,6 +70,7 @@ public class BudgetPersistService {
         budgetApplicationAsset.setApplicationDeptId(application.getApplicationDeptId());
         application = budgetApplicationDao.save(application);
         BudgetApplicationAsset budgetApplicationAssetPersistent = application.getBudgetAssets().iterator().next();
+        //明细关联的主键id 没有带出 需要放入 或者在字段上设置 不可以更新
         budgetApplicationAssetPersistent.setApplicationId(application.getId());
         if(CollectionUtils.isNotEmpty(attachList)){
             attachList.stream().forEach(att -> att.setBoUuid(budgetApplicationAssetPersistent.getId()));
@@ -228,10 +226,6 @@ public class BudgetPersistService {
         if(CollectionUtils.isNotEmpty(application.getBudgetApprovals())){
             approvalDao.delete(application.getBudgetApprovals());
         }
-        application.setIsDeleted(1);
-        if(CollectionUtils.isNotEmpty(application.getBudgetAssets())){
-            application.getBudgetAssets().iterator().next().setIsDeleted(1);
-        }
         budgetApplicationDao.delete(application);
         return true;
     }
@@ -311,16 +305,6 @@ public class BudgetPersistService {
         budgetAssetInfoDao.delete(assetInfo);
         return true;
     }
-    /**
-     * 回退列表
-     *
-     * @param
-     * @return
-     */
-    public String backList() {
-        return "List.xhtml?faces-redirect=true";
-    }
-
     /**
      * 给申请单添加单号和索引
      *
