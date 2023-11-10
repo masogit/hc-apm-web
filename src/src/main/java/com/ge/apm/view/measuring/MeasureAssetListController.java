@@ -1,5 +1,6 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -78,7 +79,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private TreeNode selectedNode;
     private UserAuth customRoleAuth;
     private StreamedContent exportFile;
-    private TenantInfoRepository tenantInfoDao;
+    private ConfigCacheService ccService;
     private FileDownloadService fileDownloadService;
     private I18nMessageRepository i18nMessageDao;
     private ConfigItemMapper configItemMapper;
@@ -88,6 +89,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private AssetInfoMapper assetInfoMapper;
     private WorkflowService workflowService;
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
+    private TenantInfo currentTenantInfo;
 
     @Override
     protected void init() {
@@ -96,7 +98,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         i18nMessageDao = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
+        ccService = WebUtil.getBean(ConfigCacheService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
@@ -112,6 +114,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         this.selectedMap = MapUtil.newHashMap();
         this.searchFilters = new ArrayList<>();
         totalMeasureExpireMonths();
+        currentTenantInfo = ccService.getTenantByUid(UserContextService.getCurrentUserAccount().getTenantUID());
     }
 
     @Override
@@ -347,11 +350,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean isYunNanFuWai(){
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
-        if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        return Objects.equals(currentTenantInfo.getName().trim(),"云南省阜外心血管病医院");
     }
 
     public void downloadSelectedFile() {

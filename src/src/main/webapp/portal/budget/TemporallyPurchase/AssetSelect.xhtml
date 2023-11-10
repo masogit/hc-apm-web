@@ -80,7 +80,7 @@
             <br/>
             <p:commandButton validateClient="true" actionListener="#{budgetBayController.onBudgetAssetInfoChange}"
                              value="确定"
-                             update=":AssetSelectDlg, BudgetApplicationEditForm, :growl"
+                             update=":AssetSelectDlg, @(.budgetAssetInfoChange), :growl"
                              oncomplete="handleSubmit(args, 'AssetSelectDialog');"/>
             <p:commandButton immediate="true" value="#{msg.Cancel}"
                              onclick="PF('AssetSelectDialog').hide()"/>

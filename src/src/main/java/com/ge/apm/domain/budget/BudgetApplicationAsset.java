@@ -18,7 +18,7 @@ import java.util.Date;
  * @date 4/9/2022 18:20
  */
 @Entity
-@Table(name = "budget_application_asset", indexes = {@Index(columnList = "application_id")})
+@Table(name = "budget_application_asset")
 public class BudgetApplicationAsset implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -29,16 +29,14 @@ public class BudgetApplicationAsset implements Serializable {
     private String id;
 
     // 申请id
-    @Column(name = "application_id", columnDefinition = "CHAR(32)")
+    @Column(name = "application_id",updatable = false,columnDefinition = "CHAR(32)")
     private String applicationId;
 
     // 申请编号
     @Column(name = "application_num")
     private String applicationNum;
 
-    // 申请设备id
-    @Column(name = "application_asset_id")
-    private Integer applicationAssetId;
+
     // 申请科室id
     @Column(name = "applicant_dept_id")
     private Integer applicationDeptId;
@@ -266,13 +264,6 @@ public class BudgetApplicationAsset implements Serializable {
     private BudgetApplication budgetApplication;
 
 
-    public Integer getApplicationAssetId() {
-        return applicationAssetId;
-    }
-
-    public void setApplicationAssetId(Integer applicationAssetId) {
-        this.applicationAssetId = applicationAssetId;
-    }
 
     public Date getOfflineApprovalDate() {
         return offlineApprovalDate;

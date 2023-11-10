@@ -98,7 +98,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     }
     private void queryScope(OrgInfo org){
         if(org == null) return;
-        switch (org.getOrgType()) {
+        /*switch (org.getOrgType()) {
             case 4:
                 // 科室
                 updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, org.getId()));
@@ -118,19 +118,19 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
             default:
                 // 租户
                 updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
-        }
+        }*/
+        updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+
     }
     @Override
     public void save() {
         // 保存时设置科室
-        selected.setDept(selectedDept);
-        selected.setDeptId(selectedDept.getId());
-
-        selected.setTenantUID(selectedDept.getTenantUID());
-        selected.setInstitutionUID(selectedDept.getInstitutionUID());
-        selected.setHospitalUID(selectedDept.getHospitalUID());
-        selected.setSiteUID(selectedDept.getSiteUID());
-
+        //selected.setDept(selectedDept);
+        //selected.setDeptId(selectedDept.getId());
+        selected.setTenantUID(account.getTenantUID());
+        selected.setInstitutionUID(account.getTenantUID());
+        selected.setHospitalUID(account.getTenantUID());
+        selected.setSiteUID(account.getTenantUID());
         boolean isOk = persistService.saveAsset(selected);
         actionMessage(isOk);
     }
@@ -291,16 +291,6 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     public void prepareEdit() {
         crudActionName = "Edit";
         selectedDept = selected.getDept();
-    }
-
-    @Override
-    public void prepareView() {
-        crudActionName = "View";
-    }
-
-    @Override
-    public void prepareDelete() {
-        crudActionName = "Delete";
     }
 
     /*

@@ -9,12 +9,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.view.asset.AssetInfoListController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,6 +44,7 @@ public class CustomConfigObject {
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
     List<String> assetsMobilepageFilterFields;
+    List<String> assetsMobilepageBuildAssetFields;
     List<String> assetsWebMaintainDetailFields;
 
     List<String> assetsImportantFields;
@@ -53,7 +52,6 @@ public class CustomConfigObject {
 
     JSONObject mobilePage;
     JSONObject mobileMaintainPage;
-    JSONObject mobileBuildAssetPage;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -234,6 +232,10 @@ public class CustomConfigObject {
         return assetsMobilepageFilterFields;
     }
 
+    public List<String> defaultAssetsMobilepageFilterFields() {
+        return CustomConfigConstant.defaultAssetsMobilepageFilterFields();
+    }
+
     public void setAssetsMobilepageFilterFields(List<String> assetsMobilepageFilterFields) {
         this.assetsMobilepageFilterFields = assetsMobilepageFilterFields;
     }
@@ -261,6 +263,17 @@ public class CustomConfigObject {
         this.assetsMobilepageHeaderFields = assetsMobilepageHeaderFields;
     }
 
+    public List<String> getAssetsMobilepageBuildAssetFields() {
+        if (assetsMobilepageBuildAssetFields == null) {
+            assetsMobilepageBuildAssetFields = CustomConfigConstant.getAssetsMobilepageBuildAssetFields();
+        }
+        return assetsMobilepageBuildAssetFields;
+    }
+
+    public void setAssetsMobilepageBuildAssetFields(List<String> assetsMobilepageBuildAssetFields) {
+        this.assetsMobilepageBuildAssetFields = assetsMobilepageBuildAssetFields;
+    }
+
     public JSONObject getMobilePage() {
         if (mobilePage == null) {
             mobilePage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
@@ -281,17 +294,6 @@ public class CustomConfigObject {
 
     public void setMobileMaintainPage(JSONObject mobileMaintainPage) {
         this.mobileMaintainPage = mobileMaintainPage;
-    }
-
-    public JSONObject getMobileBuildAssetPage() {
-        if (mobileBuildAssetPage == null) {
-            mobileBuildAssetPage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_BUILD_ASSET_PAGE_JSON);
-        }
-        return mobileBuildAssetPage;
-    }
-
-    public void setMobileBuildAssetPage(JSONObject mobileBuildAssetPage) {
-        this.mobileBuildAssetPage = mobileBuildAssetPage;
     }
 
     public List<String> getAssetsImportantFields() {

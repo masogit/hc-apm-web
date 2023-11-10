@@ -37,6 +37,8 @@ public class WorkOrderDetailPojo {
     private String comment;
     //结单状态
     private Boolean statementStatus;
+    //备件类别
+    private String partsType;
 
     public String getId() {
         return id;
@@ -156,5 +158,13 @@ public class WorkOrderDetailPojo {
 
     public void setAssetDepartNum(String assetDepartNum) {
         this.assetDepartNum = assetDepartNum;
+    }
+
+    public String getPartsType() {
+        return partsType;
+    }
+
+    public void setPartsType(String partsType) {
+        this.partsType = partsType;
     }
 }

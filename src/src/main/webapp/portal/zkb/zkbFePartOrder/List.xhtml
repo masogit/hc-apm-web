@@ -60,6 +60,9 @@
                         <p:column headerText="#{msg.zkbFePartOrder_orderNo}" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
+                        <p:column headerText="合同编号" filterBy="#{item.contractNoSearch}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.contractNoSearch}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_systemId}" filterBy="#{item.systemId}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.systemId}"/>
                         </p:column>
