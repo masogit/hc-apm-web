@@ -173,8 +173,16 @@ public class CustomConfigConstant {
         return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
     }
 
+    public static List<String> getAssetsMobilepageBuildAssetFields() {
+        return Arrays.asList("name", "departNum", "financingNum", "serialNum", "functionType", "assetGroup", "manufactDate", "installDate", "acceptDate", "factoryWarrantyDate", "vendor", "vendorTel", "purchasePrice", "registrationNo", "assetClass", "lifecycle", "emergencyEquipment", "makerShortName", "parentAssetId", "locationName", "comments");
+    }
+
     public static List<String> getAssetsMobilepageFilterFields() {
         return Arrays.asList("siteUID", "assetGroup", "status");
+    }
+
+    public static List<String> defaultAssetsMobilepageFilterFields() {
+        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked");
     }
 
     /**

@@ -20,7 +20,7 @@ public interface BudgetApplicationRepository extends GenericRepositoryUUID<Budge
 
 
 
-    List<BudgetApplication> findByPurchaseIdAndIsDeleted(String purchaseId,Integer isDeleted);
+    List<BudgetApplication> findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(String purchaseId,Integer isDeleted);
 
     List<BudgetApplication> findByIdIn(List<String> ids);
 

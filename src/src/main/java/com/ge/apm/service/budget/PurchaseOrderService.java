@@ -40,23 +40,6 @@ public class PurchaseOrderService {
     @Autowired
     private PurchaseTemplateRepository purchaseTemplateRepository;
     @Autowired
-    private BudgetApplicationAssetRepository budgetApplicationAssetDao;
-    @Autowired
-    private BudgetAssetInfoRepository budgetAssetInfoDao;
-    @Autowired
-    private UserAccountRepository userDao;
-    @Autowired
-    private MultiLevelApprovalRepository approvalDao;
-    @Autowired
-    private MultiLevelApprovalService approvalService;
-    @Autowired
-    private BudgetApplicationMapper budgetApplicationMapper;
-    @Autowired
-    private BlobFileService blobService;
-    @Autowired
-    private OrgInfoRepository orgDao;
-
-    @Autowired
     private BudgetApplicationExportService budgetApplicationExportService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -66,14 +49,17 @@ public class PurchaseOrderService {
         //先去掉之前的关联数据
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
+        }else{
+            //编辑才需要处理之前数据
+            List<BudgetApplication> lastBudgetApplications = budgetApplicationDao.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
+            if(CollectionUtils.isNotEmpty(lastBudgetApplications)){
+                lastBudgetApplications.stream().forEach(budget -> {
+                    setPurchaseInfoNull(budget);
+                });
+            }
+            budgetApplicationDao.save(lastBudgetApplications);
         }
-        List<BudgetApplication> lastBudgetApplications = budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
-        if(CollectionUtils.isNotEmpty(lastBudgetApplications)){
-            lastBudgetApplications.stream().forEach(budget -> {
-                setPurchaseInfoNull(budget);
-            });
-        }
-        budgetApplicationDao.save(lastBudgetApplications);
+
         //保存采购单数据
         purchaseOrderInfo.setApplicationAssetName(null);
         if(CollectionUtils.isNotEmpty(budgetApplicationAssetList)){
@@ -157,7 +143,7 @@ public class PurchaseOrderService {
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteApplication(PurchaseOrderInfo purchaseOrderInfo) {
         purchaseOrderInfoRepository.delete(purchaseOrderInfo);
-        List<BudgetApplication> budgetApplicationList =  budgetApplicationDao.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
+        List<BudgetApplication> budgetApplicationList =  budgetApplicationDao.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
         budgetApplicationList.stream().forEach(budget -> {
             setPurchaseInfoNull(budget);
         });
