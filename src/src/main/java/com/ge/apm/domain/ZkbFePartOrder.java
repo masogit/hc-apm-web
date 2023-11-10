@@ -2,12 +2,10 @@ package com.ge.apm.domain;
 
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
-import webapp.framework.util.StringUtil;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -271,6 +269,9 @@ public class ZkbFePartOrder {
      */
     @Transient
     private String contractNo;
+
+    @Formula("(select zc.contract_no  FROM zkb_contract zc WHERE zc.id = contract_Id)")
+    private String contractNoSearch;
 
     /**
      * 区域
@@ -643,6 +644,14 @@ public class ZkbFePartOrder {
 
     @Column(name = "cat_model_non_ge")
     private String catModelNonGe;
+
+    public String getContractNoSearch() {
+        return contractNoSearch;
+    }
+
+    public void setContractNoSearch(String contractNoSearch) {
+        this.contractNoSearch = contractNoSearch;
+    }
 
     public String getCatModelNonGe() {
         return catModelNonGe;
