@@ -75,6 +75,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -242,6 +243,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     private SimplePartsConfigService partsConfigService;
     private MultiLevelApprovalService multiLevelApprovalService;
+    private ExternalTempUserRepository externalTempUserDao;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Setter@Getter
     private String highlevelApprovalComments;
@@ -275,7 +277,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private boolean hospitalShow = false;
     private UserAccount loginUser;
-
+    @Getter @Setter
+    private ExternalTempUser externalTempUser;
+    @Getter @Setter
+    private List<Map<String,String>> maintenancePersonInformation;
     @Override
     protected void init() {
         try {
@@ -320,6 +325,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
             detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
+            externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
@@ -1209,8 +1215,26 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
         picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        // 获取temp user信息
+        initExternalTempUser();
     }
+    private void initExternalTempUser(){
+        externalTempUser = externalTempUserDao.findByWoId(selected.getId());
+        if(ObjectUtil.isNotEmpty(externalTempUser)){
+            maintenancePersonInformation = new ArrayList<>();
+            maintenancePersonInformation.add(initMap("userName","姓名",externalTempUser.getUserName()));
+            maintenancePersonInformation.add(initMap("tel","联系人电话",externalTempUser.getTel()));
+            maintenancePersonInformation.add(initMap("comName","公司名称",externalTempUser.getComName()));
+        }
 
+    }
+    private Map<String,String> initMap(String fieldName,String key,String label){
+        Map<String,String> row=new HashMap<>();
+        row.put("fieldName",fieldName);
+        row.put("key",key);
+        row.put("label",label);
+        return row;
+    }
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
 
         List<V2_BlobObject> pList = woService.getPicListBySrUid(srId, type, boSubType).stream().filter(item -> type == 1 ^
@@ -3777,6 +3801,43 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         return false;
+    }
+
+    public void onRowEditExternalTempUser(RowEditEvent event) {
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        Map<String,String> row =(Map) event.getObject();
+        String label = row.get("label");
+        if(StringUtils.isBlank(label)){
+            WebUtil.addErrorMessage(row.get("key")+"不能为空");
+            return;
+        }
+        try {
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            fieldName.set(externalTempUser,label);
+            externalTempUserDao.save(externalTempUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+    public void onRowCancelExternalTempUser(RowEditEvent event) {
+        try {
+            Map<String,String> row =(Map) event.getObject();
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            Object o = fieldName.get(externalTempUser);
+            if(!ObjectUtils.isEmpty(o)){
+                row.put("label",o.toString());
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }
 

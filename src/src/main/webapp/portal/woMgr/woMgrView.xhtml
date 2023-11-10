@@ -422,7 +422,34 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{workOrderMgrController.maintenancePersonInformation != null}">
+                                <label class="label">维修人信息</label>
+                                <p:dataTable styleClass="header1" id="qrCodeEditForm" var="person" value="#{workOrderMgrController.maintenancePersonInformation}" editable="true" rowKey="#{person.fieldName}">
+                                    <p:ajax event="rowEdit" listener="#{workOrderMgrController.onRowEditExternalTempUser}" update="woTab:woMgrDetailForm:qrCodeEditForm" />
+                                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancelExternalTempUser}" update="woTab:woMgrDetailForm:qrCodeEditForm" />
+                                    <p:column  >
+                                        <h:outputText value="#{person.key}" />
+                                    </p:column>
+                                    <p:column  >
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{person.label}" /></f:facet>
+                                            <f:facet name="input"><p:inputText id="label" value="#{person.label}" style="width:100%"/></f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+                                    <p:column >
+                                        <p:rowEditor editTitle="#{msg.Edit}" />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
 
+                            <h:panelGroup rendered="#{not empty workOrderMgrController.externalTempUser}">
+                                <label class="label">签名图片</label>
+                                <p:panel  style="text-align:center">
+                                    <h:panelGrid columns="1" style="width:100%" >
+                                        <p:graphicImage value="#{fileDownloadService.getFile(workOrderMgrController.externalTempUser.signatureId)}" stream="false" height="80"  width="100"/>
+                                    </h:panelGrid>
+                                </p:panel>
+                            </h:panelGroup>
                             <c:choose>
                                 <c:when test="#{userContextService.isCountyArea()}">
                                     <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHours(woItem.id)}">
@@ -523,5 +550,10 @@
             </h:form>
 
         </div>
+        <style type="text/css">
+            .header1  thead{
+                display: none!important;
+            }
+        </style>
     </ui:composition>
 </html>
