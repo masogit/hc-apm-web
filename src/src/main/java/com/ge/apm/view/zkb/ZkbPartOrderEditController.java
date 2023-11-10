@@ -726,8 +726,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         } else {
                             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                         }
+                    }else{
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                     }
-
                 }
             }
         }
