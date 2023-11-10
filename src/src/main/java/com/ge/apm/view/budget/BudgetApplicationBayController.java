@@ -288,7 +288,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     public void saveApplication() {
         persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
-        boolean isOk = persistService.saveApplication(selected,this.attachList);
+        boolean isOk = persistService.saveApplication(selected,this.attachList,null);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
@@ -306,7 +306,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
                     account,crudActionName,this.curSelectBudgetAssetInfo);
-             persistService.saveApplication(selected,this.attachList);
+             persistService.saveApplication(selected,this.attachList,null);
         }
         return this.backList();
     }

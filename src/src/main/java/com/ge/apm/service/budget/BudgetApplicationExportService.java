@@ -356,7 +356,7 @@ public class BudgetApplicationExportService {
      * 生成申购单文件
      */
     public void generateBudgetFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
-        List<BudgetApplication> budgetApplicationList = budgetApplicationRepository.findByPurchaseIdAndIsDeleted(purchaseOrderInfo.getId(),0);
+        List<BudgetApplication> budgetApplicationList = budgetApplicationRepository.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
         if(budgetApplicationList != null && budgetApplicationList.size() > 0){
             for(BudgetApplication application : budgetApplicationList){
                 BudgetApplicationAsset applicationAsset = null;
