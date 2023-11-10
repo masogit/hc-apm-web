@@ -112,7 +112,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private OrgInfo selectedDept;
     @Getter @Setter
     private StreamedContent exportFile;
-
+    @Getter @Setter
+    private List<String> removeFileBlobId = new ArrayList<>();
     @Override
     protected void init() {
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
@@ -304,7 +305,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     public void saveApplication() {
         persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
-        boolean isOk = persistService.saveApplication(selected,this.attachList);
+        boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
@@ -323,7 +324,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
                     account,crudActionName,this.curSelectBudgetAssetInfo);
-            persistService.saveApplication(selected,this.attachList);
+            persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         }
         return this.backList();
     }
@@ -546,7 +547,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void removeAttachmentById(String blobId) {
-        blobService.deleteBlobFileById(blobId);
+        this.removeFileBlobId.add(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 

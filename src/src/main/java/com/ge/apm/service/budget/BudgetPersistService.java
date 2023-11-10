@@ -60,7 +60,7 @@ public class BudgetPersistService {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
+    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList,List<String> removeFileBlobIds) {
         if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
             // 保存以获得ID
             this.genApplicationNum(application,application.getOrderType());
@@ -74,6 +74,12 @@ public class BudgetPersistService {
         budgetApplicationAssetPersistent.setApplicationId(application.getId());
         if(CollectionUtils.isNotEmpty(attachList)){
             attachList.stream().forEach(att -> att.setBoUuid(budgetApplicationAssetPersistent.getId()));
+        }
+        //去掉删除的数据
+        if(CollectionUtils.isNotEmpty(removeFileBlobIds)){
+            removeFileBlobIds.stream().forEach(blobId ->{
+                blobService.deleteBlobFileById(blobId);
+            });
         }
         blobService.saveBlobObject(attachList);
         return true;
@@ -156,7 +162,7 @@ public class BudgetPersistService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
-        this.saveApplication(application,attachList);
+        this.saveApplication(application,attachList,null);
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
        /* if (true) {*/
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
