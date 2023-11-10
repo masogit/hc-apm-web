@@ -29,8 +29,8 @@ public class ExternalTempUser implements Serializable {
 
     @Column(name="wo_id")
     private String woId;
-    @Column(name="signature_id")
-    private String signatureId;
+    @Column(name="signature")
+    private String signature;
 
     public String getId() {
         return id;
@@ -72,11 +72,11 @@ public class ExternalTempUser implements Serializable {
         this.woId = woId;
     }
 
-    public String getSignatureId() {
-        return signatureId;
+    public String getSignature() {
+        return signature;
     }
 
-    public void setSignatureId(String signatureId) {
-        this.signatureId = signatureId;
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }
