@@ -187,6 +187,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastPmDate")), "setLastPmDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastMeteringDate")), "setLastMeteringDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("LastInspectionDate")), "setLastQaDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("MVSContractStartDate")), "setMvsContractStartDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("MVSContractEndDate")), "setMvsContractEndDate");
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Maintainer")), "setMaitanance", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("MaintainerTelephone")), "setMaitananceTel", true);
