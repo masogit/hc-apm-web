@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
@@ -87,7 +88,7 @@ public class CustomConfigService {
         CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if (config == null) {
             config = new CustomConfig();
-            config.setConfig(JSONObject.toJSONString(customConfigObject));
+            config.setConfig(JSON.toJSONString(customConfigObject));
             config.setTenantUID(selectSite.getTenantUID());
             config.setInstitutionUID(selectSite.getInstitutionUID());
             config.setHospitalUID(selectSite.getHospitalUID());
@@ -95,7 +96,7 @@ public class CustomConfigService {
             config.setCreatedDate(new Date());
             config.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
         } else {
-            config.setConfig(JSONObject.toJSONString(customConfigObject));
+            config.setConfig(JSON.toJSONString(customConfigObject));
             config.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
             config.setLastModifiedDate(new Date());
         }
@@ -213,46 +214,21 @@ public class CustomConfigService {
             WebUtil.addErrorMessage(WebUtil.getMessage("SystemRequiredFieldsCannotBeDeleted"));
             return;
         }
-        if (customConfigObject.getAssetFields().containsKey(key)) {
-            customConfigObject.getAssetFields().remove(key);
-        }
+        customConfigObject.getAssetFields().remove(key);
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item-> !Objects.equals(item, key)).collect(Collectors.toList()));
-//            customConfigObject.getAssetsListPageFields().remove(key);
         }
-        if (customConfigObject.getAssetsDetailpageBasicFields().contains(key)) {
-            customConfigObject.getAssetsDetailpageBasicFields().remove(key);
-        }
-        if (customConfigObject.getAssetsDetailpageDetailFields().contains(key)) {
-            customConfigObject.getAssetsDetailpageDetailFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageBasicFields().contains(key)) {
-            customConfigObject.getAssetsEditpageBasicFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageCatalogFields().contains(key)) {
-            customConfigObject.getAssetsEditpageCatalogFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageCodesFields().contains(key)) {
-            customConfigObject.getAssetsEditpageCodesFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageFinicialFields().contains(key)) {
-            customConfigObject.getAssetsEditpageFinicialFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageStatusFields().contains(key)) {
-            customConfigObject.getAssetsEditpageStatusFields().remove(key);
-        }
-        if (customConfigObject.getAssetsEditpageDateFields().contains(key)) {
-            customConfigObject.getAssetsEditpageDateFields().remove(key);
-        }
-        if (customConfigObject.getAssetsMobilepageBasicFields().contains(key)) {
-            customConfigObject.getAssetsMobilepageBasicFields().remove(key);
-        }
-        if (customConfigObject.getAssetsMobilepageDetailFields().contains(key)) {
-            customConfigObject.getAssetsMobilepageDetailFields().remove(key);
-        }
-        if (customConfigObject.getAssetsMobilepageHeaderFields().contains(key)) {
-            customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
-        }
+        customConfigObject.getAssetsDetailpageBasicFields().remove(key);
+        customConfigObject.getAssetsDetailpageDetailFields().remove(key);
+        customConfigObject.getAssetsEditpageBasicFields().remove(key);
+        customConfigObject.getAssetsEditpageCatalogFields().remove(key);
+        customConfigObject.getAssetsEditpageCodesFields().remove(key);
+        customConfigObject.getAssetsEditpageFinicialFields().remove(key);
+        customConfigObject.getAssetsEditpageStatusFields().remove(key);
+        customConfigObject.getAssetsEditpageDateFields().remove(key);
+        customConfigObject.getAssetsMobilepageBasicFields().remove(key);
+        customConfigObject.getAssetsMobilepageDetailFields().remove(key);
+        customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
         if (JSONPath.containsValue(customConfigObject.getMobilePage(), "$.pageWorkOrder.group[type='assetInfo'].assetInfoFields",key)) {
             JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
                     ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).fluentRemove(key));

@@ -18,7 +18,7 @@
     <http pattern="/error/*" security="none"/>
     <http pattern="/about.html" security="none"/>
     <http pattern="/portal/asset/info/specialAssetList.xhtml" security="none"/>
-    <http pattern="/portal/woMgr/workOrderList.xhtml" security="none"/>
+<!--    <http pattern="/portal/woMgr/workOrderList.xhtml" security="none"/>-->
     <http pattern="/portal/woMgr/specialWorkOrderList.xhtml" security="none"/>
     <http pattern="/portal/pm/specialPmOrderListAll.xhtml" security="none"/>
     <http pattern="/portal/measuring/specialMeasuringResultMain.xhtml" security="none"/>

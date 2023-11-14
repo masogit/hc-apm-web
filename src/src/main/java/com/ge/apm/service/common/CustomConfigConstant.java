@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.common;
 
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
@@ -110,7 +111,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -120,7 +121,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
@@ -173,8 +174,16 @@ public class CustomConfigConstant {
         return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
     }
 
+//    public static List<String> getAllAssetsMobilepageBuildAssetFields() {
+//        return ListUtil.newArrayList("name", "departNum", "financingNum", "serialNum", "functionType", "assetGroup", "manufacture", "manufactDate", "installDate", "acceptDate", "factoryWarrantyDate", "vendor", "vendorTel", "purchasePrice", "registrationNo", "assetClass", "clinicalDeptName", "lifecycle", "emergencyEquipment", "makerShortName", "parentAssetId", "locationName", "comments");
+//    }
+
+    public static List<String> getAllAssetsMobilepageBuildAssetFields() {
+        return ListUtil.newArrayList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments");
+    }
+
     public static List<String> getAssetsMobilepageBuildAssetFields() {
-        return Arrays.asList("name", "departNum", "financingNum", "serialNum", "functionType", "assetGroup", "manufactDate", "installDate", "acceptDate", "factoryWarrantyDate", "vendor", "vendorTel", "purchasePrice", "registrationNo", "assetClass", "lifecycle", "emergencyEquipment", "makerShortName", "parentAssetId", "locationName", "comments");
+        return Arrays.asList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments");
     }
 
     public static List<String> getAssetsMobilepageFilterFields() {

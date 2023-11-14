@@ -163,8 +163,9 @@ public class CustomConfigController {
                         && !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
             case "MobileBuildAssetFields":
-                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getAssetsMobilepageBuildAssetFields().contains(item)).collect(Collectors.toList());
+                addFieldsList = customConfigObject.getAllAssetsMobilepageBuildAssetFields();
+//                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+//                        .filter(item -> !customConfigObject.getAssetsMobilepageBuildAssetFields().contains(item)).collect(Collectors.toList());
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -230,9 +231,9 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageFilterFields());
                 break;
             case "RemoveMobileBuildAssetFields":
-                List<String> assetsMobilepageBuildAssetFields = new ArrayList<>(customConfigObject.getAssetsMobilepageBuildAssetFields());
-                assetsMobilepageBuildAssetFields.removeAll(CustomConfigConstant.getAssetsMobilepageBuildAssetFields());
-                addFieldsList.addAll(assetsMobilepageBuildAssetFields);
+//                List<String> assetsMobilepageBuildAssetFields = new ArrayList<>(customConfigObject.getAssetsMobilepageBuildAssetFields());
+//                assetsMobilepageBuildAssetFields.removeAll(CustomConfigConstant.getAssetsMobilepageBuildAssetFields());
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageBuildAssetFields());
                 break;
             case "MobileWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
