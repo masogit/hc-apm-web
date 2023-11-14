@@ -811,6 +811,11 @@
                                     <h:outputText value="#{item.assetUsedLifecycle}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetLifecycleDeadline'}">
+                                <p:column headerText="#{msg.assetLifecycleDeadline}" filterBy="#{item.assetLifecycleDeadline}" filterMatchMode="LTE">
+                                    <h:outputText value="#{item.assetLifecycleDeadline}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'assetQuantity'}">
                                 <p:column headerText="#{msg.assetQuantity}" exportable="true" sortBy="#{item.assetQuantity}" filterBy="#{item.assetQuantity}" filterMatchMode="EQ">
                                     <h:outputText value="#{item.assetQuantity}"/>

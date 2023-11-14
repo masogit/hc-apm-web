@@ -950,6 +950,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
         map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
+        map.put(getMessage("assetLifecycleDeadline"), assetInfo.getAssetLifecycleDeadline());
+        map.put(getMessage("MVSContractStartDate"), assetInfo.getMvsContractStartDate());
+        map.put(getMessage("MVSContractEndDate"), assetInfo.getMvsContractEndDate());
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
@@ -1083,6 +1086,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
         map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
+        map.put(getMessage("assetLifecycleDeadline"), assetInfo.getAssetLifecycleDeadline());
+        map.put(getMessage("MVSContractStartDate"), assetInfo.getMvsContractStartDate());
+        map.put(getMessage("MVSContractEndDate"), assetInfo.getMvsContractEndDate());
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
