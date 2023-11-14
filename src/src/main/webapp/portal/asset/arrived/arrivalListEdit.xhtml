@@ -556,7 +556,12 @@
                                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                     <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                    <h:panelGroup >
+                                                        <p:inputText value="#{fileitem.objectName}" >
+                                                            <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                        </p:inputText>
+                                                    </h:panelGroup>
                                                     <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -594,7 +599,12 @@
                                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup >
+                                                    <p:inputText value="#{fileitem.objectName}" >
+                                                        <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                    </p:inputText>
+                                                </h:panelGroup>
                                                 <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                         <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -620,7 +630,12 @@
                                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup >
+                                                    <p:inputText value="#{fileitem.objectName}" >
+                                                        <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                    </p:inputText>
+                                                </h:panelGroup>
                                                 <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                         <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -646,7 +661,12 @@
                                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup >
+                                                    <p:inputText value="#{fileitem.objectName}" >
+                                                        <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                    </p:inputText>
+                                                </h:panelGroup>
                                                 <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                         <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -679,7 +699,12 @@
                                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup >
+                                                    <p:inputText value="#{fileitem.objectName}" >
+                                                        <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                    </p:inputText>
+                                                </h:panelGroup>
                                                 <h:panelGroup rendered="#{assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                         <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -707,8 +732,12 @@
                                                             paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                     <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                    <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
+                                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                    <h:panelGroup >
+                                                        <p:inputText value="#{fileitem.objectName}" >
+                                                            <p:ajax event="blur" listener="#{assetArrivedListEditController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                                        </p:inputText>
+                                                    </h:panelGroup>                                                    <h:panelGroup rendered="#{ assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"
                                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"

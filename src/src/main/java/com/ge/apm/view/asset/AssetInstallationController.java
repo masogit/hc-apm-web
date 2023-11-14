@@ -633,6 +633,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 .collect(Collectors.toList());
     }
 
+    public void reName(String blobId, String name) {
+
+        attachList.forEach(v -> {
+            if (v.getId().equals(blobId)) {
+                v.setObjectName(name);
+                blobService.saveBlobObject(v);
+            }
+        });
+    }
+
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
         return configService.getAttachmentCategories(config);
     }
