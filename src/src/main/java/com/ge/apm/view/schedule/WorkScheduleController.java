@@ -82,6 +82,7 @@ public class WorkScheduleController{
     private Boolean isEdited=Boolean.FALSE;
     private List<UserAccount> editUserList;
     private SharedAssetConfigController sharedAssetConfigController;
+    private List<UserAccount> tenantUserList;
     @PostConstruct
     protected void init() {
 
@@ -104,6 +105,7 @@ public class WorkScheduleController{
             type=UserSchedule.Type.W;
         }
         this.initSite();
+        this.initTenantUserList();
         this.loadScheduleData();
         this.loadScheduleConfig();
         this.userList = loadUserList();
@@ -142,22 +144,31 @@ public class WorkScheduleController{
             selectSite=selectSiteSchedule;
         }
     }
-    private void loadScheduleData(){
-        eventModel = new DefaultScheduleModel();
-
-        List<SearchFilter> searchFilters = new ArrayList<>();
-
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid()));
-
-        List<UserSchedule> tempUserScheduleList = dao.findBySearchFilter(searchFilters);
-
-        for (UserSchedule us : tempUserScheduleList) {
-
-            DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(this.getShowTitle(us.getScheduleDateStage()) + "---" + us.getUserAccount().getName(), us.getScheduleDate(), us.getScheduleDate(), true);
-            tempEvent.setData(us);
-            eventModel.addEvent(tempEvent);
+    private void initTenantUserList(){
+        if(CollectionUtils.isEmpty(tenantUserList)){
+            tenantUserList = userAccountDao.findByTenantUID(selectSite.getTenantUID());
         }
+    }
+    private void loadScheduleData(){
+            eventModel = new DefaultScheduleModel();
+
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid()));
+
+            List<UserSchedule> tempUserScheduleList = dao.findBySearchFilter(searchFilters);
+
+            Map<String, UserAccount> userAccountMap =new HashMap<>();
+            if(!CollectionUtils.isEmpty(tenantUserList)){
+                userAccountMap = tenantUserList.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
+            }
+            for (UserSchedule us : tempUserScheduleList) {
+                UserAccount userAccount = userAccountMap.get(us.getUserUID());
+                us.setUserAccount(userAccount);
+                DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(this.getShowTitle(us.getScheduleDateStage()) + "---" + (userAccount == null?"":userAccount.getName()), us.getScheduleDate(), us.getScheduleDate(), true);
+                tempEvent.setData(us);
+                eventModel.addEvent(tempEvent);
+            }
     }
 
     public void addSchedule(ActionEvent actionEvent) {
