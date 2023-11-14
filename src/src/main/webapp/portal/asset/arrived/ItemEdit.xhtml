@@ -482,7 +482,12 @@
                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -508,7 +513,12 @@
                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -534,7 +544,12 @@
                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -560,7 +575,12 @@
                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <p:ajax event="page" oncomplete="loadPreImg()"/>
                                     <f:facet name="header">临床验收确认</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -588,7 +608,12 @@
                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                         <p:ajax event="page" oncomplete="loadPreImg()"/>
                                         <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <h:panelGroup >
+                                            <p:inputText value="#{fileitem.objectName}" >
+                                                <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                            </p:inputText>
+                                        </h:panelGroup>
                                         <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                             <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                                 <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
@@ -629,7 +654,12 @@
                                 </h:panelGroup>
                                 <p:dataList id="pictureList1" value="#{assetInstallationController.getAttachList('business')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{msg.attachmentUrl}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList1" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton> 
@@ -653,7 +683,12 @@
                                 </h:panelGroup>
                                 <p:dataList id="pictureList2" value="#{assetInstallationController.getAttachList('clinical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{msg.attachmentUrl}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList2" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>   
@@ -677,7 +712,12 @@
                                 </h:panelGroup>
                                 <p:dataList id="pictureList3" value="#{assetInstallationController.getAttachList('technical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{msg.attachmentUrl}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList3" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>    
@@ -701,7 +741,12 @@
                                 </h:panelGroup>
                                 <p:dataList id="pictureList4" value="#{assetInstallationController.getAttachList('fixasset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{msg.attachmentUrl}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <h:panelGroup >
+                                        <p:inputText value="#{fileitem.objectName}" >
+                                            <p:ajax event="blur" listener="#{assetInstallationController.reName(fileitem.id, fileitem.objectName)}" update="@this "/>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList4" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
