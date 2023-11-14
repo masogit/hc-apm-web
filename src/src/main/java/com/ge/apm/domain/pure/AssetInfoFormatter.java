@@ -1105,10 +1105,10 @@ public class AssetInfoFormatter {
     }
 
     private String getMessage(String key) {
-        if(!messageCacheMap.containsKey(key)) {
-            messageCacheMap.put(key, WebUtil.getMessage(key));
-        }
-        return messageCacheMap.get(key);
+//        if(!messageCacheMap.containsKey(key)) {
+//            messageCacheMap.put(key, WebUtil.getMessage(key));
+//        }
+        return WebUtil.getMessage(key);
     }
 
     public String selectCreatedBy(String loginName) {
