@@ -3,9 +3,9 @@ package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
@@ -25,7 +25,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -65,7 +64,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     SharedAssetReqTypeRepository apdDao = null;
     AssetInfoRepository asiDao = null;
     SharedAssetTypeRepository swapDao = null;
-    WorkflowConfigRepository wfCfigDao = null;
     SharedAssetConfigRepository sharedAssetConfigDao = null;
     UserRoleRepository userRoleRepository = null;
     SysRoleRepository sysRoleDao;
@@ -87,6 +85,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Integer dialogTitle;
     private Integer stock=0;
     private boolean isReturn=false;
+    private ConfigService configService;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -198,7 +197,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-        wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
@@ -264,9 +263,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private WorkflowConfig getWorkflowConfig(){
         OrgInfo selectSite = userContextService.getSelectSite();
         if(selectSite != null){
-          return  wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+          return   configService.findConfigBySite(selectSite.getUid());
         }else{
-            return  wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            return  configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID());
         }
     }
     @Override
@@ -1360,11 +1359,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
-           for (int i = 0; i < infoList.size(); i++) {
+           // 只能同院区调剂不存在多个WorkflowConfig
+            WorkflowConfig configBySite = configService.findConfigBySite(selected.getSiteUID());
+            String deptForSharedAsset = "";
+            if(configBySite != null){
+                 deptForSharedAsset = configBySite.getDeptForSharedAsset();
+            }
+            for (int i = 0; i < infoList.size(); i++) {
                AssetInfo info = infoList.get(i);
                AssetInfo realInfo = asiDao.findByUid(info.getUid());
-               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getClinicalDeptUID());
-               if (wfcList == null || wfcList.size() == 0) {
+                String clinicalDeptUID = realInfo.getClinicalDeptUID();
+               if (StringUtils.isNotBlank(deptForSharedAsset) && !deptForSharedAsset.equals(clinicalDeptUID)) {
                    msg = msg + "设备 ‘" + info.getDepartNum() +"’ 刚已被科室 ‘" + realInfo.getClinicalDeptName() + "’ 借走，设备已移除。 ";
                    for (int j = 0; j < sardList.size(); j++) {
                        SharedAssetReqDetail sard = sardList.get(j);
@@ -1430,11 +1435,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
+            // 只能同院区调剂不存在多个WorkflowConfig
+            WorkflowConfig configBySite = configService.findConfigBySite(selected.getSiteUID());
+            String deptForSharedAsset = "";
+            if(configBySite != null){
+                deptForSharedAsset = configBySite.getDeptForSharedAsset();
+            }
            for (int i = 0; i < infoList.size(); i++) {
                AssetInfo info = infoList.get(i);
                AssetInfo realInfo = asiDao.findByUid(info.getUid());
-               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getAssetDeptUID());
-               if (wfcList != null && wfcList.size() > 0) {
+               String assetDeptUID = realInfo.getAssetDeptUID();
+               if (StringUtils.isNotBlank(deptForSharedAsset) && deptForSharedAsset.equals(assetDeptUID)) {
                    msg = msg + "设备 ‘" + info.getDepartNum() +"’ 刚刚已被归还，请重新录入！ ";
                    for (int j = 0; j < sardList.size(); j++) {
                        SharedAssetReqDetail sard = sardList.get(j);
@@ -2032,9 +2043,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         OrgInfo selectSite = bean.getSelectSite();
         WorkflowConfig wfConfig=null;
         if(selectSite != null){
-             wfConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+             wfConfig = configService.findConfigBySite(selectSite.getUid());
         }else{
-             wfConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            wfConfig=configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID());
         }
         if(wfConfig != null) {
             result = (wfConfig.getEnableLogPatientInfo() != null) ? wfConfig.getEnableLogPatientInfo() : Boolean.FALSE;
