@@ -134,7 +134,7 @@
                         </p:dataTable>
                     </h:panelGroup>
 
-                    <h:panelGroup rendered="#{not empty v2PmOrderController.externalTempUser}">
+                    <h:panelGroup rendered="#{not empty v2PmOrderController.externalTempUser and not empty v2PmOrderController.externalTempUser.signature}">
                         <label class="label">签名图片</label>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >

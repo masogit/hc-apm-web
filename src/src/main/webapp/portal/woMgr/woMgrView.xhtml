@@ -442,7 +442,7 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{not empty workOrderMgrController.externalTempUser}">
+                            <h:panelGroup rendered="#{not empty workOrderMgrController.externalTempUser and not empty workOrderMgrController.externalTempUser.signature}">
                                 <label class="label">签名图片</label>
                                 <p:panel  style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%" >
