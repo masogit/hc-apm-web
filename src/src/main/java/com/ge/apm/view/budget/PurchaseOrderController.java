@@ -386,7 +386,11 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             for(PurchaseVender purchaseVender :purchaseVenderList){
                 StringBuilder stringBuilder = new StringBuilder();
                 String s = new String();
-                stringBuilder.append(venderInfoRepository.findById(purchaseVender.getVenderId()).getVenderName()+" : ");
+                VenderInfo venderInfo = venderInfoRepository.findById(purchaseVender.getVenderId());
+                if(venderInfo == null){
+                    continue;
+                }
+                stringBuilder.append(venderInfo.getVenderName()+" : ");
                 stringBuilder.append("[");
                 List<V2_BlobObject> v2_blobObjectList = blobService.findBlobObjectsByBoUid(purchaseVender.getId());
                 if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
