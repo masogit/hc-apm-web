@@ -3088,7 +3088,7 @@ public class AssetInfo implements ChineseName,Serializable {
         this.assetLocation = assetLocation;
     }
 
-    private final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 
     public String getAssetUsedLifecycle() {
         if (ObjectUtil.isNotEmpty(assetUsedLifecycle)) {
