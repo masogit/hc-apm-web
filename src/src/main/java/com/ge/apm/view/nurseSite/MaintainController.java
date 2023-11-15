@@ -116,9 +116,9 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = ListUtil.empty();
 		} else if (currentUser.isEnableAssetTypeGroup()) {
 			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
-			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(), wrapper);
+			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		} else {
-			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(), wrapper);
+			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);

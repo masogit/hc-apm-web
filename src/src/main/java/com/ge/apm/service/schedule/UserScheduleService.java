@@ -251,6 +251,8 @@ public class UserScheduleService {
         long daysDiff = ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1;
         LocalDate scheduleDate;
         Instant scheduleDateInstant;
+        List<String> userList = userAccountList.stream().map(UserAccount::getUid).distinct().collect(Collectors.toList());
+        List<UserSchedule> byUserUIDInAndScheduleDateBetween = userScheduleDao.findByUserUIDInAndScheduleDateBetween(userList, Date.from(startLocalDate.atStartOfDay(zone).toInstant()), Date.from(endLocalDate.atStartOfDay(zone).toInstant()));
         for(int i = 0 ; i < daysDiff ; i++) {
             scheduleDateInstant = startLocalDate.plus(i, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
             scheduleDate = startLocalDate.plus(i, ChronoUnit.DAYS).atStartOfDay().toLocalDate();
@@ -263,9 +265,9 @@ public class UserScheduleService {
                 for (UserAccount ua : userAccountList) {
                     String[] types=batchType;
                     if(UserSchedule.Type.A.equals(type)){
-                        types=changeType(types,scheduleDateInstant,ua);
+                        types=changeType(types,scheduleDateInstant,ua,byUserUIDInAndScheduleDateBetween);
                     }
-                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,selectSite,ua,type);
+                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,selectSite,ua,type,byUserUIDInAndScheduleDateBetween);
                 }
             }
         }
@@ -276,8 +278,9 @@ public class UserScheduleService {
         resultMap.put(BATCH_FAILED_LIST, failedList);
         return resultMap;
     }
-    private String[] changeType(String[] types,Instant scheduleDateInstant,UserAccount ua){
-        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.A.name(), ua.getUid(), Date.from(scheduleDateInstant));
+    private String[] changeType(String[] types,Instant scheduleDateInstant,UserAccount ua,List<UserSchedule> byUserUIDInAndScheduleDateBetween){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = getCurrentUserSchedule(scheduleDateInstant, ua, byUserUIDInAndScheduleDateBetween, UserSchedule.Type.A);
+        //List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.A.name(), ua.getUid(), Date.from(scheduleDateInstant));
         if(CollectionUtils.isNotEmpty(byTypeAndUserUIDAndScheduleDate)){
             List<String> collect = byTypeAndUserUIDAndScheduleDate.stream().filter(item -> !StringUtils.isEmpty(item.getScheduleDateStage())).map(UserSchedule::getScheduleDateStage).collect(Collectors.toList());
             List<String> typeList = Arrays.asList(types).stream().filter(item -> !collect.contains(item)).collect(Collectors.toList());
@@ -285,8 +288,34 @@ public class UserScheduleService {
         }
         return types;
     }
-    private void createUserWorkSchedule(Instant scheduleDateInstant, String[] batchType, List<UserSchedule> successList, List<UserSchedule> failedList, OrgInfo selectSite, UserAccount ua, UserSchedule.Type type){
-        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(type.name(), ua.getUid(), Date.from(scheduleDateInstant));
+
+    private List<UserSchedule> getCurrentUserSchedule(Instant scheduleDateInstant, UserAccount ua, List<UserSchedule> byUserUIDInAndScheduleDateBetween,UserSchedule.Type type) {
+      return  byUserUIDInAndScheduleDateBetween.stream().filter(item->{
+            boolean flag=true;
+            if(!type.name().equals(item.getType())){
+                flag = false;
+            }
+            if(flag && !item.getUserUID().equals(ua.getUid())){
+                flag = false;
+            }
+            if(flag){
+                Date scheduleDate = item.getScheduleDate();
+                LocalDate localDate = scheduleDateInstant.atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate localDate1 = scheduleDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if(localDate.compareTo(localDate1) != 0){
+                    flag = false;
+                }
+            }
+            return flag;
+        }).collect(Collectors.toList());
+    }
+
+    private void createUserWorkSchedule(Instant scheduleDateInstant, String[] batchType, List<UserSchedule> successList, List<UserSchedule> failedList, OrgInfo selectSite, UserAccount ua, UserSchedule.Type type,List<UserSchedule> byUserUIDInAndScheduleDateBetween){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = getCurrentUserSchedule(scheduleDateInstant, ua, byUserUIDInAndScheduleDateBetween, type);
+        if(!UserSchedule.Type.A.equals(type)){
+            byTypeAndUserUIDAndScheduleDate.clear();
+        }
+//        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(type.name(), ua.getUid(), Date.from(scheduleDateInstant));
         Map<String, UserSchedule> collect = byTypeAndUserUIDAndScheduleDate.stream().collect(Collectors.toMap(item -> item.getScheduleDateStage(), item -> item));
         for (int j=0;j<batchType.length;j++) {
             if (SCHEDULE_STAGE_AM.equals(batchType[j])) {

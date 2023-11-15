@@ -278,7 +278,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
-        multiLevelApprovalService.cancelApplication(multiLevelApproval,BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING,BudgetApplication.applicationStep.ToSubmitted.toString());
+        multiLevelApprovalService.cancelApplication(multiLevelApproval,BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
         selected = null;
         this.needSignature = false;
         this.resetSignature();

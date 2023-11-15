@@ -119,6 +119,7 @@ public enum CustomConfigFields {
     systemNum4(fieldName, "systemNum4" ,Text),   //系统编号4
     systemNum5(fieldName, "systemNum5" ,Text),   //系统编号5
     assetUsedLifecycle(fieldName, "assetUsedLifecycle" ,Text),  //设备已使用年限
+    assetLifecycleDeadline(fieldName, "assetLifecycleDeadline" ,Text),  //设备使用年限截止日期
     assetQuantity(label, "assetQuantity" ,Text),   //数量
     productFamily(label, "productFamily" ,Text),  //产品系列
     productSegment(label, "productSegment" ,Text),  //产品细分

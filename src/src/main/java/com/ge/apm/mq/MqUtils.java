@@ -95,6 +95,7 @@ public class MqUtils {
         mqContextDTO.setExChange(RabbitConfig.ASSET_CHANGE);
         mqContextDTO.setClassName(mqContext.getClassName());
         mqContextDTO.setMethodName(mqContext.getMethodName());
+        mqContextDTO.setServiceName(mqContext.getServiceName());
         mqContextDTO.setDescribe(mqContext.getDescribe());
         mqContextDTO.setLocale(mqContext.getLocale());
         JSONObject jsonObject = new JSONObject();

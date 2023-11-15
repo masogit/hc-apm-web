@@ -172,6 +172,11 @@
                                     <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
+                                <p:fieldset legend="#{msg.FilterCondition}">
+                                    <p:orderList id="MobileFilterFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageFilterFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileFilterFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileFilterFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
                         <!--<p:tab title="xxx">
@@ -191,7 +196,14 @@
                                         <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveWebWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
 
                                     </p:fieldset>
+                                    <p:fieldset legend="维修信息字段控制" rendered="#{groupItem.type eq 'assetInfo'}">
+                                        <h:panelGroup >
+                                            <label class="label">外部报价</label>
+                                            <p:selectBooleanCheckbox value="#{groupItem.externalQuotation.enable}" >
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
 
+                                    </p:fieldset>
                                 </p:dataList>
                             </p:panelGrid>
 
@@ -235,13 +247,7 @@
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
                                         </p:panelGrid>
-                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="externalQuotationGroup">
-                                            <h:panelGroup >
-                                                <label class="label">外部报价</label>
-                                                <p:selectBooleanCheckbox value="#{groupItem.externalQuotation.enable}" >
-                                                </p:selectBooleanCheckbox>
-                                            </h:panelGroup>
-                                        </p:panelGrid>
+
                                         <h:panelGroup style="float:right;padding-left: 5px">
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="#{msg.ShiftUp}"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}"/>
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="#{msg.ShiftDown}"  update=":customConfigForm "  disabled="#{groupIndex.index eq 2}"/>
@@ -327,20 +333,16 @@
                                                        itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
-
-
                             </p:panelGrid>
                         </p:tab>
 
-                        <p:tab title="微信端扫码建档页面" rendered="false">
+                        <p:tab title="微信端扫码建档页面">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:dataList id="MobileBuildAssetFieldsList" value="#{customConfigController.customConfigObject.mobileBuildAssetPage.pageBuildAsset.group}" var="groupItem" varStatus="groupIndex" type="definition" >
-                                    <p:fieldset legend="扫码建档字段组" rendered="#{groupItem.type eq 'buildAsset'}">
-                                        <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BuildAssetFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
-                                        <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveBuildAssetFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
-                                    </p:fieldset>
-                                </p:dataList>
+                                <p:fieldset legend="扫码建档字段组">
+                                    <p:orderList id="MobileBuildAssetFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageBuildAssetFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('MobileBuildAssetFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileBuildAssetFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
 

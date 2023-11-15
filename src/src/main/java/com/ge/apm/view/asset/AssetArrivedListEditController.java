@@ -555,6 +555,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
+    public void reName(String blobId, String name) {
+
+        attachList.forEach(v -> {
+            if (v.getId().equals(blobId)) {
+                v.setObjectName(name);
+                blobService.saveBlobObject(v);
+            }
+        });
+    }
+
     public void removeAttachmentByIdJiuYuan(String blobId) {
         String msg = isEditFileJiuYuan();
         if(msg != null){

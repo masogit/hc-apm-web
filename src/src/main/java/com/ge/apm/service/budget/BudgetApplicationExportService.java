@@ -11,6 +11,7 @@ import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.zkb.CopyByInvok;
 import org.apache.commons.io.IOUtils;
@@ -44,6 +45,13 @@ public class BudgetApplicationExportService {
     public static final int TOTAL_SPLIT = 50000;
     public static final String FILE_NAME_ROOT = "年度采购申报表";
 
+    public static final String PURCHASE_ROOT = "采购汇总下载";
+    public static final String PURCHASE_FILE_TITLE = "采购单";
+    public static final String BUDGET_FILE_TITLE = "采购申报表";
+    public static final String SUPPLIER_FILE_TITLE = "预供应商";
+    public static final String ATTACHMENT = "附件";
+
+
 
     @Autowired
     BudgetApplicationRepository budgetApplicationRepository;
@@ -68,28 +76,30 @@ public class BudgetApplicationExportService {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
         for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
+            BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
             List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
-            exportZipStream(budgetApplicationAsset,blobObjects, zout);
+            generateSingleBudget(budgetApplicationAsset, budgetApplication,blobObjects, zout, FILE_NAME_ROOT, ATTACHMENT);
         }
         zout.close();
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", "Export_Purchase.zip");
+        StreamedContent streamedContent = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Export_Purchase.zip");
         return streamedContent;
     }
 
 
     public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException {
+        BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
         String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
-        exportZipStream(budgetApplicationAsset, blobObjects,zout);
+        generateSingleBudget(budgetApplicationAsset,budgetApplication, blobObjects,zout, FILE_NAME_ROOT, ATTACHMENT);
         zout.close();
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
     }
 
-    public void exportZipStream(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects, ZipOutputStream zout) throws IOException {
+    public void generateSingleBudget(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication, List<V2_BlobObject> blobObjects, ZipOutputStream zout,String docPrefix, String attachmentPrefix) throws IOException {
         //1、doc模板部分
-        Map<String, Object> data = createReportData(budgetApplicationAsset);
+        Map<String, Object> data = createReportData(budgetApplicationAsset, budgetApplication);
         byte[] templateBytes;
         if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
@@ -99,21 +109,20 @@ public class BudgetApplicationExportService {
 
         byte[] bytes = this.renderDocx(data, templateBytes);
 
-
         String fileName = buildFileName(data, false);
-        zout.putNextEntry(new ZipEntry(FILE_NAME_ROOT +"/" + fileName));
+        zout.putNextEntry(new ZipEntry(docPrefix + "/" + fileName));
         IOUtils.write(bytes, zout);
         zout.closeEntry();
 
         //2、上传附件部分
         HashMap<String,Integer> nameMap = new HashMap<>();
-        //List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
         if(blobObjects != null && blobObjects.size() > 0){
-            for(V2_BlobObject v : blobObjects){
+            getFileBufferedInputStream(zout, blobObjects, attachmentPrefix);
+            /*for(V2_BlobObject v : blobObjects){
                 String fn = v.getObjectName();
                 String newFileName = handleRepeatFileName(nameMap, fn);
                 StreamedContent sf = msService.downloadSingleFile(v.getObjectStorageId());
-                zout.putNextEntry(new ZipEntry("附件" + "/" + newFileName));
+                zout.putNextEntry(new ZipEntry(attachmentPrefix + "/" + newFileName));
                 byte[] bys = new byte[1024 * 5];
                 BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream());
                 int rd = 0;
@@ -121,7 +130,7 @@ public class BudgetApplicationExportService {
                     zout.write(bys, 0, rd);
                 }
                 zout.closeEntry();
-            }
+            }*/
         }
     }
 
@@ -150,8 +159,7 @@ public class BudgetApplicationExportService {
     /**
       * 获取导出的doc模板数据
      */
-    public Map<String, Object> createReportData(BudgetApplicationAsset budgetApplicationAsset) throws IOException {
-        BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
+    public Map<String, Object> createReportData(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication) throws IOException {
         Map<String, Object> mm = new HashMap<>();
         if(budgetApplicationAsset != null){
             if(budgetApplication.getApplicationDept() != null){
@@ -186,7 +194,7 @@ public class BudgetApplicationExportService {
             mm.put("equipmentUsage", budgetApplicationAsset.getEquipmentUsage());
             mm.put("offlineApprovalOpinions", budgetApplicationAsset.getOfflineApprovalOpinions());
 
-            if(budgetApplication.getBudgetApprovals() != null){
+            if(budgetApplication.getBudgetApprovals() != null && budgetApplication.getBudgetApprovals().size()>0){
                 MultiLevelApproval a = budgetApplication.getBudgetApprovals().iterator().next();
                 if(a != null){
                     mm.put("machineDeptOpinions", a.getApprovalOpinion());
@@ -200,16 +208,16 @@ public class BudgetApplicationExportService {
 
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getImportedOr())){
-                mm.put("importedOrYes", "是");
+                mm.put("importedOr", "");
+            }else if("T".equals(budgetApplicationAsset.getImportedOr())){
+                mm.put("importedOr", "是");
             }else {
-                mm.put("importedOrYes", "否");
+                mm.put("importedOr", "否");
             }
             //设备是否有放置场地
             if(StringUtils.isEmpty(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getPlaceSite())){
+            }else if("T".equals(budgetApplicationAsset.getPlaceSite())){
                 mm.put("placeSite", "是");
             }else {
                 mm.put("placeSite", "否");
@@ -217,7 +225,7 @@ public class BudgetApplicationExportService {
             //是否在手术室使用
             if(StringUtils.isEmpty(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getUsedOperatingRoom())){
+            }else if("T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
                 mm.put("usedOperatingRoom", "是");
             }else {
                 mm.put("usedOperatingRoom", "否");
@@ -225,7 +233,7 @@ public class BudgetApplicationExportService {
             //是否需要同院内信息系统对接
             if(StringUtils.isEmpty(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getSystemDocking())){
+            }else if("T".equals(budgetApplicationAsset.getSystemDocking())){
                 mm.put("systemDocking", "是");
             }else {
                 mm.put("systemDocking", "否");
@@ -233,7 +241,7 @@ public class BudgetApplicationExportService {
             //是否需要连接外网
             if(StringUtils.isEmpty(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "");
-            }else if(CopyByInvok.T.equals(budgetApplicationAsset.getConnectNetwork())){
+            }else if("T".equals(budgetApplicationAsset.getConnectNetwork())){
                 mm.put("connectNetwork", "是");
             }else {
                 mm.put("connectNetwork", "否");
@@ -309,5 +317,67 @@ public class BudgetApplicationExportService {
         } catch (UnsupportedEncodingException e) {
             return fileName;
         }
+    }
+
+
+    /**
+     * 生成采购单文件
+     */
+    public void generatePurchaseFile(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
+        List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(purchaseOrderInfo.getId());
+        if(blobObjects != null && blobObjects.size() > 0) {
+            String preFileName = PURCHASE_FILE_TITLE + ATTACHMENT;
+            getFileBufferedInputStream(zout, blobObjects, preFileName);
+        }
+    }
+
+    public void getFileBufferedInputStream(ZipOutputStream zout, List<V2_BlobObject> blobObjects, String preFileName) throws IOException{
+        HashMap<String,Integer> nameMap = new HashMap<>();
+        for (V2_BlobObject v : blobObjects) {
+            String fn = v.getObjectName();
+            String newFileName = handleRepeatFileName(nameMap, fn);
+            StreamedContent sf = msService.downloadSingleFile(v.getObjectStorageId());
+            if(StringUtils.isEmpty(preFileName)){
+                zout.putNextEntry(new ZipEntry(newFileName));
+            }else{
+                zout.putNextEntry(new ZipEntry(preFileName + "/" + newFileName));
+            }
+            byte[] bys = new byte[1024 * 5];
+            BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream());
+            int rd = 0;
+            while ((rd = bufferStream.read(bys)) != -1) {
+                zout.write(bys, 0, rd);
+            }
+            zout.closeEntry();
+        }
+    }
+
+    /**
+     * 生成申购单文件
+     */
+    public void generateBudgetFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
+        List<BudgetApplication> budgetApplicationList = budgetApplicationRepository.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
+        if(budgetApplicationList != null && budgetApplicationList.size() > 0){
+            for(BudgetApplication application : budgetApplicationList){
+                BudgetApplicationAsset applicationAsset = null;
+                if(application.getBudgetAssets().size() > 0){
+                    applicationAsset = application.getBudgetAssets().iterator().next();
+                }
+                if(applicationAsset == null){
+                    continue;
+                }
+                String docPrefix = BUDGET_FILE_TITLE+ "/" + application.getApplicationNum() + "/医疗仪器设备年度采购申报表";
+                String attachmentPrefix = BUDGET_FILE_TITLE+ "/" + application.getApplicationNum()  + "/"+ ATTACHMENT;
+                List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(applicationAsset.getId());
+                generateSingleBudget(applicationAsset, application, blobObjects, zout, docPrefix, attachmentPrefix);
+            }
+        }
+    }
+
+    /**
+     * 生成预供应商附件
+     */
+    public void generateSupplierFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
+
     }
 }

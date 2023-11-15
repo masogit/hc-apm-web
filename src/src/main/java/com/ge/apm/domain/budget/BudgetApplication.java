@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
@@ -44,17 +45,17 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "application_status")
     private Integer applicationStatus;
     /**
-     * 申请步骤
+     * 申请步骤APPLICATIONSTEP
      *已完成   待审核   已完成
      */
-    public enum applicationStep {
+    public enum APPLICATIONSTEP {
         ToSubmitted, PendingApproval,PendingComplete,Complete
     }
     /**
      * 采购状态
      *已采购未采购
      */
-    public enum procureStatus {
+    public enum PROCURESTATUS {
         Unpurchased, Purchased
     }
     /**
@@ -69,7 +70,11 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "procure_Status")
     private String procureStatus;
 
-
+    /**
+     * 采购单id
+     */
+    @Column(name = "purchase_id")
+    private String purchaseId;
 
     // 申请日期
     @Column(name = "application_date")
@@ -201,7 +206,7 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     private String applicantName ;//申请人
 
     public String getProcureStatus() {
-        return procureStatus;
+        return StringUtils.isBlank(procureStatus)?BudgetApplication.PROCURESTATUS.Unpurchased.toString(): procureStatus;
     }
 
     public void setProcureStatus(String procureStatus) {
@@ -611,5 +616,13 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Override
     public int getBusinessType() {
         return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT;
+    }
+
+    public String getPurchaseId() {
+        return purchaseId;
+    }
+
+    public void setPurchaseId(String purchaseId) {
+        this.purchaseId = purchaseId;
     }
 }

@@ -331,6 +331,17 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private String repairName;
 
+    @Transient
+    private Integer repairPersonId;
+
+    public Integer getRepairPersonId() {
+        return repairPersonId;
+    }
+
+    public void setRepairPersonId(Integer repairPersonId) {
+        this.repairPersonId = repairPersonId;
+    }
+
     public String getRepairName() {
         return repairName;
     }

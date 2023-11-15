@@ -43,8 +43,6 @@ public class BudgetPersistService {
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
     @Autowired
-    private BudgetApplicationAssetRepository budgetApplicationAssetDao;
-    @Autowired
     private BudgetAssetInfoRepository budgetAssetInfoDao;
     @Autowired
     private UserAccountRepository userDao;
@@ -59,11 +57,10 @@ public class BudgetPersistService {
     @Autowired
     private OrgInfoRepository orgDao;
 
-
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
+    public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList,List<String> removeFileBlobIds) {
         if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
             // 保存以获得ID
             this.genApplicationNum(application,application.getOrderType());
@@ -73,9 +70,16 @@ public class BudgetPersistService {
         budgetApplicationAsset.setApplicationDeptId(application.getApplicationDeptId());
         application = budgetApplicationDao.save(application);
         BudgetApplicationAsset budgetApplicationAssetPersistent = application.getBudgetAssets().iterator().next();
+        //明细关联的主键id 没有带出 需要放入 或者在字段上设置 不可以更新
         budgetApplicationAssetPersistent.setApplicationId(application.getId());
         if(CollectionUtils.isNotEmpty(attachList)){
             attachList.stream().forEach(att -> att.setBoUuid(budgetApplicationAssetPersistent.getId()));
+        }
+        //去掉删除的数据
+        if(CollectionUtils.isNotEmpty(removeFileBlobIds)){
+            removeFileBlobIds.stream().forEach(blobId ->{
+                blobService.deleteBlobFileById(blobId);
+            });
         }
         blobService.saveBlobObject(attachList);
         return true;
@@ -129,14 +133,13 @@ public class BudgetPersistService {
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         budgetApplicationAssetSet.add(budgetApplicationAsset);
         application.setBudgetAssets(budgetApplicationAssetSet);
-        application.setApplicationStep(BudgetApplication.applicationStep.ToSubmitted.toString());
+        application.setApplicationStep(BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString());
         application.setApplicant(account);
         application.setApplicantId(account.getId());
         application.setApplicationDate(new Date());
         application.setApplicationStatus(BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING);
         application.setBudgetApprovals(new HashSet<>());
         application.setIsDeleted(0);
-        application.setProcureStatus(BudgetApplication.procureStatus.Unpurchased.toString());//采购状态
         application.setCreatedBy(account.getLoginName());
         application.setCreatedDate(new Date());
         application.setLastModifiedBy(account.getLoginName());
@@ -159,7 +162,7 @@ public class BudgetPersistService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean submitApplication(BudgetApplication application,List<V2_BlobObject> attachList) {
-        this.saveApplication(application,attachList);
+        this.saveApplication(application,attachList,null);
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
        /* if (true) {*/
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
@@ -229,11 +232,7 @@ public class BudgetPersistService {
         if(CollectionUtils.isNotEmpty(application.getBudgetApprovals())){
             approvalDao.delete(application.getBudgetApprovals());
         }
-        application.setIsDeleted(1);
-        if(CollectionUtils.isNotEmpty(application.getBudgetAssets())){
-            application.getBudgetAssets().iterator().next().setIsDeleted(1);
-        }
-        budgetApplicationDao.save(application);
+        budgetApplicationDao.delete(application);
         return true;
     }
 
@@ -309,20 +308,9 @@ public class BudgetPersistService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAsset(BudgetAssetInfo assetInfo) {
-        assetInfo.setIsDeleted(1);
-        budgetAssetInfoDao.save(assetInfo);
+        budgetAssetInfoDao.delete(assetInfo);
         return true;
     }
-    /**
-     * 回退列表
-     *
-     * @param
-     * @return
-     */
-    public String backList() {
-        return "List.xhtml?faces-redirect=true";
-    }
-
     /**
      * 给申请单添加单号和索引
      *
@@ -385,7 +373,7 @@ public class BudgetPersistService {
                 budgetApplicationMap.put("所需耗材及使用量",  budgetApplicationAsset.getUsage());
                 budgetApplicationMap.put("设备是否有放置场地", StringUtils.isBlank(budgetApplicationAsset.getPlaceSite())?"": WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getPlaceSite()));
                 budgetApplicationMap.put("是否在手术室使用",StringUtils.isBlank(budgetApplicationAsset.getUsedOperatingRoom())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getUsedOperatingRoom()));
-                budgetApplicationMap.put("手术室护士长签名",StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSignatureNurse()));
+                budgetApplicationMap.put("手术室护士长是否已签名",StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSignatureNurse()));
                 budgetApplicationMap.put("是否需要同院内信息系统对接",StringUtils.isBlank(budgetApplicationAsset.getSystemDocking())?"":   WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getSystemDocking()));
                 budgetApplicationMap.put("是否需要连接外网",StringUtils.isBlank(budgetApplicationAsset.getConnectNetwork())?"":  WebUtil.getFieldValueMessage("budgetApplicationT_F", budgetApplicationAsset.getConnectNetwork()));
                 budgetApplicationMap.put("情况说明",  budgetApplicationAsset.getDescription());

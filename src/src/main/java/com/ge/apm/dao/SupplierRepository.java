@@ -53,4 +53,5 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     List<Supplier> findByIdIn(Collection<Integer> ids);
 
     List<Supplier> findByUidIn(Collection<String> uidList);
+
 }

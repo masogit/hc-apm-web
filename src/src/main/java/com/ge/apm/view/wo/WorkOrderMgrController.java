@@ -17,6 +17,7 @@ import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -74,6 +75,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -163,6 +165,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Boolean approveFlag = false;
     private List<V2_WorkOrderCoworker> coWorkerList;
 
+    private List<MultiLevelApproval> approveList;
+
     private V2_WorkOrder_Detail itemDetail;
     private V2_WorkOrderCoworker coWorkerDetail;
 
@@ -239,6 +243,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     private SimplePartsConfigService partsConfigService;
     private MultiLevelApprovalService multiLevelApprovalService;
+    private ExternalTempUserRepository externalTempUserDao;
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -271,7 +277,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private boolean hospitalShow = false;
     private UserAccount loginUser;
-
+    @Getter @Setter
+    private ExternalTempUser externalTempUser;
+    @Getter @Setter
+    private List<Map<String,String>> maintenancePersonInformation;
     @Override
     protected void init() {
         try {
@@ -313,8 +322,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+            multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
             detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
+            externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
@@ -1204,8 +1215,26 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
         picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        // 获取temp user信息
+        initExternalTempUser();
     }
+    private void initExternalTempUser(){
+        externalTempUser = externalTempUserDao.findByWoId(selected.getId());
+        if(ObjectUtil.isNotEmpty(externalTempUser)){
+            maintenancePersonInformation = new ArrayList<>();
+            maintenancePersonInformation.add(initMap("userName","姓名",externalTempUser.getUserName()));
+            maintenancePersonInformation.add(initMap("tel","联系人电话",externalTempUser.getTel()));
+            maintenancePersonInformation.add(initMap("comName","公司名称",externalTempUser.getComName()));
+        }
 
+    }
+    private Map<String,String> initMap(String fieldName,String key,String label){
+        Map<String,String> row=new HashMap<>();
+        row.put("fieldName",fieldName);
+        row.put("key",key);
+        row.put("label",label);
+        return row;
+    }
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
 
         List<V2_BlobObject> pList = woService.getPicListBySrUid(srId, type, boSubType).stream().filter(item -> type == 1 ^
@@ -1258,8 +1287,52 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return CollectionUtils.isEmpty(v2WorkOrderStep)?"":v2WorkOrderStep.get(0).getOwnerName();
     }
 
+    public V2_WorkOrder_Step getRepairPerson(String woId, Integer step){
+        List<V2_WorkOrder_Step> v2WorkOrderStep = woService.getMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
+        return CollectionUtils.isEmpty(v2WorkOrderStep)?null:v2WorkOrderStep.get(0);
+    }
+
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
+        //获取多级备件审批节点详情
+        try {
+            approveList = multiLevelApprovalRepository.getByBusinessUidList(woId);
+            if (!CollectionUtils.isEmpty(approveList)) {
+                MultiLevelApprovalConfig config = multiLevelApprovalService.getApproveWorkflowConfig(approveList.get(0).getWorkflowConfigApproveUid());
+                List<ApprovalNode> approvalNodes = JSON.parseObject(config.getApprovalItem(), new TypeReference<List<ApprovalNode>>(){});
+                boolean isOwner = isOwner();
+                approveList.forEach(v -> {
+                    ApprovalNode node = approvalNodes.get(v.getApprovalLevel() - 1);
+                    if (isOwner) {
+                        switch (v.getApprovalNodeStatus()) {
+                            case 0:
+                            case 1:
+                                v.setActualApproverName(userDao.findByUidIn(Arrays.stream(v.getApprovalUid().split(",")).filter(c -> StringUtils.isNotEmpty(c)).collect(Collectors.toList())).stream().map(UserAccount::getName).collect(Collectors.joining(",")));
+                                break;
+                        }
+                    } else {
+                        v.setActualApproverName(node.getNodeName());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return woService.getWorkOrderDetails(woId);
+    }
+
+    public boolean isOwner() {
+        if (null != selected.getRepairPersonId() && selected.getRepairPersonId().compareTo(UserContextService.getCurrentUserAccount().getId()) == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<MultiLevelApproval> getApproveList() {
+        return approveList;
+    }
+
+    public void setApproveList(List<MultiLevelApproval> approveList) {
+        this.approveList = approveList;
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
@@ -3672,11 +3745,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public boolean needTwoSubStatus(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
         return isConfigNeedTwoSubStatus(workOrder.getAssetId())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
-
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
-        workOrders.forEach(workOrder -> workOrder.setRepairName(isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairNameRefract(workOrder.getId(), 10):getRepairNameRefract(workOrder.getId(), 4)));
+        workOrders.forEach(workOrder -> {
+            V2_WorkOrder_Step workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
+            workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());
+        });
     }
 
     public Boolean isConfigNeedTwoSubBySiteUid(String siteUid) {
@@ -3725,6 +3801,43 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         return false;
+    }
+
+    public void onRowEditExternalTempUser(RowEditEvent event) {
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        Map<String,String> row =(Map) event.getObject();
+        String label = row.get("label");
+        if(StringUtils.isBlank(label)){
+            WebUtil.addErrorMessage(row.get("key")+"不能为空");
+            return;
+        }
+        try {
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            fieldName.set(externalTempUser,label);
+            externalTempUserDao.save(externalTempUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+    public void onRowCancelExternalTempUser(RowEditEvent event) {
+        try {
+            Map<String,String> row =(Map) event.getObject();
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            Object o = fieldName.get(externalTempUser);
+            if(!ObjectUtils.isEmpty(o)){
+                row.put("label",o.toString());
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -146,6 +146,11 @@ public class MeasuringService {
             if(mcdList != null && !mcdList.isEmpty()) {
                 MeasuringCertificateDetail tempMcd = mcdList.get(0);
                 measuringCertificateDetail.setId(tempMcd.getId());
+                measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+                measuringCertificateDetail.setLastModifiedDate(new Date());
+            } else {
+                measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+                measuringCertificateDetail.setCreatedDate(new Date());
             }
 
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
@@ -290,6 +295,11 @@ public class MeasuringService {
             if(mcdList != null && !mcdList.isEmpty()) {
                 MeasuringCertificateDetail tempMcd = mcdList.get(0);
                 measuringCertificateDetail.setId(tempMcd.getId());
+                measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+                measuringCertificateDetail.setLastModifiedDate(new Date());
+            } else {
+                measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+                measuringCertificateDetail.setCreatedDate(new Date());
             }
 
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());

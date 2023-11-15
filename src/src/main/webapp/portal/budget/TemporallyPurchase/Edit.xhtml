@@ -111,7 +111,7 @@
                                 <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="数量 #{msg.ValidationRequire}"
                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationQuantity}">
-                                    <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
+                                    <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount "/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -122,7 +122,7 @@
                                 <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber disabled="#{budgetBayController.curModelDisables() or budgetBayController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.applicationPrice}">
-                                    <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount BudgetApplicationEditForm"/>
+                                    <p:ajax listener="#{budgetBayController.calcAmount(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount "/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>

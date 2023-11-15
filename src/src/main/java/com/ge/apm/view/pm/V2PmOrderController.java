@@ -62,6 +62,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -77,6 +78,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -154,6 +156,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
     private CustomConfigObject currentCustomConfig;
+    private ExternalTempUserRepository externalTempUserDao;
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -334,7 +337,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private SimplePartsItemService partsItemService;
     private BlobObjectRepository blobObjectRepository;
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
-
+    @Getter @Setter
+    private ExternalTempUser externalTempUser;
+    @Getter @Setter
+    private List<Map<String,String>> maintenancePersonInformation;
     @Getter @Setter
     public String customerName;
     @Getter @Setter
@@ -546,12 +552,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
-        if(orderRule == null){
-            return new PmOrderRule();
-        }else {
-            return orderRule;
-        }
+       //根据设备查找规则
+        return Optional.ofNullable(pmOrderService.acqPmOrderRule(v2_pmOrder)).orElse(new PmOrderRule());
+//        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+//        if(orderRule == null){
+//            return new PmOrderRule();
+//        }else {
+//            return orderRule;
+//        }
 //            return new PmOrderRule();
 //        }
 //        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
@@ -1668,6 +1676,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
@@ -2199,6 +2208,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         reportList = pmOrderService.getReportList(selected.getId());
 
         loadHmCheck(selected);
+        // 获取temp user信息
+        initExternalTempUser();
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -3713,5 +3724,60 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setFileTypeName(String fileTypeName) {
         this.fileTypeName = fileTypeName;
+    }
+
+    private void initExternalTempUser(){
+        externalTempUser = externalTempUserDao.findByWoId(selected.getId());
+        if(ObjectUtil.isNotEmpty(externalTempUser)){
+            maintenancePersonInformation = new ArrayList<>();
+            maintenancePersonInformation.add(initMap("userName","姓名",externalTempUser.getUserName()));
+            maintenancePersonInformation.add(initMap("tel","联系人电话",externalTempUser.getTel()));
+            maintenancePersonInformation.add(initMap("comName","公司名称",externalTempUser.getComName()));
+        }
+
+    }
+    private Map<String,String> initMap(String fieldName,String key,String label){
+        Map<String,String> row=new HashMap<>();
+        row.put("fieldName",fieldName);
+        row.put("key",key);
+        row.put("label",label);
+        return row;
+    }
+
+    public void onRowEditExternalTempUser(RowEditEvent event) {
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        Map<String,String> row =(Map) event.getObject();
+        String label = row.get("label");
+        if(org.apache.commons.lang.StringUtils.isBlank(label)){
+            WebUtil.addErrorMessage(row.get("key")+"不能为空");
+            return;
+        }
+        try {
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            fieldName.set(externalTempUser,label);
+            externalTempUserDao.save(externalTempUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+    public void onRowCancelExternalTempUser(RowEditEvent event) {
+        try {
+            Map<String,String> row =(Map) event.getObject();
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            Object o = fieldName.get(externalTempUser);
+            if(!ObjectUtils.isEmpty(o)){
+                row.put("label",o.toString());
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

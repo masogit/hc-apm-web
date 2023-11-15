@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <style>
+            .ui-chkbox{
+                width: 18px !IMPORTANT;
+            }
+        </style>
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="采购单信息"/>
+        </div>
+        <div  class="ui-g-12 card">
+            <h:form id="BudgetApplicationEditForm">
+                <h:panelGroup id="display">
+                    <p:fieldset legend="采购详情">
+                        <p:panelGrid id="editPanel" columns="4" layout="grid"
+                                     styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{purchaseOrderController.selected != null}">
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购编号</p:outputLabel>
+                                <h:outputText value="#{purchaseOrderController.selected.purchaseNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购数量</p:outputLabel>
+                                <h:outputText id="purchaseQuantity" value="#{purchaseOrderController.selected.purchaseQuantity}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购金额</p:outputLabel>
+                                <h:outputText id="totalPrice"  value="#{purchaseOrderController.selected.totalPrice}">
+                                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                </h:outputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">操作人</p:outputLabel>
+                                <h:outputText value="#{purchaseOrderController.selected.operator.name}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购开始时间</p:outputLabel>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{purchaseOrderController.selected.startDate}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            showButtonPanel="true" required="true"  requiredMessage="采购开始时间 #{msg.ValidationRequire}"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">采购截止时间</p:outputLabel>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{purchaseOrderController.selected.endDate}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            showButtonPanel="true" required="true" requiredMessage="采购截止时间 #{msg.ValidationRequire}"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="申购单信息" id="applicationDetail" >
+                        <p:dataTable id="budgetApplicationlist" value="#{purchaseOrderController.curApplicationBudgetAssets}"
+                                     var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
+                                     selection="#{purchaseOrderController.dataListSelectApplicationAssetBudget}"
+                                     selectionMode="single"
+                                     paginatorPosition="top" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+                                     sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
+                            <p:ajax event="rowSelect" update="delButton"/>
+                            <p:column headerText="申请科室">
+                                <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
+                            </p:column>
+                            <p:column headerText="申请编号">
+                                <h:outputText value="#{item.applicationNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.EquipmentName}">
+                                <h:outputText value="#{item.applicationAssetName}"/>
+                            </p:column>
+                            <p:column headerText="推荐品牌">
+                                <h:outputText value="#{item.recommendedBrand}"/>
+                            </p:column>
+                            <p:column headerText="规格">
+                                <h:outputText value="#{item.standards}"/>
+                            </p:column>
+                            <p:column headerText="型号">
+                                <h:outputText value="#{item.model}"/>
+                            </p:column>
+                            <p:column headerText="设备品类">
+                                <h:outputText value="#{item.applicationAssetCategory}"/>
+                            </p:column>
+                            <p:column headerText="数量">
+                                <h:outputText value="#{item.applicationQuantity}"/>
+                            </p:column>
+                            <p:column headerText="单位">
+                                <h:outputText value="#{item.unit}"/>
+                            </p:column>
+                            <p:column headerText="预算单价">
+                                <h:outputText value="#{item.applicationPrice}"/>
+                            </p:column>
+                            <p:column headerText="预算总价">
+                                <h:outputText value="#{item.applicationAmount}"/>
+                            </p:column>
+                         <f:facet name="{Toolbar}">
+                             <p:commandButton title="选择申购单" id="addButton" process="@this" update="BudgetSelectDlg"
+                                              icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
+                                              actionListener="#{purchaseOrderController.preAddBudgetApplication()}"
+                                              oncomplete="PF('BudgetSelectDialog').show()"/>
+                             <p:commandButton title="删除" id="delButton" update="budgetApplicationlist BudgetApplicationEditForm:purchaseQuantity BudgetApplicationEditForm:totalPrice "
+                                              disabled="#{empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
+                                              icon="ui-icon-close" class="btn btn-sm btn-gray zoom-08"
+                                              actionListener="#{purchaseOrderController.delBudgetApplication()}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"  icon="ui-icon-alert"/>
+                             </p:commandButton>
+                         </f:facet>
+                     </p:dataTable>
+                    </p:fieldset>
+
+                    <p:fieldset legend="采购单模板"  >
+                        <h:panelGroup>
+                            <p:selectManyMenu  styleClass="manymenu-advanced"   style="width: 400px"  value="#{purchaseOrderController.templateIds}" filter="true" filterMatchMode="contains" showCheckbox="true">
+                                <f:selectItems value="#{purchaseOrderController.budgetPurchaseTemplateManageList}" var="template" itemLabel="#{template.name}" itemValue="#{template.id}"   />
+                            </p:selectManyMenu>
+                        </h:panelGroup>
+                    </p:fieldset>
+
+                    <br/>
+                    <p:commandButton update=":growl :BudgetApplicationEditForm"
+                                     validateClient="true" action="#{purchaseOrderController.savePurchase}" value="保存" id="savePurchase" />
+                    <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                     action="#{purchaseOrderController.backList}" />
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+        <div class="ui-g-12 card">
+            <ui:include src="BudgetSelect.xhtml"/>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -377,6 +377,12 @@
             <p:inputText id="locationName" value="#{assetInfoDetailController.selected.locationName}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLocation')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetLocation}</label>
+            <p:inputText id="assetLocation" value="#{assetInfoDetailController.selected.assetLocation}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status')}">
         <h:panelGroup >
             <label class="label">#{msg.status}</label>
@@ -680,6 +686,12 @@
         <h:panelGroup >
             <label class="label">#{msg.assetUsedLifecycle}</label>
             <p:inputText id="assetUsedLifecycle" value="#{assetInfoDetailController.selected.assetUsedLifecycle}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLifecycleDeadline')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetLifecycleDeadline}</label>
+            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoDetailController.selected.assetLifecycleDeadline}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetQuantity')}">

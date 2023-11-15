@@ -143,7 +143,7 @@ public class MaintainExportController {
             if (currentUser.isEnableAssetTypeGroup()) {
                 itemWrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
             }
-            Map<String, List<NurseSiteMaintainItem>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
+            Map<String, List<NurseSiteMaintainItem>> itemMap = nurseSiteMaintainService.findItemJoinAssetList(new Pagination(1, 5000), itemWrapper).stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
             for (NurseSiteMaintain maintain : listMaintainData) {
                 maintain.setListNurseSiteMaintainItem(itemMap.get(maintain.getId()));
             }

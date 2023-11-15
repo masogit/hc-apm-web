@@ -23,6 +23,7 @@ public class BudgetApplicationProvider {
                 "  t.application_date," +
                 "  t.application_status," +
                 "  t.application_step," +
+                "  t.procure_status," +
                 "  uap.name as approveName," +
                 "  t.approval_date" +
                 "  from budget_application t" +
@@ -76,6 +77,27 @@ public class BudgetApplicationProvider {
             }
             if("applicationNum".equals(tempColumn)) {
                 sb.append(" and t.application_num = '"+value.toString()+"'");
+            }
+            //临床只能看自己创建
+            if("applicantId".equals(tempColumn)) {
+                sb.append(" and t.applicant_id = '"+value.toString()+"'");
+            }
+            //科室主任  医学工程主任
+            if("applicationDeptId".equals(tempColumn)) {
+                sb.append(" and t.applicant_dept_id = '"+value.toString()+"'");
+            }
+            if("siteUID".equals(tempColumn)) {
+                sb.append(" and t.site_uid = '"+value.toString()+"'");
+            }
+            if("hospitalUID".equals(tempColumn)) {
+                sb.append(" and t.hospital_uid = '"+value.toString()+"'");
+            }
+
+            if("institutionUID".equals(tempColumn)) {
+                sb.append(" and t.institution_uid = '"+value.toString()+"'");
+            }
+            if("tenantUID".equals(tempColumn)) {
+                sb.append(" and t.tenant_uid = '"+value.toString()+"'");
             }
         }
         sb.append(" order by t.created_date desc");
