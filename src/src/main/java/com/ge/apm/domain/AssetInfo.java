@@ -459,7 +459,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer meteringCycle;
 
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
-    //1:待完善,2:待审核,3:已经建档
+    //1:待完善,2:待审核,3:已经建档  4 审核不通过
     @Column(name = "usage_status")
     private Integer usageStatus;
 
