@@ -22,7 +22,7 @@
                         <p:inputText value="#{budgetAssetController.selected.financingNum}"/>
                     </h:panelGroup>-->
 
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.clinicaldepart}<span style="color: red">*</span></p:outputLabel>
                         <p:inputText id="dept" readonly="true"
                                      value="#{budgetAssetController.selectedDept.name}"/>
@@ -46,7 +46,7 @@
                                 </p:tree>
                             </p:scrollPanel>
                         </p:overlayPanel>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup>
                         <p:outputLabel class="label">#{msg.EquipmentName}<span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetAssetController.selected.name}" required="true"
@@ -103,8 +103,7 @@
                 <p:commandButton validateClient="true" actionListener="#{budgetAssetController.save}"
                                  value="#{msg.Save}" id="saveButton"
                                  update="display :BudgetAssetEditDlg searchForm assetList :growl"
-                                 oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');"
-                                 disabled="#{empty budgetAssetController.selectedDept}"/>
+                                 oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');" />
                 <p:commandButton immediate="true" value="#{msg.Cancel}" update="assetList"
                                  actionListener="#{budgetAssetController.clearSelected}"
                                  onclick="PF('BudgetAssetEditDialog').hide()"/>

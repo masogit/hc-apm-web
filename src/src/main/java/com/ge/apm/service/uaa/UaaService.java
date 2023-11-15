@@ -77,7 +77,7 @@ public class UaaService {
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
-            
+
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         List<SysRole> sysRoleList = sysRoleDao.find();
 
@@ -86,7 +86,7 @@ public class UaaService {
             sysRoles.put(sysRole.getName(), sysRole);
         }
     }
-    
+
     public String getUserDefaultHomePage(UserAccount user){
         String url;
         UserContextService userContextService = (UserContextService) WebUtil.getBean(UserContextService.class);
@@ -111,7 +111,7 @@ public class UaaService {
             url = getDefautHomePage("ClinicalStaff");
         else
             url = "/home.xhtml";
-        
+
         return url;
     }
 
@@ -124,9 +124,9 @@ public class UaaService {
         else
             return "/home.xhtml";
     }
-    
+
     public List<SysRole> getSysRoles(){
-        loadSysRoles();        
+        loadSysRoles();
 
         List<SysRole> roleList = new ArrayList<SysRole>();
         roleList.addAll(sysRoles.values());
@@ -136,7 +136,7 @@ public class UaaService {
 
     public List<String> getSysRoleNames(){
         loadSysRoles();
-        
+
         List<String> roleList = new ArrayList<String>();
 
         for(Map.Entry<String, SysRole> item: sysRoles.entrySet()){
@@ -235,7 +235,7 @@ public class UaaService {
     }
 
     public List<CustomRole> getTenantCustomRoles(String tenantUID){
-       return customRoleRepository.findByTenantUID(tenantUID);
+        return customRoleRepository.findByTenantUID(tenantUID);
     }
 
     public List<UserRole> getSystemRoles(Integer userId){
@@ -273,17 +273,17 @@ public class UaaService {
     public UserAccount loadUserWithUserRoles(int userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         UserAccount user = userDao.getById(userId);
-        
+
         try{
             Hibernate.initialize(user.getUserRoleList());
         }
         catch(Exception ex){
             logger.error(ex.getMessage(), ex);
         }
-        
+
         return user;
     }
-    
+
     @Transactional
     public void setUserRoles(boolean isCreated, UserAccount userAccount, List<String> newRoleNames){
         //first remove all existing user roles
@@ -439,18 +439,18 @@ public class UaaService {
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         userDao.deactiveTemporaryUser(userId);
     }
-    
+
     public List<OrgInfo> getHospitalListBySiteId(int siteId){
         return orgInfoDao.getHospitalBySiteId(siteId);
     }
-    
+
     public List<OrgInfo> getOrgListByHospitalId(int hospitalId){
         return orgInfoDao.getByHospitalId(hospitalId);
     }
-    
+
     public List<OrgInfo> getFullOrgListBySiteId(int siteId) {
         return orgInfoDao.getFullOrgListBySiteId(siteId);
-    
+
     }
 
     public DefaultTreeNode getFullOrgTreeBySiteId(DefaultTreeNode rootNode, int siteId, Integer selectedOrgId){
@@ -458,11 +458,11 @@ public class UaaService {
 
         DefaultTreeNode root = new DefaultTreeNode("Root", null);
         root.getChildren().add(rootNode);
-                
+
         buildOrgTree(fullOrgList, rootNode, selectedOrgId);
         return root;
     }
-    
+
     public DefaultTreeNode getFullOrgTreeBySiteId(int siteId, Integer selectedOrgId){
         List<OrgInfo> fullOrgList = orgInfoDao.getFullOrgListBySiteId(siteId);
 
@@ -503,15 +503,15 @@ public class UaaService {
                 node = node.getParent();
             }
         }
-        
+
         //store selectedNode into root.data property
         if(selectedNode!=null) {
             selectedNode.setSelected(true);
-            
+
             root.setData(selectedNode);
-        }        
+        }
     }
-    
+
     public DefaultTreeNode getOrgTree(int hospitalId, boolean showHospitalAsRoot, Integer selectedOrgId, boolean ...type){
         List<OrgInfo> orgList = null;
         if (type == null || type.length == 0) {
@@ -522,7 +522,7 @@ public class UaaService {
 
         DefaultTreeNode root = new DefaultTreeNode("Root", null);
         DefaultTreeNode treeRoot = root;
-        
+
         if(showHospitalAsRoot){
             OrgInfo hospitalInfo = orgInfoDao.findById(hospitalId);
             if(hospitalInfo!=null){
@@ -533,10 +533,10 @@ public class UaaService {
         }
 
         buildOrgTree(orgList, root, selectedOrgId);
-        
+
         return treeRoot;
     }
-    
+
     //origin user accessible org list
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
@@ -652,7 +652,7 @@ public class UaaService {
 
         return root;
     }
-    
+
     @Transactional
     public void clearUserScope(String userUid){
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
@@ -667,6 +667,7 @@ public class UaaService {
 
     @Transactional
     public void setDefaultScope(UserAccount user) {
+        userOrgDao.deleteByUserUid(user.getUid());
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
         if (ownnedOrg.getOrgType() == 4) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
@@ -682,12 +683,11 @@ public class UaaService {
                 userOrg.setUserUid(user.getUid());
                 userOrg.setOrgUid(org.getUid());
                 userOrg.setOrgType(org.getOrgType());
-                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
                 userOrgDao.save(userOrg);
             }
         }
-        
-        List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
+
+/*        List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
 
         UserOrgInfo foundUserOrg = null;
 
@@ -715,10 +715,10 @@ public class UaaService {
                     userOrgDao.save(userOrg);
                 }
             }
-        }
+        }*/
 
     }
-    
+
     public DefaultTreeNode getOrgTree(int hospitalId){
         return getOrgTree(hospitalId, false, null);
     }
@@ -727,7 +727,7 @@ public class UaaService {
         if("org".equals(node.getType())){
             OrgInfo org = (OrgInfo)node.getData();
             List<AssetInfo> assets = assetMap.get(org.getId());
-            
+
             if(assets!=null) {
                 for(AssetInfo item: assets){
                     TreeNode assetNode = new DefaultTreeNode("asset", item, node);
@@ -735,7 +735,7 @@ public class UaaService {
                 }
             }
         }
-        
+
         for(TreeNode aNode: node.getChildren()){
             addAssetToOrgNode(aNode, assetMap);
         }
@@ -749,7 +749,7 @@ public class UaaService {
         } else {
             assetList = assetInfoDao.getBySiteId(hospitalId);//实际是siteId
         }
-        
+
         Map<Integer, List<AssetInfo>> assetMap = new HashMap<>();
         for(AssetInfo asset: assetList){
             List<AssetInfo> assets = assetMap.get(asset.getClinicalDeptId());
@@ -761,13 +761,13 @@ public class UaaService {
 
             assets.add(asset);
         }
-        
+
         TreeNode root = getOrgTree(hospitalId, false, null, type);
         addAssetToOrgNode(root, assetMap);
         cleanTree(root,ASSET);
         return root;
     }
-    
+
     private TreeNode cleanTree(TreeNode node, String type) {
         Iterator<TreeNode> iterator = node.getChildren().iterator();
         Set<TreeNode> remomveset = new HashSet<TreeNode>();
@@ -784,35 +784,35 @@ public class UaaService {
         node.getChildren().removeAll(remomveset);
         return node;
     }
-    
+
     public void removeInvalidNode(TreeNode node,String type){
-    	if(node == null || !node.getType().equals(type)){
-    		logger.error("current node is null or not org node !");
-    		return;
-    	}
-    	if(node.isLeaf()){
-    		node.getParent().getChildren().remove(node);
-    		return;
-    	}
-    	List<TreeNode> invalidNodeList = new ArrayList<TreeNode>();
-		for(TreeNode childNode : node.getChildren()){
-			if(childNode.isLeaf() && childNode.getType().equals(type)){
-				invalidNodeList.add(childNode);
-			}
-			if(childNode.getType().equals(node.getType()) && childNode.getChildCount() > 0){
-				removeInvalidNode(childNode,type);
-			}
-		}
-    	if(!CollectionUtils.isEmpty(invalidNodeList)){
-    		node.getChildren().removeAll(invalidNodeList);
-    	}
-    }   
+        if(node == null || !node.getType().equals(type)){
+            logger.error("current node is null or not org node !");
+            return;
+        }
+        if(node.isLeaf()){
+            node.getParent().getChildren().remove(node);
+            return;
+        }
+        List<TreeNode> invalidNodeList = new ArrayList<TreeNode>();
+        for(TreeNode childNode : node.getChildren()){
+            if(childNode.isLeaf() && childNode.getType().equals(type)){
+                invalidNodeList.add(childNode);
+            }
+            if(childNode.getType().equals(node.getType()) && childNode.getChildCount() > 0){
+                removeInvalidNode(childNode,type);
+            }
+        }
+        if(!CollectionUtils.isEmpty(invalidNodeList)){
+            node.getChildren().removeAll(invalidNodeList);
+        }
+    }
 
     private void addChecklistToAssetNode(TreeNode node, Map<Integer, List<InspectionChecklist>> checklistMap){
         if("asset".equals(node.getType())){
             AssetInfo asset = (AssetInfo)node.getData();
             List<InspectionChecklist> checkList = checklistMap.get(asset.getId());
-            
+
             if(checkList!=null) {
                 for(InspectionChecklist item: checkList){
                     TreeNode checklistNode = new DefaultTreeNode("checklist", item, node);
@@ -820,12 +820,12 @@ public class UaaService {
                 }
             }
         }
-        
+
         for(TreeNode aNode: node.getChildren()){
             addChecklistToAssetNode(aNode, checklistMap);
         }
     }
-    
+
     public TreeNode getOrgAssetChecklistTree(int hospitalId, int checklistType){
         InspectionChecklistRepository checklistDao = WebUtil.getBean(InspectionChecklistRepository.class);
         List<InspectionChecklist> checkList = checklistDao.getByHospitalIdAndChecklistType(hospitalId, checklistType);
@@ -838,20 +838,20 @@ public class UaaService {
                 checklist = new ArrayList<>();
                 checklistMap.put(item.getAssetId(), checklist);
             }
-            
+
             checklist.add(item);
         }
-        
+
         TreeNode root = getOrgAssetTree(hospitalId);
-        addChecklistToAssetNode(root, checklistMap);        
+        addChecklistToAssetNode(root, checklistMap);
         return root;
     }
-	
-	public List<UserAccount> getUserList(int hospitalId){
+
+    public List<UserAccount> getUserList(int hospitalId){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.getByHospitalId(hospitalId);
     }
-        
+
     public List<UserAccount> getUsersWithAssetStaffRole(int hospitalId){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.getUsersWithAssetStaffRole(hospitalId);
@@ -896,8 +896,8 @@ public class UaaService {
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-       orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-         orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
@@ -953,7 +953,7 @@ public class UaaService {
         }
         return accessList;
     }
-    
+
     //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
         if(logger.isDebugEnabled()) {
@@ -973,8 +973,8 @@ public class UaaService {
         List<String> allocationDepts = this.getRegulatorUidsBySiteUid(siteUid);
         if(allocationDepts != null && allocationDepts.size() > 0) {
             deptList = deptList.stream()
-                                .filter(item -> !allocationDepts.contains(item.getUid()))
-                                .collect(Collectors.toList());
+                    .filter(item -> !allocationDepts.contains(item.getUid()))
+                    .collect(Collectors.toList());
         }
         return deptList;
     }
@@ -993,7 +993,7 @@ public class UaaService {
         UserAccount user = UserContextService.getCurrentUserAccount();
         return this.getUserAccessibleSiteListWithClinicalDept(user.getUid());
     }
-    
+
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
         List<SearchFilter> orgFilters = new ArrayList<>();
         orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID));
@@ -1146,7 +1146,7 @@ public class UaaService {
             return list;
         }
     }
-    
+
     public TreeNode getOrgTreeByParentIdWithSelectedChildren(String parentOrgId) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getOrgInfosByParentId(parentOrgId);
@@ -1349,141 +1349,141 @@ public class UaaService {
     public List<String> getRegulatorUidsBySiteUid(String siteUID) {
         List<WorkflowConfig> workflows = wfcfigDao.findBySiteUID(siteUID);
         List<String> regulatorUids = workflows.stream()
-                                                .map(workflow -> workflow.getDeptForSharedAsset())
-                                                .distinct()
-                                                .collect(Collectors.toList());
+                .map(workflow -> workflow.getDeptForSharedAsset())
+                .distinct()
+                .collect(Collectors.toList());
         if(logger.isDebugEnabled()) {
             logger.debug("getRegulatorUidsBySiteUid siteUID: " + siteUID + ", regulatorUids: " + regulatorUids.stream().collect(Collectors.joining(",")));
         }
         return regulatorUids;
 
     }
-    
+
     //where or
     public Map<Integer,List<String>> findAccessUidByUserUid(String userUid) {
-		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				UserOrgInfo temp=listUserOrgInfo.get(i);
-				Integer type=temp.getOrgType();
-				if(map.containsKey(type)){
-					map.get(type).add(temp.getOrgUid());
-				}
-				else{
-					List<String> tempSet=new ArrayList<String>();
-					tempSet.add(temp.getOrgUid());
-					map.put(type, tempSet);
-				}
-			}
-		}
-		return map;
-	}
-    
+        List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+        Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
+        if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+            for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+                UserOrgInfo temp=listUserOrgInfo.get(i);
+                Integer type=temp.getOrgType();
+                if(map.containsKey(type)){
+                    map.get(type).add(temp.getOrgUid());
+                }
+                else{
+                    List<String> tempSet=new ArrayList<String>();
+                    tempSet.add(temp.getOrgUid());
+                    map.put(type, tempSet);
+                }
+            }
+        }
+        return map;
+    }
+
     //where or
     public Map<Integer,List<String>> findAccessUidByUserUid(String userUid,String siteUid) {
-		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
-		List<String> orgUids=new ArrayList<String>();
-		List<OrgInfo> listOrgInfo=null;
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				UserOrgInfo temp=listUserOrgInfo.get(i);
-				if(!orgUids.contains(temp.getOrgUid())){
-					orgUids.add(temp.getOrgUid());
-				}
-			}
-		}
-		if(orgUids.size()>0){
-			listOrgInfo=orgInfoDao.findByUidAndSiteUid(orgUids,siteUid);
-		}
-		if (listOrgInfo != null && listOrgInfo.size() > 0) {
-			for (int i = 0; i < listOrgInfo.size(); ++i) {
-				OrgInfo temp=listOrgInfo.get(i);
-				Integer type=temp.getOrgType();
-				if(map.containsKey(type)){
-					map.get(type).add(temp.getUid());
-				}
-				else{
-					List<String> tempSet=new ArrayList<String>();
-					tempSet.add(temp.getUid());
-					map.put(type, tempSet);
-				}
-			}
-		}
-		return map;
-	}
-    
-  //where and
+        List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+        Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
+        List<String> orgUids=new ArrayList<String>();
+        List<OrgInfo> listOrgInfo=null;
+        if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+            for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+                UserOrgInfo temp=listUserOrgInfo.get(i);
+                if(!orgUids.contains(temp.getOrgUid())){
+                    orgUids.add(temp.getOrgUid());
+                }
+            }
+        }
+        if(orgUids.size()>0){
+            listOrgInfo=orgInfoDao.findByUidAndSiteUid(orgUids,siteUid);
+        }
+        if (listOrgInfo != null && listOrgInfo.size() > 0) {
+            for (int i = 0; i < listOrgInfo.size(); ++i) {
+                OrgInfo temp=listOrgInfo.get(i);
+                Integer type=temp.getOrgType();
+                if(map.containsKey(type)){
+                    map.get(type).add(temp.getUid());
+                }
+                else{
+                    List<String> tempSet=new ArrayList<String>();
+                    tempSet.add(temp.getUid());
+                    map.put(type, tempSet);
+                }
+            }
+        }
+        return map;
+    }
+
+    //where and
     public List<String> findAccessClinicalUidByUserUid(String userUid){
-    	Map<Integer,List<String>> map=findAccessUidByUserUid(userUid);
-    	if(map.size()>0){
-			List<String> tempSet=null;
-			List<String> clinicalSet=null;
-			tempSet=map.get(4);
-			boolean hasClinical=false;
-			if(tempSet!=null){
-				hasClinical=true;
-				clinicalSet=tempSet;
-			}
-			if(!hasClinical){
-				clinicalSet=new ArrayList<String>();
-				map.put(4, clinicalSet);
-			}
-			tempSet=map.get(3);
-			if(tempSet!=null){
-				List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
-				if(re!=null){
-					clinicalSet.addAll(re);
-				}
-			}
-			tempSet=map.get(2);
-			if(tempSet!=null){
-				List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
-				if(re!=null){
-					clinicalSet.addAll(re);
-				}
-			}
-			tempSet=map.get(1);
-			if(tempSet!=null){
-				List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
-				if(re!=null){
-					clinicalSet.addAll(re);
-				}
-			}
-			tempSet=map.get(0);
-			if(tempSet!=null){
-				List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
-				if(re!=null){
-					clinicalSet.addAll(re);
-				}
-			}
-		}
-		return map.get(4);
+        Map<Integer,List<String>> map=findAccessUidByUserUid(userUid);
+        if(map.size()>0){
+            List<String> tempSet=null;
+            List<String> clinicalSet=null;
+            tempSet=map.get(4);
+            boolean hasClinical=false;
+            if(tempSet!=null){
+                hasClinical=true;
+                clinicalSet=tempSet;
+            }
+            if(!hasClinical){
+                clinicalSet=new ArrayList<String>();
+                map.put(4, clinicalSet);
+            }
+            tempSet=map.get(3);
+            if(tempSet!=null){
+                List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
+                if(re!=null){
+                    clinicalSet.addAll(re);
+                }
+            }
+            tempSet=map.get(2);
+            if(tempSet!=null){
+                List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
+                if(re!=null){
+                    clinicalSet.addAll(re);
+                }
+            }
+            tempSet=map.get(1);
+            if(tempSet!=null){
+                List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
+                if(re!=null){
+                    clinicalSet.addAll(re);
+                }
+            }
+            tempSet=map.get(0);
+            if(tempSet!=null){
+                List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
+                if(re!=null){
+                    clinicalSet.addAll(re);
+                }
+            }
+        }
+        return map.get(4);
     }
-    
-  //where and
+
+    //where and
     public List<OrgInfo> findAccessClinicalUidByUserUid(String userUid,String siteUid){
-    	List<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
-    	List<OrgInfo> re=null;
-    	if(setAccessClinical!=null && setAccessClinical.size()>0){
-    		re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);
-    	}
-    	return re;
+        List<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
+        List<OrgInfo> re=null;
+        if(setAccessClinical!=null && setAccessClinical.size()>0){
+            re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);
+        }
+        return re;
     }
-    
+
     public TreeNode buildOrgTree(String tenantUid, String filterKeyword, int maxOrgType, int maxOrgLevel){
-            OrgInfo rootOrg = new OrgInfo();
-            rootOrg.setId(-1);
-            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
-            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-            TreeNode orgTree = new DefaultTreeNode("root", null, null);
-            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(getOrgFullTreeByTenant(tenantUid).getChildren());
-            
-            filterTreeNode(orgTree, filterKeyword, maxOrgType, maxOrgLevel);
-            
-            return orgTree;
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.getChildren().addAll(getOrgFullTreeByTenant(tenantUid).getChildren());
+
+        filterTreeNode(orgTree, filterKeyword, maxOrgType, maxOrgLevel);
+
+        return orgTree;
     }
 
     public void expendedTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
@@ -1530,17 +1530,17 @@ public class UaaService {
             if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
         });
     }
-    
+
     private void doFilterTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
         node.getChildren().forEach(item->{
             doFilterTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
 
-            item.setType("hidden"); 
+            item.setType("hidden");
             OrgInfo org = (OrgInfo)item.getData();
             if(!org.getName().contains(filterKeyword) && (org.getNamePyCode()==null?true:!org.getNamePyCode().contains(filterKeyword))) return;
             if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
             if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
-           
+
             nodeList.add(item);
             TreeNode pNode = node;
             while(pNode!=null){

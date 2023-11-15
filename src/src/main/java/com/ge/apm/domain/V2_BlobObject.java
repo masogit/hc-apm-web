@@ -89,6 +89,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_EXPORT_RECORD = "ExportRecord";
     public static final String BO_TYPE_ZKB = "ZKB";
     public static final String BO_TYPE_BUDGET = "budget";
+    public static final String BO_TYPE_BUDGET_PURCHASE = "budgetPurchase";
     public static final String BO_SUB_TYPE_DOCS = "Docs";
     public static final String BO_SUB_TYPE_IMG = "Image";
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
@@ -108,6 +109,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_AUDIT_CONFIG_ITEM = "auditConfigItem";
     public static final String BO_TYPE_AUDIT_TEMPLATE = "auditTemplate";
     public static final String BO_TYPE_PART_PIC = "sparePart";
+    public static final String BO_TYPE_BUDGET_PURCHASE_TEMPLATE = "budgetPurchaseTemplate";
     /**
      * 工程师信息
      */

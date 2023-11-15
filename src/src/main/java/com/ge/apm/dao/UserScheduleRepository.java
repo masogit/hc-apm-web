@@ -31,4 +31,6 @@ public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedu
     @Transactional
     @Query(value="delete from user_schedule where user_uid in ?1 and schedule_date between ?2 and ?3 and type=?4 and schedule_date_stage in ?5 and site_uid=?6",nativeQuery = true)
     void batchDeleteWorkSchedule(List<String> collect, Date startBatchDate, Date endBatchDate, String name,List<String> scheduleDateStage,String siteUid);
+
+    List<UserSchedule> findByUserUIDInAndScheduleDateBetween(List<String>userLis,Date startDate,Date endDate);
 }

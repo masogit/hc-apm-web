@@ -140,11 +140,14 @@
             </p:submenu>
 
             <!-- 预算管理 -->
-            <p:submenu label="#{msg.BudgetMgr}" icon="fa fa-university" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_')}">
+            <p:submenu label="#{msg.BudgetMgr}" icon="fa fa-university" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_') and userContextService.hasAnyRole('AssetHead,DeptHead,ClinicalStaff')}">
                 <p:menuitem value="年度采购预算入口" outcome="/portal/budget/config/List.xhtml" />
                 <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/application/List.xhtml" />
                 <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" />
                 <p:menuitem  value="预算设备管理" outcome="/portal/budget/asset/List.xhtml" />
+                <p:menuitem  value="采购管理" outcome="/portal/budget/purchase/List.xhtml" />
+                <p:menuitem  value="模板管理" outcome="/portal/budget/purchaseTemplate/List.xhtml" />
+
             </p:submenu>
 
             <!-- 计量 -->

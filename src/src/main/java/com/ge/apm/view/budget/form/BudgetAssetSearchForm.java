@@ -3,6 +3,7 @@ package com.ge.apm.view.budget.form;
 import com.ge.apm.domain.OrgInfo;
 
 
+
 /**
  * @author Yangfan, Liu
  * @date 4/8/2022 17:21
@@ -24,6 +25,29 @@ public class BudgetAssetSearchForm {
     private String standards;
     // 设备品类
     private String applicationAssetCategory;
+
+    // 申请编号
+    private String applicationNum;
+
+    //申请科室
+    private String applicationDeptId;
+
+
+    public String getApplicationDeptId() {
+        return applicationDeptId;
+    }
+
+    public void setApplicationDeptId(String applicationDeptId) {
+        this.applicationDeptId = applicationDeptId;
+    }
+
+    public String getApplicationNum() {
+        return applicationNum;
+    }
+
+    public void setApplicationNum(String applicationNum) {
+        this.applicationNum = applicationNum;
+    }
 
     public String getStandards() {
         return standards;

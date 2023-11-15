@@ -2,6 +2,7 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -85,9 +86,11 @@ public class UserSchedule implements Serializable {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
-    @JoinColumn(insertable=false,updatable=false, name = "user_uid", referencedColumnName = "uid")
-    @ManyToOne(optional = true, fetch = FetchType.EAGER)
-    @JsonBackReference
+//    @JoinColumn(insertable=false,updatable=false, name = "user_uid", referencedColumnName = "uid")
+//    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+//    @JsonBackReference
+    @Transient
+    @JsonProperty
     private UserAccount userAccount;
 
     public String getId() {

@@ -7,9 +7,7 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
@@ -20,7 +18,6 @@ import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -59,7 +56,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
- * @author Yangfan, Liu
+ * @author lyj
  */
 @ViewScoped
 @ManagedBean(name = "budgetController")
@@ -68,31 +65,28 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     private Page<BudgetApplication> emptyPage = new PageImpl<>(Collections.emptyList());
     private UserAccount account = UserContextService.getCurrentUserAccount();
+    @Getter  @Setter
     private Integer tabIndex = 0;
     private Integer tabIndexList = 0;
-
-
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
     public final static String VIEW_ACTION = "View";
-
     private BlobFileService blobService;
     /**
      * 编辑数据主键
      */
+    @Getter  @Setter
     private String editId;
-
+    @Getter  @Setter
     private BudgetApplicationAsset curSelectApplicationBudgetAsset = new BudgetApplicationAsset();
-
+    @Getter  @Setter
     private BudgetAssetInfo curSelectBudgetAssetInfo;
-
+    @Getter  @Setter
     private List<V2_BlobObject> attachList;
-
     // 弹窗列表
+    @Getter  @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
-
     private List<SearchFilter> assetSearchFilters;
-
     private BudgetApplicationRepository dao;
     private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
@@ -102,18 +96,24 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private UserContextService userContextService;
     private BudgetPersistService persistService;
     private BudgetApplicationExportService budgetApplicationExportService;
-
+    @Getter  @Setter
     private BudgetSearchForm searchForm = new BudgetSearchForm();
+    @Getter  @Setter
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
-
+    @Getter  @Setter
     private BudgetAssetInfo selectedAsset;
-
+    @Getter  @Setter
     private OrgInfo org;
-    private CustomConfigObject customConfig;
+    @Getter  @Setter
     private TreeNode orgTree;
+    @Getter  @Setter
     private TreeNode orgTreeEdit;
+    @Getter  @Setter
     private OrgInfo selectedDept;
-
+    @Getter @Setter
+    private StreamedContent exportFile;
+    @Getter @Setter
+    private List<String> removeFileBlobId = new ArrayList<>();
     @Override
     protected void init() {
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
@@ -126,8 +126,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         persistService = WebUtil.getBean(BudgetPersistService.class);
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-        CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
@@ -165,12 +163,12 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return dao;
     }
 
-    public List<BudgetAssetInfo> autoCompleteAssetName(String query) {
+   /* public List<BudgetAssetInfo> autoCompleteAssetName(String query) {
         optionalBudgetAssets.clear();
         List<BudgetAssetInfo> assetInfoList = budgetAssetDao.findByTenantUIDAndIsDeleted(selectedDept.getTenantUID(),0);
         assetInfoList = assetInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
         return CollectionUtils.isNotEmpty(assetInfoList)?assetInfoList:new ArrayList<BudgetAssetInfo>();
-    }
+    }*/
 
     public void onBudgetAssetInfoChange(){
         this.curSelectApplicationBudgetAsset.setApplicationAssetName(this.curSelectBudgetAssetInfo.getName());
@@ -184,9 +182,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return "View".equals(crudActionName)?true:false;
     }
 
-    public boolean curModelCreate(){
-        return "Create".equals(crudActionName)?true:false;
-    }
 
     public void onTabChange(TabChangeEvent event) {
         selected = null;
@@ -241,7 +236,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ, BudgetApplication.OrderType.BAP.toString()));
+        updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ,
+                BudgetApplication.OrderType.BAP.toString()));
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
         removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");
         if (tabIndex == 0) {//待办
@@ -266,36 +262,39 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return searchFilters;
     }
 
+
     /**
-     * 跳转新增模式
+     * 根据参数跳转相关模式
      *
      * @return
      */
-    public String intoCreateModel(){
-        List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),new Date());
-        String url = new String();
-        if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
-            url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+    public String intoActionModel(String action){
+        if(BudgetApplicationBapController.CREATE_ACTION.equals(action)){
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date modifiedDate = calendar.getTime();
+            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),modifiedDate);
+            String url = new String();
+            if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
+                url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
+            }
+            WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
+            return url;
+        }else if(BudgetApplicationBapController.EDIT_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION
+                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+
+        }else if(BudgetApplicationBapController.VIEW_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.VIEW_ACTION
+                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
+        }else{
+            return null;
         }
-        WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
-        return url;
     }
-    /**
-     * 跳转编辑模式
-     *
-     * @return
-     */
-    public String intoEditModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
-    /**
-     * 跳转查看模式
-     *
-     * @return
-     */
-    public String intoViewModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
-    }
+
     public void doubleClick(SelectEvent event) {
         String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
@@ -304,15 +303,15 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void saveApplication() {
-        persistService.handleCommonField(selected,1,BudgetApplication.applicationStep.ToSubmitted.toString(),
+        persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
-        boolean isOk = persistService.saveApplication(selected,this.attachList);
+        boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
-        if(BudgetApplication.applicationStep.PendingApproval.toString().equals(applicationStep)){
+        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
@@ -325,7 +324,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
                     account,crudActionName,this.curSelectBudgetAssetInfo);
-            persistService.saveApplication(selected,this.attachList);
+            persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         }
         return this.backList();
     }
@@ -347,12 +346,12 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void saveAsset() {
         // 保存时设置科室·
-        selectedAsset.setDept(selectedDept);
-        selectedAsset.setDeptId(selectedDept.getId());
-        selectedAsset.setTenantUID(selectedDept.getTenantUID());
-        selectedAsset.setInstitutionUID(selectedDept.getInstitutionUID());
-        selectedAsset.setHospitalUID(selectedDept.getHospitalUID());
-        selectedAsset.setSiteUID(selectedDept.getSiteUID());
+        //selectedAsset.setDept(selectedDept);
+        //selectedAsset.setDeptId(selectedDept.getId());
+        selectedAsset.setTenantUID(account.getTenantUID());
+        selectedAsset.setInstitutionUID(account.getTenantUID());
+        selectedAsset.setHospitalUID(account.getTenantUID());
+        selectedAsset.setSiteUID(account.getTenantUID());
         boolean isOk = persistService.saveAsset(selectedAsset);
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
@@ -534,7 +533,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public void buildCurDetail(String id){
         this.selected = this.dao.findById(id);
-        this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
+        this.curSelectApplicationBudgetAsset = CollectionUtils.isNotEmpty(this.selected.getBudgetAssets())?
+                this.selected.getBudgetAssets().iterator().next():new BudgetApplicationAsset();
         this.selectedDept = this.selected.getApplicationDept();
         this.selected.setApplicationDeptName(this.selectedDept.getName());
         if(this.curSelectApplicationBudgetAsset!=null ){
@@ -547,7 +547,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public void removeAttachmentById(String blobId) {
-        blobService.deleteBlobFileById(blobId);
+        this.removeFileBlobId.add(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
@@ -556,14 +556,15 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         if (null != blobObject ) {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET);
-                //blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+           /* if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
+                blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
+            }*/
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
     }
-
     public void searchAsset() {
         clearAssetSearchFilter();
         addAssetSearchFilter();
@@ -615,17 +616,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
-    @Getter
-    @Setter
-    private StreamedContent exportFile;
-
-
     public void exportAll()  {
         try {
-            this.selected = this.dao.findById(selected.getId());
-            this.curSelectApplicationBudgetAsset = this.selected.getBudgetAssets().iterator().next();
-            this.selectedDept = this.selected.getApplicationDept();
-            this.selected.setApplicationDeptName(this.selectedDept.getName());
+            buildCurDetail(selected.getId());
             if(this.curSelectApplicationBudgetAsset!=null ){
                 this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
             }
@@ -634,110 +627,5 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    @Override
-    public void prepareDelete() {
-        crudActionName = "Delete";
-    }
-
-
-    public Integer getTabIndex() {
-        return tabIndex;
-    }
-
-    public void setTabIndex(Integer tabIndex) {
-        this.tabIndex = tabIndex;
-    }
-
-    public BudgetSearchForm getSearchForm() {
-        return searchForm;
-    }
-
-    public void setSearchForm(BudgetSearchForm searchForm) {
-        this.searchForm = searchForm;
-    }
-
-    public BudgetAssetSearchForm getAssetSearchForm() {
-        return assetSearchForm;
-    }
-
-    public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
-        this.assetSearchForm = assetSearchForm;
-    }
-
-    public BudgetAssetInfo getSelectedAsset() {
-        return selectedAsset;
-    }
-
-    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
-        this.selectedAsset = selectedAsset;
-    }
-
-    public TreeNode getOrgTree() {
-        return orgTree;
-    }
-
-    public void setOrgTree(TreeNode orgTree) {
-        this.orgTree = orgTree;
-    }
-
-    public TreeNode getOrgTreeEdit() {
-        return orgTreeEdit;
-    }
-
-    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
-        this.orgTreeEdit = orgTreeEdit;
-    }
-
-    public OrgInfo getSelectedDept() {
-        return selectedDept;
-    }
-
-    public void setSelectedDept(OrgInfo selectedDept) {
-        this.selectedDept = selectedDept;
-    }
-
-    public String getEditId() {
-        return editId;
-    }
-
-    public void setEditId(String editId) {
-        this.editId = editId;
-    }
-
-    public BudgetApplicationAsset getCurSelectApplicationBudgetAsset() {
-        return curSelectApplicationBudgetAsset;
-    }
-
-    public void setCurSelectApplicationBudgetAsset(BudgetApplicationAsset curSelectApplicationBudgetAsset) {
-        this.curSelectApplicationBudgetAsset = curSelectApplicationBudgetAsset;
-    }
-
-    public List<V2_BlobObject> getAttachList() {
-        if(this.curSelectApplicationBudgetAsset!=null && StringUtils.isNotBlank(this.curSelectApplicationBudgetAsset.getId())){
-            attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
-        }
-        return attachList;
-    }
-
-    public void setAttachList(List<V2_BlobObject> attachList) {
-        this.attachList = attachList;
-    }
-
-    public BudgetAssetInfo getCurSelectBudgetAssetInfo() {
-        return curSelectBudgetAssetInfo;
-    }
-
-    public void setCurSelectBudgetAssetInfo(BudgetAssetInfo curSelectBudgetAssetInfo) {
-        this.curSelectBudgetAssetInfo = curSelectBudgetAssetInfo;
-    }
-
-    public List<BudgetAssetInfo> getOptionalBudgetAssets() {
-        return optionalBudgetAssets;
-    }
-
-    public void setOptionalBudgetAssets(List<BudgetAssetInfo> optionalBudgetAssets) {
-        this.optionalBudgetAssets = optionalBudgetAssets;
     }
 }
