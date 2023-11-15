@@ -76,6 +76,7 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
                             <p:ajax event="rowSelect" update="delButton"/>
+                            <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                             <p:column headerText="申请科室">
                                 <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
                             </p:column>
@@ -112,10 +113,10 @@
                          <f:facet name="{Toolbar}">
                              <p:commandButton title="选择申购单" id="addButton" process="@this" update="BudgetSelectDlg"
                                               icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
-                                              actionListener="#{purchaseOrderController.preAddBudgetApplication()}"
+                                              actionListener="#{purchaseOrderController.preAddBudgetApplication()}" disabled="#{purchaseOrderController.curModelDisables()}"
                                               oncomplete="PF('BudgetSelectDialog').show()"/>
                              <p:commandButton title="删除" id="delButton" update="budgetApplicationlist BudgetApplicationEditForm:purchaseQuantity BudgetApplicationEditForm:totalPrice "
-                                              disabled="#{empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
+                                              disabled="#{purchaseOrderController.curModelDisables() or empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
                                               icon="ui-icon-close" class="btn btn-sm btn-gray zoom-08"
                                               actionListener="#{purchaseOrderController.delBudgetApplication()}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"  icon="ui-icon-alert"/>
@@ -131,10 +132,16 @@
                             </p:selectManyMenu>
                         </h:panelGroup>
                     </p:fieldset>
-
+                    <p:fieldset legend="竞标信息" style="color: red;" >
+                        <c:forEach items="#{purchaseOrderController.venderInfoStr}" var="venderInfo" >
+                            <div style="margin-bottom: 5px;">
+                                <span>#{venderInfo}</span><br/>
+                            </div>
+                        </c:forEach>
+                    </p:fieldset>
                     <br/>
                     <p:commandButton update=":growl :BudgetApplicationEditForm"
-                                     validateClient="true" action="#{purchaseOrderController.savePurchase}" value="保存" id="savePurchase" />
+                                     validateClient="true" action="#{purchaseOrderController.savePurchase}" disabled="#{purchaseOrderController.curModelDisables()}" value="保存" id="savePurchase" />
                     <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{purchaseOrderController.backList}" />
                 </h:panelGroup>

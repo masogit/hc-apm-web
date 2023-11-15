@@ -85,7 +85,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton exportZipButton"/>
+                        <p:ajax event="rowSelect" update="createButton viewButton editButton deleteButton exportZipButton viewUrl"/>
                         <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:column headerText="采购单号" >
                             <h:outputText value="#{item.purchaseNum}"/>
@@ -119,6 +119,13 @@
                                                    pattern="#{userContextService.timeFormat()}"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="数据状态" >
+                            <h:outputText value="#{fieldMsg.fieldValue('purchaseStatus', item.status)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false">
+                            <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled'}" update=" datalist deleteButton" actionListener="#{purchaseOrderController.updateStatus(item.id,'Enabled')}"  />
+                            <p:commandButton value="停用"  rendered="#{item.status eq 'Enabled'}" update="datalist deleteButton" actionListener="#{purchaseOrderController.updateStatus(item.id,'NotEnabled')}"  />
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                              title="#{msg.Create}"
@@ -126,26 +133,80 @@
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                              title="#{msg.Edit}"
                                              action="#{purchaseOrderController.intoActionModel('Edit')}"
-                                             disabled="#{empty purchaseOrderController.selected }"/>
-                            <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
+                                             disabled="#{empty purchaseOrderController.selected}"/>
+                            <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
+                                             title="#{msg.View}"
+                                             action="#{purchaseOrderController.intoActionModel('View')}"
+                                             disabled="#{empty purchaseOrderController.selected}" />
+                            <p:commandButton id="viewUrl" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray"  title="查看Url"
+                                             disabled="#{empty purchaseOrderController.selected }"
+                                           immediate="false" process="@this"  oncomplete="PF('viewUrlDlg').show()" update=":growl :viewUrlForm" >
+                            </p:commandButton>
+                           <!-- <p:commandButton id="confirmBid" icon="ui-icon-settings" class="btn btn-sm btn-gray"
+                                             actionListener="#{purchaseOrderController.loadVenderInfo}" update=":confirmBidForm"
+                                             title="确认中标" oncomplete="PF('confirmBidDlg').show()"
+                                             />-->
+                            <p:commandButton  title="导出采购单列表" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                               ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="Purchase_Export"/>
                             </p:commandButton>
-                            <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
-                                             disabled="#{empty purchaseOrderController.selected}" actionListener="#{purchaseOrderController.delete}"  >
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
-                            <p:commandButton id="exportZipButton" ajax="false" title="下载压缩文件" actionListener="#{purchaseOrderController.exportAll}"
+                            <p:commandButton id="exportZipButton" ajax="false" title="采购单完整信息" actionListener="#{purchaseOrderController.exportAll}"
                                              disabled="#{empty purchaseOrderController.selected}"
                                              icon="ui-icon-circle-triangle-s" class="btn btn-sm btn-gray">
                                 <p:fileDownload value="#{purchaseOrderController.exportFile}"/>
                             </p:commandButton>
+                            <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
+                                             disabled="#{(empty purchaseOrderController.selected) ||  purchaseOrderController.selected.status eq 'Enabled'}" actionListener="#{purchaseOrderController.delete}"  >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+
                         </f:facet>
                     </p:dataTable>
 
                 </h:form>
-
-
+                <p:dialog id="viewUrlDlg" widgetVar="viewUrlDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="采购单Url" >
+                    <h:form id="viewUrlForm">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <span class="label">#{purchaseOrderController.getPurchaseUrl()}</span>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <br/>
+                        <p:commandButton immediate="true" process="@this" value="关闭" onclick="PF('viewUrlDlg').hide()"/>
+                    </h:form>
+                </p:dialog>
+               <!-- <p:dialog id="confirmBidDlg" widgetVar="confirmBidDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="确认中标" width="960" height="560">
+                    <h:form id="confirmBidForm">
+                        <p:dataTable id="assetDatalist" value="#{purchaseOrderController.venderInfoList}" var="item" widgetVar="venderInfoList"
+                                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                     rowKey="#{item.id}" selection="#{purchaseOrderController.venderInfo}"
+                                     paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5,10,20">
+                            <p:column selectionMode="single">
+                            </p:column>
+                            <p:column headerText="供应商名称">
+                                <h:outputText value="#{item.venderName}"/>
+                            </p:column>
+                            <p:column headerText="地址">
+                                <h:outputText value="#{item.venderAddress}"/>
+                            </p:column>
+                            <p:column headerText="供应商联系人">
+                                <h:outputText value="#{item.venderContacts}"/>
+                            </p:column>
+                            <p:column headerText="电话">
+                                <h:outputText value="#{item.venderPhone}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                       &lt;!&ndash;<p:commandButton validateClient="true" actionListener="#{purchaseOrderController.confirmBid}"
+                                         value="确定"
+                                         update=":BudgetSelectDlg, :growl"
+                                         oncomplete="handleSubmit(args, 'confirmBidDlg');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}"
+                                         onclick="PF('confirmBidDlg').hide()"/>&ndash;&gt;
+                    </h:form>
+                </p:dialog>-->
             </div>
         </div>
         <script>
