@@ -123,7 +123,7 @@
                             <h:outputText value="#{fieldMsg.fieldValue('purchaseStatus', item.status)}"/>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false">
-                            <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled'}" update=" datalist deleteButton" actionListener="#{purchaseOrderController.updateStatus(item.id,'Enabled')}"  />
+                            <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled' || item.status eq ''}" update=" datalist deleteButton" actionListener="#{purchaseOrderController.updateStatus(item.id,'Enabled')}"  />
                             <p:commandButton value="停用"  rendered="#{item.status eq 'Enabled'}" update="datalist deleteButton" actionListener="#{purchaseOrderController.updateStatus(item.id,'NotEnabled')}"  />
                         </p:column>
                         <f:facet name="{Toolbar}">
