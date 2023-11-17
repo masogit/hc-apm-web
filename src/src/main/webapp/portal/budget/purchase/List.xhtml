@@ -32,7 +32,7 @@
 
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
-                    <p:fieldset legend="#{msg.AdvancedSearch}">
+                    <!--<p:fieldset legend="#{msg.AdvancedSearch}">
                         <p:panelGrid id="searchPanel" columns="4" layout="grid"
                                      styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -43,7 +43,7 @@
                                 <p:outputLabel class="label" value="操作人"/>
                                 <p:inputText value="#{purchaseOrderController.searchForm.applicantName}"/>
                             </h:panelGroup>
-                           <!-- <h:panelGroup>
+                           &lt;!&ndash; <h:panelGroup>
                                 <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
                                 <p:calendar mode="popup" showOn="button"
                                             value="#{purchaseOrderController.searchForm.dateStart}"
@@ -66,7 +66,7 @@
                                             navigator="true" mask="true">
                                     <p:ajax event="dateSelect" update="@this"/>
                                 </p:calendar>
-                            </h:panelGroup>-->
+                            </h:panelGroup>&ndash;&gt;
                          <h:panelGroup style="display: flex;">
                                 <p:commandButton value="#{msg.Search}"
                                                  actionListener="#{purchaseOrderController.search}"
@@ -76,7 +76,7 @@
                                                  update="searchForm datalist"/>
                             </h:panelGroup>
                         </p:panelGrid>
-                    </p:fieldset>
+                    </p:fieldset>-->
 
                     <p:dataTable id="datalist" value="#{purchaseOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{purchaseOrderController.selected}"
@@ -95,19 +95,19 @@
                         <p:column headerText="设备名称"  filterBy="#{item.applicationAssetName}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.applicationAssetName}"/>
                         </p:column>
-                        <p:column headerText="采购数量" filterBy="#{item.purchaseQuantity}" filterMatchMode="EQ">
+                        <p:column headerText="采购数量" >
                             <h:outputText value="#{item.purchaseQuantity}"/>
                         </p:column>
-                        <p:column headerText="采购金额" filterBy="#{item.totalPrice}" filterMatchMode="EQ">
+                        <p:column headerText="采购金额">
                             <h:outputText value="#{item.totalPrice}">
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="操作人" filterBy="#{item.operator.name}" filterMatchMode="LIKE">
+                        <p:column headerText="操作人" >
                             <h:outputText value="#{item.operator.name}"/>
 
                         </p:column>
-                        <p:column headerText="采购开始时间" filterBy="#{item.startDate}" filterMatchMode="GTE">
+                        <p:column headerText="采购开始时间"  sortBy="#{item.startDate}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>
                             </f:facet>
@@ -117,7 +117,7 @@
                                                    pattern="#{userContextService.timeFormat()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="采购截止时间" filterBy="#{item.endDate}" filterMatchMode="GTE">
+                        <p:column headerText="采购截止时间" sortBy="#{item.endDate}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
                             </f:facet>
