@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -268,15 +269,11 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
      *
      * @return
      */
-    public String intoActionModel(String action){
+    public String intoActionModel(String action) throws ParseException {
         if(BudgetApplicationBapController.CREATE_ACTION.equals(action)){
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            Date modifiedDate = calendar.getTime();
-            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),account.getSiteUID(),modifiedDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
+                    account.getSiteUID(),sdf.parse(sdf.format(new Date())));
             String url = new String();
             if(CollectionUtils.isNotEmpty(purchaseBudgetConfigList)){
                 url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndexList="+tabIndex);
