@@ -17,7 +17,8 @@ import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -28,9 +29,7 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -123,7 +122,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<OrgInfo> clinicalDeptListMVS;
     private boolean terminate = false;
     private OrgInfoRepository orgDao;
-    private TenantInfoRepository tenantInfoRepository;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
     private AuditGroupConfigurationRepository auditGroupConfigurationRepository;
@@ -144,11 +142,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Set<String> clinicalDeptOrgUidSet;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSetMVS;
-    private Set<String> assetDeptOrgUidSet;
-    private  UserOrgInfoRepository userOrgInfoRepository;
     private BlobObjectRepository blobObjectRepository;
     private V2_ServiceRequest newServiceRequest;
-    private WorkflowService workflowService;
+    private ConfigService configService;
     private MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
@@ -195,7 +191,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String selectedApproverUid;
     private ServiceRequestApiService serviceRequestApiService;
     private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
-    private WorkflowConfigRepository woConDao;
+    private ConfigCacheService cacheService;
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
     private AutoCompleteService autoCompleteService;
@@ -218,7 +214,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String tabTitle;
 
     public String faultReason;
-    public CustomConfigService customConfigService;
     private CustomConfigObject currentCustomConfig;
     private CustomConfigService ccService;
     private CustomConfig customConfig;
@@ -287,15 +282,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
-            customConfigService = WebUtil.getBean(CustomConfigService.class);
-            tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
             auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
-            currentCustomConfig = customConfigService.getCurrentCustomConfig(
-                    UserContextService.getCurrentUserAccount().getSiteUID());
+            loginUser = UserContextService.getCurrentUserAccount();
+            currentCustomConfig = ccService.getCurrentCustomConfig(
+                    loginUser.getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
             mvsAssetInfoRepository = WebUtil.getBean(MvsAssetInfoRepository.class);
-            userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
-            //orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
             token = UserContextService.getAccessToken();
             dao = WebUtil.getBean(V2_WorkOrderRepository.class);
             auditGroupConfigurationRepository = WebUtil.getBean(AuditGroupConfigurationRepository.class);
@@ -309,10 +301,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             assetDao = WebUtil.getBean(AssetInfoRepository.class);
             detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
             coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-            woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
+            cacheService = WebUtil.getBean(ConfigCacheService.class);
             woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
             assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
-            workflowService = WebUtil.getBean(WorkflowService.class);
+            configService = WebUtil.getBean(ConfigService.class);
             serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
             orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
             autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -327,11 +319,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
             externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
-            selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+            selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
-            loginUser = UserContextService.getCurrentUserAccount();
+
 
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -386,13 +378,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
-   /* public boolean displayTime(){
-       if(subStatus==1)
-            return true;
-       else
-           return false;
-    }
-*/
     @Setter
     public boolean displayTime=false;
 
@@ -524,27 +509,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         switch(stepId){
             case 7: //待评价
                 return "icons/5.png";
-                /*if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
-                    if(v2_workOrder.getApprovalDate()==null){
-                        return  "icons/6.png";
-                    }
-                    return "icons/5.png";
-                }
-                else{//如果没有备件 则显审核图标显示为灰色的
-                    return "icons/6.png";
-                }*/
             case 6: //
                 return "icons/5.png";
-                /*if(v2_workOrder.getV2_workOrder_detail_list().size()>0){
-                    if(v2_workOrder.getApprovalDate()==null) //有备件但未提交审核
-                    {
-                        return "icons/6.png";
-                    }else
-                        return "icons/5.png";
-                }else{//如果没有备件 则显审核图标显示为灰色的
-                    return "icons/6.png";
-                }*/
-
             case 5: //待验收
             {
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0 && v2_workOrder.getApprovalDate()==null){//有备件 没有提交审核 则显审核图标显示为灰色的
@@ -583,13 +549,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         Integer stepId =v2_workOrder.getCurrentStepId();
         switch(stepId){
             case 2:
-                return "待接单";
             case 3:
                 return "待接单";
             case 4:
                 return "维修中";
             case 7:
-                return "已关单";
             case 9:
                 return "已关单";
             default:
@@ -660,7 +624,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private void loadClinicalDeptList() {
         try {
-            /*clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
             clinicalDeptList = Collections.emptyList();
             List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
             if (!CollectionUtils.isEmpty(deptList)) {
@@ -693,66 +656,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void onTabChange(TabChangeEvent event) {
         FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
         tabTitle = msg.getDetail();
-        /*if("MVS工单".equals(tabTitle)){
-        }*/
         queryIndex = 0;
     }
 
     public void updateQueryIndex(int query){
         queryIndex = query;
         selected = null;
-    }
-
-    private void setUserSearchFilters() {
-        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        if (terminate) {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
-        } else {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-        }
-
-        if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
-
-        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        }
-
-        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
-            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
-
-        if (!Strings.isNullOrEmpty(fileterOrgName)) {
-            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.EQ, fileterOrgName, "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
-
-        if (null != selectSite) {
-            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
-        }
-
     }
 
     private Boolean isRating;
@@ -812,12 +721,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+"));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+B*"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, loginUser.getId(), "1*3+4*A+"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*A+B*"));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
+                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*5+owner*6+"));
+                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*5+owner*6+"));
+                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*5+owner*6+"));
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner2*"));
@@ -825,10 +734,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
                 //去除派工模式4且待派工的单子
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+7*"));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
                 //当前责任人是自己且已经派工的单子
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
                 List<Integer> tagGroupAssets = getTagGroupAssets();
                 if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
@@ -846,14 +755,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             } else if (queryIndex == 4) { //维修中
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
             } else if (queryIndex == 5) { //待验收
                 /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*3+"));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
-                    searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*3+"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, loginUser.getOrgInfoUID(), "1*3+"));
                 } else {
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
@@ -871,25 +780,21 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 10));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 11));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
             } else if (queryIndex == 8) { //已关单
                 if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
                     if (userContextService.hasRole("AssetStaff")) {
-                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                     }
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             } else if (queryIndex == 9) { //已取消
-//            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
-//                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-//                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-//            }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
                 String tenantUID = loginUser.getTenantUID();
-                TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+                TenantInfo tenantInfo = cacheService.getTenantByUid(tenantUID);
                 if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(loginUser.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
@@ -911,19 +816,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                     if (userAccountList.contains(loginUser)) {
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1, "1*approve+"));
-                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(), "1*approve+9*"));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, loginUser.getId(), "1*approve+9*"));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0, "1*approve+9*"));
                     } else {
-                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, loginUser.getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
                     }
                 } else {
                     if (!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead"))) {
-                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, loginUser.getId()));
                     }
                     if (userContextService.hasRole("DeptHead")) {
-                        List<String> clinicalUidList = orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
-                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        List<String> clinicalUidList = orgDao.findClinicalUidBySiteUid(Arrays.asList(loginUser.getSiteUID()));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, loginUser.getId()));
                         searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList, "1*2+"));
                     }
                 }
@@ -959,21 +864,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             } else if (queryIndex == 13) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
-//                if(!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff"))) {
-//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-//                  }
+
             } else if (queryIndex == 14) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
-//                if(!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff"))) {
-//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-//                }
             }else {//待办
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
@@ -1019,7 +913,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = pageResult.getContent();
             }
-            TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
             List<V2_WorkOrder> workOrderList = new ArrayList<>();
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
                 List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
@@ -1100,6 +994,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*2+"));
         }
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
@@ -1112,12 +1007,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
         if (!this.hasFilterOnField("siteUID")) {
-            TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
-                String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
+                String hospitalUID = loginUser.getHospitalUID();
                 updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
-                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
                 updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -1125,7 +1020,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-                updateSearchFilter(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                updateSearchFilter(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                 searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
         }
@@ -1156,7 +1051,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             if (orgUidList == null || orgUidList.isEmpty()) {
                 orgUidList = Arrays.asList("");
             }
@@ -1167,7 +1062,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private List<Integer> getTagGroupAssets() {
         if (tagGroupAssets == null) {
-            tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
+            tagGroupAssets = dao.getAssetsByTagGroup(loginUser.getId());
         }
         return tagGroupAssets;
     }
@@ -1321,7 +1216,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public boolean isOwner() {
-        if (null != selected.getRepairPersonId() && selected.getRepairPersonId().compareTo(UserContextService.getCurrentUserAccount().getId()) == 0) {
+        if (null != selected.getRepairPersonId() && selected.getRepairPersonId().compareTo(loginUser.getId()) == 0) {
             return true;
         }
         return false;
@@ -1368,10 +1263,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     }
 
-   /* public void prepareRepair(String woid){
-        selectedWorkOrder = dao.findById(woid);
-    }*/
-
     public boolean isStep(V2_WorkOrder workOrder){
         if(workOrder==null){
             return false;
@@ -1396,7 +1287,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
         if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
             List<V2_WorkOrder_Detail> approvedDetailList = new ArrayList<>();
             approvedDetails.stream().forEach(item -> {
@@ -1610,9 +1501,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 return;
             }
         }
-        /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
-                selectedWorkOrder.setManHours(null);
-            }*/
 
         if (selectedWorkOrder.getEntryType() == 1) {
             workHoursList = workHoursList.stream()
@@ -1737,7 +1625,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             valid = false;
         };
 
-        WorkflowConfig woc = workflowService.getWorkflowByOrg(UserContextService.getCurrentUserAccount().getSiteUID());
+        WorkflowConfig woc = configService.findConfigBySite(loginUser.getSiteUID());
         /*hourRequired=  woc.getHourRequired();*/
         if(null!=woc) {
             if(woc.getPatProblems()!=null && woc.getPatProblems() && selectedWorkOrder.getPatProblems()==null) {
@@ -1864,15 +1752,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
             return;
         }
-//        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
-//           if(isRating && feedback<1){
-//               WebUtil.addErrorMessage("请务必给予评价");
-//               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
-//               return;
-//           }else {
-//           }
+
         if(userContextService.isCountyArea()){//关单前县域租户备件必须全部归还
-//            List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList = detailReturnDao.findByWoIdAndReturnType(selectedWorkOrder.getId(),null);
             if(v2WorkOrderDetailReturnList != null){
                 for(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn:v2WorkOrderDetailReturnList){
                     if(v2WorkOrderDetailReturn.getReturnType() == null){
@@ -1901,7 +1782,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         //从配置信息获取紧急程度
-        CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         //从配置信息获取当前状态
         String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
@@ -1920,12 +1801,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest.setStatus(currentStatus);
-        newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
-        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
-        newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestorId(loginUser.getId());
+        newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
+        newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestTime(new Date());
         if(selectedAsset != null && userContextService.isCountyArea()){
-            OrgInfo orgInfo = orgDao.findByUid(selectedAsset.getSiteUID());
+            OrgInfo orgInfo = cacheService.findOrgByUid(selectedAsset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
             newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
             newServiceRequest.setHospitalName(orgInfo.getName());//这里只需要开单页面显示，asset微服务会保存医院Uid和名称。
@@ -1946,7 +1827,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         //从配置信息获取紧急程度
-        CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         //从配置信息获取当前状态
         String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
@@ -1964,12 +1845,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest.setStatus(currentStatus);
-        newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
-        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
-        newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestorId(loginUser.getId());
+        newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
+        newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestTime(new Date());
         if(selectedAsset != null && userContextService.isCountyArea()){
-            OrgInfo orgInfo = orgDao.findByUid(selectedAsset.getSiteUID());
+            OrgInfo orgInfo = cacheService.findOrgByUid(selectedAsset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
             newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
             newServiceRequest.setHospitalName(orgInfo.getName());//这里只需要开单页面显示，asset微服务会保存医院Uid和名称。
@@ -1981,7 +1862,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if(assetInfos!=null && !assetInfos.isEmpty()){
             for (int i = 0; i < assetInfos.size(); i++) {
                 AssetInfo assetInfo = assetInfos.get(i);
-                WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetInfo.getId());
+                WorkflowConfig woc = configService.findConfigBySite(assetInfo.getSiteUID());
                 if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
                     this.saveServiceRequestSupplier();
                 }
@@ -2040,7 +1921,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 return;
             }
         }
-        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
+        WorkflowConfig woc = configService.findConfigBySite(selectedAsset.getSiteUID());
         if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
             this.saveServiceRequestSupplier();
         }
@@ -2119,7 +2000,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private void onSelectedAsset(AssetInfo asset) {
         String lName ="";
         final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-        OrgInfo org = orgDao.findByUid(orgInfoUID);
+        OrgInfo org = cacheService.findOrgByUid(orgInfoUID);
         if(org.getOrgType()==4){
              lName = org.getName();
         }else{
@@ -2129,7 +2010,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         locationName = lName;
 
         if(newServiceRequest != null && userContextService.isCountyArea()){
-            OrgInfo orgInfo = orgDao.findByUid(asset.getSiteUID());
+            OrgInfo orgInfo = cacheService.findOrgByUid(asset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
             newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
             newServiceRequest.setHospitalName(orgInfo.getName());
@@ -2241,7 +2122,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierName = null;
         selectedObjectMap = new HashMap();
         switchTmp=true;
-        currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
+        currentCustomConfig = ccService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
         Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
         itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
     }
@@ -2255,7 +2136,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             itemDetail.setApplyTime(new Date());
             supplierName = null;
             switchTmp=true;
-            currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
+            currentCustomConfig = ccService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
             String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
@@ -2502,12 +2383,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public OrgInfo getOrgInfoByUid(String orgUid) {
-        return orgDao.getByUid(orgUid);
-    }
-
-    public OrgInfo getOrgNameByAssetid(String orgUid) {
-
-        return orgDao.getByUid(orgUid);
+        return cacheService.findOrgByUid(orgUid);
     }
 
     public String getRequestReasonInShort(String reason) {
@@ -2621,7 +2497,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         // 备件审核是否需要签名
-        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(this.selectedWorkOrder.getSiteUID());
+        WorkflowConfig workflowConfig = configService.findConfigBySite(this.selectedWorkOrder.getSiteUID());
 
         if(workflowConfig != null && workflowConfig.getPartsNeedSign() != null && workflowConfig.getPartsNeedSign()){
             // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
@@ -3374,7 +3250,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 userAccount = userDao.getById(selectedWorkOrder.getAcceptStepOwnerId());
             }
             AssetInfo assetInfo = selectedWorkOrder.getAssetInfo();
-            OrgInfo orgInfo = orgDao.getByUid(assetInfo.getHospitalUID());
+            OrgInfo orgInfo = cacheService.findOrgByUid(assetInfo.getHospitalUID());
             StringBuilder sb = new StringBuilder();
             sb.append("收货地址：").append(orgInfo.getAddress()==null?"":orgInfo.getAddress()).append("，")
                     .append("收货人：").append(orgInfo.getContactPerson()==null?"":orgInfo.getContactPerson()).append("，")
@@ -3433,12 +3309,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      */
     public void onRowEdit(RowEditEvent event) {
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-//        V2_WorkOrder v2WorkOrder = dao.findById(selected.getId());
-//        Integer currentStepId = v2WorkOrder.getCurrentStepId();
-//        if(!(v2WorkOrder.getStatus() == 1 && currentStepId > 3 && currentStepId < 7)){
-//            WebUtil.addErrorMessage("必须是维修中、待验收、待评价或待关单的工单才可以新增或修改工时信息");
-//            return;
-//        }
+
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
         if(StringUtils.isBlank(workOrderManHours.getManHoursOwner())){
             WebUtil.addErrorMessage("工时所属人不能为空");
@@ -3671,7 +3542,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<OrgInfo> LoadSiteNameList() {
         if (CollectionUtils.isEmpty(orgList)) {
             if (!CollectionUtils.isEmpty(bySearchFilterInternal)) {
-                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream()
+                        .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgList)) {
                 orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3681,7 +3553,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void initLoadInternalSiteNameList() {
-        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
         orgList = orgInfoList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
         hospitalShow = orgList.size() > 1;
     }
@@ -3693,7 +3565,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<OrgInfo> LoadSiteNameListMVS() {
         if (CollectionUtils.isEmpty(orgListMVS)) {
             if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream()
+                        .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3707,7 +3580,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public String getSiteOrgName(String siteUID) {
-        OrgInfo org = orgDao.getByUid(siteUID);
+        OrgInfo org = cacheService.findOrgByUid(siteUID);
         if (org != null) {
             return org.getName();
         }
@@ -3718,7 +3591,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         try {
             if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
                 if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getServiceRequest().getFromDeptUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                    clinicalDeptListMVS = bySearchFilterMVS.stream()
+                            .map(item -> item.getServiceRequest().getFromDeptUID()).collect(Collectors.toSet()).stream()
+                            .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
                 }
             }
         } catch (Exception e) {
@@ -3732,6 +3607,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
 
     public boolean hasPermissionConfirmReturn(String woId){
+        //todo
         V2_WorkOrder workOrder = dao.findById(woId);
         return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId();
 
@@ -3744,7 +3620,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public boolean needTwoSubStatus(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
-        return isConfigNeedTwoSubStatus(workOrder.getAssetId())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
+        return isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
@@ -3756,16 +3632,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public Boolean isConfigNeedTwoSubBySiteUid(String siteUid) {
-        WorkflowConfig woc = workflowService.getWorkflowByOrg(siteUid);
+        WorkflowConfig woc = configService.findConfigBySite(siteUid);
         return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
     }
 
-    public Boolean isConfigNeedTwoSubStatus(Integer assetId) {
-        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetId);
-        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
-    }
+
     public Boolean isConfigNeedTwoSubStatusByUser(UserAccount userAccount) {
-        WorkflowConfig woc = workflowService.getWorkflowByOrg(userAccount.getSiteUID());
+        WorkflowConfig woc =  configService.findConfigBySite(userAccount.getSiteUID());
         return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
     }
 
