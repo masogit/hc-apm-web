@@ -218,7 +218,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     public String getRuleName(String ruleUID) {
         List<PmOrderRule> pmOrderRules = ListUtil.newArrayList();
         for (String ruleUid : StringUtils.split(ruleUID, '|')) {
-            pmOrderRules.add(ruleMap.get(ruleUid));
+            if (ObjectUtil.isNotEmpty(ruleMap.get(ruleUid))) {
+                pmOrderRules.add(ruleMap.get(ruleUid));
+            }
         }
         String ruleName = "";
         if (CollectionUtils.isNotEmpty(pmOrderRules)) {
