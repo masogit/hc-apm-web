@@ -39,7 +39,7 @@ public class PurchaseOrderService {
     private PurchaseTemplateRepository purchaseTemplateRepository;
     @Autowired
     private BudgetApplicationExportService budgetApplicationExportService;
-    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
+    @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     private String baseURL;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
