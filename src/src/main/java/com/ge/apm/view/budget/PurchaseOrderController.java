@@ -488,7 +488,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public String getPurchaseUrl() {
-        return selected==null?"":purchaseOrderService.getBaseURL()+"/reports/purchaseInfo?purchaseNum="+selected.getPurchaseNum()+
+        return selected==null?"":purchaseOrderService.getBaseURL().replace("gateway","")+"reports/purchaseInfo?purchaseNum="+selected.getPurchaseNum()+
                 "&assetName="+ (StringUtils.isNotBlank(selected.getApplicationAssetName())?selected.getApplicationAssetName():"");
     }
 
