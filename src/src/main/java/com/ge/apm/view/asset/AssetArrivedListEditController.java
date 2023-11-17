@@ -7,6 +7,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
@@ -17,8 +18,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -110,10 +115,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private UserContextService userContextService;
     private TenantInfoRepository tenantInfoRepository;
+    private List<OrgInfo> deptInfoList;
+    private OrgInfoRepository orgDao;
+
+    private  QrCodeLibRepository qrCodeLibRepository;
 
     @Override
     protected void init() {
-
         dao = WebUtil.getBean(ArrivalListRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -141,6 +149,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(currentUser.getSiteUID());
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        qrCodeLibRepository = WebUtil.getBean(QrCodeLibRepository.class);
+
 
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
@@ -1221,5 +1233,56 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, lastItem.getMedicalApparatusClassification());
         }
+    }
+
+
+    public List<String> autoCompleteDept(String query) {
+        return deptInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).sorted(new PinYinComparator()).collect(Collectors.toList());
+    }
+
+
+
+    public void onClinicalDeptChange(SelectEvent event) {
+        OrgInfo dept = deptInfoList.stream().filter(item -> item.getName().equals(selected.getClinicalDeptName())).findFirst().orElse(null);
+        selected.setClinicalDeptUID(dept.getUid());
+
+    }
+    private StreamedContent zipFile;
+
+    public StreamedContent getZipFile() {
+        return zipFile;
+    }
+
+    public void setZipFile(StreamedContent zipFile) {
+        this.zipFile = zipFile;
+    }
+
+    private String exportQrCodeTemplateId;
+
+    public String getExportQrCodeTemplateId() {
+        return exportQrCodeTemplateId;
+    }
+
+    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
+        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
+    }
+
+    public void exportQrCode() throws Exception {
+//        Map<String, String> orgNamesMap = orgDao.findByUids(arrivalItemList.stream().filter(item->item.getSiteUid()!=null).map(ArrivalListItem::getSiteUid).distinct().collect(Collectors.toSet()))
+//                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
+        OrgInfo orgInfo = orgDao.findByUid(selected.getSiteUID());
+        Map<String, String> orgNamesMap = new HashMap<>(2);
+        orgNamesMap.put(orgInfo.getUid(),orgInfo.getName());
+
+        List<String> list = arrivalItemList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(ArrivalListItem::getQrCode).collect(Collectors.toList());
+
+        List<SearchFilter> filterFilter =new ArrayList<>();
+        filterFilter.add(new SearchFilter("qrCode", SearchFilter.Operator.IN, list));
+
+
+        List<QrCodeLib> bySearchFilter = qrCodeLibRepository.findBySearchFilter(filterFilter);
+        QrCodeExportStream exportStream = new QrCodeExportStream(bySearchFilter.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 }
