@@ -87,39 +87,54 @@
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
                         <p:ajax event="rowSelect" update="createButton viewButton editButton deleteButton exportZipButton viewUrl"/>
                         <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
-                        <p:column headerText="采购单号" >
-                            <h:outputText value="#{item.purchaseNum}"/>
+                        <p:ajax event="filter" listener="#{purchaseOrderController.onFilter}" />
+
+                        <p:column headerText="采购单号" filterBy="#{item.purchaseNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.purchaseNum}" />
                         </p:column>
-                        <p:column headerText="设备名称" >
+                        <p:column headerText="设备名称"  filterBy="#{item.applicationAssetName}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.applicationAssetName}"/>
                         </p:column>
-                        <p:column headerText="采购数量" >
+                        <p:column headerText="采购数量" filterBy="#{item.purchaseQuantity}" filterMatchMode="EQ">
                             <h:outputText value="#{item.purchaseQuantity}"/>
                         </p:column>
-                        <p:column headerText="采购金额" >
+                        <p:column headerText="采购金额" filterBy="#{item.totalPrice}" filterMatchMode="EQ">
                             <h:outputText value="#{item.totalPrice}">
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="操作人" >
+                        <p:column headerText="操作人" filterBy="#{item.operator.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.operator.name}"/>
 
                         </p:column>
-                        <p:column headerText="采购开始时间" >
+                        <p:column headerText="采购开始时间" filterBy="#{item.startDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>
+                            </f:facet>
                             <h:outputText value="#{item.startDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                    locale="#{userContextService.getCalendarLocale()}"
                                                    pattern="#{userContextService.timeFormat()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="采购截止时间" >
+                        <p:column headerText="采购截止时间" filterBy="#{item.endDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
+                            </f:facet>
                             <h:outputText value="#{item.endDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                    locale="#{userContextService.getCalendarLocale()}"
                                                    pattern="#{userContextService.timeFormat()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="数据状态" >
+                        <p:column headerText="数据状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('purchaseStatus', 'Enabled')}" itemValue="Enabled"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('purchaseStatus', 'NotEnabled')}" itemValue="NotEnabled"  />
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('purchaseStatus', item.status)}"/>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false">
@@ -215,6 +230,26 @@
                 window.location.href = args.url;
             }
         </script>
+        <p:overlayPanel widgetVar="panelFilterStartTime" for=":searchForm:datalist:filterStartTime" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList','varFilterStartTime','varStartTimeFrom','varStartTimeTo'); PF('panelFilterStartTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterStartTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+        <p:overlayPanel widgetVar="panelFilterEndTime" for=":searchForm:datalist:filterEndTime" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varEndTimeFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varEndTimeTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList','varFilterEndTime','varEndTimeFrom','varEndTimeTo'); PF('panelFilterEndTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterEndTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
     </ui:define>
 
 </ui:composition>
