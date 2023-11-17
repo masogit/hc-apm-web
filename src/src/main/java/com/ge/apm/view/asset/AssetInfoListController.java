@@ -403,6 +403,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         }
         boolean assetStatus = "-1".equals(filterAssetStatus);
         if(assetStatus){
