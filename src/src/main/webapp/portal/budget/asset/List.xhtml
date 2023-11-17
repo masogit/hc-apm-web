@@ -108,19 +108,19 @@
                         <p:ajax event="filter" listener="#{budgetAssetController.onFilter}"
                                 update="createButton editButton viewButton deleteButton"/>
 
-                        <p:column headerText="#{msg.EquipmentName}">
+                        <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="推荐设备品牌 ">
+                        <p:column headerText="推荐设备品牌" filterBy="#{item.assetBrand}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetBrand}"/>
                         </p:column>
-                        <p:column headerText="设备品类 ">
+                        <p:column headerText="设备品类" filterBy="#{item.applicationAssetCategory}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.applicationAssetCategory}"/>
                         </p:column>
-                        <p:column headerText="规格">
+                        <p:column headerText="规格"  filterBy="#{item.standards}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.standards}"/>
                         </p:column>
-                        <p:column headerText="型号">
+                        <p:column headerText="型号" filterBy="#{item.assetModel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetModel}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">

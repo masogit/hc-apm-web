@@ -87,7 +87,7 @@
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
                         <p:ajax event="rowSelect" update="createButton viewButton editButton deleteButton exportZipButton viewUrl"/>
                         <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
-                        <p:ajax event="filter" listener="#{purchaseOrderController.onFilter}" />
+                        <p:ajax event="filter" listener="#{purchaseOrderController.onFilter}" update="createButton viewButton editButton deleteButton exportZipButton viewUrl"/>
 
                         <p:column headerText="采购单号" filterBy="#{item.purchaseNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.purchaseNum}" />
