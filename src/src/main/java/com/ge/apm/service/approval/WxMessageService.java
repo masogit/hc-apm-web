@@ -2,14 +2,19 @@ package com.ge.apm.service.approval;
 
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -22,7 +27,7 @@ import java.util.stream.Collectors;
 public class WxMessageService extends MicroServiceInvoker {
 
 
-
+    private static final Logger logger = LoggerFactory.getLogger(WxMessageService.class);
 
     public void sendMessage(AssetInfo assetInfo, String approvalName, ApprovableTarget
         approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason) {
@@ -37,6 +42,7 @@ public class WxMessageService extends MicroServiceInvoker {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("paramList", paramList);
+        map.put("wxTemplateId", "new_workorder_change_template_id");
         send(map);
 
     }
@@ -122,5 +128,39 @@ public class WxMessageService extends MicroServiceInvoker {
                 break;
         }
         return businessTypeName;
+    }
+
+
+    @Autowired
+    private AssetCreateService acService;
+
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    @Async
+    public  void submitAssetApprovalSendMessage(AssetInfo assetInfo) {
+        List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
+        List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
+        Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
+        List<UserAccount> resultUser = userAccounts2.stream().filter(item -> uids.contains(item.getId())).distinct().collect(Collectors.toList());
+        logger.info("submitApprovalSendMessage users:{}",JSON.toJSONString(resultUser));
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword1","资产入库审核");
+        params.put("keyword2", "待审核");
+        params.put("keyword3", assetInfo.getCreatedDate());
+        List<WechatParam> paramList = new ArrayList<>();
+        resultUser= resultUser.stream().distinct().collect(Collectors.toList());
+        for (UserAccount userAccount : resultUser) {
+            WechatParam wechatParam = JSON.parseObject(JSON.toJSONString(params), WechatParam.class);
+            wechatParam.setOpenId(userAccount.getWeChatId());
+            wechatParam.setAppAlias(userAccount.getAppAlias());
+            paramList.add(wechatParam);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("paramList", paramList);
+        map.put("wxTemplateId", "partorder_template_id");
+        send(map);
     }
 }

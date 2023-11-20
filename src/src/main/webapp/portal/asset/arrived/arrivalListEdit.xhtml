@@ -151,7 +151,7 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup id = "clinicalDeptName">
-                                        <label class="label">#{msg.clinicalDeptName}*</label>
+                                        <label class="label">#{msg.clinicalDeptName}</label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.selected.clinicalDeptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoCompleteDept}">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onClinicalDeptChange}" />
                                         </p:autoComplete>

@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -208,6 +209,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private AssetScrapService assetScrapService;
 
+    private WxMessageService wxMessageService;
+
     private MqUtils mqUtils;
 
     //设备状态
@@ -296,6 +299,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
+        wxMessageService = WebUtil.getBean(WxMessageService.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -1501,8 +1505,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public String submitApproval(Integer usageStatusconstant) {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         selected.setUsageStatus(usageStatusconstant);
-        return applyChange();
+        String redirectUrl = applyChange();
+        if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
+            wxMessageService.submitAssetApprovalSendMessage(selected);
+        }
+        return redirectUrl;
     }
+
     public String submitApprovalExtend(Integer usageStatusconstant) {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         String redirectUrl = submitApproval(usageStatusconstant);
