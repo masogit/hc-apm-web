@@ -994,7 +994,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*"));
         }
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
@@ -1021,7 +1021,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 updateSearchFilter(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
-                searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*"));
+                if(searchFilters.stream().noneMatch(i-> "serviceRequest.fromDeptUID".equals(i.fieldName) && "1*2+".equals(i.conditionPath))){
+                    searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                }
             }
         }
 
@@ -3606,16 +3609,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
 
-    public boolean hasPermissionConfirmReturn(String woId){
-        //todo
-        V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId();
-
+    public boolean hasPermissionConfirmReturn(String requestorId){
+        return Objects.equals(requestorId , userContextService.getLoginUserId());
     }
-    public boolean hasPermissionConfirmSend(String woId){
-         V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId() ;
-
+    public boolean hasPermissionConfirmSend(String currentPersonId){
+        return Objects.equals(currentPersonId , userContextService.getLoginUserId());
     }
 
     public boolean needTwoSubStatus(String woId){

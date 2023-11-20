@@ -223,10 +223,10 @@
 
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 120px" exportable="false" rendered="#{workOrderMgrController.queryIndex==13}">
-                    <p:commandButton value="#{msg.confirmSend}" actionListener="#{workOrderMgrController.confirmSend(item.id)}" update="woTab:woMgrListForm" disabled="#{!(workOrderMgrController.queryIndex==13 and workOrderMgrController.hasPermissionConfirmSend(item.id))}"/>
+                    <p:commandButton value="#{msg.confirmSend}" actionListener="#{workOrderMgrController.confirmSend(item.id)}" update="woTab:woMgrListForm" disabled="#{!(workOrderMgrController.queryIndex==13 and workOrderMgrController.hasPermissionConfirmSend(item.currentPersonId))}"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 120px" exportable="false" rendered="#{workOrderMgrController.queryIndex==14}">
-                    <p:commandButton value="#{msg.confirmReturn}" actionListener="#{workOrderMgrController.confirmReturn(item.id)}" update="woTab:woMgrListForm" disabled="#{!(workOrderMgrController.queryIndex==14 and workOrderMgrController.hasPermissionConfirmReturn(item.id))}" />
+                    <p:commandButton value="#{msg.confirmReturn}" actionListener="#{workOrderMgrController.confirmReturn(item.id)}" update="woTab:woMgrListForm" disabled="#{!(workOrderMgrController.queryIndex==14 and workOrderMgrController.hasPermissionConfirmReturn(item.serviceRequest.requestorId))}" />
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
