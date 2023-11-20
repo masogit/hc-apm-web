@@ -583,14 +583,19 @@ public class UaaService {
         List<OrgInfo> orgList = orgInfoDao.getOrgTreeBySiteAndparm(siteUID,retrieval);
         return getOrgTreeNodes(siteUID, orgList);
     }
-
     public TreeNode getOrgTreeNodes(String siteUID, List<OrgInfo> orgList) {
+        return getOrgTreeNodes(siteUID,  orgList,null);
+    }
+    public TreeNode getOrgTreeNodes(String siteUID, List<OrgInfo> orgList,List<String> orgUid) {
         TreeNode root = new DefaultTreeNode("root", null, null);
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
         for (OrgInfo org : orgList) {
             TreeNode node = new DefaultTreeNode("org", org, null);
             node.setRowKey("org_" + org.getId());
+            if(CollectionUtils.isNotEmpty(orgUid)){
+                node.setSelectable( orgUid.contains(org.getUid()));
+            }
             treeMap.put(org.getUid(), node);
         }
         for (Map.Entry<String, TreeNode> nodeItem : treeMap.entrySet()) {
