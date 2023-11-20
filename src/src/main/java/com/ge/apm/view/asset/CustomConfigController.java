@@ -26,6 +26,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.httpclient.util.DateUtil;
@@ -164,8 +165,6 @@ public class CustomConfigController {
                 break;
             case "MobileBuildAssetFields":
                 addFieldsList = customConfigObject.getAllAssetsMobilepageBuildAssetFields();
-//                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-//                        .filter(item -> !customConfigObject.getAssetsMobilepageBuildAssetFields().contains(item)).collect(Collectors.toList());
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -231,9 +230,9 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageFilterFields());
                 break;
             case "RemoveMobileBuildAssetFields":
-//                List<String> assetsMobilepageBuildAssetFields = new ArrayList<>(customConfigObject.getAssetsMobilepageBuildAssetFields());
-//                assetsMobilepageBuildAssetFields.removeAll(CustomConfigConstant.getAssetsMobilepageBuildAssetFields());
-                addFieldsList.addAll(customConfigObject.getAssetsMobilepageBuildAssetFields());
+                List<String> removeBuildAssetFields = customConfigObject.getAssetsMobilepageBuildAssetFields();
+                removeBuildAssetFields.removeAll(ListUtil.newArrayList("name", "assetGroup", "clinicalDeptName"));
+                addFieldsList.addAll(removeBuildAssetFields);
                 break;
             case "MobileWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
