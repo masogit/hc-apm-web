@@ -179,7 +179,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsMobilepageBuildAssetFields() {
-        return Arrays.asList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments");
+        return ListUtil.newArrayList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments");
     }
 
     public static List<String> getAssetsMobilepageFilterFields() {
