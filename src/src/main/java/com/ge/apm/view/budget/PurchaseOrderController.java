@@ -385,7 +385,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         if(CollectionUtils.isNotEmpty(purchaseVenderList)){
             for(PurchaseVender purchaseVender :purchaseVenderList){
                 StringBuilder stringBuilder = new StringBuilder();
-                String s = new String();
                 VenderInfo venderInfo = venderInfoRepository.findById(purchaseVender.getVenderId());
                 if(venderInfo == null){
                     continue;
@@ -397,9 +396,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                     for(V2_BlobObject v2_blobObject :v2_blobObjectList){
                         stringBuilder.append(" "+v2_blobObject.getObjectName()+",");
                     }
-                    s = stringBuilder.toString().substring(0,stringBuilder.toString().length()-1);
+                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                 }
-                venderInfoStr.add(s+"]");
+                stringBuilder.append("]");
+                venderInfoStr.add(stringBuilder.toString());
             }
         }
     }

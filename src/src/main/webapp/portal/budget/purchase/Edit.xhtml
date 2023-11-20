@@ -132,7 +132,7 @@
                             </p:selectManyMenu>
                         </h:panelGroup>
                     </p:fieldset>
-                    <p:fieldset legend="竞标信息" style="color: red;" >
+                    <p:fieldset legend="竞标信息" style="color: red;" rendered="#{purchaseOrderController.selected.status eq 'Enabled'}" >
                         <c:forEach items="#{purchaseOrderController.venderInfoStr}" var="venderInfo" >
                             <div style="margin-bottom: 5px;">
                                 <span>#{venderInfo}</span><br/>
