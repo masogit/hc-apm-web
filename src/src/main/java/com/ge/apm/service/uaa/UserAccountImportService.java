@@ -76,6 +76,8 @@ public class UserAccountImportService {
     boolean isInsulate = false;
     boolean isCreate = true;
     UserAccount currentUser;
+    private List<OrgInfo> affiliatedDepartments;
+    private List<String> affiliatedDepartmentsUid;
 
     @Autowired
     UserAccountMapper userAccountMapper;
@@ -374,7 +376,7 @@ public class UserAccountImportService {
         }
         newUser.setOrgInfoUID(orgInfoTemp.getUid());
         newUser.setOrgInfoId(orgInfoTemp.getId());
-
+        checkDepartment(newUser);
     }
 
     private boolean hasControllerOrgInfo(OrgInfo tempOrgInfo, String userOrgInfoUid) {
@@ -453,7 +455,15 @@ public class UserAccountImportService {
         newUser.setOrgType(orgInfoTemp.getOrgType());
         return true;
     }
-
+    private void checkDepartment(UserAccount newUser){
+        boolean flag;
+        if(ObjectUtil.isNotEmpty(newUser)){
+            flag=affiliatedDepartmentsUid.stream().anyMatch(item->item.equals(newUser.getOrgInfoUID()));
+           if(!flag){
+               newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR, "科室错误;");
+           }
+         }
+    }
     private boolean getDepartmentID(UserAccount newUser, String department, boolean isInsulate) {
         OrgInfo temp = getOrgInfoByDepartmentKey(department, orgInfoTemp.getUid());
         if (temp == null) {
@@ -847,6 +857,8 @@ public class UserAccountImportService {
         initParam();
         getRoleNameMap();
         currentUser = user;
+        affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(currentUser.getOrgInfoUID()));
+        affiliatedDepartmentsUid=affiliatedDepartments.stream().map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
         if (tenantInfo != null && tenantInfo.getInsulate() != null) {
             isInsulate = tenantInfo.getInsulate();
