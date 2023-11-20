@@ -278,4 +278,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value="select ua.* from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.org_uid = ?1 and ur.role_id = ?2",nativeQuery=true)
     public List<UserAccount> findOrgUidByRoleId(String tenantUid ,int roleId);
 
+
+    @Query(value = "WITH recursive t AS( ( SELECT * FROM org_info WHERE uid = ?1) UNION ALL ( SELECT org_info.* FROM org_info JOIN t ON t.parent_uid = org_info.uid ) ) SELECT ua.* FROM t LEFT JOIN user_org uo ON uo.org_uid = t.uid LEFT JOIN user_account ua ON uo.user_uid = ua.uid  where ua.id is not null ", nativeQuery = true)
+    List<UserAccount> findByClinicalDeptUID(String clinicalDeptUID);
+
 }
