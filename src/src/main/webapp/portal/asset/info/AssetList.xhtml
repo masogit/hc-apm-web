@@ -724,7 +724,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'deviceName'}">
-                                <p:column headerText="#{msg.deviceName}" >
+                                <p:column headerText="#{msg.deviceName}" sortBy="#{item.deviceName}" filterBy="#{item.deviceName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.deviceName}"/>
                                 </p:column>
                             </c:if>
