@@ -43,12 +43,12 @@ public class WxMessageService extends MicroServiceInvoker {
         Map<String, Object> map = new HashMap<>();
         map.put("paramList", paramList);
         map.put("wxTemplateId", "new_workorder_change_template_id");
-        send(map);
+        String token = UserContextService.getAccessToken();
+        send(map,token);
 
     }
 
-    public void send(Map<String, Object> map){
-        String token = UserContextService.getAccessToken();
+    public void send(Map<String, Object> map,String token){
 
         HttpEntity<Map> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SEND_WE_CHAT);
@@ -139,7 +139,7 @@ public class WxMessageService extends MicroServiceInvoker {
     private UserAccountRepository userAccountRepository;
 
     @Async
-    public  void submitAssetApprovalSendMessage(AssetInfo assetInfo) {
+    public  void submitAssetApprovalSendMessage(AssetInfo assetInfo,String token) {
         List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
         List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
         Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
@@ -161,6 +161,6 @@ public class WxMessageService extends MicroServiceInvoker {
         Map<String, Object> map = new HashMap<>();
         map.put("paramList", paramList);
         map.put("wxTemplateId", "partorder_template_id");
-        send(map);
+        send(map,token);
     }
 }
