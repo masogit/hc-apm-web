@@ -341,25 +341,25 @@
     <location>/login.xhtml?session_expired=1</location>
   </error-page>
 
-  <error-page>
-    <exception-type>org.springframework.dao.DataAccessException</exception-type>
-    <location>/error.xhtml</location>
-  </error-page>
+<!--  <error-page>-->
+<!--    <exception-type>org.springframework.dao.DataAccessException</exception-type>-->
+<!--    <location>/error.xhtml</location>-->
+<!--  </error-page>-->
 
   <error-page>
     <exception-type>com.sun.faces.context.FacesFileNotFoundException</exception-type>
     <location>/notfound.xhtml</location>
   </error-page>
 
-  <error-page>
-    <exception-type>java.lang.Throwable</exception-type>
-    <location>/error.xhtml</location>
-  </error-page>
+<!--  <error-page>-->
+<!--    <exception-type>java.lang.Throwable</exception-type>-->
+<!--    <location>/error.xhtml</location>-->
+<!--  </error-page>-->
 
-  <error-page>
-    <error-code>500</error-code>
-    <location>/error.xhtml</location>
-  </error-page>
+<!--  <error-page>-->
+<!--    <error-code>500</error-code>-->
+<!--    <location>/error.xhtml</location>-->
+<!--  </error-page>-->
   <error-page>
     <error-code>404</error-code>
     <location>/notfound.xhtml</location>

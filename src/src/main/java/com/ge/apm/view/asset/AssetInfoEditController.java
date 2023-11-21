@@ -1507,7 +1507,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setUsageStatus(usageStatusconstant);
         String redirectUrl = applyChange();
         if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
-            wxMessageService.submitAssetApprovalSendMessage(selected);
+            String token = UserContextService.getAccessToken();
+            wxMessageService.submitAssetApprovalSendMessage(selected,token);
         }
         return redirectUrl;
     }
