@@ -340,4 +340,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select  ai.*  from  asset_info ai  left join org_info  oi  on ai.asset_dept_uid = oi.uid  where  ai.asset_dept_uid != '' and ai.asset_dept_uid is not null and  oi.uid is not null and (ai.asset_dept_id is null or ai.asset_dept_id != oi.id)", nativeQuery = true)
     List<AssetInfo> notEqualAssetDeptId();
+
+    @Query(value="select count(id) from asset_info  ai left join user_account ua on ai.created_by=ua.login_name  where ua.id is not null and ua.login_name!=ua.name", nativeQuery = true)
+    Long findByCreatedByIsLoginName();
+
+
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info  set created_by=ua.name from user_account ua where asset_info.created_by=ua.login_name and ua.login_name!=ua.name",nativeQuery = true)
+    Long batchUpdateAssetInfoCreatedBy();
 }

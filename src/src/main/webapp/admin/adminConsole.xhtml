@@ -109,6 +109,10 @@
 					<p:fieldset legend="批量更新设备使用风险等级">
 						<p:commandButton actionListener="#{adminConsoleController.batchUpdateI18nMsgType()}" value="批量更新" update=":growl"></p:commandButton>
 					</p:fieldset>
+
+				<p:fieldset legend="批量更新设备表的创建人为name">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetInfo()}" value="批量更新" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>
