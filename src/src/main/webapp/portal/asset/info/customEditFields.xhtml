@@ -999,10 +999,10 @@
             <p:inputText id="assetUsedLifecycle" value="#{assetInfoEditController.selected.assetUsedLifecycle}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLifecycleDeadline')}">
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetLifecycleDeadline')}">
         <h:panelGroup >
             <label class="label">#{msg.assetLifecycleDeadline}</label>
-            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoDetailController.selected.assetLifecycleDeadline}" readonly="true"/>
+            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoEditController.selected.assetLifecycleDeadline}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuantity')}">

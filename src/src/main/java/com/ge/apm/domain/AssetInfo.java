@@ -3103,10 +3103,10 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getAssetLifecycleDeadline() {
-        if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
+        if (ObjectUtil.isEmpty(manufactDate) || ObjectUtil.isEmpty(lifecycle)) {
             return null;
         }
-        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(installDate, DateField.DAY_OF_MONTH, lifecycle);
+        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.DAY_OF_MONTH, lifecycle);
         return DateUtil.formatDate(dateTime);
     }
 }
