@@ -1090,4 +1090,14 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		return t -> seen.add(keyExtractor.apply(t));
 	}
 
+	public void batchUpdateAssetInfo() {
+		Long count=assetInfoRepository.findByCreatedByIsLoginName();
+		logger.info("query batchUpdateAssetInfo count:{}",count);
+
+		long startTimeUpdate = System.currentTimeMillis();
+		Long size=assetInfoRepository.batchUpdateAssetInfoCreatedBy();
+		long endTimeUpdate = System.currentTimeMillis();
+		logger.info("update  batchUpdateAssetInfo size:{},耗时:{}",size,startTimeUpdate-endTimeUpdate);
+
+	}
 }
