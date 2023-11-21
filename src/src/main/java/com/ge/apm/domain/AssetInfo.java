@@ -3106,7 +3106,7 @@ public class AssetInfo implements ChineseName,Serializable {
         if (ObjectUtil.isEmpty(manufactDate) || ObjectUtil.isEmpty(lifecycle)) {
             return null;
         }
-        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.DAY_OF_MONTH, lifecycle);
+        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.MONTH, lifecycle);
         return DateUtil.formatDate(dateTime);
     }
 }
