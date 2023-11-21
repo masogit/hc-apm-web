@@ -384,6 +384,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             if (readableFieldsList.contains("createdBy")) {
                 readableFieldsList.remove("createdBy");
             }
+            readableFieldsList.remove("assetUsedLifecycle");
+            readableFieldsList.remove("assetLifecycleDeadline");
         }
         if(selected.getUnitPriceElectricity()==null){
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
