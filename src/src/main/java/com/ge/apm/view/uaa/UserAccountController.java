@@ -299,10 +299,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         String orgInfoUID = loginUser.getOrgInfoUID();
-        List<OrgInfo> userAccessibleSiteListWithClinicalDept = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid());
         List<OrgInfo> childrenByUids = orgInfoDao.getHospitalChildrenByUids(Arrays.asList(orgInfoUID));
         childNodeUid=childrenByUids.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-        orgTree=uaaService.getOrgTreeNodes(loginUser.getSiteUID(),userAccessibleSiteListWithClinicalDept,childNodeUid);
+        orgTree=uaaService.getOrgTreeNodes(orgInfoUID,childrenByUids);
     }
 
 
