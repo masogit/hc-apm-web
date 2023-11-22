@@ -90,7 +90,7 @@ public class Test {
         currentUserAccount.setSiteId(14);
         JSONObject jsonObject =new JSONObject();
         assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
+//        assetInfo.setQrCodeLib(null);
         assetInfo.setAssetTags(null);
         assetInfo.setBrand(null);
         //gson序列化只与属性(字段)有关，与get开头的方法无关
