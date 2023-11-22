@@ -661,7 +661,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					assetHistory.setClinicalDeptUid(assetInfo.getClinicalDeptUID());
 
 					assetInfo.setHospital(null);
-					assetInfo.setQrCodeLib(null);
+//					assetInfo.setQrCodeLib(null);
 					assetInfo.setAssetTags(null);
 					assetInfo.setBrand(null);
 					assetInfo.setTags(null);

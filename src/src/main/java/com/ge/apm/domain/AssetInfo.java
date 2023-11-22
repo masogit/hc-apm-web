@@ -596,17 +596,17 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_disposal_results")
     private Integer assetDisposalResults;
 
-    @Size(max = 256)
-    @Column(name = "one_qr_code")
-    private String oneQrCode;
-
-    @Transient
-    @TableField(exist = false)
-    private String oneQrCodeStatus;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
-    private QrCodeLib qrCodeLib;
+//    @Size(max = 256)
+//    @Column(name = "one_qr_code")
+//    private String oneQrCode;
+//
+//    @Transient
+//    @TableField(exist = false)
+//    private String oneQrCodeStatus;
+//
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
+//    private QrCodeLib qrCodeLib;
 
     /**
      * 主目录
@@ -2955,29 +2955,29 @@ public class AssetInfo implements ChineseName,Serializable {
         this.visibleStatus = visibleStatus;
     }
 
-    public String getOneQrCode() {
-        return oneQrCode;
-    }
-
-    public void setOneQrCode(String oneQrCode) {
-        this.oneQrCode = oneQrCode;
-    }
-
-    public String getOneQrCodeStatus() {
-        return oneQrCodeStatus;
-    }
-
-    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-        this.oneQrCodeStatus = oneQrCodeStatus;
-    }
-
-    public QrCodeLib getQrCodeLib() {
-        return qrCodeLib;
-    }
-
-    public void setQrCodeLib(QrCodeLib qrCodeLib) {
-        this.qrCodeLib = qrCodeLib;
-    }
+//    public String getOneQrCode() {
+//        return oneQrCode;
+//    }
+//
+//    public void setOneQrCode(String oneQrCode) {
+//        this.oneQrCode = oneQrCode;
+//    }
+//
+//    public String getOneQrCodeStatus() {
+//        return oneQrCodeStatus;
+//    }
+//
+//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+//        this.oneQrCodeStatus = oneQrCodeStatus;
+//    }
+//
+//    public QrCodeLib getQrCodeLib() {
+//        return qrCodeLib;
+//    }
+//
+//    public void setQrCodeLib(QrCodeLib qrCodeLib) {
+//        this.qrCodeLib = qrCodeLib;
+//    }
 
     public Integer getAnnualMaintenanceTimes() {
         return annualMaintenanceTimes;
