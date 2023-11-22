@@ -342,6 +342,9 @@ public class QrCodeService {
                     case "purchaseDate":
                         itemObject.put("TextShowValue", textValue.concat(asset.getPurchaseDate() == null ? "" :" "+TimeUtils.getStrDate(asset.getPurchaseDate(), "yyyy-MM-dd")));
                         break;
+                    case "manufactDate":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getManufactDate() == null ? "" :" "+TimeUtils.getStrDate(asset.getManufactDate(), "yyyy-MM-dd")));
+                        break;
                 }
             }
         });

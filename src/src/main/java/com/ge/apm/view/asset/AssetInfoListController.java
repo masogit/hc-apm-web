@@ -322,12 +322,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
-        currentPageAssets.forEach(item -> {
-            if(item.getQrCodeLib()!=null){
-                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
-            }
-            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
-        });
+//        currentPageAssets.forEach(item -> {
+//            if(item.getQrCodeLib()!=null){
+//                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
+//            }
+//            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
+//        });
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
@@ -446,10 +446,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
         }
 
-        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
-            this.removeFilterOnField("oneQrCodeStatus");
-            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
-        }
+//        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
+//            this.removeFilterOnField("oneQrCodeStatus");
+//            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
+//        }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -1377,13 +1377,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
     }
 
-    public String getOneQrCodeStatus() {
-        return oneQrCodeStatus;
-    }
-
-    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-        this.oneQrCodeStatus = oneQrCodeStatus;
-    }
+//    public String getOneQrCodeStatus() {
+//        return oneQrCodeStatus;
+//    }
+//
+//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+//        this.oneQrCodeStatus = oneQrCodeStatus;
+//    }
 
     public boolean getCountyArea() {
         return countyArea;

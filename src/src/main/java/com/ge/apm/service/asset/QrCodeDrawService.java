@@ -9,14 +9,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplateElement;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.ge.healthcare.cn.common.qrcode.QrCodeSupportUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,10 +21,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -44,14 +38,9 @@ public class QrCodeDrawService {
     @Autowired
     private QrCodeLibRepository qrCodeLibRepository;
 
-    private static final String CHARSET = "utf-8";
     private static final String FORMAT_NAME = "JPG";
     // 二维码尺寸
     private static final int QRCODE_SIZE = 300;
-    // LOGO宽度
-    private static final int WIDTH = 78;
-    // LOGO高度
-    private static final int HEIGHT = 78;
 
     private static final Pattern PATTERN_DIGITAL = Pattern.compile("[0-9]*");
     // LOGO路径
@@ -64,23 +53,6 @@ public class QrCodeDrawService {
     @Value("#{wxProperties.qrcode_web_context_url}")
     private String webContextUrl;
 
-    private BufferedImage createBitMatrixImage(String content, Integer size) throws Exception {
-        Map<EncodeHintType, Object> hints = new HashMap();
-        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-        hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
-        hints.put(EncodeHintType.MARGIN, 1);
-        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, size, size,
-                hints);
-        int width = bitMatrix.getWidth();
-        int height = bitMatrix.getHeight();
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
-            }
-        }
-        return image;
-    }
 
     public String getImageBase64(BufferedImage src) {
         Base64 encoder = new Base64();
@@ -98,66 +70,9 @@ public class QrCodeDrawService {
         return res;
     }
 
-    private BufferedImage drawQrcodeWithText(JSONObject qrcodeElement, String siteUid) throws Exception{
-        String code = qrcodeElement.getString("TextValue");
-        Integer fontSize = qrcodeElement.getInteger("FontSize");
-        Integer textPositionX = qrcodeElement.getInteger("FontPositionX");
-        String fontName = qrcodeElement.getString("FontName");
-
-        BufferedImage image = new BufferedImage(QRCODE_SIZE, QRCODE_SIZE * 11 / 10, BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.createGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g.drawImage(createBitMatrixImage(this.buildQrCodeUrl(qrcodeElement, siteUid), QRCODE_SIZE), 0, 0, null);
-
-        StringBuffer textSB = new StringBuffer(code);
-        if (code != null && code.length() == 16 && PATTERN_DIGITAL.matcher(code).matches()) {
-            textSB.insert(4, "-");
-            textSB.insert(9, "-");
-            textSB.insert(14, "-");
-        }
-        String os = System.getProperty("os.name").toLowerCase();
-        int textX = os.indexOf("windows") != -1 ? 23 : 0;
-        int textY = 310;
-        textX = textPositionX;
-        Font font = new Font(Optional.ofNullable(fontName).orElse("TimesRoman"), Font.BOLD, fontSize);
-
-        g.setFont(font);
-        g.setColor(Color.BLACK);
-        g.drawChars(textSB.toString().toCharArray(), 0, textSB.length(), textX, textY);
-        g.dispose();
-        return image;
-    }
-
     public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate, String siteUid) throws Exception {
-        Integer width = qrcodeTemplate.getInteger("Width");
-        Integer height = qrcodeTemplate.getInteger("Height");
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.createGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, width, height);
-
-        JSONObject qrcodeElement = qrcodeTemplate.getJSONObject("QrCodeElements");
-        BufferedImage imageQrcode = drawQrcodeWithText(qrcodeElement, siteUid);
-        g.drawImage(
-                imageQrcode.getScaledInstance(qrcodeElement.getInteger("Size"), imageQrcode.getHeight()*qrcodeElement.getInteger("Size") / QRCODE_SIZE, Image.SCALE_SMOOTH),
-                qrcodeElement.getInteger("PositionX"),
-                qrcodeElement.getInteger("PositionY"), null
-        );
-
-        //其它文字
-        qrcodeTemplate.getJSONArray("Elements").forEach(item -> {
-            JSONObject object = (JSONObject) item;
-            if (Strings.isNotEmpty(object.getString("TextShowValue"))) {
-                Font font = new Font(object.getString("FontName"), object.getInteger("FontType"), object.getInteger("FontSize"));
-                g.setFont(font);
-                g.setColor(new Color(Integer.parseInt(object.getString("ColorStr"), 16)));
-                g.drawChars(object.getString("TextShowValue").toCharArray(), 0, object.getString("TextShowValue").length(), object.getIntValue("PositionX"), object.getIntValue("PositionY") + object.getIntValue("FontSize"));
-            }
-        });
-
-        g.dispose();
-        return image;
+        String url = buildQrCodeUrl( qrcodeTemplate.getJSONObject("QrCodeElements"),siteUid);
+        return QrCodeSupportUtil.createQrCodeTag(qrcodeTemplate,siteUid,url);
     }
 
     private String buildQrCodeUrl(JSONObject qrcodeElement, String siteUid) {
@@ -181,46 +96,15 @@ public class QrCodeDrawService {
     }
 
     public BufferedImage createImageWithLogo(String content, String imgPath, boolean needCompress) throws Exception {
-        BufferedImage image = createBitMatrixImage(content,QRCODE_SIZE);
+        BufferedImage image = QrCodeSupportUtil.createBitMatrixImage(content,QRCODE_SIZE);
         if (imgPath == null || "".equals(imgPath)) {
             return image;
         }
         // 插入Logo图片
-        insertImage(image, imgPath, needCompress);
+        QrCodeSupportUtil.insertImage(image, imgPath, needCompress);
         return image;
     }
 
-    public void insertImage(BufferedImage source, String imgPath, boolean needCompress) throws Exception {
-        File file = new File(imgPath);
-        if (!file.exists()) {
-            System.err.println("" + imgPath + "   该文件不存在！");
-            return;
-        }
-        Image src = ImageIO.read(new File(imgPath));
-        int width = src.getWidth(null);
-        int height = src.getHeight(null);
-        if (needCompress) { // 压缩LOGO
-            if (width > WIDTH) {
-                width = WIDTH;
-            }
-            if (height > HEIGHT) {
-                height = HEIGHT;
-            }
-            Image image = src.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            BufferedImage tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Graphics g = tag.getGraphics();
-            g.drawImage(image, 0, 0, null); // 绘制缩小后的图
-            g.dispose();
-            src = image;
-        }
-        // 插入LOGO
-        Graphics2D graph = source.createGraphics();
-        int x = (QRCODE_SIZE - width) / 2;
-        int y = (QRCODE_SIZE - height) / 2;
-        graph.drawImage(src, x, y, width, height, null);
-        graph.setStroke(new BasicStroke(3f));
-        graph.dispose();
-    }
 
     public BufferedImage getQrCodeImageWithGeLogo(QrCodeLib qrCodeLib) throws Exception{
         String domain = webContextUrl;
