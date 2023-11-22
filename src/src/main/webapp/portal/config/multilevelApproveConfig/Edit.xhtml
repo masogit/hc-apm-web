@@ -194,8 +194,8 @@
                         <label class="label"> 审核人选择 </label>
                         <br></br>
 
-                        <h:panelGroup>
-<!--                            <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalConditionEnable}">-->
+
+                        <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalConditionEnable}">
                             <p:fieldset legend="审批节点-角色">
                                 <p:selectOneMenu  value="#{multiLevelApprovalConfigController.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}审批角色" itemValue="#{null}" noSelectionOption="true" />
