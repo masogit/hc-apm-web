@@ -49,6 +49,7 @@ public class QrcodeConfigConstant {
             FieldsMap.put("locationName", WebUtil.getMessage("locationName"));
             FieldsMap.put("riskGrade", WebUtil.getMessage("riskGrade"));    //风险等级  AssetInfo.riskGrade
             FieldsMap.put("purchaseDate", WebUtil.getMessage("purchaseDate"));    //采购日期  AssetInfo.purchaseDate
+            FieldsMap.put("manufactDate", WebUtil.getMessage("manufactDate"));    //出厂日期  AssetInfo.manufactDate
         }
         return FieldsMap;
     }
