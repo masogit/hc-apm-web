@@ -46,9 +46,20 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
 
-                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm manHoursManageButton"/>
-                <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist woTab:woMgrDetailForm"/>
+                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm manHoursManageButton "/>
+                <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist woTab:woMgrDetailForm " oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
+                <p:column width="36" id="checkBoxColumn" rendered="#{userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}">
+                    <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedBatchMap[item.id]}"  class="selectCheckBox">
+                        <p:ajax process="@this" update="@this @(.batch-terminated) batchReviewButton batchAckButton" oncomplete="updateSelectAllCheckBox();"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header"  >
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{workOrderMgrController.onSelectAllOfPage}" update="@(.selectCheckBox) batchReviewButton batchAckButton" oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
                 <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -261,6 +272,10 @@
                     <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
+
+                    <p:commandButton id="batchReviewButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量审批" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton()}" rendered="#{workOrderMgrController.queryIndex == 10 and userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}" oncomplete="PF('batchWoActionDialog').show()"/>
+                    <p:commandButton id="batchAckButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量验收" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton() }" rendered="#{workOrderMgrController.queryIndex == 5 and userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}" oncomplete="PF('ackDialogBatch').show()"/>
+
                     <p:commandButton id="manHoursManageButton" value="工时管理" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                         <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
@@ -277,6 +292,7 @@
         <ui:include src="toCloseDlg.xhtml"/>
         <ui:include src="editCloseDlg.xhtml"/>
         <ui:include src="approveDlg.xhtml"/>
+        <ui:include src="batchWoActionDlg.xhtml"/>
         <ui:include src="moreAccDialogPrice.xhtml"/>
         <ui:include src="manHoursMgrDlg.xhtml"/>
 
@@ -397,6 +413,24 @@
             </h:panelGroup>
         </h:form>
     </p:dialog>
+    <p:dialog id="ackDialogBatch" widgetVar="ackDialogBatch" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="批量#{msg.Acknowledge}">
+        <h:form id="ackDialogBatchForm" >
+            <h:panelGroup id="displayBatch">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.comments}</label>
+                        <p:inputTextarea value="#{workOrderMgrController.failReason}" maxlength="256"  required="true" requiredMessage="#{msg.comments}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <h:panelGroup>
+                    <p:commandButton immediate="true" validateClient="false" actionListener="#{workOrderMgrController.batchAckWorkOrder()}" value="批量#{msg.AckPass}" update="woTab:woMgrListForm ackDialogBatchForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'ackDialogBatch');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.batchRejectWorkOrder()}" value="批量#{msg.AckNoPass}" update="woTab:woMgrListForm ackDialogBatchForm :growl"  oncomplete="handleSubmit(args, 'ackDialogBatch');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('ackDialogBatch').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
     <p:dialog id="rateDialog" widgetVar="rateDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.feedbackRating}">
         <h:form id="rateDialogForm" >
             <h:panelGroup id="display" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
@@ -429,6 +463,19 @@
             var isActive = "#{userContextService.isActive()}";
             if(isActive == '1'){
                 PF('ActiveDlg').show();
+            }
+        }
+        function updateSelectAllCheckBox() {
+            var checkboxlist = $(".selectCheckBox");
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+            });
+            $("#woMgrListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+            if (selectAllstatus) {
+                $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+            } else {
+                $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
             }
         }
     </script>
