@@ -165,7 +165,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private V2_WorkOrder_Detail itemDetail;
     private V2_WorkOrderCoworker coWorkerDetail;
-
+    private Map<String, Boolean> selectedBatchMap;
+    @Getter
+    @Setter
+    private List<V2_WorkOrder> currentPageWorkOrder;
     private Date esTime;
     private String comments;
     private Date confirmedUpDate;
@@ -323,7 +326,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
-
+            selectedBatchMap = new HashMap<>();
 
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -370,6 +373,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageWorkOrder.stream().anyMatch(item -> !selectedBatchMap.containsKey(item.getId()) || !selectedBatchMap.get(item.getId()));
+        for (V2_WorkOrder item : currentPageWorkOrder) {
+            selectedBatchMap.put(item.getId(), !isSelectedAll);
+        }
+    }
+
     public void partsPriceUpdate(){
         if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
             itemDetail.setClosedPrice(0.0);
@@ -935,6 +946,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (!userContextService.hasCurrentTenantName("")) {
             needTwoSubStatusBatch(pageResult.getContent());
         }
+        currentPageWorkOrder = pageResult.getContent();
         return pageResult;
     }
     private List<V2_WorkOrder> pageNum(List<V2_WorkOrder> v2_workOrderList,PageRequest pageRequest){
@@ -1565,6 +1577,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         cancel();
     }
 
+    public void batchAckWorkOrder() {
+        selectedBatchMap.forEach((k, v) -> {
+            if (v) {
+                woService.ackWorkOrder(dao.findById(k));
+            }
+        });
+        selectedBatchMap.clear();
+        cancel();
+    }
+
     public void updateDownTime() {
         woService.updateDownTime(selected, confirmedDownTime);
         needConfirmTime = false;
@@ -1573,6 +1595,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void rejectWorkOrder() {
         woService.rejectWorkOrder(selectedWorkOrder, failReason, currentStatus, confirmedDownTime);
+        cancel();
+    }
+
+    public void batchRejectWorkOrder() {
+        selectedBatchMap.forEach((k, v) -> {
+            if (v) {
+                woService.rejectWorkOrder(dao.findById(k), failReason, currentStatus, confirmedDownTime);
+            }
+        });
+        selectedBatchMap.clear();
         cancel();
     }
 
@@ -2512,6 +2544,32 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         approveWorkOrder();
     }
 
+    public void batchPreApproveWorkOrder(){
+        // 备件审核是否需要签名
+        WorkflowConfig workflowConfig = configService.findConfigBySite(this.currentPageWorkOrder.get(0).getSiteUID());
+
+        if(workflowConfig != null && workflowConfig.getPartsNeedSign() != null && workflowConfig.getPartsNeedSign()){
+            // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+            response.setStatus(205);
+            return;
+        }
+        selectedBatchMap.forEach((k,v) -> {
+            if (v) {
+                selectedWorkOrder = dao.findById(k);
+                selectedMap = new HashMap<>();
+                approvedDetails = new ArrayList<>();
+                detailDao.findByWoId(k).forEach(i -> {
+                    approvedDetails.add(i);
+                    selectedMap.put(i.getId(), true);
+                });
+                approveWorkOrder();
+            }
+        });
+        selectedBatchMap.clear();
+    }
+
     public void saveSignatureAndSubmitApprove(){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
@@ -2549,6 +2607,55 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         approveWorkOrder();
+    }
+
+    public void saveSignatureAndBatchSubmitApprove() {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+            return;
+        }
+        if(this.newSignature){
+            if (StringUtils.isNotEmpty(signatureContent)) {
+
+                try {
+                    String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] decode = decoder.decodeBuffer(base64);
+
+                    V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                    if (null != blobObject) {
+                        this.signatureId = blobObject.getObjectStorageId();
+                        woService.addUserSignature(this.signatureId);
+                    }else{
+                        WebUtil.addErrorMessage("签名保存失败！");
+                        response.setStatus(206);
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            }
+        }
+        selectedBatchMap.forEach((k,v) -> {
+            if (v) {
+                selectedWorkOrder = dao.findById(k);
+                selectedMap = new HashMap<>();
+                approvedDetails = new ArrayList<>();
+                detailDao.findByWoId(k).forEach(i -> {
+                    approvedDetails.add(i);
+                    selectedMap.put(i.getId(), true);
+                });
+                approveWorkOrder();
+            }
+        });
+        selectedBatchMap.clear();
     }
 
     public void approveWorkOrder() {
@@ -3647,6 +3754,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void onFilterWo(FilterEvent event) {
+        selectedBatchMap.clear();
         onFilterCustom(event, this::filters);
     }
 
@@ -3709,6 +3817,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public Map<String, Boolean> getSelectedBatchMap() {
+        return selectedBatchMap;
+    }
+
+    public void setSelectedBatchMap(Map<String, Boolean> selectedBatchMap) {
+        this.selectedBatchMap = selectedBatchMap;
+    }
+
+    public boolean batchReviewPassButton() {
+        if (CollectionUtils.isEmpty(selectedBatchMap)) {
+            return true;
+        }
+        if (!selectedBatchMap.containsValue(true)) {
+           return true;
+        }
+        return false;
     }
 }
 
