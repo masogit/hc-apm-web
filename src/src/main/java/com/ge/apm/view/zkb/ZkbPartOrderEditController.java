@@ -636,6 +636,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         return "";
     }
 
+    //工作站条件：人工申请且机型为放射类设备时才显示
+    public boolean workStationRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(CopyByInvok.NORMAL_ONE.equals(artificialType)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean scoreFlagRender(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(CopyByInvok.T.equals(maintainFlag)){
@@ -1381,13 +1391,21 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void ssaKeyFlagChange2(ValueChangeEvent event){
+        System.out.println(selected.getZkbEngineerPhone());
+    }
+
     public void ssaKeyFlagChange(){
         calcRemainQty();
         if("t".equals(selected.getSsaKeyFlag())){
             currentScoreFlag = true;
             currentScoreText = "";
             selected.setScoreFlag(CopyByInvok.F);
+            selected.setExchangeType(null);
             return;
+        }else{
+            currentScoreFlag = false;
+            editCurrentScoreFlag();
         }
 
     }
