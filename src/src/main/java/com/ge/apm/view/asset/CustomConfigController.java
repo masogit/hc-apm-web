@@ -230,9 +230,7 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageFilterFields());
                 break;
             case "RemoveMobileBuildAssetFields":
-                List<String> removeBuildAssetFields = customConfigObject.getAssetsMobilepageBuildAssetFields();
-                removeBuildAssetFields.removeAll(ListUtil.newArrayList("name", "assetGroup", "clinicalDeptName"));
-                addFieldsList.addAll(removeBuildAssetFields);
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageBuildAssetFields());
                 break;
             case "MobileWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
