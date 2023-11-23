@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetDto;
 import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
@@ -138,6 +140,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private StockRecordRepository stockRecordRepository;
+
+	@Autowired
+	private AssetInfoMapper assetInfoMapper;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -1091,13 +1096,29 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	}
 
 	public void batchUpdateAssetInfo() {
-		Long count=assetInfoRepository.findByCreatedByIsLoginName();
-		logger.info("query batchUpdateAssetInfo count:{}",count);
+		try {
+			Long count=assetInfoRepository.findByCreatedByIsLoginNameSize();
+			logger.info("query batchUpdateAssetInfo count:{}",count);
+			long startTimeUpdate = System.currentTimeMillis();
+//		int size=assetInfoRepository.batchUpdateAssetInfoCreatedBy();
+			int size=0;
+			while (true){
+				List<AssetDto> assetInfos=assetInfoMapper.findByCreatedByIsLoginName();
+				if(CollectionUtils.isEmpty(assetInfos)){
+					break;
+				}
+				for (AssetDto assetInfo : assetInfos) {
+					assetInfoRepository.updateCreatedBy(assetInfo.getId(),assetInfo.getUserName());
+				}
+				size=size+assetInfos.size();
+				Thread.sleep(10000);
+			}
+			long endTimeUpdate = System.currentTimeMillis();
+			logger.info("update  batchUpdateAssetInfo size:{},耗时:{}",size,startTimeUpdate-endTimeUpdate);
+		}catch (Exception e){
+			logger.error("update  batchUpdateAssetInfo error :",e);
+		}
 
-		long startTimeUpdate = System.currentTimeMillis();
-		Long size=assetInfoRepository.batchUpdateAssetInfoCreatedBy();
-		long endTimeUpdate = System.currentTimeMillis();
-		logger.info("update  batchUpdateAssetInfo size:{},耗时:{}",size,startTimeUpdate-endTimeUpdate);
 
 	}
 }
