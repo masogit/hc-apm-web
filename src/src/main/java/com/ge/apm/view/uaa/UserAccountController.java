@@ -280,6 +280,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             setTenantUid(tenantInfos.get(0).getUid());
         } else if(isITAdmin){
             setITAdminOrgTree();
+            updateRoleList();
         }else {
             setTenantUid(loginUser.getTenantUID());
         }
