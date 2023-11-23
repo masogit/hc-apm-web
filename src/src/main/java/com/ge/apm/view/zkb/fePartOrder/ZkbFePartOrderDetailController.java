@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -156,6 +157,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             if (ZkbFePartOrderController.CREATE_ACTION.equals(action)) {
                 this.prepareCreate();
                 this.selected.setNotGeAsset(WebUtil.getRequestParameter("notGeAsset"));
+                //如果是人工申请，是否保养默认为否，同时页面该字段隐藏
+                if(ZkbFePartOrder.OrderType.ManMade.toString().equals(selected.getOrderType())){
+                    this.selected.setMaintainFlag(CopyByInvok.F);
+                }
             } else if (ZkbFePartOrderController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
             }
