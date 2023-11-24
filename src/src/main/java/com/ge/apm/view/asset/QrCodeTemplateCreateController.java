@@ -2,13 +2,11 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.QrCodeTemplateElement;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.common.QrcodeConfigConstant;
@@ -22,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Strings;
 import org.primefaces.context.RequestContext;
@@ -48,6 +47,7 @@ public class QrCodeTemplateCreateController {
 
     private List<OrgInfo> siteList;
 
+    private I18nMessageRepository i18nMessageRepository;
     @PostConstruct
     protected void init() {
         templateDao = WebUtil.getBean(QrCodeTemplateRepository.class);
@@ -56,6 +56,7 @@ public class QrCodeTemplateCreateController {
         templateService = WebUtil.getBean(QrCodeTemplateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 
         initSiteList();
         
@@ -136,7 +137,15 @@ public class QrCodeTemplateCreateController {
     }
     
     public Map<String, String> getFieldsMap() {
-        return QrcodeConfigConstant.getFieldsMap();
+        Map<String,String> result=new HashMap<>();
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        I18nMessage capitalSource2 = i18nMessageRepository.findFirstByMsgKeyAndSiteId("capitalSource2", siteId);
+        Map<String, String> fieldsMap = QrcodeConfigConstant.getFieldsMap();
+        result.putAll(fieldsMap);
+        if(capitalSource2 != null){
+            result.put(capitalSource2.getMsgKey(),capitalSource2.getValue());
+        }
+        return result;
     }
     
     public Map<String, String> getFontNameMap() {
