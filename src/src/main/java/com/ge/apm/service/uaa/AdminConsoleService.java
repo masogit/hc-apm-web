@@ -690,8 +690,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 	}
 	public void batchSynchronizationConfig() {
-		saveDefaultValue("assetInstallApprove",3,"false",3,"安装入库完成是否审批","安装入库完成是否审批");
-		saveLevelValue("assetInstallApprove","assetApprover");
+//		saveDefaultValue("assetInstallApprove",3,"false",3,"安装入库完成是否审批","安装入库完成是否审批");
+		saveLevelValue("whetherToEnableUnattended","whethertoenableunattended");
+		saveLevelValue("appointmentStatusLockedTime","appointmentstatuslockedtime");
 	}
 
 	public void analyseMenus() {
@@ -906,7 +907,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							field.setAccessible(true);
 							Object o = field.get(item);
 							if(o != null){
-								return initConfigItemValue(item,key,true);
+								return initConfigItemValue(item,key,o);
 							}else{
 								return null;
 							}
@@ -925,7 +926,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							field.setAccessible(true);
 							Object o = field.get(item);
 							if(o != null){
-								return initConfigItemValue(item,key,true);
+								return initConfigItemValue(item,key,o);
 							}else{
 								return null;
 							}
