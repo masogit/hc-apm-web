@@ -23,9 +23,9 @@
                             <p:ajax update="AssetFileAttachmentEditForm"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{assetFileAttachmentController.i18nMessages}" var="v">
-<!--                                <c:if test="#{v.msgKey ne '4'}">-->
-                                    <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
-                              <!--  </c:if>-->
+                                <!--                                <c:if test="#{v.msgKey ne '4'}">-->
+                                <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
+                                <!--  </c:if>-->
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -46,7 +46,7 @@
                              rendered="#{'vlink' ne assetFileAttachmentController.selected.boSubType}">
                         <h:panelGroup
                                 rendered="#{assetFileAttachmentController.isCreatAction() and assetFileAttachmentController.selected.objectName==null}">
-                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/"
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
                                           fileUploadListener="#{assetFileAttachmentController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="500000000"
