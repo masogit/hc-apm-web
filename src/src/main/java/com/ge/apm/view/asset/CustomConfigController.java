@@ -8,25 +8,17 @@ package com.ge.apm.view.asset;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.httpclient.util.DateUtil;
@@ -37,6 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbMessageSource;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -54,7 +53,7 @@ public class CustomConfigController {
     private ConfigCacheService configCacheService;
     private UserContextService userContextService;
     private I18nMessageService i18nMessageService;
-
+    private ConfigItemValueRepository configItemValueRepository;
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -85,6 +84,7 @@ public class CustomConfigController {
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
@@ -806,9 +806,12 @@ public class CustomConfigController {
         return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
     }
     public boolean enabledWhethertoenableunattended(){
-        WorkflowConfig workflowConfig = configService.findConfigBySite(selectSite.getUid());
-        if(workflowConfig == null ) return false;
-        return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(selectSite.getSiteUID(),
+                selectSite.getHospitalUID(),
+                selectSite.getInstitutionUID(),
+                selectSite.getTenantUID(), key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 
 }

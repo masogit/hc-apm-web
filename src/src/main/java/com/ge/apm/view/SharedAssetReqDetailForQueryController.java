@@ -57,6 +57,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     OrgInfoRepository orgInfoDao = null;
     AssetInfoService assetInfoService = null;
     WorkflowConfigRepository wfCfigDao = null;
+    ConfigItemValueRepository configItemValueRepository=null;
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
@@ -114,6 +115,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         sharedDao = WebUtil.getBean(SharedAssetRequestRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
         sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
@@ -389,17 +391,19 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     public boolean  openWhethertoenableunattended(){
         if(whethertoenableunattended == null){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            String siteUID = currentUserAccount.getSiteUID();
-            List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
-            if(CollectionUtils.isEmpty(bySiteUID)){
-                return false;
-            }
-            whethertoenableunattended= bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
+            whethertoenableunattended= checkWhethertoenableunattended(currentUserAccount);
         }
 
        return whethertoenableunattended;
     }
-
+    private boolean checkWhethertoenableunattended(UserAccount currentUserAccount){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserAccount.getSiteUID(),
+                currentUserAccount.getHospitalUID(),
+                currentUserAccount.getInstitutionUID(),
+                currentUserAccount.getTenantUID(), key);
+       return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
+    }
     public void  initAssetAllocateFields(){
         if(!openWhethertoenableunattended())  {
             assetAllocateFields= AllocateCustomConfigConstant.ASSET_ALLOCATE.getAssetAllocateFields();

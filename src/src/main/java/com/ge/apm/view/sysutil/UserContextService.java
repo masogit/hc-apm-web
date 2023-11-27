@@ -180,9 +180,11 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public boolean accessContain() {
-        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        UserAccount currentUserAccount = getCurrentUserAccount();
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(currentUserAccount.getSiteUID());
         if (null != config) {
-            return BooleanUtils.isTrue(config.getWhethertoenableunattended()) && BooleanUtils.isTrue(config.getIsiotenabled());
+            String whetherToEnableUnattended = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(currentUserAccount.getSiteUID(), currentUserAccount.getHospitalUID(), currentUserAccount.getInstitutionUID(), currentUserAccount.getTenantUID(), "whetherToEnableUnattended");
+            return Boolean.TRUE.toString().equalsIgnoreCase(whetherToEnableUnattended) && BooleanUtils.isTrue(config.getIsiotenabled());
         }
         return false;
     }
