@@ -50,7 +50,7 @@
                 <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist woTab:woMgrDetailForm " oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-                <p:column width="36" id="checkBoxColumn" rendered="#{userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}">
+                <p:column width="36" id="checkBoxColumn" visible="#{userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院') and (workOrderMgrController.queryIndex == 10 or workOrderMgrController.queryIndex == 5)}" exportable="false">
                     <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedBatchMap[item.id]}"  class="selectCheckBox">
                         <p:ajax process="@this" update="@this @(.batch-terminated) batchReviewButton batchAckButton" oncomplete="updateSelectAllCheckBox();"/>
                     </p:selectBooleanCheckbox>
