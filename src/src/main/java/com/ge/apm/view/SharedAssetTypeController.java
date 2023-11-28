@@ -423,7 +423,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         return false;
     }
 
-    private Boolean  isWhetherToEnableUnattended(){
+    public Boolean  isWhetherToEnableUnattended(){
         if(whethertoenableunattended == null){
             UserContextService userContextService = WebUtil.getBean(UserContextService.class);
             OrgInfo selectSite = userContextService.getSelectSite();
