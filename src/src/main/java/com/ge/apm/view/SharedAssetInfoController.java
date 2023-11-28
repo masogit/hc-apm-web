@@ -103,7 +103,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();
             deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
-            whethertoenableunattended=checkWhethertoenableunattended(selectSite.getSiteUID(),selectSite.getHospitalUID(),selectSite.getInstitutionUID(),selectSite.getTenantUID());
+            whethertoenableunattended=checkWhethertoenableunattended(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID());
         }
         brandRepository=WebUtil.getBean(BrandRepository.class);
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
