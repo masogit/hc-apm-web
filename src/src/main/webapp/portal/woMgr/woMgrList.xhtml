@@ -50,7 +50,7 @@
                 <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist woTab:woMgrDetailForm " oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-                <p:column width="36" id="checkBoxColumn" visible="#{userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院') and (workOrderMgrController.queryIndex == 10 or workOrderMgrController.queryIndex == 5)}" exportable="false">
+                <p:column width="36" id="checkBoxColumn" visible="#{workOrderMgrController.queryIndex == 10 or workOrderMgrController.queryIndex == 5}" exportable="false">
                     <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedBatchMap[item.id]}"  class="selectCheckBox">
                         <p:ajax process="@this" update="@this @(.batch-terminated) batchReviewButton batchAckButton" oncomplete="updateSelectAllCheckBox();"/>
                     </p:selectBooleanCheckbox>
@@ -273,8 +273,8 @@
                 </p:column>
                 <f:facet name="{Toolbar}">
 
-                    <p:commandButton id="batchReviewButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量审批" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton()}" rendered="#{workOrderMgrController.queryIndex == 10 and userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}" oncomplete="PF('batchWoActionDialog').show()"/>
-                    <p:commandButton id="batchAckButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量验收" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton() }" rendered="#{workOrderMgrController.queryIndex == 5 and userContextService.hasCurrentTenantName('上海交通大学医学院附属第九人民医院')}" oncomplete="PF('ackDialogBatch').show()"/>
+                    <p:commandButton id="batchReviewButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量审批" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton()}" rendered="#{workOrderMgrController.queryIndex == 10 }" oncomplete="PF('batchWoActionDialog').show()"/>
+                    <p:commandButton id="batchAckButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量验收" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton() }" rendered="#{workOrderMgrController.queryIndex == 5}" oncomplete="PF('ackDialogBatch').show()"/>
 
                     <p:commandButton id="manHoursManageButton" value="工时管理" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
