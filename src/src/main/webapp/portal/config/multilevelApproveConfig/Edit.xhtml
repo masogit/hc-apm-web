@@ -142,7 +142,7 @@
                              rendered="#{!'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                             onclick="PF('ApproveDialog').hide()"
+                             onclick="PF('ApproveDialog').hide()" update="MultiLevelListForm"
                              rendered="#{!'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
             <p:commandButton immediate="true" value="确定" icon="ui-icon-check" onclick="PF('ApproveDialog').hide()"
                              rendered="#{'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
