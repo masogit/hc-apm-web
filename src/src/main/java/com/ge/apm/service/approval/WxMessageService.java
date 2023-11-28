@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -146,10 +147,12 @@ public class WxMessageService extends MicroServiceInvoker {
         List<UserAccount> resultUser = userAccounts2.stream().filter(item -> uids.contains(item.getId())).distinct().collect(Collectors.toList());
         logger.info("submitApprovalSendMessage users:{}",JSON.toJSONString(resultUser));
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = simpleDateFormat.format(assetInfo.getCreatedDate());
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword1","资产入库审核");
         params.put("keyword2", "待审核");
-        params.put("keyword3", assetInfo.getCreatedDate());
+        params.put("keyword3", dateString);
         List<WechatParam> paramList = new ArrayList<>();
         resultUser= resultUser.stream().distinct().collect(Collectors.toList());
         for (UserAccount userAccount : resultUser) {

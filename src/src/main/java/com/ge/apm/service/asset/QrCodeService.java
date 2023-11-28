@@ -7,10 +7,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.QrCodeTemplateRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -23,6 +20,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import javax.imageio.ImageIO;
@@ -69,6 +67,8 @@ public class QrCodeService {
 
     @Autowired
     private BlobFileService blobObjectService;
+    @Autowired
+    private SysAuthGroupRepository sysAuthGroupRepository;
 
     public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
         if (tenantUID == null || siteUID == null) {
@@ -260,7 +260,6 @@ public class QrCodeService {
     private JSONObject fillElementsValue(JSONObject qrCodeObject, AssetInfo asset) {
 
         qrCodeObject.getJSONObject("QrCodeElements").put("TextValue", Strings.isNullOrEmpty(asset.getQrCode()) ? "" : asset.getQrCode());
-
         qrCodeObject.getJSONArray("Elements").forEach(item -> {
             JSONObject itemObject = (JSONObject) item;
             if (!Strings.isNullOrEmpty(itemObject.getString("FieldKey"))) {
@@ -344,6 +343,38 @@ public class QrCodeService {
                         break;
                     case "manufactDate":
                         itemObject.put("TextShowValue", textValue.concat(asset.getManufactDate() == null ? "" :" "+TimeUtils.getStrDate(asset.getManufactDate(), "yyyy-MM-dd")));
+                        break;
+                    case "manufacture":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getManufacture() == null ? "" :asset.getManufacture()));
+                        break;
+                    case "medicalApparatusClassification":
+                        String medicalApparatusClassification = asset.getMedicalApparatusClassification();
+                        SysAuthGroup byClassificationCode =null;
+                        if(!StringUtils.isEmpty(medicalApparatusClassification)){
+                             byClassificationCode = sysAuthGroupRepository.findByClassificationCode(medicalApparatusClassification);
+                        }
+                        itemObject.put("TextShowValue", textValue.concat(byClassificationCode == null ? "" :byClassificationCode.getName()));
+                        break;
+                    case "emergencyEquipment":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getEmergencyEquipment() == null ? "" :FieldValueMessageController.fieldValue("emergencyEquipment", asset.getEmergencyEquipment().toString())));
+                        break;
+                    case "measureGrade":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getMeasureGrade() == null ? "" :FieldValueMessageController.fieldValue("measureGrade", asset.getMeasureGrade().toString())));
+                        break;
+                    case "measuringItemCategory":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getMeasuringItemCategory() == null ? "" :FieldValueMessageController.fieldValue("measuringItemCategory", asset.getMeasuringItemCategory().toString())));
+                        break;
+                    case "capitalSource2":
+                        Integer capitalSource2 = asset.getCapitalSource2();
+                        I18nMessage capitalSourceI18n=null;
+                        if(capitalSource2 != null){
+                            List<I18nMessage> capitalSource2I18nList = FieldValueMessageController.getFieldValueListByMsgType("capitalSource2");
+                            Optional<I18nMessage> first = capitalSource2I18nList.stream().filter(i18n -> i18n.getMsgKey().equalsIgnoreCase(capitalSource2.toString())).findFirst();
+                            if (first.isPresent()) {
+                                capitalSourceI18n = first.get();
+                            }
+                        }
+                        itemObject.put("TextShowValue", textValue.concat(capitalSourceI18n == null ? "" :capitalSourceI18n.getValue()));
                         break;
                 }
             }

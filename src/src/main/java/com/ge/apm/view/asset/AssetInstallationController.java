@@ -17,6 +17,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
@@ -156,6 +157,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     @Setter
     private String assetTypeGroup;
 
+    private WxMessageService wxMessageService;
+
+
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
         return arrivalListDao;
@@ -197,6 +201,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded() + "#" + arrivalListItem.getArrivalList().getTenantUID());
         configItemRepository = WebUtil.getBean(ConfigItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        wxMessageService = WebUtil.getBean(WxMessageService.class);
+
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
             AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
@@ -415,7 +421,10 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
         }
         String arrivalListId = arrivalListItem.getArrivalListId();
-
+        if(isApproved()){
+            String token = UserContextService.getAccessToken();
+            extracted(token, arrivalListItem);
+        }
         if(arrivalListId != null ){
             //获取到arrival_list实体类对象
             ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
@@ -597,8 +606,23 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
 
         finishInstallHandle(itemList);
+        if(isApproved()){
+            String token = UserContextService.getAccessToken();
+            for (ArrivalListItem listItem : itemList) {
+                extracted(token, listItem);
+            }
+        }
         return returnAction();
     }
+
+    private void extracted(String token, ArrivalListItem listItem) {
+        AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setSiteUID(listItem.getArrivalList().getSiteUID());
+        assetInfo.setCreatedDate(new Date());
+        assetInfo.setClinicalDeptUID(listItem.getClinicalDeptUID());
+        wxMessageService.submitAssetApprovalSendMessage(assetInfo, token);
+    }
+
     public void finishInstallHandle(List<ArrivalListItem> itemList) {
         StringBuilder message = new StringBuilder();
         for(ArrivalListItem arrivalListItem : itemList){
