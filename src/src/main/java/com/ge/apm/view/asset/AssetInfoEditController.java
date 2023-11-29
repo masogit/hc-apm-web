@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -30,6 +31,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
@@ -83,10 +85,38 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private AssetTypeGroupRepository assetTypeGroupRepository;
 
+    private BuildManagementRepository buildManagementRepository;
+    private ConfigItemValueRepository configItemValueRepository;
+    private AssetScrapRepository assetScrapRepository;
+
+
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
+
+    public List<BuildManagement> getManagementList() {
+        return managementList;
+    }
+
+
+    public List<String> managementListString(String query) {
+        if(CollectionUtils.isNotEmpty(managementList)){
+            List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
+            Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
+            managementMap=collect;
+            return list;
+        }
+        return new ArrayList<>();
+
+    }
+
+    public void setManagementList(List<BuildManagement> managementList) {
+        this.managementList = managementList;
+    }
+
+    private List<BuildManagement>  managementList=new ArrayList<>();
+    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
 
@@ -179,6 +209,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private AssetScrapService assetScrapService;
 
+    private WxMessageService wxMessageService;
+
     private MqUtils mqUtils;
 
     //设备状态
@@ -214,6 +246,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean approval=false;
+    private String applyReason;
+    private String approvalReason;
+    private String locationName;
 
     @Override
     protected void init() {
@@ -261,6 +296,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
+        buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
+        wxMessageService = WebUtil.getBean(WxMessageService.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -345,6 +384,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             if (readableFieldsList.contains("createdBy")) {
                 readableFieldsList.remove("createdBy");
             }
+            readableFieldsList.remove("assetUsedLifecycle");
+            readableFieldsList.remove("assetLifecycleDeadline");
         }
         if(selected.getUnitPriceElectricity()==null){
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
@@ -354,6 +395,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initOrgTree();
 
         updateClinicalDeptOnSiteChange();
+        updateManagementOnSiteChange();
         updateAssetStatusList();
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -597,6 +639,41 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
     }
 
+    private void updateManagementOnSiteChange() {
+        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
+        if(CollectionUtils.isEmpty(managementList)){
+            return;
+        }
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        if (!org.apache.commons.collections4.CollectionUtils.isEmpty(managementList)) {
+            managementList.forEach(val -> root.getChildren().add(new DefaultTreeNode("org", val, null)));
+            componentFloor(root);
+        }
+    }
+
+
+    private void componentFloor(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            componentRoom(val);
+        });
+    }
+
+    private void componentRoom(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            managementList.addAll(buildFloorList);
+        });
+    }
+
+
+
+
+
     public void onParentAssetChange() {
         AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
         selected.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
@@ -664,6 +741,39 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+
+
+
+
+    public void locationNamechangeSelect(SelectEvent event){
+        selected.setLocationCode(null);
+        selected.setLocationName(locationName);
+        if(event==null){
+            return;
+        }
+        String code =(String) event.getObject();
+        if(StringUtils.isNotBlank(code)){
+            List<BuildManagement> list = managementMap.get(code);
+            if(CollectionUtils.isNotEmpty(list)){
+                BuildManagement buildManagement = list.get(0);
+                selected.setLocationCode(buildManagement.getNamePyCode());
+                selected.setLocationName(buildManagement.getName());
+            }
+        }
+    }
+//        Map<Integer, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getId));
+//        List<BuildManagement> list = collect.get(idx);
+//        if(CollectionUtils.isNotEmpty(list)){
+//            BuildManagement buildManagement = list.get(0);
+//            selected.setLocationCode(buildManagement.getNamePyCode());
+//            selected.setLocationName(buildManagement.getName());
+//        }
+
+
+    public void locationNamechange(){
+        locationNamechangeSelect(null);
+
+    }
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null) {
@@ -751,6 +861,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
+        if(!checkAssetScrap()){
+            WebUtil.addErrorMessage("设备在报废流程中,不允许修改状态");
+            return "";
+        }
+
         if(selected.getUnitPriceElectricity()==null){
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
             selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
@@ -867,6 +982,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else {
             return "";
         }
+    }
+
+    private boolean checkAssetScrap() {
+        if(selected.getId()!=null){
+            AssetInfo assetInfo = dao.getById(selected.getId());
+            if(assetInfo.getStatus()!=selected.getStatus()){
+                AssetScrap assetScrap = assetScrapRepository.findByAssetId(selected.getId());
+                if(assetScrap==null){
+                    return true ;
+                }else{
+                    if(assetScrap.getCurrentStatus()==2){
+                        return false ;
+                    }
+                }
+            }
+        }
+        return true;
+
     }
 
     private void creteRule() {
@@ -1111,12 +1244,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         Date now = new Date();
         if (object.getId() == null) {
-            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             object.setCreatedDate(now);
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             object.setLastModifiedDate(now);
         } else {
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             object.setLastModifiedDate(now);
         }
     }
@@ -1131,6 +1264,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
+        return "AssetList?faces-redirect=true";
+    }
+
+    public String applyAssetScrap(){
+        assetScrapService.apply(selected.getId(),applyReason,approvalReason);
         return "AssetList?faces-redirect=true";
     }
 
@@ -1369,8 +1507,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public String submitApproval(Integer usageStatusconstant) {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         selected.setUsageStatus(usageStatusconstant);
-        return applyChange();
+        String redirectUrl = applyChange();
+        if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
+            String token = UserContextService.getAccessToken();
+            wxMessageService.submitAssetApprovalSendMessage(selected,token);
+        }
+        return redirectUrl;
     }
+
     public String submitApprovalExtend(Integer usageStatusconstant) {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         String redirectUrl = submitApproval(usageStatusconstant);
@@ -1672,6 +1816,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
     }
 
+    public boolean getAssetScrapEnable(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(userAccount.getSiteUID(),userAccount.getHospitalUID(),userAccount.getInstitutionUID(),userAccount.getTenantUID(),"assetScrap");
+        return  value.equals("true")?true:false;
+
+    }
+
     public boolean getUploadFlag() {
         return uploadFlag;
     }
@@ -1704,5 +1855,29 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setApproval(boolean approval) {
         this.approval = approval;
+    }
+
+    public String getApplyReason() {
+        return applyReason;
+    }
+
+    public void setApplyReason(String applyReason) {
+        this.applyReason = applyReason;
+    }
+
+    public String getApprovalReason() {
+        return approvalReason;
+    }
+
+    public void setApprovalReason(String approvalReason) {
+        this.approvalReason = approvalReason;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }

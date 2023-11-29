@@ -114,6 +114,34 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
+                    <h:panelGroup rendered="#{v2PmOrderController.maintenancePersonInformation != null}">
+                        <label class="label">保养人信息</label>
+                        <p:dataTable styleClass="header1" id="qrCodeEditForm" var="person" value="#{v2PmOrderController.maintenancePersonInformation}" editable="true" rowKey="#{person.fieldName}">
+                            <p:ajax event="rowEdit" listener="#{v2PmOrderController.onRowEditExternalTempUser}" update="qrCodeEditForm" />
+                            <p:ajax event="rowEditCancel" listener="#{v2PmOrderController.onRowCancelExternalTempUser}" update="qrCodeEditForm" />
+                            <p:column  >
+                                <h:outputText value="#{person.key}" />
+                            </p:column>
+                            <p:column  >
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{person.label}" /></f:facet>
+                                    <f:facet name="input"><p:inputText id="label" value="#{person.label}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column >
+                                <p:rowEditor editTitle="#{msg.Edit}" />
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{not empty v2PmOrderController.externalTempUser and not empty v2PmOrderController.externalTempUser.signature}">
+                        <label class="label">签名图片</label>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage value="#{fileDownloadService.getFile(v2PmOrderController.externalTempUser.signature)}" stream="false" height="80"  width="100"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </h:panelGroup>
                         <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
                         <label class="label">#{msg.UsedPart}</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">

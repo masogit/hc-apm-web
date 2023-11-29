@@ -5,15 +5,15 @@
  */
 package com.ge.apm.domain.pure;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.view.asset.AssetInfoListController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,14 +44,14 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    List<String> assetsMobilepageFilterFields;
+    List<String> assetsMobilepageBuildAssetFields;
     List<String> assetsWebMaintainDetailFields;
 
     List<String> assetsImportantFields;
     List<String> assetAllocateFields;
 
     JSONObject mobilePage;
-
-
     JSONObject mobileMaintainPage;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
@@ -226,6 +226,21 @@ public class CustomConfigObject {
         return assetsMobilepageDetailFields;
     }
 
+    public List<String> getAssetsMobilepageFilterFields() {
+        if (assetsMobilepageFilterFields == null) {
+            assetsMobilepageFilterFields = CustomConfigConstant.getAssetsMobilepageFilterFields();
+        }
+        return assetsMobilepageFilterFields;
+    }
+
+    public List<String> defaultAssetsMobilepageFilterFields() {
+        return CustomConfigConstant.defaultAssetsMobilepageFilterFields();
+    }
+
+    public void setAssetsMobilepageFilterFields(List<String> assetsMobilepageFilterFields) {
+        this.assetsMobilepageFilterFields = assetsMobilepageFilterFields;
+    }
+
     public List<String> getAssetsWebMaintainDetailFields() {
         return assetsWebMaintainDetailFields;
     }
@@ -249,9 +264,27 @@ public class CustomConfigObject {
         this.assetsMobilepageHeaderFields = assetsMobilepageHeaderFields;
     }
 
+    @JSONField(serialize = false)
+    public List<String> getAllAssetsMobilepageBuildAssetFields() {
+        List<String> allBuildAssetFields = CustomConfigConstant.getAllAssetsMobilepageBuildAssetFields();
+        allBuildAssetFields.removeAll(getAssetsMobilepageBuildAssetFields());
+        return allBuildAssetFields;
+    }
+
+    public List<String> getAssetsMobilepageBuildAssetFields() {
+        if (assetsMobilepageBuildAssetFields == null) {
+            assetsMobilepageBuildAssetFields = CustomConfigConstant.getAssetsMobilepageBuildAssetFields();
+        }
+        return assetsMobilepageBuildAssetFields;
+    }
+
+    public void setAssetsMobilepageBuildAssetFields(List<String> assetsMobilepageBuildAssetFields) {
+        this.assetsMobilepageBuildAssetFields = assetsMobilepageBuildAssetFields;
+    }
+
     public JSONObject getMobilePage() {
         if (mobilePage == null) {
-            mobilePage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+            mobilePage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
         return mobilePage;
     }
@@ -262,7 +295,7 @@ public class CustomConfigObject {
 
     public JSONObject getMobileMaintainPage() {
         if (mobileMaintainPage == null) {
-            mobileMaintainPage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+            mobileMaintainPage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
         return mobileMaintainPage;
     }

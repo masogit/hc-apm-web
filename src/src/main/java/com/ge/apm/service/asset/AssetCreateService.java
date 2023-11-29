@@ -272,6 +272,18 @@ public class AssetCreateService {
         }
         return false;
     }
+
+    public List<UserAccount> getAssetApprovalUser(String siteUid){
+        OrgInfo siteOrg = orgDao.getByUid(siteUid);
+        List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
+        List<CustomRole> customRoles = customeRoleDao.findCustomRolesBySiteUIdsAndFunction(siteUidList, ApmFunction.ASSET_AUDIT_APPROVE.name());
+        //List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        if (!CollectionUtils.isEmpty(customRoles)) {
+            List<UserAccount> userAccounts = userDao.findCustomRoleUser(customRoles.stream().map(CustomRole::getId).collect(Collectors.toList()));
+            return userAccounts;
+        }
+        return new ArrayList<>();
+    }
     
     public Boolean needShowAssetApprovalByUser(String userUid){
         UserAccount user = userDao.getByUid(userUid);

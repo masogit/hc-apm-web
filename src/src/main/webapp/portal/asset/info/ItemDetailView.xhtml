@@ -213,7 +213,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.riskGrade}</label>
-                            <p:inputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew',assetArrivedItemsController.selected.riskGrade) : fieldMsg.fieldValue('riskGrade',assetArrivedItemsController.selected.riskGrade)}"  readonly="true"/>
+                            <p:inputText value="#{fieldMsg.fieldValue('riskGrade',assetArrivedItemsController.selected.riskGrade)}"  readonly="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>

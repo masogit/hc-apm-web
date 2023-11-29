@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="budgetPurchaseTemplateEditDlg" widgetVar="budgetPurchaseTemplateEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="模板详情" height="370" width="650">
+        <h:form id="editForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{budgetPurchaseTemplateManageController.selected != null}">
+                <h:panelGroup>
+                    <label class="label">模板名称*</label>
+                    <p:inputText id="name" value="#{budgetPurchaseTemplateManageController.selected.name}" style="width: 350px;" required="true"  requiredMessage="模板名称不能为空"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <p:dataList id="uploadList" value="#{budgetPurchaseTemplateManageController.blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">附件</f:facet>
+                        <p:commandLink validateClient="false" value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandButton actionListener="#{budgetPurchaseTemplateManageController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{!(zkbPartOrderAuditController.returnFormFlag eq 'readOnly') and !(zkbPartOrderAuditController.returnFormFlag eq 'audit')}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:dataList>
+                    <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF|png|PNG|jpg|JPG|doc|docx|xls|xlsx|zip)$/" fileUploadListener="#{budgetPurchaseTemplateManageController.handleProveFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true"  sizeLimit="31000000"  update=":growl uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}" label="#{msg.Add}"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{budgetPurchaseTemplateManageController.saveData}" update=":growl" icon="ui-icon-check" />
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('budgetPurchaseTemplateEditDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>

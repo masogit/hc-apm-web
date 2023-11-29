@@ -26,6 +26,18 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
     //设备UID
     @Column(name = "asset_uid")
     private String assetUID;
@@ -157,6 +169,38 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getCertificateNo() {

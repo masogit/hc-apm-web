@@ -20,6 +20,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<String> getAccessScope(String userUID);
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getByLoginName(String loginName);
+    List<UserAccount> getByLoginNameIn(Collection<String> loginNames);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getById(int userId);
@@ -273,5 +274,12 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value = "WITH recursive t AS( ( SELECT * FROM org_info WHERE uid = ?1) UNION ALL ( SELECT org_info.* FROM org_info JOIN t ON t.parent_uid = org_info.uid ) ) SELECT ua.* FROM t LEFT JOIN user_org uo ON uo.org_uid = t.uid LEFT JOIN user_account ua ON uo.user_uid = ua.uid LEFT JOIN user_role ur ON ua.id = ur.user_id LEFT JOIN sys_role sr ON ur.role_id = sr.id WHERE uo.id IS NOT NULL AND sr.NAME =?2 group by ua.id ", nativeQuery = true)
     List<UserAccount> findUserByClinicalDeptUID(String clinicalDeptUID,String roleName);
+
+    @Query(value="select ua.* from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.org_uid = ?1 and ur.role_id = ?2",nativeQuery=true)
+    public List<UserAccount> findOrgUidByRoleId(String tenantUid ,int roleId);
+
+
+    @Query(value = "WITH recursive t AS( ( SELECT * FROM org_info WHERE uid = ?1) UNION ALL ( SELECT org_info.* FROM org_info JOIN t ON t.parent_uid = org_info.uid ) ) SELECT ua.* FROM t LEFT JOIN user_org uo ON uo.org_uid = t.uid LEFT JOIN user_account ua ON uo.user_uid = ua.uid  where ua.id is not null ", nativeQuery = true)
+    List<UserAccount> findByClinicalDeptUID(String clinicalDeptUID);
 
 }

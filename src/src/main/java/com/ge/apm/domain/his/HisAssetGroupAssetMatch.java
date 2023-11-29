@@ -6,6 +6,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * 设备分组科室匹配
+ */
 @Entity
 @Table(name = "his_asset_group_asset_match")
 @Data
@@ -37,6 +40,10 @@ public class HisAssetGroupAssetMatch implements Serializable {
 
     @Column(name = "is_sub_equipment") //是否子设备
     private Boolean isSubEquipment;
+
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
 
 //    @Column(name = "group_rate") //占比
     @Transient

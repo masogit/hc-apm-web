@@ -76,6 +76,8 @@ public class UserAccountImportService {
     boolean isInsulate = false;
     boolean isCreate = true;
     UserAccount currentUser;
+    private List<OrgInfo> affiliatedDepartments;
+    private List<String> affiliatedDepartmentsUid;
 
     @Autowired
     UserAccountMapper userAccountMapper;
@@ -374,7 +376,7 @@ public class UserAccountImportService {
         }
         newUser.setOrgInfoUID(orgInfoTemp.getUid());
         newUser.setOrgInfoId(orgInfoTemp.getId());
-
+        checkDepartment(newUser);
     }
 
     private boolean hasControllerOrgInfo(OrgInfo tempOrgInfo, String userOrgInfoUid) {
@@ -453,7 +455,15 @@ public class UserAccountImportService {
         newUser.setOrgType(orgInfoTemp.getOrgType());
         return true;
     }
-
+    private void checkDepartment(UserAccount newUser){
+        boolean flag;
+        if(ObjectUtil.isNotEmpty(newUser)){
+            flag=affiliatedDepartmentsUid.stream().anyMatch(item->item.equals(newUser.getOrgInfoUID()));
+           if(!flag){
+               newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR, "科室错误;");
+           }
+         }
+    }
     private boolean getDepartmentID(UserAccount newUser, String department, boolean isInsulate) {
         OrgInfo temp = getOrgInfoByDepartmentKey(department, orgInfoTemp.getUid());
         if (temp == null) {
@@ -847,6 +857,8 @@ public class UserAccountImportService {
         initParam();
         getRoleNameMap();
         currentUser = user;
+        affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(currentUser.getOrgInfoUID()));
+        affiliatedDepartmentsUid=affiliatedDepartments.stream().map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
         if (tenantInfo != null && tenantInfo.getInsulate() != null) {
             isInsulate = tenantInfo.getInsulate();
@@ -957,7 +969,7 @@ public class UserAccountImportService {
                 String strLocked = ExcelParser.getCellStringValue(row, isLockedIndex);
                 isLocked = !StringUtils.isNotEmpty(strLocked) || !"否".equals(strLocked);
                 String strDisable = ExcelParser.getCellStringValue(row, isDisableIndex);
-                isDisable = !StringUtils.isNotEmpty(strDisable) || !"否".equals(strDisable);
+                isDisable = StringUtils.isNotEmpty(strDisable) && "是".equals(strDisable);
                 roleName = ExcelParser.getCellStringValue(row, roleNameIndex);
                 accessScope = ExcelParser.getCellStringValue(row, accessScopeIndex);
 
@@ -1043,9 +1055,9 @@ public class UserAccountImportService {
                 if (StringUtils.isEmpty(roleName)) {
                     newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE, "角色不能为空;");
                 }
-                if(StringUtils.isEmpty(assetClassification)){
-                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"资产分类不能为空;");
-                }
+//                if(StringUtils.isEmpty(assetClassification)){
+//                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"资产分类不能为空;");
+//                }
 
                 if (!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo,assetClassification)) {
                     importFailedDataList.add(newUser);

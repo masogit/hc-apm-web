@@ -55,7 +55,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     SharedAssetReqDetailRepository sharedAssetReqDetailRepository = null;
     private String operation;
     private String createDateFormatTime = null;
-
+    private ConfigItemValueRepository configItemValueRepository;
     private String filterUnitPrice;
     private Double filterUnitPriceFrom;
     private Double filterUnitPriceTo;
@@ -63,6 +63,8 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     private List<V2_BlobObject> attachements;
     //如果无图片 就显示请上传图片
     private boolean uploadFlag;
+    //是否启用无人值守 true：启动
+    private Boolean whethertoenableunattended;
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
@@ -72,6 +74,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         sharedAssetReqDetailRepository = WebUtil.getBean(SharedAssetReqDetailRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -413,37 +416,35 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     }
 
     public boolean  isWhetherToEnableUnattendedAndType(){
-        WorkflowConfig workflowConfig = getWorkflowConfig();
-        if(workflowConfig == null){
-            return false;
-        }
         String chargingType = selected.getChargingType();
-        if(workflowConfig.getWhethertoenableunattended() &&  !("1".equals(chargingType) || "3".equals(chargingType))){
+        if(isWhetherToEnableUnattended() &&  !("1".equals(chargingType) || "3".equals(chargingType))){
             return true;
         }
-
         return false;
     }
-    public boolean isWhetherToEnableUnattended(){
-        WorkflowConfig workflowConfig = getWorkflowConfig();
-        if(workflowConfig == null){
-            return false;
+
+    public Boolean  isWhetherToEnableUnattended(){
+        if(whethertoenableunattended == null){
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            OrgInfo selectSite = userContextService.getSelectSite();
+            List<WorkflowConfig> bySiteUID=null;
+            if(selectSite != null){
+                whethertoenableunattended=checkWhethertoenableunattended(selectSite.getSiteUID(),selectSite.getHospitalUID(),selectSite.getInstitutionUID(),selectSite.getTenantUID());
+            }else{
+                UserAccount loginUser = userContextService.getLoginUser();
+                whethertoenableunattended=checkWhethertoenableunattended(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID());
+
+            }
         }
-       return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+
+        return whethertoenableunattended;
     }
-    private WorkflowConfig  getWorkflowConfig(){
-        WorkflowConfig workflowConfig=null;
-        WorkflowConfigRepository workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        OrgInfo selectSite = userContextService.getSelectSite();
-        List<WorkflowConfig> bySiteUID=null;
-        if(selectSite != null){
-            bySiteUID = workflowConfigRepository.findBySiteUID(selectSite.getUid());
-        }else{
-            UserAccount loginUser = userContextService.getLoginUser();
-            bySiteUID = workflowConfigRepository.findBySiteUID(loginUser.getSiteUID());
-        }
-            workflowConfig=CollectionUtils.isNotEmpty(bySiteUID)?bySiteUID.get(0):null;
-        return workflowConfig;
+    private boolean checkWhethertoenableunattended(String siteUid,String hospitalUID,String InstitutionUID,String tenantUID){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(siteUid,
+                hospitalUID,
+                InstitutionUID,
+                tenantUID, key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 }

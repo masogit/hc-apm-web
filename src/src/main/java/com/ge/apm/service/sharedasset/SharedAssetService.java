@@ -6,22 +6,20 @@
 package com.ge.apm.service.sharedasset;
 
 import com.alibaba.fastjson.JSON;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.PmOrderActionForm;
-import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author 212579464
@@ -38,8 +36,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("pushWxMsg request: " + JSON.toJSONString(requestEntity));
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
+        runAsync(url, HttpMethod.POST,requestEntity);
     }
 
     public void remoteAcceptRent(String requestId) {
@@ -49,8 +46,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("Remote confirm rent request: " + JSON.toJSONString(requestEntity));
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        logger.info("Remote confirm rent " + (isOkay(response) ? "successfully." : "failed."));
+        runAsync(url,HttpMethod.POST,requestEntity);
     }
 
     public ResponseEntity<LinkedHashMap> getAssigneeList(String requestId) {
@@ -73,8 +69,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
-        logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
+        runAsync(url,HttpMethod.PUT,requestEntity);
     }
 
     @Deprecated
@@ -117,20 +112,6 @@ public class SharedAssetService extends MicroServiceInvoker {
         return responseEntity;
     }
 
-    public String getVoucherNum() {
-        String url = getGatewayURL(GatewayURL.GET_VOUCHER_NUM);
-        String token = UserContextService.getAccessToken();
-        HttpHeaders header = createHttpHeaders(token);
-        HttpEntity<Map> requestEntity = new HttpEntity<>(header);
-        ResponseEntity<LinkedHashMap> responseEntity = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
-        logger.info("Create request " + (isOkay(responseEntity) ? "successfully." : "failed."));
-        logger.info("Response: {}" ,JSON.toJSONString(responseEntity));
-        LinkedHashMap<String, String> body = responseEntity.getBody();
-        String voucherNum = body.get("data");
-        logger.info("voucherNum: {}", voucherNum);
-        return voucherNum;
-    }
-
     public ResponseEntity<LinkedHashMap> rejectApply(GatewayURL gatewayUrl,Map<String, Object> requestData) {
         logger.info("rejectApply data : {} ", JSON.toJSONString(requestData));
         String url = getGatewayURL(gatewayUrl);
@@ -142,6 +123,14 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Response: {}" ,JSON.toJSONString(responseEntity));
         return responseEntity;
     }
+
+    private void runAsync(String url,HttpMethod method, HttpEntity<String> requestEntity) {
+        CompletableFuture.runAsync(()->{
+            ResponseEntity<LinkedHashMap> response = template.exchange(url,method, requestEntity, LinkedHashMap.class);
+            logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
+        });
+    }
+
 }
 
 

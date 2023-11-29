@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetDto;
 import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
@@ -22,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -33,11 +36,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.RestTemplate;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.service.DbMessageSource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.ge.healthcare.cn.common.cons.ApmFunction.*;
@@ -132,6 +140,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private StockRecordRepository stockRecordRepository;
+
+	@Autowired
+	private AssetInfoMapper assetInfoMapper;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -655,7 +666,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					assetHistory.setClinicalDeptUid(assetInfo.getClinicalDeptUID());
 
 					assetInfo.setHospital(null);
-					assetInfo.setQrCodeLib(null);
+//					assetInfo.setQrCodeLib(null);
 					assetInfo.setAssetTags(null);
 					assetInfo.setBrand(null);
 					assetInfo.setTags(null);
@@ -679,14 +690,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 	}
 	public void batchSynchronizationConfig() {
-		saveDefaultValue("autoAck",4,"false",3,"工单完工不需要验收","工单完工不需要验收");
-		saveDefaultValue("autoAckDays",4,"3",2,"系统自动验收(天)","系统自动验收(天)");
-		saveDefaultValue("autoClose",4,"false",3,"工单完工自动关单","工单完工自动关单");
-		saveDefaultValue("closeWithoutParts",4,"false",3,"无备件自动关单","无备件自动关单");
-		saveLevelValue("autoAck","autoAck");
-		saveLevelValue("autoAckDays","autoAckDays");
-		saveLevelValue("autoClose","autoClose");
-		saveLevelValue("closeWithoutParts","closeWithoutParts");
+//		saveDefaultValue("assetInstallApprove",3,"false",3,"安装入库完成是否审批","安装入库完成是否审批");
+		saveLevelValue("whetherToEnableUnattended","whethertoenableunattended");
+		saveLevelValue("appointmentStatusLockedTime","appointmentstatuslockedtime");
 	}
 
 	public void analyseMenus() {
@@ -1061,5 +1067,59 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 			}
 		}
+	}
+
+
+    public void batchUpdateI18nMsgType() {
+		String msgType="riskGradeNew";
+		List<SearchFilter> searchFilters=new ArrayList<>();
+		searchFilters.add(new SearchFilter("useNewRiskGrade", SearchFilter.Operator.EQ,Boolean.TRUE));
+		List<WorkflowConfig> bySearchFilter = workflowConfigRepository.findBySearchFilter(searchFilters);
+		List<I18nMessage> i18nByType = i18nRepository.findI18nByType(msgType);
+		if(CollectionUtils.isEmpty(bySearchFilter) || CollectionUtils.isEmpty(i18nByType)) return ;
+		List<I18nMessage> collect = bySearchFilter.stream().filter(item-> item.getSiteId() != 70).filter(distinctByKey(item->item.getSiteId())).map(item -> {
+			return i18nByType.stream().map(i18n -> {
+				I18nMessage i18nMessage = new I18nMessage();
+				BeanUtils.copyProperties(i18n, i18nMessage);
+				i18nMessage.setId(item.getSiteId());
+				i18nMessage.setMsgKey("riskGrade");
+				return i18nMessage;
+			}).collect(Collectors.toList());
+		}).flatMap(item -> item.stream()).collect(Collectors.toList());
+		i18nRepository.save(collect);
+		DbMessageSource.reLoadMessages();
+	}
+
+
+	private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+		Set<Object> seen = ConcurrentHashMap.newKeySet();
+		return t -> seen.add(keyExtractor.apply(t));
+	}
+
+	public void batchUpdateAssetInfo() {
+		try {
+			Long count=assetInfoRepository.findByCreatedByIsLoginNameSize();
+			logger.info("query batchUpdateAssetInfo count:{}",count);
+			long startTimeUpdate = System.currentTimeMillis();
+//		int size=assetInfoRepository.batchUpdateAssetInfoCreatedBy();
+			int size=0;
+			while (true){
+				List<AssetDto> assetInfos=assetInfoMapper.findByCreatedByIsLoginName();
+				if(CollectionUtils.isEmpty(assetInfos)){
+					break;
+				}
+				for (AssetDto assetInfo : assetInfos) {
+					assetInfoRepository.updateCreatedBy(assetInfo.getId(),assetInfo.getUserName());
+				}
+				size=size+assetInfos.size();
+				Thread.sleep(10000);
+			}
+			long endTimeUpdate = System.currentTimeMillis();
+			logger.info("update  batchUpdateAssetInfo size:{},耗时:{}",size,startTimeUpdate-endTimeUpdate);
+		}catch (Exception e){
+			logger.error("update  batchUpdateAssetInfo error :",e);
+		}
+
+
 	}
 }

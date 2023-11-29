@@ -17,6 +17,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
@@ -41,7 +42,9 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -70,6 +73,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private ConfigItemRepository configItemRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -152,6 +157,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     @Setter
     private String assetTypeGroup;
 
+    private WxMessageService wxMessageService;
+
+
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
         return arrivalListDao;
@@ -191,6 +199,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupTreeComponentController.registerController(this);
         assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded() + "#" + arrivalListItem.getArrivalList().getTenantUID());
+        configItemRepository = WebUtil.getBean(ConfigItemRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        wxMessageService = WebUtil.getBean(WxMessageService.class);
 
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
@@ -386,8 +397,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
-
-        if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
+        //configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())
+        if (isApproved()) {
             //待审核
             arrivalListItem.setUsageStatus(2);
         } else {
@@ -410,7 +421,10 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
         }
         String arrivalListId = arrivalListItem.getArrivalListId();
-
+        if(isApproved()){
+            String token = UserContextService.getAccessToken();
+            extracted(token, arrivalListItem);
+        }
         if(arrivalListId != null ){
             //获取到arrival_list实体类对象
             ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
@@ -574,7 +588,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 arrivalListItem.setFactoryWarrantyDate(calender.getTime());
             }
 
-            if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
+            if (isApproved()) {
                 //待审核
                 arrivalListItem.setUsageStatus(2);
             } else {
@@ -592,8 +606,23 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
 
         finishInstallHandle(itemList);
+        if(isApproved()){
+            String token = UserContextService.getAccessToken();
+            for (ArrivalListItem listItem : itemList) {
+                extracted(token, listItem);
+            }
+        }
         return returnAction();
     }
+
+    private void extracted(String token, ArrivalListItem listItem) {
+        AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setSiteUID(listItem.getArrivalList().getSiteUID());
+        assetInfo.setCreatedDate(new Date());
+        assetInfo.setClinicalDeptUID(listItem.getClinicalDeptUID());
+        wxMessageService.submitAssetApprovalSendMessage(assetInfo, token);
+    }
+
     public void finishInstallHandle(List<ArrivalListItem> itemList) {
         StringBuilder message = new StringBuilder();
         for(ArrivalListItem arrivalListItem : itemList){
@@ -626,6 +655,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     public List<V2_BlobObject> getAttachList(String type) {
         return attachList == null ? null : attachList.stream().filter(item -> type.equals(item.getBoSubType()))
                 .collect(Collectors.toList());
+    }
+
+    public void reName(String blobId, String name) {
+
+        attachList.forEach(v -> {
+            if (v.getId().equals(blobId)) {
+                v.setObjectName(name);
+                blobService.saveBlobObject(v);
+            }
+        });
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
@@ -1090,5 +1129,50 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             }
         }
         return false;
+    }
+    private boolean  isApproved(){
+        /**
+         * --  YHAAO-19736  远东宏信-完成安装验收后，进入资产审核流程
+         * insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '安装入库完成是否审批', 'AssetCreationApprover', '安装入库完成是否审批', 'f', 't', 3 where not exists (select * from config_item where key = 'AssetCreationApprover');
+          */
+        // TODO
+        boolean flag=false;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo tenantInfo = userContextService.getTenantInfo();
+        String featureList = tenantInfo.getFeatureList();
+        if (StringUtils.isNotBlank(featureList)) {
+             flag=featureList.contains("ASSET_APPROVE");
+             if(flag){
+                flag=getConfigItemAssetCreationApprover(userContextService.getLoginUser());
+             }
+        }
+        return flag;
+    }
+    private boolean getConfigItemAssetCreationApprover(UserAccount loginUser ){
+        Boolean flag=null;
+        String key="assetInstallApprove";
+        ConfigItem byDefaultValueForKey = configItemRepository.findByDefaultValueForKey(key);
+        if(byDefaultValueForKey == null ) return Boolean.FALSE;
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ,key));
+        String siteUID = loginUser.getSiteUID();
+        String hospitalUID = loginUser.getHospitalUID();
+        String institutionUID = loginUser.getInstitutionUID();
+        String tenantUID = loginUser.getTenantUID();
+        List<String> value = Arrays.asList(siteUID, hospitalUID, institutionUID, tenantUID);
+        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, value));
+        List<ConfigItemValue> configItemValues = configItemValueRepository.findBySearchFilter(searchFilters);
+        if(!CollectionUtils.isEmpty(configItemValues)){
+            Map<String, Boolean> collect = configItemValues.stream().collect(Collectors.toMap(ConfigItemValue::getSiteUid, item ->Boolean.valueOf(item.getValue())));
+            if((flag=collect.get(siteUID)) == null
+                    && (flag=collect.get(hospitalUID)) == null
+                    && (flag=collect.get(institutionUID)) == null
+                    && (flag=collect.get(tenantUID)) == null){
+                flag = Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
+            }
+        }else{
+            flag=Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
+        }
+        return flag;
     }
 }

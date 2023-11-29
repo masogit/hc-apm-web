@@ -48,7 +48,13 @@ public class QrcodeConfigConstant {
             FieldsMap.put("qrCode", WebUtil.getMessage("QRCode"));           //启用日期  AssetInfo.installDate
             FieldsMap.put("locationName", WebUtil.getMessage("locationName"));
             FieldsMap.put("riskGrade", WebUtil.getMessage("riskGrade"));    //风险等级  AssetInfo.riskGrade
-            FieldsMap.put("purchaseDate", WebUtil.getMessage("purchaseDate"));    //采购日期  AssetInfo.purchaseDate
+            FieldsMap.put("purchaseDate", WebUtil.getMessage("purchaseDate"));    //采购日期 AssetInfo.manufacture
+            FieldsMap.put("manufactDate", WebUtil.getMessage("manufactDate"));    //出长日期  AssetInfo.manufactDate
+            FieldsMap.put("manufacture", WebUtil.getMessage("manufacture"));    //制造商   AssetInfo.manufactDate
+            FieldsMap.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification"));    //医疗器械分类 AssetInfo.medicalApparatusClassification
+            FieldsMap.put("emergencyEquipment", WebUtil.getMessage("EmergencyEquipment"));    //是否急救设备 AssetInfo.EmergencyEquipment
+            FieldsMap.put("measureGrade", WebUtil.getMessage("measureGrade"));    //计量等级 AssetInfo.measureGrade
+            FieldsMap.put("measuringItemCategory", WebUtil.getMessage("measuringItemCategory"));    //出厂日期  AssetInfo.measuringItemCategory
         }
         return FieldsMap;
     }

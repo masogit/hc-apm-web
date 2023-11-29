@@ -331,9 +331,9 @@
   <!-- session timeout (in minutes) -->
   <session-config>
     <session-timeout>30</session-timeout>
-      <cookie-config>
-          <secure>true</secure>
-      </cookie-config>
+    <cookie-config>
+      <secure>true</secure>
+    </cookie-config>
   </session-config>
 
   <error-page>

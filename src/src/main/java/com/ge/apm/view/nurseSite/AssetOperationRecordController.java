@@ -9,6 +9,8 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.joda.time.DateTime;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
@@ -70,6 +72,9 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
 
     @Override
     protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())){
+            return ListUtil.empty();
+        }
         if (this.searchFilters == null) {
             this.searchFilters = new HashSet<>();
         }
@@ -85,17 +90,9 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
         }
         boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
-//        if (returnFlag == assetFlag) {
-//            pageRequest = new Pagination(1, pageRequest.getSize());
-//            if (assetFlag) {
-//                pageRequest = assetPageRequest;
-//            }
-//        } else {
-//            if (assetFlag) {
-//                assetPageRequest = pageRequest;
-//            }
-//        }
-//        returnFlag = !assetFlag;
+        if (currentUser.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+        }
         this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
         return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
     }

@@ -50,6 +50,12 @@
                         <p:column headerText="#{msg.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
+                        <p:column headerText="#{msg.functionType}" filterBy="#{item.modelNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.modelNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.issueDate}" sortBy="#{item.issueDate}" >
                             <h:outputText value="#{item.issueDate}">
                                 <f:convertDateTime pattern="yyyy/MM/dd" />

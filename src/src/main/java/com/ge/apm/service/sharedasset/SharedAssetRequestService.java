@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SharedAssetRequestService {
@@ -44,7 +45,8 @@ public class SharedAssetRequestService {
         sharedAssetRequestRepository.save(selected);
         assetInfoRepository.save(selected.getInfoList());
         sendMq(selected.getInfoList());
-        sharedAssetReqTypeRepository.save(selected.getSartList());        String voucherNum = sharedAssetService.getVoucherNum();
+        sharedAssetReqTypeRepository.save(selected.getSartList());
+        String voucherNum = getVoucherNum();
         for (SharedAssetReqDetail sard : selected.getSardList()) {
             logger.info("voucherNum :" + voucherNum + ", for sard:" + sard.getId());
             sard.setVoucherNum(voucherNum);
@@ -53,7 +55,12 @@ public class SharedAssetRequestService {
         asdDao.save(selected.getSardList());
 
     }
-
+    public String getVoucherNum(){
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        String latestSeqInNumber =
+                Optional.of(currentUserAccount.getTenantUID()).map(asdDao::findLatestVoucherNum).orElse("0");
+        return String.format("%06d", Integer.parseInt(latestSeqInNumber) + 1);
+    }
     public void sendMq(List<AssetInfo> assetInfos) {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         MqContext mqContext=new MqContext();

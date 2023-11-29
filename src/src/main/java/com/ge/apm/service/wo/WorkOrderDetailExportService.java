@@ -8,6 +8,7 @@ import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.domain.pure.WorkOrderDetailPojo;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -122,12 +123,13 @@ public class WorkOrderDetailExportService {
             workOrderDetailMap.put(WebUtil.getMessage("Vendor"), workOrderDetailPojo.getSupplierName());
             workOrderDetailMap.put(WebUtil.getMessage("PartName_xlsx2"), workOrderDetailPojo.getPartsName());
             workOrderDetailMap.put(WebUtil.getMessage("Quantity"), workOrderDetailPojo.getPartsQuantity());
-            workOrderDetailMap.put(WebUtil.getMessage("ClosedPrice_xlsx"), workOrderDetailPojo.getClosedPrice()); 
+            workOrderDetailMap.put(WebUtil.getMessage("ClosedPrice_xlsx"), workOrderDetailPojo.getClosedPrice());
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceNumber_xlsx"), workOrderDetailPojo.getInvoiceNum());
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceTime_xlsx"), formatDate(workOrderDetailPojo.getInvoiceTime()));
             workOrderDetailMap.put(WebUtil.getMessage("approveUserId"), workOrderDetailPojo.getApproverName());
             workOrderDetailMap.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetailPojo.getContractNum());
             workOrderDetailMap.put(WebUtil.getMessage("Remark"), workOrderDetailPojo.getComment());
+            workOrderDetailMap.put(WebUtil.getMessage("PartType"), workOrderDetailPojo.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetailPojo.getPartsType()) : "");
             if(workOrderDetailPojo.getStatementStatus() != null){
                 workOrderDetailMap.put(WebUtil.getMessage("CloseStatus_xlsx"), workOrderDetailPojo.getStatementStatus() == Boolean.TRUE ? WebUtil.getMessage("ClosedFinish") : WebUtil.getMessage("Opened"));
             }else{

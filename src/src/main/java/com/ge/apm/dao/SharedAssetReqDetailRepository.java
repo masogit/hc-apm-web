@@ -55,4 +55,7 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
 
     @Query(value = "select * from shared_asset_req_detail where asset_info_id=?1 order by create_date desc LIMIT 1",nativeQuery = true)
     public SharedAssetReqDetail findByAssetInfoSharedAssetReqDetail( String assetInfoId);
+
+    @Query(nativeQuery = true, value = "select max(voucher_num) from shared_asset_req_detail where tenant_uid = ?1 and char_length(voucher_num) = 6 ")
+    String findLatestVoucherNum(String tenantUID);
 }

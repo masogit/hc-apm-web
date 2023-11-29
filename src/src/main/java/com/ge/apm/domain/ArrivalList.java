@@ -231,6 +231,19 @@ public class ArrivalList implements Serializable {
     @Column(name = "is_edit")
     private Boolean isEdit;
 
+
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备所属科室
+
+    @Size(max = 64)
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//所属科室
+
+    @Column(name = "enable_generate_qrcode")
+    private Boolean enableGenerateQrcode;
+
+
+
     public String getId() {
         return id;
     }
@@ -625,5 +638,30 @@ public class ArrivalList implements Serializable {
             return false;
         }
         return true;
+    }
+
+
+    public String getClinicalDeptUID() {
+        return clinicalDeptUID;
+    }
+
+    public void setClinicalDeptUID(String clinicalDeptUID) {
+        this.clinicalDeptUID = clinicalDeptUID;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public Boolean getEnableGenerateQrcode() {
+        return enableGenerateQrcode;
+    }
+
+    public void setEnableGenerateQrcode(Boolean enableGenerateQrcode) {
+        this.enableGenerateQrcode = enableGenerateQrcode;
     }
 }

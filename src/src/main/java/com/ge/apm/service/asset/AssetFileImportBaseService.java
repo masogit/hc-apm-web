@@ -874,13 +874,20 @@ public class AssetFileImportBaseService {
                 }
             }
             // 资产分类校验
-            if(StringUtils.hasLength(newAsset.getAssetType())){
-                AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupMap.get(newAsset.getAssetType());
-                if (selectedAssetTypeGroup == null) {
+            if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+                if (ObjectUtil.isEmpty(newAsset.getAssetType())) {
                     item.put("status", ImportStatus.CheckFail);
                     result.put("canBeImport",Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetTypeGroup") + "编码不存在");
+                    AssetRow.addErrMessage(item, "错误: 资产分类编码为空！");
                     continue;
+                } else {
+                    AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupMap.get(newAsset.getAssetType());
+                    if (selectedAssetTypeGroup == null) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.put("canBeImport",Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetTypeGroup") + "编码不存在");
+                        continue;
+                    }
                 }
             }
             // 县域租户添加设备性质字段，且必填

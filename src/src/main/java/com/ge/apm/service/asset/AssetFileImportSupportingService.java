@@ -326,9 +326,9 @@ public class AssetFileImportSupportingService {
             asset.setIsValid(true);
             asset.setIsDeleted(Boolean.FALSE);
 
-            asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             asset.setCreatedDate(now);
-            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             asset.setLastModifiedDate(now);
 
             if (asset.getDeviceStatus() == null) {
@@ -344,7 +344,7 @@ public class AssetFileImportSupportingService {
 
         } else {
             //update
-            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             asset.setLastModifiedDate(now);
 
             cleanRelatedFieldsWhenUpdating(asset);

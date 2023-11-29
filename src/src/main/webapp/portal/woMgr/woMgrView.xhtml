@@ -254,6 +254,10 @@
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>
                                 </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">外部报价</label>
+                                    <p:outputLabel value="#{woItem.externalQuotation}"/>
+                                </h:panelGroup>
                                 <c:if test="#{userContextService.countyArea}">
                                     <h:panelGroup>
                                         <label class="label">#{msg.siebleNumber}</label>
@@ -384,10 +388,68 @@
 
                                         <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogViewDlg)" oncomplete="PF('moreAccDialogViewDlg').show()"/>
                                     </p:column>
-
+                                </p:dataTable>
+                                <!--添加审核流程表格-->
+                                <p:dataTable class="cl3" value="#{workOrderMgrController.getApproveList()}" var="approveItem" rendered="#{not empty workOrderMgrController.approveList and userContextService.hasAnyRoleByApmRoles('AssetStaff') and (workOrderMgrController.queryIndex == 4 or workOrderMgrController.queryIndex == 5 or workOrderMgrController.queryIndex == 6 or workOrderMgrController.queryIndex == 7 or workOrderMgrController.queryIndex == 8)}">
+                                    <p:column headerText="审批单号">
+                                        <h:outputText value="#{approveItem.approvalNumber}"/>
+                                    </p:column>
+                                    <p:column headerText="业务单号">
+                                        <h:outputText value="#{approveItem.businessNumber}"/>
+                                    </p:column>
+                                    <p:column headerText="业务类型" >
+                                        <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(approveItem)}"/>
+                                    </p:column>
+                                    <p:column headerText="审批人">
+                                        <h:outputText value="#{approveItem.actualApproverName}"/>
+                                    </p:column>
+                                    <p:column headerText="审批级别">
+                                        <h:outputText value="#{approveItem.approvalLevel}级审批人"/>
+                                    </p:column>
+                                    <p:column headerText="审批意见">
+                                        <h:outputText value="#{approveItem.approvalOpinion}"/>
+                                    </p:column>
+                                    <p:column headerText="审批状态">
+                                        <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalStatus(approveItem.approvalStatus)}"/>
+                                    </p:column>
+                                    <p:column headerText="审批节点状态">
+                                        <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalNodeStatus(approveItem.approvalNodeStatus)}"/>
+                                    </p:column>
+                                    <p:column headerText="审批时间"  >
+                                        <h:outputText value="#{approveItem.actualApproverDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{workOrderMgrController.maintenancePersonInformation != null}">
+                                <label class="label">维修人信息</label>
+                                <p:dataTable styleClass="header1" id="qrCodeEditForm" var="person" value="#{workOrderMgrController.maintenancePersonInformation}" editable="true" rowKey="#{person.fieldName}">
+                                    <p:ajax event="rowEdit" listener="#{workOrderMgrController.onRowEditExternalTempUser}" update="woTab:woMgrDetailForm:qrCodeEditForm" />
+                                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancelExternalTempUser}" update="woTab:woMgrDetailForm:qrCodeEditForm" />
+                                    <p:column  >
+                                        <h:outputText value="#{person.key}" />
+                                    </p:column>
+                                    <p:column  >
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{person.label}" /></f:facet>
+                                            <f:facet name="input"><p:inputText id="label" value="#{person.label}" style="width:100%"/></f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+                                    <p:column >
+                                        <p:rowEditor editTitle="#{msg.Edit}" />
+                                    </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
 
+                            <h:panelGroup rendered="#{not empty workOrderMgrController.externalTempUser and not empty workOrderMgrController.externalTempUser.signature}">
+                                <label class="label">签名图片</label>
+                                <p:panel  style="text-align:center">
+                                    <h:panelGrid columns="1" style="width:100%" >
+                                        <p:graphicImage value="#{fileDownloadService.getFile(workOrderMgrController.externalTempUser.signature)}" stream="false" height="80"  width="100"/>
+                                    </h:panelGrid>
+                                </p:panel>
+                            </h:panelGroup>
                             <c:choose>
                                 <c:when test="#{userContextService.isCountyArea()}">
                                     <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHours(woItem.id)}">
@@ -488,5 +550,10 @@
             </h:form>
 
         </div>
+        <style type="text/css">
+            .header1  thead{
+                display: none!important;
+            }
+        </style>
     </ui:composition>
 </html>

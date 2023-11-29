@@ -3,63 +3,53 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <!--#{relRuleAssetManagerController.CRUDActionName} #{msg.RelRuleAsset}-->
-        <p:dialog id="RelRuleAssetEditDlg" widgetVar="RelRuleAssetEditDialog" height="180" width="1000" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TwoOrThreeDelRecordDel}">
+        <p:dialog id="RelRuleAssetEditDlg" widgetVar="RelRuleAssetEditDialog" height="500" width="1000" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.MultipleRulesRecordDel}">
             <h:form id="RelRuleAssetEditForm">
                 <h:panelGroup id="display">
-                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{relRuleAssetManagerController.selected != null}">
-                        <h:panelGroup >
-                            <label class ="label">#{msg.name}</label>
-                            <p:inputText id="name" value="#{relRuleAssetManagerController.getAssetName(relRuleAssetManagerController.selected.assetUID)}" readonly="true" />
-                        </h:panelGroup>
+                    <p:dataTable id="datalist" var="item" value="#{relRuleAssetManagerController.currentEditAssets}">
+                        <p:column headerText="#{msg.name}">
+                            <h:outputText value="#{item.assetInfo.name}" />
+                        </p:column>
 
+                        <p:column headerText="#{msg.departNum}">
+                            <h:outputText value="#{item.assetInfo.departNum}" />
+                        </p:column>
 
-                        <h:panelGroup >
-                            <label class ="label">#{msg.departNum}</label>
-                            <p:inputText id="departNum" readonly="true" value="#{relRuleAssetManagerController.getDepartNum(relRuleAssetManagerController.selected.assetUID)}"/>
-                        </h:panelGroup>
-                        <!--<h:panelGroup >
-                            <label class ="label">#{msg.assetGroup}</label>
-                            <p:inputText id="assetGroup" readonly="true" value="#{relRuleAssetManagerController.getAssetGroup(relRuleAssetManagerController.selected.assetUID)}"/>
-                        </h:panelGroup>-->
-                        <h:panelGroup >
-                            <label class ="label">#{msg.clinicalDeptName}</label>
-                            <p:inputText id="clinicalDeptName" readonly="true" value="#{relRuleAssetManagerController.getClinicalDeptName(relRuleAssetManagerController.selected.assetUID)}" />
-                        </h:panelGroup>
-                        <!--<h:panelGroup >
-                            <label class ="label">#{msg.nationalStandardCode}</label>
-                            <p:inputText id="nationalStandardCode" readonly="true" value="#{relRuleAssetManagerController.getNationalStandardCode(relRuleAssetManagerController.selected.assetUID)}" />
-                        </h:panelGroup>
-                        <h:panelGroup >
-                            <label class ="label">#{msg.makerShortName}</label>
-                            <p:inputText id="makerShortName" readonly="true" value="#{relRuleAssetManagerController.getBrand(relRuleAssetManagerController.selected.assetUID)}" />
-                        </h:panelGroup>-->
-                        <h:panelGroup >
-                            <label class ="label">#{msg.manufacture}</label>
-                            <p:inputText id="manufacture" readonly="true" value="#{relRuleAssetManagerController.getManufacture(relRuleAssetManagerController.selected.assetUID)}" />
-                        </h:panelGroup>
-                        <!--<h:panelGroup >
-                            <label class ="label">#{msg.QRCode}</label>
-                            <p:inputText id="QRCode" readonly="true" value="#{relRuleAssetManagerController.getQrCode(relRuleAssetManagerController.selected.assetUID)}" />
-                        </h:panelGroup>-->
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.manufacture}">
+                            <h:outputText value="#{item.assetInfo.manufacture}" />
+                        </p:column>
+                    </p:dataTable>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{relRuleAssetManagerController.currentEditAssets != null}">
                         <h:panelGroup >
                             <label class ="label">#{msg.Level2RulePM}</label>
-                            <p:inputText id="rule2" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.selected.ruleUID2)}" readonly="true" />
-                            <p:commandButton class="btn btn-sm btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID2 != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule2()}" update="display"/>
+                            <p:inputText id="rule2" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.deleteRuleMap.get('rule2'))}" readonly="true" />
+                            <p:commandButton class="btn btn-sm btn-gray" rendered="#{relRuleAssetManagerController.deleteRuleMap.get('rule2')!= null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.updateDeleteRule(2)}" update="display"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.Level3RulePM}</label>
-                            <p:inputText id="rule3" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.selected.ruleUID)}" readonly="true"/>
-                            <p:commandButton class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule3()}" update="display"/>
+                            <p:inputText id="rule3" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.deleteRuleMap.get('rule'))}" readonly="true"/>
+                            <p:commandButton class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.deleteRuleMap.get('rule') != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.updateDeleteRule(3)}" update="display"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.Level1RulePM}</label>
+                            <p:inputText id="rule1" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.deleteRuleMap.get('rule1'))}" readonly="true"/>
+                            <p:commandButton class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.deleteRuleMap.get('rule1') != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.updateDeleteRule(1)}" update="display"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.Level4RulePM}</label>
+                            <p:inputText id="rule4" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.deleteRuleMap.get('rule4'))}" readonly="true"/>
+                            <p:commandButton class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.deleteRuleMap.get('rule4') != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.updateDeleteRule(4)}" update="display"/>
                         </h:panelGroup>
                     </p:panelGrid>
 
                     <p:commandButton validateClient="true" actionListener="#{relRuleAssetManagerController.deleteRule()}" value="#{msg.Confirm}" update="display,:RelRuleAssetEditDlg, :RelRuleAssetListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RelRuleAssetEditDialog');"/>
-                    &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('RelRuleAssetEditDialog').hide()" update = ":RelRuleAssetListForm:datalist"/>
                 </h:panelGroup>
             </h:form>

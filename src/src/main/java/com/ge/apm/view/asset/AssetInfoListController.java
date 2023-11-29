@@ -165,6 +165,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneQrCodeStatus;
     private boolean countyArea = false;
     private UserAccount user;
+    private Map<String, UserAccount> createdByMap;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -321,12 +322,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
-        currentPageAssets.forEach(item -> {
-            if(item.getQrCodeLib()!=null){
-                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
-            }
-            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
-        });
+//        currentPageAssets.forEach(item -> {
+//            if(item.getQrCodeLib()!=null){
+//                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
+//            }
+//            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
+//        });
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
@@ -334,6 +335,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         setSupplier(currentPageAssets);
 
+        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
         Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());
         currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
@@ -360,14 +363,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){
-        assets.stream().forEach(item -> {
-            item.setWarrantyExpireAlertDays(warrantyAlertDays);
-        });
+        assets.forEach(item -> item.setWarrantyExpireAlertDays(warrantyAlertDays));
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
-        Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
-        Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
+        Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(AssetInfo::getClinicalDeptUID).collect(Collectors.toSet());
+        Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(AssetInfo::getAssetDeptUID).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
 
         if (orgUids.isEmpty()) {
@@ -376,7 +377,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
-        Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
+        Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> item));
 
         currentPageAssets.stream().forEach(item -> {
             if (item.getClinicalDeptUID() != null) {
@@ -402,6 +403,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         }
         boolean assetStatus = "-1".equals(filterAssetStatus);
         if(assetStatus){
@@ -444,10 +446,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
         }
 
-        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
-            this.removeFilterOnField("oneQrCodeStatus");
-            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
-        }
+//        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
+//            this.removeFilterOnField("oneQrCodeStatus");
+//            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
+//        }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -1088,23 +1090,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setSupplier(List<AssetInfo> assets){
-        assets.stream().forEach(item -> {
-            item.setSupplier(item.getSupplierId() != null ? supplierDao.findById(item.getSupplierId()) : new Supplier());
-        });
-
-        /*for (AssetInfo ai : assets) {
-            if(ai.getSupplierId() != null){
-                ai.setSupplier(supplierDao.findById(ai.getSupplierId()));
-            }
-        }*/
-
+        Set<Integer> supplierIds = assets.stream().map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        List<Supplier> supplierList = supplierDao.findByIdIn(supplierIds);
+        Map<Integer, Supplier> supplierMap = supplierList.stream().collect(Collectors.toMap(Supplier::getId, t -> t));
+        assets.forEach(item -> item.setSupplier(supplierMap.get(item.getSupplierId()) != null ? supplierMap.get(item.getSupplierId()) : new Supplier()));
     }
+
     public String selectCreatedBy(String loginName) {
-        UserAccount user = userDao.getByLoginName(loginName);
-        if(user != null){
-            return user.getName();
+        UserAccount userAccount = createdByMap.get(loginName);
+        String createdBy = null;
+        if (ObjectUtil.isNotEmpty(userAccount)) {
+            createdBy = userAccount.getName();
         }
-        return null;
+        return createdBy;
     }
 
     /**
@@ -1379,13 +1377,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
     }
 
-    public String getOneQrCodeStatus() {
-        return oneQrCodeStatus;
-    }
-
-    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-        this.oneQrCodeStatus = oneQrCodeStatus;
-    }
+//    public String getOneQrCodeStatus() {
+//        return oneQrCodeStatus;
+//    }
+//
+//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+//        this.oneQrCodeStatus = oneQrCodeStatus;
+//    }
 
     public boolean getCountyArea() {
         return countyArea;

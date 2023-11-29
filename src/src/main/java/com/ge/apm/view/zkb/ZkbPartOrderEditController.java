@@ -636,6 +636,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         return "";
     }
 
+    //工作站条件：人工申请且机型为放射类设备时才显示
+    public boolean workStationRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(CopyByInvok.NORMAL_ONE.equals(artificialType)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean scoreFlagRender(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(CopyByInvok.T.equals(maintainFlag)){
@@ -726,8 +736,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         } else {
                             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                         }
+                    }else{
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                     }
-
                 }
             }
         }
@@ -780,6 +791,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
                         Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else {
+                        this.selected.setRemainQty(null);
                     }
                 }else if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
                     if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
@@ -1289,7 +1302,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "";
         }
 
-        //selected.setOrderType(orderType);
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
@@ -1379,13 +1391,21 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void ssaKeyFlagChange2(ValueChangeEvent event){
+        System.out.println(selected.getZkbEngineerPhone());
+    }
+
     public void ssaKeyFlagChange(){
         calcRemainQty();
         if("t".equals(selected.getSsaKeyFlag())){
             currentScoreFlag = true;
             currentScoreText = "";
             selected.setScoreFlag(CopyByInvok.F);
+            selected.setExchangeType(null);
             return;
+        }else{
+            currentScoreFlag = false;
+            editCurrentScoreFlag();
         }
 
     }

@@ -311,9 +311,10 @@
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup id="buttonGroup">
                                     <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
-                                    <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval(2)}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
+                                    <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval(2)}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and ((assetInfoEditController.CRUDActionName eq msg.Create and assetInfoEditController.selected.usageStatus ne 3) or (assetInfoEditController.CRUDActionName eq msg.Edit and assetInfoEditController.selected.usageStatus eq 4))}"/>
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactiveEnable" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   oncomplete="PF('scrapapply').show()"  immediate="true"  update=":growl" style="float:right;"/>
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
@@ -543,6 +544,26 @@
                                  oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
                 <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
             </p:fieldset>
+        </p:dialog>
+
+
+        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="300" width="500" header="报废申请">
+            <h:form id="nodeForm" >
+                <h:panelGroup>
+                    <label class="label">申请理由</label>
+                    <p:inputTextarea placeholder="报废申请*" value="#{assetInfoEditController.applyReason}" maxlength="256" />
+                    <p:outputLabel value="#{assetInfoEditController.applyReason}" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">鉴定理由</label>
+                    <p:inputTextarea placeholder="申请通过*" value="#{assetInfoEditController.approvalReason}" maxlength="256" />
+                    <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
+                </h:panelGroup>
+                <br/>
+                <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.applyAssetScrap()}" value="确定"  icon="ui-icon-check"  oncomplete="PF('scrapapply').hide()"/>
+                <p:commandButton  validateClient="true" immediate="false"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
+            </h:form>
+
         </p:dialog>
     </ui:define>
 </ui:composition>
