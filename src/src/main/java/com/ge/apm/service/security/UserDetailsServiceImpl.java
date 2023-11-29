@@ -1,10 +1,19 @@
 package com.ge.apm.service.security;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.GrantedAuthorityDiyImpl;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -35,6 +44,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsServiceImpl(UserAccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
+
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
 
     /**
      * Retrieve an account depending on its login this method is not case sensitive.<br>
@@ -86,7 +98,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Collection<GrantedAuthority> grantedAuthorities = obtainGrantedAuthorities(login);
 
         if (grantedAuthorities == null) {
-            grantedAuthorities = toGrantedAuthorities(account.getRoleNames());
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(account.getTenantUID());
+            grantedAuthorities = toGrantedAuthorities(account.getRoleNames(), tenantInfo);
         }
 
         String password = obtainPassword(login);
@@ -109,12 +122,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return the account if found
      */
     protected UserAccount obtainAccount(String login) {
-        UserAccount user = accountRepository.getByLoginName(login);
-        return user;
-/*        if(!user.getIsActive())
-            return null;
-        else
-            return user;*/
+        return accountRepository.getByLoginName(login);
     }
 
     /**
@@ -131,11 +139,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return null;
     }
 
-    public static Collection<GrantedAuthority> toGrantedAuthorities(List<String> roles) {
-        List<GrantedAuthority> result = new ArrayList<GrantedAuthority>();
-
+    public static Collection<GrantedAuthority> toGrantedAuthorities(List<String> roles, TenantInfo tenantInfo) {
+        List<GrantedAuthority> result = new ArrayList<>();
+        Set<String> featureList = new HashSet<>(((List<String>) JSON.parse(tenantInfo.getFeatureList())));
+        Set<ApmSystemRole> apmSystemRoles = Arrays.stream(ApmSystemRole.values()).filter(r -> roles.contains(r.name())).collect(Collectors.toSet());
+        Map<String, ApmSystemRole> systemRoleMap = apmSystemRoles.stream().collect(Collectors.toMap(ApmSystemRole::name, e -> e));
+        List<ApmFeature> features = Arrays.stream(ApmFeature.values()).filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
+        List<ApmFunction> apmFunctionList = ListUtil.newArrayList();
+        features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList()));
         for (String role : roles) {
-            result.add(new GrantedAuthorityImpl(role));
+            Set<String> roleFunctionList = new HashSet<>();
+            for (ApmFunction apmFunction : apmFunctionList) {
+                ApmSystemRole apmSystemRole = systemRoleMap.get(role);
+                if (apmFunction.getRoleList().contains(apmSystemRole)) {
+                    roleFunctionList.add(apmFunction.name());
+                }
+            }
+            result.add(new GrantedAuthorityDiyImpl(role, roleFunctionList));
         }
 
         return result;
