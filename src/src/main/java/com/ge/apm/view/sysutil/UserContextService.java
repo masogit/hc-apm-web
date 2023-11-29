@@ -406,7 +406,7 @@ public class UserContextService implements Serializable {
     }
 
     public void setAssetTypeGroup() {
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+        if (apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
             userAccount.setEnableAssetTypeGroup(true);
             AssetTypeGroupRepository assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(userAccount.getUid());
