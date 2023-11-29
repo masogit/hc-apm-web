@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.domain.QrCodeLib;
@@ -61,6 +63,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
     private UserContextService userContextService;
 
     private List<OrgInfo> hospitalFileterList = new ArrayList();
+    private Map<String, String> mapOrg = new HashMap<>();
 
     OrgInfo selectedOrg;
 
@@ -175,7 +178,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter) );
         }
 
-        if (this.searchFilters == null) {
+        if (CollectionUtils.isEmpty(this.searchFilters)) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -189,7 +192,13 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
     }
 
     public String getHospitalName(String orgUid) {
-        return orgInfoDao.getByUid(orgUid).getName();
+        String orgName = mapOrg.get(orgUid);
+        if (StringUtils.hasText(orgName)) {
+            return orgName;
+        }
+        orgName = orgInfoDao.getByUid(orgUid).getName();
+        mapOrg.put(orgUid, orgName);
+        return orgName;
     }
 
     public String getTenantName(String tenantUid) {
@@ -341,7 +350,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 //            return;
 //        }
 
-        Map<String,String> orgNamesMap = orgInfoDao.findByUids(exportList.stream().map(QrCodeLib::getSiteUID).distinct().collect(Collectors.toSet()))
+        Map<String,String> orgNamesMap = orgInfoDao.findInUIds(exportList.stream().map(QrCodeLib::getSiteUID).collect(Collectors.toSet()))
                 .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
         QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()),null,orgNamesMap);
         zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed","qrCodes.zip");

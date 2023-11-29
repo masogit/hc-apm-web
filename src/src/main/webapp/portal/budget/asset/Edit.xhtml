@@ -17,17 +17,13 @@
                 <p:panelGrid id="editPanel" columns="4" layout="grid"
                              styleClass="ui-panelgrid-blank form-group"
                              rendered="#{budgetAssetController.selected != null}">
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.ProductNumber}</p:outputLabel>
                         <p:inputText value="#{budgetAssetController.selected.financingNum}"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.EquipmentName}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.name}" required="true"
-                                     requiredMessage="#{msg.EquipmentName}#{msg.Blank}#{msg.ValidationRequire}"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.clinicaldepart}</p:outputLabel>
+                    </h:panelGroup>-->
+
+                    <!--<h:panelGroup>
+                        <p:outputLabel class="label">#{msg.clinicaldepart}<span style="color: red">*</span></p:outputLabel>
                         <p:inputText id="dept" readonly="true"
                                      value="#{budgetAssetController.selectedDept.name}"/>
                         <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
@@ -50,8 +46,18 @@
                                 </p:tree>
                             </p:scrollPanel>
                         </p:overlayPanel>
+                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.EquipmentName}<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.name}" required="true"
+                                     requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.applicationAssetCategory}" required="true"
+                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
                         <p:selectOneMenu value="#{budgetAssetController.selected.assetGroup}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -69,33 +75,35 @@
                             <f:selectItems value="#{budgetAssetController.budgetAssetGroupSecondaryList}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <p:outputLabel class="label">推荐#{msg.AssetBrand}<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.assetBrand}" required="true"
+                                     requiredMessage="推荐设备品牌#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.assetBrand}"/>
+                        <p:outputLabel class="label">型号<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.assetModel}" required="true"
+                                     requiredMessage="型号#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.EquipmentModel}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.assetModel}"/>
+                        <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.standards}" required="true"
+                                     requiredMessage="规格#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.Unit}</p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.unit}"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.Price}</p:outputLabel>
                         <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
                                        value="#{budgetAssetController.selected.price}">
                         </p:inputNumber>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                 </p:panelGrid>
 
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{budgetAssetController.save}"
                                  value="#{msg.Save}" id="saveButton"
                                  update="display :BudgetAssetEditDlg searchForm assetList :growl"
-                                 oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');"
-                                 disabled="#{empty budgetAssetController.selectedDept}"/>
+                                 oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');" />
                 <p:commandButton immediate="true" value="#{msg.Cancel}" update="assetList"
                                  actionListener="#{budgetAssetController.clearSelected}"
                                  onclick="PF('BudgetAssetEditDialog').hide()"/>

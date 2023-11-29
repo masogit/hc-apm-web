@@ -48,7 +48,7 @@ public class MicroServiceInvoker {
     @Value("#{systemEnvironment['DOCXTOPDF_URL'] ?: urlProperties.docxtopdf}")
     protected String docxToPdfUrl;
 
-    @Value("#{wxProperties.qrcode_web_context_url}")
+    @Value("#{wxProperties.web_context_url}")
     protected String webContextUrl;
 
     @Autowired

@@ -120,6 +120,8 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @Column(name = "audit_uid", columnDefinition = "TEXT")
     private String auditUid;   //待审核人uid
 
+    @Column(name = "asset_status")
+    private Integer assetStatus; //报废之前asset_info status
 
     public AssetScrap() {
     }
@@ -386,5 +388,13 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setAuditUid(String auditUid) {
         this.auditUid = auditUid;
+    }
+
+    public Integer getAssetStatus() {
+        return assetStatus;
+    }
+
+    public void setAssetStatus(Integer assetStatus) {
+        this.assetStatus = assetStatus;
     }
 }

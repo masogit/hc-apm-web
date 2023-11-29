@@ -814,6 +814,7 @@ public class ZkbContractImportService {
         Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
 
         ZkbContractAssetRow.clearErrMessage(item);
+
         if(zkbContractAssetVO.getContractNo() == null){
             item.put("status", ImportStatus.Failure);
             ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNumberIsEmpty"));
@@ -1151,7 +1152,7 @@ public class ZkbContractImportService {
             isValidateData = false;
         }
 
-        for (Map<String, Object> tempContractCatMap: importContractCatMapList) {
+       /* for (Map<String, Object> tempContractCatMap: importContractCatMapList) {
             ZkbContractCatVO tempZkbContractCatVO = (ZkbContractCatVO)tempContractCatMap.get("zkbContractCatVO");
             Integer tempHashCode = Integer.valueOf(tempContractCatMap.get("hashCode").toString());
             if(hashCode.equals(tempHashCode) && zkbContractCatVO.getLineNum() != tempZkbContractCatVO.getLineNum()){
@@ -1160,7 +1161,7 @@ public class ZkbContractImportService {
                 isValidateData = false;
                 break;
             }
-        }
+        }*/
         return isValidateData;
     }
 

@@ -227,6 +227,10 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     //维修价值
     @Column(name = "maintenance_value")
     private Double maintenanceValue;
+
+    //外部报价
+    @Column(name = "external_quotation")
+    private Double externalQuotation;
     
     //MVS工单类型
     @Column(name="mvs_type")
@@ -326,6 +330,17 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private String repairName;
+
+    @Transient
+    private Integer repairPersonId;
+
+    public Integer getRepairPersonId() {
+        return repairPersonId;
+    }
+
+    public void setRepairPersonId(Integer repairPersonId) {
+        this.repairPersonId = repairPersonId;
+    }
 
     public String getRepairName() {
         return repairName;
@@ -756,6 +771,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public Double getMaintenanceValue() {
         return maintenanceValue;
+    }
+
+    public Double getExternalQuotation() {
+        return externalQuotation;
+    }
+
+    public void setExternalQuotation(Double externalQuotation) {
+        this.externalQuotation = externalQuotation;
     }
 
     public void setMaintenanceValue(Double maintenanceValue) {

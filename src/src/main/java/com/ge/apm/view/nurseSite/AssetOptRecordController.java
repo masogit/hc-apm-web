@@ -18,6 +18,8 @@ import com.ge.apm.service.nurseSite.AssetOptRecordService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.primefaces.event.SelectEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -55,6 +57,9 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 
 	@Override
 	protected List<AssetOptRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())){
+			return ListUtil.empty();
+		}
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<>();
 		}
@@ -68,6 +73,9 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
 		} else if (selectOrgInfo.getOrgType() == 3) {
 			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+		}
+		if (currentUser.isEnableAssetTypeGroup()) {
+			searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
 		}
 		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
 		List<AssetOptRecord> listAssetOptRecord = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());

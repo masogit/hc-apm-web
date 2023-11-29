@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import com.ge.healthcare.cn.common.utils.date.DateField;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.BooleanUtils;
@@ -26,6 +29,8 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -454,7 +459,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer meteringCycle;
 
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
-    //1:待完善,2:待审核,3:已经建档
+    //1:待完善,2:待审核,3:已经建档  4 审核不通过
     @Column(name = "usage_status")
     private Integer usageStatus;
 
@@ -591,17 +596,17 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_disposal_results")
     private Integer assetDisposalResults;
 
-    @Size(max = 256)
-    @Column(name = "one_qr_code")
-    private String oneQrCode;
-
-    @Transient
-    @TableField(exist = false)
-    private String oneQrCodeStatus;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
-    private QrCodeLib qrCodeLib;
+//    @Size(max = 256)
+//    @Column(name = "one_qr_code")
+//    private String oneQrCode;
+//
+//    @Transient
+//    @TableField(exist = false)
+//    private String oneQrCodeStatus;
+//
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
+//    private QrCodeLib qrCodeLib;
 
     /**
      * 主目录
@@ -834,9 +839,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     @TableField(exist = false)
-    @Getter
     @Setter
     private String assetUsedLifecycle;
+
+    @Transient
+    @TableField(exist = false)
+    @Setter
+    private String assetLifecycleDeadline;
 
     @Getter
     @Setter
@@ -963,6 +972,13 @@ public class AssetInfo implements ChineseName,Serializable {
      */
     @Column(name = "tubewatch_status")
     private String tubeWatchStatus;
+
+
+    /**
+     * 当前位置
+     */
+    @Column(name = "asset_location")
+    private String  assetLocation;
 
 
     public void setSupplierPyCode(String supplierPyCode) {
@@ -2939,29 +2955,29 @@ public class AssetInfo implements ChineseName,Serializable {
         this.visibleStatus = visibleStatus;
     }
 
-    public String getOneQrCode() {
-        return oneQrCode;
-    }
-
-    public void setOneQrCode(String oneQrCode) {
-        this.oneQrCode = oneQrCode;
-    }
-
-    public String getOneQrCodeStatus() {
-        return oneQrCodeStatus;
-    }
-
-    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-        this.oneQrCodeStatus = oneQrCodeStatus;
-    }
-
-    public QrCodeLib getQrCodeLib() {
-        return qrCodeLib;
-    }
-
-    public void setQrCodeLib(QrCodeLib qrCodeLib) {
-        this.qrCodeLib = qrCodeLib;
-    }
+//    public String getOneQrCode() {
+//        return oneQrCode;
+//    }
+//
+//    public void setOneQrCode(String oneQrCode) {
+//        this.oneQrCode = oneQrCode;
+//    }
+//
+//    public String getOneQrCodeStatus() {
+//        return oneQrCodeStatus;
+//    }
+//
+//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+//        this.oneQrCodeStatus = oneQrCodeStatus;
+//    }
+//
+//    public QrCodeLib getQrCodeLib() {
+//        return qrCodeLib;
+//    }
+//
+//    public void setQrCodeLib(QrCodeLib qrCodeLib) {
+//        this.qrCodeLib = qrCodeLib;
+//    }
 
     public Integer getAnnualMaintenanceTimes() {
         return annualMaintenanceTimes;
@@ -3062,5 +3078,35 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isPm=null;
         this.isUseRegistration=null;
         this.networkingStatus=null;
+    }
+
+    public String getAssetLocation() {
+        return assetLocation;
+    }
+
+    public void setAssetLocation(String assetLocation) {
+        this.assetLocation = assetLocation;
+    }
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
+    public String getAssetUsedLifecycle() {
+        if (ObjectUtil.isNotEmpty(assetUsedLifecycle)) {
+            return assetUsedLifecycle;
+        }
+        if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
+            return null;
+        }
+        java.time.temporal.Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
+        java.time.temporal.Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
+        return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
+    }
+
+    public String getAssetLifecycleDeadline() {
+        if (ObjectUtil.isEmpty(manufactDate) || ObjectUtil.isEmpty(lifecycle)) {
+            return null;
+        }
+        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.MONTH, lifecycle);
+        return DateUtil.formatDate(dateTime);
     }
 }

@@ -124,6 +124,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select o from OrgInfo o where o.uid in ?1")
     public List<OrgInfo> findByUids(Set<String> idc);
 
+    @Query(value = "select o.* from org_info o  where o.uid in ?1", nativeQuery = true)
+    public List<OrgInfo> findInUIds(Set<String> ids);
+
     public List<OrgInfo> getByTenantUID(String tenantUID);
 
     @Query("select o from OrgInfo o where orgType<>4 and tenantUID=?1")

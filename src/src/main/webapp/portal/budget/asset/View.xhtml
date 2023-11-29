@@ -16,19 +16,20 @@
             <h:panelGroup id="display">
                 <p:panelGrid id="searchPanel" columns="4" layout="grid"
                              styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <label class="label">#{msg.ProductNumber}</label>
                         <p:outputLabel value="#{budgetAssetController.selected.financingNum}"/>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
+
+                   <!-- <h:panelGroup>
+                        <label class="label">#{msg.clinicaldepart}</label>
+                        <p:outputLabel value="#{budgetAssetController.selected.dept.name}"/>
+                    </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.EquipmentName}</label>
                         <p:outputLabel value="#{budgetAssetController.selected.name}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.clinicaldepart}</label>
-                        <p:outputLabel value="#{budgetAssetController.selected.dept.name}"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
+                   <!-- <h:panelGroup>
                         <label class="label">#{msg.AssetGroup}</label>
                         <p:outputLabel
                                 value="#{fieldMsg.fieldValue('assetGroup', budgetAssetController.selected.assetGroup)}"/>
@@ -37,16 +38,24 @@
                         <label class="label">#{msg.AssetGroupSecondary}</label>
                         <p:outputLabel
                                 value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(budgetAssetController.selected.assetGroup), budgetAssetController.selected.assetGroupSecondary)}"/>
+                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">设备品类</label>
+                        <p:outputLabel value="#{budgetAssetController.selected.applicationAssetCategory}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.AssetBrand}</label>
+                        <label class="label">推荐#{msg.AssetBrand}</label>
                         <p:outputLabel value="#{budgetAssetController.selected.assetBrand}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.EquipmentModel}</label>
+                        <label class="label">型号</label>
                         <p:outputLabel value="#{budgetAssetController.selected.assetModel}"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">规格</label>
+                        <p:outputLabel value="#{budgetAssetController.selected.standards}"/>
+                    </h:panelGroup>
+                   <!-- <h:panelGroup>
                         <label class="label">#{msg.Unit}</label>
                         <p:outputLabel value="#{budgetAssetController.selected.unit}"/>
                     </h:panelGroup>
@@ -55,7 +64,7 @@
                         <h:outputText value="#{budgetAssetController.selected.price}">
                             <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                         </h:outputText>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                 </p:panelGrid>
 
                 <br/>

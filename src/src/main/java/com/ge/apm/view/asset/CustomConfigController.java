@@ -8,23 +8,16 @@ package com.ge.apm.view.asset;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbMessageSource;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -53,7 +53,7 @@ public class CustomConfigController {
     private ConfigCacheService configCacheService;
     private UserContextService userContextService;
     private I18nMessageService i18nMessageService;
-
+    private ConfigItemValueRepository configItemValueRepository;
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -84,6 +84,7 @@ public class CustomConfigController {
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
@@ -108,6 +109,19 @@ public class CustomConfigController {
             customConfigObject = ccService.getCurrentCustomConfig(siteUid);
         } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
+        }
+        JSONObject pageWorkOrder = customConfigObject.getMobileMaintainPage().getJSONObject("pageWorkOrder");
+        JSONArray group = pageWorkOrder.getJSONArray("group");
+        for (int i = 0; i < group.size(); i++) {
+            JSONObject obj = group.getJSONObject(i);
+            if ("assetInfo".equals(obj.get("type"))) {
+                JSONObject externalQuotation = obj.getJSONObject("externalQuotation");
+                if (externalQuotation == null) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("enable", false);
+                    obj.put("externalQuotation", jsonObject);
+                }
+            }
         }
         updateConfigInfo();
     }
@@ -136,6 +150,9 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "MobileFilterFields":
+                addFieldsList = customConfigObject.defaultAssetsMobilepageFilterFields().stream().filter(item -> !customConfigObject.getAssetsMobilepageFilterFields().contains(item)).collect(Collectors.toList());
+                break;
             case "MobileHeaderFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsMobilepageHeaderFields().contains(item)).collect(Collectors.toList());
@@ -145,6 +162,9 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)
                         && !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+                break;
+            case "MobileBuildAssetFields":
+                addFieldsList = customConfigObject.getAllAssetsMobilepageBuildAssetFields();
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -206,6 +226,12 @@ public class CustomConfigController {
             case "RemoveMobileHeaderFields":
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageHeaderFields());
                 break;
+            case "RemoveMobileFilterFields":
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageFilterFields());
+                break;
+            case "RemoveMobileBuildAssetFields":
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageBuildAssetFields());
+                break;
             case "MobileWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
@@ -214,7 +240,6 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
-
             case "WebMaintainFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
@@ -222,14 +247,14 @@ public class CustomConfigController {
             case "RemoveMobileWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
-
             case "RemoveWebWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
             case "assetAllocateFieldsList":
                 addFieldsList=getAllAllocateFields().keySet().stream().filter(item->!customConfigObject.getAssetAllocateFields().contains(item)).collect(Collectors.toList());
                 break;
-
+            default:
+                break;
 
         }
 
@@ -259,6 +284,12 @@ public class CustomConfigController {
             case "MobileDetailFields":
             case "RemoveMobileDetailFields":
                 return ":customConfigForm:tabView:MobileDetailFieldsList";
+            case "MobileFilterFields":
+            case "RemoveMobileFilterFields":
+                return ":customConfigForm:tabView:MobileFilterFieldsList";
+            case "MobileBuildAssetFields":
+            case "RemoveMobileBuildAssetFields":
+                return ":customConfigForm:tabView:MobileBuildAssetFieldsList";
             case "DetailFields":
             case "RemoveDetailFields":
                 return ":customConfigForm:tabView:DetailFieldsList";
@@ -329,6 +360,14 @@ public class CustomConfigController {
                 customConfigObject.getAssetsMobilepageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsMobilepageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
+            case "MobileFilterFields":
+                customConfigObject.getAssetsMobilepageFilterFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsMobilepageFilterFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "MobileBuildAssetFields":
+                customConfigObject.getAssetsMobilepageBuildAssetFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsMobilepageBuildAssetFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
             case "ListPageFields":
                 List<String> addFields = new ArrayList();
                 addFields.addAll(customConfigObject.getAssetsListPageFields());
@@ -353,6 +392,10 @@ public class CustomConfigController {
                 customConfigObject.getAssetsMobilepageHeaderFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsMobilepageHeaderFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
+            case "RemoveMobileBuildAssetFields":
+                customConfigObject.getAssetsMobilepageBuildAssetFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsMobilepageBuildAssetFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
             case "RemoveMobileBasicFields":
                 customConfigObject.getAssetsMobilepageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsMobilepageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
@@ -360,6 +403,10 @@ public class CustomConfigController {
             case "RemoveMobileDetailFields":
                 customConfigObject.getAssetsMobilepageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsMobilepageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveMobileFilterFields":
+                customConfigObject.getAssetsMobilepageFilterFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsMobilepageFilterFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "EditpageBasicFields":
                 customConfigObject.getAssetsEditpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
@@ -409,7 +456,6 @@ public class CustomConfigController {
                 JSONPath.set(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", ((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                         .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
-
             case "RemoveEditpageFinicialFields":
                 customConfigObject.getAssetsEditpageFinicialFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
@@ -423,7 +469,6 @@ public class CustomConfigController {
                         ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
-
             case "RemoveMobileWorkOrderFieldsList":
                 JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
                         ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
@@ -444,6 +489,8 @@ public class CustomConfigController {
             case "assetAllocateFieldsList":
                 customConfigObject.getAssetAllocateFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetAllocateFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            default:
                 break;
 
         }
@@ -759,9 +806,12 @@ public class CustomConfigController {
         return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
     }
     public boolean enabledWhethertoenableunattended(){
-        WorkflowConfig workflowConfig = configService.findConfigBySite(selectSite.getUid());
-        if(workflowConfig == null ) return false;
-        return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(selectSite.getSiteUID(),
+                selectSite.getHospitalUID(),
+                selectSite.getInstitutionUID(),
+                selectSite.getTenantUID(), key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 
 }

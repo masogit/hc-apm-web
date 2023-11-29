@@ -7,6 +7,7 @@ import com.ge.apm.dao.mapper.provider.AssetInfoProvider;
 import com.ge.apm.domain.AssetCostStatistics;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.dto.AssetDto;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -88,4 +89,11 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 	List<AssetInfo> selectMeasureResult(Pagination pagination, @Param("ew") Wrapper<AssetInfo> wrapper);
 
 	List<AssetInfo> selectMeasureResult(@Param("ew") Wrapper<AssetInfo> wrapper);
+
+    List<AssetInfo> findAssetByMaintainConfigParentId(@Param("ew") Wrapper<AssetInfo> wrapper);
+
+	List<AssetInfo> findAssetByMaintainConfigJNParentId(@Param("ew") Wrapper<AssetInfo> wrapper);
+
+	@Select("select  ai.id,ua.name as userName  from asset_info  ai left join user_account ua on ai.created_by=ua.login_name  where ua.id is not null and ua.login_name!=ua.name order by ai.id desc limit 2000")
+	List<AssetDto> findByCreatedByIsLoginName();
 }

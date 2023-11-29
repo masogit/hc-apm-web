@@ -5,22 +5,15 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysAuthGroup;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -44,20 +37,17 @@ import java.util.stream.Collectors;
 public class AssetInfoService {
 
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
-    AssetContractRepository contractDao = WebUtil.getBean(AssetContractRepository.class);
-    ContractInfoItemRepository contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
     SysAuthGroupRepository authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     V2_WorkOrderService woService = WebUtil.getBean(V2_WorkOrderService.class);
-    JdbcTemplate jdbcTemplate = WebUtil.getBean(JdbcTemplate.class);
 
     public String getAssetInfoName(Integer id) {
         if (null == id || id == 0) {
             return "";
         } else {
-            return Optional.ofNullable(assetInfoDao.findById(id)).map(t -> t.getName()).orElse("");
+            return Optional.ofNullable(assetInfoDao.findById(id)).map(AssetInfo::getName).orElse("");
         }
     }
 
@@ -76,8 +66,7 @@ public class AssetInfoService {
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
         List<SearchFilter> assetInfoFilters = new ArrayList<>();
         assetInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, currentUser.getSiteId()));
-        List<AssetInfo> assetList = assetInfoDao.findBySearchFilter(assetInfoFilters);
-        return assetList;
+        return assetInfoDao.findBySearchFilter(assetInfoFilters);
     }
 
     public List<OrgInfo> getHospitalList() {
@@ -232,46 +221,6 @@ public class AssetInfoService {
         rootNode.setExpanded(true);
         return rootNode;
     }
-    public AssetInfo selectAssetInfos(String uid,String name, String departNum,Integer assetGroup,Set<String> clinicalDeptOrgUidSet,String nationalStandardCode,
-                                      String makerShortName,String manufacture,String qrCode,String startUsingDate,String purchaseDate){
-        StringBuffer sqlStringBuffer = new StringBuffer();
-        sqlStringBuffer.append(" select a.* from asset_info a where  a.uid = '"+ uid+"'");
-        if(name!=null) sqlStringBuffer.append(" and a.name like '%"+name+"%'");
-        if(departNum!=null) sqlStringBuffer.append(" and a.depart_num like '%"+departNum+"%'");
-        if(assetGroup!=null) sqlStringBuffer.append(" and a.asset_group = "+ assetGroup);
-        if(nationalStandardCode!=null) sqlStringBuffer.append(" and a.national_standard_code like '%"+nationalStandardCode+"%'");
-        if(makerShortName!=null) sqlStringBuffer.append(" and a.make_short_name like '%"+makerShortName+"%'");
-        if(manufacture!=null) sqlStringBuffer.append(" and a.manufacture like '%"+manufacture+"%'");
-        if(qrCode!=null) sqlStringBuffer.append(" and a.qr_code like '%"+qrCode+"%'");
-        if(CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)) {
-            StringBuffer clinicalDeptUidStr=new StringBuffer();
-            clinicalDeptUidStr.append("( ");
-            for ( String clinicalDeptUid :clinicalDeptOrgUidSet) {
-                clinicalDeptUidStr.append("'"+clinicalDeptUid+"' ,");
-            }
-            clinicalDeptUidStr.deleteCharAt(clinicalDeptUidStr .length() - 1);
-            clinicalDeptUidStr.append(" )");
-            sqlStringBuffer.append(" and a.clinical_dept_uid in "+clinicalDeptUidStr);
-        }
-        if (StringUtils.isNotEmpty(startUsingDate)){
-            String startUsingDateStart = startUsingDate.substring(0, 10);
-            String startUsingDateEnd = startUsingDate.substring(11, startUsingDate.length());
-            sqlStringBuffer.append(" and a.install_date >=   '"+startUsingDateStart.replace("/","-")+"'");
-            sqlStringBuffer.append(" and a.install_date <= '"+startUsingDateEnd.replace("/","-")+"'");
-        }
-        if (StringUtils.isNotEmpty(purchaseDate)){
-            String purchaseDateStart = purchaseDate.substring(0, 10);
-            String purchaseDateEnd = purchaseDate.substring(11, purchaseDate.length());
-            sqlStringBuffer.append(" and a.purchase_date >=   '"+purchaseDateStart.replace("/","-")+"'");
-            sqlStringBuffer.append(" and a.purchase_date <=  '"+purchaseDateEnd.replace("/","-")+"'");
-        }
-        List<AssetInfo> assetInfos=jdbcTemplate.query(sqlStringBuffer.toString(), new BeanPropertyRowMapper<AssetInfo>(AssetInfo.class));
-        if(CollectionUtils.isNotEmpty(assetInfos)){
-            return assetInfos.get(0);
-        }
-        return null;
-    }
-
 
     public void sortSysAuthGroupNaturally(TreeNode root) {
         root.getChildren().sort((TreeNode o1, TreeNode o2) -> {

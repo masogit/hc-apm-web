@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.NurseSiteMaintainConfigJNMapper">
+
+    <resultMap type="com.ge.apm.domain.NurseSiteMaintainConfigJN" id="maintainConfigBean" autoMapping="true">
+        <result column="id" property="id"/>
+        <result column="create_date" property="createDate"/>
+        <result column="modify_date" property="modifyDate"/>
+        <result column="tenant_uid" property="tenantUID"/>
+        <result column="institution_uid" property="institutionUID"/>
+        <result column="hospital_uid" property="hospitalUID"/>
+        <result column="site_uid" property="siteUID"/>
+        <result column="create_by" property="createByUid"/>
+        <result column="modify_by" property="modifyByUid"/>
+        <result column="check_items_detail" property="checkItemsDetail"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+        <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="type" property="type"/>
+        <result column="type_value" property="typeValue"/>
+        <result column="name" property="name"/>
+        <result column="apply_directly" property="applyDirectly"/>
+    </resultMap>
+
+    <select id="findJoinAssetList" resultMap="maintainConfigBean">
+        select nsmc.* from nurse_site_maintain_config_jn nsmc left join nurse_site_maintain_config_item_jn nsmci on nsmc.id = nsmci.parent_id
+        <where>${ew.sqlSegment}</where>
+<!--        select nsmc.* from nurse_site_maintain_config_jn nsmc left join nurse_site_maintain_config_item_jn nsmci on nsmc.id = nsmci.parent_id left join asset_info ai on ai.uid = nsmci.asset_uid-->
+<!--        <where>${ew.sqlSegment}</where>-->
+    </select>
+
+</mapper>

@@ -119,20 +119,20 @@
             <p:inputText value="#{assetInfoDetailController.selected.modalityType}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'monitorRate')}">
         <h:panelGroup >
             <label class="label">#{msg.monitorRate}(W)</label>
             <p:inputText value="#{assetInfoDetailController.selected.monitorRate}" readonly="true"/>
         </h:panelGroup>
     </c:if>
 
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'otherPower')}">
         <h:panelGroup >
             <label class="label">#{msg.otherPower}(W)</label>
             <p:inputText value="#{assetInfoDetailController.selected.otherPower}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'unitPriceElectricity')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'unitPriceElectricity')}">
         <h:panelGroup >
             <label class="label">电费单价(元)</label>
             <p:inputText value="#{assetInfoDetailController.selected.unitPriceElectricity}" readonly="true"/>
@@ -377,6 +377,12 @@
             <p:inputText id="locationName" value="#{assetInfoDetailController.selected.locationName}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLocation')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetLocation}</label>
+            <p:inputText id="assetLocation" value="#{assetInfoDetailController.selected.assetLocation}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status')}">
         <h:panelGroup >
             <label class="label">#{msg.status}</label>
@@ -440,7 +446,7 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'riskGrade')}">
         <h:panelGroup >
             <label class="label">#{msg.riskGrade}</label>
-            <p:inputText id="riskGrade" value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', assetInfoDetailController.selected.riskGrade) : fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true"/>
+            <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'emergencyEquipment')}">
@@ -680,6 +686,12 @@
         <h:panelGroup >
             <label class="label">#{msg.assetUsedLifecycle}</label>
             <p:inputText id="assetUsedLifecycle" value="#{assetInfoDetailController.selected.assetUsedLifecycle}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLifecycleDeadline')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetLifecycleDeadline}</label>
+            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoDetailController.selected.assetLifecycleDeadline}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetQuantity')}">

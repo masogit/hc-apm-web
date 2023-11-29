@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.common;
 
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
@@ -20,10 +21,12 @@ public class CustomConfigConstant {
     private static HashMap<String, String> exportFields;
 
     public static final String DEFAULT_MOBILE_PAGE_JSON =
-            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"orgPath\",\"clinicalDeptName\",\"locationName\",\"assetLocation\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
+            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"externalQuotation\":{\"enable\":false},\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"orgPath\",\"clinicalDeptName\",\"locationName\",\"assetLocation\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
 
    /* public static final String DEFAULT_MOBILE_PAGE_JSON =
             "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"clinicalDeptName\",\"locationName\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";*/
+
+    public static final String DEFAULT_MOBILE_BUILD_ASSET_PAGE_JSON = "{\"pageBuildAsset\":{\"group\":[{\"type\":\"buildAsset\",\"show\":true,\"assetInfoFields\":[\"name\",\"departNum\",\"financingNum\",\"serialNum\",\"functionType\",\"assetGroup\",\"manufactDate\",\"installDate\",\"acceptDate\",\"factoryWarrantyDate\",\"vendor\",\"vendorTel\",\"purchasePrice\",\"registrationNo\",\"assetClass\",\"lifecycle\",\"emergencyEquipment\",\"makerShortName\",\"parentAssetId\",\"locationName\",\"comments\"]}]}}";
 
     //默认不使用的字段
     static public List<String> getExtFields() {
@@ -108,7 +111,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -118,7 +121,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
@@ -169,6 +172,22 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsMobilepageHeaderFields() {
         return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
+    }
+
+    public static List<String> getAllAssetsMobilepageBuildAssetFields() {
+        return ListUtil.newArrayList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments", "assetTypeGroup");
+    }
+
+    public static List<String> getAssetsMobilepageBuildAssetFields() {
+        return ListUtil.newArrayList("name", "assetGroup", "assetClass", "functionType", "lifecycle", "emergencyEquipment", "departNum", "manufacture", "serialNum", "makerShortName", "registrationNo", "locationName", "manufactDate", "clinicalDeptName", "parentAssetId", "comments");
+    }
+
+    public static List<String> getAssetsMobilepageFilterFields() {
+        return Arrays.asList("siteUID", "assetGroup", "status");
+    }
+
+    public static List<String> defaultAssetsMobilepageFilterFields() {
+        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked");
     }
 
     /**

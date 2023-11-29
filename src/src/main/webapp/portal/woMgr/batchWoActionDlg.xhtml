@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="batchWoActionDialog" widgetVar="batchWoActionDialog" modal="true"  resizable="true" draggable="true" width="400" appendTo="@(body)" header="#{msg.audit}" height="230">
+        <h:form id="batchWoActionDialogForm" >
+            <h:panelGroup id="display3" >
+                <h:panelGroup>
+                    <label class="label">#{msg.Remark}</label>
+                    <p:inputText id="comment" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                </h:panelGroup>
+                <br/>
+                <br/>
+                <br/>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.batchPreApproveWorkOrder()}"
+                                     value="通过" update="woTab:woMgrListForm woTab:signatureBatchDlg" icon="ui-icon-check"
+                                     oncomplete="handleBatchComplete(xhr, status, args);"/>
+                    <p:commandButton style="display: none" id="openSignatureBatch" actionListener="#{workOrderMgrController.getSignature()}" value="查看签名" update="woTab:signatureBatchDlg" oncomplete="PF('signatureBatchDlg').show();" />
+                    <!--<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approveDialog');"/>-->
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('batchWoActionDialog').hide()"/>
+                </h:panelGroup>
+
+            </h:panelGroup>
+        </h:form>
+        <script>
+            function handleBatchComplete(xhr, status, args) {
+                if(xhr.status===205){
+                    document.getElementById('woTab:batchWoActionDialogForm:openSignatureBatch').click();
+                }else{
+                    if (args.needComents) {
+                        $('#woTab\\:batchWoActionDialogForm\\:comment').addClass("ui-state-error");
+                    } else {
+                        handleSubmit(args, 'batchWoActionDialog');
+                    }
+                }
+            }
+            function handleBatchApproveSuccess(xhr, status, args) {
+                if(xhr.status!==206){
+                    handleSubmit(args, 'signatureBatchDlg');
+                    handleSubmit(args, 'batchWoActionDialog');
+                }
+            }
+        </script>
+    </p:dialog>
+    <p:dialog id="signatureBatchDlg" widgetVar="signatureBatchDlg" header="签名" modal="true">
+        <h:form id="signatureBatchForm">
+            <h:panelGrid columnClasses="value" columns="1">
+                <h:panelGroup>
+                    <p:signature id="signatureBatchContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{workOrderMgrController.signatureContent}"
+                                 guideline="false" rendered="#{workOrderMgrController.signatureContentStream==null}" />
+                    <p:graphicImage value="#{workOrderMgrController.signatureContentStream}" stream="false" rendered="#{workOrderMgrController.signatureContentStream!=null}"></p:graphicImage>
+                </h:panelGroup>
+            </h:panelGrid>
+            <p:commandButton value="确认" actionListener="#{workOrderMgrController.saveSignatureAndBatchSubmitApprove()}" update="woTab:woMgrListForm woTab:woMgrDetailForm" oncomplete="handleBatchApproveSuccess(xhr, status, args);"/>
+            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{workOrderMgrController.resetSignature()}" update="woTab:signatureBatchForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureBatchDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

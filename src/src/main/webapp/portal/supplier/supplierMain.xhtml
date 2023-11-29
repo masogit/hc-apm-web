@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.SupplierMgmt}"/>
+            </div>
+
+            <div class="ui-g-12">
+                <p:tabView id="supplierTab" class="ui-g-12">
+                    <p:ajax event="tabChange" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+                    <p:tab title="#{msg.Supplier}" id="supplierList" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
+                        <ui:include src="List.xhtml"/>
+                    </p:tab>
+                    <p:tab title="供应商导入" id="supplierImport" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
+                        <ui:include src="import.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+        <script>
+            //<![CDATA[
+            function openAssetViewWindow(xhr, status, args) {
+                if(args.url != null){
+                    window.location.href = args.url;
+                }
+
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#SupplierListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

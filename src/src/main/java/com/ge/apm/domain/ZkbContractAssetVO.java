@@ -115,6 +115,7 @@ public class ZkbContractAssetVO extends ZkbContractAsset {
 
         str += (this.getContractNo() != null ? this.getContractNo().toString() : "");
         str += (this.getQrCode() != null ? this.getQrCode().toString() : "");
+        str += (this.getId() != null ? this.getId().toString() : "");
 
         return str.hashCode();
     }

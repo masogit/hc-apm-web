@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -92,7 +93,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private List<AssetInfo> assetInfoList = new ArrayList<>();
     private Integer total = 0;
     private Integer assetRuleModelTotal = 0;
-
+	private List<AssetTypeGroup> assetTypeGroupList;
 	private boolean isYmyg = false;
 	private OrgInfo userOrgInfo;
 
@@ -132,6 +133,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         //initTree(user.getTenantUID());
 		initOrgTree();
 		generatePmOrders4Controller = WebUtil.getBean(GeneratePmOrders4Controller.class);
+		assetTypeGroupList = user.getAssetTypeGroupList();
 	}
 
     public boolean getPmRule(){
@@ -303,6 +305,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public List<AssetInfo> getAssetList() {
 		List<SearchFilter> assetFilters = new ArrayList<>();
+		if (user.isEnableAssetTypeGroup()) {
+			if(ObjectUtil.isEmpty(assetTypeGroupList)){
+				return new ArrayList<>();
+			}else{
+				List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+				assetFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList)));
+			}
+		}
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
 		}

@@ -193,6 +193,12 @@ public class Supplier implements Serializable, ChineseName {
     @Transient
     private String taxpayerIdentityNumber;
 
+    @Transient
+    private Integer excelIndex;
+
+    @Transient
+    private String errorInfo;
+
     @PrePersist
     public void initializeUid() {
         if (uid == null) {
@@ -546,6 +552,22 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setTaxpayerIdentityNumber(String taxpayerIdentityNumber) {
         this.taxpayerIdentityNumber = taxpayerIdentityNumber;
+    }
+
+    public Integer getExcelIndex() {
+        return excelIndex;
+    }
+
+    public void setExcelIndex(Integer excelIndex) {
+        this.excelIndex = excelIndex;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
     }
 
     @Override

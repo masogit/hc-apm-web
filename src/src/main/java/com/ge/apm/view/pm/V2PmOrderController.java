@@ -13,6 +13,7 @@ import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
@@ -31,7 +32,6 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -39,7 +39,6 @@ import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -62,6 +61,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -77,11 +77,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -154,6 +153,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
     private CustomConfigObject currentCustomConfig;
+    private ExternalTempUserRepository externalTempUserDao;
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -180,7 +180,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Double totalManHours;
     @Getter @Setter
     private String dptName;
-    private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
@@ -295,6 +294,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private WorkflowService workflowService;
 
+    private ConfigCacheService configCacheService;
+
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
     }
@@ -334,7 +335,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private SimplePartsItemService partsItemService;
     private BlobObjectRepository blobObjectRepository;
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
-
+    @Getter @Setter
+    private ExternalTempUser externalTempUser;
+    @Getter @Setter
+    private List<Map<String,String>> maintenancePersonInformation;
     @Getter @Setter
     public String customerName;
     @Getter @Setter
@@ -352,7 +356,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
     public String getSiteOrgName(String siteUID) {
-        OrgInfo org = orgDao.getByUid(siteUID);
+        OrgInfo org = configCacheService.findOrgByUid(siteUID);
         if (org != null) {
             return org.getName();
         }
@@ -510,7 +514,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          periodObj = filters.get("period");
         removeFilterOnField("ruleName");
         removeFilterOnField("period");
-
+        selectedMap.clear();
     }
 
     public void updatePMRuleFilterChange(){
@@ -546,12 +550,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
-        if(orderRule == null){
-            return new PmOrderRule();
-        }else {
-            return orderRule;
-        }
+       //根据设备查找规则
+        return Optional.ofNullable(pmOrderService.acqPmOrderRule(v2_pmOrder)).orElse(new PmOrderRule());
+//        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+//        if(orderRule == null){
+//            return new PmOrderRule();
+//        }else {
+//            return orderRule;
+//        }
 //            return new PmOrderRule();
 //        }
 //        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
@@ -976,13 +982,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<TableDefinition> getReportList(String siteUID) {
-        OrgInfo site = orgDao.getByUid(siteUID);
+        OrgInfo site = configCacheService.findOrgByUid(siteUID);
         List<String> orgUids = Arrays.asList(site.getSiteUID(), site.getHospitalUID(), site.getInstitutionUID(), site.getTenantUID());
         return tableDao.getBySiteUIDIn(orgUids);
     }
 
 
-
+    //todo
     public boolean hasRepairReport() {
         List<TableDefinition> tdList;
         List<TableDefinition> tdListTotal = new ArrayList<TableDefinition>();
@@ -1405,7 +1411,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public OrgInfo getOrgInfoByUid(String orgUid) {
-        return orgDao.getByUid(orgUid);
+        return configCacheService.findOrgByUid(orgUid);
     }
 
     public void savePM(){
@@ -1554,7 +1560,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             selectedAsset = selectedPmOrder.getAssetInfo();
             currentStatus=3;
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-            dptName = orgDao.getByUid(orgInfoUID).getName();
+            dptName = configCacheService.findOrgByUid(orgInfoUID).getName();
             casePriority =3;//一般
         }
 
@@ -1643,7 +1649,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         dao = WebUtil.getBean(V2_PmOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
-        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -1667,10 +1672,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
-//        assetTypeGroupList = loginUser.getAssetTypeGroupList();
+        assetTypeGroupList = loginUser.getAssetTypeGroupList();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1709,24 +1716,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
 
-
-
-        /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
-            String query = WebUtil.getRequestParameter("query");
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 8;
-            } else { userContextService.()
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        } else {
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = -1; //代办
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        }*/
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
@@ -1876,6 +1865,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
         searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
         searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
+        searchFilterList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
+        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
+
     }
 
     public void deleteReporter(String id) {
@@ -1891,9 +1883,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
-        /*if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-        }*/
+        }
         this.setSearchFilter();
 
         if(queryIndex == 20){
@@ -2199,6 +2191,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         reportList = pmOrderService.getReportList(selected.getId());
 
         loadHmCheck(selected);
+        // 获取temp user信息
+        initExternalTempUser();
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -2517,10 +2511,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         // 资产分类权限
-//        if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
-//            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-//            filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
-//        }
+        if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }
     }
 
     public void searchList(Integer buttonIndex) {
@@ -2766,7 +2760,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         needConfirmTime = false;
         if(userContextService.isCountyArea()){
-            OrgInfo orgInfo = orgDao.findByUid(asset.getSiteUID());
+            OrgInfo orgInfo = configCacheService.findOrgByUid(asset.getSiteUID());
             customerName = orgInfo.getContactPerson();
             customerTel = orgInfo.getContactPhone();
             siteName = orgInfo.getName();
@@ -3060,7 +3054,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<OrgInfo> LoadSiteNameList() {
         if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
-                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
                 orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3072,7 +3066,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<OrgInfo> LoadSiteNameListMVS() {
         if (org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3130,7 +3124,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         try {
             if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
                 if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getClinicalDeptId()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getClinicalDeptId()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
                 }
             }
         } catch (Exception e) {
@@ -3713,5 +3707,60 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setFileTypeName(String fileTypeName) {
         this.fileTypeName = fileTypeName;
+    }
+
+    private void initExternalTempUser(){
+        externalTempUser = externalTempUserDao.findByWoId(selected.getId());
+        if(ObjectUtil.isNotEmpty(externalTempUser)){
+            maintenancePersonInformation = new ArrayList<>();
+            maintenancePersonInformation.add(initMap("userName","姓名",externalTempUser.getUserName()));
+            maintenancePersonInformation.add(initMap("tel","联系人电话",externalTempUser.getTel()));
+            maintenancePersonInformation.add(initMap("comName","公司名称",externalTempUser.getComName()));
+        }
+
+    }
+    private Map<String,String> initMap(String fieldName,String key,String label){
+        Map<String,String> row=new HashMap<>();
+        row.put("fieldName",fieldName);
+        row.put("key",key);
+        row.put("label",label);
+        return row;
+    }
+
+    public void onRowEditExternalTempUser(RowEditEvent event) {
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        Map<String,String> row =(Map) event.getObject();
+        String label = row.get("label");
+        if(org.apache.commons.lang.StringUtils.isBlank(label)){
+            WebUtil.addErrorMessage(row.get("key")+"不能为空");
+            return;
+        }
+        try {
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            fieldName.set(externalTempUser,label);
+            externalTempUserDao.save(externalTempUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+    public void onRowCancelExternalTempUser(RowEditEvent event) {
+        try {
+            Map<String,String> row =(Map) event.getObject();
+            Class<ExternalTempUser> externalTempUserClass = ExternalTempUser.class;
+            Field fieldName = externalTempUserClass.getDeclaredField(row.get("fieldName"));
+            fieldName.setAccessible(true);
+            Object o = fieldName.get(externalTempUser);
+            if(!ObjectUtils.isEmpty(o)){
+                row.put("label",o.toString());
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -69,7 +69,7 @@
 							<h:outputText value="#{msg.CapitalSource}" />
 							<h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}" />
 							<h:outputText value="#{msg.RiskGrade}" />
-							<h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}" />
+							<h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}" />
 							<h:outputText value="#{msg.MeasurementGrade}" />
 							<h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}" />
 							<h:outputText value="#{msg.EmergencyEquipment}" />

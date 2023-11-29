@@ -142,7 +142,7 @@
                              rendered="#{!'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                             onclick="PF('ApproveDialog').hide()"
+                             onclick="PF('ApproveDialog').hide()" update="MultiLevelListForm"
                              rendered="#{!'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
             <p:commandButton immediate="true" value="确定" icon="ui-icon-check" onclick="PF('ApproveDialog').hide()"
                              rendered="#{'view'.equals(multiLevelApprovalConfigController.operateType)}"/>
@@ -194,17 +194,8 @@
                         <label class="label"> 审核人选择 </label>
                         <br></br>
 
-                        <h:panelGroup>
 
-<!--                            <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.RoleApproveCondition.approveRoles}"-->
-<!--                                                     itemLabel="临床科室主任" >-->
-<!--&lt;!&ndash;                                <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>&ndash;&gt;-->
-<!--                            </p:selectBooleanCheckbox>-->
-
-<!--                            <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.clinicalDepartmentDirector}"-->
-<!--                                                     itemLabel="设备所属科室" >-->
-<!--                                &lt;!&ndash;                                <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>&ndash;&gt;-->
-<!--                            </p:selectBooleanCheckbox>-->
+                        <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalConditionEnable}">
                             <p:fieldset legend="审批节点-角色">
                                 <p:selectOneMenu  value="#{multiLevelApprovalConfigController.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}审批角色" itemValue="#{null}" noSelectionOption="true" />

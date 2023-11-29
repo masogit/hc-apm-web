@@ -10,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -97,7 +98,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     }
     private void queryScope(OrgInfo org){
         if(org == null) return;
-        switch (org.getOrgType()) {
+        /*switch (org.getOrgType()) {
             case 4:
                 // 科室
                 updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, org.getId()));
@@ -117,30 +118,30 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
             default:
                 // 租户
                 updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
-        }
+        }*/
+        updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+
     }
     @Override
     public void save() {
         // 保存时设置科室
-        selected.setDept(selectedDept);
-        selected.setDeptId(selectedDept.getId());
-
-        selected.setTenantUID(selectedDept.getTenantUID());
-        selected.setInstitutionUID(selectedDept.getInstitutionUID());
-        selected.setHospitalUID(selectedDept.getHospitalUID());
-        selected.setSiteUID(selectedDept.getSiteUID());
-
+        //selected.setDept(selectedDept);
+        //selected.setDeptId(selectedDept.getId());
+        selected.setTenantUID(account.getTenantUID());
+        selected.setInstitutionUID(account.getTenantUID());
+        selected.setHospitalUID(account.getTenantUID());
+        selected.setSiteUID(account.getTenantUID());
         boolean isOk = persistService.saveAsset(selected);
         actionMessage(isOk);
     }
 
     @Override
     public void delete() {
-        int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
+        /*int usingAssetsCount = budgetAssetDao.countByApplicationAssetId(selected.getId());
         if (usingAssetsCount > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("BudgetAssetAlreadyInUsing"));
             return;
-        }
+        }*/
         boolean isOk = persistService.deleteAsset(selected);
         selected = null;
         actionMessage(isOk);
@@ -192,6 +193,12 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         }
         if (StringUtils.isNotBlank(searchForm.getAssetName())) {
             updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicationAssetCategory())) {
+            updateSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.LIKE, searchForm.getApplicationAssetCategory()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getStandards())) {
+            updateSearchFilter(new SearchFilter("standards", SearchFilter.Operator.LIKE, searchForm.getStandards()));
         }
     }
 
@@ -284,16 +291,6 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     public void prepareEdit() {
         crudActionName = "Edit";
         selectedDept = selected.getDept();
-    }
-
-    @Override
-    public void prepareView() {
-        crudActionName = "View";
-    }
-
-    @Override
-    public void prepareDelete() {
-        crudActionName = "Delete";
     }
 
     /*

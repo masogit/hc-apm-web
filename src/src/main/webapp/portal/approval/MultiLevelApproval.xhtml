@@ -123,11 +123,19 @@
                                 <f:selectItem itemLabel="同意不上报" itemValue="2"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">审批意见</label>
-                            <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
-                                         value="#{multiLevelApprovalController.approvalOpinion}"/>
-                        </h:panelGroup>
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">审批意见</label>
+                                <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
+                                             value="#{multiLevelApprovalController.approvalOpinion}"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{multiLevelApprovalController.signatureNurseRendered}">
+                                <label class="label">手术室护士长是否已签名</label>
+                                <p:selectOneMenu value="#{multiLevelApprovalController.signatureNurse}"  >
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
                     </p:panelGrid>
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15 and multiLevelApprovalController.businessTypeFlag != 16}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
@@ -150,13 +158,17 @@
                     </h:panelGroup>
                     <!-- 预算审核 -->
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14}">
-                        <p:commandButton validateClient="true" immediate="false"
+                        <p:commandButton validateClient="true" immediate="false" id="approveAgreeBtn"
                                          actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}"
-                                         value="#{msg.Approved}" update="approvalList ItemDetailViewForm"
+                                         value="审核通过" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false"
                                          actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}"
-                                         value="#{msg.NotApproved}" update="approvalList ItemDetailViewForm"
+                                         value="审核不通过" update="approvalList ItemDetailViewForm"
+                                         oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false"
+                                         actionListener="#{multiLevelApprovalController.cancelApplicationMultiLevelApproval()}"
+                                         value="取消申请单" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
 

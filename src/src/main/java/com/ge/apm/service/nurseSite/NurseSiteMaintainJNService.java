@@ -217,7 +217,7 @@ public class NurseSiteMaintainJNService {
 	}
 
 	public List<AssetInfo> getListAssetInfoByMaintainConfigParentId(String parentId) {
-		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
+		return assetInfoRepository.findAssetByMaintainConfigJNParentId(parentId);
 	}
 
 	public List<AssetInfo> getListAssetInfoBySearchFilter(List<SearchFilter> listFilter, Sort sort) {

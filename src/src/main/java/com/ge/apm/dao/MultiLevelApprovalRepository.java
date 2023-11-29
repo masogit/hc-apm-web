@@ -20,6 +20,9 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Query("select m from MultiLevelApproval m  where m.businessNumber = ?1 Order By m.createdDate ASC")
     public List<MultiLevelApproval> getByBusinessNumberList(String businessNumber);
 
+    @Query("select m from MultiLevelApproval m  where m.businessUid = ?1 Order By m.createdDate ASC")
+    public List<MultiLevelApproval> getByBusinessUidList(String businessUid);
+
     @Query("select m from MultiLevelApproval m  where m.approvalNumber = ?1 Order By m.createdDate ASC")
     public List<MultiLevelApproval> getByApprovalNumberList(String approvalNumber);
 
