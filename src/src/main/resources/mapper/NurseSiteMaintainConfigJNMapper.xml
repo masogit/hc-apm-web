@@ -22,8 +22,10 @@
     </resultMap>
 
     <select id="findJoinAssetList" resultMap="maintainConfigBean">
-        select nsmc.* from nurse_site_maintain_config_jn nsmc left join nurse_site_maintain_config_item_jn nsmci on nsmc.id = nsmci.parent_id left join asset_info ai on ai.uid = nsmci.asset_uid
+        select nsmc.* from nurse_site_maintain_config_jn nsmc left join nurse_site_maintain_config_item_jn nsmci on nsmc.id = nsmci.parent_id
         <where>${ew.sqlSegment}</where>
+<!--        select nsmc.* from nurse_site_maintain_config_jn nsmc left join nurse_site_maintain_config_item_jn nsmci on nsmc.id = nsmci.parent_id left join asset_info ai on ai.uid = nsmci.asset_uid-->
+<!--        <where>${ew.sqlSegment}</where>-->
     </select>
 
 </mapper>

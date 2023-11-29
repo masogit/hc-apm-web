@@ -376,15 +376,15 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT,ApprovalConstant.APPROVAL_ASSET_SCRAP);//设备维修/设备保养/预算管理
         configEnable = list.contains(selected.getBusinessType());
     }
-//
-//    //审核人条件是否展示
-//    public boolean getApprovalConditionEnable(){
-//        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR) ; //设备维修
-//        if(selected!=null && selected.getBusinessType()!=null){
-//            return list.contains(selected.getBusinessType());
-//        }
-//        return false;
-//    }
+
+    //审核人条件是否展示
+    public boolean getApprovalConditionEnable(){
+        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR) ; //设备维修
+        if(selected!=null && selected.getBusinessType()!=null){
+            return list.contains(selected.getBusinessType());
+        }
+        return false;
+    }
 
     public void setToUsing(String uid) {
         selected = configDao.findById(uid);

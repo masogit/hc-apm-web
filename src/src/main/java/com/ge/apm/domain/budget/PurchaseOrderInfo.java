@@ -3,6 +3,7 @@ package com.ge.apm.domain.budget;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.UserAccount;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -127,7 +128,7 @@ public class PurchaseOrderInfo implements Serializable {
     }
 
     public String getStatus() {
-        return status;
+        return StringUtils.isNotBlank(status)?status:"NotEnabled";
     }
 
     public void setStatus(String status) {

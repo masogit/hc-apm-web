@@ -5099,3 +5099,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','contactInformation','联系方式','Contact information',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MultipleRulesRecordDel', '提示：二级规则、三级规则、巡检和质量控制都被删除时该条记录会被删除', 'Note: When the second level rule, third level rule, inspection, and quality control are all deleted, the record will be deleted.', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'Enabled', '启用', 'Enabled', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'NotEnabled', '未启用', 'Not Enabled', NULL, '-1');

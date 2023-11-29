@@ -1,17 +1,15 @@
 package com.ge.apm.service.budget;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.BudgetApplicationMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
-import com.ge.apm.service.approval.MultiLevelApprovalService;
-import com.ge.apm.service.asset.BlobFileService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -41,8 +39,14 @@ public class PurchaseOrderService {
     private PurchaseTemplateRepository purchaseTemplateRepository;
     @Autowired
     private BudgetApplicationExportService budgetApplicationExportService;
-
+    @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
+    private String baseURL;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+
+    public String getBaseURL(){
+        return baseURL;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<V2_BlobObject> attachList,List<String> templateIds) {
@@ -122,6 +126,7 @@ public class PurchaseOrderService {
         purchaseOrderInfo.setCreatedDate(new Date());
         purchaseOrderInfo.setLastModifiedBy(account.getLoginName());
         purchaseOrderInfo.setLastModifiedDate(new Date());
+        purchaseOrderInfo.setStatus("NotEnabled");
     }
 
     /**

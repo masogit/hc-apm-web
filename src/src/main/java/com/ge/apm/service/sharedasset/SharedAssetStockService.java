@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,10 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SharedAssetReqDetailRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.dao.mapper.SharedAssetRequestMapper;
 import com.ge.apm.service.uaa.UaaService;
@@ -63,6 +60,8 @@ public class SharedAssetStockService {
 
     @Autowired
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+    @Autowired
+    private ConfigItemValueRepository configItemValueRepository ;
 
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
         List<String> orgUidList = getOrgInfo();
@@ -462,16 +461,20 @@ public class SharedAssetStockService {
     public boolean  isWhethertoenableunattended(){
         UserContextService bean = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = bean.getSelectSite();
-        String siteUid="";
         if(selectSite != null){
-            siteUid=selectSite.getUid();
+            return checkWhethertoenableunattended(selectSite.getSiteUID(),selectSite.getHospitalUID(),selectSite.getInstitutionUID(),selectSite.getTenantUID());
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();
-            siteUid=user.getSiteUID();
+            return checkWhethertoenableunattended(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID());
         }
-        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUid);
-        if(CollectionUtils.isEmpty(bySiteUID)) return false;
-        Boolean whethertoenableunattended = bySiteUID.get(0).getWhethertoenableunattended();
-        return whethertoenableunattended==null?false:whethertoenableunattended;
+    }
+
+    private boolean checkWhethertoenableunattended(String siteUid,String hospitalUID,String InstitutionUID,String tenantUID){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(siteUid,
+                hospitalUID,
+                InstitutionUID,
+                tenantUID, key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 }

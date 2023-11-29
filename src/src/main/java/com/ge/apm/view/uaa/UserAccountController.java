@@ -160,6 +160,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
     private String originalTelephone = null;//原始
     private Integer originaSelectId;
+    private boolean isITAdmin=false;
+    private List<String> childNodeUid=new ArrayList<>();
 
     public boolean isPropagateSelectionUp() {
         return propagateSelectionUp;
@@ -271,12 +273,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         userAssetTypeGroupMapper = WebUtil.getBean(UserAssetTypeGroupMapper.class);
         userAssetGroupDao = WebUtil.getBean(UserAssetGroupRepository.class);
-
+        setITAdmin();
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
             List<TenantInfo> tenantInfos = tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
             setTenantUid(tenantInfos.get(0).getUid());
-        } else {
+        } else if(isITAdmin){
+            setITAdminOrgTree();
+            updateRoleList();
+        }else {
             setTenantUid(loginUser.getTenantUID());
         }
 
@@ -288,7 +293,27 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
     }
+    private void setITAdminOrgTree(){
+        searchFilters.clear();
+        selectedOrg = null;
+        selected = null;
+        selectedTenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
+        String orgInfoUID = loginUser.getOrgInfoUID();
+        List<OrgInfo> childrenByUids = orgInfoDao.getHospitalChildrenByUids(Arrays.asList(orgInfoUID));
+        childNodeUid=childrenByUids.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        orgTree=uaaService.getOrgTreeNodes(orgInfoUID,childrenByUids);
+    }
 
+
+    private void setITAdmin(){
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String encodeStr = request.getRequestURI();
+        if("/geapm/portal/uaa/userAccount/ListMain.xhtml".equals(encodeStr)){
+            String roleName="ITAdmin";
+            isITAdmin= loginUser.getRoleNames().stream().anyMatch(item->roleName.equals(item));
+        }
+    }
     public boolean isLocale() {
         return "zh".equalsIgnoreCase(LocaleHolder.getLocale().toString());
     }
@@ -390,6 +415,33 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     private void generateListSearchFilter() {
+        if(isITAdmin){
+            itAdminFilter();
+        }else{
+            superAdminFilter();
+        }
+        boolean nameFilter = false;
+        Object nameValue = "";
+        for (SearchFilter filter : searchFilters) {
+            if (filter.fieldName.equals("name")) {
+                nameFilter = true;
+                nameValue = filter.value;
+                filter.conditionPath = "1*2*3+";
+            }
+        }
+        if (nameFilter) {
+            nameValue = ((String) nameValue).toLowerCase();
+            searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
+        }
+    }
+    private void itAdminFilter(){
+        if (selectedOrg == null) {
+            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN,childNodeUid));
+        }else{
+            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ,selectedOrg.getUid()));
+        }
+    }
+    private void superAdminFilter() {
         if (selectedOrg == null) {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
         } else {
@@ -409,19 +461,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
                 }
             }
-        }
-        boolean nameFilter = false;
-        Object nameValue = "";
-        for (SearchFilter filter : searchFilters) {
-            if (filter.fieldName.equals("name")) {
-                nameFilter = true;
-                nameValue = filter.value;
-                filter.conditionPath = "1*2*3+";
-            }
-        }
-        if (nameFilter) {
-            nameValue = ((String) nameValue).toLowerCase();
-            searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
         }
     }
 

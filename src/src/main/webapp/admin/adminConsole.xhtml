@@ -90,7 +90,7 @@
 				<!-- <p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.deleteObjectHub()}" value="批量更新所有租户" update=":growl"></p:commandButton>
 				</p:fieldset> -->
-				<p:fieldset legend="批量更新workflow表配置到config_item数据(到货安装是否审批 YHAAO-19736)，（只用点击一次即可，请勿重复点击）">
+				<p:fieldset legend="批量更新workflow表配置到config_item数据(无人值守设备预约锁定时长 YHAAO-20276)，（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.batchSynchronizationConfig()}" value="批量同步配置" update=":growl"></p:commandButton>
 				</p:fieldset>
 <!--				<p:fieldset legend="批量根据旧菜单项计算并保存到新菜单模块">-->
@@ -109,6 +109,10 @@
 					<p:fieldset legend="批量更新设备使用风险等级">
 						<p:commandButton actionListener="#{adminConsoleController.batchUpdateI18nMsgType()}" value="批量更新" update=":growl"></p:commandButton>
 					</p:fieldset>
+
+				<p:fieldset legend="批量更新设备表的创建人为name">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetInfo()}" value="批量更新" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

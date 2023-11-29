@@ -45,6 +45,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     private BrandRepository brandRepository;
     private String filterSatId;
     private StreamedContent exportXls;
+    private ConfigItemValueRepository configItemValueRepository;
     //是否启用无人值守 true：启动
     private boolean whethertoenableunattended;
 
@@ -94,27 +95,29 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         OrgInfo selectSite = userContextService.getSelectSite();
         if(selectSite != null){
             deptids = wfcDao.findDeptForSharedAsset(selectSite.getUid());
-            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(selectSite.getUid());
-            whethertoenableunattended=workflowConfig.getWhethertoenableunattended();
+            whethertoenableunattended=checkWhethertoenableunattended(selectSite.getSiteUID(),selectSite.getHospitalUID(),selectSite.getInstitutionUID(),selectSite.getTenantUID());
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();
             deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
-            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
-            if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
-                whethertoenableunattended = false;
-            }else {
-                whethertoenableunattended = true;
-            }
+            whethertoenableunattended=checkWhethertoenableunattended(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID());
         }
         brandRepository=WebUtil.getBean(BrandRepository.class);
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
     }
-
+    private boolean checkWhethertoenableunattended(String siteUid,String hospitalUID,String InstitutionUID,String tenantUID){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(siteUid,
+                hospitalUID,
+                InstitutionUID,
+                tenantUID, key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
+    }
     @Override
     protected GenericRepository<AssetInfo> getDAO() {
         return dao;
