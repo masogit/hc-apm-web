@@ -2,19 +2,25 @@ package com.ge.apm.service.approval;
 
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,7 +28,7 @@ import java.util.stream.Collectors;
 public class WxMessageService extends MicroServiceInvoker {
 
 
-
+    private static final Logger logger = LoggerFactory.getLogger(WxMessageService.class);
 
     public void sendMessage(AssetInfo assetInfo, String approvalName, ApprovableTarget
         approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason) {
@@ -37,12 +43,13 @@ public class WxMessageService extends MicroServiceInvoker {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("paramList", paramList);
-        send(map);
+        map.put("wxTemplateId", "new_workorder_change_template_id");
+        String token = UserContextService.getAccessToken();
+        send(map,token);
 
     }
 
-    public void send(Map<String, Object> map){
-        String token = UserContextService.getAccessToken();
+    public void send(Map<String, Object> map,String token){
 
         HttpEntity<Map> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SEND_WE_CHAT);
@@ -122,5 +129,41 @@ public class WxMessageService extends MicroServiceInvoker {
                 break;
         }
         return businessTypeName;
+    }
+
+
+    @Autowired
+    private AssetCreateService acService;
+
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    @Async
+    public  void submitAssetApprovalSendMessage(AssetInfo assetInfo,String token) {
+        List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
+        List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
+        Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
+        List<UserAccount> resultUser = userAccounts2.stream().filter(item -> uids.contains(item.getId())).distinct().collect(Collectors.toList());
+        logger.info("submitApprovalSendMessage users:{}",JSON.toJSONString(resultUser));
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = simpleDateFormat.format(assetInfo.getCreatedDate());
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword1","资产入库审核");
+        params.put("keyword2", "待审核");
+        params.put("keyword3", dateString);
+        List<WechatParam> paramList = new ArrayList<>();
+        resultUser= resultUser.stream().distinct().collect(Collectors.toList());
+        for (UserAccount userAccount : resultUser) {
+            WechatParam wechatParam = JSON.parseObject(JSON.toJSONString(params), WechatParam.class);
+            wechatParam.setOpenId(userAccount.getWeChatId());
+            wechatParam.setAppAlias(userAccount.getAppAlias());
+            paramList.add(wechatParam);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("paramList", paramList);
+        map.put("wxTemplateId", "partorder_template_id");
+        send(map,token);
     }
 }

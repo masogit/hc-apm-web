@@ -459,7 +459,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer meteringCycle;
 
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
-    //1:待完善,2:待审核,3:已经建档
+    //1:待完善,2:待审核,3:已经建档  4 审核不通过
     @Column(name = "usage_status")
     private Integer usageStatus;
 
@@ -596,17 +596,17 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_disposal_results")
     private Integer assetDisposalResults;
 
-    @Size(max = 256)
-    @Column(name = "one_qr_code")
-    private String oneQrCode;
-
-    @Transient
-    @TableField(exist = false)
-    private String oneQrCodeStatus;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
-    private QrCodeLib qrCodeLib;
+//    @Size(max = 256)
+//    @Column(name = "one_qr_code")
+//    private String oneQrCode;
+//
+//    @Transient
+//    @TableField(exist = false)
+//    private String oneQrCodeStatus;
+//
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
+//    private QrCodeLib qrCodeLib;
 
     /**
      * 主目录
@@ -2955,29 +2955,29 @@ public class AssetInfo implements ChineseName,Serializable {
         this.visibleStatus = visibleStatus;
     }
 
-    public String getOneQrCode() {
-        return oneQrCode;
-    }
-
-    public void setOneQrCode(String oneQrCode) {
-        this.oneQrCode = oneQrCode;
-    }
-
-    public String getOneQrCodeStatus() {
-        return oneQrCodeStatus;
-    }
-
-    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-        this.oneQrCodeStatus = oneQrCodeStatus;
-    }
-
-    public QrCodeLib getQrCodeLib() {
-        return qrCodeLib;
-    }
-
-    public void setQrCodeLib(QrCodeLib qrCodeLib) {
-        this.qrCodeLib = qrCodeLib;
-    }
+//    public String getOneQrCode() {
+//        return oneQrCode;
+//    }
+//
+//    public void setOneQrCode(String oneQrCode) {
+//        this.oneQrCode = oneQrCode;
+//    }
+//
+//    public String getOneQrCodeStatus() {
+//        return oneQrCodeStatus;
+//    }
+//
+//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+//        this.oneQrCodeStatus = oneQrCodeStatus;
+//    }
+//
+//    public QrCodeLib getQrCodeLib() {
+//        return qrCodeLib;
+//    }
+//
+//    public void setQrCodeLib(QrCodeLib qrCodeLib) {
+//        this.qrCodeLib = qrCodeLib;
+//    }
 
     public Integer getAnnualMaintenanceTimes() {
         return annualMaintenanceTimes;
@@ -3088,7 +3088,7 @@ public class AssetInfo implements ChineseName,Serializable {
         this.assetLocation = assetLocation;
     }
 
-    private final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 
     public String getAssetUsedLifecycle() {
         if (ObjectUtil.isNotEmpty(assetUsedLifecycle)) {
@@ -3103,10 +3103,10 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getAssetLifecycleDeadline() {
-        if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
+        if (ObjectUtil.isEmpty(manufactDate) || ObjectUtil.isEmpty(lifecycle)) {
             return null;
         }
-        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(installDate, DateField.DAY_OF_MONTH, lifecycle);
+        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.MONTH, lifecycle);
         return DateUtil.formatDate(dateTime);
     }
 }

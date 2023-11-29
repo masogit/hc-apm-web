@@ -3,10 +3,6 @@ package com.ge.apm.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -30,19 +26,15 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    @CreatedBy
     @Column(name = "created_by", nullable = true, length = 50)
     private String createdBy;
 
-    @CreatedDate
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
-    @LastModifiedBy
     @Column(name = "last_modified_by", nullable = true, length = 50)
     private String lastModifiedBy;
 
-    @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 

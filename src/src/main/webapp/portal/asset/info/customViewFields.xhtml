@@ -119,20 +119,20 @@
             <p:inputText value="#{assetInfoDetailController.selected.modalityType}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'monitorRate')}">
         <h:panelGroup >
             <label class="label">#{msg.monitorRate}(W)</label>
             <p:inputText value="#{assetInfoDetailController.selected.monitorRate}" readonly="true"/>
         </h:panelGroup>
     </c:if>
 
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'otherPower')}">
         <h:panelGroup >
             <label class="label">#{msg.otherPower}(W)</label>
             <p:inputText value="#{assetInfoDetailController.selected.otherPower}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'unitPriceElectricity')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'unitPriceElectricity')}">
         <h:panelGroup >
             <label class="label">电费单价(元)</label>
             <p:inputText value="#{assetInfoDetailController.selected.unitPriceElectricity}" readonly="true"/>

@@ -302,7 +302,7 @@
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 <!--                                action="ApprovalList?faces-redirect=true"-->
                                 <h:panelGroup id="buttonGroup">
-                                        <p:commandButton  validateClient="true"  update=":growl" action="#{assetInfoEditController.submitApprovalExtend(1)}" value="审核不通过" oncomplete="handleComplete(xhr, status, args);" icon="ui-icon-clear"/>
+                                        <p:commandButton  validateClient="true"  update=":growl" action="#{assetInfoEditController.submitApprovalExtend(4)}" value="审核不通过" oncomplete="handleComplete(xhr, status, args);" icon="ui-icon-clear"/>
                                         <p:commandButton  validateClient="true" update=":growl"  action="#{assetInfoEditController.submitApprovalExtend(3)}"  value="审核通过" oncomplete="handleComplete(xhr, status, args);" icon="ui-icon-check" />
                                         <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{assetInfoApprovalController.cancel()}" action="ApprovalList?faces-redirect=true"  icon="ui-icon-cancel" />
                                 </h:panelGroup>

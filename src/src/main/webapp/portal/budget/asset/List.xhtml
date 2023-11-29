@@ -33,10 +33,10 @@
 
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
-                    <p:fieldset legend="#{msg.AdvancedSearch}">
+                  <!--  <p:fieldset legend="#{msg.AdvancedSearch}">
                         <p:panelGrid id="searchPanel" columns="4" layout="grid"
                                      styleClass="ui-panelgrid-blank form-group">
-                            <!--<h:panelGroup>
+                            &lt;!&ndash;<h:panelGroup>
                                 <label class="label">#{msg.clinicaldepart}</label>
                                 <p:inputText id="dept" readonly="true"
                                              value="#{budgetAssetController.searchForm.dept}"/>
@@ -59,7 +59,7 @@
                                         </p:tree>
                                     </p:scrollPanel>
                                 </p:overlayPanel>
-                            </h:panelGroup>-->
+                            </h:panelGroup>&ndash;&gt;
                             <h:panelGroup>
                                 <p:outputLabel class="label" value="#{msg.EquipmentName}"/>
                                 <p:inputText value="#{budgetAssetController.searchForm.assetName}"/>
@@ -89,7 +89,7 @@
                                                  update="searchForm assetList"/>
                             </h:panelGroup>
                         </p:panelGrid>
-                    </p:fieldset>
+                    </p:fieldset>-->
                 </h:form>
 
                 <h:form id="assetList">
@@ -108,19 +108,19 @@
                         <p:ajax event="filter" listener="#{budgetAssetController.onFilter}"
                                 update="createButton editButton viewButton deleteButton"/>
 
-                        <p:column headerText="#{msg.EquipmentName}">
+                        <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="推荐设备品牌 ">
+                        <p:column headerText="推荐设备品牌" filterBy="#{item.assetBrand}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetBrand}"/>
                         </p:column>
-                        <p:column headerText="设备品类 ">
+                        <p:column headerText="设备品类" filterBy="#{item.applicationAssetCategory}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.applicationAssetCategory}"/>
                         </p:column>
-                        <p:column headerText="规格">
+                        <p:column headerText="规格"  filterBy="#{item.standards}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.standards}"/>
                         </p:column>
-                        <p:column headerText="型号">
+                        <p:column headerText="型号" filterBy="#{item.assetModel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetModel}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">

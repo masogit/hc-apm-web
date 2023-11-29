@@ -131,17 +131,17 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 
     @Override
 	protected Page<NurseSiteMaintainConfigJN> loadData(PageRequest pageRequest) {
-		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
-			return new PageImpl<>(ListUtil.empty());
-		}
+//		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+//			return new PageImpl<>(ListUtil.empty());
+//		}
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
 		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
 		Wrapper<NurseSiteMaintainConfigJN> wrapper = new EntityWrapper<>();
-		if (currentUser.isEnableAssetTypeGroup()) {
-			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
-		}
+//		if (currentUser.isEnableAssetTypeGroup()) {
+//			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+//		}
 		if(selectSite!=null) {
 			wrapper.andNew().eq("nsmc.site_uid", selectSite.getUid());
 			wrapper.or().eq("nsmc.hospital_uid", selectSite.getUid());

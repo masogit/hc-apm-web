@@ -30,7 +30,8 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbFePartOrderDetailController.selected.orderType eq 'ManMade'}">
+                    <!--<h:panelGroup id="maintainFlagGroup" rendered="#{zkbFePartOrderDetailController.selected.orderType eq 'ManMade'}">-->
+                    <h:panelGroup id="maintainFlagGroup" rendered="false">
                         <label class="label">保养申请*</label>
                         <p:selectOneMenu id="maintainFlag" valueChangeListener="#{zkbFePartOrderDetailController.handSubtractStatus}" disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.maintainFlag}" requiredMessage="保养申请 #{msg.ValidationRequire}">
                             <p:ajax event="change" update="zkbFeHeadForm zkbFePartOrderEditForm:subtractTotalStatus"   />

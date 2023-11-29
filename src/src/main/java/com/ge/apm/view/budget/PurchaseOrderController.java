@@ -2,9 +2,7 @@
 package com.ge.apm.view.budget;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
@@ -86,7 +84,11 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     @Getter @Setter
     private List<V2_BlobObject> attachList;
+    @Getter @Setter
+    private List<VenderInfo> venderInfoList;
 
+    @Getter @Setter
+    private VenderInfo venderInfo;
     private List<SearchFilter> assetSearchFilters;
 
     private PurchaseOrderInfoRepository dao;
@@ -95,6 +97,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     private BudgetApplicationRepository budgetApplicationRepository;
     //private BlobObjectRepository blobObjectRepository;
+
+    private VenderInfoRepository venderInfoRepository;
+    private PurchaseVenderRepository purchaseVenderRepository;
+
 
     private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
     private PurchaseTemplateRepository purchaseTemplateRepository;
@@ -119,10 +125,15 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private List<BudgetPurchaseTemplateManage> budgetPurchaseTemplateManageList;
     @Getter @Setter
     private List<String> templateIds = new ArrayList<>();
+    @Getter @Setter
+    private List<String> venderInfoStr = new ArrayList<>();
 
+    private String purchaseUrl;
 
     @Override
     protected void init() {
+        venderInfoRepository = WebUtil.getBean(VenderInfoRepository.class);;
+        purchaseVenderRepository = WebUtil.getBean(PurchaseVenderRepository.class);;
         dao = WebUtil.getBean(PurchaseOrderInfoRepository.class);
         budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         budgetApplicationRepository = WebUtil.getBean(BudgetApplicationRepository.class);
@@ -147,6 +158,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 this.prepareCreate();
             } else if (PurchaseOrderController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
+            }else if (PurchaseOrderController.VIEW_ACTION.equals(action)) {
+                this.prepareView();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -171,6 +184,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
         curApplicationBudgetAssets.addAll(selectApplicationBudgetAssets);
         calcTotalAmount(curApplicationBudgetAssets);
+    }
+
+    public void loadVenderInfo() {
+        this.venderInfoList = venderInfoRepository.queryByPurchaseId(this.selected.getId());
     }
 
     @Override
@@ -207,13 +224,27 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.CREATE_ACTION);
         }else if(PurchaseOrderController.EDIT_ACTION.equals(action)){
             return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId());
+        }else if(PurchaseOrderController.VIEW_ACTION.equals(action)){
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.VIEW_ACTION + "&editId=" + this.selected.getId());
         }else {
             return null;
         }
     }
 
+    public void updateStatus(String purchaseId , String status){
+        PurchaseOrderInfo purchaseOrderInfo = dao.findById(purchaseId);
+        purchaseOrderInfo.setStatus(status);
+        purchaseOrderInfo.setLastModifiedDate(new Date());
+        purchaseOrderInfo.setLastModifiedBy(account.getLoginName());
+        PurchaseOrderInfo purchaseOrder = dao.save(purchaseOrderInfo);
+        if(this.selected!=null && this.selected.getId().equals(purchaseOrder.getId())){
+            this.selected = purchaseOrder;
+        }
+    }
+
+
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId();
+        String str = "action=" + PurchaseOrderController.VIEW_ACTION + "&editId=" + this.selected.getId();
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -249,6 +280,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.searchFilters = purchaseOrderService.initSearchFilter(this.searchFilters);
         addSearchFilter();
     }
+
+
 
 
     public void removeAttachmentById(String blobId) {
@@ -312,7 +345,9 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         OrgInfo orgInfo = (OrgInfo) node.getData();
         assetSearchForm.setDept(orgInfo);
     }
-
+    public boolean curModelDisables(){
+        return "View".equals(crudActionName)?true:false;
+    }
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         crudActionName = "Create";
@@ -343,6 +378,29 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         List<PurchaseTemplate> purchaseTemplateList = purchaseTemplateRepository.findByPurchaseId(id);
         if(CollectionUtils.isNotEmpty(purchaseTemplateList)){
             this.templateIds = purchaseTemplateList.stream().map(PurchaseTemplate::getTemplateId).collect(Collectors.toList());
+        }
+        //投标商拼接数据
+        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(id);
+
+        if(CollectionUtils.isNotEmpty(purchaseVenderList)){
+            for(PurchaseVender purchaseVender :purchaseVenderList){
+                StringBuilder stringBuilder = new StringBuilder();
+                VenderInfo venderInfo = venderInfoRepository.findById(purchaseVender.getVenderId());
+                if(venderInfo == null){
+                    continue;
+                }
+                stringBuilder.append(venderInfo.getVenderName()+" : ");
+                stringBuilder.append("[");
+                List<V2_BlobObject> v2_blobObjectList = blobService.findBlobObjectsByBoUid(purchaseVender.getId());
+                if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
+                    for(V2_BlobObject v2_blobObject :v2_blobObjectList){
+                        stringBuilder.append(" "+v2_blobObject.getObjectName()+",");
+                    }
+                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                }
+                stringBuilder.append("]");
+                venderInfoStr.add(stringBuilder.toString());
+            }
         }
     }
 
@@ -429,5 +487,12 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
     }
 
+    public String getPurchaseUrl() {
+        return selected==null?"":purchaseOrderService.getBaseURL().replace("gateway","")+"reports/purchaseInfo?purchaseNum="+selected.getPurchaseNum()+
+                "&assetName="+ (StringUtils.isNotBlank(selected.getApplicationAssetName())?selected.getApplicationAssetName():"");
+    }
 
+    public void setPurchaseUrl(String purchaseUrl) {
+        this.purchaseUrl = purchaseUrl;
+    }
 }
