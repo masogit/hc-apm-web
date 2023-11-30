@@ -71,7 +71,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private Integer tabIndexList = 0;
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
-    public final static String VIEW_ACTION = "View";
     private BlobFileService blobService;
     /**
      * 编辑数据主键
@@ -149,8 +148,6 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
                 this.prepareCreate();
             } else if (BudgetApplicationBapController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
-            } else if (BudgetApplicationBapController.VIEW_ACTION.equals(action)){
-                this.prepareView();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -284,16 +281,13 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION
                     + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
 
-        }else if(BudgetApplicationBapController.VIEW_ACTION.equals(action)){
-            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.VIEW_ACTION
-                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
         }else{
             return null;
         }
     }
 
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + BudgetApplicationBapController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
+        String str = "action=" + BudgetApplicationBapController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -312,7 +306,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
-                WebUtil.addSuccessMessage("无可用的审批流,请检查后重试！");
+                WebUtil.addSuccessMessage("失败:无可用的审批流,请检查后重试！");
                 return "";
             }
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
@@ -624,5 +618,13 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public boolean editButtonDisplay(){
+        boolean render = true;
+        if(!BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString().equals(this.selected.getApplicationStep())){
+            render = false;
+        }
+        return render;
     }
 }

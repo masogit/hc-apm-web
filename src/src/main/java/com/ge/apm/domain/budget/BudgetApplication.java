@@ -46,7 +46,7 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     private Integer applicationStatus;
     /**
      * 申请步骤APPLICATIONSTEP
-     *已完成   待审核   已完成
+     *待提交 待审核  已完成     已完成
      */
     public enum APPLICATIONSTEP {
         ToSubmitted, PendingApproval,PendingComplete,Complete
@@ -574,28 +574,6 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
-    }
-
-    // 计算审核进度
-    public BigDecimal approvalProgressPercentage() {
-        Integer totalApprovalProgress = 0;
-        if (this.approvalConfig != null && this.approvalConfig.getApprovalItem() != null) {
-            switch (this.getApplicationStatus()) {
-                case 1:
-                case 2:
-                    totalApprovalProgress = JSON.parseObject(this.approvalConfig.getApprovalItem(), new TypeReference<List<ApprovalNode>>() {
-                    }).size();
-                    break;
-                case 3:
-                case 4:
-                    totalApprovalProgress = this.approvalProgress;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return totalApprovalProgress == 0 ? BigDecimal.ZERO : new BigDecimal(approvalProgress).multiply(new BigDecimal(100))
-                .divide(new BigDecimal(totalApprovalProgress), RoundingMode.HALF_UP);
     }
 
     @Override

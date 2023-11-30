@@ -16,7 +16,7 @@
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
-            <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+            <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
             <p:ajax event="rowDblselect" listener="#{budgetBayController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
             <p:column headerText="#{msg.ApplicationNum}" >
                 <h:outputText value="#{item.applicationNum}"/>
@@ -76,11 +76,7 @@
                 <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                  title="#{msg.Edit}"
                                  action="#{budgetBayController.intoActionModel('Edit')}"
-                                 disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStep eq 'Complete' or budgetBayController.selected.applicationStep eq 'PendingApproval'}"/>
-                <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
-                                 title="#{msg.View}"
-                                 action="#{budgetBayController.intoActionModel('View')}"
-                                 disabled="#{empty budgetBayController.selected}"/>
+                                 disabled="#{empty budgetBayController.selected }"/>
                 <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                   ajax="false">
                     <p:dataExporter type="xls" target="datalist" fileName="Budget_Application_Export"/>
