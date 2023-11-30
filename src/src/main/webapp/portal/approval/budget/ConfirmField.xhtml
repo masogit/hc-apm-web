@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition >
+        <p:dialog class="BudgetApplicationDialogConfirm" id="BudgetApplicationDialogConfirm" widgetVar="BudgetApplicationDialogConfirm"
+                  modal="true" height="500" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="申购信息">
+            <h:form id="confirmForm">
+                <p:fieldset legend="申购信息确认">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:outputLabel class="label">#{msg.ApplicationDept}<span style="color: red">*</span></p:outputLabel>
+                                <p:inputText  id="deptConfirm" value="#{multiLevelApprovalController.confirmBudget.confirmApplicationDeptName}"
+                                              readonly="true" class="confirm" required="true" requiredMessage="申请科室 #{msg.ValidationRequire}"/>
+                                <p:commandButton id="orgEditConfirm" process="@this" icon="fa fa-angle-down"
+                                                 class="btn btn-sm popupIconButton"  />
+                                <p:overlayPanel  id="popupPanelEditConfirm" widgetVar="varOrgEditConfirm" for="orgEditConfirm" hideEffect="fade"
+                                                 style="position: absolute; left: 0; top: 0; width: 300px;"
+                                                 dynamic="false" modal="false" dismissable="true"   >
+                                    <p:scrollPanel style="height:300px; border: 0" mode="native"  >
+                                        <p:tree id="orgTreeEditConfirm" value="#{multiLevelApprovalController.orgTree}" var="node"
+                                                selectionMode="single" class="tree" style="width:98%; border:0"  >
+                                            <p:ajax process="@this" event="select"
+                                                    update="@parent:deptConfirm "
+                                                    listener="#{multiLevelApprovalController.onSelectTreeNode}"
+                                                    oncomplete="PF('varOrgEditConfirm').hide();" />
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                              <label class="label">设备品目<span style="color: red">*</span></label>
+                              <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmEquipmentCategory}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                           </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">数量(台)<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" class="confirm" required="true" requiredMessage="数量(台) #{msg.ValidationRequire}"
+                                                value="#{multiLevelApprovalController.confirmBudget.confirmQuantity}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                 <p:outputLabel class="label">预算(万元)<span style="color: red">*</span></p:outputLabel>
+                                 <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                                                 value="#{multiLevelApprovalController.confirmBudget.confirmPrice}"/>
+                             </h:panelGroup>
+                              <h:panelGroup>
+                                <label class="label">国产占比(国家财政部)<span style="color: red">*</span></label>
+                                <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmNationalFinance}" class="confirm" required="true" requiredMessage="国产占比(国家财政部) #{msg.ValidationRequire}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">国产占比(省财政部)<span style="color: red">*</span></label>
+                                <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmProvincialFinance}" class="confirm" required="true" requiredMessage="国产占比(省财政部) #{msg.ValidationRequire}" />
+                            </h:panelGroup>
+                              <h:panelGroup>
+                                    <label class="label">科室意见（是否进口）<span style="color: red">*</span></label>
+                                    <p:selectOneMenu value="#{multiLevelApprovalController.confirmBudget.confirmImport}"  class="confirm" required="true" requiredMessage="科室意见（是否进口） #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    </p:selectOneMenu>
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <label class="label">公告及信息收集情况<span style="color: red">*</span></label>
+                                  <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmNotice}" class="confirm" required="true" requiredMessage="公告及信息收集情况 #{msg.ValidationRequire}" />
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <label class="label">主要功能和配置<span style="color: red">*</span></label>
+                                  <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmMajorFunction}" class="confirm" required="true" requiredMessage="主要功能和配置 #{msg.ValidationRequire}" />
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <label class="label">主要参数和要求<span style="color: red">*</span></label>
+                                  <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmParameters}" class="confirm" required="true" requiredMessage="主要参数和要求 #{msg.ValidationRequire}" />
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <label class="label">意向品牌<span style="color: red">*</span></label>
+                                  <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmBrand}" class="confirm" required="true" requiredMessage="意向品牌 #{msg.ValidationRequire}" />
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <p:outputLabel class="label">栏标价(万元)<span style="color: red">*</span></p:outputLabel>
+                                  <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="栏标价(万元) #{msg.ValidationRequire}"
+                                                  value="#{multiLevelApprovalController.confirmBudget.confirmMaximumPrice}" />
+                              </h:panelGroup>
+                              <h:panelGroup>
+                                  <p:outputLabel class="label">备注<span style="color: red">*</span></p:outputLabel>
+                                  <p:inputTextarea  value="#{multiLevelApprovalController.confirmBudget.confirmRemark}" class="confirm" required="true" requiredMessage="备注 #{msg.ValidationRequire}" rows="2"  cols="20">
+                                  </p:inputTextarea>
+                              </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{multiLevelApprovalController.saveConfirmInfoBudgetApp()}"
+                                     value="#{msg.Save}" id="saveButton"
+                                     update=":BudgetApplicationDialogConfirm approvalDialogPurForm:budgetApplicationConfirmlist :growl"
+                                     oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');"/>
+                    <p:commandButton value="取消" immediate="true" icon="ui-icon-arrow-back" oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');" />
+                </h:panelGroup>
+            </h:form>
+
+        </p:dialog>
+</ui:composition>
+</html>
