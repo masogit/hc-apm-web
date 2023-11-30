@@ -17,6 +17,7 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -25,6 +26,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -79,6 +84,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private Integer pendingUnOrderQty = 0;
     private Integer pendingReturnQty = 0;
     private Integer pendingCloseQty = 0;
+    private Integer pendingCompleteAuditQty = 0;
 
     @Override
     protected void init() {
@@ -236,15 +242,21 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
             pendingOsscReturnQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
 
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString());
+            pendingCompleteAuditQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
         }
     }
 
     public void calcPendQty(){
         if(userContextService.isZkbUser()) {
+            List<String> steps = new ArrayList<>();
+            steps.add(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+            steps.add(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
             if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-                pendingQty = dao.fetchQtyByStepForTest(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString(), selectionTenantInfo);
+                pendingQty = dao.fetchQtyByStepsForTest(steps, selectionTenantInfo);
             }else{
-                pendingQty = dao.fetchQtyByStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString(), selectionTenantInfo);
+                pendingQty = dao.fetchQtyBySteps(steps, selectionTenantInfo);
             }
         }else{
             Map<String, Object> mm = new HashMap<>();
@@ -301,6 +313,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
                     mm.put("status", ZkbPartOrder.PartOrderStatus.PartReturned.toString());
+                }else if(ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString());
                 }
                 pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
             }else if(zkbPartOrderUserConfigList.size() == 2){
@@ -343,284 +357,210 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,"");
-        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
+        Specification<ZkbPartOrder> specification = buildSpecification(this.searchFilters,"");
+        zkbContractPage = dao.findBySpecification(specification, pageRequest);
         //searchFilters.clear();
         return zkbContractPage;
     }
 
-    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters,String type){
-        List<SearchFilter> searchFilters = csearchFilters;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        }
-
-        if(StrUtil.isEmpty(notGeAsset)){
-            searchFilters.add(new SearchFilter("notGeAsset", SearchFilter.Operator.IsNull, ""));
-        }else{
-            searchFilters.add(new SearchFilter("notGeAsset", SearchFilter.Operator.EQ, "t"));
-        }
-
-        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            if(StringUtils.isEmpty(type)){
-                searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+    public Specification<ZkbPartOrder> buildSpecification(List<SearchFilter> csearchFilters , String type){
+        return  (Root<ZkbPartOrder> root, CriteriaQuery<?> query, CriteriaBuilder builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if(StrUtil.isEmpty(notGeAsset)){
+                predicates.add(builder.isNull(root.get("notGeAsset")));
+            }else{
+                predicates.add(builder.equal(root.get("notGeAsset"), CopyByInvok.T));
             }
-        }else {
-            searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.IsNull, ""));
-        }
-        if("letter".equals(queryStatus)){
-            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
-            }
-            searchFilters.add(new SearchFilter("needLetterFlag", SearchFilter.Operator.EQ, "t"));
-            searchFilters.add(new SearchFilter("uploadLetterFlag", SearchFilter.Operator.EQ, "f"));
-        }else if(userContextService.isZkbUser()) {
-            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
-            }
-            if(StringUtils.isEmpty(queryStatus)){
-                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
-            }else if(!"all".equals(queryStatus)){
-                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-            }
-        }else{
-            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
-            }
-
-            if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
-                //return null;
-            }else if(zkbPartOrderUserConfigList.size() == 1){
-                //region 用户只有一种角色
-                ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
-                if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
-                        }else if("all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
-                        }
-                    }else {
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
-                        }else if("all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
-                        }else if("all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
-                        }
-                    }else {
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
-                        }else if("all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion()));
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString()));
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(),"1*2+3*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(),"1*2+3*"));
-                            searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(), "1+2*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+2*"));
-                            searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    /*if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString()));
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+"));
-                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                        }
-                    }*/
-                    if (StringUtils.isEmpty(queryStatus)) {
-                        if(searchFilters.size() > 0){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1*2+"));
-                        }else{
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1+"));
-                        }
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString()));
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(), "1+"));
-                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString()));
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("productAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(), "1+"));
-                            searchFilters.add(new SearchFilter("productAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Probe.toString()));
-                        }else if(!"all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Probe.toString()));
-                        }else{
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Probe.toString()));
-                        }
-                    }else{
-                        if(StringUtils.isEmpty(queryStatus)){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString()));
-                        }else if(!"all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString()));
-                        }
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString()));
-                    }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
-                        }else {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1+"));
-                        }
-                    }else if("all".equals(queryStatus)){
-                        /*if(searchFilters.size() > 0 ){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.Complete.toString(),"1*2+"));
-                        }else{
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.Complete.toString(),"1+"));
-                        }*/
-
-                        /*searchFilters.add(new SearchFilter("closedAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));*/
-                    }else{
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-
-                    }
-                }else if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(!"all".equals(queryStatus)&&StringUtils.isNotBlank(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-                    }
+            if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+                if(StringUtils.isEmpty(type)){
+                    predicates.add(builder.equal(root.get("dataType"), ZkbPartOrder.DATA_TYPE_TEST));
                 }
-                //endregion
-            }else if(zkbPartOrderUserConfigList.size() == 2){
-                //判断是否为肖雨的角色
-                boolean is4ooRole = true;
-                boolean isCommercialRole = false;
-                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
-                    if (StringUtils.isEmpty(c.getConfigType())) {
-                        is4ooRole = false;
-                    }
-                    if (!c.getConfigType().contains("Order")) {
-                        is4ooRole = false;
-                    }
-                    if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString())){
-                        isCommercialRole = true;
-                    }
+            }else {
+                predicates.add(builder.isNull(root.get("dataType")));
+            }
+
+            if(csearchFilters != null){
+                for(SearchFilter searchFilter : csearchFilters){
+                    predicates.add(builder.equal(root.get(searchFilter.fieldName), searchFilter.value));
                 }
-                if(is4ooRole) {
-                    if (StringUtils.isEmpty(queryStatus)) {
-                        if(searchFilters.size() > 0){
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString(),"1*2+3*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString(),"1*2+3*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString(),"1*2+"));
-                        }else{
-                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString(),"1+2*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString(),"1+2*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString(),"1+"));
-                        }
-                    }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
-                    }
+            }
+
+            if("letter".equals(queryStatus)){
+                if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
+                    predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
                 }
-                if(isCommercialRole) {
-                    if (StringUtils.isEmpty(queryStatus)) {
-                        if(searchFilters.size() > 0){
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));
-                        }else{
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));
-                        }
-                    }else if("all".equals(queryStatus)){
-                        if(searchFilters.size() > 0) {
-                            /*searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));*/
-                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-                            searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1*2+"));
-                        }else {
-                            /*searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));*/
-                            searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
+                predicates.add(builder.equal(root.get("needLetterFlag"), CopyByInvok.T));
+                predicates.add(builder.equal(root.get("uploadLetterFlag"), CopyByInvok.F));
+            }else if(userContextService.isZkbUser()) {
+                if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
+                    predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
+                }
+                if(StringUtils.isEmpty(queryStatus)){
+                    predicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
+                }else if(!"all".equals(queryStatus)){
+                    predicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                }
+            }else{
+                if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
+                    predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
+                }
+                if(zkbPartOrderUserConfigList != null && zkbPartOrderUserConfigList.size() > 0){
+                    List<Predicate> userConfigPredicates = new ArrayList<>();
+                    HashMap<String,String> tseMap = new HashMap<>();//TSE特殊，配置3种角色同一账号，但是待办全部看到的信息应要一样
+                    for(ZkbPartOrderUserConfig zkbPartOrderUserConfig : zkbPartOrderUserConfigList) {
+                        if (ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())) {//技术支持
+                            if ("US".equals(zkbPartOrderUserConfig.getAssetType())) {
+                                if (StringUtils.isEmpty(queryStatus)) {
+                                    Predicate pre1 = builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId());
+                                    Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                                    Predicate pre3 = builder.and(pre2, pre1);
+                                    userConfigPredicates.add(pre3);
+                                } else if ("all".equals(queryStatus)) {
+                                    userConfigPredicates.add(builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId()));
+                                }
+                            } else {
+                                if (StringUtils.isEmpty(queryStatus)) {
+                                    Predicate pre1 = builder.equal(root.get("assetTypeDi"), zkbPartOrderUserConfig.getAssetType());
+                                    Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                                    Predicate pre3 = builder.and(pre2, pre1);
+                                    userConfigPredicates.add(pre3);
+                                } else if ("all".equals(queryStatus)) {
+                                    userConfigPredicates.add(builder.equal(root.get("assetTypeDi"), zkbPartOrderUserConfig.getAssetType()));
+                                }
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(tseMap.containsKey(ZkbPartOrderStep.PartOrderStep.TsePending.toString())){
+                                continue;
+                            }
+                            if(StringUtils.isEmpty(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                                userConfigPredicates.add(pre1);
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                                Predicate pre2 = builder.equal(root.get("tseAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }
+                            tseMap.put(ZkbPartOrderStep.PartOrderStep.TsePending.toString(), ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                        }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("region"), zkbPartOrderUserConfig.getRegion());
+                                Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                                Predicate pre3 = builder.and(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("region"), zkbPartOrderUserConfig.getRegion());
+                                Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                                Predicate pre3 = builder.equal(root.get("manageAuditerUid"), currentUser.getUid());
+                                Predicate pre4 = builder.and(pre1, pre2);
+                                Predicate pre5 = builder.or(pre4, pre3);
+                                userConfigPredicates.add(pre5);
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if (StringUtils.isEmpty(queryStatus)) {
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+                                Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }else if("all".equals(queryStatus)){
+                               /* Predicate pre1 = builder.equal(root.get("osscAuditerUid"), currentUser.getUid());
+                                Predicate pre2 = builder.equal(root.get("returnAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+                                Predicate pre4 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
+                                Predicate pre5 = builder.or(pre1, pre2, pre3, pre4);
+                                userConfigPredicates.add(pre5);*/
+                                Predicate pre1 = builder.equal(root.get("osscAuditerUid"), currentUser.getUid());
+                                Predicate pre2 = builder.equal(root.get("returnAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.notEqual(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.Complete.toString());
+                                Predicate pre4 = builder.or(pre1, pre2, pre3);
+                                userConfigPredicates.add(pre4);
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.DirectorPending.toString()));
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                                Predicate pre2 = builder.equal(root.get("directorAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.CommercialPending.toString()));
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                                Predicate pre2 = builder.equal(root.get("commercialAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ProductPending.toString()));
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
+                                Predicate pre2 = builder.equal(root.get("productAuditerUid"), currentUser.getUid());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }
+                        }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
+                                if(StringUtils.isEmpty(queryStatus)){
+                                    Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                                    Predicate pre2 = builder.equal(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
+                                    Predicate pre3 = builder.and(pre1, pre2);
+                                    userConfigPredicates.add(pre3);
+                                }else if(!"all".equals(queryStatus)){
+                                    Predicate pre1 = builder.equal(root.get("currentStep"), queryStatus);
+                                    Predicate pre2 = builder.equal(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
+                                    Predicate pre3 = builder.and(pre1, pre2);
+                                    userConfigPredicates.add(pre3);
+                                }else{
+                                    userConfigPredicates.add(builder.equal(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString()));
+                                }
+                            }else{
+                                if(StringUtils.isEmpty(queryStatus)){
+                                    Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                                    Predicate pre2 = builder.notEqual(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
+                                    Predicate pre3 = builder.and(pre1, pre2);
+                                    userConfigPredicates.add(pre3);
+                                }else if(!"all".equals(queryStatus)){
+                                    Predicate pre1 = builder.equal(root.get("currentStep"), queryStatus);
+                                    Predicate pre2 = builder.notEqual(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
+                                    Predicate pre3 = builder.and(pre1, pre2);
+                                    userConfigPredicates.add(pre3);
+                                }
+                            }
+                        } else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString()));
+                            }else if(!"all".equals(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                            }
+                        } else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                                Predicate pre2 = builder.equal(root.get("status"), ZkbPartOrder.PartOrderStatus.PartReturned.toString());
+                                Predicate pre3 = builder.or(pre1, pre2);
+                                userConfigPredicates.add(pre3);
+                            }else if(!"all".equals(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                            }
+                        } else if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(!"all".equals(queryStatus)&&StringUtils.isNotBlank(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                            }
                         }
                     }
-                }
-            }else if(zkbPartOrderUserConfigList.size() == 3) {
-                if (StringUtils.isEmpty(queryStatus)) {
-                    searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
-                } else if ("all".equals(queryStatus)){
-                    if(searchFilters.size() > 0) {
-                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1*2+"));
-                    }else{
-                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1+"));
+                    if(userConfigPredicates.size() > 0){
+                        predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
                     }
                 }
             }
-        }
-        return searchFilters;
+
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
     }
+
 
     public String techAuditField(ZkbPartOrder zkbPartOrder){
         if(StringUtils.isNotEmpty(zkbPartOrder.getTechAuditer())){
@@ -750,9 +690,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private StreamedContent exportFile;
 
     public void exportAll(){
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters, "export");
+        Specification<ZkbPartOrder> specification = buildSpecification(this.searchFilters, "export");
         Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
-        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters,sort);
+        List<ZkbPartOrder> zkbPartOrders =  dao.findBySpecification(specification,sort);
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
@@ -1002,5 +942,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setPendingOsscReturnQty(Integer pendingOsscReturnQty) {
         this.pendingOsscReturnQty = pendingOsscReturnQty;
+    }
+
+    public Integer getPendingCompleteAuditQty() {
+        return pendingCompleteAuditQty;
+    }
+
+    public void setPendingCompleteAuditQty(Integer pendingCompleteAuditQty) {
+        this.pendingCompleteAuditQty = pendingCompleteAuditQty;
     }
 }
