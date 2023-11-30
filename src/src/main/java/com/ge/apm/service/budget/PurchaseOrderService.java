@@ -363,5 +363,19 @@ public class PurchaseOrderService {
         }
         return result;
     }
+    @Transactional(rollbackFor = Exception.class)
+    public void delBudgetApplication(List<BudgetApplicationAsset> curApplicationBudgetAssets,BudgetApplicationAsset selectApplicationAssetBudget,
+                                     PurchaseOrderInfo purchaseOrderInfoSelect,UserAccount account,List<String> templateIds) {
+
+        if(selectApplicationAssetBudget.getBudgetApplication() !=null &&
+                StringUtils.isNotBlank(selectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
+                StringUtils.isNotBlank(selectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
+            this.setPurchaseInfoNull(selectApplicationAssetBudget.getBudgetApplication());
+            budgetApplicationDao.save(selectApplicationAssetBudget.getBudgetApplication());
+        }
+        this.handleCommonField(purchaseOrderInfoSelect,account);
+        this.savePurchase(purchaseOrderInfoSelect,curApplicationBudgetAssets,templateIds);
+    }
+
 
 }

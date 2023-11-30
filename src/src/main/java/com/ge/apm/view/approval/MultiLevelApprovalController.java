@@ -745,21 +745,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
 
     public void saveConfirmInfoBudgetApp() {
-        BudgetApplicationAsset budgetApplicationAsset =budgetApplicationAssetRepository.findById(budgetAssetId);
-        budgetApplicationAsset.setConfirmApplicationDeptId(this.confirmBudget.getConfirmApplicationDeptId());
-        budgetApplicationAsset.setConfirmEquipmentCategory(this.confirmBudget.getConfirmEquipmentCategory());
-        budgetApplicationAsset.setConfirmQuantity(this.confirmBudget.getConfirmQuantity());
-        budgetApplicationAsset.setConfirmPrice(this.confirmBudget.getConfirmPrice());
-        budgetApplicationAsset.setConfirmNationalFinance(this.confirmBudget.getConfirmNationalFinance());
-        budgetApplicationAsset.setConfirmProvincialFinance(this.confirmBudget.getConfirmProvincialFinance());
-        budgetApplicationAsset.setConfirmNotice(this.confirmBudget.getConfirmNotice());
-        budgetApplicationAsset.setConfirmImport(this.confirmBudget.getConfirmImport());
-        budgetApplicationAsset.setConfirmMajorFunction(this.confirmBudget.getConfirmMajorFunction());
-        budgetApplicationAsset.setConfirmParameters(this.confirmBudget.getConfirmParameters());
-        budgetApplicationAsset.setConfirmBrand(this.confirmBudget.getConfirmBrand());
-        budgetApplicationAsset.setConfirmMaximumPrice(this.confirmBudget.getConfirmMaximumPrice());
-        budgetApplicationAsset.setConfirmRemark(this.confirmBudget.getConfirmRemark());
-        budgetApplicationAssetRepository.save(budgetApplicationAsset);
+        multiLevelApprovalService.saveConfirmInfoBudgetApp(budgetAssetId,this.confirmBudget);
     }
     /**
      * 申购单信息
@@ -774,7 +760,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         if(!CollectionUtils.isEmpty(budgetApplicationAssets)){
             budgetApplicationAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
                 OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());
-                baa.setConfirmApplicationDeptName(confirmOrg.getName());
+                baa.setConfirmApplicationDeptName(confirmOrg!=null?confirmOrg.getName():null);
             });
         }
         return CollectionUtils.isEmpty(budgetApplicationAssets)?null:budgetApplicationAssets;

@@ -7,6 +7,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
@@ -83,7 +84,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private V2_PmOrderService pmOrderService;
     @Autowired
     private SimplePartsConfigService partsConfigService;
-
+    @Autowired
+    private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
     @Autowired
     private AssetScrapRepository assetScrapDao;
 
@@ -1181,6 +1183,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     // 预算管理
+    @Transactional(rollbackFor = Exception.class)
     public void cancelApplication(MultiLevelApproval multiLevelApproval, Integer approvalStatus,String applicationStep) {
         BudgetApplication budget = budgetApplicationRepository.findById(multiLevelApproval.getBusinessUid());
         if(CollectionUtils.isNotEmpty(budget.getBudgetAssets())){
@@ -1451,5 +1454,22 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public void saveConfirmInfoBudgetApp(String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm) {
+        BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
+        budgetApplicationAsset.setConfirmApplicationDeptId(budgetApplicationAssetConfirm.getConfirmApplicationDeptId());
+        budgetApplicationAsset.setConfirmEquipmentCategory(budgetApplicationAssetConfirm.getConfirmEquipmentCategory());
+        budgetApplicationAsset.setConfirmQuantity(budgetApplicationAssetConfirm.getConfirmQuantity());
+        budgetApplicationAsset.setConfirmPrice(budgetApplicationAssetConfirm.getConfirmPrice());
+        budgetApplicationAsset.setConfirmNationalFinance(budgetApplicationAssetConfirm.getConfirmNationalFinance());
+        budgetApplicationAsset.setConfirmProvincialFinance(budgetApplicationAssetConfirm.getConfirmProvincialFinance());
+        budgetApplicationAsset.setConfirmNotice(budgetApplicationAssetConfirm.getConfirmNotice());
+        budgetApplicationAsset.setConfirmImport(budgetApplicationAssetConfirm.getConfirmImport());
+        budgetApplicationAsset.setConfirmMajorFunction(budgetApplicationAssetConfirm.getConfirmMajorFunction());
+        budgetApplicationAsset.setConfirmParameters(budgetApplicationAssetConfirm.getConfirmParameters());
+        budgetApplicationAsset.setConfirmBrand(budgetApplicationAssetConfirm.getConfirmBrand());
+        budgetApplicationAsset.setConfirmMaximumPrice(budgetApplicationAssetConfirm.getConfirmMaximumPrice());
+        budgetApplicationAsset.setConfirmRemark(budgetApplicationAssetConfirm.getConfirmRemark());
+        budgetApplicationAssetRepository.save(budgetApplicationAsset);
+    }
 }
