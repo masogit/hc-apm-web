@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition >
+    <p:fieldset legend="采购办" id="procurementOffice" rendered="#{multiLevelApprovalController.approvaLevelPurchase() eq 3}" >
+        <h:panelGroup >
+            <label class="label">采购类型<span style="color: red">*</span></label>
+            <p:selectOneMenu value="#{multiLevelApprovalController.purchaseOrderInfo.purchaseType}"  required="true" requiredMessage="采购类型 #{msg.ValidationRequire}" >
+                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+        <br/> <br/>
+        <p:fieldset legend="预供应商" id="purchaseVender"  >
+            <p:selectOneRadio id="purchaseVenderConfirm" value="#{multiLevelApprovalController.venderInfoConfirm}" converter="venderConverter"
+                              required="true" requiredMessage="预供应商 #{msg.ValidationRequire}" layout="responsive" columns="4" styleClass="grid-radio">
+                <f:selectItems value="#{multiLevelApprovalController.venderInfos}" var="item" itemLabel="#{item.venderName}" itemValue="#{item}"/>
+            </p:selectOneRadio>
+        </p:fieldset>
+        <p:fieldset legend="招标公司" id="purchaseCompany"  >
+            <p:selectOneRadio id="purchaseCompanyConfirm" value="#{multiLevelApprovalController.companyInfoConfirm}" converter="venderConverter"
+                              required="true" requiredMessage="招标公司 #{msg.ValidationRequire}" layout="responsive" columns="4" styleClass="grid-radio">
+                <f:selectItems value="#{multiLevelApprovalController.companyInfos}" var="item" itemLabel="#{item.companyName}" itemValue="#{item}"/>
+            </p:selectOneRadio>
+        </p:fieldset>
+    </p:fieldset>
+
+</ui:composition>
+</html>

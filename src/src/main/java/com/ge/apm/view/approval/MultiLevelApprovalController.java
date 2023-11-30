@@ -7,9 +7,11 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.budget.BudgetConstant;
@@ -18,12 +20,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -50,6 +56,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private V2_PmOrderRepository v2_PmOrderRepository;
     private V2_WorkOrderService woService;
     private BudgetApplicationRepository budgetDao;
+    private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
+    private PurchaseOrderInfoRepository purchaseOrderInfoRepository;
+    private OrgInfoRepository orgDao;
+    private VenderInfoRepository venderInfoRepository;
+    private UaaService uaaService;
+
+
     private WorkflowService workflowService;
     private BlobFileService blobService;
 
@@ -74,7 +87,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     @Setter
     @Getter
     private List<MultiLevelApproval> multiLevelApprovals;
-
+    private UserAccount account = UserContextService.getCurrentUserAccount();
     @Getter
     @Setter
     private Integer businessTypeFlag;
@@ -106,6 +119,26 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private String signatureId;
     @Getter
     private boolean newSignature = true;
+    @Getter @Setter
+    private BudgetApplicationAsset confirmBudget;
+    @Getter @Setter
+    private PurchaseOrderInfo purchaseOrderInfo;
+    @Getter  @Setter
+    private OrgInfo org;
+    @Getter  @Setter
+    private TreeNode orgTree;
+    @Getter  @Setter
+    private String budgetAssetId;
+
+    @Getter  @Setter
+    private VenderInfo venderInfoConfirm;
+    @Getter  @Setter
+    private VenderInfo companyInfoConfirm;
+    @Getter  @Setter
+    private List<VenderInfo> venderInfos = new ArrayList<>();
+    @Getter  @Setter
+    private List<VenderInfo> companyInfos = new ArrayList<>();
+
     private boolean isAgree = true;
     private boolean needSignature = false;
 
@@ -126,13 +159,22 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
         budgetDao = WebUtil.getBean(BudgetApplicationRepository.class);
+        budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
+        purchaseOrderInfoRepository = WebUtil.getBean(PurchaseOrderInfoRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
         assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
+        venderInfoRepository = WebUtil.getBean(VenderInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
-
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
+        org = orgDao.findById(account.getOrgInfoId());
+        orgTree = initOrgTree(treeNode);
+        this.confirmBudget = new BudgetApplicationAsset();
+        this.purchaseOrderInfo = new PurchaseOrderInfo();
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -176,7 +218,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
                 BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
-                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(budgetApplication.getBudgetAssets())){
+                if(!CollectionUtils.isEmpty(budgetApplication.getBudgetAssets())){
                      budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
                 }
                 budgetApplicationAsset.setApplicantName(budgetApplication.getApplicant().getName());//申请人
@@ -189,6 +231,23 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 if(BudgetApplication.OrderType.BAP.toString().equals(budgetApplication.getOrderType()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
                     signatureNurseRendered = true;
                 }
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT:
+                this.venderInfos = new ArrayList<>();
+                this.companyInfos = new ArrayList<>();
+                PurchaseOrderInfo purchaseOrderInfo = purchaseOrderInfoRepository.findById(multiLevelApproval.getBusinessUid());
+                List<VenderInfo> venderInfoList = venderInfoRepository.queryByPurchaseId(purchaseOrderInfo.getId());
+                if(StringUtils.isNotBlank(purchaseOrderInfo.getVenderId())){
+                    this.venderInfoConfirm = venderInfoRepository.findById(purchaseOrderInfo.getVenderId());
+                }
+                if(StringUtils.isNotBlank(purchaseOrderInfo.getCompanyId())){
+                    this.companyInfoConfirm = venderInfoRepository.findById(purchaseOrderInfo.getCompanyId());
+                }
+                if(!CollectionUtils.isEmpty(venderInfoList)){
+                    this.venderInfos = venderInfoList.stream().filter(vi -> VenderInfo.BidType.Vender.toString().equals(vi.getBidType())).collect(Collectors.toList());
+                    this.companyInfos = venderInfoList.stream().filter(vi -> VenderInfo.BidType.Company.toString().equals(vi.getBidType())).collect(Collectors.toList());
+                }
+                this.purchaseOrderInfo = purchaseOrderInfo;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
@@ -219,6 +278,28 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public void getMultiLevelApprovalPersonByAgree() throws Exception {
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
         boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
+        selected = null;
+        this.needSignature = false;
+        this.resetSignature();
+    }
+
+    /**
+     * 供备件审批使用--审批同意
+     * @return
+     */
+    public void getBudgetMultiLevelApprovalPersonByAgree() throws Exception {
+        MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(signatureNurseRendered && "F".equals(this.signatureNurse)){
             WebUtil.addWarnMessage("在手术室使用的设备，手术室护士长签名为否时，不允许通过审核！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -239,6 +320,43 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.resetSignature();
     }
 
+    /**
+     * 供采购使用
+     * @return
+     */
+    public void purchaseInfoSubmit() throws Exception {
+        MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        //  1节点校验所有数据全部确认完成
+        PurchaseOrderInfo purchaseOrderInfo = purchaseOrderInfoRepository.findById(this.selected.getBusinessUid());
+        List<SearchFilter> searchFilterAssets = new ArrayList<>();
+        searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                SearchFilter.Operator.EQ,purchaseOrderInfo.getId()));
+        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        if (!CollectionUtils.isEmpty(budgetApplicationAssets)){
+            try {
+                budgetApplicationAssets.stream().forEach(baa -> {
+                    if(baa.getConfirmMaximumPrice()==null || StringUtils.isBlank(baa.getConfirmRemark())){
+                        throw new RuntimeException();
+                    }
+                });
+            } catch(Exception e) {
+                WebUtil.addWarnMessage("产品信息确认未完成，请检查后重试！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
+        multiLevelApprovalService.getMultiLevelApprovalPurchaseByAgree(multiLevelApproval,approvalOpinion,
+                this.purchaseOrderInfo,this.venderInfoConfirm,this.companyInfoConfirm);
+        selected = null;
+        this.needSignature = false;
+        this.resetSignature();
+    }
 
     /**
      * 供备件审批使用--审批不同意
@@ -569,4 +687,100 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.signatureNurseRendered = signatureNurseRendered;
     }
 
+    public TreeNode initOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return orgTree;
+    }
+    /**
+     * 编辑区域部门选择
+     * @param event
+     */
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        this.confirmBudget.setConfirmApplicationDeptName(orgInfo.getName());
+        this.confirmBudget.setConfirmApplicationDeptId(orgInfo.getId());
+    }
+
+
+    public void prepareConfirm(String budgetAssetId) {
+        this.budgetAssetId = budgetAssetId;
+        this.confirmBudget = new BudgetApplicationAsset();
+        BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
+        if(budgetApplicationAsset!=null){
+            this.confirmBudget.setConfirmApplicationDeptId(budgetApplicationAsset.getConfirmApplicationDeptId());
+            if(budgetApplicationAsset.getConfirmApplicationDeptId() != null){
+                OrgInfo confirmOrg = orgDao.findById(budgetApplicationAsset.getConfirmApplicationDeptId());
+                this.confirmBudget.setConfirmApplicationDeptName(confirmOrg!=null?confirmOrg.getName():null);
+            }
+            this.confirmBudget.setConfirmQuantity(budgetApplicationAsset.getConfirmQuantity());
+            this.confirmBudget.setConfirmPrice(budgetApplicationAsset.getConfirmPrice());
+            this.confirmBudget.setConfirmNationalFinance(budgetApplicationAsset.getConfirmNationalFinance());
+            this.confirmBudget.setConfirmProvincialFinance(budgetApplicationAsset.getConfirmProvincialFinance());
+            this.confirmBudget.setConfirmNotice(budgetApplicationAsset.getConfirmNotice());
+            this.confirmBudget.setConfirmImport(budgetApplicationAsset.getConfirmImport());
+            this.confirmBudget.setConfirmMajorFunction(budgetApplicationAsset.getConfirmMajorFunction());
+            this.confirmBudget.setConfirmEquipmentCategory(budgetApplicationAsset.getConfirmEquipmentCategory());
+            this.confirmBudget.setConfirmParameters(budgetApplicationAsset.getConfirmParameters());
+            this.confirmBudget.setConfirmBrand(budgetApplicationAsset.getConfirmBrand());
+            this.confirmBudget.setConfirmMaximumPrice(budgetApplicationAsset.getConfirmMaximumPrice());
+            this.confirmBudget.setConfirmRemark(budgetApplicationAsset.getConfirmRemark());
+        }
+    }
+
+
+    public void saveConfirmInfoBudgetApp() {
+        BudgetApplicationAsset budgetApplicationAsset =budgetApplicationAssetRepository.findById(budgetAssetId);
+        budgetApplicationAsset.setConfirmApplicationDeptId(this.confirmBudget.getConfirmApplicationDeptId());
+        budgetApplicationAsset.setConfirmEquipmentCategory(this.confirmBudget.getConfirmEquipmentCategory());
+        budgetApplicationAsset.setConfirmQuantity(this.confirmBudget.getConfirmQuantity());
+        budgetApplicationAsset.setConfirmPrice(this.confirmBudget.getConfirmPrice());
+        budgetApplicationAsset.setConfirmNationalFinance(this.confirmBudget.getConfirmNationalFinance());
+        budgetApplicationAsset.setConfirmProvincialFinance(this.confirmBudget.getConfirmProvincialFinance());
+        budgetApplicationAsset.setConfirmNotice(this.confirmBudget.getConfirmNotice());
+        budgetApplicationAsset.setConfirmImport(this.confirmBudget.getConfirmImport());
+        budgetApplicationAsset.setConfirmMajorFunction(this.confirmBudget.getConfirmMajorFunction());
+        budgetApplicationAsset.setConfirmParameters(this.confirmBudget.getConfirmParameters());
+        budgetApplicationAsset.setConfirmBrand(this.confirmBudget.getConfirmBrand());
+        budgetApplicationAsset.setConfirmMaximumPrice(this.confirmBudget.getConfirmMaximumPrice());
+        budgetApplicationAsset.setConfirmRemark(this.confirmBudget.getConfirmRemark());
+        budgetApplicationAssetRepository.save(budgetApplicationAsset);
+    }
+    /**
+     * 申购单信息
+     * @return
+     */
+    public List<BudgetApplicationAsset> applicationDetailConfirm(){
+        PurchaseOrderInfo purchaseOrderInfo = purchaseOrderInfoRepository.findById(this.selected.getBusinessUid());
+        List<SearchFilter> searchFilterAssets = new ArrayList<>();
+        searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                SearchFilter.Operator.EQ,purchaseOrderInfo.getId()));
+        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        if(!CollectionUtils.isEmpty(budgetApplicationAssets)){
+            budgetApplicationAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
+                OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());
+                baa.setConfirmApplicationDeptName(confirmOrg.getName());
+            });
+        }
+        return CollectionUtils.isEmpty(budgetApplicationAssets)?null:budgetApplicationAssets;
+    }
+
+    public Integer approvaLevelPurchase() {
+        return this.selected.getApprovalLevel();
+    }
 }

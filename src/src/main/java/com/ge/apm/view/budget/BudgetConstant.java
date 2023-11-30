@@ -10,5 +10,4 @@ public interface BudgetConstant {
     Integer BUDGET_APPLICATION_STATUS_APPROVED = 3;//审核通过
     Integer BUDGET_APPLICATION_STATUS_NOT_APPROVED = 4;//审核不通过
 
-    String BUDGET_APPLICATION_NUM_PREFIX = "YSSQ";
 }
