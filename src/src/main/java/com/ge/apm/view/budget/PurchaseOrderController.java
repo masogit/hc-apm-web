@@ -468,15 +468,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
         //第二步处理状态
-        if(dataListSelectApplicationAssetBudget.getBudgetApplication() !=null &&
-                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
-                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
-            purchaseOrderService.setPurchaseInfoNull(dataListSelectApplicationAssetBudget.getBudgetApplication());
-            budgetApplicationRepository.save(dataListSelectApplicationAssetBudget.getBudgetApplication());
-        }
+        purchaseOrderService.delBudgetApplication(curApplicationBudgetAssets,dataListSelectApplicationAssetBudget,
+                selected,account,templateIds);
         dataListSelectApplicationAssetBudget = null;
         calcTotalAmount(curApplicationBudgetAssets);
-        savePurchase();
     }
 
     public void searchBudgetApplication() {
