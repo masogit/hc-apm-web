@@ -2,7 +2,11 @@ package com.ge.apm.domain.budget;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ge.apm.domain.MultiLevelApproval;
+import com.ge.apm.domain.MultiLevelApprovalConfig;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
@@ -12,13 +16,14 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author lyj
  */
 @Entity
 @Table(name = "purchase_order")
-public class PurchaseOrderInfo implements Serializable {
+public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -89,9 +94,64 @@ public class PurchaseOrderInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endDate;
 
+    /**
+     * 申请步骤APPLICATIONSTEP
+     * 信息已确认 过会已完成  完成
+     */
+    public enum PURCHASESTEPSTATUS {
+        Complete, ConfirmedInfoMeet,ConfirmedInfo
+    }
+    /**
+     * 待信息确认  待过会 待招标 完成
+     *
+     *
+     */
+    public enum PURCHASESTEP {
+        ToConfirmedInfo, ToConfirmedInfoMeet,ToConfirmedInfoTendered,Complete
+    }
+
+
+    @Column(name = "order_step")
+    private String orderStep;
+
+    @Column(name = "step_status")
+    private String stepStatus;
+
     @Column(name = "status")
     private String status;
 
+    // 审批人id
+    @Column(name = "approver_id")
+    private Integer approverId;
+
+    // 审批人
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "approver_id",
+            referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private UserAccount approver;
+
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "business_uid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @OrderBy("approval_level ASC")
+    private Set<MultiLevelApproval> purchaseApprovals;
+
+    // 审批流id
+    @Column(name = "approval_config_id")
+    private String approvalConfigId;
+
+    // 审批流
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "approval_config_id",
+            referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private MultiLevelApprovalConfig approvalConfig;
 
     @Column(name = "last_modified_date")
     @Temporal(TemporalType.TIMESTAMP)
@@ -110,6 +170,226 @@ public class PurchaseOrderInfo implements Serializable {
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action = NotFoundAction.IGNORE)
     private UserAccount operator;
+
+    /*****过会信息****/
+
+    //
+    @Column(name = "meeting_engineer_opinion")
+    private String meetingEngineerOpinion;
+
+    @Column(name = "meeting_existing_brands")
+    private String meetingExistingBrands;
+
+    @Column(name = "meeting_fee_items")
+    private String meetingFeeItems;
+
+    @Column(name = "meeting_consumable_description")
+    private String meetingConsumableDescription;
+
+    @Column(name = "meeting_remarks")
+    private String meetingRemarks;
+
+    @Column(name = "meeting_equipment_dept_opin")
+    private String meetingEquipmentDeptOpin;
+
+    @Column(name = "meeting_maximum_price")
+    private String meetingMaximumPrice;
+
+    @Column(name = "meeting_purchasing_imports")
+    private String meetingPurchasingImports;
+
+    @Column(name = "meeting_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date meetingDate;
+
+
+    /*****招标****/
+    @Column(name = "purchase_type")
+    private String purchaseType;
+
+    @Column(name = "vender_name")
+    private String venderName;
+
+    @Column(name = "vender_id")
+    private String venderId;
+
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Column(name = "company_id")
+    private String companyId;
+
+
+    public String getVenderName() {
+        return venderName;
+    }
+
+    public void setVenderName(String venderName) {
+        this.venderName = venderName;
+    }
+
+    public String getVenderId() {
+        return venderId;
+    }
+
+    public void setVenderId(String venderId) {
+        this.venderId = venderId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
+    }
+
+    public String getPurchaseType() {
+        return purchaseType;
+    }
+
+    public void setPurchaseType(String purchaseType) {
+        this.purchaseType = purchaseType;
+    }
+
+    public Date getMeetingDate() {
+        return meetingDate;
+    }
+
+    public void setMeetingDate(Date meetingDate) {
+        this.meetingDate = meetingDate;
+    }
+
+    public String getMeetingEngineerOpinion() {
+        return meetingEngineerOpinion;
+    }
+
+    public void setMeetingEngineerOpinion(String meetingEngineerOpinion) {
+        this.meetingEngineerOpinion = meetingEngineerOpinion;
+    }
+
+    public String getMeetingExistingBrands() {
+        return meetingExistingBrands;
+    }
+
+    public void setMeetingExistingBrands(String meetingExistingBrands) {
+        this.meetingExistingBrands = meetingExistingBrands;
+    }
+
+    public String getMeetingFeeItems() {
+        return meetingFeeItems;
+    }
+
+    public void setMeetingFeeItems(String meetingFeeItems) {
+        this.meetingFeeItems = meetingFeeItems;
+    }
+
+    public String getMeetingConsumableDescription() {
+        return meetingConsumableDescription;
+    }
+
+    public void setMeetingConsumableDescription(String meetingConsumableDescription) {
+        this.meetingConsumableDescription = meetingConsumableDescription;
+    }
+
+    public String getMeetingRemarks() {
+        return meetingRemarks;
+    }
+
+    public void setMeetingRemarks(String meetingRemarks) {
+        this.meetingRemarks = meetingRemarks;
+    }
+
+    public String getMeetingEquipmentDeptOpin() {
+        return meetingEquipmentDeptOpin;
+    }
+
+    public void setMeetingEquipmentDeptOpin(String meetingEquipmentDeptOpin) {
+        this.meetingEquipmentDeptOpin = meetingEquipmentDeptOpin;
+    }
+
+    public String getMeetingMaximumPrice() {
+        return meetingMaximumPrice;
+    }
+
+    public void setMeetingMaximumPrice(String meetingMaximumPrice) {
+        this.meetingMaximumPrice = meetingMaximumPrice;
+    }
+
+    public String getMeetingPurchasingImports() {
+        return meetingPurchasingImports;
+    }
+
+    public void setMeetingPurchasingImports(String meetingPurchasingImports) {
+        this.meetingPurchasingImports = meetingPurchasingImports;
+    }
+
+    /*****过会信息****/
+
+    public Integer getApproverId() {
+        return approverId;
+    }
+
+    public void setApproverId(Integer approverId) {
+        this.approverId = approverId;
+    }
+
+    public UserAccount getApprover() {
+        return approver;
+    }
+
+    public void setApprover(UserAccount approver) {
+        this.approver = approver;
+    }
+
+    public Set<MultiLevelApproval> getPurchaseApprovals() {
+        return purchaseApprovals;
+    }
+
+    public void setPurchaseApprovals(Set<MultiLevelApproval> purchaseApprovals) {
+        this.purchaseApprovals = purchaseApprovals;
+    }
+
+    public String getApprovalConfigId() {
+        return approvalConfigId;
+    }
+
+    public void setApprovalConfigId(String approvalConfigId) {
+        this.approvalConfigId = approvalConfigId;
+    }
+
+    public MultiLevelApprovalConfig getApprovalConfig() {
+        return approvalConfig;
+    }
+
+    public void setApprovalConfig(MultiLevelApprovalConfig approvalConfig) {
+        this.approvalConfig = approvalConfig;
+    }
+
+    public String getOrderStep() {
+        return orderStep;
+    }
+
+    public void setOrderStep(String orderStep) {
+        this.orderStep = orderStep;
+    }
+
+    public String getStepStatus() {
+        return stepStatus;
+    }
+
+    public void setStepStatus(String stepStatus) {
+        this.stepStatus = stepStatus;
+    }
 
     public Date getStartDate() {
         return startDate;
@@ -287,6 +567,26 @@ public class PurchaseOrderInfo implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return new BigDecimal(0);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return purchaseNum;
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return id;
+    }
+
+    @Override
+    public int getBusinessType() {
+        return ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT;
     }
 
 }
