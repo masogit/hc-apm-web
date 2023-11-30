@@ -114,7 +114,7 @@
                                                   icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
                                                   actionListener="#{purchaseOrderController.preAddBudgetApplication()}"
                                                   rendered="#{purchaseOrderController.editButtonDisplay()}"
-                                                  oncomplete="PF('BudgetSelectDialog').show()"/>
+                                                  oncomplete="PF('BudgetApplicationSelectDlg').show()"/>
                                  <p:commandButton title="删除" id="delButton" update="budgetApplicationlist PurchaseApplicationEditForm:purchaseQuantity PurchaseApplicationEditForm:totalPrice "
                                                   disabled="#{ empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
                                                   rendered="#{purchaseOrderController.editButtonDisplay()}"
