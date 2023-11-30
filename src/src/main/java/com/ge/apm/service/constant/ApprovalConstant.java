@@ -107,6 +107,7 @@ public interface ApprovalConstant {
     String APPROVAL_ASSET_TRANSFER = "assetTransfer";//设备转移
     String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
+    String APPROVAL_PURCHASE_MANAGEMENT = "purchaseManagement"; // 采购管理
     String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
     String APPROVAL_ASSET_SCRAP_CHI = "设备报废"; // 设备报废
     String APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI = "设备转科"; // 设备转科
@@ -127,8 +128,10 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_BUDGET_MANAGEMENT = 14; // 预算管理
     int BUSINESS_TYPE_ASSET_SCRAP = 15; // 设备报废流程
     int BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT = 16; // 资产转科
+    int BUSINESS_TYPE_PURCHASE_MANAGEMENT = 17; // 采购管理
 
-    String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "预算管理"; // 预算管理
+    String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "申购管理"; // 预算管理
+    String BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME = "采购管理"; // 预算管理
 
 
     String BUSINESS_TYPE_ADVERSE_EVENTS_NAME = "不良事件上报"; // 不良事件上报

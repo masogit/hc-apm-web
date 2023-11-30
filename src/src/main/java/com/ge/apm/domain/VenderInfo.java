@@ -1,9 +1,10 @@
 package com.ge.apm.domain;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author lyj
@@ -19,21 +20,135 @@ public class VenderInfo implements Serializable {
     @Column(name = "id", columnDefinition = "CHAR(32)")
     private String id;
 
-    //
+
+
+    public enum BidType {
+        Vender,Company
+    }
+    //投标人类型预供应商和招标公司
+    @Column(name = "bid_Type")
+    private String bidType;
+
+    //供应商名称
     @Column(name = "vender_name")
     private String venderName;
 
-    @Column(name = "vender_address")
-    private String venderAddress;
 
+    //联系方式
     @Column(name = "vender_phone")
     private String venderPhone;
 
+    //代理人//代理商
     @Column(name = "vender_contacts")
     private String venderContacts;
 
+    //生产企业规模
+    @Column(name = "vender_production_size")
+    private String venderProductionSize;
+
+    //招标公司名称
+    @Column(name = "company_name")
+    private String companyName;
+
+    //标的名称
+    @Column(name = "company_target")
+    private String companyTarget;
+
+    //联系方式
+    @Column(name = "company_phone")
+    private String companyPhone;
+
+    //负责人
+    @Column(name = "company_contacts")
+    private String companyContacts;
+
+    @Transient
+    private String promptText;
+
+    public String getPromptText() {
+        return promptText;
+    }
+
+    public void setPromptText(String promptText) {
+        this.promptText = promptText;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getCompanyTarget() {
+        return companyTarget;
+    }
+
+    public void setCompanyTarget(String companyTarget) {
+        this.companyTarget = companyTarget;
+    }
+
+    public String getCompanyPhone() {
+        return companyPhone;
+    }
+
+    public void setCompanyPhone(String companyPhone) {
+        this.companyPhone = companyPhone;
+    }
+
+    public String getCompanyContacts() {
+        return companyContacts;
+    }
+
+    public void setCompanyContacts(String companyContacts) {
+        this.companyContacts = companyContacts;
+    }
+
     @Column(name = "opend_id")
     private String openId;
+
+    @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createdDate;
+
+    @Column(name = "last_modified_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date lastModifiedDate;
+
+    public String getBidType() {
+        return bidType;
+    }
+
+    public void setBidType(String bidType) {
+        this.bidType = bidType;
+    }
+
+    public String getVenderProductionSize() {
+        return venderProductionSize;
+    }
+
+    public void setVenderProductionSize(String venderProductionSize) {
+        this.venderProductionSize = venderProductionSize;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
     public String getOpenId() {
         return openId;
@@ -57,14 +172,6 @@ public class VenderInfo implements Serializable {
 
     public void setVenderName(String venderName) {
         this.venderName = venderName;
-    }
-
-    public String getVenderAddress() {
-        return venderAddress;
-    }
-
-    public void setVenderAddress(String venderAddress) {
-        this.venderAddress = venderAddress;
     }
 
     public String getVenderPhone() {
@@ -99,3 +206,4 @@ public class VenderInfo implements Serializable {
         return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
     }
 }
+
