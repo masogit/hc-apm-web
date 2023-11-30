@@ -66,7 +66,9 @@ public class PurchaseOrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<String> templateIds) {
+    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,
+                                List<String> templateIds,UserAccount userAccount) {
+        this.handleCommonField(purchaseOrderInfo,userAccount);
         //先去掉之前的关联数据
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
@@ -209,7 +211,7 @@ public class PurchaseOrderService {
         }
         return arg;
     }
-
+  
     public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException {
         String base = "采购单" + purchaseOrderInfo.getPurchaseNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -374,7 +376,7 @@ public class PurchaseOrderService {
             budgetApplicationDao.save(selectApplicationAssetBudget.getBudgetApplication());
         }
         this.handleCommonField(purchaseOrderInfoSelect,account);
-        this.savePurchase(purchaseOrderInfoSelect,curApplicationBudgetAssets,templateIds);
+        this.savePurchase(purchaseOrderInfoSelect,curApplicationBudgetAssets,templateIds,account);
     }
 
 
