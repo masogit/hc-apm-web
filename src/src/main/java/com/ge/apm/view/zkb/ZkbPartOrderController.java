@@ -396,7 +396,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
                 }
                 if(StringUtils.isEmpty(queryStatus)){
-                    predicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
+                    Predicate pre1 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+                    Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
+                    Predicate pre3 = builder.or(pre2, pre1);
+                    predicates.add(pre3);
                 }else if(!"all".equals(queryStatus)){
                     predicates.add(builder.equal(root.get("currentStep"), queryStatus));
                 }
@@ -549,11 +552,20 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             if(!"all".equals(queryStatus)&&StringUtils.isNotBlank(queryStatus)){
                                 userConfigPredicates.add(builder.equal(root.get("currentStep"), queryStatus));
                             }
+                        } else if(ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                            if(StringUtils.isEmpty(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString()));
+                            }else if(!"all".equals(queryStatus)){
+                                userConfigPredicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                            }
                         }
                     }
                     if(userConfigPredicates.size() > 0){
                         predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
                     }
+                } else {
+                    return null;
+                    //predicates.add(builder.isNull(root.get("currentStep")));
                 }
             }
 
