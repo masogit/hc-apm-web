@@ -1063,7 +1063,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog.append("附件不能为空！");
             }
         }else{
@@ -1301,6 +1301,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             contractList.add(zkbContract);
             return "";
         }
+        //endregion
 
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);

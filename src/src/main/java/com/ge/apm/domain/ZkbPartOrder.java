@@ -30,11 +30,10 @@ public class ZkbPartOrder implements Serializable {
      * 已归还之后
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
-        ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
-        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,
-        DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel,
-        CloseReject,TseAccept,TseReject,OsscAccept,OsscReject,OsscReturned
+        Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject, ManageAccept,ManageReject,UnOrdered,
+        UnOrderedReject, Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept, DirectorReject,CommercialAccept,
+        CommercialReject,FourHundredCancel, CloseReject,TseAccept,TseReject,OsscAccept,OsscReject,OsscReturned,CloseCommited,
+        ReturnCompleted,CloseApproved,CloseFailed
     }
 
     /**
@@ -362,6 +361,21 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "part_quality_issue")
     private String partQualityIssue;
+
+    @Column(name = "udi")
+    private String udi;
+
+    @Column(name = "internal_packaging")
+    private String internalPackaging;
+
+    @Column(name = "quality_seal_type")
+    private String qualitySealType;
+
+    @Column(name = "quality_seal_status")
+    private String qualitySealStatus;
+
+    @Column(name = "part_quality")
+    private String partQuality;
 
     /**
      * 归还备注
@@ -701,6 +715,79 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "work_station_flag")
     private String workStationFlag;
+
+    @Column(name = "return_complete_auditer")
+    private String returnCompleteAuditer;
+
+    @Column(name = "return_complete_audit_date")
+    private Date returnCompleteAuditDate;
+
+    @Column(name = "return_complete_auditer_uid")
+    private String returnCompleteAuditerUid;
+
+    public String getUdi() {
+        return udi;
+    }
+
+    public void setUdi(String udi) {
+        this.udi = udi;
+    }
+
+    public String getInternalPackaging() {
+        return internalPackaging;
+    }
+
+    public void setInternalPackaging(String internalPackaging) {
+        this.internalPackaging = internalPackaging;
+    }
+
+    public String getQualitySealType() {
+        return qualitySealType;
+    }
+
+    public void setQualitySealType(String qualitySealType) {
+        this.qualitySealType = qualitySealType;
+    }
+
+    public String getQualitySealStatus() {
+        return qualitySealStatus;
+    }
+
+    public void setQualitySealStatus(String qualitySealStatus) {
+        this.qualitySealStatus = qualitySealStatus;
+    }
+
+    public String getPartQuality() {
+        return partQuality;
+    }
+
+    public void setPartQuality(String partQuality) {
+        this.partQuality = partQuality;
+    }
+
+    public String getReturnCompleteAuditer() {
+        return returnCompleteAuditer;
+    }
+
+    public void setReturnCompleteAuditer(String returnCompleteAuditer) {
+        this.returnCompleteAuditer = returnCompleteAuditer;
+    }
+
+    public Date getReturnCompleteAuditDate() {
+        return returnCompleteAuditDate;
+    }
+
+    public void setReturnCompleteAuditDate(Date returnCompleteAuditDate) {
+        this.returnCompleteAuditDate = returnCompleteAuditDate;
+    }
+
+    public String getReturnCompleteAuditerUid() {
+        return returnCompleteAuditerUid;
+    }
+
+    public void setReturnCompleteAuditerUid(String returnCompleteAuditerUid) {
+        this.returnCompleteAuditerUid = returnCompleteAuditerUid;
+    }
 
     public String getWorkStationFlag() {
         return workStationFlag;
