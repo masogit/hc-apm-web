@@ -857,6 +857,41 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
+
+                            <c:if test="#{columnItem eq 'spare01'}">
+                                <p:column  headerText="#{msg.spare01}" sortBy="#{item.spare01}" filterBy="#{item.spare01}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('TCM',item.spare01)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="300">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('TCM')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+
+
+
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare02'}">
+                                <p:column headerText="#{msg.spare02}" exportable="true" sortBy="#{item.spare02}" filterBy="#{item.spare02}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.spare02}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare03'}">
+                                <p:column headerText="#{msg.spare03}" exportable="true" sortBy="#{item.spare03}" filterBy="#{item.spare03}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.spare03}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare04'}">
+                                <p:column headerText="#{msg.spare04}" exportable="true" sortBy="#{item.spare04}" filterBy="#{item.spare04}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.spare04}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare05'}">
+                                <p:column headerText="#{msg.spare05}" exportable="true" sortBy="#{item.spare05}" filterBy="#{item.spare05}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.spare05}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">

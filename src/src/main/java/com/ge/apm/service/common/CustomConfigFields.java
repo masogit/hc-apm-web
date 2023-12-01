@@ -126,6 +126,11 @@ public enum CustomConfigFields {
     mvsContractStartDate(fieldName, "MVSContractStartDate" ,Text),
     mvsContractEndDate(fieldName, "MVSContractEndDate" ,Text),
     assetTypeGroup(label, "assetTypeGroup" ,Text),  //资产分类
+    spare01(fieldName, "spare01" ,Text),  //备用字段01
+    spare02(fieldName, "spare02" ,Text),  //备用字段02
+    spare03(fieldName, "spare03" ,Text),  //备用字段03
+    spare04(fieldName, "spare04" ,Text),  //备用字段04
+    spare05(fieldName, "spare05" ,Text),  //备用字段05
 
 
     ;

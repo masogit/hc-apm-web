@@ -735,4 +735,35 @@
             <p:inputText id="assetTypeGroup" value="#{assetInfoDetailController.selectedAssetTypeGroupName}" readonly="true" />
         </h:panelGroup>
     </c:if>
+
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare01')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare01}</label>
+            <p:inputText id="spare01" value="#{fieldMsg.fieldValue('TCM', assetInfoDetailController.selected.spare01)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare02')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare02}</label>
+            <p:inputText id="spare02" value="#{assetInfoDetailController.selected.spare02}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare03')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare03}</label>
+            <p:inputText id="spare03" value="#{assetInfoDetailController.selected.spare03}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare04')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare04}</label>
+            <p:inputText id="spare04" value="#{assetInfoDetailController.selected.spare04}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare05')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare05}</label>
+            <p:inputText id="spare05" value="#{assetInfoDetailController.selected.spare05}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
