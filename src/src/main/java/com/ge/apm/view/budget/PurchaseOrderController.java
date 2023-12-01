@@ -282,8 +282,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public String savePurchase() {
-        purchaseOrderService.handleCommonField(selected,account);
-        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.templateIds);
+        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.templateIds,account);
         return purchaseOrderService.backList();
     }
 
