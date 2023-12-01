@@ -240,6 +240,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setCreatedBy(userAccount.getLoginName());
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
                         multiLevelApproval.setHierOrgUid(userAccount.getSiteUID());
+                        multiLevelApproval.setDigest(approvableTarget.getBusinessDigest());
                         MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(multiLevelApproval);
                         if (multiLevel != null) {
                             // 发送短信
