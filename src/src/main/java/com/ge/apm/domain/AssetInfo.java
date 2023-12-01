@@ -981,6 +981,28 @@ public class AssetInfo implements ChineseName,Serializable {
     private String  assetLocation;
 
 
+    @Getter
+    @Setter
+    @Column(name = "spare01")
+    private String spare01;
+    @Getter
+    @Setter
+    @Column(name = "spare02")
+    private String spare02;
+    @Getter
+    @Setter
+    @Column(name = "spare03")
+    private String spare03;
+    @Getter
+    @Setter
+    @Column(name = "spare04")
+    private String spare04;
+    @Getter
+    @Setter
+    @Column(name = "spare05")
+    private String spare05;
+
+
     public void setSupplierPyCode(String supplierPyCode) {
         this.supplierPyCode = supplierPyCode;
     }
