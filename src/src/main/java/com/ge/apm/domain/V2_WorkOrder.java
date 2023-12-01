@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,6 +19,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Entity
@@ -1027,5 +1029,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
+    }
+
+    @Transient
+    private String businessDigest;
+    @Override
+    public String getBusinessDigest() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("assetName",this.getAssetInfo().getName());
+        map.put("clinicalDeptName",this.getAssetInfo().getClinicalDeptName());
+        String businessDigest= JSON.toJSONString(map);
+        return businessDigest;
+    }
+
+
+    public void setBusinessDigest(String businessDigest) {
+        this.businessDigest = businessDigest;
     }
 }
