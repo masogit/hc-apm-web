@@ -2683,6 +2683,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        selectedMap.clear();
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
         }

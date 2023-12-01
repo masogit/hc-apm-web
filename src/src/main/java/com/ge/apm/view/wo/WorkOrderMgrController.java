@@ -596,6 +596,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        selectedBatchMap.clear();
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
         }
