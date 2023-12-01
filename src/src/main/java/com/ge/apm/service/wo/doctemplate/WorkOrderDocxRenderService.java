@@ -2,15 +2,11 @@ package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
-import com.ge.apm.dao.ServiceRequestMsgRepository;
-import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
-import com.ge.apm.dao.V2_WorkOrderManHoursDetailRepository;
-import com.ge.apm.dao.V2_WorkOrderStepRepository;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrderManHoursDetail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.utils.MultilApproveStatusMapping;
 import com.ge.apm.service.wo.WorkOrderExportService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
@@ -19,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
@@ -48,6 +45,9 @@ public class WorkOrderDocxRenderService {
 
     @Autowired
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
+
+    @Autowired
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
 
     @Autowired
     private V2_WorkOrderManHoursDetailRepository manHoursDetailRepository;
@@ -297,6 +297,16 @@ public class WorkOrderDocxRenderService {
             map.put("senderUserName", srMessage.getSenderUserName());
             map.put("message", srMessage.getMessage());
             srMsgs.add(map);
+        }
+        List<MultiLevelApproval> approveList = multiLevelApprovalRepository.getByBusinessUidList(id);
+        if (!CollectionUtils.isEmpty(approveList)) {
+            approveList.forEach(v -> {
+                Map<String, Object> map = new HashedMap();
+                map.put("sendTime", formatDate(v.getActualApproverDate()));
+                map.put("senderUserName", v.getActualApproverName());
+                map.put("message", MultilApproveStatusMapping.getApprovalNodeStatus(v.getApprovalNodeStatus()) + (StringUtils.isNotEmpty(v.getApprovalOpinion())?v.getApprovalOpinion():""));
+                srMsgs.add(map);
+            });
         }
         workOrderMap.put("audit_table", srMsgs);
     }
