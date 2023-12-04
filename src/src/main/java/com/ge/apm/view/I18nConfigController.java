@@ -20,6 +20,7 @@ import webapp.framework.web.service.DbMessageSource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -132,6 +133,10 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
             initFlag = true;
             i18nList = dao.getByTypeAndSiteId(this.selected.getMsgKey(), -1);
         }
+
+        i18nList = i18nList.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).collect(Collectors.toList());
+
+
         removeList = new ArrayList<>();
         // 重置
         selectedI18n = null;

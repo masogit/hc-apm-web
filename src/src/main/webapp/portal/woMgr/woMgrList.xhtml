@@ -117,9 +117,9 @@
                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                         <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}" appendTo="@(Body)"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
-                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
+                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
 
-                            <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" />
+                            <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
 
                         </p:autoComplete>
                     </f:facet>
