@@ -41,4 +41,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     @Query(value = "select listItem.* from  arrival_list_item listItem where asset_uid=?1 ",nativeQuery=true)
     ArrivalListItem getArrivalListItemByAssetUid(String assetUid);
+
+    ArrivalListItem findByQrCode(String qrCode);
+
 }
