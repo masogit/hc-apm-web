@@ -61,7 +61,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbPartOrderCloseInfoRepository zkbPartOrderCloseInfoRepository;
     private ZkbPartOrderRepository zkbPartOrderRepository;
-    private I18nMessageRepository i18nDao;
     private List<HashMap<String, Object>> v2_listHashMap;
     private TenantInfo tenantInfo;
     private TenantInfoRepository tenantInfoRepository;
@@ -108,7 +107,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderRepository = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         zkbPartOrderCloseInfoRepository = WebUtil.getBean(ZkbPartOrderCloseInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -167,8 +165,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
             zkbPartOrderStatusService.initRemainQty(selected, zkbContract);
             zkbPartOrderStatusService.initValues(selected, zkbPartOrderStatusVo);
-            initReturnList();
-            initHighList(zkbContract.getId());
+            returnTypeList = zkbPartOrderStatusService.initReturnList(selected);
+            highCatList = zkbPartOrderStatusService.initHighList(zkbContract.getId());
 
             trainCourseRender();
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) && selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString())){
@@ -438,9 +436,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return Boolean.FALSE;
     }
 
-    public void initHighList(String contractId){
-        highCatList = zkbPartOrderService.queryHighCatByContract(contractId,true);
-    }
+
 
     public String closeFieldTitle(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
@@ -463,24 +459,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-    public void initReturnList(){
-        returnTypeList = i18nDao.getByMsgType("zkbPoReturnType");
-        if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-            List<I18nMessage> removeI18 = new ArrayList<>();
-            for(I18nMessage i18nMessage : returnTypeList){
-                if(!"DOA".equals(i18nMessage.getMsgKey()) &&
-                    !"goodReturn".equals(i18nMessage.getMsgKey()) &&
-                    !"cancel".equals(i18nMessage.getMsgKey()) &&
-                    !"damagedShipment".equals(i18nMessage.getMsgKey())
-                ){
-                    removeI18.add(i18nMessage);
-                }
-            }
-            if(removeI18.size() > 0){
-                returnTypeList.removeAll(removeI18);
-            }
-        }
-    }
+
 
     private String[] selectedOptions;
     private String unrealReason;
@@ -831,7 +810,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if("Create".equals(actionReturnName) || "Edit".equals(actionReturnName)){
             if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
                 if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
-                   /* if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
+                    if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                         WebUtil.addErrorMessage("请提供好还的备件照片和寄件时的外包装照片","");
                         return;
@@ -841,7 +820,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         return;
                     }else {
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-                    }*/
+                    }
                 }
             }
             boolean flag = true;
