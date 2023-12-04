@@ -1,9 +1,6 @@
 package com.ge.apm.service.zkb;
 
-import com.ge.apm.dao.ZkbContractAssetRepository;
-import com.ge.apm.dao.ZkbContractRepository;
-import com.ge.apm.dao.ZkbPartOrderCloseWorkTimeRepository;
-import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -40,6 +38,9 @@ public class ZkbPartOrderStatusService {
     @Autowired
     @Getter@Setter
     ZkbPartOrderCloseWorkTimeRepository zkbPartOrderCloseWorkTimeRepository;
+
+    @Autowired
+    private I18nMessageRepository i18nDao;
 
     public void fieldRendered(UserAccount currentUser, ZkbPartOrderStatusVo zkbPartOrderStatusVo, ZkbPartOrder selected, ZkbPartOrderCloseInfo zkbPartOrderCloseInfo){
         if(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
@@ -1022,8 +1023,36 @@ public class ZkbPartOrderStatusService {
         return "";
     }
 
+    /**
+     * 获取归还类型的下拉数据
+     * 工具申请的时候则需要去除DOA、goodReturn、cancel、damagedShipment
+     * @param zkbPartOrder
+     * @return
+     */
+    public List<I18nMessage> initReturnList(ZkbPartOrder zkbPartOrder){
+        List<I18nMessage> returnTypeList = i18nDao.getByMsgType("zkbPoReturnType");
+        if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
+            List<I18nMessage> removeI18 = new ArrayList<>();
+            for(I18nMessage i18nMessage : returnTypeList){
+                if(!"DOA".equals(i18nMessage.getMsgKey()) &&
+                        !"goodReturn".equals(i18nMessage.getMsgKey()) &&
+                        !"cancel".equals(i18nMessage.getMsgKey()) &&
+                        !"damagedShipment".equals(i18nMessage.getMsgKey())
+                ){
+                    removeI18.add(i18nMessage);
+                }
+            }
+            if(removeI18.size() > 0){
+                returnTypeList.removeAll(removeI18);
+            }
+        }
+        return returnTypeList;
+    }
 
-
+    public List<HashMap<String, String>> initHighList(String contractId){
+        List<HashMap<String, String>> highCatList = zkbPartOrderService.queryHighCatByContract(contractId,true);
+        return highCatList;
+    }
 
     public void saveWorkTime(ZkbPartOrderCloseWorkTime zkbPartOrderCloseWorkTime){
         zkbPartOrderCloseWorkTimeRepository.save(zkbPartOrderCloseWorkTime);
