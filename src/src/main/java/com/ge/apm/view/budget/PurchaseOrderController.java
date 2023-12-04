@@ -443,7 +443,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 if(venderInfo == null){
                     continue;
                 }
-                stringBuilder.append(VenderInfo.BidType.Company.toString().equals(venderInfo.getBidType())?venderInfo.getCompanyName():venderInfo.getVenderName()+" : ");
+                stringBuilder.append(VenderInfo.BidType.Company.toString().equals(venderInfo.getBidType())?venderInfo.getCompanyName()+" : ":venderInfo.getVenderName()+" : ");
                 stringBuilder.append("[");
                 List<V2_BlobObject> v2_blobObjectList = blobService.findBlobObjectsByBoUid(purchaseVender.getId());
                 if(CollectionUtils.isNotEmpty(v2_blobObjectList)){

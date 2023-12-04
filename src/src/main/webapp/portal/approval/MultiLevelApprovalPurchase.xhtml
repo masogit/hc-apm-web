@@ -92,7 +92,7 @@
                             </p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:fieldset legend="申购单信息" id="applicationDetail" >
+                    <p:fieldset legend="申购单信息" id="applicationDetail"  rendered="#{multiLevelApprovalController.approvaLevelPurchase() ne 3 }">
                         <p:dataTable id="budgetApplicationlist" value="#{multiLevelApprovalController.applicationDetailConfirm()}"
                                      var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
                                      selectionMode="single" disabledSelection="true"
@@ -102,7 +102,6 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
                             <p:ajax event="rowSelect" />
-                            <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                             <p:column headerText="申请科室">
                                 <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
                             </p:column>
@@ -149,7 +148,6 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
                             <p:ajax event="rowSelect" />
-                            <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                             <p:column headerText="申请科室">
                                 <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
                             </p:column>
@@ -223,10 +221,6 @@
                                 <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingConsumableDescription}" required="true" requiredMessage="耗材或试剂说明 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">备注<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}" required="true" requiredMessage="备注 #{msg.ValidationRequire}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
                                 <label class="label">器械科审核意见<span style="color: red">*</span></label>
                                 <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}" required="true" requiredMessage="器械科审核意见 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
@@ -253,6 +247,10 @@
                                             navigator="true" mask="true">
                                     <p:ajax event="dateSelect" update="@this"/>
                                 </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">备注<span style="color: red">*</span></label>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}" required="true" requiredMessage="备注 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
