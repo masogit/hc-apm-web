@@ -1,9 +1,11 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -78,6 +80,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
 
+    private I18nMessageService i18nMessageService;
     //选定的院区
     private OrgInfo selectSite;
 
@@ -86,6 +89,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterAssetDeptOrg;
 
     private Set<String> clinicalDeptOrgUidSet;
+    private String filterSpare01;
+
+    private Set<String> spare01Set;
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
     @Getter
@@ -196,6 +202,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -509,6 +516,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         if (user.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+        }
+        if (spare01Set != null && !spare01Set.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("spare01", SearchFilter.Operator.IN, new ArrayList<>(spare01Set), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "spare01".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
     }
 
@@ -981,6 +993,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+
+    public List<String> autoCompleteSpare01Name(String query) {
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+
+        if (spare01List == null) {
+            return Collections.emptyList();
+        }
+
+        List<I18nMessage> res = spare01List.stream()
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().equals(query))
+                .collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getMsgKey).collect(Collectors.toList());
+
+        return result;
+    }
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
@@ -1001,6 +1031,31 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+    public void onSpare01FilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSpare01 = (String) ((SelectEvent) event).getObject();
+        }
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+
+        if (!Strings.isNullOrEmpty(filterSpare01) && !spare01List.stream().anyMatch(item -> filterSpare01.equals(item.getMsgKey()))) {
+            filterSpare01 = null;
+        }
+
+        if (filterSpare01 != null) {
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getMsgKey().equals(filterSpare01)).collect(Collectors.toList());
+
+            Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
+            spare01Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            spare01Set = Collections.emptySet();
+        }
+
+    }
+
+
 
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
 
@@ -1391,5 +1446,21 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setCountyArea(boolean countyArea) {
         this.countyArea = countyArea;
+    }
+
+    public String getFilterSpare01() {
+        return filterSpare01;
+    }
+
+    public void setFilterSpare01(String filterSpare01) {
+        this.filterSpare01 = filterSpare01;
+    }
+
+    public Set<String> getSpare01Set() {
+        return spare01Set;
+    }
+
+    public void setSpare01Set(Set<String> spare01Set) {
+        this.spare01Set = spare01Set;
     }
 }

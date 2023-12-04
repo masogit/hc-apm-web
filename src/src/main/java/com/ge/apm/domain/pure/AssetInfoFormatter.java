@@ -8,10 +8,12 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AssetInfoFormatter {
 
@@ -451,6 +453,28 @@ public class AssetInfoFormatter {
 
         return value;
     }
+
+    public String getSpare01AsString() {
+
+        if (assetInfo.getSpare01() == null) return null;
+
+        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+
+        return value;
+    }
+
+    private String findMatchTreeValue(String spare01, List<I18nMessage> spare01List) {
+        List<I18nMessage> collect = spare01List.stream().filter(item -> spare01.contains(item.getMsgKey())).sorted((a,b)-> a.getMsgKey().length()+b.getMsgKey().length()).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(collect)){
+            return null;
+        }
+        String path="";
+        for (int i=0;i<collect.size();i++){
+            path=path+"/"+collect.get(i).getValueZh();
+        }
+        return path;
+    }
+
 
     public Date getManufactDate() {
         return assetInfo.getManufactDate();
@@ -1092,6 +1116,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+
+        map.put(getMessage("spare01"), this.getSpare01AsString());
+
         return map;
 
     }

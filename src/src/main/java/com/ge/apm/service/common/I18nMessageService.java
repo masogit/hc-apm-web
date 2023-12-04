@@ -2,6 +2,7 @@ package com.ge.apm.service.common;
 
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import webapp.framework.web.service.DbMessageSource;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class I18nMessageService {
@@ -159,5 +161,23 @@ public class I18nMessageService {
         I18nMessage defaultMsg = i18nMessageDao.findFirstByMsgKeyAndSiteId(fields.getMsgKey(), -1);
 
         return Optional.ofNullable(defaultMsg).map(i-> i.getValueZh()).orElse(fields.getMsgKey());
+    }
+
+    public Set<I18nMessage> collectSpare01InExstingList(List<I18nMessage> i18nMessagesByName, List<I18nMessage> spare01List) {
+        Set<I18nMessage> spare01Set = new HashSet<>();
+
+        for (I18nMessage i18nMessage: i18nMessagesByName) {
+            collectSpare01InExstingList(i18nMessage, spare01List, spare01Set);
+        }
+
+        return spare01Set;
+    }
+
+
+
+    public void collectSpare01InExstingList(I18nMessage i18nMessage, List<I18nMessage> spare01List, Set<I18nMessage> spare01SetOutput) {
+        Set<I18nMessage> collect = spare01List.stream().filter(item -> item.getMsgKey().contains(i18nMessage.getMsgKey())).collect(Collectors.toSet());
+        spare01SetOutput.addAll(collect);
+
     }
 }
