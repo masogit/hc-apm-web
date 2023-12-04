@@ -158,6 +158,12 @@ public class MultiLevelApproval implements Serializable {
     @Transient
     private String signatureNurse;
 
+    /**
+     * 摘要
+     */
+    @Column(name = "digest")
+    private String digest;
+
 
     public String getSignatureNurse() {
         return signatureNurse;

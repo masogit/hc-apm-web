@@ -208,27 +208,27 @@
                         <p:panelGrid id="meetingPanel" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">专业工程师意见<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEngineerOpinion}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEngineerOpinion}" required="true" requiredMessage="专业工程师意见 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">医院现有品牌<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingExistingBrands}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingExistingBrands}" required="true" requiredMessage="医院现有品牌 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">收费项目<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingFeeItems}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingFeeItems}" required="true" requiredMessage="收费项目 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">耗材或试剂说明<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingConsumableDescription}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingConsumableDescription}" required="true" requiredMessage="耗材或试剂说明 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">备注<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}" required="true" requiredMessage="备注 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">器械科审核意见<span style="color: red">*</span></label>
-                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
+                                <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}" required="true" requiredMessage="器械科审核意见 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">拦标价（万元）<span style="color: red">*</span></p:outputLabel>
@@ -237,7 +237,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">是否采购进口产品<span style="color: red">*</span></label>
-                                <p:selectOneMenu value="#{multiLevelApprovalController.purchaseOrderInfo.meetingPurchasingImports}"  required="true" requiredMessage="国产占比(国家财政部) #{msg.ValidationRequire}">
+                                <p:selectOneMenu value="#{multiLevelApprovalController.purchaseOrderInfo.meetingPurchasingImports}"  required="true" requiredMessage="是否采购进口产品 #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
