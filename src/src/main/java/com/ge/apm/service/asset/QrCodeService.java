@@ -70,6 +70,13 @@ public class QrCodeService {
     @Autowired
     private SysAuthGroupRepository sysAuthGroupRepository;
 
+    @Autowired
+    private ArrivalListItemRepository itemDao;
+
+    @Autowired
+    private ArrivalListRepository arrivalListRepository;
+
+
     public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
         if (tenantUID == null || siteUID == null) {
             return null;
@@ -222,6 +229,7 @@ public class QrCodeService {
             }
             if (null == asset) {
                 asset = getDefaultAsset();
+                qrCodeLibTOAsset(qrCodeLib,asset);
                 asset.setQrCode(qrCode);
                 asset.setSiteUID(Strings.isNullOrEmpty(siteUid) ? template.getSiteUID() : siteUid);
             }
@@ -241,6 +249,23 @@ public class QrCodeService {
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return img;
+    }
+
+    private void qrCodeLibTOAsset(QrCodeLib qrCodeLib,AssetInfo assetInfo) {
+
+        //Demo asset for preview
+
+        ArrivalListItem arrivalListItem=itemDao.findByQrCode(qrCodeLib.getQrCode());
+        if(arrivalListItem==null){
+            return;
+        }
+        ArrivalList arrivalList = arrivalListRepository.findById(arrivalListItem.getArrivalListId());
+        assetInfo.setSerialNum(arrivalListItem.getSerialNum());
+        assetInfo.setFinancingNum(arrivalListItem.getFinancingNum());
+        assetInfo.setDepartNum(arrivalListItem.getDepartNum());
+        assetInfo.setName(arrivalList.getAssetName());
+        assetInfo.setClinicalDeptName(arrivalList.getClinicalDeptName());
+        assetInfo.setClinicalDeptUID(arrivalList.getClinicalDeptUID());
     }
 
     private AssetInfo getDefaultAsset() {
