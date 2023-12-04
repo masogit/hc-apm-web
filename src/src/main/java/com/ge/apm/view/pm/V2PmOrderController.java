@@ -1864,7 +1864,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE,true));
 //        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
 //        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
-        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
+//        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
         searchFilterList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
 
