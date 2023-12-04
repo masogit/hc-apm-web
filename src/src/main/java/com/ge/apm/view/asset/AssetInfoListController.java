@@ -1004,9 +1004,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
         List<I18nMessage> res = spare01List.stream()
-                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().equals(query))
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().contains(query))
                 .collect(Collectors.toList());
-        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getMsgKey).collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getValueZh).collect(Collectors.toList());
 
         return result;
     }
@@ -1040,12 +1040,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
 
-        if (!Strings.isNullOrEmpty(filterSpare01) && !spare01List.stream().anyMatch(item -> filterSpare01.equals(item.getMsgKey()))) {
+        if (!Strings.isNullOrEmpty(filterSpare01) && !spare01List.stream().anyMatch(item -> filterSpare01.equals(item.getValueZh()))) {
             filterSpare01 = null;
         }
 
         if (filterSpare01 != null) {
-            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getMsgKey().equals(filterSpare01)).collect(Collectors.toList());
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getValueZh().equals(filterSpare01)).collect(Collectors.toList());
 
             Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
             spare01Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
