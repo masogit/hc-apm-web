@@ -31,7 +31,7 @@
                             <p:inputTextarea value="#{sharedAssetRequestV2Controller.selectedSard.accepter}" rows="1"/>
                         </h:panelGroup>
                        <h:panelGroup>
-                            <label class="label">附件</label>
+                            <label class="label">#{msg.AttachedFileInfo}</label>
 
                             <p:selectManyCheckbox id="grid" value="#{sharedAssetRequestV2Controller.selectedBorrowAccessoryList}" layout="grid" columns="1">
 <!--                                <f:selectItems value="#{sharedAssetTypeController.getAccessoriesById(sharedAssetReqDetailV2Controller.selected.sharedAssetTypeId).accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />-->
