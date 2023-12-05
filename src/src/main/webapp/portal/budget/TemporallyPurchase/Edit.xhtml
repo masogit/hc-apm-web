@@ -208,6 +208,35 @@
                                                  value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApprovalConclusion}" rows="2" cols="20">
                                 </p:inputTextarea>
                             </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel class="label">记录人<span style="color: red">*</span></p:outputLabel>
+                                <p:inputText  value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApprovalRecorder}"
+                                              required="true" requiredMessage="记录人 #{msg.ValidationRequire}"
+                                              disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel class="label">审批数量<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber minValue="0" decimalPlaces="0" required="true" disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"
+                                               requiredMessage="审批数量 #{msg.ValidationRequire}"  value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApplicationQuantity}">
+                                    <p:ajax listener="#{budgetBayController.calcAmountOffline(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this offlineApplicationAmount "/>
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">审批单价<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}" disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"
+                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApplicationPrice}">
+                                    <p:ajax listener="#{budgetBayController.calcAmountOffline(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this offlineApplicationAmount"/>
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">审批总价<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  id="offlineApplicationAmount" disabled="true" minValue="0" decimalPlaces="2"
+                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApplicationAmount}" >
+                                </p:inputNumber>
+                            </h:panelGroup>
+
                             <h:panelGroup >
                                 <p:outputLabel class="label">备注<span style="color: red">*</span></p:outputLabel>
                                 <p:inputTextarea disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"
@@ -215,12 +244,8 @@
                                                  value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApprovalRemark}" rows="2" cols="20">
                                 </p:inputTextarea>
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label">记录人<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText  value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApprovalRecorder}"
-                                              required="true" requiredMessage="记录人 #{msg.ValidationRequire}"
-                                              disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"/>
-                            </h:panelGroup>
+
+
                         </p:panelGrid>
                     </p:fieldset>
 

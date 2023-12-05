@@ -431,7 +431,14 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            this.selected.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
+        }
+    }
+
+    public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
+        if(budgetApplicationAsset.getOfflineApplicationPrice()!= null && budgetApplicationAsset.getOfflineApplicationQuantity()!= null){
+            budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
+                    .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP));
         }
     }
 

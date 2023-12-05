@@ -462,8 +462,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
         if (null != configList && configList.size() > 0) {
             if (ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType)
-                    || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType) || ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT.equals(busiType)
-                    ||ApprovalConstant.APPROVAL_PURCHASE_MANAGEMENT.equals(busiType)) {
+                    || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType) ) {
                 return getPartsSteam(configList, amount);
             } else {
                 return configList.get(0);

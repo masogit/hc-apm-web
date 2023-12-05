@@ -181,10 +181,6 @@
                      <h:outputText value="#{multiLevelApprovalController.purchaseOrderInfo.meetingConsumableDescription}"/>
                  </h:panelGroup>
                  <h:panelGroup>
-                     <label class="label">备注<span style="color: red">*</span></label>
-                     <h:outputText value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}"/>
-                 </h:panelGroup>
-                 <h:panelGroup>
                      <label class="label">器械科审核意见<span style="color: red">*</span></label>
                      <h:outputText value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}"/>
                  </h:panelGroup>
@@ -205,6 +201,10 @@
                                             locale="#{userContextService.getCalendarLocale()}"
                                             pattern="#{userContextService.timeFormat14()}"/>
                      </h:outputText>
+                 </h:panelGroup>
+                 <h:panelGroup>
+                     <label class="label">备注<span style="color: red">*</span></label>
+                     <h:outputText value="#{multiLevelApprovalController.purchaseOrderInfo.meetingRemarks}"/>
                  </h:panelGroup>
              </p:panelGrid>
          </p:fieldset>
