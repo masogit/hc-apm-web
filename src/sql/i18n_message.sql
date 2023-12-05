@@ -5123,3 +5123,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'Enabled', '启用', 'Enabled', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'NotEnabled', '未启用', 'Not Enabled', NULL, '-1');
+
+
+-- YHAAO-20326 加备用字段1-5
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare01', '备用字段01', 'spare01', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare02', '备用字段02', 'spare02', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare03', '备用字段03', 'spare03', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare04', '备用字段04', 'spare04', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare05', '备用字段05', 'spare05', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'TCM', '中医诊疗设备分类', 'Classification of Traditional Chinese Medicine Diagnosis and Treatment Equipment', NULL, '-1')
+

@@ -302,4 +302,36 @@ public class AssetRow {
     }
 
 
+    public void setFieldDropdownTreeValueAsString(String fieldName, String methodName, List<I18nMessage> msgList, Map map, String defaultValue) {
+        try {
+            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            Method method = AssetInfo.class.getMethod(methodName, String.class);
+
+            String selectedOption = null;
+            if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
+                String[] length = fieldValueOfString.split("/");
+                selectedOption = getI18nMsgKeyAsString(msgList, length[length.length-1], map, fieldName);
+            }
+
+            if (selectedOption == null) {
+                selectedOption = defaultValue;
+            }
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
+                method.invoke(assetInfo, selectedOption);
+            } else {
+                if (!StringUtils.isEmpty(fieldValueOfString)) {
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        String nullString = null;
+                        method.invoke(assetInfo, nullString);
+                    } else {
+                        method.invoke(assetInfo, selectedOption);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
 }
