@@ -464,15 +464,12 @@ public class AssetInfoFormatter {
     }
 
     private String findMatchTreeValue(String spare01, List<I18nMessage> spare01List) {
-        List<I18nMessage> collect = spare01List.stream().filter(item -> spare01.contains(item.getMsgKey())).sorted((a,b)-> a.getMsgKey().length()+b.getMsgKey().length()).collect(Collectors.toList());
+        List<I18nMessage> collect = spare01List.stream().filter(item -> spare01.startsWith(item.getMsgKey())).sorted((a,b)-> a.getMsgKey().length()+b.getMsgKey().length()).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(collect)){
             return null;
         }
-        String path="";
-        for (int i=0;i<collect.size();i++){
-            path=path+"/"+collect.get(i).getValueZh();
-        }
-        return path;
+        String collect1 = collect.stream().map(I18nMessage::getValueZh).collect(Collectors.joining("/"));
+        return collect1;
     }
 
 
