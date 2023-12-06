@@ -104,15 +104,15 @@
                                     <p:ajax process="@this" listener="#{v2SupplierPmOrderController.onRuleFilterChange}"   update=":pmOrderListForm:datalist"/>
                                 </p:autoComplete>-->
                             </f:facet>
-                            <h:outputText value="#{v2SupplierPmOrderController.getRulePm(item).name}"/>
+                            <h:outputText value="#{item.name}"/>
 
                         </p:column>
 
                         <p:column headerText="保养周期">
-                            <h:outputText value="#{v2SupplierPmOrderController.getRulePm(item).period}"/>
+                            <h:outputText value="#{item.period}"/>
                         </p:column>
                         <p:column headerText="保养周期单位">
-                            <h:outputText value="#{v2SupplierPmOrderController.getPeriodUnit(v2SupplierPmOrderController.getRulePm(item).periodUnit)}"/>
+                            <h:outputText value="#{v2SupplierPmOrderController.getPeriodUnit(item.periodUnit)}"/>
                         </p:column>
 
                 <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
