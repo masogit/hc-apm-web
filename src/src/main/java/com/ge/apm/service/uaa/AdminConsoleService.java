@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AdminConsoleMapper;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
@@ -18,6 +19,7 @@ import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -143,6 +145,18 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private AssetInfoMapper assetInfoMapper;
+
+	@Autowired
+	private V2_PmOrderRepository pmOrderRepository;
+
+	@Autowired
+	private PmOrderRuleRepository pmOrderRuleRepository;
+
+	@Autowired
+	private RelRuleAssetRepository relRuleAssetRepository;
+
+	@Autowired
+	private AdminConsoleMapper adminConsoleMapper;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -1121,5 +1135,48 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 
 
+	}
+
+	public void batchUpdatePmOrderFields() {
+		try {
+			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
+			Map<String, PmOrderRule> ruleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, t -> t));
+			int offset = 0;
+			logger.info("batchUpdatePmOrderFields start");
+			while (true) {
+				List<V2_PmOrder> orders = adminConsoleMapper.limitPmOrder(5000, offset++ * 5000);
+				if (ObjectUtil.isEmpty(orders)) {
+					logger.info("batchUpdatePmOrderFields end");
+					break;
+				}
+				logger.info("batchUpdatePmOrderFields {}, {}", 5000, offset * 5000);
+				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+				List<RelRuleAsset> relRuleAssets = adminConsoleMapper.findRelRuleAssetByAssetUidList(assetUidList);
+				Map<String, String> relRuleAssetMap = MapUtil.newHashMap();
+				for (RelRuleAsset relRuleAsset : relRuleAssets) {
+					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#1", relRuleAsset.getRuleUID1());
+					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#2", relRuleAsset.getRuleUID2());
+					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#3", relRuleAsset.getRuleUID());
+					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#4", relRuleAsset.getRuleUID4());
+				}
+				List<V2_PmOrder> saveList = ListUtil.newArrayList();
+				for (V2_PmOrder order : orders) {
+					String ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
+					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
+					if (ObjectUtil.isNotEmpty(pmOrderRule)) {
+						order.setPmRuleUid(pmOrderRule.getUid());
+						saveList.add(order);
+					}
+				}
+				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
+				for (Map.Entry<String, List<V2_PmOrder>> entry : pmOrderMap.entrySet()) {
+					List<String> orderIds = entry.getValue().stream().map(V2_PmOrder::getId).collect(Collectors.toList());
+					PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());
+					adminConsoleMapper.updatePmOrderByIds(pmOrderRule, orderIds);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
+		}
 	}
 }

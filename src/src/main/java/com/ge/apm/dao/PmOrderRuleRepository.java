@@ -52,4 +52,7 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 	@Query(value = "delete from pm_order_rule where uid in ?1",nativeQuery = true)
 	Integer deleteById(List<String> collect);
 
+	@Override
+	List<PmOrderRule> findAll();
+
 }
