@@ -4,11 +4,11 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.data.style.Style;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.BudgetApplicationAssetRepository;
-import com.ge.apm.dao.BudgetApplicationRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.MultiLevelApproval;
+import com.ge.apm.domain.PurchaseVender;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.VenderInfo;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
@@ -43,11 +43,11 @@ public class BudgetApplicationExportService {
     public static final String OVER_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/over_fifty_thousand.docx";
     public static final String LESS_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/less_fifty_thousand.docx";
     public static final int TOTAL_SPLIT = 50000;
-    public static final String FILE_NAME_ROOT = "年度采购申报表";
+    public static final String FILE_NAME_ROOT = "年度采购申购单";
 
     public static final String PURCHASE_ROOT = "采购汇总下载";
     public static final String PURCHASE_FILE_TITLE = "采购单";
-    public static final String BUDGET_FILE_TITLE = "采购申报表";
+    public static final String BUDGET_FILE_TITLE = "采购申购单";
     public static final String SUPPLIER_FILE_TITLE = "预供应商";
     public static final String ATTACHMENT = "附件";
 
@@ -61,6 +61,12 @@ public class BudgetApplicationExportService {
 
     @Autowired
     BlobObjectRepository blobObjectRepository;
+
+    @Autowired
+    PurchaseVenderRepository purchaseVenderRepository;
+
+    @Autowired
+    VenderInfoRepository venderInfoRepository;
 
     private MicroServiceUtil msService;
 
@@ -366,7 +372,7 @@ public class BudgetApplicationExportService {
                 if(applicationAsset == null){
                     continue;
                 }
-                String docPrefix = BUDGET_FILE_TITLE+ "/" + application.getApplicationNum() + "/医疗仪器设备年度采购申报表";
+                String docPrefix = BUDGET_FILE_TITLE+ "/" + application.getApplicationNum() ;
                 String attachmentPrefix = BUDGET_FILE_TITLE+ "/" + application.getApplicationNum()  + "/"+ ATTACHMENT;
                 List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(applicationAsset.getId());
                 generateSingleBudget(applicationAsset, application, blobObjects, zout, docPrefix, attachmentPrefix);
@@ -378,6 +384,18 @@ public class BudgetApplicationExportService {
      * 生成预供应商附件
      */
     public void generateSupplierFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
+        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(purchaseOrderInfo.getId());
+        for(PurchaseVender p : purchaseVenderList){
+            VenderInfo venderInfo = venderInfoRepository.findById(p.getVenderId());
+            String preFileName = "";
+            if(VenderInfo.BidType.Company.toString().equals(venderInfo.getBidType())){
+                preFileName = venderInfo.getCompanyName();
+            }else if(VenderInfo.BidType.Vender.toString().equals(venderInfo.getBidType())){
+                preFileName = venderInfo.getVenderName();
+            }
 
+            List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(p.getId());
+            getFileBufferedInputStream(zout, blobObjects, preFileName);
+        }
     }
 }
