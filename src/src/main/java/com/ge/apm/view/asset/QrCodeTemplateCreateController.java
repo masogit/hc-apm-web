@@ -12,10 +12,8 @@ import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.common.QrcodeConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -137,7 +135,7 @@ public class QrCodeTemplateCreateController {
     }
     
     public Map<String, String> getFieldsMap() {
-        Map<String,String> result=new HashMap<>();
+        Map<String,String> result=new LinkedHashMap<>();
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
         I18nMessage capitalSource2 = i18nMessageRepository.findFirstByMsgKeyAndSiteId("capitalSource2", siteId);
         Map<String, String> fieldsMap = QrcodeConfigConstant.getFieldsMap();

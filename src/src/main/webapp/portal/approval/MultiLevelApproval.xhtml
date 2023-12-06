@@ -12,6 +12,12 @@
                 max-width: 90%;
             }
         </style>
+        <style>
+            .ui-chkbox{
+                width: 18px !IMPORTANT;
+            }
+        </style>
+
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.audit}"/>
@@ -57,10 +63,18 @@
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" rendered="#{multiLevelApprovalListController.pendingApprovalByMe}">
-                        <p:commandButton value="审批"
-                                         action="#{multiLevelApprovalListController.promptApproval(item)}"
-                                         update="MultiLevelApprovalClaimDialog"
-                                         oncomplete="PF('MultiLevelApprovalClaimDialog').show()" />
+                        <!--17 为采购-->
+                                <p:commandButton value="审批" rendered="#{item.businessType eq 17}"
+                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"
+                                                 update="MultiLevelApprovalClaimPurDialog"
+                                                 oncomplete="PF('MultiLevelApprovalClaimPurDialog').show()"  />
+
+                        <!--17 为采购-->
+                                <p:commandButton value="审批" rendered="#{item.businessType ne 17}"
+                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"
+                                                 update="MultiLevelApprovalClaimDialog"
+                                                 oncomplete="PF('MultiLevelApprovalClaimDialog').show()"  />
+
                     </p:column>
 
                     <f:facet name="{Toolbar}">
@@ -70,6 +84,11 @@
                 <ui:include src="MultiLeveApprovalDetail.xhtml"/>
 
             </div>
+            <!--采购使用-->
+            <div class="ui-g-12 card">
+                <ui:include src="MultiLevelApprovalPurchase.xhtml"/>
+            </div>
+            <!--采购使用-->
 
             <p:dialog class="MultiLevelApprovalClaimDialog" id="MultiLevelApprovalClaimDialog" widgetVar="MultiLevelApprovalClaimDialog" modal="true" height="600" width="1200"  resizable="false" draggable="true" appendTo="@(body)" header="审批">
                 <h:form id="approvalDialogForm" class="tform">
@@ -124,12 +143,12 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
+                            <h:panelGroup >
                                 <label class="label">审批意见</label>
                                 <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
                                              value="#{multiLevelApprovalController.approvalOpinion}"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{multiLevelApprovalController.signatureNurseRendered}">
+                            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14 and multiLevelApprovalController.signatureNurseRendered}">
                                 <label class="label">手术室护士长是否已签名</label>
                                 <p:selectOneMenu value="#{multiLevelApprovalController.signatureNurse}"  >
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
@@ -159,7 +178,7 @@
                     <!-- 预算审核 -->
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14}">
                         <p:commandButton validateClient="true" immediate="false" id="approveAgreeBtn"
-                                         actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}"
+                                         actionListener="#{multiLevelApprovalController.getBudgetMultiLevelApprovalPersonByAgree()}"
                                          value="审核通过" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false"
@@ -171,7 +190,6 @@
                                          value="取消申请单" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
-
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 15 or multiLevelApprovalController.businessTypeFlag == 16}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
@@ -181,7 +199,6 @@
                         <p:commandButton style="display: none"   id="openSignature2" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     </h:panelGroup>
                 </h:form>
-
             </p:dialog>
             <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
                 <h:form id="signatureForm">
@@ -261,7 +278,6 @@
 
                 </h:form>
             </p:dialog>
-
         </div>
     </ui:define>
 </ui:composition>

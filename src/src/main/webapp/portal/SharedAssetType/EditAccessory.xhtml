@@ -8,12 +8,12 @@
 
     <ui:composition>
 
-        <p:dialog id="SharedAssetTypeAccesssoryEditDlg" widgetVar="SharedAssetTypeAccesssoryEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetTypeController.CRUDActionName} 附件">
+        <p:dialog id="SharedAssetTypeAccesssoryEditDlg" widgetVar="SharedAssetTypeAccesssoryEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetTypeController.CRUDActionName} #{msg.AttachedFileInfo}">
             <h:form id="SharedAssetTypeAccesssoryEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetTypeController.selected != null}">
                         <h:panelGroup styleClass="md-inputfield">
-                            <p:inputText id="name" value="#{sharedAssetTypeController.selectedAccessory.name}" required="true" requiredMessage="附件名称 #{msg.ValidationRequire}"/>
+                            <p:inputText id="name" value="#{sharedAssetTypeController.selectedAccessory.name}" required="true" requiredMessage="#{msg.AttachedFileInfo} #{msg.ValidationRequire}"/>
                             <label>#{msg.name}</label>
                         </h:panelGroup>
                     </p:panelGrid>

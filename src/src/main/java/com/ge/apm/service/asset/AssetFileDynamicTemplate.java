@@ -711,6 +711,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         private Map supliers;
         private List<Object> assetTypeGroupPaths;
         private Map<String, String> encodedToAssetTypeGroupPath;
+        private Map<String, String> spare01;
 
         public GetAllElement(List<AssetInfo> assetList) {
             this.assetList = assetList;

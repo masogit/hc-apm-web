@@ -15,7 +15,7 @@
             <p:outputLabel class="pageTitle" value="采购单信息"/>
         </div>
         <div  class="ui-g-12 card">
-            <h:form id="BudgetApplicationEditForm">
+            <h:form id="PurchaseApplicationEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset legend="采购详情">
                         <p:panelGrid id="editPanel" columns="4" layout="grid"
@@ -76,7 +76,6 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
                             <p:ajax event="rowSelect" update="delButton"/>
-                            <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                             <p:column headerText="申请科室">
                                 <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
                             </p:column>
@@ -110,24 +109,26 @@
                             <p:column headerText="预算总价">
                                 <h:outputText value="#{item.applicationAmount}"/>
                             </p:column>
-                         <f:facet name="{Toolbar}">
-                             <p:commandButton title="选择申购单" id="addButton" process="@this" update="BudgetSelectDlg"
-                                              icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
-                                              actionListener="#{purchaseOrderController.preAddBudgetApplication()}" disabled="#{purchaseOrderController.curModelDisables()}"
-                                              oncomplete="PF('BudgetSelectDialog').show()"/>
-                             <p:commandButton title="删除" id="delButton" update="budgetApplicationlist BudgetApplicationEditForm:purchaseQuantity BudgetApplicationEditForm:totalPrice "
-                                              disabled="#{purchaseOrderController.curModelDisables() or empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
-                                              icon="ui-icon-close" class="btn btn-sm btn-gray zoom-08"
-                                              actionListener="#{purchaseOrderController.delBudgetApplication()}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"  icon="ui-icon-alert"/>
-                             </p:commandButton>
-                         </f:facet>
-                     </p:dataTable>
+                             <f:facet name="{Toolbar}">
+                                 <p:commandButton title="选择申购单" id="addButton" process="@this" update="BudgetApplicationSelectDlg"
+                                                  icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
+                                                  actionListener="#{purchaseOrderController.preAddBudgetApplication()}"
+                                                  rendered="#{purchaseOrderController.editButtonDisplay()}"
+                                                  oncomplete="PF('BudgetApplicationSelectDlg').show()"/>
+                                 <p:commandButton title="删除" id="delButton" update="budgetApplicationlist PurchaseApplicationEditForm:purchaseQuantity PurchaseApplicationEditForm:totalPrice "
+                                                  disabled="#{ empty purchaseOrderController.dataListSelectApplicationAssetBudget}"
+                                                  rendered="#{purchaseOrderController.editButtonDisplay()}"
+                                                  icon="ui-icon-close" class="btn btn-sm btn-gray zoom-08"
+                                                  actionListener="#{purchaseOrderController.delBudgetApplication()}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"  icon="ui-icon-alert"/>
+                                 </p:commandButton>
+                             </f:facet>
+                        </p:dataTable>
                     </p:fieldset>
 
                     <p:fieldset legend="采购单模板"  >
                         <h:panelGroup>
-                            <p:selectManyMenu  styleClass="manymenu-advanced"   style="width: 400px"  value="#{purchaseOrderController.templateIds}" filter="true" filterMatchMode="contains" showCheckbox="true">
+                            <p:selectManyMenu  styleClass="manymenu-advanced"   style="width: 400px" value="#{purchaseOrderController.templateIds}" filter="true" filterMatchMode="contains" showCheckbox="true">
                                 <f:selectItems value="#{purchaseOrderController.budgetPurchaseTemplateManageList}" var="template" itemLabel="#{template.name}" itemValue="#{template.id}"   />
                             </p:selectManyMenu>
                         </h:panelGroup>
@@ -139,10 +140,13 @@
                             </div>
                         </c:forEach>
                     </p:fieldset>
+                    <ui:include src="PurchaseDetail.xhtml"/>
                     <br/>
-                    <p:commandButton update=":growl :BudgetApplicationEditForm"
-                                     validateClient="true" action="#{purchaseOrderController.savePurchase}" disabled="#{purchaseOrderController.curModelDisables()}" value="保存" id="savePurchase" />
-                    <p:commandButton update=":growl :BudgetApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                    <p:commandButton update=":growl :PurchaseApplicationEditForm"
+                                     validateClient="true" action="#{purchaseOrderController.savePurchase}"
+                                     rendered="#{purchaseOrderController.editButtonDisplay()}"
+                                     value="保存" id="savePurchase" />
+                    <p:commandButton update=":growl :PurchaseApplicationEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="#{purchaseOrderController.backList}" />
                 </h:panelGroup>
 

@@ -67,7 +67,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
-    public final static String VIEW_ACTION = "View";
 
     private BlobFileService blobService;
     /**
@@ -143,8 +142,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
                 this.prepareCreate();
             } else if (BudgetApplicationBayController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
-            } else if (BudgetApplicationBayController.VIEW_ACTION.equals(action)){
-                this.prepareView();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -175,10 +172,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         this.curSelectApplicationBudgetAsset.setRecommendedBrand(this.curSelectBudgetAssetInfo.getAssetBrand());
         this.curSelectApplicationBudgetAsset.setModel(this.curSelectBudgetAssetInfo.getAssetModel());
         this.curSelectApplicationBudgetAsset.setStandards(this.curSelectBudgetAssetInfo.getStandards());
-    }
-
-    public boolean curModelDisables(){
-        return "View".equals(crudActionName)?true:false;
     }
 
     public void onTabChange(TabChangeEvent event) {
@@ -272,15 +265,12 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }else if(BudgetApplicationBayController.EDIT_ACTION.equals(action)){
             return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.EDIT_ACTION + "&editId="
                     + this.selected.getId()+"&tabIndexList="+tabIndex);
-        }else if(BudgetApplicationBayController.VIEW_ACTION.equals(action)){
-            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBayController.VIEW_ACTION
-                    + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex);
         }else{
             return null;
         }
     }
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + BudgetApplicationBayController.VIEW_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
+        String str = "action=" + BudgetApplicationBayController.EDIT_ACTION + "&editId=" + this.selected.getId()+"&tabIndexList="+tabIndex;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -297,7 +287,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
-                WebUtil.addSuccessMessage("无可用的审批流,请检查后重试！");
+                WebUtil.addSuccessMessage("失败:无可用的审批流,请检查后重试！");
                 return "";
             }
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
@@ -422,7 +412,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            this.selected.setTotalAmount(budgetApplicationAsset.getApplicationAmount());
         }
     }
 
@@ -631,7 +620,20 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         this.selectedAsset = selectedAsset;
     }
 
+    public boolean editButtonDisplay(){
+        boolean render = true;
+        if(!BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString().equals(this.selected.getApplicationStep())){
+            render = false;
+        }
+        return render;
+    }
 
-
+    public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
+        if(budgetApplicationAsset.getOfflineApplicationPrice()!= null && budgetApplicationAsset.getOfflineApplicationQuantity()!= null){
+            budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
+                    .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP));
+        }
+    }
 
 }

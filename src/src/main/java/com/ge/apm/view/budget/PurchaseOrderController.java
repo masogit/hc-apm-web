@@ -22,6 +22,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -52,61 +53,22 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "purchaseOrderController")
 public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseOrderInfo> {
     private static Logger logger = LoggerFactory.getLogger(PurchaseOrderController.class);
-
     private Page<PurchaseOrderInfo> emptyPage = new PageImpl<>(Collections.emptyList());
     private UserAccount account = UserContextService.getCurrentUserAccount();
-
-
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
-    public final static String VIEW_ACTION = "View";
-
     private BlobFileService blobService;
-    /**
-     * 编辑数据主键
-     */
-    @Getter @Setter
-    private String editId;
-    //当前设备列表
-    @Getter @Setter
-    private List<BudgetApplicationAsset> curApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
-    @Getter @Setter
-    private BudgetApplicationAsset dataListSelectApplicationAssetBudget ;
-    // 弹窗列表
-    @Getter @Setter
-    private List<BudgetApplicationAsset> optionalBudgetApplications = new ArrayList<BudgetApplicationAsset>();
-    // 已选择的设备列表
-    @Getter @Setter
-    private List<BudgetApplicationAsset> selectApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
-
-    @Getter @Setter
-    private StreamedContent exportFile;
-
-    @Getter @Setter
-    private List<V2_BlobObject> attachList;
-    @Getter @Setter
-    private List<VenderInfo> venderInfoList;
-
-    @Getter @Setter
-    private VenderInfo venderInfo;
     private List<SearchFilter> assetSearchFilters;
-
     private PurchaseOrderInfoRepository dao;
-
     private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
-
     private BudgetApplicationRepository budgetApplicationRepository;
-    //private BlobObjectRepository blobObjectRepository;
-
+    private BlobObjectRepository blobObjectRepository;
     private VenderInfoRepository venderInfoRepository;
     private PurchaseVenderRepository purchaseVenderRepository;
-
-
+    private OrgInfoRepository orgDao;
     private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
     private PurchaseTemplateRepository purchaseTemplateRepository;
-
     private PurchaseOrderService purchaseOrderService;
-
     @Getter @Setter
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     @Getter @Setter
@@ -127,8 +89,37 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private List<String> templateIds = new ArrayList<>();
     @Getter @Setter
     private List<String> venderInfoStr = new ArrayList<>();
-
-    private String purchaseUrl;
+    @Getter  @Setter
+    private VenderInfo venderInfoConfirm;
+    @Getter  @Setter
+    private VenderInfo companyInfoConfirm;
+    @Getter  @Setter
+    private List<VenderInfo> venderInfos = new ArrayList<>();
+    @Getter  @Setter
+    private List<VenderInfo> companyInfos = new ArrayList<>();
+    @Getter @Setter
+    private String editId;
+    //当前设备列表
+    @Getter @Setter
+    private List<BudgetApplicationAsset> curApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
+    @Getter @Setter
+    private BudgetApplicationAsset dataListSelectApplicationAssetBudget ;
+    // 弹窗列表
+    @Getter @Setter
+    private List<BudgetApplicationAsset> optionalBudgetApplications = new ArrayList<BudgetApplicationAsset>();
+    // 已选择的设备列表
+    @Getter @Setter
+    private List<BudgetApplicationAsset> selectApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
+    @Getter @Setter
+    private StreamedContent exportFile;
+    @Getter @Setter
+    private List<V2_BlobObject> attachList;
+    @Getter @Setter
+    private List<VenderInfo> venderInfoList;
+    @Getter @Setter
+    private VenderInfo venderInfo;
+    @Getter  @Setter
+    private Integer tabIndex = 0;
 
     @Override
     protected void init() {
@@ -141,7 +132,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         purchaseTemplateRepository = WebUtil.getBean(PurchaseTemplateRepository.class);
         purchaseOrderService = WebUtil.getBean(PurchaseOrderService.class);
         budgetPurchaseTemplateManageRepository = WebUtil.getBean(BudgetPurchaseTemplateManageRepository.class);
-        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -158,8 +149,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 this.prepareCreate();
             } else if (PurchaseOrderController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
-            }else if (PurchaseOrderController.VIEW_ACTION.equals(action)) {
-                this.prepareView();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -172,6 +161,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     protected GenericRepositoryUUID<PurchaseOrderInfo> getDAO() {
         return dao;
     }
+
     public String backList() {
         return "List.xhtml?faces-redirect=true";
     }
@@ -186,18 +176,62 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         calcTotalAmount(curApplicationBudgetAssets);
     }
 
-    public void loadVenderInfo() {
-        this.venderInfoList = venderInfoRepository.queryByPurchaseId(this.selected.getId());
-    }
-
     @Override
     protected Page<PurchaseOrderInfo> loadData(PageRequest pageRequest) {
+        this.searchFilters = this.getSearchFilter(this.tabIndex);
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+    public List<SearchFilter> getSearchFilter(Integer tabIndex) {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
+        if (tabIndex == 0) {//待转信息确认
+            updateSearchFilter(new SearchFilter("orderStep", SearchFilter.Operator.IsNull, null));
+            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.IsNull, null));
+        } else if(tabIndex == 1){//待信息确认
+            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "ToConfirmedInfo"));
+            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.IsNull, null));
+        } else if(tabIndex == 2){//待过会确认
+            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "ToConfirmedInfoMeet"));
+            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.EQ, "ConfirmedInfo"));
+        } else if(tabIndex == 3){//待招标
+            updateSearchFilter(new SearchFilter("orderStep", SearchFilter.Operator.EQ, "ToConfirmedInfoTendered"));
+            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.EQ, "ConfirmedInfoMeet"));
+        } else if(tabIndex == 4){//完成
+            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "Complete"));
+            updateSearchFilter(new SearchFilter("stepStatus",SearchFilter.Operator.EQ, "Complete"));
+        } else if(tabIndex == 5){//全部
+        }
+        return searchFilters;
     }
+    public void onTabChange(TabChangeEvent event) {
+        selected = null;
+        switch (event.getTab().getId()) {
+            case "s1":
+                tabIndex = 1;
+                break;
+            case "s2":
+                tabIndex = 2;
+                break;
+            case "s3":
+                tabIndex = 3;
+                break;
+            case "s4":
+                tabIndex = 4;
+                break;
+            case "s5":
+                tabIndex = 5;
+                removeFilterOnField("orderStep");
+                removeFilterOnField("stepStatus");
+                break;
+            default:
+                tabIndex = 0;
+                break;
+        }
+    }
+
 
     private void addSearchFilter() {
         if (null != searchForm.getDateStart()) {
@@ -224,8 +258,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.CREATE_ACTION);
         }else if(PurchaseOrderController.EDIT_ACTION.equals(action)){
             return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId());
-        }else if(PurchaseOrderController.VIEW_ACTION.equals(action)){
-            return UrlEncryptController.encodeUrlParam("Edit?action=" + PurchaseOrderController.VIEW_ACTION + "&editId=" + this.selected.getId());
         }else {
             return null;
         }
@@ -242,19 +274,31 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
     }
 
-
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + PurchaseOrderController.VIEW_ACTION + "&editId=" + this.selected.getId();
+        String str = "action=" + PurchaseOrderController.EDIT_ACTION + "&editId=" + this.selected.getId();
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
 
     public String savePurchase() {
-        purchaseOrderService.handleCommonField(selected,account);
-        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.attachList,this.templateIds);
+        purchaseOrderService.savePurchase(selected,curApplicationBudgetAssets,this.templateIds,account);
         return purchaseOrderService.backList();
     }
+
+    public void submitPurchase() {
+        //无可用的审批流
+        boolean resultMultiLevelApproval = purchaseOrderService.checkMultiLevelApproval(selected);
+        if(!resultMultiLevelApproval){
+            WebUtil.addSuccessMessage("失败:无可用的确认流程,请检查后重试！");
+            return;
+        }
+        selected.setOrderStep("ToConfirmedInfo");
+        purchaseOrderService.submitPurchaseApplication(selected);
+        this.selected = null;
+        WebUtil.addSuccessMessage("采购单提交成功");
+    }
+
 
     @Override
     public void delete() {
@@ -362,26 +406,36 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         buildCurDetail(this.editId);
     }
 
-    @Override
-    public void prepareView() {
-        crudActionName = "View";
-        buildCurDetail(this.editId);
-    }
-
     public void buildCurDetail(String id){
         this.selected = this.dao.findById(id);
         List<SearchFilter> searchFilterAssets = new ArrayList<>();
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ,this.selected.getId()));
         this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
-        //this.attachList = blobObjectRepository.findByBoUuid(this.selected.getId());
+        if(CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)){
+            this.curApplicationBudgetAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
+                OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());
+                baa.setConfirmApplicationDeptName(confirmOrg.getName());
+            });
+        }
         List<PurchaseTemplate> purchaseTemplateList = purchaseTemplateRepository.findByPurchaseId(id);
         if(CollectionUtils.isNotEmpty(purchaseTemplateList)){
             this.templateIds = purchaseTemplateList.stream().map(PurchaseTemplate::getTemplateId).collect(Collectors.toList());
         }
         //投标商拼接数据
-        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(id);
+        if(StringUtils.isNotBlank(this.selected.getVenderId())){
+            this.venderInfoConfirm = venderInfoRepository.findById(this.selected.getVenderId());
+        }
+        if(StringUtils.isNotBlank(this.selected.getCompanyId())){
+            this.companyInfoConfirm = venderInfoRepository.findById(this.selected.getCompanyId());
+        }
+        List<VenderInfo> venderInfoListRadioList = venderInfoRepository.queryByPurchaseId(this.selected.getId());
 
+        if(CollectionUtils.isNotEmpty(venderInfoListRadioList)){
+            this.venderInfos = venderInfoListRadioList.stream().filter(vi -> VenderInfo.BidType.Vender.toString().equals(vi.getBidType())).collect(Collectors.toList());
+            this.companyInfos = venderInfoListRadioList.stream().filter(vi -> VenderInfo.BidType.Company.toString().equals(vi.getBidType())).collect(Collectors.toList());
+        }
+        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(id);
         if(CollectionUtils.isNotEmpty(purchaseVenderList)){
             for(PurchaseVender purchaseVender :purchaseVenderList){
                 StringBuilder stringBuilder = new StringBuilder();
@@ -389,7 +443,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 if(venderInfo == null){
                     continue;
                 }
-                stringBuilder.append(venderInfo.getVenderName()+" : ");
+                stringBuilder.append(VenderInfo.BidType.Company.toString().equals(venderInfo.getBidType())?venderInfo.getCompanyName()+" : ":venderInfo.getVenderName()+" : ");
                 stringBuilder.append("[");
                 List<V2_BlobObject> v2_blobObjectList = blobService.findBlobObjectsByBoUid(purchaseVender.getId());
                 if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
@@ -413,15 +467,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.curApplicationBudgetAssets = this.curApplicationBudgetAssets.stream().filter(cur ->
                 !cur.getId().equals(dataListSelectApplicationAssetBudget.getId())).collect(Collectors.toList());
         //第二步处理状态
-        if(dataListSelectApplicationAssetBudget.getBudgetApplication() !=null &&
-                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
-                StringUtils.isNotBlank(dataListSelectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
-            purchaseOrderService.setPurchaseInfoNull(dataListSelectApplicationAssetBudget.getBudgetApplication());
-            budgetApplicationRepository.save(dataListSelectApplicationAssetBudget.getBudgetApplication());
-        }
+        purchaseOrderService.delBudgetApplication(curApplicationBudgetAssets,dataListSelectApplicationAssetBudget,
+                selected,account,templateIds);
         dataListSelectApplicationAssetBudget = null;
         calcTotalAmount(curApplicationBudgetAssets);
-        savePurchase();
     }
 
     public void searchBudgetApplication() {
@@ -448,6 +497,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     private void addAssetSearchFilter() {
+        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
         if (null != assetSearchForm.getDept()) {
             updateAssetSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, assetSearchForm.getDept().getId()));
         }
@@ -492,7 +542,16 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 "&assetName="+ (StringUtils.isNotBlank(selected.getApplicationAssetName())?selected.getApplicationAssetName():"");
     }
 
-    public void setPurchaseUrl(String purchaseUrl) {
-        this.purchaseUrl = purchaseUrl;
+    public int approvaLevelPurchase(){
+        Set<MultiLevelApproval> multiLevelApprovalSet = this.selected.getPurchaseApprovals();
+        return CollectionUtils.isEmpty(multiLevelApprovalSet)?0:multiLevelApprovalSet.size();
+    }
+
+    public boolean editButtonDisplay(){
+        boolean render = true;
+        if("Enabled".equals(this.selected.getStatus()) || StringUtils.isNotBlank(this.selected.getOrderStep())){
+            render = false;
+        }
+        return render;
     }
 }

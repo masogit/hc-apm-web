@@ -12,4 +12,8 @@ public interface ApprovableTarget {
 
     int getBusinessType();
 
+    default String getBusinessDigest() {
+        return null;
+    }
+
 }

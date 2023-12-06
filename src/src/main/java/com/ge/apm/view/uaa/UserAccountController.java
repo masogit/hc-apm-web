@@ -161,6 +161,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private String originalTelephone = null;//原始
     private Integer originaSelectId;
     private boolean isITAdmin=false;
+    private List<OrgInfo> affiliationDepartmentGroup = new ArrayList<>();
     private List<String> childNodeUid=new ArrayList<>();
 
     public boolean isPropagateSelectionUp() {
@@ -300,9 +301,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         String orgInfoUID = loginUser.getOrgInfoUID();
-        List<OrgInfo> childrenByUids = orgInfoDao.getHospitalChildrenByUids(Arrays.asList(orgInfoUID));
-        childNodeUid=childrenByUids.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-        orgTree=uaaService.getOrgTreeNodes(orgInfoUID,childrenByUids);
+        affiliationDepartmentGroup= orgInfoDao.getHospitalChildrenByUids(Arrays.asList(orgInfoUID));
+        childNodeUid=affiliationDepartmentGroup.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        orgTree=uaaService.getOrgTreeNodes(orgInfoUID,affiliationDepartmentGroup);
     }
 
 
@@ -438,8 +439,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (selectedOrg == null) {
             searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN,childNodeUid));
         }else{
-            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ,selectedOrg.getUid()));
+            String uid = selectedOrg.getUid();
+            Set<String> child=new HashSet<>();
+            getSubOrgInfo(uid,child);
+            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, child));
         }
+    }
+    private void getSubOrgInfo(String uid,Set<String> result){
+        result.add(uid);
+        affiliationDepartmentGroup.stream()
+                .filter(item -> uid.equals(item.getParentUID()))
+                .forEach(item->{
+                    getSubOrgInfo(item.getUid(),result);
+                });
     }
     private void superAdminFilter() {
         if (selectedOrg == null) {

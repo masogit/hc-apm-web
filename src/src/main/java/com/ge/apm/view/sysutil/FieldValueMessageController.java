@@ -17,6 +17,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static webapp.framework.web.WebUtil.getServiceBean;
 
@@ -96,6 +97,7 @@ public class FieldValueMessageController implements Serializable {
         if (msgList.isEmpty() && institutionId != -1) {
             msgList = doGetFieldValueList(fieldName, -1);
         }
+        msgList = msgList.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).collect(Collectors.toList());
 
         return msgList;
     }

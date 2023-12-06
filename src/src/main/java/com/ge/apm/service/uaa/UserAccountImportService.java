@@ -209,12 +209,8 @@ public class UserAccountImportService {
                         return newUser;
                     }
                 }
-                if (ObjectUtil.isNotEmpty(telephone)) {
-                    if (!telephone.equals(user.getTelephone())) {
-                        if (telephoneValid(newUser)) {
-                            newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE, "电话号码已存在");
-                        }
-                    }
+                if (ObjectUtil.isNotEmpty(telephone) && !telephone.equals(user.getTelephone()) && telephoneValid(newUser)) {
+                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE, "电话号码已存在");
                 }
             }
             //update finally
@@ -639,7 +635,7 @@ public class UserAccountImportService {
             }
         } else {
             String accessScope = user.getAccessScope();
-            if (StringUtils.isEmpty(accessScope)) {
+            if (ObjectUtil.isEmpty(accessScope)) {
                 if (!isCreate) {
                     return true;
                 }
@@ -857,7 +853,7 @@ public class UserAccountImportService {
         initParam();
         getRoleNameMap();
         currentUser = user;
-        affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(currentUser.getOrgInfoUID()));
+        affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Collections.singletonList(currentUser.getOrgInfoUID()));
         affiliatedDepartmentsUid=affiliatedDepartments.stream().map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
         if (tenantInfo != null && tenantInfo.getInsulate() != null) {
@@ -1241,14 +1237,7 @@ public class UserAccountImportService {
 
     private UserAccount checkAssetClassification(UserAccount newUser,String assetClassification) {
         String[] checkAssetClassificationUIds = assetClassification.trim().split(",");
-        String uuid=newUser.getUid();
         List<AssetTypeGroup> assetTypeGroups = assetTypeGroupDao.findByClassificationCodeAndTenantUid(Arrays.asList(checkAssetClassificationUIds),newUser.getTenantUID());
-        if(StringUtils.isEmpty(uuid)){
-            //create
-            isCreate=true;
-        }else{
-            isCreate=false;
-        }
         if(assetTypeGroups!=null && !assetTypeGroups.isEmpty()){
             assetClassificationUIds = assetTypeGroups.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList());
         }

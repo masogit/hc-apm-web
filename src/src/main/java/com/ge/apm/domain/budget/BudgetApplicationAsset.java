@@ -237,8 +237,72 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "offline_approval_recorder")
     private String offlineApprovalRecorder;
 
-    /*offline线下审批数据*/
+    @Column(name = "offline_application_quantity")
+    private Integer offlineApplicationQuantity;
 
+    @Column(name = "offline_application_price", scale = 2)
+    private BigDecimal offlineApplicationPrice;
+
+    @Column(name = "offline_application_amount", scale = 2)
+    private BigDecimal offlineApplicationAmount;
+
+    @Column(name = "result_application_quantity")
+    private Integer resultApplicationQuantity;
+
+    @Column(name = "result_application_price", scale = 2)
+    private BigDecimal resultApplicationPrice;
+
+    @Column(name = "result_application_amount", scale = 2)
+    private BigDecimal resultApplicationAmount;
+
+    /*offline线下审批数据*/
+//    序号	使用科室	设备品目	数量（台）	预算（万元）	国产占比（国家财政部）	国产占比（省财政部）	科室意见（是否进口）	公告及信息收集情况	主要功能和配置	主要参数和要求	意向品牌	拦标价（万元）	备注
+    /*采购确认信息*/
+    // 申请科室id
+    @Column(name = "confirm_applicant_dept_id")
+    private Integer confirmApplicationDeptId;
+    // 申请科室
+    @Transient
+    private String confirmApplicationDeptName;
+
+    @Column(name = "confirm_equipment_category")
+    private String confirmEquipmentCategory;
+
+    @Column(name = "confirm_quantity")
+    private Integer confirmQuantity;
+
+    @Column(name = "confirm_price", scale = 2)
+    private BigDecimal confirmPrice;
+
+    @Column(name = "confirm_national_finance")
+    private String confirmNationalFinance;
+
+    @Column(name = "confirm_provincial_finance")
+    private String confirmProvincialFinance;
+
+    @Column(name = "confirm_import")
+    private String confirmImport;
+
+    @Column(name = "confirm_notice")
+    private String confirmNotice;
+
+    @Column(name = "confirm_major_function")
+    private String confirmMajorFunction;
+
+    @Column(name = "confirm_parameters")
+    private String confirmParameters;
+
+    @Column(name = "confirm_brand")
+    private String confirmBrand;
+
+    @Column(name = "confirm_maximum_price", scale = 2)
+    private BigDecimal confirmMaximumPrice;
+
+    @Column(name = "confirm_rmark", scale = 2)
+    @Size(max = 1024)
+    private String confirmRemark;
+
+    /*采购确认信息*/
     // 删除标识 0: 未删除；1：已删除
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
@@ -263,7 +327,165 @@ public class BudgetApplicationAsset implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private BudgetApplication budgetApplication;
 
+    public Integer getOfflineApplicationQuantity() {
+        return offlineApplicationQuantity;
+    }
 
+    public void setOfflineApplicationQuantity(Integer offlineApplicationQuantity) {
+        this.offlineApplicationQuantity = offlineApplicationQuantity;
+    }
+
+    public BigDecimal getOfflineApplicationPrice() {
+        return offlineApplicationPrice;
+    }
+
+    public void setOfflineApplicationPrice(BigDecimal offlineApplicationPrice) {
+        this.offlineApplicationPrice = offlineApplicationPrice;
+    }
+
+    public BigDecimal getOfflineApplicationAmount() {
+        return offlineApplicationAmount;
+    }
+
+    public void setOfflineApplicationAmount(BigDecimal offlineApplicationAmount) {
+        this.offlineApplicationAmount = offlineApplicationAmount;
+    }
+
+    public Integer getResultApplicationQuantity() {
+        return resultApplicationQuantity;
+    }
+
+    public void setResultApplicationQuantity(Integer resultApplicationQuantity) {
+        this.resultApplicationQuantity = resultApplicationQuantity;
+    }
+
+    public BigDecimal getResultApplicationPrice() {
+        return resultApplicationPrice;
+    }
+
+    public void setResultApplicationPrice(BigDecimal resultApplicationPrice) {
+        this.resultApplicationPrice = resultApplicationPrice;
+    }
+
+    public BigDecimal getResultApplicationAmount() {
+        return resultApplicationAmount;
+    }
+
+    public void setResultApplicationAmount(BigDecimal resultApplicationAmount) {
+        this.resultApplicationAmount = resultApplicationAmount;
+    }
+
+    public String getConfirmApplicationDeptName() {
+        return confirmApplicationDeptName;
+    }
+
+    public void setConfirmApplicationDeptName(String confirmApplicationDeptName) {
+        this.confirmApplicationDeptName = confirmApplicationDeptName;
+    }
+
+    public Integer getConfirmApplicationDeptId() {
+        return confirmApplicationDeptId;
+    }
+
+    public void setConfirmApplicationDeptId(Integer confirmApplicationDeptId) {
+        this.confirmApplicationDeptId = confirmApplicationDeptId;
+    }
+
+    public String getConfirmEquipmentCategory() {
+        return confirmEquipmentCategory;
+    }
+
+    public void setConfirmEquipmentCategory(String confirmEquipmentCategory) {
+        this.confirmEquipmentCategory = confirmEquipmentCategory;
+    }
+
+    public Integer getConfirmQuantity() {
+        return confirmQuantity;
+    }
+
+    public void setConfirmQuantity(Integer confirmQuantity) {
+        this.confirmQuantity = confirmQuantity;
+    }
+
+    public BigDecimal getConfirmPrice() {
+        return confirmPrice;
+    }
+
+    public void setConfirmPrice(BigDecimal confirmPrice) {
+        this.confirmPrice = confirmPrice;
+    }
+
+    public String getConfirmNationalFinance() {
+        return confirmNationalFinance;
+    }
+
+    public void setConfirmNationalFinance(String confirmNationalFinance) {
+        this.confirmNationalFinance = confirmNationalFinance;
+    }
+
+    public String getConfirmProvincialFinance() {
+        return confirmProvincialFinance;
+    }
+
+    public void setConfirmProvincialFinance(String confirmProvincialFinance) {
+        this.confirmProvincialFinance = confirmProvincialFinance;
+    }
+
+    public String getConfirmImport() {
+        return confirmImport;
+    }
+
+    public void setConfirmImport(String confirmImport) {
+        this.confirmImport = confirmImport;
+    }
+
+    public String getConfirmNotice() {
+        return confirmNotice;
+    }
+
+    public void setConfirmNotice(String confirmNotice) {
+        this.confirmNotice = confirmNotice;
+    }
+
+    public String getConfirmMajorFunction() {
+        return confirmMajorFunction;
+    }
+
+    public void setConfirmMajorFunction(String confirmMajorFunction) {
+        this.confirmMajorFunction = confirmMajorFunction;
+    }
+
+    public String getConfirmParameters() {
+        return confirmParameters;
+    }
+
+    public void setConfirmParameters(String confirmParameters) {
+        this.confirmParameters = confirmParameters;
+    }
+
+    public String getConfirmBrand() {
+        return confirmBrand;
+    }
+
+    public void setConfirmBrand(String confirmBrand) {
+        this.confirmBrand = confirmBrand;
+    }
+
+    public BigDecimal getConfirmMaximumPrice() {
+        return confirmMaximumPrice;
+    }
+
+    public void setConfirmMaximumPrice(BigDecimal confirmMaximumPrice) {
+        this.confirmMaximumPrice = confirmMaximumPrice;
+    }
+
+    public String getConfirmRemark() {
+        return confirmRemark;
+    }
+
+    public void setConfirmRemark(String confirmRemark) {
+        this.confirmRemark = confirmRemark;
+    }
 
     public Date getOfflineApprovalDate() {
         return offlineApprovalDate;
