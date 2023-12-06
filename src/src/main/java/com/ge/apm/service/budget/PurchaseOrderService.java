@@ -217,7 +217,7 @@ public class PurchaseOrderService {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
 
-        budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
+        //budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
         budgetApplicationExportService.generateBudgetFiles(zout, purchaseOrderInfo);
         budgetApplicationExportService.generateSupplierFiles(zout, purchaseOrderInfo);
 
