@@ -1657,7 +1657,7 @@ public class NurseSiteMaintainService {
 //	}
 
 	public List<String> findAccessOrgUidListByUserUid(String userUid) {
-		return uaaService.findAccessClinicalUidByUserUid(userUid);
+		return uaaService.findAccessClinicalUidByUserUid(userUid).stream().distinct().collect(Collectors.toList());
 	}
 
 	public boolean existMaintain(NurseSiteMaintain tempMaintain) {

@@ -4791,7 +4791,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'AddNewAsset', '添加新设备', 'Add New Asset', NULL, -1);
 
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'budgetManagement', '预算管理', 'Budget Management', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'budgetManagement', '申购管理', 'Budget Management', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'purchaseManagement', '采购管理', 'Purchase Management', NULL, -1);
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '1', '未提交', 'Staging', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '2', '已提交', 'Submitted', NULL, -1);
@@ -4800,6 +4801,26 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '5', '取消', 'Cancel', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStatus', '6', '已完成', 'Complete', NULL, -1);
 
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStep', 'ToConfirmedInfo', '待信息确认', 'ToConfirmedInfo', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStep', 'ToConfirmedInfoMeet', '待过会确认', 'ToConfirmedInfoMeet', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStep', 'ToConfirmedInfoTendered', '待招标完成', 'ToConfirmedInfoTendered', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStep', 'Complete', '完成', 'Complete', NULL, -1);
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStepStatus', 'ConfirmedInfo', '信息已确认', 'ConfirmedInfo', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStepStatus', 'ConfirmedInfoMeet', '过会已完成', 'ConfirmedInfoMeet', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseStepStatus', 'Complete', '完成', 'Complete', NULL, -1);
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseType', 'SelfHarvesting', '自采', 'SelfHarvesting', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('purchaseType', 'CentralizedProcurement', '集采', 'CentralizedProcurement', NULL, -1);
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderBidType', 'Company', '招标公司', 'Company', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderBidType', 'Vender', '预供应商', 'Vender', NULL, -1);
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderProductionSize', 'LargeEnterprises', '大企业', 'LargeEnterprises', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderProductionSize', 'MediumEnterprises', '中企业', 'MediumEnterprises', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderProductionSize', 'SmallEnterprises', '小企业', 'SmallEnterprises', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('venderProductionSize', 'MicroEnterprises', '微企业', 'MicroEnterprises', NULL, -1);
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'ToSubmitted', '待提交', 'To be submitted', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationStep', 'PendingApproval', '待审核', 'Pending Approval', NULL, -1);
@@ -5102,3 +5123,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'Enabled', '启用', 'Enabled', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('purchaseStatus', 'NotEnabled', '未启用', 'Not Enabled', NULL, '-1');
+
+
+-- YHAAO-20326 加备用字段1-5
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare01', '备用字段01', 'spare01', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare02', '备用字段02', 'spare02', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare03', '备用字段03', 'spare03', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare04', '备用字段04', 'spare04', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare05', '备用字段05', 'spare05', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'TCM', '中医诊疗设备分类', 'Classification of Traditional Chinese Medicine Diagnosis and Treatment Equipment', NULL, '-1')
+

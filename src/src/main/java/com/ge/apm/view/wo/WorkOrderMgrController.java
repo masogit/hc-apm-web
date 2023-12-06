@@ -596,6 +596,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        selectedBatchMap.clear();
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
         }
@@ -1006,8 +1007,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*"));
         }
+        updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*"));
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
@@ -1033,10 +1034,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 updateSearchFilter(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,loginUser.getTenantUID(), "1*"));
-                if(searchFilters.stream().noneMatch(i-> "serviceRequest.fromDeptUID".equals(i.fieldName) && "1*2+".equals(i.conditionPath))){
-                    searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-                }
+                updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
         }
 

@@ -22,6 +22,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -249,6 +250,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String applyReason;
     private String approvalReason;
     private String locationName;
+    private UserAccount loginUser;
 
     @Override
     protected void init() {
@@ -309,6 +311,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         qr_Code = WebUtil.getRequestParameter("qrCode");
         siteUid = WebUtil.getRequestParameter("siteUid");
         createRequest = acService.getCreateRequest(qr_Code, siteUid);
+        loginUser = UserContextService.getCurrentUserAccount();
         if(createRequest != null){
             qrCode = qr_Code;
             isStatus = true;
@@ -336,7 +339,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             isStatusAssetHistory = false;
             try {
                 prepareCreate();
-                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
                 assetLifecyleStatus = 0;
             } catch (InstantiationException | IllegalAccessException ex) {
@@ -363,7 +366,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(selected ==null){
             try {
                 prepareCreate();
-                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -373,7 +376,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         ownerList = ucService.getWorkerList(selected.getId(), "");
         config = configService.findConfigBySite(selected.getSiteUID());
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        customConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
@@ -397,8 +400,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         updateClinicalDeptOnSiteChange();
         updateManagementOnSiteChange();
         updateAssetStatusList();
-
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
 
@@ -578,7 +579,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(getIsSelect46Account()){
             return;
         }
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
@@ -866,6 +866,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
 
+        // 资产分类
+        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
+            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
+        }
+
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(selected.getAssetType())) {
+            WebUtil.addErrorMessage("当前租户已开启资产分类,必填");
+            return "";
+        }
+
         if(selected.getUnitPriceElectricity()==null){
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
             selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
@@ -922,12 +933,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setNationalStandardCode(selectedGb.getCode());
         }
 
-        // 资产分类
-        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
-            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
-            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
-        }
-
         if (null != selectedObjectMap.get("selectedAuthGroup")) {
             SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
             selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
@@ -964,7 +969,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         // do other stuff after save
         int status = selected.getStatus();
         if(status != assetLifecyleStatus){
-            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,UserContextService.getCurrentUserAccount());
+            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
         }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
@@ -1025,9 +1030,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(CollectionUtils.isNotEmpty(listSelectedNurseSiteMaintainConfig)) {
             List<NurseSiteMaintainConfigItem> items = new ArrayList<>();
             for(NurseSiteMaintainConfig config : listSelectedNurseSiteMaintainConfig) {
-                UserAccount userAccount = UserContextService.getCurrentUserAccount();
-                config.setModifyBy(userAccount);
-                config.setModifyByUid(userAccount.getUid());
+                config.setModifyBy(loginUser);
+                config.setModifyByUid(loginUser.getUid());
                 config.setModifyDate(new Date());
                 NurseSiteMaintainConfigItem item = new NurseSiteMaintainConfigItem();
                 item.setAssetUid(selected.getUid());
@@ -1052,9 +1056,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             nurseSiteMaintainConfigItemRepository.save(items);
         }
         if(Objects.nonNull(selectedNurseSiteMaintainConfigJN)) {
-            UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            selectedNurseSiteMaintainConfigJN.setModifyBy(userAccount);
-            selectedNurseSiteMaintainConfigJN.setModifyByUid(userAccount.getUid());
+            selectedNurseSiteMaintainConfigJN.setModifyBy(loginUser);
+            selectedNurseSiteMaintainConfigJN.setModifyByUid(loginUser.getUid());
             selectedNurseSiteMaintainConfigJN.setModifyDate(new Date());
             NurseSiteMaintainConfigJNItem item = new NurseSiteMaintainConfigJNItem();
             item.setAssetUid(selected.getUid());
@@ -1117,7 +1120,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         newTags.stream().distinct().forEach(item -> {
             AssetTags assetTags = new AssetTags();
             assetTags.setAssetUid(this.selected.getUid());
-            assetTags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            assetTags.setTenantUID(loginUser.getTenantUID());
             assetTags.setTag(item);
             assetTagsDao.save(assetTags);
         });
@@ -1176,7 +1179,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.assetGroupSecondaryList = Collections.emptyList();
         } else {
             String msgType = "assetGroupSecondary_" + this.selected.getAssetGroup();
-            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, UserContextService.getCurrentUserAccount().getSiteId());
+            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, loginUser.getSiteId());
         }
 
     }
@@ -1244,12 +1247,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         Date now = new Date();
         if (object.getId() == null) {
-            object.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setCreatedBy(loginUser.getName());
             object.setCreatedDate(now);
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setLastModifiedBy(loginUser.getName());
             object.setLastModifiedDate(now);
         } else {
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setLastModifiedBy(loginUser.getName());
             object.setLastModifiedDate(now);
         }
     }
@@ -1261,7 +1264,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setStatus(4);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
+        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
@@ -1281,7 +1284,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setTerminateDate(null);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
+        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 
@@ -1452,7 +1455,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return null;
     }
     public List<String> completeAssetName(String prefix) {
-        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        String tenantUID = loginUser.getTenantUID();
         List<String> names = null;
         if (StringUtils.isEmpty(prefix)) {
             names = dao.findDistinctAssetNames(tenantUID);
@@ -1698,7 +1701,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     public void saveNewSupplier() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
         this.newSupplier.setTenantUID(loginUser.getTenantUID());
@@ -1720,7 +1722,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public List<String> autoCompleteTags(String query) {
 
-        List<String> tags = assetTagsMapper.getTagsByTenant(UserContextService.getCurrentUserAccount().getTenantUID());
+        List<String> tags = assetTagsMapper.getTagsByTenant(loginUser.getTenantUID());
 
         if (org.springframework.util.StringUtils.isEmpty(query)) {
             return tags;
@@ -1776,8 +1778,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mqContext.setClassName("AssetInfoEditController");
         mqContext.setMethodName("applyChange");
         mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+        mqUtils.sendAssetToMQ(newAsset,loginUser,mqContext);
     }
 
     public int getAssetChangeHistoryCount() {
@@ -1785,10 +1786,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean getIsSelect46Account() {
-        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
-            return true;
-        }
-        return false;
+        return loginUser.getSiteId() == 46 && loginUser.getTenantUID().equals(loginUser.getSiteUID());
     }
     private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
         OrgInfo rootOrg = new OrgInfo();
@@ -1812,13 +1810,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return rootNode;
     }
     public void filterTreeNode(){
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
     }
 
     public boolean getAssetScrapEnable(){
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        String value = configItemValueRepository.findByKeyAndSiteForUseParent(userAccount.getSiteUID(),userAccount.getHospitalUID(),userAccount.getInstitutionUID(),userAccount.getTenantUID(),"assetScrap");
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"assetScrap");
         return  value.equals("true")?true:false;
 
     }

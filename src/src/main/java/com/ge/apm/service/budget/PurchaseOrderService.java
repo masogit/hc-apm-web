@@ -1,9 +1,18 @@
 package com.ge.apm.service.budget;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -20,6 +29,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 
@@ -42,14 +52,23 @@ public class PurchaseOrderService {
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     private String baseURL;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-
+    @Autowired
+    private UserAccountRepository userDao;
+    @Autowired
+    private MultiLevelApprovalRepository approvalDao;
+    @Autowired
+    private PurchaseVenderRepository purchaseVenderRepository;
+    @Autowired
+    private MultiLevelApprovalService approvalService;
 
     public String getBaseURL(){
         return baseURL;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,List<V2_BlobObject> attachList,List<String> templateIds) {
+    public boolean savePurchase(PurchaseOrderInfo purchaseOrderInfo,List<BudgetApplicationAsset> budgetApplicationAssetList,
+                                List<String> templateIds,UserAccount userAccount) {
+        this.handleCommonField(purchaseOrderInfo,userAccount);
         //先去掉之前的关联数据
         if (!Optional.ofNullable(purchaseOrderInfo.getId()).isPresent()) { // 新增  数据状态和步骤为空
             this.generatePurchaseNum(purchaseOrderInfo);
@@ -147,12 +166,16 @@ public class PurchaseOrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteApplication(PurchaseOrderInfo purchaseOrderInfo) {
-        purchaseOrderInfoRepository.delete(purchaseOrderInfo);
+        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(purchaseOrderInfo.getId());
+        if(CollectionUtils.isNotEmpty(purchaseVenderList)){
+            purchaseVenderRepository.delete(purchaseVenderList);
+        }
         List<BudgetApplication> budgetApplicationList =  budgetApplicationDao.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
         budgetApplicationList.stream().forEach(budget -> {
             setPurchaseInfoNull(budget);
         });
         budgetApplicationDao.save(budgetApplicationList);
+        purchaseOrderInfoRepository.delete(purchaseOrderInfo);
         return true;
     }
 
@@ -201,6 +224,159 @@ public class PurchaseOrderService {
         zout.close();
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean submitPurchaseApplication(PurchaseOrderInfo purchaseOrderInfo) {
+        boolean isEditAction = Optional.ofNullable(purchaseOrderInfo.getId()).isPresent();
+        /* if (true) {*/
+        MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(purchaseOrderInfo, false);
+        MultiLevelApproval approval = generateApproval(purchaseOrderInfo, approvalConfig);
+        if (approval == null) {
+            // 无可用的审批流
+            logger.info("budget message 001: new budget application, but no approval configuration is available");
+        } else {
+            // 正常
+            logger.info("budget message 002: new budget application");
+            purchaseOrderInfo.setApprovalConfigId(approval.getWorkflowConfigApproveUid());
+            approvalDao.save(approval);
+            purchaseOrderInfoRepository.save(purchaseOrderInfo);
+            sendMsg(purchaseOrderInfo, approvalConfig);
+        }
+       /* } else {
+            // 编辑
+            Set<MultiLevelApproval> budgetApprovals = application.getBudgetApprovals();
+            MultiLevelApprovalConfig newApprovalConfig = approvalService.getFirstApprovalList(application, false);
+            if (newApprovalConfig == null) {
+                // 无可用的审批流
+                logger.info("budget message 003: edit budget application, but no approval configuration is available");
+                if (CollectionUtils.isNotEmpty(budgetApprovals)) {
+                    // 删除, 之前发送过消息
+                    approvalDao.delete(budgetApprovals);
+                }
+                application.setApprovalConfigId(null);
+            } else if (newApprovalConfig.getId().equals(application.getApprovalConfigId())) {
+                // 总金额变化没有导致审批流变化
+                logger.info("budget message 004: edit budget application, no need to update approval configuration");
+            } else {
+                // 总金额变化导致审批流变化
+                logger.info("budget message 005: edit budget application, need to update approval configuration");
+                application.setApprovalConfigId(newApprovalConfig.getId());
+                // 更新审批单, 最多只会有一个审批单
+                MultiLevelApproval newApproval = generateApproval(application, newApprovalConfig);
+                if (newApproval != null) {
+                    if (CollectionUtils.isNotEmpty(budgetApprovals)) {
+                        budgetApprovals.forEach(target -> {
+                            // 由于set方法的逻辑需要先去掉第一个和最后一个逗号
+                            String s = newApproval.getApprovalUid();
+                            target.setApprovalUid(StringUtils.isNotEmpty(s) ? s.substring(1, s.length() - 1) : s);
+                            target.setWorkflowConfigApproveUid(newApproval.getWorkflowConfigApproveUid());
+                            target.setInitiateApproverUid(newApproval.getInitiateApproverUid());
+                            target.setCreatedDate(newApproval.getCreatedDate());
+                            target.setCreatedBy(newApproval.getCreatedBy());
+
+                            target.setTenantUID(newApproval.getTenantUID());
+                            target.setHierOrgUid(newApproval.getHierOrgUid());
+                        });
+                    } else {
+                        budgetApprovals.add(newApproval);
+                    }
+                    approvalDao.save(budgetApprovals);
+                    sendMsg(application, newApprovalConfig);
+                }
+            }
+            budgetApplicationDao.save(application);
+
+        }*/
+        return true;
+    }
+
+
+    public MultiLevelApproval generateApproval(PurchaseOrderInfo application, MultiLevelApprovalConfig approvalConfig) {
+        UserAccount account = UserContextService.getCurrentUserAccount();
+        AtomicReference<MultiLevelApproval> approval = new AtomicReference<>(null);
+        Optional.ofNullable(approvalConfig).flatMap(config -> Optional.ofNullable(config.getApprovalItem())).ifPresent(item -> {
+            List<ApprovalNode> approvalNodes = JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
+            });
+            Optional.ofNullable(approvalNodes).flatMap(nodes -> Optional.ofNullable(nodes.get(0))).ifPresent(node -> {
+                approval.set(new MultiLevelApproval());
+                if (node.getUsingRole()) {
+                    // 角色审批, 目前ACCT没有角色审批
+                    Optional.ofNullable(node.getRoleUids()).ifPresent(list -> {
+                        approval.get().setApprovalType(ApprovalConstant.ROLE_APPROVAL_TYPE);
+                        approval.get().setApprovalUid(StringUtils.join(list.toArray(), ","));
+                    });
+                } else {
+                    // 用户审批
+                    Optional.ofNullable(node.getUserUids()).ifPresent(list -> {
+                        approval.get().setApprovalType(ApprovalConstant.USER_APPROVAL_TYPE);
+                        approval.get().setApprovalUid(StringUtils.join(list.toArray(), ","));
+                    });
+                }
+                approval.get().setBusinessNumber(application.getBusinessNumber());
+                approval.get().setBusinessType(application.getBusinessType());
+                approval.get().setBusinessUid(application.getBusinessUid());
+                approval.get().setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+                approval.get().setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+                approval.get().setApprovalLevel(1);
+                approval.get().setApprovalNumber(approvalService.autoGenerateFinacingNum());
+                approval.get().setApprovalIng(false);
+                approval.get().setApprovalLevelNow(1);
+                approval.get().setWorkflowConfigApproveUid(approvalConfig.getId());
+                approval.get().setInitiateApproverUid(account.getUid());
+                approval.get().setCreatedDate(new Date());
+                approval.get().setCreatedBy(account.getLoginName());
+
+                approval.get().setTenantUID(account.getTenantUID());
+                approval.get().setHierOrgUid(account.getSiteUID());
+            });
+        });
+        return approval.get();
+    }
+    private void sendMsg(PurchaseOrderInfo purchaseOrderInfo, MultiLevelApprovalConfig config) {
+        Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
+                Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
+                })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
+            List<WechatParam> paramList = ListUtil.newArrayList();
+            if (node.getUsingRole()) {
+                // 角色审批, 目前ACCT没有角色审批
+                Optional.ofNullable(node.getRoleUids()).flatMap(list -> Optional.ofNullable(userDao.getApprovalPersonByRoleId(list)))
+                        .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
+                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
+            } else {
+                // 用户审批
+                Optional.ofNullable(node.getUserUids()).flatMap(list -> Optional.ofNullable(userDao.findByUidIn(list)))
+                        .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
+                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
+            }
+            // 发送消息
+            String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
+                    + purchaseOrderInfo.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
+            approvalService.sendWxMsg(paramList, message, "待审批","");
+        });
+    }
+    public boolean checkMultiLevelApproval (PurchaseOrderInfo purchaseOrderInfo){
+        boolean result = true;
+        MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(purchaseOrderInfo, false);
+        MultiLevelApproval approval = generateApproval(purchaseOrderInfo, approvalConfig);
+        if (approval == null) {
+            result = false;
+            logger.info("purchase message 001: confirm purchase application, but no approval configuration is available");
+        }
+        return result;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void delBudgetApplication(List<BudgetApplicationAsset> curApplicationBudgetAssets,BudgetApplicationAsset selectApplicationAssetBudget,
+                                     PurchaseOrderInfo purchaseOrderInfoSelect,UserAccount account,List<String> templateIds) {
+
+        if(selectApplicationAssetBudget.getBudgetApplication() !=null &&
+                StringUtils.isNotBlank(selectApplicationAssetBudget.getBudgetApplication().getProcureStatus()) &&
+                StringUtils.isNotBlank(selectApplicationAssetBudget.getBudgetApplication().getPurchaseId())){
+            this.setPurchaseInfoNull(selectApplicationAssetBudget.getBudgetApplication());
+            budgetApplicationDao.save(selectApplicationAssetBudget.getBudgetApplication());
+        }
+        this.handleCommonField(purchaseOrderInfoSelect,account);
+        this.savePurchase(purchaseOrderInfoSelect,curApplicationBudgetAssets,templateIds,account);
     }
 
 

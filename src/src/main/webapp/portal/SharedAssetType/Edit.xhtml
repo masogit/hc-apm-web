@@ -165,7 +165,7 @@
                                           multiple="true"  sizeLimit="500000000"  update="pictureList SwapTypeEditForm:pict"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:fieldset>
-                    <p:fieldset legend="附件信息" style="margin-bottom:20px">
+                    <p:fieldset legend="#{msg.AttachedFileInfo}" style="margin-bottom:20px">
                         <p:dataTable id="dataAccessory" value="#{sharedAssetTypeController.selected.accessoryList}"
                                      var="item" widgetVar="varDataAccessory"
                                      rendered="#{sharedAssetTypeController.selected ne null}"

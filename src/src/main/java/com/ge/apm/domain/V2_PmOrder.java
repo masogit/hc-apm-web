@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -28,6 +29,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
@@ -271,6 +273,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Transient
     private String partApproveSignature;
 
+    @Transient
+    private String businessDigest;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPriceToBigDecimal;
@@ -293,6 +298,21 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     public int getBusinessType() {
         return  ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT;
     }
+
+    @Override
+    public String getBusinessDigest() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("assetName",this.getAssetInfo().getName());
+        map.put("clinicalDeptName",this.getAssetInfo().getClinicalDeptName());
+        String businessDigest= JSON.toJSONString(map);
+        return businessDigest;
+    }
+
+
+    public void setBusinessDigest(String businessDigest) {
+        this.businessDigest = businessDigest;
+    }
+
 
     public V2_PmOrder() {
     }

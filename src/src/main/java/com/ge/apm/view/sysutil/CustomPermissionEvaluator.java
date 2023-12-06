@@ -4,9 +4,11 @@ import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,10 +25,16 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         // targetDomainObject：要访问的资源对象
         // permission：权限表达式，例如 "ASSET_"
 
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).contains("ROLE_ANONYMOUS")) {
             return false;
         }
-        return checkPermission(functionName.toString());
+        Set<String> functionList = new HashSet<>();
+        for (GrantedAuthority authority : authorities) {
+            GrantedAuthorityDiyImpl authorityDiy = (GrantedAuthorityDiyImpl) authority;
+            functionList.addAll(authorityDiy.getFunctionList());
+        }
+        return !functionList.stream().filter(function -> function.startsWith(functionName.toString())).collect(Collectors.toSet()).isEmpty();
     }
 
     @Override

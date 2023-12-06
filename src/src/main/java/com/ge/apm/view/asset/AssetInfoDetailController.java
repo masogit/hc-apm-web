@@ -22,7 +22,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
-import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
@@ -156,8 +156,6 @@ public class AssetInfoDetailController {
 
             List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
             this.selected.setTags(existingTags);
-
-            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
         }
 
     }
@@ -469,6 +467,9 @@ public class AssetInfoDetailController {
     }
 
     public int getAssetChangeHistoryCount() {
+        if(CollectionUtils.isEmpty(changeHistoryList) && null!=selected){
+            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
+        }
         return changeHistoryList.size();
     }
 
