@@ -1203,6 +1203,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void getAllegedPatientConsequence(){
         if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
             zkbPartOrderCloseInfo.setAllegedPatientConsequence("非患者扫描时出现问题，不涉及患者");
+        }else if("非患者扫描时出现问题，不涉及患者".equals(zkbPartOrderCloseInfo.getAllegedPatientConsequence())){
+            zkbPartOrderCloseInfo.setAllegedPatientConsequence("");
         }
     }
 

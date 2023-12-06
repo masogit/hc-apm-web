@@ -3757,6 +3757,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Used/Dirty','Used/Dirty(被用过/污迹)','Used/Dirty',NULL,-1);
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Travel','Travel差旅时间','Travel',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite现场维修时间','onsite',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support远程支持时间','Phone Support',NULL,-1);
+
+
 
 
 -- 归还类型
