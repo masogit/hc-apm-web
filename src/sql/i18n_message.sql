@@ -3745,7 +3745,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Declined','Declined(用户拒绝透露)','Declined',NULL,-1);
 
 
-
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Boot Up Issue','Boot Up Issue(启动故障)','Boot Up Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Cosmetic Issue','Cosmetic Issue(外观目视差(生锈、磨损严重等))','Cosmetic Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Disassembled','Disassembled(部件结构分离)','Disassembled',NULL,-1);
@@ -3760,8 +3759,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Travel','Travel差旅时间','Travel',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite现场维修时间','onsite',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support远程支持时间','Phone Support',NULL,-1);
-
-
 
 
 -- 归还类型

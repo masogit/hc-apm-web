@@ -1112,6 +1112,9 @@
                         <p:column headerText="备件质量问题" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnPartQualityIssue',it.partQualityIssue)}"/>
                         </p:column>
+                        <p:column headerText="故障描述" rendered="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnPartQualityIssue',it.partQualityIssue)}"/>
+                        </p:column>
                         <p:column headerText="归还数量">
                             <h:outputText value="#{it.qty}"/>
                         </p:column>

@@ -803,7 +803,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void saveReturn(){
-        if(!"DOA".equals(zkbPartOrderReturn.getReturnType())){
+        if(!"DOA".equals(zkbPartOrderReturn.getReturnType()) && !"damagedShipment".equals(zkbPartOrderReturn.getReturnType())){
             zkbPartOrderReturn.setPartSerialNumber(null);
             zkbPartOrderReturn.setPartQualityIssue(null);
         }
