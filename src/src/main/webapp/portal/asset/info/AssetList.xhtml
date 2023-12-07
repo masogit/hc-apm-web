@@ -859,19 +859,21 @@
                             </c:if>
 
                             <c:if test="#{columnItem eq 'spare01'}">
-                                <p:column  headerText="#{msg.spare01}" sortBy="#{item.spare01}" filterBy="#{item.spare01}" filterMatchMode="EQ">
-                                    <h:outputText value="#{fieldMsg.fieldValue('TCM',item.spare01)}"/>
-                                    <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="300">
-                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('TCM')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
+                                <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">
+
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.spare01}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterSpare01}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteSpare01Name}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onSpare01FilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onSpare01FilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
+                                        </p:autoComplete>
                                     </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('TCM',item.spare01)}"/>
                                 </p:column>
-
-
-
                             </c:if>
+
+
                             <c:if test="#{columnItem eq 'spare02'}">
                                 <p:column headerText="#{msg.spare02}" exportable="true" sortBy="#{item.spare02}" filterBy="#{item.spare02}" filterMatchMode="EQ">
                                     <h:outputText value="#{item.spare02}"/>

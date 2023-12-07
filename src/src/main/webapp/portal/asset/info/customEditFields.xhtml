@@ -1069,27 +1069,39 @@
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
-        <h:panelGroup >
+        <h:panelGroup>
             <label class="label">#{msg.spare02}</label>
-            <p:inputText id="spare02" value="#{assetInfoEditController.selected.spare02}"/>
+            <p:selectOneMenu id="spare02" value="#{assetInfoEditController.selected.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare02')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare03')}">
-        <h:panelGroup >
+        <h:panelGroup>
             <label class="label">#{msg.spare03}</label>
-            <p:inputText id="spare03" value="#{assetInfoEditController.selected.spare03}" />
+            <p:selectOneMenu id="spare03" value="#{assetInfoEditController.selected.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare03')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare04')}">
-        <h:panelGroup >
+        <h:panelGroup>
             <label class="label">#{msg.spare04}</label>
-            <p:inputText id="spare04" value="#{assetInfoEditController.selected.spare04}" />
+            <p:selectOneMenu id="spare04" value="#{assetInfoEditController.selected.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare04')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare05')}">
-        <h:panelGroup >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
+        <h:panelGroup>
             <label class="label">#{msg.spare05}</label>
-            <p:inputText id="spare05" value="#{assetInfoEditController.selected.spare05}" />
+            <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
 </ui:composition>

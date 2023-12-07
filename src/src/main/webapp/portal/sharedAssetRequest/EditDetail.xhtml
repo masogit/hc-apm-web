@@ -34,14 +34,14 @@
                         </h:panelGroup>
                        
                         <h:panelGroup>
-                            <label class="label">借用附件</label>
+                            <label class="label">借用#{msg.AttachedFileInfo}</label>
                             <p:selectManyCheckbox id="grid" value="#{sharedAssetRequestNewController.selectedBorrowAccessoryList}" layout="grid" columns="1" >
 <!--                                <f:selectItems value="#{sharedAssetRequestNewController.getAccessoriesById(sharedAssetReqDetailController.selected.sharedAssetTypeId).accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />-->
                                  <f:selectItems value="#{sharedAssetRequestNewController.selectedSard.accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />
                             </p:selectManyCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">归还附件</label>
+                            <label class="label">归还#{msg.AttachedFileInfo}</label>
                             <p:selectManyCheckbox  value="#{sharedAssetRequestNewController.selectedReturnAccessoryList}" layout="grid" columns="1">
 <!--                                <f:selectItems value="#{sharedAssetRequestNewController.getAccessoriesById(sharedAssetReqDetailController.selected.sharedAssetTypeId).accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />-->
                                  <f:selectItems value="#{sharedAssetRequestNewController.selectedSard.accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />

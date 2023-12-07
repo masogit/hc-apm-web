@@ -7,6 +7,7 @@ public class AssetRuleModel {
 	private String assetName;
 	private Integer level;
 	private Integer period;
+	private String periodUnit;//保养周期单位 /y 、m 、w、d  /年 月 周 日
 	private Date planTime;
 	private Integer pmType;
 	private Integer measuringType;
@@ -53,6 +54,14 @@ public class AssetRuleModel {
 	}
 	public void setPeriod(Integer period) {
 		this.period = period;
+	}
+
+	public String getPeriodUnit() {
+		return periodUnit;
+	}
+
+	public void setPeriodUnit(String periodUnit) {
+		this.periodUnit = periodUnit;
 	}
 
 	public String getPmRuleUid() {
