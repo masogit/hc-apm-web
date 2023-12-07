@@ -137,7 +137,7 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     private Set<BudgetApplicationAsset> budgetAssets;
 
     // 总金额
-    @Formula("(select sum(a.application_amount) from budget_application_asset a where a.application_id = id)")
+    @Transient
     private BigDecimal totalAmount;
 
     @OneToMany(fetch = FetchType.EAGER)

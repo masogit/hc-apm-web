@@ -76,7 +76,7 @@
                 <p:column headerText="型号">
                     <h:outputText value="#{item.model}"/>
                 </p:column>
-                <p:column headerText="设备品类">sxz
+                <p:column headerText="设备品类">
                     <h:outputText value="#{item.applicationAssetCategory}"/>
                 </p:column>
                 <p:column headerText="数量">
@@ -90,6 +90,15 @@
                 </p:column>
                 <p:column headerText="预算总价">
                     <h:outputText value="#{item.applicationAmount}"/>
+                </p:column>
+                <p:column headerText="审批数量">
+                    <h:outputText value="#{item.offlineApplicationQuantity}"/>
+                </p:column>
+                <p:column headerText="审批单价">
+                    <h:outputText value="#{item.offlineApplicationPrice}"/>
+                </p:column>
+                <p:column headerText="审批总价">
+                    <h:outputText value="#{item.offlineApplicationAmount}"/>
                 </p:column>
             </p:dataTable>
         </p:fieldset>
@@ -121,12 +130,7 @@
                  <p:column headerText="设备品目">
                      <h:outputText value="#{item.confirmEquipmentCategory}"/>
                  </p:column>
-                 <p:column headerText="数量（台）">
-                     <h:outputText value="#{item.confirmQuantity}"/>
-                 </p:column>
-                 <p:column headerText="预算（万元）">
-                     <h:outputText value="#{item.confirmPrice}"/>
-                 </p:column>
+
                  <p:column headerText="国产占比（国家财政部）">
                      <h:outputText value="#{item.confirmNationalFinance}"/>
                  </p:column>
@@ -147,6 +151,12 @@
                  </p:column>
                  <p:column headerText="意向品牌">
                      <h:outputText value="#{item.confirmBrand}"/>
+                 </p:column>
+                 <p:column headerText="采购确认数量（台）">
+                     <h:outputText value="#{item.confirmQuantity}"/>
+                 </p:column>
+                 <p:column headerText="采购确认价格（万元）">
+                     <h:outputText value="#{item.confirmPrice}"/>
                  </p:column>
                  <p:column headerText="拦标价（万元）">
                      <h:outputText value="#{item.confirmMaximumPrice}"/>
