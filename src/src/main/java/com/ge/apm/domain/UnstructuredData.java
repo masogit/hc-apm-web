@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -35,6 +36,14 @@ public class UnstructuredData implements Serializable {
     @Column(name = "class", columnDefinition = "VARCHAR(64)")
     @JsonIgnore
     private String clazz;
+
+    @Column(name = "name")
+    @Size(min = 1, max = 128)
+    private String name;//检查项名称
+
+    @Column(name = "remark")
+    @Size(max = 1024)
+    private String remark;//项目内容
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -92,5 +101,21 @@ public class UnstructuredData implements Serializable {
 
     public void setClazz(String clazz) {
         this.clazz = clazz;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

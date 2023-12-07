@@ -50,8 +50,10 @@ public class LoginRecordController extends GenericCRUDController<LoginRecord> {
             searchFilters = new ArrayList();
         }
         String siteUid = currentUser.getSiteUID();
-        List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
-        searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.IN, loginNameList));
+        if (!this.hasFilterOnField("loginName")) {
+            List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
+            searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.IN, loginNameList));
+        }
     }
 
     @Override
