@@ -1035,11 +1035,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private String businessDigest;
     @Override
     public String getBusinessDigest() {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("assetName",this.getAssetInfo().getName());
-        map.put("clinicalDeptName",this.getAssetInfo().getClinicalDeptName());
-        String businessDigest= JSON.toJSONString(map);
-        return businessDigest;
+        if (null != assetInfo) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("assetName", assetInfo.getName());
+            map.put("clinicalDeptName", assetInfo.getClinicalDeptName());
+            return JSON.toJSONString(map);
+        }
+        return null;
     }
 
 
