@@ -412,8 +412,20 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
+            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
+            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
         }
     }
+    public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
+        if(budgetApplicationAsset.getOfflineApplicationPrice()!= null && budgetApplicationAsset.getOfflineApplicationQuantity()!= null){
+            budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
+                    .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP));
+            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
+            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
+        }
+    }
+
 
     public void prepareCreateAsset() {
         selectedAsset = new BudgetAssetInfo();
@@ -628,12 +640,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         return render;
     }
 
-    public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
-        if(budgetApplicationAsset.getOfflineApplicationPrice()!= null && budgetApplicationAsset.getOfflineApplicationQuantity()!= null){
-            budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
-                    .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
-                    .setScale(2, RoundingMode.HALF_UP));
-        }
-    }
+
 
 }

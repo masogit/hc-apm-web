@@ -69,8 +69,12 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
     private PurchaseTemplateRepository purchaseTemplateRepository;
     private PurchaseOrderService purchaseOrderService;
+    @Getter  @Setter
+    private String budgetAssetId;
     @Getter @Setter
     private BudgetSearchForm searchForm = new BudgetSearchForm();
+    @Getter @Setter
+    private BudgetApplicationAsset confirmBudget;
     @Getter @Setter
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
     @Getter @Setter
@@ -87,8 +91,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private List<BudgetPurchaseTemplateManage> budgetPurchaseTemplateManageList;
     @Getter @Setter
     private List<String> templateIds = new ArrayList<>();
-    @Getter @Setter
-    private List<String> venderInfoStr = new ArrayList<>();
+  /*  @Getter @Setter
+    private List<String> venderInfoStr = new ArrayList<>();*/
     @Getter  @Setter
     private VenderInfo venderInfoConfirm;
     @Getter  @Setter
@@ -352,9 +356,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
         int applicationQuantitySumResult = 0;
         for(BudgetApplicationAsset curApplicationBudget:curApplicationBudgetAssets){
-            totalAmount.set(totalAmount.get().add(curApplicationBudget.getApplicationAmount()));
-            applicationQuantitySumResult += curApplicationBudget.getApplicationQuantity();
-
+            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmPrice()==null?
+                    new BigDecimal(0):curApplicationBudget.getConfirmPrice()));
+            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                    0:curApplicationBudget.getConfirmQuantity();
         }
         selected.setTotalPrice(totalAmount.get());
         selected.setPurchaseQuantity(applicationQuantitySumResult);
@@ -411,13 +416,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         List<SearchFilter> searchFilterAssets = new ArrayList<>();
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ,this.selected.getId()));
-        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
-        if(CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)){
-            this.curApplicationBudgetAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
-                OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());
-                baa.setConfirmApplicationDeptName(confirmOrg.getName());
-            });
-        }
+        this.curApplicationBudgetAssets = this.queryBudgetApplicationAsset();
         List<PurchaseTemplate> purchaseTemplateList = purchaseTemplateRepository.findByPurchaseId(id);
         if(CollectionUtils.isNotEmpty(purchaseTemplateList)){
             this.templateIds = purchaseTemplateList.stream().map(PurchaseTemplate::getTemplateId).collect(Collectors.toList());
@@ -435,7 +434,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             this.venderInfos = venderInfoListRadioList.stream().filter(vi -> VenderInfo.BidType.Vender.toString().equals(vi.getBidType())).collect(Collectors.toList());
             this.companyInfos = venderInfoListRadioList.stream().filter(vi -> VenderInfo.BidType.Company.toString().equals(vi.getBidType())).collect(Collectors.toList());
         }
-        List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(id);
+        /*List<PurchaseVender> purchaseVenderList = purchaseVenderRepository.findByPurchaseId(id);
         if(CollectionUtils.isNotEmpty(purchaseVenderList)){
             for(PurchaseVender purchaseVender :purchaseVenderList){
                 StringBuilder stringBuilder = new StringBuilder();
@@ -455,7 +454,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
                 stringBuilder.append("]");
                 venderInfoStr.add(stringBuilder.toString());
             }
-        }
+        }*/
     }
 
     public void preAddBudgetApplication() {
@@ -554,4 +553,33 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         }
         return render;
     }
+    public void prepareConfirm(String budgetAssetId) {
+        this.confirmBudget = new BudgetApplicationAsset();
+        this.budgetAssetId = budgetAssetId;
+        BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
+        if(budgetApplicationAsset!=null){
+            this.confirmBudget.setConfirmQuantity(budgetApplicationAsset.getConfirmQuantity());
+            this.confirmBudget.setConfirmPrice(budgetApplicationAsset.getConfirmPrice());
+        }
+    }
+
+    public void saveConfirmInfoBudgetApp() {
+        purchaseOrderService.saveConfirmInfoBudgetApp(this.budgetAssetId,this.confirmBudget);
+        WebUtil.addSuccessMessage("操作成功！");
+    }
+
+    public List<BudgetApplicationAsset> queryBudgetApplicationAsset() {
+        List<SearchFilter> searchFilterAssets = new ArrayList<>();
+        searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                SearchFilter.Operator.EQ, this.selected.getId()));
+        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        if (CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)) {
+            this.curApplicationBudgetAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId() != null).forEach(baa -> {
+                OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());
+                baa.setConfirmApplicationDeptName(confirmOrg.getName());
+            });
+        }
+        return this.curApplicationBudgetAssets;
+    }
+
 }

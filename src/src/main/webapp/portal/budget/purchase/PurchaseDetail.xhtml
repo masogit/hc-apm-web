@@ -42,7 +42,7 @@
     <!--<p:fieldset legend="申购单信息确认" id="applicationDetailConfirm"  rendered="#{(multiLevelApprovalController.approvaLevelPurchase() eq 1
     or multiLevelApprovalController.approvaLevelPurchase() eq 2) and userContextService.hasAnyRole('DeptHead,ClinicalStaff')}">-->
     <p:fieldset legend="申购单信息确认" id="applicationDetailConfirm"  rendered="#{(purchaseOrderController.approvaLevelPurchase() ge 2 )  }">
-         <p:dataTable id="budgetApplicationConfirmlist" value="#{purchaseOrderController.curApplicationBudgetAssets}"
+         <p:dataTable id="budgetApplicationConfirmlist" value="#{purchaseOrderController.queryBudgetApplicationAsset()}"
                       var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
                       selectionMode="single" disabledSelection="true"
                       paginatorPosition="top" paginatorAlwaysVisible="true" rowKey="#{item.id}"
@@ -67,12 +67,6 @@
              <p:column headerText="设备品目">
                  <h:outputText value="#{item.confirmEquipmentCategory}"/>
              </p:column>
-             <p:column headerText="数量（台）">
-                 <h:outputText value="#{item.confirmQuantity}"/>
-             </p:column>
-             <p:column headerText="预算（万元）">
-                 <h:outputText value="#{item.confirmPrice}"/>
-             </p:column>
              <p:column headerText="国产占比（国家财政部）">
                  <h:outputText value="#{item.confirmNationalFinance}"/>
              </p:column>
@@ -94,11 +88,24 @@
              <p:column headerText="意向品牌">
                  <h:outputText value="#{item.confirmBrand}"/>
              </p:column>
+             <p:column headerText="采购确认数量（台）">
+                 <h:outputText value="#{item.confirmQuantity}"/>
+             </p:column>
+             <p:column headerText="采购确认价格（万元）">
+                 <h:outputText value="#{item.confirmPrice}"/>
+             </p:column>
+             <p:column headerText="采购确认总价（万元）">
+                 <h:outputText value="#{item.confirmAmount}"/>
+             </p:column>
              <p:column headerText="拦标价（万元）">
                  <h:outputText value="#{item.confirmMaximumPrice}"/>
              </p:column>
              <p:column headerText="备注">
                  <h:outputText value="#{item.confirmRemark}"/>
+             </p:column>
+             <p:column headerText="#{msg.Operation}" style="width: 150px" exportable="false">
+                 <p:commandButton value="申购信息调整"   oncomplete="PF('BudgetApplicationDialogConfirm').show()" process="@this" update="BudgetApplicationDialogConfirm"
+                                  actionListener="#{purchaseOrderController.prepareConfirm(item.id)}"/>
              </p:column>
          </p:dataTable>
      </p:fieldset>
@@ -153,7 +160,7 @@
            </p:panelGrid>
        </p:fieldset>
     <br/>
-    <p:fieldset legend="采购办" id="procurementOffice"
+    <p:fieldset legend="采购办确认信息" id="procurementOffice"
                 rendered="#{purchaseOrderController.approvaLevelPurchase() ge 3 and purchaseOrderController.selected.purchaseType ne null}" >
         <p:panelGrid id="meetingPanelProcurementOffice" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup >
@@ -166,13 +173,13 @@
         </p:panelGrid>
         <p:fieldset legend="预供应商" id="purchaseVender"  >
             <p:selectOneRadio id="purchaseVenderConfirm" value="#{purchaseOrderController.venderInfoConfirm}" disabled="true" converter="venderConverter"
-                              required="true" requiredMessage="预供应商 #{msg.ValidationRequire}" layout="responsive" columns="4" styleClass="grid-radio">
+                               layout="responsive" columns="4" styleClass="grid-radio">
                 <f:selectItems value="#{purchaseOrderController.venderInfos}" var="item" itemLabel="#{item.venderName}" itemValue="#{item}"/>
             </p:selectOneRadio>
         </p:fieldset>
         <p:fieldset legend="招标公司" id="purchaseCompany"  >
             <p:selectOneRadio id="purchaseCompanyConfirm" value="#{purchaseOrderController.companyInfoConfirm}" disabled="true" converter="venderConverter"
-                              required="true" requiredMessage="招标公司 #{msg.ValidationRequire}" layout="responsive" columns="4" styleClass="grid-radio">
+                               layout="responsive" columns="4" styleClass="grid-radio">
                 <f:selectItems value="#{purchaseOrderController.companyInfos}" var="item" itemLabel="#{item.companyName}" itemValue="#{item}"/>
             </p:selectOneRadio>
         </p:fieldset>

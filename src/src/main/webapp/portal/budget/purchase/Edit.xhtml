@@ -109,6 +109,15 @@
                             <p:column headerText="预算总价">
                                 <h:outputText value="#{item.applicationAmount}"/>
                             </p:column>
+                            <p:column headerText="审批数量">
+                                <h:outputText value="#{item.offlineApplicationQuantity}"/>
+                            </p:column>
+                            <p:column headerText="审批单价">
+                                <h:outputText value="#{item.offlineApplicationPrice}"/>
+                            </p:column>
+                            <p:column headerText="审批总价">
+                                <h:outputText value="#{item.offlineApplicationAmount}"/>
+                            </p:column>
                              <f:facet name="{Toolbar}">
                                  <p:commandButton title="选择申购单" id="addButton" process="@this" update="BudgetApplicationSelectDlg"
                                                   icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
@@ -133,12 +142,19 @@
                             </p:selectManyMenu>
                         </h:panelGroup>
                     </p:fieldset>
-                    <p:fieldset legend="竞标信息" style="color: red;" rendered="#{purchaseOrderController.selected.status eq 'Enabled'}" >
-                        <c:forEach items="#{purchaseOrderController.venderInfoStr}" var="venderInfo" >
-                            <div style="margin-bottom: 5px;">
-                                <span>#{venderInfo}</span><br/>
-                            </div>
-                        </c:forEach>
+                    <p:fieldset legend="供应商信息" rendered="#{purchaseOrderController.selected.status eq 'Enabled'
+                            and purchaseOrderController.venderInfos != null and purchaseOrderController.venderInfos.size() gt 0}" >
+                        <p:selectOneRadio disabled="true" converter="venderConverter"
+                                          layout="responsive" columns="4" styleClass="grid-radio">
+                            <f:selectItems value="#{purchaseOrderController.venderInfos}" var="item" itemLabel="#{item.venderName}" itemValue="#{item}"/>
+                        </p:selectOneRadio>
+                    </p:fieldset>
+                    <p:fieldset legend="招标公司信息" rendered="#{purchaseOrderController.selected.status eq 'Enabled'
+                            and purchaseOrderController.companyInfos != null and purchaseOrderController.companyInfos.size() gt 0}" >
+                        <p:selectOneRadio disabled="true" converter="venderConverter"
+                                          layout="responsive" columns="4" styleClass="grid-radio">
+                            <f:selectItems value="#{purchaseOrderController.companyInfos}" var="item" itemLabel="#{item.companyName}" itemValue="#{item}"/>
+                        </p:selectOneRadio>
                     </p:fieldset>
                     <ui:include src="PurchaseDetail.xhtml"/>
                     <br/>
@@ -154,6 +170,9 @@
         </div>
         <div class="ui-g-12 card">
             <ui:include src="BudgetSelect.xhtml"/>
+        </div>
+        <div class="ui-g-12 card">
+            <ui:include src="ConfirmField.xhtml"/>
         </div>
     </ui:define>
 </ui:composition>

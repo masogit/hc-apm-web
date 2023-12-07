@@ -14,8 +14,7 @@ import java.math.RoundingMode;
 import java.util.Date;
 
 /**
- * @author Yangfan, Liu
- * @date 4/9/2022 18:20
+ * lyj
  */
 @Entity
 @Table(name = "budget_application_asset")
@@ -246,15 +245,6 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "offline_application_amount", scale = 2)
     private BigDecimal offlineApplicationAmount;
 
-    @Column(name = "result_application_quantity")
-    private Integer resultApplicationQuantity;
-
-    @Column(name = "result_application_price", scale = 2)
-    private BigDecimal resultApplicationPrice;
-
-    @Column(name = "result_application_amount", scale = 2)
-    private BigDecimal resultApplicationAmount;
-
     /*offline线下审批数据*/
 //    序号	使用科室	设备品目	数量（台）	预算（万元）	国产占比（国家财政部）	国产占比（省财政部）	科室意见（是否进口）	公告及信息收集情况	主要功能和配置	主要参数和要求	意向品牌	拦标价（万元）	备注
     /*采购确认信息*/
@@ -273,6 +263,10 @@ public class BudgetApplicationAsset implements Serializable {
 
     @Column(name = "confirm_price", scale = 2)
     private BigDecimal confirmPrice;
+
+    @Transient
+    private BigDecimal confirmAmount;
+
 
     @Column(name = "confirm_national_finance")
     private String confirmNationalFinance;
@@ -349,30 +343,6 @@ public class BudgetApplicationAsset implements Serializable {
 
     public void setOfflineApplicationAmount(BigDecimal offlineApplicationAmount) {
         this.offlineApplicationAmount = offlineApplicationAmount;
-    }
-
-    public Integer getResultApplicationQuantity() {
-        return resultApplicationQuantity;
-    }
-
-    public void setResultApplicationQuantity(Integer resultApplicationQuantity) {
-        this.resultApplicationQuantity = resultApplicationQuantity;
-    }
-
-    public BigDecimal getResultApplicationPrice() {
-        return resultApplicationPrice;
-    }
-
-    public void setResultApplicationPrice(BigDecimal resultApplicationPrice) {
-        this.resultApplicationPrice = resultApplicationPrice;
-    }
-
-    public BigDecimal getResultApplicationAmount() {
-        return resultApplicationAmount;
-    }
-
-    public void setResultApplicationAmount(BigDecimal resultApplicationAmount) {
-        this.resultApplicationAmount = resultApplicationAmount;
     }
 
     public String getConfirmApplicationDeptName() {
@@ -927,5 +897,18 @@ public class BudgetApplicationAsset implements Serializable {
 
     public void setBudgetApplication(BudgetApplication budgetApplication) {
         this.budgetApplication = budgetApplication;
+    }
+
+    public BigDecimal getConfirmAmount() {
+        if(this!=null && this.getConfirmPrice()!= null && this.getConfirmQuantity()!= null){
+            return this.getConfirmPrice().multiply(new BigDecimal(this.getConfirmQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        return confirmAmount;
+
+    }
+
+    public void setConfirmAmount(BigDecimal confirmAmount) {
+        this.confirmAmount = confirmAmount;
     }
 }
