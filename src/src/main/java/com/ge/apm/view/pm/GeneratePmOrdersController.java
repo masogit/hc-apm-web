@@ -342,15 +342,15 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			List<String> uids = null;
 			if(level == 1) {
 				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
-				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				uids = uids.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 2) {
 				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
-				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				uids = uids.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 3) {
 				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
-				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				uids = uids.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 4){
 				List<SearchFilter> searchFilters=new ArrayList<>();
@@ -358,7 +358,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				if(pmOrderRule==null) {
 					searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.IsNotNull,null));
 				} else {
-					searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ,pmOrderRule.getUid()));
+					searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.LIKE,pmOrderRule.getUid()));
 				}
 				List<RelRuleAsset> bySearchFilter = relRuleAssetRepository.findBySearchFilter(searchFilters);
 				uids = bySearchFilter.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
@@ -366,7 +366,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			}
 		}else{
 			List<String> uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
-			uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+			uids = uids.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
 			assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 		}
 		if (!assetFilters.isEmpty()) {
@@ -688,6 +688,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setLevel(level);
 			model.setPlanTime(planTime == null ? new Date():planTime);
 			model.setPmRuleUid(rule.getUid());
+			model.setPmRuleName(rule.getName());
+			model.setPeriod(rule.getPeriod());
+			model.setPeriodUnit(rule.getPeriodUnit());
 			models.add(model);
 		}else {
 			for (AssetInfo ai : targetAssets) {
