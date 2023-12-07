@@ -124,7 +124,21 @@
                         </h:panelGrid>
                     </p:fieldset>
                     <br/>
-                    <p:commandButton validateClient="true"  actionListener="#{tenantInfoController.save()}" value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);"/>
+<!--                    <p:commandButton id="savebutton" validateClient="true"    actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" >-->
+<!--                        <p:confirm   disabled="#{tenantInfoController.checkNameChange()}"  header="保存" message="租户名称目前是某些租户定制化业务逻辑的启用标志，改动后可能会导致相关逻辑被停用。是否确认修改租户名称？" icon="pi pi-exclamation-triangle" />-->
+<!--                    </p:commandButton>-->
+                    <p:commandButton id="submit" style="display:none"   actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" ></p:commandButton>
+
+                    <!-- 保存按钮 -->
+                    <p:commandButton   validateClient="true"  update=":growl" icon="ui-icon-check"   value="#{msg.Save}"  onclick="checkFieldModified(event)"/>
+
+                    <p:confirmDialog header="保存" global="true" showEffect="fade" hideEffect="fade" widgetVar="confirmDialog" message="租户名称目前是某些租户定制化业务逻辑的启用标志，改动后可能会导致相关逻辑被停用。是否确认修改租户名称？">
+
+                        <p:commandButton value="确认保存" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"  validateClient="true"  update=":SiteInfoEditForm :growl"  actionListener="#{tenantInfoController.save()}" onclick="doSave()"/>
+                        <p:commandButton value="取消保存" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"
+                                         onclick="cancelSave()" />
+                    </p:confirmDialog>
+
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('SiteInfoEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
@@ -143,7 +157,37 @@
             function handleAddTemplateFiles(xhr, status, args){
             }
 
+            var fieldOriginalValue ;
 
+            // 点击保存按钮时检查字段是否修改
+            function checkFieldModified(event) {
+                var currentValue = document.getElementById('SiteInfoEditForm:name').value;
+                if (currentValue != fieldOriginalValue) {
+                    PF('savelog').show();
+                }else{
+                    doSave(); // 如果字段未修改直接执行保存操作
+                }
+            }
+
+            function doSave() {
+                // 在这里执行保存操作的逻辑
+                var button= document.getElementById('SiteInfoEditForm:submit');
+                button.click();
+            }
+
+            function saveButton() {
+                fieldOriginalValue = document.getElementById('SiteInfoEditForm:name').value;
+
+            }
         </script>
+
+
+        <p:dialog widgetVar="savelog" modal="true" class="savelog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="租户名称目前是某些租户定制化业务逻辑的启用标志，改动后可能会导致相关逻辑被停用。是否确认修改租户名称？">
+                <p:commandButton id="submitButton" validateClient="true" actionListener="#{tenantInfoController.save()}" value="确认" update=":SiteInfoEditForm :growl" icon="ui-icon-check"
+                                  oncomplete="handleTenantInfo(xhr, status, args); PF('savelog').hide()"/>
+                <p:commandButton immediate="true" value="取消" icon="ui-icon-arrow-back" oncomplete="PF('savelog').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
     </ui:composition>
 </html>

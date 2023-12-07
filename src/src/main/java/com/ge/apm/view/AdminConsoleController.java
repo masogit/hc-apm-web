@@ -270,4 +270,9 @@ public class AdminConsoleController {
 		new Thread(() -> adminConsoleService.batchUpdateAssetInfo()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void  batchUpdatePmOrderFields(){
+		new Thread(() -> adminConsoleService.batchUpdatePmOrderFields()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }

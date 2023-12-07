@@ -260,15 +260,17 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Transient
     private BigDecimal totalPriceToBigDecimal;
 
-    @Transient
-    @Getter
-    @Setter
+    @Column(name = "rule_name")
+    @Getter @Setter
     private String ruleName;
 
-    @Transient
-    @Getter
-    @Setter
-    private String period;
+    @Column(name = "period")
+    @Getter @Setter
+    private Integer period;//保养周期
+
+    @Column(name = "period_unit", columnDefinition = "CHAR(1)" )
+    @Getter @Setter
+    private String periodUnit;//保养周期单位 /y 、m 、w、d  /年 月 周 日
 
     @Transient
     private String partApproveSignature;

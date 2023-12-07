@@ -149,7 +149,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
-    private PmOrderRuleCheckList pmCheckItem;
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
     private CustomConfigObject currentCustomConfig;
@@ -1864,10 +1863,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE,true));
 //        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
 //        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
-        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
+//        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
         searchFilterList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
-        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
-
     }
 
     public void deleteReporter(String id) {
@@ -2426,6 +2423,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     UnstructuredData unData = new UnstructuredData();
                     unData.setValue("pass");
                     unData.setKey(item.getUid());
+                    unData.setName(item.getName());
+                    unData.setRemark(item.getRemark());
                     hmCheck.put(item.getUid(), unData);
                 });
 
@@ -2473,6 +2472,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
@@ -2912,21 +2912,26 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
     public void loadHmCheck(V2_PmOrder v2PmOrder) {
-        hmCheck = new   HashMap<String, UnstructuredData>();
+        hmCheck = new   HashMap<>();
         //pmCheckItemList:检查项
         pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
         if (pmCheckItemList == null) return ;
         //下面的代码是需要的 ，没有的话 检查项如改动后 在详细信息只会显示通过状态
-        for (int i = 0; i < pmCheckItemList.size(); i++) {
-            pmCheckItem = (PmOrderRuleCheckList) pmCheckItemList.get(i);
+        for (PmOrderRuleCheckList pmCheckItem : pmCheckItemList) {
             if (unDataCollection != null && !unDataCollection.isEmpty()) { //
-                unCollection = (UnstructuredDataCollection) unDataCollection.get(0);
+                unCollection = unDataCollection.get(0);
                 if (unCollection != null) {
-                    List<UnstructuredData> dataList = (List<UnstructuredData>) unCollection.getData();
-                    for (int k = 0; k < dataList.size(); k++) {
-                        UnstructuredData unsData = (UnstructuredData) dataList.get(k);
+                    List<UnstructuredData> dataList = unCollection.getData();
+                    for (UnstructuredData unsData : dataList) {
                         if (unsData.getKey().equalsIgnoreCase(pmCheckItem.getUid())) {
+                            if (v2PmOrder.isFinished() && ObjectUtil.isAllNotEmpty(unsData.getName(), unsData.getRemark())) {
+                                pmCheckItem.setName(unsData.getName());
+                                pmCheckItem.setRemark(unsData.getRemark());
+                            } else {
+                                unsData.setName(pmCheckItem.getName());
+                                unsData.setRemark(pmCheckItem.getRemark());
+                            }
                             hmCheck.put(pmCheckItem.getUid(), unsData);
                         }
                     }

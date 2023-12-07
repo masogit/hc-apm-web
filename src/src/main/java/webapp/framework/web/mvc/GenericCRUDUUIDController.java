@@ -52,9 +52,12 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable, Serv
     }
     
     public void updateSearchFilter(SearchFilter searchFilter){
-        removeFilterOnField(searchFilter.fieldName);
-        searchFilters.add(searchFilter);
+        if(searchFilters !=null){
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.fieldName.equals(searchFilter.fieldName) && item.conditionPath.equals(searchFilter.conditionPath)).collect(Collectors.toList()));
+            searchFilters.add(searchFilter);
+        }
     }
+
     
     public void removeFilterOnField(String fieldName) {
         searchFilters.removeAll(searchFilters.stream().filter(item -> fieldName.equals(item.fieldName)).collect(Collectors.toList()));

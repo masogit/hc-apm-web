@@ -111,15 +111,15 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
                             </f:facet>
-                            <h:outputText value="#{v2PmOrderController.getRulePm(item).name}"/>
+                            <h:outputText value="#{item.ruleName}"/>
 
                         </p:column>
 
                         <p:column headerText="保养周期">
-                            <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
+                            <h:outputText value="#{item.period}"/>
                         </p:column>
                         <p:column headerText="保养周期单位">
-                            <h:outputText value="#{v2PmOrderController.getPeriodUnit(v2PmOrderController.getRulePm(item).periodUnit)}"/>
+                            <h:outputText value="#{v2PmOrderController.getPeriodUnit(item.periodUnit)}"/>
                         </p:column>
                 <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}">
 <!--                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">-->
