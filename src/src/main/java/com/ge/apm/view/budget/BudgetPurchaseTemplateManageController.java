@@ -60,6 +60,7 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         crudActionName = CREATE;
         selected = new BudgetPurchaseTemplateManage();
+        blobObjectList = new ArrayList<>();
     }
 
     @Override
