@@ -127,7 +127,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
         orgTreeEdit = initOrgTree(treeNodeEdit);
