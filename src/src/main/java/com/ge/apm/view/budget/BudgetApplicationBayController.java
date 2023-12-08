@@ -243,14 +243,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         } else if(tabIndex == 4){//全部
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
-        if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
-                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)) {
-            // 临床科室主任, 医学工程处主任
-            queryScope(org);
-        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
-            // 临床科室人员
-            searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
-        }
+
+        queryByUserRole(org);
+
         return searchFilters;
     }
 
@@ -362,7 +357,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         if (null != searchForm.getDept()) {
             OrgInfo orgInfo = searchForm.getDept();
-            queryScope(orgInfo);
+            queryByUserRole(orgInfo);
         }
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE,  formatter.format(searchForm.getDateStart())));
@@ -383,30 +378,39 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             updateSearchFilter(new SearchFilter("applicationAssetName", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
         }
     }
-    private void queryScope(OrgInfo org){
+
+    private void queryByUserRole(OrgInfo org){
         if(org == null) return;
-        switch (org.getOrgType()) {
-            case 4:
-                // 科室
-                searchFilters.add(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, org.getId()));
-                break;
-            case 3:
-                // 院区
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
-                break;
-            case 2:
-                // 医院
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
-                break;
-            case 1:
-                // 集团
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
-                break;
-            default:
-                // 租户
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+        if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)) {
+            // 临床科室主任可以查看自己科室的数据, 医学工程处主任可以查看当前所属机构的单子   // 临床科室人员只能查看自己创建的数据
+            int switchArg = userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)?org.getOrgLevel():org.getOrgType();
+            switch (switchArg) {
+                case 4:
+                    // 科室
+                    searchFilters.add(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, org.getId()));
+                    break;
+                case 3:
+                    // 院区
+                    searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
+                    break;
+                case 2:
+                    // 医院
+                    searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
+                    break;
+                case 1:
+                    // 集团
+                    searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
+                    break;
+                default:
+                    // 租户
+                    searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+            }
+        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+            searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
         }
     }
+
     public void calcAmount(BudgetApplicationAsset budgetApplicationAsset) {
         if(budgetApplicationAsset.getApplicationPrice()!= null && budgetApplicationAsset.getApplicationQuantity()!= null){
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
