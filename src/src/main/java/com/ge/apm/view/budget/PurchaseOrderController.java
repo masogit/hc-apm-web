@@ -69,6 +69,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
     private PurchaseTemplateRepository purchaseTemplateRepository;
     private PurchaseOrderService purchaseOrderService;
+    private UserContextService userContextService;
     @Getter  @Setter
     private String budgetAssetId;
     @Getter @Setter
@@ -133,6 +134,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         budgetApplicationAssetRepository = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         budgetApplicationRepository = WebUtil.getBean(BudgetApplicationRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         purchaseTemplateRepository = WebUtil.getBean(PurchaseTemplateRepository.class);
         purchaseOrderService = WebUtil.getBean(PurchaseOrderService.class);
         budgetPurchaseTemplateManageRepository = WebUtil.getBean(BudgetPurchaseTemplateManageRepository.class);
@@ -208,7 +210,30 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             updateSearchFilter(new SearchFilter("stepStatus",SearchFilter.Operator.EQ, "Complete"));
         } else if(tabIndex == 5){//全部
         }
+        queryByUserRole(org);
         return searchFilters;
+    }
+
+    private void queryByUserRole(OrgInfo org){
+        if(org == null) return;
+       // int switchArg = userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)?org.getOrgLevel():org.getOrgType();
+        switch (org.getOrgLevel()) {
+            case 3:
+                // 院区
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
+                break;
+            case 2:
+                // 医院
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
+                break;
+            case 1:
+                // 集团
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
+                break;
+            default:
+                // 租户
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+        }
     }
     public void onTabChange(TabChangeEvent event) {
         selected = null;
