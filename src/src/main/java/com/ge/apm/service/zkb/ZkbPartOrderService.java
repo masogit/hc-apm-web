@@ -1005,7 +1005,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
-        if(!nextFlag){
+        if(!nextFlag && !(oldStep.equals(ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString()))){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
         }
