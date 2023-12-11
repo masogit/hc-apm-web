@@ -427,7 +427,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public Boolean isCanModifyClose(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
-            if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
+            if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.CloseCommited.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.CloseApproved.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.CloseReject.toString().equals(selected.getStatus())
+            ){
                 if(zkbPartOrderStatusVo.isChoseAdmin()){
                     return Boolean.TRUE;
                 }
