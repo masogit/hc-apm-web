@@ -827,15 +827,6 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isEmpty(selected.getReturnType())){
                     errorLog.append("归还类型不能为空，\r\n");
                 }
-                if("DOA".equals(selected.getReturnType())){
-                    if(StrUtil.isEmpty(selected.getPartSerialNumber())){
-                        errorLog.append("Part Serial Number不能为空，\r\n");
-                    }
-                    if(StrUtil.isEmpty(selected.getPartQualityIssue())){
-                        errorLog.append("故障描述不能为空，\r\n");
-                    }
-                }
-
                 if(StrUtil.isEmpty(selected.getWaybillNo())){
                     errorLog.append("运单号不能为空，\r\n");
                 }
@@ -844,6 +835,9 @@ public class ZkbPartOrderStatusService {
                 }
                 if(StrUtil.isEmpty(selected.getNewCatSn())){
                     errorLog.append("新探头SN编号不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getUdi())){
+                    errorLog.append("探头UDI不能为空，\r\n");
                 }
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -1044,6 +1038,13 @@ public class ZkbPartOrderStatusService {
             }
             if(removeI18.size() > 0){
                 returnTypeList.removeAll(removeI18);
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            for(I18nMessage i18nMessage : returnTypeList){
+                if("singlePurchase".equals(i18nMessage.getMsgKey())){
+                    returnTypeList.remove(i18nMessage);
+                    break;
+                }
             }
         }
         return returnTypeList;
