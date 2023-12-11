@@ -1,11 +1,12 @@
 package com.ge.apm.view;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
@@ -96,6 +96,7 @@ public class SearchController {
 	ContractInfoService contractInfoService;
 	AutoCompleteService autoCompleteService;
 	String otherSiteUID;
+	OrgInfoRepository orgInfoDao;
 
 	@PostConstruct
 	protected void init() {
@@ -106,6 +107,7 @@ public class SearchController {
 		contractInfoService = WebUtil.getBean(ContractInfoService.class);
 		aiService = WebUtil.getBean(AssetInstallationService.class);
 		autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
 		blnDepartOrgUpdate = false;
 		blnOrgTreeUpdate = false;
@@ -152,7 +154,11 @@ public class SearchController {
 
 	public void updateData() {
 		resetStatus();
-		fetchOrgTree();
+		if (type == 3) {
+			fetchSiteTree(currentUser.getSiteUID());
+		} else {
+			fetchOrgTree();
+		}
 		if (type == 1) {
 			blnDepartOrg = true;
 			blnPickList = true;
@@ -210,6 +216,26 @@ public class SearchController {
 		selectedOrg = aiService.getOrgInfoByUid(siteUid);
 	}
 
+	private void fetchSiteTree(String siteUid) {
+		List<OrgInfo> orgList = orgInfoDao.getOrgInfosByParentId(siteUid);
+		selectedOrg = orgList.stream().min((item, item2) -> item2.getOrgType() - item.getOrgType()).get();
+		List<OrgInfo> collect = orgList.stream().sorted((item, item2) ->item2.getOrgType()-item.getOrgType()).collect(Collectors.toList());
+		OrgInfo orgInfo = collect.get(0);
+		orgTree = new DefaultTreeNode("org", null, null);
+		Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> {
+			TreeNode org = new DefaultTreeNode("org", item, null);
+			if(!item.getOrgType().equals(orgInfo.getOrgType())){
+				org.setSelectable(false);
+			}
+			return org;
+		}));
+		for (OrgInfo org : orgList) {
+			treeMap.getOrDefault(org.getParentUID(), orgTree).getChildren().add(treeMap.get(org.getUid()));
+		}
+		TreeNodeUtil.sortTreeNodeByName(orgTree);
+		orgTree.setExpanded(true);
+	}
+
 	public void fetchSiteOrgList() {
 		if (searchService.isSiteUser(currentUser)) {
 			listOrgSite = new ArrayList<OrgInfo>();
@@ -229,12 +255,13 @@ public class SearchController {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}
 		if(listOrgDept==null){
-			listOrgDept=new ArrayList<OrgInfo>();
+			listOrgDept=new ArrayList<>();
 		}
 		OrgInfo tempOrgInfo=new OrgInfo();
 		tempOrgInfo.setId(-1);
 		tempOrgInfo.setName("请选择...");
 		listOrgDept.add(0,tempOrgInfo);
+		selectedOrgDepart = null;
 	}
 
 	private void triggerEvent() {
@@ -250,7 +277,7 @@ public class SearchController {
 						callingController.onServerEvent("change", null);
 					}
 				} else {
-					callingController.onServerEvent("change", null);
+					callingController.onServerEvent("change", selectedOrg);
 				}
 			} else if (type == 4) {
 				callingController.onServerEvent("change", listSelectedAssetInfo);
@@ -361,10 +388,8 @@ public class SearchController {
 			return;
 		}
 		showDialog = false;
-		if (callingController != null) {
-			if (type == 1) {
-				callingController.onServerEvent("assetListSelected", listSelectedAssetInfo);
-			}
+		if (callingController != null && type == 1) {
+			callingController.onServerEvent("assetListSelected", listSelectedAssetInfo);
 		}
 	}
 
@@ -373,7 +398,7 @@ public class SearchController {
 	}
 
 	private void generateListFilter() {
-		listSearchFilter = new ArrayList<SearchFilter>();
+		listSearchFilter = new ArrayList<>();
 		int filterCount = 0;
 		if (selectedOrg != null) {
 			int orgTypeTemp = selectedOrg.getOrgType();
@@ -423,14 +448,7 @@ public class SearchController {
 				listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
 			}
 		}
-		if (filterCount > 1) {
-			blnUpdate = true;
-		} else {
-			blnUpdate = false;
-		}
-		if (type == 5) {
-			blnUpdate = true;
-		}
+		blnUpdate = filterCount > 1 || type == 3 || type == 5;
 	}
 
 	public UserAccount getCurrentUser() {
@@ -627,7 +645,11 @@ public class SearchController {
 
 	public TreeNode getOrgTree() {
 		if (orgTree == null) {
-			fetchOrgTree();
+			if (type == 3) {
+				fetchSiteTree(currentUser.getSiteUID());
+			} else {
+				fetchOrgTree();
+			}
 		}
 		return orgTree;
 	}
