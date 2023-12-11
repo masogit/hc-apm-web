@@ -161,7 +161,7 @@
 
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit'}">
                     <label class="label">审批备注</label>
-                    <p:inputText  value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}"  />
+                    <p:inputText  value="#{zkbPartOrderAuditController.zkbPartOrderReturn.closedRemark}" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}"  />
                 </h:panelGroup>
             </p:panelGrid>
             <h:panelGroup id="goodReturnAttachment" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' or zkbPartOrderAuditController.actionReturnName eq 'Create' or zkbPartOrderAuditController.actionReturnName eq 'Edit'}">
