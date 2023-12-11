@@ -727,6 +727,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             if(budgetApplicationAsset.getConfirmApplicationDeptId() != null){
                 OrgInfo confirmOrg = orgDao.findById(budgetApplicationAsset.getConfirmApplicationDeptId());
                 this.confirmBudget.setConfirmApplicationDeptName(confirmOrg!=null?confirmOrg.getName():null);
+                this.confirmBudget.setConfirmApplicationDeptId(confirmOrg!=null?confirmOrg.getId():null);
+            }else{
+                OrgInfo applicationOrg = orgDao.findById(budgetApplicationAsset.getApplicationDeptId());
+                this.confirmBudget.setConfirmApplicationDeptName(applicationOrg!=null?applicationOrg.getName():null);
+                this.confirmBudget.setConfirmApplicationDeptId(applicationOrg!=null?applicationOrg.getId():null);
+
             }
             this.confirmBudget.setConfirmQuantity(budgetApplicationAsset.getConfirmQuantity());
             this.confirmBudget.setConfirmPrice(budgetApplicationAsset.getConfirmPrice());

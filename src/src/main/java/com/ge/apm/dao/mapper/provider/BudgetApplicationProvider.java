@@ -25,11 +25,13 @@ public class BudgetApplicationProvider {
                 "  t.application_step," +
                 "  t.procure_status," +
                 "  uap.name as approveName," +
+                "  oi.name as applicantDeptName," +
                 "  t.approval_date" +
                 "  from budget_application t" +
                 "  inner join budget_application_asset baa on t.id = baa.application_id" +
                 "  left join user_account ua on t.applicant_id = ua.id" +
                 "  left join user_account uap on t.approver_id = uap.id " +
+                "  left join org_info oi on t.applicant_dept_id = oi.id " +
                 "  where 1=1 ");
         String filter = buildFilter(searchFilterList);
         sb.append(filter);

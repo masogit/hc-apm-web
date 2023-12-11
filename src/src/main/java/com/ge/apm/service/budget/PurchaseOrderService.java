@@ -42,6 +42,8 @@ public class PurchaseOrderService {
     private static Logger logger = LoggerFactory.getLogger(PurchaseOrderService.class);
 
     @Autowired
+    private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
+    @Autowired
     private PurchaseOrderInfoRepository purchaseOrderInfoRepository;
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
@@ -217,7 +219,7 @@ public class PurchaseOrderService {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
 
-        budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
+        //budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
         budgetApplicationExportService.generateBudgetFiles(zout, purchaseOrderInfo);
         budgetApplicationExportService.generateSupplierFiles(zout, purchaseOrderInfo);
 
@@ -379,5 +381,12 @@ public class PurchaseOrderService {
         this.savePurchase(purchaseOrderInfoSelect,curApplicationBudgetAssets,templateIds,account);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void saveConfirmInfoBudgetApp(String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm) {
+        BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
+        budgetApplicationAsset.setConfirmQuantity(budgetApplicationAssetConfirm.getConfirmQuantity());
+        budgetApplicationAsset.setConfirmPrice(budgetApplicationAssetConfirm.getConfirmPrice());
+        budgetApplicationAssetRepository.save(budgetApplicationAsset);
+    }
 
 }

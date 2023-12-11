@@ -178,6 +178,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             this.selected = dao.findById(listId);
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+            deptInfoList = uaaService.getClinicalDeptListBySiteUID(selected.getSiteUID());
+
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
                 this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
@@ -313,7 +315,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selectedOrg = (OrgInfo) node.getData();
         if (null != selectedOrg) {
             customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
+            deptInfoList = uaaService.getClinicalDeptListBySiteUID(selectedOrg.getUid());
         }
+
+        clearClinicalDept();
     }
 
     public UserAccount getUserAccountByUid(String uid) {
@@ -1284,5 +1289,21 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         List<QrCodeLib> bySearchFilter = qrCodeLibRepository.findBySearchFilter(filterFilter);
         QrCodeExportStream exportStream = new QrCodeExportStream(bySearchFilter.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
         zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        selected.setTenantUID(orgInfo.getTenantUID());
+        selected.setInstitutionUID(orgInfo.getInstitutionUID());
+        selected.setHospitalUID(orgInfo.getHospitalUID());
+        selected.setSiteUID(orgInfo.getSiteUID());
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(orgInfo.getUid());
+        clearClinicalDept();
+    }
+
+    public void clearClinicalDept() {
+        selected.setClinicalDeptName(null);
+        selected.setClinicalDeptUID(null);
     }
 }

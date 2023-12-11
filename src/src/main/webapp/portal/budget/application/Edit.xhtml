@@ -242,12 +242,12 @@
                                             paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <f:facet name="header">附件详情</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton rendered="#{budgetController.editButtonDisplay()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}" actionListener="#{budgetController.removeAttachmentById(fileitem.id)}" update="attachList" icon="ui-icon-clear" title="#{msg.Delete}"
+                                    <p:commandButton  disabled="#{budgetController.selected.applicationStep eq 'PendingApproval' || budgetController.selected.applicationStep eq 'Complete'}" actionListener="#{budgetController.removeAttachmentById(fileitem.id)}" update="attachList" icon="ui-icon-clear" title="#{msg.Delete}"
                                                      class="popupIconButton" process="@this" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                               <p:fileUpload  rendered="#{budgetController.editButtonDisplay()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete'}"
+                               <p:fileUpload   disabled="#{budgetController.selected.applicationStep eq 'PendingApproval' || budgetController.selected.applicationStep eq 'Complete'}"
                                               allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{budgetController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                </h:panelGroup>
@@ -379,7 +379,7 @@
 
             </h:form>
         </div>
-        <div class="ui-g-12 card">
+        <div class="ui-g-12 ">
             <ui:include src="AssetSelect.xhtml"/>
             <ui:include src="AssetEdit.xhtml"/>
         </div>

@@ -117,7 +117,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
     }
 
     @Override
-    public void save() {
+    public void save()  {
         if(selected.getStartDate().compareTo(selected.getEndDate()) > 0){
             WebUtil.addErrorMessage("终止申报日期不能小于开启日期！");
             return;
@@ -141,7 +141,11 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
             }
             selected = purchaseBudgetConfigRepository.save(selected);
         }
-        purchaseBudgetConfigService.sendWxMsg(selected);
+        try {
+            purchaseBudgetConfigService.sendWxMsg(selected, UserContextService.getAccessToken());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         selected = null;
     }
 
