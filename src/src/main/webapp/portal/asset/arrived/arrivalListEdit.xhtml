@@ -39,7 +39,7 @@
                                         <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{assetArrivedListEditController.orgTree}" selection="#{assetArrivedListEditController.selectedNode}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm:selectedOrgName :AssetArrivalEditForm:arrivalListAttachment" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
+                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm:selectedOrgName :AssetArrivalEditForm:arrivalListAttachment :AssetArrivalEditForm:clinicalDeptName" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
                                                     <p:ajax process="@this" event="collapse"/>
 
@@ -153,7 +153,7 @@
                                     <h:panelGroup id = "clinicalDeptName">
                                         <label class="label">#{msg.clinicalDeptName}</label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.selected.clinicalDeptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoCompleteDept}">
-                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onClinicalDeptChange}" />
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onClinicalDeptChange}"/>
                                         </p:autoComplete>
                                     </h:panelGroup>
 

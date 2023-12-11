@@ -89,7 +89,6 @@
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
                     <p:tab id="s2" title="待过会确认">
-
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
                     <p:tab id="s3" title="待招标完成">
@@ -108,6 +107,16 @@
             function openViewWindow(xhr, status, args) {
                 window.document.body.innerHTML = '加载中...';
                 window.location.href = args.url;
+            }
+            function copyText() {
+                let pwd = document.getElementById("purchseUrl").innerText;
+                let input = document.createElement("input");
+                input.setAttribute('id', 'copyInput');
+                input.setAttribute('value', pwd);
+                document.getElementsByTagName('body')[0].appendChild(input);
+                document.getElementById('copyInput').select();
+                document.execCommand("copy");
+                document.getElementById('copyInput').remove();
             }
         </script>
         <div class="ui-g-12 card">

@@ -116,6 +116,15 @@
                 <p:column headerText="预算总价">
                     <h:outputText value="#{item.applicationAmount}"/>
                 </p:column>
+                <p:column headerText="审批数量">
+                    <h:outputText value="#{item.offlineApplicationQuantity}"/>
+                </p:column>
+                <p:column headerText="审批单价">
+                    <h:outputText value="#{item.offlineApplicationPrice}"/>
+                </p:column>
+                <p:column headerText="审批总价">
+                    <h:outputText value="#{item.offlineApplicationAmount}"/>
+                </p:column>
             </p:dataTable>
             <br/>
             <p:commandButton validateClient="true" actionListener="#{purchaseOrderController.addBudgetAsset}"

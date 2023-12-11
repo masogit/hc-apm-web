@@ -12,11 +12,11 @@
         <h:form id="viewUrlForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
-                    <span class="label">#{purchaseOrderController.getPurchaseUrl()}</span>
+                    <span class="label" id="purchseUrl">#{purchaseOrderController.getPurchaseUrl()}</span>
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton immediate="true" process="@this" value="关闭" onclick="PF('viewUrlDlg').hide()"/>
+             <p:commandButton value="点此复制" onclick="copyText()" oncomplete="PF('viewUrlDlg').hide()"/>
         </h:form>
     </p:dialog>
 </ui:composition>

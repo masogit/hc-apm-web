@@ -21,6 +21,13 @@
             <p:column headerText="#{msg.ApplicationNum}" >
                 <h:outputText value="#{item.applicationNum}"/>
             </p:column>
+            <p:column headerText="年份" >
+                <h:outputText value="#{item.applicationDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="yyyy"/>
+                </h:outputText>
+            </p:column>
              <p:column headerText="设备名称" >
                 <h:outputText value="#{item.applicationAssetName}"/>
              </p:column>
@@ -36,6 +43,9 @@
                 <h:outputText value="#{item.applicationAmount}">
                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                 </h:outputText>
+            </p:column>
+            <p:column headerText="申请科室" >
+                <h:outputText value="#{item.applicantDeptName}"/>
             </p:column>
             <p:column headerText="#{msg.Applicant}" >
                 <h:outputText value="#{item.applicantName}"/>
