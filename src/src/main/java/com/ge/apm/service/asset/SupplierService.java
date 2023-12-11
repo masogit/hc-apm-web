@@ -3,6 +3,8 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +30,7 @@ public class SupplierService {
     @Autowired
     private SupplierApiService supplierApiService;
     @Autowired
-    private WorkflowConfigRepository workflowConfigDao;
+    private ConfigService configService;
     @Autowired
     private TenantInfoRepository tenantInfoDao;
     @Autowired
@@ -234,25 +236,13 @@ public class SupplierService {
 
     }
 
-    public boolean activeSupplier(){
-
+    public boolean
+    activeSupplier(){
         UserAccount user = UserContextService.getCurrentUserAccount();
 
-        List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
-        }
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
-        }
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
-        }
-
-        if(!workflowConfigList.isEmpty()){
-            if (workflowConfigList.get(0).getActiveSupplier() != null && workflowConfigList.get(0).getActiveSupplier()){
-                return true;
-            }
+        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+        if(null != configBySite){
+           return configBySite.getActiveSupplier() != null && configBySite.getActiveSupplier();
         }
 
         return false;
@@ -295,21 +285,9 @@ public class SupplierService {
 
     public boolean activeSupplierCertificateManage(){
         UserAccount user = UserContextService.getCurrentUserAccount();
-
-        List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
-        }
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
-        }
-        if(workflowConfigList.isEmpty()){
-            workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
-        }
-        if(!workflowConfigList.isEmpty()){
-            if (workflowConfigList.get(0).getSupplierCertificateManage() != null && workflowConfigList.get(0).getSupplierCertificateManage()){
-                return true;
-            }
+        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+        if(null != configBySite){
+            return configBySite.getSupplierCertificateManage() != null && configBySite.getSupplierCertificateManage();
         }
         return false;
     }
