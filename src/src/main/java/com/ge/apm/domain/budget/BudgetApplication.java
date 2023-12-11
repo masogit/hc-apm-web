@@ -205,6 +205,17 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Transient
     private String applicantName ;//申请人
 
+    @Transient
+    private String applicantDeptName ;//申请科室
+
+    public String getApplicantDeptName() {
+        return applicantDeptName;
+    }
+
+    public void setApplicantDeptName(String applicantDeptName) {
+        this.applicantDeptName = applicantDeptName;
+    }
+
     public String getProcureStatus() {
         return StringUtils.isBlank(procureStatus)?BudgetApplication.PROCURESTATUS.Unpurchased.toString(): procureStatus;
     }
