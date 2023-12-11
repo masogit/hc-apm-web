@@ -210,29 +210,29 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             updateSearchFilter(new SearchFilter("stepStatus",SearchFilter.Operator.EQ, "Complete"));
         } else if(tabIndex == 5){//全部
         }
-        queryByUserRole(org);
+        queryByUserRole(org,searchFilters);
         return searchFilters;
     }
 
-    private void queryByUserRole(OrgInfo org){
+    private void queryByUserRole(OrgInfo org,List<SearchFilter> searchFiltersArg){
         if(org == null) return;
        // int switchArg = userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)?org.getOrgLevel():org.getOrgType();
         switch (org.getOrgLevel()) {
             case 3:
                 // 院区
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
+                searchFiltersArg.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
                 break;
             case 2:
                 // 医院
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
+                searchFiltersArg.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
                 break;
             case 1:
                 // 集团
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
+                searchFiltersArg.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
                 break;
             default:
                 // 租户
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
+                searchFiltersArg.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
         }
     }
     public void onTabChange(TabChangeEvent event) {
@@ -521,7 +521,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     private void addAssetSearchFilter() {
-        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
         if (null != assetSearchForm.getDept()) {
             updateAssetSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, assetSearchForm.getDept().getId()));
         }
@@ -546,6 +545,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         if (CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)) {//每次选择去掉之前的
             updateAssetSearchFilter(new SearchFilter("id", SearchFilter.Operator.NotIN, this.curApplicationBudgetAssets.stream().map(BudgetApplicationAsset::getId).collect(Collectors.toList())));
         }
+        queryByUserRole(org,assetSearchFilters);
         updateAssetSearchFilter(new SearchFilter("budgetApplication.procureStatus",
                 SearchFilter.Operator.IsNull,null));//采购状态未采购的数据
         updateAssetSearchFilter(new SearchFilter("budgetApplication.applicationStatus", SearchFilter.Operator.IN, Arrays.asList(6)));//状态已完成
