@@ -553,11 +553,11 @@ public class NurseSiteMaintainService {
 	}
 
 	public List<String> getOrgListByUser(String userUid) {
-		return uaaService.getOrgListByUser(userUid).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+		return uaaService.getOrgListByUser(userUid).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
 	}
 
 	public List<String> getOrgUidListByUser(String userUid) {
-		return uaaService.getOrgListByUser(userUid).stream().map(item -> item.getUid()).collect(Collectors.toList());
+		return uaaService.getOrgListByUser(userUid).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 	}
 
 	public NurseSiteMaintainRepository getNurseSiteMaintainRepository() {
@@ -1658,6 +1658,10 @@ public class NurseSiteMaintainService {
 
 	public List<String> findAccessOrgUidListByUserUid(String userUid) {
 		return uaaService.findAccessClinicalUidByUserUid(userUid).stream().distinct().collect(Collectors.toList());
+	}
+
+	public List<OrgInfo> findAccessOrgDeptList(String siteUid) {
+		return uaaService.getClinicalDeptListBySiteUID(siteUid);
 	}
 
 	public boolean existMaintain(NurseSiteMaintain tempMaintain) {

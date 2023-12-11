@@ -7,7 +7,6 @@ import com.ge.apm.domain.pure.AssetRuleModel;
 import com.ge.apm.domain.pure.AssetRuleModelList;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.uaa.UaaService;
@@ -24,7 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.TransferEvent;
@@ -559,9 +557,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                         model.setLevel(level);
                         model.setPlanTime(planTime);
                         model.setPmRuleUid(item);
-                        model.setPeriod(ruleNameMap.get(item).getPeriod());
-                        model.setAssetName(e.getAssetName());
-                        model.setPmRuleName(ruleNameMap.get(item).getName());
+						PmOrderRule pmOrderRule = ruleNameMap.get(item);
+						if (ObjectUtil.isNotEmpty(pmOrderRule)) {
+							model.setPeriod(ruleNameMap.get(item).getPeriod());
+							model.setPmRuleName(ruleNameMap.get(item).getName());
+						} else {
+							LOGGER.info("ruleUid : {}, e : {}", item, e.getId());
+						}
+						model.setAssetName(e.getAssetName());
                         model.setUniqueUid(e.getAssetUID() + item);
                         notOnlyOneModels.add(model);
                     }

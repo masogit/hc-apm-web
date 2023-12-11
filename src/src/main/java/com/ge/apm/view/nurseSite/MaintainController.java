@@ -82,7 +82,7 @@ public class MaintainController implements ServerEventInterface{
 	private StreamedContent signatureContentWeiXin;
 	private boolean blnWebSignatureEidt;
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	private List<String> orgUidList;
+	private List<String> orgUidList = Collections.singletonList("-1");
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
 	private UserAuth customRoleAuth;
@@ -101,12 +101,17 @@ public class MaintainController implements ServerEventInterface{
 		maintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
+		searchController.setBlnOrgTreeUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
 		searchController.updateData();
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
-		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+		OrgInfo selectedOrg = searchController.getSelectedOrg();
+		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
+		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
+			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
 		wrapper.in("nsmc.clinical_dept_uid", orgUidList);
 		wrapper.eq("nsmc.deleted", false);
@@ -792,15 +797,18 @@ public class MaintainController implements ServerEventInterface{
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
-		// TODO Auto-generated method stub
 		OrgInfo tempOrg = (OrgInfo) eventObject;
 		if (listCheckClinicalOrgInfo != null) {
 			listCheckClinicalOrgInfo.clear();
 		} else {
-			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
+			listCheckClinicalOrgInfo = new ArrayList<>();
 		}
 		if (tempOrg != null) {
-			listCheckClinicalOrgInfo.add(tempOrg);
+			if (tempOrg.getOrgType() != 4) {
+				listCheckClinicalOrgInfo.addAll(nurseSiteMaintainService.findAccessOrgDeptList(tempOrg.getSiteUID()));
+			} else {
+				listCheckClinicalOrgInfo.add(tempOrg);
+			}
 		}
 		onClinicalOrgInfoChange();
 	}
