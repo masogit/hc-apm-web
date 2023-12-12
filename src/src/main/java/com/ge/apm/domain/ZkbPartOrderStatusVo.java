@@ -77,5 +77,7 @@ public class ZkbPartOrderStatusVo {
     @Getter@Setter
     private boolean haveTrainCourseFlag = false;
 
+    @Getter@Setter
+    private boolean allegedPatientConsequenceFlag = false;
 
 }
