@@ -1247,7 +1247,6 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
                             <label class="label">归还审核时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.closedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
-
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
                             <label class="label">是否已上传探头说明函</label>
@@ -1274,7 +1273,6 @@
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
-
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -1334,7 +1332,7 @@
                             <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.additionalDetails}" required="true" requiredMessage="额外的信息不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">Problem服务原因*</label>
+                            <label class="label">服务原因*</label>
                             <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.problemReason}" required="true" requiredMessage="Problem服务原因不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                             <p:outputLabel style="color: red" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">请在服务原因里填写旧探头型号和序列号</p:outputLabel>
                         </h:panelGroup>
@@ -1343,12 +1341,11 @@
                             <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.actionContent}" required="true" requiredMessage="服务内容不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">Test服务结果*</label>
+                            <label class="label">服务结果*</label>
                             <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.testResult}" required="true" requiredMessage="Test服务结果为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                             <p:outputLabel style="color: red" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.selected.returnType eq 'badReturn'}">请在服务结果里填写新探头型号和序列号</p:outputLabel>
                         </h:panelGroup>
                     </p:panelGrid>
-
                     <p:dataTable id="zkbCloseWorkTimeDatalist"  value="#{zkbPartOrderAuditController.zkbPartOrderCloseWorkTimeList}" var="item"
                                  widgetVar="zkbCloseWorkTimeDatalist" selectionMode="single" selection="#{zkbPartOrderAuditController.selectZkbPartOrderCloseWorkTime}"
                                  lazy="false" paginator="true" rowKey="#{item.dateType}" sortMode="single" sortOrder="ascending" sortBy="#{item.createdDate}"
@@ -1395,7 +1392,6 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-
                 <p:fieldset legend="关单审核信息" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showCompleteAudit}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
@@ -1410,12 +1406,9 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompleteAuditPending')}">
                             <label class="label">完成信息审核时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.completeAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
-
                         </h:panelGroup>
                     </p:panelGrid>
-
                 </p:fieldset>
-
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.saveTips}"/><br/>
                 <p:commandButton validateClient="true" value="#{zkbPartOrderAuditController.normalNextText()}" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '1' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and !(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}"/>
                 <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' or zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' ) and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
@@ -1423,7 +1416,6 @@
                 <p:commandButton id="accept" validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '0') and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 'f'}"/>
                 <p:commandButton id="reject" validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '0' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 't'}"/>
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />
-
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
@@ -1432,7 +1424,6 @@
             <ui:include src="PartOrderReturnModify.xhtml"/>
             <ui:include src="UnrealEdit.xhtml"/>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
-
                 <h:form id="zkbConfigForm">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
@@ -1453,7 +1444,6 @@
                     <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
                 </h:form>
-
             </p:dialog>
             <p:dialog id="zkbModifyApplyDlg" widgetVar="zkbModifyApplyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改申请信息" height="300">
                 <h:form id="zkbModifyApplyForm">
