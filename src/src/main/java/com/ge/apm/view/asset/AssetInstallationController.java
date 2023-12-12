@@ -22,6 +22,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -159,6 +160,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     private WxMessageService wxMessageService;
 
+    private UserAccount loginUser;
+
 
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
@@ -202,6 +205,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         configItemRepository = WebUtil.getBean(ConfigItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
+        loginUser = UserContextService.getCurrentUserAccount();
 
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
@@ -386,6 +390,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             WebUtil.addErrorMessage(isvalidDeptNum._2);
         }
 
+        AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup)selectedObjectMap.get("selectedAssetTypeGroup");
+        if (null != selectedAssetTypeGroup){
+            arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
+        }
+
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(arrivalListItem.getEncoded())) {
+            WebUtil.addErrorMessage("当前租户已开启资产分类,必填");
+            isValidate = false;
+        }
+
         if (!isValidate) {
             return "";
         }
@@ -403,11 +417,6 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             arrivalListItem.setUsageStatus(2);
         } else {
             arrivalListItem.setUsageStatus(3);
-        }
-
-        AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup)selectedObjectMap.get("selectedAssetTypeGroup");
-        if (null != selectedAssetTypeGroup){
-            arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
@@ -553,6 +562,15 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                     message = message + "、" + WebUtil.getMessage(qrCodeStatus);
                 }
             }
+
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup)selectedObjectMap.get("selectedAssetTypeGroup");
+            if (null != selectedAssetTypeGroup){
+                arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
+            }
+
+            if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(arrivalListItem.getEncoded())) {
+                message = message + "、当前租户已开启资产分类,必填";
+            }
             arrivalListItem.setBusinessAckStatus(ArrivalListItem.ACK_STATUS_PASS);
             arrivalListItem.setBusinessAckDate(new Date());
             arrivalListItem.setTechnicalAckStatus(ArrivalListItem.ACK_STATUS_PASS);
@@ -695,6 +713,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             }
             arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
         }
+
+//        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(selected.getAssetType())) {
+//            WebUtil.addErrorMessage("当前租户已开启资产分类,必填");
+//            return false;
+//        }
 
         if (Boolean.FALSE.equals(isAvailableQrcode(arrivalListItem.getQrCode()))) {
             valid = false;

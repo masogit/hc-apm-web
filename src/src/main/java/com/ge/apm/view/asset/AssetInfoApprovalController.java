@@ -5,15 +5,19 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -34,6 +38,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     private BlobObjectRepository blobDao;
     private List<V2_BlobObject> picList;
     private OrgInfo fileterOrg;
+    private UserAccount loginUser;
 
     @Override
     protected void init() {
@@ -41,6 +46,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        loginUser = UserContextService.getCurrentUserAccount();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(encodeStr)) {
@@ -56,12 +62,15 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(loginUser.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         selected = null;
         if (this.searchFilters == null) {
-            searchFilters = new ArrayList();
+            searchFilters = new ArrayList<>();
         }
         if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -69,6 +78,11 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
             searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
             searchFilters.add(new SearchFilter("usageStatus", SearchFilter.Operator.EQ, 2));
+        }
+
+        // 资产分类权限
+        if (loginUser.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, loginUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
         
         if (null != fileterOrg) {
@@ -81,7 +95,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     }
 
     public String checkItem() {
-        String operation = "ApprovalItemDetail.xhtml?actionName=Edit&selectedid=" + selected.getUid().toString()
+        String operation = "ApprovalItemDetail.xhtml?actionName=Edit&selectedid=" + selected.getUid()
                 + "&asset_name=" + selected.getName()
                 + "&terminate=" + false
                 + "&approval=" + true;
@@ -90,7 +104,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
 
     public List<V2_BlobObject> getPicList() {
         if (selected == null) {
-            return null;
+            return Collections.emptyList();
         }
         if (picList == null) {
             picList = blobDao.findByBoUuid(selected.getUid());
