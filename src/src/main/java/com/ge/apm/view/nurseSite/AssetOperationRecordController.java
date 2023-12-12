@@ -254,7 +254,11 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     }
 
     public List<AssetOperationRecord> getAssetOperationRecordList(String assetUid){
-        return service.getAssetOperationRecordRepository().fetchRecordByAssetUid(assetUid);
+        searchFilters = new HashSet<>();
+        searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetUid, "1*2+"));
+        List<AssetOperationRecord> list = dao.getAll(searchFilters, "createDate", false, 1000, 0, false);
+        searchFilters.clear();
+        return list;
     }
 
 }
