@@ -92,7 +92,6 @@
                 sat.swap_name
                 from  shared_asset_req_detail sard
                 left join shared_asset_request bsar on bsar.id=sard.borrow_id
-                left join shared_asset_request rsar on rsar.id=sard.return_id
                 left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
                 left join asset_info ai on ai.uid=sard.asset_info_id
                 left join shared_asset_type  sat on ai.shared_asset_type=sat.id
@@ -147,7 +146,6 @@
             sat.swap_name
             from  shared_asset_req_detail sard
             left join shared_asset_request bsar on bsar.id=sard.borrow_id
-            left join shared_asset_request rsar on rsar.id=sard.return_id
             left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
             left join asset_info ai on ai.uid=sard.asset_info_id
             left join shared_asset_type  sat on ai.shared_asset_type=sat.id
