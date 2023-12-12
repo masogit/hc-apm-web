@@ -265,6 +265,12 @@ public class UserContextService implements Serializable {
         return CollectionUtils.isNotEmpty(functions);
     }
 
+    public boolean accessContainsApmFeature(String featureName) {
+        Set<String> apmFeatures = getFeatureList();
+        apmFeatures = apmFeatures.stream().filter(apmFeature -> apmFeature.startsWith(featureName)).collect(Collectors.toSet());
+        return CollectionUtils.isNotEmpty(apmFeatures);
+    }
+
     public boolean hasAnyRoleByApmRoles(ApmSystemRole ... roleList) {
         List<ApmSystemRole> roles = Optional.ofNullable(Arrays.asList(roleList)).orElse(new ArrayList<>());
         if (CollectionUtils.isEmpty(roles)) return false;
