@@ -557,16 +557,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                         model.setLevel(level);
                         model.setPlanTime(planTime);
                         model.setPmRuleUid(item);
-						PmOrderRule pmOrderRule = ruleNameMap.get(item);
-						if (ObjectUtil.isNotEmpty(pmOrderRule)) {
-							model.setPeriod(ruleNameMap.get(item).getPeriod());
-							model.setPmRuleName(ruleNameMap.get(item).getName());
-						} else {
-							LOGGER.info("ruleUid : {}, e : {}", item, e.getId());
+						PmOrderRule rule = ruleNameMap.get(item);
+						if (ObjectUtil.isNotEmpty(rule)) {
+							model.setAssetName(e.getAssetName());
+							model.setUniqueUid(e.getAssetUID() + item);
+							notOnlyOneModels.add(model);
 						}
-						model.setAssetName(e.getAssetName());
-                        model.setUniqueUid(e.getAssetUID() + item);
-                        notOnlyOneModels.add(model);
                     }
 					});
 				}else{
