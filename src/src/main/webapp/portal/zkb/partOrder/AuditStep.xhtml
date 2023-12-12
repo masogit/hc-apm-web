@@ -1296,7 +1296,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">事件发生的时间*</label>
-                            <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.eventDated}" required="true" requiredMessage="事件发生的时间不能为空" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
+                            <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.eventDated}" required="true" requiredMessage="事件发生的时间不能为空" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">过程类型*</label>
