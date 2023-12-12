@@ -10,8 +10,8 @@
 
 <!--    <ui:define name="content">-->
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
-        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
+        <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
 
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
