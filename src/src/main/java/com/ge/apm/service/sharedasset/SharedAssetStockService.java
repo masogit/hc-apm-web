@@ -10,6 +10,7 @@ import javax.faces.model.SelectItem;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,12 +57,11 @@ public class SharedAssetStockService {
 	  AssetInfoRepository assetInfoRepository;
 
     @Autowired
-    private WorkflowConfigRepository wfCfigDao;
-
-    @Autowired
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
     @Autowired
     private ConfigItemValueRepository configItemValueRepository ;
+    @Autowired
+    private ConfigService configService;
 
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
         List<String> orgUidList = getOrgInfo();
@@ -390,7 +390,7 @@ public class SharedAssetStockService {
         } else if(StringUtils.isNotEmpty(reqDetail.getBorrowId())){
             //borrowId不应为空
             SharedAssetRequest borrowReq = this.findRequestById(reqDetail.getBorrowId());
-            if("1".equals(borrowReq.getType())) {
+            if(borrowReq != null && "1".equals(borrowReq.getType())) {
                 reqDetail.setTotalAmount(BigDecimal.valueOf(0));
             }
         }
@@ -418,10 +418,10 @@ public class SharedAssetStockService {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = userContextService.getSelectSite();
         if(selectSite != null){
-            WorkflowConfig workflowConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selectSite.getUid());
             return workflowConfig==null?false:workflowConfig.getEnableLogPatientInfo();
         }
-        return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
+        return configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
     }
     private List<String> getWorkflowConfig(){
         UserContextService bean = WebUtil.getBean(UserContextService.class);
@@ -430,16 +430,18 @@ public class SharedAssetStockService {
         if(selectSite != null){
             List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
             for (String s : orgInfoUidsByparentUid) {
-                List<String> deptForSharedAsset = wfCfigDao.findDeptForSharedAsset(s);
-                if(CollectionUtils.isNotEmpty(deptForSharedAsset)){
-                    workflowConfigList.addAll(deptForSharedAsset);
+                WorkflowConfig configBySite = configService.findConfigBySite(s);
+                String deptForSharedAsset = null;
+                if(StringUtils.isNotEmpty(deptForSharedAsset = configBySite.getDeptForSharedAsset())){
+                    workflowConfigList.add(deptForSharedAsset);
                 }
             }
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
-            if(CollectionUtils.isNotEmpty(allocationCenterUids)){
-                workflowConfigList.addAll(allocationCenterUids);
+            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+            String deptForSharedAsset = null;
+            if(StringUtils.isNotEmpty(deptForSharedAsset = configBySite.getDeptForSharedAsset())){
+                workflowConfigList.add(deptForSharedAsset);
             }
         }
         return workflowConfigList;
