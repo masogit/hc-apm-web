@@ -51,6 +51,10 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="#{msg.vendor}" sortBy="#{item.supplier.name}" filterBy="#{item.supplier.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.supplier.name}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.plannedArriveDate}" sortBy="#{item.expectArrivalDate}">
                             <f:facet name="filter">
                                 <p:inputText id="filterExpectArrivalDate" widgetVar="varfilterExpectArrivalDate"/>
