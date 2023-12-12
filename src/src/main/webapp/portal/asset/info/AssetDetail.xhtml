@@ -390,7 +390,7 @@
                             </p:panel>
                             <c:choose>
                                 <c:when test="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
-                                    <p:panel  header="使用登记" id="B">
+                                    <p:panel  header="使用登记记录" id="B">
                                         <p:dataTable id="usingRecordeList" var="item" value="#{assetOperationRecordController.getAssetOperationRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
                                                      paginator="true" paginatorPosition="both" rows="5"
                                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Toolbar}"
