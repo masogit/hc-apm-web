@@ -634,10 +634,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         } else if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) ||
                 ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()))
-                && ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())  ){
+                && ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())){
             if(zkbPartOrderCloseWorkTimeList == null || zkbPartOrderCloseWorkTimeList.size() == 0){
                 WebUtil.addErrorMessage("工作&差旅时间不能为空!","");
                 return "";
+            }else{
+                boolean f = false;
+                for(ZkbPartOrderCloseWorkTime t : zkbPartOrderCloseWorkTimeList){
+                    if("Phone Support".equals(t.getDateType())){
+                        f = true;
+                    }else if("onsite".equals(t.getDateType())){
+                        f = true;
+                    }
+                }
+                if(!f){
+                    WebUtil.addErrorMessage("必须有一个【远程支持}或【现场维修】时间类型!","");
+                    return "";
+                }
             }
             if(closeBlobObjectList == null || closeBlobObjectList.size() == 0){
                 WebUtil.addErrorMessage("服务记录单不能为空!","");
