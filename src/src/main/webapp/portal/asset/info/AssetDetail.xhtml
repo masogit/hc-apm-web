@@ -388,39 +388,76 @@
                                     </p:column>
                                 </p:dataTable>
                             </p:panel>
+                            <c:choose>
+                                <c:when test="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
+                                    <p:panel  header="使用登记" id="B">
+                                        <p:dataTable id="usingRecordeList" var="item" value="#{assetOperationRecordController.getAssetOperationRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                                     paginator="true" paginatorPosition="both" rows="5"
+                                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Toolbar}"
+                                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                            <p:column headerText="住院号" filterBy="#{item.hospitalNumber}" filterMatchMode="LIKE">
+                                                <h:outputText value="#{item.hospitalNumber}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="检查项" filterBy="#{item.operationName}" filterMatchMode="LIKE">
+                                                <h:outputText value="#{item.operationName}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="检查人" filterBy="#{item.operationByName}" filterMatchMode="LIKE">
+                                                <h:outputText value="#{item.operationByName}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="登记时间" sortBy="#{item.createDate}"  filterBy="#{item.createDate}" filterMatchMode="GTE">
+                                                <f:facet name="filter">
+                                                    <p:inputText id="filtercreateDate" widgetVar="varFiltercreateDate" />
+                                                </f:facet>
+                                                <h:outputText value="#{item.createDate}" >
+                                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <f:facet name="{Toolbar}">
+                                                <p:commandButton immediate="true" ajax="false" icon="ui-icon-arrowthick-1-s"  title="导出到Excel" rendered="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
+                                                    <p:dataExporter type="xlsx" target="usingRecordeList" fileName="assetOperationRecord"/>
+                                                </p:commandButton>
+                                            </f:facet>
+                                        </p:dataTable>
+                                    </p:panel>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:panel  header="开关机记录" id="A">
+                                        <f:facet name="actions">
+                                            <!--                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/assetOptRecordList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
+                                            <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
+                                        </f:facet>
 
-                            <p:panel  header="开关机记录" id="A">
-                                <f:facet name="actions">
-<!--                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/assetOptRecordList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
-                                    <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
-                                </f:facet>
-
-                                <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
-                                             paginator="true" paginatorPosition="both" rows="5"
-                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                    <p:column headerText="开机时间" >
-                                        <h:outputText value="#{item.startDate}">
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
-                                        </h:outputText>
-                                    </p:column>
-                                    <p:column headerText="关机时间" >
-                                        <h:outputText value="#{item.endDate}">
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm "/>
-                                        </h:outputText>
-                                    </p:column>
-                                    <p:column headerText="开机人" >
-                                        <h:outputText value="#{item.createByName}" />
-                                    </p:column>
-                                    <p:column headerText="关机人" >
-                                        <h:outputText value="#{empty item.endDate?'':item.modifyByName}" />
-                                    </p:column>
-                                    <p:column headerText="使用时长">
-                                        <h:outputText value="#{item.costTime}">
-                                        </h:outputText>
-                                    </p:column>
-                                </p:dataTable>
-                            </p:panel>
+                                        <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                                     paginator="true" paginatorPosition="both" rows="5"
+                                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                            <p:column headerText="开机时间" >
+                                                <h:outputText value="#{item.startDate}">
+                                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="关机时间" >
+                                                <h:outputText value="#{item.endDate}">
+                                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm "/>
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="开机人" >
+                                                <h:outputText value="#{item.createByName}" />
+                                            </p:column>
+                                            <p:column headerText="关机人" >
+                                                <h:outputText value="#{empty item.endDate?'':item.modifyByName}" />
+                                            </p:column>
+                                            <p:column headerText="使用时长">
+                                                <h:outputText value="#{item.costTime}">
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:panel>
+                                </c:otherwise>
+                            </c:choose>
                         </p:panelGrid>
                     </h:form>
 

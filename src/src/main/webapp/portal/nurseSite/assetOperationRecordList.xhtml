@@ -54,7 +54,7 @@
 							</h:outputText>
 						</p:column>
 						<f:facet name="{Toolbar}">
-							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_OPERATE_RECORD_EDIT')}">
+							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
 								<p:dataExporter type="xlsx" target="datalist" fileName="assetOperationRecord"/>
 							</p:commandButton>
 						</f:facet>
