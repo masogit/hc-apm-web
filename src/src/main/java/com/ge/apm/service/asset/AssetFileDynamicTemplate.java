@@ -82,6 +82,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     SXSSFSheet assetSheet;
     SXSSFSheet orgSheet;
+    SXSSFSheet tcmSheet;
 
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
@@ -140,6 +141,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
         orgSheet.setDisplayGridlines(true);
 
+        tcmSheet = workBook.getSheet(SHEET_TCM);
+        if (tcmSheet == null) {
+            tcmSheet = workBook.createSheet(SHEET_TCM);
+        }
+        tcmSheet.setDisplayGridlines(true);
+
+
+
         dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
         if (dynamicListSheet == null) {
             dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
@@ -176,6 +185,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (!crossSite) {
             createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
             createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown( WebUtil.getMessage("spare01"), "OFFSET('TCM List'!$A$5,0,0,COUNTA('TCM List'!$A:$A) - 2, 1)");
         }
 
     }
@@ -565,6 +575,23 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+    private void writeI18nMessage(List<I18nMessage> messages) {
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, tcmSheet.getSheetName(), null);
+
+        int startRow = EXCEL_ORG_DATA_ROW;
+        for (I18nMessage i18nMessage: messages) {
+
+            writer.writeRowData(startRow, new String[]{i18nMessage.getValueZh()});
+
+            ++startRow;
+        }
+        writer.writeRowData(startRow, new String[]{"#"});
+
+        tcmSheet.setSelected(false);
+
+    }
+
     public void exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
         logger.info("export asset meta data");
         writeMetaData(exportFields);
@@ -586,6 +613,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         writeSampleAsset(exportFields, clinicalDeptList);
+    }
+
+    public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields,List<I18nMessage> tcm) throws IOException {
+
+        if (!crossSite) {
+            writeI18nMessage(tcm);
+        }
     }
 
     public InputStream getInputStream() throws IOException {

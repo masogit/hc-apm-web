@@ -71,7 +71,7 @@ public class FieldValueMessageController implements Serializable {
         return msgList;
     }
 
-    public List<I18nMessage> getFieldValueList(String fieldName) {
+    public static List<I18nMessage> getFieldValueList(String fieldName) {
         Integer instId = -1;
         try {
             instId = UserContextService.getCurrentUserAccount().getSiteId();
