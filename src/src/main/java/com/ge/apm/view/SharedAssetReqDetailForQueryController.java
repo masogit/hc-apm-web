@@ -12,6 +12,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
@@ -49,14 +50,12 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     private String iouUid;
 
     private Integer iouId = -1;
-    private List<String> selectedBorrowAccessoryList = null;
-    private List<String> selectedReturnAccessoryList = null;
     AssetInfoRepository asiDao = null;
     SharedAssetReqTypeRepository apdDao = null;
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
     AssetInfoService assetInfoService = null;
-    WorkflowConfigRepository wfCfigDao = null;
+    ConfigService configService = null;
     ConfigItemValueRepository configItemValueRepository=null;
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     SharedAssetSwapIndexRepository swapIndexRepository=null;
@@ -114,7 +113,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
         sharedDao = WebUtil.getBean(SharedAssetRequestRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-        wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
         sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
@@ -145,15 +144,18 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
+        UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList =new ArrayList<>();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = userContextService.getSelectSite();
+        String siteUid=null;
         if(selectSite != null){
-            List<OrgInfo> deptListBySiteUid = orgInfoDao.getDeptListBySiteUid(selectSite.getUid());
+            siteUid = selectSite.getUid();
+            List<OrgInfo> deptListBySiteUid = orgInfoDao.getDeptListBySiteUid(siteUid);
             orgUidList = deptListBySiteUid.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 
         }else{
-            UserAccount user = UserContextService.getCurrentUserAccount();
+            siteUid = user.getSiteUID();
             orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
                     .filter(item -> item.getOrgType() == 4)
                     .map(item -> item.getUid())
@@ -162,11 +164,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             orgUidList.add(getVirtuallyOrgInfoUid(user));
         }
 
-        this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("site_uid", SearchFilter.Operator.EQ, siteUid));
+        this.updateSearchFilter(new SearchFilter("clinical_dept_uid", SearchFilter.Operator.IN, orgUidList));
 
     }
     private String getVirtuallyOrgInfoUid(UserAccount user){
@@ -181,7 +180,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     }
 
     private void clinicalDeptNameParamInit(DataTable table) {
-        Object clinicalDeptName = table.getFilters().remove("clinicalDeptName");
+        Object clinicalDeptName = table.getFilters().remove("clinical_dept_uid");
         this.clinicalDeptName = clinicalDeptName;
         }
     private void addClinicalDeptNameSearchFilters() {
@@ -194,7 +193,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
         List<SelectItem> orgInfo = assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel();
         List<Object> orgUidList = orgInfo.stream().filter(item -> item.getLabel().contains(name)).map(SelectItem::getValue).collect(Collectors.toList());
-        this.searchFilters.add(0,new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList,"1*"));
+        this.searchFilters.add(0,new SearchFilter("clinical_dept_uid", SearchFilter.Operator.IN, orgUidList,"1*"));
     }
 
     @Override
@@ -204,10 +203,10 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
         addClinicalDeptNameSearchFilters();
 
-        String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-        List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
-        if (wfCfigList != null && wfCfigList.size() > 0) {
-            this.updateSearchFilter(new SearchFilter("clinical_dept_uid", SearchFilter.Operator.NE,orgUid));
+        String siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
+        WorkflowConfig configBySite = configService.findConfigBySite(siteUid);
+        if (configBySite != null && StringUtils.isNotBlank(configBySite.getDeptForSharedAsset())) {
+            this.updateSearchFilter(new SearchFilter("clinical_dept_uid", SearchFilter.Operator.NE,configBySite.getDeptForSharedAsset()));
         }
 
         if (queryIndex == 0){
