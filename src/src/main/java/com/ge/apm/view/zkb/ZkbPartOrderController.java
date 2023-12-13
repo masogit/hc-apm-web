@@ -84,6 +84,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private Integer pendingUnOrderQty = 0;
     private Integer pendingReturnQty = 0;
     private Integer pendingCloseQty = 0;
+    private Integer pendingCompleteQty = 0;
     private Integer pendingCompleteAuditQty = 0;
 
     @Override
@@ -245,6 +246,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             mm = initQtyMap();
             mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString());
             pendingCompleteAuditQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
+            pendingCompleteQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
         }
     }
 
@@ -962,5 +967,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setPendingCompleteAuditQty(Integer pendingCompleteAuditQty) {
         this.pendingCompleteAuditQty = pendingCompleteAuditQty;
+    }
+
+    public Integer getPendingCompleteQty() {
+        return pendingCompleteQty;
+    }
+
+    public void setPendingCompleteQty(Integer pendingCompleteQty) {
+        this.pendingCompleteQty = pendingCompleteQty;
     }
 }

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -83,6 +84,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * Alleged Patient Consequence病人结果
      */
     @Getter@Setter
+    @Size(max = 2000)
     @Column(name = "alleged_patient_consequence")
     private String allegedPatientConsequence;
 
@@ -90,6 +92,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * Intervention Required需要的干涉
      */
     @Getter@Setter
+    @Size(max = 2000)
     @Column(name = "intervention_required")
     private String interventionRequired;
 
@@ -97,6 +100,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * Additional Details额外的信息
      */
     @Getter@Setter
+    @Size(max = 2000)
     @Column(name = "additional_details")
     private String additionalDetails;
 
@@ -104,6 +108,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * Problem服务原因
      */
     @Getter@Setter
+    @Size(max = 2000)
     @Column(name = "problem_reason")
     private String problemReason;
 
@@ -111,6 +116,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * 服务内容
      */
     @Getter@Setter
+    @Size(max = 2000)
     @Column(name = "action_content")
     private String actionContent;
 
@@ -119,6 +125,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      */
     @Getter@Setter
     @Column(name = "test_result")
+    @Size(max = 2000)
     private String testResult;
 
 
