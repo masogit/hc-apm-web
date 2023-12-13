@@ -14,10 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class SharedAssetReqDetailService {
@@ -59,30 +58,7 @@ public class SharedAssetReqDetailService {
 
     public Wrapper<SharedAssetReqDetail> buildDefaultFilters(List<SearchFilter> searchFilters) {
         Wrapper<SharedAssetReqDetail> ew = new EntityWrapper<SharedAssetReqDetail>();
-        Map<String, SearchFilter> collect = searchFilters.stream().collect(Collectors.toMap((item) -> item.fieldName, (item) -> item));
-        SearchFilter clinicalDeptUid = collect.get("clinicalDeptUid");
-        if("1*2+".equals(clinicalDeptUid.conditionPath)){
-            List<String> orgUidList =(List) clinicalDeptUid.value;
-            ew.andNew()
-                    .in("tenant_uid", orgUidList)
-                    .or().in("institution_uid", orgUidList)
-                    .or().in("hospital_uid", orgUidList)
-                    .or().in("site_uid", orgUidList)
-                    .or().in("clinical_dept_uid", orgUidList);
-            collect.remove("clinicalDeptUid");
-        }else{
-            List<String> orgUidList =(List) collect.get("tenantUID");
-            ew.andNew()
-                    .in("tenant_uid", orgUidList)
-                    .or().in("institution_uid", orgUidList)
-                    .or().in("hospital_uid", orgUidList)
-                    .or().in("site_uid", orgUidList);
-        }
-        collect.remove("tenantUID");
-        collect.remove("institutionUID");
-        collect.remove("hospitalUID");
-        collect.remove("siteUID");
-        for (SearchFilter filter : collect.values()) {
+        for (SearchFilter filter : searchFilters) {
                 switch(filter.operator){
                     case EQ:
                         ew.eq(filter.fieldName, filter.value);
@@ -110,6 +86,8 @@ public class SharedAssetReqDetailService {
                     case IsNotNull:
                         ew.isNotNull(filter.fieldName);
                         break;
+                    case IN:
+                        ew.in(filter.fieldName, (Collection) filter.value);
                     default:
                         break;
             }

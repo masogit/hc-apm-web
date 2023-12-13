@@ -36,6 +36,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
 
     private UserAccount currentUser;
     private AssetOperationRecordMapper dao;
+    private AssetOperationRecordService service;
     private String assetGroupFilter;
     private OrgInfo selectOrgInfo;
     private List<String> setUserUuids;
@@ -49,6 +50,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(AssetOperationRecordMapper.class);
+        service = WebUtil.getBean(AssetOperationRecordService.class);
         SearchController searchController = WebUtil.getBean(SearchController.class);
         searchController.setCallingController(this);
         searchController.setUpdateViewIDs(":optRecordListForm:datalist");
@@ -250,4 +252,13 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     public void setOperationFlag(boolean operationFlag) {
         this.operationFlag = operationFlag;
     }
+
+    public List<AssetOperationRecord> getAssetOperationRecordList(String assetUid){
+        searchFilters = new HashSet<>();
+        searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetUid, "1*2+"));
+        List<AssetOperationRecord> list = dao.getAll(searchFilters, "createDate", false, 1000, 0, false);
+        searchFilters.clear();
+        return list;
+    }
+
 }

@@ -266,7 +266,8 @@ public class BudgetApplicationAsset implements Serializable {
 
     @Transient
     private BigDecimal confirmAmount;
-
+    @Transient
+    private BigDecimal confirmMaximumTotalPrice;
 
     @Column(name = "confirm_national_finance")
     private String confirmNationalFinance;
@@ -910,5 +911,17 @@ public class BudgetApplicationAsset implements Serializable {
 
     public void setConfirmAmount(BigDecimal confirmAmount) {
         this.confirmAmount = confirmAmount;
+    }
+
+    public BigDecimal getConfirmMaximumTotalPrice() {
+        if(this!=null && this.getConfirmMaximumPrice()!= null && this.getConfirmQuantity()!= null){
+            return this.getConfirmMaximumPrice().multiply(new BigDecimal(this.getConfirmQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        return confirmMaximumTotalPrice;
+    }
+
+    public void setConfirmMaximumTotalPrice(BigDecimal confirmMaximumTotalPrice) {
+        this.confirmMaximumTotalPrice = confirmMaximumTotalPrice;
     }
 }

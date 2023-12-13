@@ -86,10 +86,9 @@ public class UserSchedule implements Serializable {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
-//    @JoinColumn(insertable=false,updatable=false, name = "user_uid", referencedColumnName = "uid")
-//    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-//    @JsonBackReference
-    @Transient
+    @JoinColumn(insertable=false,updatable=false, name = "user_uid", referencedColumnName = "uid")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonBackReference
     @JsonProperty
     private UserAccount userAccount;
 
