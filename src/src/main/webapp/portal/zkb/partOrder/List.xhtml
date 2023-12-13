@@ -47,11 +47,15 @@
                         <p:commandButton value="待OSSC取货寄回 #{zkbPartOrderController.pendingOsscReturnQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'OsscReturnPending'}" rendered="#{zkbPartOrderController.notGeAsset eq 't' and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('OsscReturnPending')}" />
                         <p:commandButton value="待归还 #{zkbPartOrderController.pendingReturnQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ReturnPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ReturnPending')}" />
                         <p:commandButton value="待归还审核 #{zkbPartOrderController.pendingCloseQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ClosePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ClosePending')}" />
+                        <p:commandButton value="待关单 #{zkbPartOrderController.pendingCompleteQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'CompletePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('CompletePending')}" />
                         <p:commandButton value="待关单审核 #{zkbPartOrderController.pendingCompleteAuditQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'CompleteAuditPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('CompleteAuditPending')}" />
                         <p:commandButton value="完成"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Complete'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbPartOrderController.queryListByStatus('all')}" />
                         <p:commandButton value="待上传探头说明函"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'letter'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbPartOrderController.showStatusBtn and !(zkbPartOrderController.notGeAsset eq 't')}" action="#{zkbPartOrderController.queryListByStatus('letter')}" />
+                        <br/>
 
+                    </h:panelGrid>
+                    <h:panelGrid  columns="20" cellpadding="5">
                         <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" rendered="#{zkbPartOrderController.vacationBtn}">
                             <h:outputText value="是否休假" />
                         </p:commandLink>

@@ -12,12 +12,10 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
-import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -25,6 +23,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -640,15 +639,26 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 return "";
             }else{
                 boolean f = false;
+                String errorMsg = "";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
                 for(ZkbPartOrderCloseWorkTime t : zkbPartOrderCloseWorkTimeList){
                     if("Phone Support".equals(t.getDateType())){
                         f = true;
                     }else if("onsite".equals(t.getDateType())){
                         f = true;
                     }
+                    if(t.getStartTime().getTime() >= t.getEndTime().getTime()){
+                        /*errorMsg += "日期：【" + simpleDateFormat.format(t.getWorkDated()) + "】开始时间不能大于结束时间！";*/
+                        errorMsg += String.format("日期：【%tF】开始时间不能大于等于结束时间！\r", t.getWorkDated());
+                    }
                 }
                 if(!f){
-                    WebUtil.addErrorMessage("必须有一个【远程支持}或【现场维修】时间类型!","");
+                    WebUtil.addErrorMessage("必须有一个【远程支持】或【现场维修】时间类型!","");
+                    return "";
+                }
+                if(StringUtils.isNotEmpty(errorMsg)){
+                    WebUtil.addErrorMessage(errorMsg,"");
                     return "";
                 }
             }
@@ -1223,7 +1233,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderCloseInfo.setAllegedPatientConsequence("非患者扫描时出现问题，不涉及患者");
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(true);
         }else if("非患者扫描时出现问题，不涉及患者".equals(zkbPartOrderCloseInfo.getAllegedPatientConsequence())){
-            zkbPartOrderCloseInfo.setAllegedPatientConsequence("");
+            if(zkbPartOrderStatusVo.isAllegedPatientConsequenceFlag()){
+                zkbPartOrderCloseInfo.setAllegedPatientConsequence("");
+            }
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(false);
         }
     }
