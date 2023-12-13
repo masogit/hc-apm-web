@@ -3731,13 +3731,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQuality','IntermittentFailure','Intermittent Failure(间隙性坏的)','Intermittent Failure',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQuality','Unknown','Unknown(不知道)','Unknown',NULL,-1);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Potential','Potential:该故障会导致潜在伤害','Potential',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Actual','Actual:该故障已导致实际伤害','Actual',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','No','No:该故障不会导致潜在或实际伤害','No',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Potential','Potential(该故障会导致潜在伤害)','Potential',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Actual','Actual(该故障已导致实际伤害)','Actual',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','No','No(该故障不会导致潜在或实际伤害)','No',NULL,-1);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','Yes','Yes（故障发生时，有病人在使用这台机器）','Yes',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','No','No （故障发生时，没有病人使用这台机器）','No',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','NotReported','Not reported（客户没有告知，不清楚故障发生时有没有病人在使用这台机器）','Not reported',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','Yes','Yes(故障发生时，有病人在使用这台机器)','Yes',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','No','No(故障发生时，没有病人使用这台机器)','No',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','NotReported','Not reported(客户没有告知，不清楚故障发生时有没有病人在使用这台机器)','Not reported',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Diagnosis','Diagnosis(诊断)','Diagnosis',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Treatment','Treatment(治疗)','Treatment',NULL,-1);
@@ -3756,9 +3756,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Used/Dirty','Used/Dirty(被用过/污迹)','Used/Dirty',NULL,-1);
 
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Travel','Travel差旅时间','Travel',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite现场维修时间','onsite',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support远程支持时间','Phone Support',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Travel','Travel(差旅时间)','Travel',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite(现场维修时间)','onsite',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support(远程支持时间)','Phone Support',NULL,-1);
 
 
 -- 归还类型
