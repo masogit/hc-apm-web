@@ -100,8 +100,14 @@ public class ContractInfo implements Serializable {
     private Double amount;
 
     //供应商
-    @Column(name = "supplier_uid", columnDefinition = "CHAR(32)")
+    @Column(name = "supplier_uid", columnDefinition = "CHAR(32)" )
     private String supplierUid;
+
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "supplier_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private Supplier supplier;
+
 
     //合同类型
     @Column(name = "contract_type")
@@ -816,4 +822,11 @@ public class ContractInfo implements Serializable {
         return isComplete;
     }
 
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
 }

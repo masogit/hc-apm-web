@@ -7,16 +7,14 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
@@ -252,9 +250,11 @@ public class AssetFileImportController {
 //                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("TCM");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         template.exportSampleAsset(orgList, exportFields);
+        template.exportSampleAsset(orgList, exportFields,tcm);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(userContextService.isLocale()){
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");

@@ -376,7 +376,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         if (null != searchForm.getDept()) {
             OrgInfo orgInfo = searchForm.getDept();
-            queryByUserRole(orgInfo);
+            searchFilters.add(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, orgInfo.getId()));
         }
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE,  formatter.format(searchForm.getDateStart())));
