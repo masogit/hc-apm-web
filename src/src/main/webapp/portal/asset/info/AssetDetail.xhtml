@@ -395,19 +395,19 @@
                                                      paginator="true" paginatorPosition="both" rows="5"
                                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Toolbar}"
                                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                            <p:column headerText="住院号" filterBy="#{item.hospitalNumber}" filterMatchMode="LIKE">
+                                            <p:column headerText="住院号">
                                                 <h:outputText value="#{item.hospitalNumber}">
                                                 </h:outputText>
                                             </p:column>
-                                            <p:column headerText="检查项" filterBy="#{item.operationName}" filterMatchMode="LIKE">
+                                            <p:column headerText="检查项">
                                                 <h:outputText value="#{item.operationName}">
                                                 </h:outputText>
                                             </p:column>
-                                            <p:column headerText="检查人" filterBy="#{item.operationByName}" filterMatchMode="LIKE">
+                                            <p:column headerText="检查人">
                                                 <h:outputText value="#{item.operationByName}">
                                                 </h:outputText>
                                             </p:column>
-                                            <p:column headerText="登记时间" sortBy="#{item.createDate}"  filterBy="#{item.createDate}" filterMatchMode="GTE">
+                                            <p:column headerText="登记时间">
                                                 <f:facet name="filter">
                                                     <p:inputText id="filtercreateDate" widgetVar="varFiltercreateDate" />
                                                 </f:facet>
