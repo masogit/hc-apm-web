@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.AssetOperationRecordMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetOperationRecordService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -26,6 +27,7 @@ import javax.faces.bean.ViewScoped;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Liu
@@ -36,21 +38,19 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
 
     private UserAccount currentUser;
     private AssetOperationRecordMapper dao;
-    private AssetOperationRecordService service;
     private String assetGroupFilter;
     private OrgInfo selectOrgInfo;
-    private List<String> setUserUuids;
+    private UaaService uaaService;
     private UserAuth customRoleAuth;
     private boolean returnFlag = false;
     private boolean operationFlag = false;
-    private Pagination assetPageRequest;
     private String assetInfoUid;
+    private List<String> orgUidList;
 
     @Override
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(AssetOperationRecordMapper.class);
-        service = WebUtil.getBean(AssetOperationRecordService.class);
         SearchController searchController = WebUtil.getBean(SearchController.class);
         searchController.setCallingController(this);
         searchController.setUpdateViewIDs(":optRecordListForm:datalist");
@@ -58,7 +58,8 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         searchController.setType(5);
         searchController.updateData();
         AssetOperationRecordService service = WebUtil.getBean(AssetOperationRecordService.class);
-        setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
         this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -80,17 +81,15 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         if (this.searchFilters == null) {
             this.searchFilters = new HashSet<>();
         }
-        // need list or set
-        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUuids, "1*"));
-        if (selectOrgInfo.getOrgType() == 0) {
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-        } else if (selectOrgInfo.getOrgType() == 1) {
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
+        if (selectOrgInfo.getOrgType() == 1) {
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
         } else if (selectOrgInfo.getOrgType() == 2) {
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
         } else if (selectOrgInfo.getOrgType() == 3) {
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
         }
+        searchFilters.add(new SearchFilter("assetInfo.orgUidList", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
         if (currentUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
