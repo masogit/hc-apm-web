@@ -50,10 +50,10 @@ public class LoginRecordController extends GenericCRUDController<LoginRecord> {
             searchFilters = new ArrayList();
         }
         String siteUid = currentUser.getSiteUID();
-        if (!this.hasFilterOnField("loginName")) {
-            List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
-            searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.IN, loginNameList));
-        }
+        this.updateSearchFilter(new SearchFilter("userAccount.tenantUID", SearchFilter.Operator.EQ, siteUid,"1*2+"));
+        this.updateSearchFilter(new SearchFilter("userAccount.institutionUID", SearchFilter.Operator.EQ, siteUid,"1*2+"));
+        this.updateSearchFilter(new SearchFilter("userAccount.hospitalUID", SearchFilter.Operator.EQ, siteUid,"1*2+"));
+        this.updateSearchFilter(new SearchFilter("userAccount.siteUID", SearchFilter.Operator.EQ, siteUid,"1*2+"));
     }
 
     @Override
