@@ -45,7 +45,7 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <p:inputText id="searchText" value="#{assetRiskAssessmentController.findByStr}" placeholder="#{msg.name}/#{msg.functionType}/#{msg.assetGroup}" maxlength="100" style="width: 500px">
-                            <p:ajax event="keyup" update=":AssetInfoListForm searchButtons " />
+                            <p:ajax event="keyup" update=":AssetInfoListForm:datalist " />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetRiskAssessmentController.findByStr}"/>
