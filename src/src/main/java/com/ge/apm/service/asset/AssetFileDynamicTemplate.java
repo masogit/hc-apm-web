@@ -476,10 +476,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public ExcelDocumentStreamingWriter initExcelWriter(int size, List<String> exportFields, List<OrgInfo> clinicalDeptList) {
         logger.info("export asset meta data");
         writeMetaData(exportFields);
-
         if (!crossSite) {
             logger.info("export clinical dept list");
             writeClinicalDeptList(clinicalDeptList);
+            writeI18nMessage(spare01List);
         }
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
@@ -582,7 +582,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int startRow = EXCEL_ORG_DATA_ROW;
         for (I18nMessage i18nMessage: messages) {
 
-            writer.writeRowData(startRow, new String[]{i18nMessage.getValueZh()});
+            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh()});
 
             ++startRow;
         }

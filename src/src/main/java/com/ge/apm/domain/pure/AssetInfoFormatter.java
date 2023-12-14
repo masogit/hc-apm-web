@@ -458,9 +458,23 @@ public class AssetInfoFormatter {
 
         if (assetInfo.getSpare01() == null) return null;
 
-        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare01(), importService.spare01List);
 
         return value;
+    }
+
+    private String findMatchKeyValue(String spare01, List<I18nMessage> spare01List) {
+
+        String msgKey = String.valueOf(spare01);
+        for (I18nMessage msg: spare01List) {
+            if (msg.getMsgKey().equals(msgKey)) {
+                return msg.getMsgKey()+" "+msg.getValueZh();
+            }
+        }
+
+        return null;
+
     }
 
     private String findMatchTreeValue(String spare01, List<I18nMessage> spare01List) {
