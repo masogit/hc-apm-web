@@ -597,7 +597,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         List<SearchFilter> searchFilterAssets = new ArrayList<>();
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ, this.selected.getId()));
-        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets,new Sort(Sort.Direction.DESC, "createdDate"));
         if (CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)) {
             this.curApplicationBudgetAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId() != null).forEach(baa -> {
                 OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());

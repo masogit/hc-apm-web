@@ -2,6 +2,7 @@ package com.ge.apm.view.schedule;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.UserScheduleDto;
 import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.SharedAssetConfigController;
@@ -13,6 +14,7 @@ import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -156,17 +158,19 @@ public class WorkScheduleController{
             searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid()));
 
-            List<UserSchedule> tempUserScheduleList = dao.findBySearchFilter(searchFilters);
+            List<UserScheduleDto> tempUserScheduleList = dao.findBySiteUidAndType(type.name(),selectSite.getUid());
 
             Map<String, UserAccount> userAccountMap =new HashMap<>();
             if(!CollectionUtils.isEmpty(tenantUserList)){
                 userAccountMap = tenantUserList.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
             }
-            for (UserSchedule us : tempUserScheduleList) {
+            for (UserScheduleDto us : tempUserScheduleList) {
+                UserSchedule schedule=new UserSchedule();
+                BeanUtils.copyProperties(us,schedule);
                 UserAccount userAccount = userAccountMap.get(us.getUserUID());
-                us.setUserAccount(userAccount);
-                DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(this.getShowTitle(us.getScheduleDateStage()) + "---" + (userAccount == null?"":userAccount.getName()), us.getScheduleDate(), us.getScheduleDate(), true);
-                tempEvent.setData(us);
+                schedule.setUserAccount(userAccount);
+                DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(this.getShowTitle(schedule.getScheduleDateStage()) + "---" + (userAccount == null?"":userAccount.getName()), schedule.getScheduleDate(), schedule.getScheduleDate(), true);
+                tempEvent.setData(schedule);
                 eventModel.addEvent(tempEvent);
             }
     }
