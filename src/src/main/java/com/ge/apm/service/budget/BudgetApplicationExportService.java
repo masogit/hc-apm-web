@@ -42,7 +42,7 @@ public class BudgetApplicationExportService {
     public static final String FILE_TITLE = "医疗仪器设备年度采购申报表";
     public static final String OVER_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/over_fifty_thousand.docx";
     public static final String LESS_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/less_fifty_thousand.docx";
-    public static final int TOTAL_SPLIT = 50000;
+    public static final int TOTAL_SPLIT = 5;
     public static final String FILE_NAME_ROOT = "年度采购申购单";
 
     public static final String PURCHASE_ROOT = "采购汇总下载";
@@ -172,9 +172,9 @@ public class BudgetApplicationExportService {
                 mm.put("deptName", budgetApplication.getApplicationDept().getName());
             }
             mm.put("assetName", budgetApplicationAsset.getApplicationAssetName());
-            mm.put("num", budgetApplicationAsset.getApplicationQuantity());
-            mm.put("price", budgetApplicationAsset.getApplicationPrice());
-            mm.put("total", budgetApplicationAsset.getApplicationAmount());
+            mm.put("num", budgetApplicationAsset.getConfirmQuantity());
+            mm.put("price", budgetApplicationAsset.getConfirmPrice());
+            mm.put("total", budgetApplicationAsset.getConfirmAmount());
             Calendar calendar=Calendar.getInstance();
             calendar.setTime(budgetApplication.getApplicationDate());
             int year = calendar.get(Calendar.YEAR);
