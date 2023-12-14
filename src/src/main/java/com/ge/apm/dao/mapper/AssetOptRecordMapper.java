@@ -14,12 +14,9 @@ import webapp.framework.dao.SearchFilter;
 
 public interface AssetOptRecordMapper extends BaseMapper<AssetOptRecord>{
 	@SelectProvider(type = AssetOptRecordProvider.class,method = "getAll")
-	public List<AssetOptRecord> getAll(@Param("filters") Set<SearchFilter> filters,@Param("sortField")String sortField,@Param("isAscending") boolean isAscending,@Param("limit")int limit,@Param("offset")int offset);
+	List<AssetOptRecord> getAll(@Param("filters") Set<SearchFilter> filters,@Param("sortField")String sortField,@Param("isAscending") boolean isAscending,@Param("limit")int limit,@Param("offset")int offset);
 
 	@SelectProvider(type = AssetOptRecordProvider.class,method = "getAllCount")
-	public Integer getAllCount(@Param("filters") Set<SearchFilter> filters);
-	
-//	@Update("update v2_work_order_detail set mvs_price=#{mvsPrice},invoice_num=#{invoiceNum},purchase_time=#{purchaseTime},deliver_time=#{deliverTime},arrived_time=#{arrivedTime} where id=#{id}")
-//	public Integer updateObj(AssetOptRecord AssetOptRecord);
+	Integer getAllCount(@Param("filters") Set<SearchFilter> filters);
 
 }
