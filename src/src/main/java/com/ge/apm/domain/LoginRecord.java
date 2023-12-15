@@ -23,7 +23,7 @@ public class LoginRecord {
 	@Column(name = "login_name")
 	private String loginName;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "login_name",referencedColumnName = "login_name", insertable = false,updatable = false)
 	private UserAccount userAccount;
 
