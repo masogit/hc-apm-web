@@ -127,7 +127,9 @@
 <!--                    <p:commandButton id="savebutton" validateClient="true"    actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" >-->
 <!--                        <p:confirm   disabled="#{tenantInfoController.checkNameChange()}"  header="保存" message="租户名称目前是某些租户定制化业务逻辑的启用标志，改动后可能会导致相关逻辑被停用。是否确认修改租户名称？" icon="pi pi-exclamation-triangle" />-->
 <!--                    </p:commandButton>-->
-                    <p:commandButton id="submit" rendered="#{tenantInfoController.type eq 'create'}"  actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" ></p:commandButton>
+                    <p:commandButton id="submit1" rendered="#{tenantInfoController.type eq 'create'}"  actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" ></p:commandButton>
+                    <p:commandButton id="submit" style="display:none"   actionListener="#{tenantInfoController.save()}"  value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);" ></p:commandButton>
+
                     <!-- 保存按钮 -->
                     <p:commandButton   validateClient="true"  update=":growl" icon="ui-icon-check"  rendered="#{tenantInfoController.type eq 'edit'}"  value="#{msg.Save}"  onclick="checkFieldModified(event)"/>
 
