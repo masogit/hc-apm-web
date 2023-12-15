@@ -180,7 +180,7 @@ public class BudgetApplicationExportService {
             int year = calendar.get(Calendar.YEAR);
             mm.put("year", year);
             int applyYear = calendar.get(Calendar.YEAR);
-            int applyMonth = calendar.get(Calendar.MONTH);
+            int applyMonth = calendar.get(Calendar.MONTH) + 1;
             int applyDay = calendar.get(Calendar.DAY_OF_MONTH);
             mm.put("applyYear", applyYear);
             mm.put("applyMonth", applyMonth);
