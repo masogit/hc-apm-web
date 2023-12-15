@@ -173,15 +173,10 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
-        if (!StringUtils.isEmpty(findByStr)) {
-            String[] fields = new String[]{"name", "assetGroup", "functionType"};
+        if (StringUtils.hasText(findByStr)) {
+            String[] fields = new String[]{"name", "functionType"};
             Arrays.asList(fields).forEach(field -> {
                 this.updateSearchFilter(new SearchFilter(field, SearchFilter.Operator.LIKE,  findByStr, "1*3+"));
-                if ("assetGroup".equals(field)) {
-                    if (!org.apache.commons.lang3.StringUtils.isNumeric(findByStr)) {
-                        this.removeFilterOnField("assetGroup");
-                    }
-                }
             });
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
@@ -197,14 +192,14 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(functionType)) {
-            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "functionType".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "functionType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(assetName)) {
-            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE,  assetName, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE,  assetName, "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "name".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "name".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
     }
 
