@@ -74,6 +74,18 @@
 				</p:autoComplete>
 			</h:panelGroup>
 		</p:panelGrid>
+		<h:panelGroup >
+				<table style="border-collapse: collapse;float: right" border="1px">  <!--	status-->
+					<tr style="background-color: #8594a3" ><td>未检查/已检查</td></tr>  <!--	0 1-->
+					<tr style="background-color: #007f01" ><td>通过没commnet没有delay</td></tr>  <!--	2-->
+					<tr style="background-color: #ee0a1d"><td>有问题，延期了</td></tr>    <!--	3-->
+					<tr  style="background-color: #052cf5"><td>进行中</td></tr>  <!--	4 -->
+					<tr style="background-color: #8fed8f"><td>通过有备注没有延期</td></tr>    <!--	5 -->
+					<tr  style="background-color: #fdd601"><td>通过有备注延期</td></tr> <!--	6 -->
+					<tr  style="background-color: #fdfddf" ><td>通过，没有备注，延期了</td></tr>  <!--	7 -->
+					<tr style="background-color: #fdbfca"><td>有问题，没有延期</td></tr>   <!--	8 -->
+				</table>
+		</h:panelGroup>
 		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
 			<h:panelGroup rendered="#{searchController.blnPickList}"><!--required="true" requiredMessage="已选设备 #{msg.ValidationRequire}"-->
 				<p:pickList id="idCSAssetsPickList" value="#{searchController.availableAssets}" var="item" itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false"
