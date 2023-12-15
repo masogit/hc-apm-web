@@ -334,4 +334,39 @@ public class AssetRow {
             throw new IllegalStateException(e.getMessage());
         }
     }
+
+    public void setFieldStringTrimValue(String fieldName, String methodName, boolean allowEmpty) {
+        try {
+            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            Method method = AssetInfo.class.getMethod(methodName, String.class);
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
+                //only new record allow # for its content
+
+//                if (DELETE_MARK.equals(fieldValueOfString)) {
+//                    fieldValueOfString = null;
+//                }
+                fieldValueOfString=fieldValueOfString.split(" ")[0];
+
+                method.invoke(assetInfo, fieldValueOfString);
+            } else {
+                //if empty, keep the old value, so there is no else clause
+                if (!StringUtils.isEmpty(fieldValueOfString)) {
+                    String emptyString = null;
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        if (allowEmpty) {
+                            method.invoke(assetInfo, emptyString);
+                        }
+
+                    } else {
+                        fieldValueOfString=fieldValueOfString.split(" ")[0];
+                        method.invoke(assetInfo, fieldValueOfString);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
 }
