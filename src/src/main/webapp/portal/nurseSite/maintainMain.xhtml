@@ -16,7 +16,7 @@
 					<p:commandButton id="batchCreateButton" actionListener="#{maintainController.onCheckDefault}" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
 					<p:commandButton id="batchDeleteButton" actionListener="#{maintainController.onCheckDefault}" value="批量删除" title="批量删除" update=":maintainBatchDeleteDlg" oncomplete="PF('maintainBatchDeleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}"/>
 					<br />
-					<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>
+					<ui:include src="/portal/asset/searchDivMaintainMain.xhtml"></ui:include>
 				</h:form>
 				<h:form id="maintainForm">
 					<h:panelGrid columnClasses="value">
