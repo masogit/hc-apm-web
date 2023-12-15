@@ -104,7 +104,7 @@ public class ContractInfo implements Serializable {
     private String supplierUid;
 
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supplier_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private Supplier supplier;
 
