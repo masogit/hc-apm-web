@@ -5131,7 +5131,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare03', '备用字段03', 'spare03', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare04', '备用字段04', 'spare04', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'spare05', '备用字段05', 'spare05', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'TCM', '中医诊疗设备分类', 'Classification of Traditional Chinese Medicine Diagnosis and Treatment Equipment', NULL, '-1')
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'TCM', '中医诊疗设备分类', 'Classification of Traditional Chinese Medicine Diagnosis and Treatment Equipment', NULL, '-1');
 -- YHAAO-19641 新增中医诊疗设备分类
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TCM', '01', '诊断', '诊断',null,'-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TCM', '01-01', '四诊', '四诊',null,'-1');
