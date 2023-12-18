@@ -988,7 +988,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 UserAccount approvalUser = userAccountRepository.getByUid(assetScrap.getApprovalUid());
                 userAccounts.add(approvalUser);
             }
-            assetLifecyleService.saveLifecycle(assetScrap.getAssetStatus(), assetInfo, userAccount);
             wxMessageService.sendMessage(assetInfo,"审批通过",assetScrap,userAccounts,null,userAccount,assetScrap.getApplyReason());
         }else{
             if(assetScrap.getAssetStatus()!=null){
