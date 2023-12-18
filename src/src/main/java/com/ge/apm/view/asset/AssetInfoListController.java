@@ -997,7 +997,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public List<String> autoCompleteSpare01Name(String query) {
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
-        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare01", siteId);
 
         if (spare01List == null) {
             return Collections.emptyList();
@@ -1038,7 +1038,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
-        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare01", siteId);
 
         if (!Strings.isNullOrEmpty(filterSpare01) && !spare01List.stream().anyMatch(item -> filterSpare01.equals(item.getValueZh()))) {
             filterSpare01 = null;
