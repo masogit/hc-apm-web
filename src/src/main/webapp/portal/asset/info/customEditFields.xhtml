@@ -1095,7 +1095,7 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare05')}">
         <h:panelGroup>
             <label class="label">#{msg.spare05}</label>
             <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -44,6 +45,8 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
     private List<I18nMessage> i18nList;
     private List<I18nMessage> removeList;
 
+    private String search;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(I18nMessageRepository.class);
@@ -61,21 +64,15 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
 
     @Override
     protected Page<I18nMessage> loadData(PageRequest pageRequest) {
-        this.selected = null;
-        List<SearchFilter> searchFilters = this.searchFilters;
 
-        if(searchFilters == null){
-            searchFilters = new ArrayList<>();
-        }
-        searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ, "customI18n"));
-
-        Page<I18nMessage> page = dao.findBySearchFilter(searchFilters, pageRequest);
-
-        List<I18nMessage> list = page.getContent();
-
+        Integer pageSize=pageRequest.getPageSize();
+        Integer pageNum=pageRequest.getPageNumber();
+        Integer count = dao.getMsgTypeAndSiteIdCount("customI18n",selectTenant.getId());
+        List<I18nMessage> list = dao.getMsgTypeAndSiteId("customI18n",selectTenant.getId(),pageSize,pageNum);
         if(CollectionUtils.isNotEmpty(list)){
             setShowValue(list);
         }
+        Page<I18nMessage> page = new PageImpl<>(list, pageRequest, count);
         return page;
     }
 
@@ -97,7 +94,7 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
                         customConfig.append(message.getValueEn()).append(",");
                     }
                 });
-                i18nMessage.setCustomConfig(customConfig.substring(0,customConfig.length() - 1));
+                i18nMessage.setCustomConfig(customConfig.substring(0,customConfig.length() - 1>30?30:customConfig.length() - 1)+"...");
             }
         }
     }
@@ -239,5 +236,13 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
 
     public void setEditFlag(boolean editFlag) {
         this.editFlag = editFlag;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 }

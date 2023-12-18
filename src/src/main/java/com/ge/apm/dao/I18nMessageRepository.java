@@ -80,4 +80,14 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     @Query(value = "select max(to_number(msg_key, '99999')) from i18n_message where msg_type = ?1 and site_id = ?2",nativeQuery = true)
     Integer getMaxMsgKeyByTypeAndSiteId(String msgType, Integer siteId);
 
+
+
+
+    @Query(value = "select message.* from i18n_message message join( select max(id) id ,msg_key msg_key , max(site_id) site_id from i18n_message where msg_type=?1 and (site_id=-1 or site_id=?2) group by msg_key)message2 on message.id=message2.id   limit ?3 offset ?4      ",nativeQuery = true)
+    List<I18nMessage> getMsgTypeAndSiteId(String msgType, Integer siteId, Integer pageSize,Integer pageNum);
+
+
+
+    @Query(value = "select count(*) from i18n_message message join( select max(id) id ,msg_key msg_key , max(site_id) site_id from i18n_message where msg_type=?1 and (site_id=-1 or site_id=?2) group by msg_key)message2 on message.id=message2.id  ",nativeQuery = true)
+    Integer getMsgTypeAndSiteIdCount(String msgType, Integer siteId );
 }
