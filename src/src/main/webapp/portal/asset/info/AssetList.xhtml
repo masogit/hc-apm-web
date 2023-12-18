@@ -869,7 +869,7 @@
                                             <p:ajax process="@this" listener="#{assetInfoListController.onSpare01FilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
                                     </f:facet>
-                                    <h:outputText value="#{fieldMsg.fieldValue('TCM',item.spare01)}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare01',item.spare01)}"/>
                                 </p:column>
                             </c:if>
 
