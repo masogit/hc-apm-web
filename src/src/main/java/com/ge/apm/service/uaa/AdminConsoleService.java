@@ -1179,4 +1179,21 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
 		}
 	}
+
+	public void batchUpdateSharedAssetRequest() {
+		List<ConfigItemValue> whetherToEnableUnattended = configItemValueRepository.findByKey("whetherToEnableUnattended");
+		if(CollectionUtils.isEmpty(whetherToEnableUnattended)) return;
+		List<String> strings = adminConsoleMapper.selectGroupBySiteUidSharedAssetRequest();
+		if(CollectionUtils.isEmpty(strings)) return;
+		Map<String, Boolean> collect = whetherToEnableUnattended.stream().collect(Collectors.toMap(ConfigItemValue::getSiteUid, item -> Boolean.TRUE.toString().equals(item.getValue())));
+		for (String siteUid : strings) {
+			if(collect.containsKey(siteUid)){
+				Boolean aBoolean = collect.get(siteUid);
+				Integer dataType=aBoolean?2:1;
+				adminConsoleMapper.updateBySiteUidSharedAssetRequest(dataType,siteUid);
+			}else{
+				adminConsoleMapper.updateBySiteUidSharedAssetRequest(1,siteUid);
+			}
+		}
+	}
 }
