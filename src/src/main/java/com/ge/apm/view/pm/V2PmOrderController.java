@@ -2876,14 +2876,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
-        List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
+        List<PmOrderRuleCheckList> pmcl =new ArrayList<>();
         UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
         if(unsD==null){
             return pmcl;
         }
         List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
-        List<String> strList=new ArrayList<String>();
-        byCollectionId.stream().forEach(item->strList.add(item.getKey()));
+        List<String> strList=new ArrayList<>();
+        byCollectionId.forEach(item->strList.add(item.getKey()));
         if(strList.isEmpty()){
             strList.add("");
         }
@@ -2892,19 +2892,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<PmOrderRuleCheckList> acPmOrderUleCheckList(V2_PmOrder v2PmOrder) {
-        if (v2PmOrder == null)
-            return null;
-        PmOrderRule pmOrderRule = pmOrderService.acqPmOrderRule(v2PmOrder);
-        if (pmOrderRule == null) {
-            return null;
+        PmOrderRule rule = Optional.of(v2PmOrder).map(pmOrderService::acqPmOrderRule).orElse(null);
+        if (rule == null) {
+            return Collections.emptyList();
         }
-       // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
-
-        if(v2PmOrder.isFinished()) {
-         return getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
+        getPmRuleCLclosed(v2PmOrder,rule.getUid());
+        if(v2PmOrder.isFinished() || "Acceptance".equals(v2PmOrder.getCurrentStepId())) {
+         return getPmRuleCLclosed(v2PmOrder,rule.getUid());
         }
         else {
-            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+            return pmckLstDao.findAllByRuleUID(rule.getUid());
         }
     }
 
