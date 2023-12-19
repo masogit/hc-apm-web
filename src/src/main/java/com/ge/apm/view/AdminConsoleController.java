@@ -275,4 +275,9 @@ public class AdminConsoleController {
 		new Thread(() -> adminConsoleService.batchUpdatePmOrderFields()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void batchUpdateSharedAssetRequest(){
+		new Thread(() -> adminConsoleService.batchUpdateSharedAssetRequest()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }
