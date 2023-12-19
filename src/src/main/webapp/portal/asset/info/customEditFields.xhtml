@@ -1064,7 +1064,7 @@
             <label class="label">#{msg.spare01}</label>
             <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('TCM')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1095,7 +1095,7 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare05')}">
         <h:panelGroup>
             <label class="label">#{msg.spare05}</label>
             <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">

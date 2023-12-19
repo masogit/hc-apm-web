@@ -86,6 +86,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Integer stock=0;
     private boolean isReturn=false;
     private ConfigService configService;
+    private ConfigItemValueRepository configItemValueRepository;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -201,6 +202,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -1085,7 +1087,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             cal.set(Calendar.MILLISECOND, 0);
             cal.add(Calendar.DAY_OF_MONTH, 1);
             selected.setInvalidTime(cal.getTime());
-
+            setDataType();
             dao.save(selected);
             apdDao.save(selected.getSartList());
 
@@ -2142,6 +2144,22 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else{
             return Boolean.FALSE;
         }
+    }
+    private void setDataType(){
+        boolean b = checkWhethertoenableunattended(selected.getSiteUID(), selected.getHospitalUID(), selected.getInstitutionUID(), selected.getTenantUID());
+        if(b){
+            selected.setDataType(2);
+        }else{
+            selected.setDataType(1);
+        }
+    }
+    private boolean checkWhethertoenableunattended(String siteUid,String hospitalUID,String InstitutionUID,String tenantUID){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(siteUid,
+                hospitalUID,
+                InstitutionUID,
+                tenantUID, key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 }
     
