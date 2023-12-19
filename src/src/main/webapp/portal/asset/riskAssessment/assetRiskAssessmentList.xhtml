@@ -44,7 +44,7 @@
                                 </p:scrollPanel>
                             </p:overlayPanel>
                         </h:panelGroup>
-                        <p:inputText id="searchText" value="#{assetRiskAssessmentController.findByStr}" placeholder="#{msg.name}/#{msg.functionType}/#{msg.assetGroup}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetRiskAssessmentController.findByStr}" placeholder="#{msg.name}/#{msg.functionType}" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm:datalist " />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
