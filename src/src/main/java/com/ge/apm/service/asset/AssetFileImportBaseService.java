@@ -64,6 +64,10 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     public List<I18nMessage> assetClassList = FieldValueMessageController.getFieldValueList("assetClass", siteId);
     public List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare01", siteId);
+    public List<I18nMessage> spare02List = FieldValueMessageController.getFieldValueList("spare02", siteId);
+    public List<I18nMessage> spare03List = FieldValueMessageController.getFieldValueList("spare03", siteId);
+    public List<I18nMessage> spare04List = FieldValueMessageController.getFieldValueList("spare04", siteId);
+    public List<I18nMessage> spare05List = FieldValueMessageController.getFieldValueList("spare05", siteId);
     public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
     public List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
     public List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
