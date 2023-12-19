@@ -2,6 +2,20 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:pu="http://primefaces.org/ultima">
+    <style type="text/css">
+        /*.fa{*/
+        /*    background-color: #f8f8f8;*/
+        /*}*/
+        /*.layout-wrapper .layout-menu.layout-menu-dark ul.ultima-menu li a i {*/
+        /*    color: #ba9a9a;!important;*/
+        /*}*/
+        body.layout-compact .layout-wrapper .ultima-menu li a {
+            font-size: 13px;!important;
+        }
+        body.layout-compact .layout-wrapper .ultima-menu li ul li a {
+            font-size: 13px;!important;
+        }
+    </style>
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
 
@@ -189,7 +203,7 @@
             <p:menuitem id="um445" value="#{msg.review}2.0" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT2_VIEW')}"  url="/auditV2/#/mainPage/" target="_blank"></p:menuitem>
 
             <!-- 系统配置 -->
-            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_')}">
+            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="fa fa-cog fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_')}">
                 <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_MESSAGE_EDIT')}"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{not userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('CONFIG_ORG_EDIT')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{not userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('CONFIG_USER_EDIT')}"/>
