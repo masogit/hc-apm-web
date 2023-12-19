@@ -9,6 +9,16 @@
 				<p:outputLabel class="pageTitle" value="临床助手日常检查" />
 			</div>
 			<div class="ui-g-12 card">
+				<table style="float:right;width:240px;height:150px;font-family: Century" >  <!--	status-->
+					<tr style="background-color: #8594a3" ><td style="color: whitesmoke">未检查/已检查</td></tr>  <!--	0 1-->
+					<tr style="background-color: #007f01" ><td style="color: whitesmoke">通过没备注没有延期</td></tr>  <!--	2-->
+					<tr style="background-color: #ee0a1d"><td style="color: whitesmoke">有问题,延期了</td></tr>    <!--	3-->
+					<tr  style="background-color: #052cf5"><td style="color: whitesmoke">进行中</td></tr>  <!--	4 -->
+					<tr style="background-color: #8fed8f"><td style="color: black">通过有备注没有延期</td></tr>    <!--	5 -->
+					<tr  style="background-color: #fdd601"><td style="color: black">通过有备注延期</td></tr> <!--	6 -->
+					<tr  style="background-color: #fdfddf" ><td style="color: black">通过,没有备注,延期了</td></tr>  <!--	7 -->
+					<tr style="background-color: #fdbfca"><td style="color: black">有问题,没有延期</td></tr>   <!--	8 -->
+				</table>
 				<p:growl widgetVar="messages" id="messages" showDetail="true" />
 				<h:form id="maintainHeaderForm" rendered="#{not empty maintainController}">
 					<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg"
@@ -20,7 +30,7 @@
 				</h:form>
 				<h:form id="maintainForm">
 					<h:panelGrid columnClasses="value">
-						<h3>-</h3>
+
 						<p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title"
 							rightHeaderTemplate="" tooltip="true" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_VIEW')}">
 							<p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();" disabled="#{!userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
