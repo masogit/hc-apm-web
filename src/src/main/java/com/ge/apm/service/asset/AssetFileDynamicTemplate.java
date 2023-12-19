@@ -506,8 +506,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (!crossSite) {
             logger.info("export clinical dept list");
             writeClinicalDeptList(clinicalDeptList);
-            writeI18nMessage(spare01List);
         }
+        writeI18nMessage(spare01List);
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
@@ -643,10 +643,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields,List<I18nMessage> tcm) throws IOException {
-
-        if (!crossSite) {
-            writeI18nMessage(tcm);
-        }
+        writeI18nMessage(tcm);
     }
 
     public InputStream getInputStream() throws IOException {
