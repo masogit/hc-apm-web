@@ -216,6 +216,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("networkingStatus"), networkingStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare02"), spare02List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare03"), spare03List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare04"), spare04List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare05"), spare05List, true);
 
         dynamicListSheet.setSelected(false);
     }
@@ -351,6 +355,29 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         namedCell.setRefersToFormula(cellRange);
 
     }
+
+    private void createDropdownWithKeyNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
+
+        List<String> msgs = new ArrayList<>(msgList.size());
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            for (I18nMessage i18nMessage : msgList) {
+                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh());
+            }
+        } else {
+            for (I18nMessage i18nMessage : msgList) {
+                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueEn());
+            }
+        }
+
+        createDropdownOnly(dynamicListSheet, rowNum, name, msgs, optional);
+
+        Name namedCell = workBook.getXSSFWorkbook().createName();
+        namedCell.setNameName(getRangeName(name));
+        String cellRange = getRangeFormulaWithHorizontalList(dynamicListSheet.getSheetName(), rowNum);
+        namedCell.setRefersToFormula(cellRange);
+
+    }
+
 
     private void createDropdownWithStaticList(int rowNum, String name, boolean optional, String... items) {
 
