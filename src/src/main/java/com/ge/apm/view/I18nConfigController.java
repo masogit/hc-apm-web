@@ -66,7 +66,7 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
     protected Page<I18nMessage> loadData(PageRequest pageRequest) {
 
         Integer pageSize=pageRequest.getPageSize();
-        Integer pageNum=pageRequest.getPageNumber();
+        Integer pageNum=pageRequest.getPageNumber()==0?pageRequest.getPageNumber():pageRequest.getPageNumber()+pageRequest.getPageSize();
         Integer count = dao.getMsgTypeAndSiteIdCount("customI18n",selectTenant.getId());
         List<I18nMessage> list = dao.getMsgTypeAndSiteId("customI18n",selectTenant.getId(),pageSize,pageNum);
         if(CollectionUtils.isNotEmpty(list)){
