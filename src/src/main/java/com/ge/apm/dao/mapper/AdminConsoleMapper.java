@@ -37,4 +37,10 @@ public interface AdminConsoleMapper {
                     "</foreach>"+
                     "</script>"})
     void updatePmOrderByIds(@Param("pmOrderRule") PmOrderRule pmOrderRule, @Param("orderIds") Collection<String> orderIds);
+
+    @Select("select  site_uid  from  shared_asset_request  group by site_uid")
+    List<String> selectGroupBySiteUidSharedAssetRequest();
+
+    @Update("update  shared_asset_request set data_type = #{dataType} where site_uid = #{siteUid} and data_type is null")
+    void updateBySiteUidSharedAssetRequest(@Param("dataType") Integer dataType,@Param("siteUid") String siteUid);
 }

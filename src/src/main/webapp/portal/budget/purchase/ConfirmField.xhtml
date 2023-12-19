@@ -19,7 +19,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                          <p:outputLabel class="label">确认预算价(万元)<span style="color: red">*</span></p:outputLabel>
-                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
                                          value="#{purchaseOrderController.confirmBudget.confirmPrice}"/>
                      </h:panelGroup>
                 </p:panelGrid>

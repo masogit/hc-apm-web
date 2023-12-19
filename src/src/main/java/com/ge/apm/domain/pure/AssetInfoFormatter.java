@@ -463,6 +463,42 @@ public class AssetInfoFormatter {
 
         return value;
     }
+    public String getSpare02AsString() {
+
+        if (assetInfo.getSpare02() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare02(), importService.spare02List);
+
+        return value;
+    }
+    public String getSpare03AsString() {
+
+        if (assetInfo.getSpare03() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare03(), importService.spare03List);
+
+        return value;
+    }
+    public String getSpare04AsString() {
+
+        if (assetInfo.getSpare04() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare04(), importService.spare04List);
+
+        return value;
+    }
+    public String getSpare05AsString() {
+
+        if (assetInfo.getSpare05() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare05(), importService.spare05List);
+
+        return value;
+    }
 
     private String findMatchKeyValue(String spare01, List<I18nMessage> spare01List) {
 
@@ -1129,6 +1165,10 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
 
         map.put(getMessage("spare01"), this.getSpare01AsString());
+        map.put(getMessage("spare02"), this.getSpare02AsString());
+        map.put(getMessage("spare03"), this.getSpare03AsString());
+        map.put(getMessage("spare04"), this.getSpare04AsString());
+        map.put(getMessage("spare05"), this.getSpare05AsString());
 
         return map;
 

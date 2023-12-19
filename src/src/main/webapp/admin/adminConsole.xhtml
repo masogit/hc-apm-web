@@ -116,6 +116,9 @@
 				<p:fieldset legend="批量更新保养工单规则名称、保养周期、保养周期单位字段，（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.batchUpdatePmOrderFields()}" value="批量更新" update=":growl"></p:commandButton>
 				</p:fieldset>
+				<p:fieldset legend="批量更新数据类型，（调剂中心，无人值守数据类型区分 YHAAO-20278 医院层级用户可看到设备调剂菜单）">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateSharedAssetRequest()}" value="批量更新" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

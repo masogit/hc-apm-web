@@ -56,12 +56,12 @@
             </p:column>
             <p:column headerText="预算单价">
                 <h:outputText value="#{item.applicationPrice}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                 </h:outputText>
             </p:column>
             <p:column headerText="预算总价">
                 <h:outputText value="#{item.applicationAmount}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                 </h:outputText>
             </p:column>
             <p:column headerText="#{msg.Unit}">
@@ -132,12 +132,12 @@
             </p:column>
             <p:column headerText="预算单价">
                 <h:outputText value="#{item.applicationPrice}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                 </h:outputText>
             </p:column>
             <p:column headerText="预算总价">
                 <h:outputText value="#{item.applicationAmount}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                 </h:outputText>
             </p:column>
             <p:column headerText="#{msg.Unit}">
@@ -205,12 +205,12 @@
                      sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
             <p:column headerText="收费标准">
                  <h:outputText value="#{item.chargingStandards}">
-                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                     <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                  </h:outputText>
              </p:column>
              <p:column headerText="年预估收入">
                  <h:outputText value="#{item.yearIncome}">
-                     <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                     <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
                  </h:outputText>
              </p:column>
              <p:column headerText="所需耗材及使用量">

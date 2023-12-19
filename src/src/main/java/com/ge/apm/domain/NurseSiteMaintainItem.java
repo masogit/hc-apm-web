@@ -140,7 +140,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name = "update_date")
 	private Date updateDate;
 
-	@Column(name = "using_dept_uid", columnDefinition = "CHAR(32)")
+	@Column(name = "using_dept_uid")
 	private String usingDeptUid;    //使用科室
 
 	@Transient
