@@ -1137,6 +1137,10 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	}
 
+	@Autowired
+	private UnstructuredDataCollectionRepository collectionRepository;
+	@Autowired
+	private PmOrderRuleCheckListRepository orderRuleCheckListRepository;
 	public void batchUpdatePmOrderFields() {
 		try {
 			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
@@ -1166,6 +1170,38 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					if (ObjectUtil.isNotEmpty(pmOrderRule)) {
 						order.setPmRuleUid(pmOrderRule.getUid());
 						saveList.add(order);
+						// 更新检查项
+						Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
+						List<UnstructuredDataCollection> dataCollections = collectionRepository.findCKByBoUuid(order.getId(), "pm-checklist-report");
+						if (order.isFinished() && ObjectUtil.isEmpty(dataCollections)) {
+							continue;
+						}
+						if (ObjectUtil.isNotEmpty(dataCollections)) {
+							UnstructuredDataCollection dataCollection = dataCollections.get(0);
+							List<UnstructuredData> dataList = dataCollection.getData();
+							dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
+						}
+						UnstructuredDataCollection unColl = new UnstructuredDataCollection();
+						unColl.setBoType("pm-checklist-report");
+						unColl.setBoUuid(order.getId());
+						unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+						List<UnstructuredData> dataList = ListUtil.newArrayList();
+						List<PmOrderRuleCheckList> items = orderRuleCheckListRepository.findAllByRuleUID(pmOrderRule.getUid());
+						for (PmOrderRuleCheckList item : items) {
+							UnstructuredData unstructuredData = dataMap.get(item.getUid());
+							UnstructuredData data = new UnstructuredData();
+							data.setKey(item.getUid());
+							if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId()))) {
+								data.setValue(unstructuredData.getValue());
+							}
+							data.setName(item.getName());
+							data.setRemark(item.getRemark());
+							data.setClazz("java.lang.String");
+							dataList.add(data);
+						}
+						unColl.setData(dataList);
+						collectionRepository.delete(dataCollections);
+						collectionRepository.save(unColl);
 					}
 				}
 				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
