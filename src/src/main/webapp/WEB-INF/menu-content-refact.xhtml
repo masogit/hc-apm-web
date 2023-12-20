@@ -7,7 +7,7 @@
         /*    background-color: #f8f8f8;*/
         /*}*/
         /*.layout-wrapper .layout-menu.layout-menu-dark ul.ultima-menu li a i {*/
-        /*    color: #ba9a9a;!important;*/
+        /*    color: #ffcccc;!important;*/
         /*}*/
         body.layout-compact .layout-wrapper .ultima-menu li a {
             font-size: 13px;!important;
@@ -278,7 +278,7 @@
             </p:submenu>
 
             <!-- 供应商维修工作台 -->
-            <p:submenu id="um25_supplier" label="供应商#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}">
+            <p:submenu id="um25_supplier" label="供应商#{msg.WorkOrderMgmt}" icon="fa fa-wrench fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}">
                 <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}"/>
             </p:submenu>
 

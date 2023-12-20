@@ -55,11 +55,16 @@
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
-                #{userContextService.loginUserOrgInfo.orgFullName}
+<!--                <i class="fa fa-user-circle fa-2x" aria-hidden="true" title="#{userContextService.userName}-#{userContextService.loginUserOrgInfo.orgFullName}"></i>-->
+                <!--                #{userContextService.loginUserOrgInfo.orgFullName}-->
             </div>
-            <div class="profile-name">
-                #{userContextService.userName}
+            <div class="btn-group closed" style="font-size: 14px; text-align: right;" >
+                <a class="btn btn-primary"><i class="fa fa-university fa-fw"></i>#{userContextService.loginUserOrgInfo.orgFullName}</a>
+                <a class="btn btn-primary"><i class="fa fa-user fa-fw"></i>#{userContextService.userName}</a>
             </div>
+<!--            <div class="profile-name">-->
+<!--                #{userContextService.userName}-->
+<!--            </div>-->
         </div>
 
     </div>
