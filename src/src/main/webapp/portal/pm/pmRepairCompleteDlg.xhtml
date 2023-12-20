@@ -232,7 +232,7 @@
                                 </h:panelGroup>
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
-                                        <p:selectOneMenu disabled="true" value="#{item.value}">
+                                        <p:selectOneMenu value="#{item.value}">
                                             <p:ajax listener="#{v2PmOrderController.hmCheckSet(item.key)}"></p:ajax>
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>

@@ -1,21 +1,15 @@
 package com.ge.apm.view.nurseSite;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
+import com.ge.apm.view.SearchController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -26,21 +20,17 @@ import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAuth;
-import com.ge.apm.domain.CustomRoleAuthConstant;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.view.SearchController;
-import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -108,12 +98,13 @@ public class MaintainController implements ServerEventInterface{
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		OrgInfo selectedOrg = searchController.getSelectedOrg();
+		List<String> accessOrgDeptUidAll = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
 		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
 		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
 			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
-		wrapper.in("nsmc.clinical_dept_uid", orgUidList);
+		wrapper.in("nsmc.clinical_dept_uid", accessOrgDeptUidAll);
 		wrapper.eq("nsmc.deleted", false);
 		wrapper.groupBy("nsmc.id");
 		wrapper.orderBy("nsmc.modify_date", false);
@@ -126,7 +117,8 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
@@ -540,7 +532,8 @@ public class MaintainController implements ServerEventInterface{
 				}
 			}
 			else{
-				showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
+				List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+				showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 			}
 		}
 		loadMaintainData();
