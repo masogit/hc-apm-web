@@ -186,6 +186,22 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+    }
+
+    public void editSearchFilters() {
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        if (!ObjectUtils.isEmpty(selectSite)) {
+            String[] fields = new String[]{"siteUID", "hospitalUID", "institutionUID"};
+            Arrays.asList(fields).forEach(field -> this.updateSearchFilter(new SearchFilter(field, SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+")));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+        }
+        if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDeptOrgUidSet.stream().findFirst().get(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
         if (null != assetGroup) {
             this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "1*"));
         } else {
@@ -224,7 +240,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             return assets;
         }
         searchFilters = new ArrayList<>();
-        setUserSearchFilters();
+        editSearchFilters();
         Page<AssetInfo> page = assetInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
         List<AssetInfo> source = new ArrayList<>(page.getContent());
         source.removeAll(assets.getTarget());
