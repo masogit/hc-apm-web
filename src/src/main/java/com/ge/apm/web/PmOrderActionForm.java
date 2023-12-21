@@ -2,6 +2,7 @@ package com.ge.apm.web;
 
 import com.ge.apm.domain.V2_BlobObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,12 @@ public class PmOrderActionForm {
     Integer pmType;
     String applyTime;
     String pmRuleUid;
+
+    //附件
+    private List<V2_BlobObject> attachmentsTwo = new ArrayList<>();
+    //保养前照片
+    private List<V2_BlobObject> prePmAttachments = new ArrayList<>();
+
     /**
      * 创建方式 1:医院创建  2:供应商创建
      */
@@ -243,5 +250,21 @@ public class PmOrderActionForm {
 
     public void setPmRuleUid(String pmRuleUid) {
         this.pmRuleUid = pmRuleUid;
+    }
+
+    public List<V2_BlobObject> getAttachmentsTwo() {
+        return attachmentsTwo;
+    }
+
+    public void setAttachmentsTwo(List<V2_BlobObject> attachmentsTwo) {
+        this.attachmentsTwo = attachmentsTwo;
+    }
+
+    public List<V2_BlobObject> getPrePmAttachments() {
+        return prePmAttachments;
+    }
+
+    public void setPrePmAttachments(List<V2_BlobObject> prePmAttachments) {
+        this.prePmAttachments = prePmAttachments;
     }
 }
