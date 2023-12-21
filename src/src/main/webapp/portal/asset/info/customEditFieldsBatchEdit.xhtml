@@ -299,6 +299,12 @@
             <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoBulkEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'manufactureTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactureTel}</label>
+            <p:inputText id="manufactureTel" value="#{assetInfoBulkEditController.selected.manufactureTel}" class="inputManufacture" readonly="true" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'makerShortName')}" >
         <h:panelGroup>
             <label class="label">#{msg.makerShortName}</label>
@@ -882,8 +888,8 @@
     <!--  资产分类  -->
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetTypeGroup')}">
         <h:panelGroup>
-            <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
-            <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required}"
+            <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
+            <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoBulkEditController.customConfig.assetFields['assetTypeGroup'].required}"
                                  updateAfterClinicalDeptChange="clinicalDeptNameChange"
                                  disabled="#{!assetInfoBulkEditController.needEdit('assetTypeGroup')}"/>
 

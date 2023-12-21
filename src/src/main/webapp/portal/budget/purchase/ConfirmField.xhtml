@@ -13,13 +13,13 @@
             <h:form id="confirmForm">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <p:outputLabel class="label">采购确认数量(台)<span style="color: red">*</span></p:outputLabel>
+                        <p:outputLabel class="label">确认数量(台)<span style="color: red">*</span></p:outputLabel>
                         <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" class="confirm" required="true" requiredMessage="数量(台) #{msg.ValidationRequire}"
                                         value="#{purchaseOrderController.confirmBudget.confirmQuantity}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                         <p:outputLabel class="label">采购确认价格(万元)<span style="color: red">*</span></p:outputLabel>
-                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                         <p:outputLabel class="label">确认预算价(万元)<span style="color: red">*</span></p:outputLabel>
+                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
                                          value="#{purchaseOrderController.confirmBudget.confirmPrice}"/>
                      </h:panelGroup>
                 </p:panelGrid>

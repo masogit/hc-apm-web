@@ -19,6 +19,7 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
@@ -115,7 +116,7 @@ public class AssetInfoDetailController {
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-        terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
+        terminate = Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if(selectedId!=null) selected = assetDao.findByUid(selectedId);
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
@@ -126,38 +127,43 @@ public class AssetInfoDetailController {
         countyArea = userContextService.isCountyArea();
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
 
-
-        if(selected!=null) {
-            if (selected.getSupplierId() != null) {
-                Supplier supplier = supplierDao.findById(selected.getSupplierId());
-                if (supplier != null) {
-                    selected.setVendorTel(supplier.getTel());
-                }
+        List<Integer> supplierIds = ListUtil.newArrayList(-1);
+        Optional.ofNullable(selected.getSupplierId()).map(supplierIds::add);
+        Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).map(supplierIds::add);
+        Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).map(supplierIds::add);
+        List<Supplier> suppliers = supplierDao.findByIdIn(supplierIds);
+        Map<Integer, String> supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getTel));
+        selected.setVendorTel(supplierMap.get(selected.getSupplierId()));
+        selected.setManufactureTel(supplierMap.get(Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).orElse(null)));
+        selected.setMaitananceTel(supplierMap.get(Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).orElse(null)));
+        if (selected.getSupplierId() != null) {
+            Supplier supplier = supplierDao.findById(selected.getSupplierId());
+            if (supplier != null) {
+                selected.setVendorTel(supplier.getTel());
             }
-
-            maintanceType = aimService.getMaintanceType(selected);
-            assetEvents  = aimService.getAssetEventsList(selected);
-
-            if (null != selected.getMedicalApparatusClassification()) {
-                selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
-            }
-            if (null != selected.getAssetType()) {
-                selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
-            }
-
-            //ge mvc data
-            if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
-                mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
-                MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
-                if (found != null) {
-                    mvsAssetInfo = found;
-                }
-            }
-
-            List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
-            this.selected.setTags(existingTags);
         }
 
+        maintanceType = aimService.getMaintanceType(selected);
+        assetEvents  = aimService.getAssetEventsList(selected);
+
+        if (null != selected.getMedicalApparatusClassification()) {
+            selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
+        }
+        if (null != selected.getAssetType()) {
+            selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
+        }
+
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
+            MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
+            if (found != null) {
+                mvsAssetInfo = found;
+            }
+        }
+
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+        this.selected.setTags(existingTags);
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {

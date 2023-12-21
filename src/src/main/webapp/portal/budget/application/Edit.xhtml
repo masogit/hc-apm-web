@@ -111,15 +111,15 @@
                                 <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete'}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
+                                <p:outputLabel class="label">预算单价(万元)<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationPrice}">
                                     <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">预算总价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAmount}" >
+                                <p:outputLabel class="label">预算总价(万元)<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  id="applicationAmount" disabled="true" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAmount}" >
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -332,15 +332,15 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">审批单价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}" disabled="#{budgetController.selected.applicationStep eq 'Complete'}"
+                                <p:outputLabel class="label">审批单价(万元)<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  minValue="0" decimalPlaces="4" required="true" requiredMessage="审批单价 #{msg.ValidationRequire}" disabled="#{budgetController.selected.applicationStep eq 'Complete'}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.offlineApplicationPrice}">
                                     <p:ajax listener="#{budgetController.calcAmountOffline(budgetController.curSelectApplicationBudgetAsset)}" update="@this offlineApplicationAmount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">审批总价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  id="offlineApplicationAmount" disabled="true" minValue="0" decimalPlaces="2"
+                                <p:outputLabel class="label">审批总价(万元)<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  id="offlineApplicationAmount" disabled="true" minValue="0" decimalPlaces="4"
                                                 value="#{budgetController.curSelectApplicationBudgetAsset.offlineApplicationAmount}" >
                                 </p:inputNumber>
                             </h:panelGroup>

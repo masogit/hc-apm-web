@@ -246,7 +246,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 伤害表现
      */
     @Column(name = "harm_perform")
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 1000)
     private String harmPerform;
 
     /**
@@ -254,13 +254,13 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> harmPerformFile;
+    private List<AdverseEventsFile> harmPerformFile;
 
     /**
      * 器械故障表现
      */
     @Column(name = "device_fault_perform")
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 1000)
     private String deviceFaultPerform;
 
     /**
@@ -268,7 +268,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> deviceFaultPerformFile;
+    private List<AdverseEventsFile> deviceFaultPerformFile;
 
     /**
      * 患者姓名
@@ -312,14 +312,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 既往病史
      */
     @Column(name = "medical_history")
-    @Size(min = 1, max = 500)
+    @Size(min = 1, max = 1000)
     private String medicalHistory;
 
     /**
      * 预期治疗疾病或者作用
      */
     @Column(name = "except_affect")
-    @Size(min = 1, max = 500)
+    @Size(min = 1, max = 1000)
     private String exceptAffect;
 
     /**
@@ -374,7 +374,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> eventCauseDescFile;
+    private List<AdverseEventsFile> eventCauseDescFile;
 
     /**
      * 初步处置情况
@@ -388,7 +388,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> initDisposeSituFile;
+    private List<AdverseEventsFile> initDisposeSituFile;
 
     /**
      * 状态
@@ -429,7 +429,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> surveySituFile;
+    private List<AdverseEventsFile> surveySituFile;
 
     /**
      * 关联性评价
@@ -450,7 +450,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> evalCauseAnalyzeFile;
+    private List<AdverseEventsFile> evalCauseAnalyzeFile;
 
     /**
      * 是否已采取控制措施
@@ -470,7 +470,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> controlMeasureDescFile;
+    private List<AdverseEventsFile> controlMeasureDescFile;
 
     /**
      * 未采取控制措施原因
@@ -497,7 +497,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Transient
     @JsonProperty
-    private List<String> falseReportCauseFile;
+    private List<AdverseEventsFile> falseReportCauseFile;
 
     /**
      * 当前审核人uid

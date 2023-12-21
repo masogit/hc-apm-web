@@ -11,17 +11,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:commandButton id="btnOrgFilterComponenet" value="#{filterSiteOrgTreeComponentController.selectedOrgName}" icon="fa fa-angle-down" iconPos="right"/>
+    <label class="label">#{msg.hospitalId}<span style="color: red">*</span></label>
+    <p:inputText id="selectedUserOrgName" value="#{filterSiteOrgTreeComponentController.selectedOrgName}" readonly="true" class="SiteUIDChange"/>
+    <p:commandButton id="btnOrgFilterComponenet" class="btnOrgFilter" icon="fa fa-angle-down" iconPos="right"/>
     <p:overlayPanel widgetVar="varPanelOrgFilterComponenet" for="btnOrgFilterComponenet" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
         <p:inputText id="orgNameInputFilterComponenet" value="#{filterSiteOrgTreeComponentController.orgNameInputFilter}"/>
         <p:commandButton partialSubmit="true" icon="ui-icon-search" process="orgNameInputFilterComponenet @this" update="orgTreeFilterComponent" actionListener="#{filterSiteOrgTreeComponentController.filterTreeNodeByName()}" value="#{msg.Search}"/>
         <p:scrollPanel style="height:300px;border: 0" mode="native">
             <p:tree id="orgTreeFilterComponent" class="tree" style="width:98%;border:0;" value="#{filterSiteOrgTreeComponentController.orgTree}" selection="#{filterSiteOrgTreeComponentController.selectedNode}" var="node" selectionMode="single" dynamic="true">
-                <p:ajax process="@this" event="select" update="#{update}" listener="#{filterSiteOrgTreeComponentController.onSelectTreeNode}" oncomplete="PF('varPanelOrgFilterComponenet').hide();"/>
+                <p:ajax process="@this" event="select" update="@(.SiteUIDChange) #{update}" listener="#{filterSiteOrgTreeComponentController.onSelectTreeNode}" oncomplete="PF('varPanelOrgFilterComponenet').hide();"/>
                 <p:ajax process="@this" event="expand"/>
                 <p:ajax process="@this" event="collapse"/>
                 <p:treeNode type="org">
@@ -29,7 +30,6 @@
                 </p:treeNode>
                 <p:treeNode type="hidden" rendered="false"/>
             </p:tree>
-
         </p:scrollPanel>
     </p:overlayPanel>
 </ui:composition>

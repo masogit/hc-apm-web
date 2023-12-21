@@ -64,18 +64,17 @@
             <div class="profile-name">
                 <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">
                     <h:outputLabel   value="#{userContextService.loginUserOrgInfo.orgFullName}"/>
-<!--                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}"  id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">-->
-<!--                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />-->
-<!--                        <f:selectItem itemLabel="" itemValue=""/>-->
-<!--                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />-->
-<!--                    </h:selectOneMenu>-->
+                    <!--                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}"  id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">-->
+                    <!--                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />-->
+                    <!--                        <f:selectItem itemLabel="" itemValue=""/>-->
+                    <!--                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />-->
+                    <!--                    </h:selectOneMenu>-->
                 </h:form>
             </div>
             <div class="profile-name">
                 #{userContextService.userName}
             </div>
         </div>
-
     </div>
 
     <p:dialog widgetVar="statusDialog" modal="false" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">

@@ -727,16 +727,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             case "supplier":
                 selected.setSupplierId(supplier == null ? null : supplier.getId());
                 selected.setVendor(supplier == null ? null : supplier.getName());
-                selected.setVendorTel(supplier == null ? null : supplier.getTel());
                 break;
             case "maintainer":
                 selected.setMaitananceId(supplier == null ? null : supplier.getId().toString());
                 selected.setMaitanance(supplier == null ? null : supplier.getName());
-                selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
                 break;
             case "manufacturer":
                 selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
                 selected.setManufacture(supplier == null ? null : supplier.getName());
+                break;
+            default:
                 break;
         }
     }

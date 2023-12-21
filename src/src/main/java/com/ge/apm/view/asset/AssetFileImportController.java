@@ -250,7 +250,7 @@ public class AssetFileImportController {
 //                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
-        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("TCM");
+        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         template.exportSampleAsset(orgList, exportFields);

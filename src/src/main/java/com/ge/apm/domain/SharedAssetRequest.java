@@ -139,6 +139,8 @@ public class SharedAssetRequest implements Serializable{
     private Double effort;
     @Column(name = "reject_shelve_remark",columnDefinition = "text")
     private String rejectShelveRemark; // 拒绝申请/搁置申请备注
+    @Column(name = "data_type")
+    private Integer dataType; // 1：调剂，2：无人值守
     public String getId() {
         return id;
     }
@@ -531,5 +533,13 @@ public class SharedAssetRequest implements Serializable{
 
     public void setRejectShelveRemark(String rejectShelveRemark) {
         this.rejectShelveRemark = rejectShelveRemark;
+    }
+
+    public Integer getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(Integer dataType) {
+        this.dataType = dataType;
     }
 }

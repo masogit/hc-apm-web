@@ -26,6 +26,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -117,6 +118,8 @@ public class WorkOrderReportExportController implements Serializable {
     private Map<String,String> filterMap;
     private WorkflowService workflowService;
     private UserContextService userContextService;
+    @Getter @Setter
+    private String srNumStr;
     @PostConstruct
     protected void init() {
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -338,6 +341,14 @@ public class WorkOrderReportExportController implements Serializable {
             v2WorkOrderReportDto.setAssetTypeGroupEncodedSet(assetTypeGroupEncodedSet);
             workOrderList = workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto);
         }
+    }
+
+    public void previewDataBySrNum(ActionEvent actionEvent) {
+        this.selectedItems = null;
+        if(actionEvent!=null) filterMap.clear();
+        V2WorkOrderReportDto v2WorkOrderReportDto = new V2WorkOrderReportDto();
+        v2WorkOrderReportDto.setSrNum(srNumStr);
+        workOrderList = workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto);
     }
 
     private void showMsgBox(String msg) {

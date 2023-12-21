@@ -3,11 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:apm="http://www.ge.com/tags/apm">
 
     <div class="ui-g">
         <div class="ui-g-12 card">
             <h:form enctype="multipart/form-data" rendered="#{measureFromExcelController.customRoleAuth.authSearch}">
+                <h:panelGroup>
+                    <apm:filterSiteOrgByOrgTree/>
+                </h:panelGroup>
                 <p:fieldset  legend="批量导入计量数据" id="uploaderContainer">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
