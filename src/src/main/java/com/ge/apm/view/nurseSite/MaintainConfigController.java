@@ -16,6 +16,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -150,8 +151,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
+		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+		Sort sort = pageRequest.getSort();
+		if (ObjectUtil.isNotEmpty(sort)) {
+			for (Sort.Order order : sort) {
+				Sort.Direction direction = order.getDirection();
+				String property = ZipUtil.camelToUnderline(order.getProperty());
+				wrapper.orderBy("nsmc." + property, "ASC".equals(direction.name()));
+			}
+		}
 		if (currentUser.isEnableAssetTypeGroup()) {
 			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
 		}
