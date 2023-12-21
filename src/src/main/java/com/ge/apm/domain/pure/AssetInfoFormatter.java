@@ -888,14 +888,9 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public String getVendorTel(Map supliers){
-        Integer vendorId = assetInfo.getSupplierId();
-        if(vendorId != null){
-            //Supplier supplier= supplierDao.getById(vendorId);
-            /*if(null!=supplier && null!=supplier.getTel()){
-                return  supplier.getTel();
-            }*/
-            return  (String) supliers.get(vendorId);
+    public String getSupplierTel(Map supliers, Integer supplierId){
+        if(supplierId != null){
+            return  (String) supliers.get(supplierId);
         }
         return null;
     }
@@ -933,11 +928,12 @@ public class AssetInfoFormatter {
         map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
         map.put(getMessage("assetDeptName"), this.getAssetDeptName());
         map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("manufactureTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getManufactureId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("makerShortName"), this.getMakerShortName());
         map.put(getMessage("deviceName"), this.getDeviceName());
         map.put(getMessage("registrationNo"), this.getRegistrationNo());
         map.put(getMessage("vendor"), this.getVendor());
-        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("vendorTel"), this.getSupplierTel(supliers, assetInfo.getSupplierId()));
         map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
         map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
@@ -971,7 +967,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());
-        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("maitananceTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getMaitananceId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("qrCode"), this.getQrCode());
         map.put(getMessage("locationCode"), this.getLocationCode());
         map.put(getMessage("locationName"), this.getLocationName());
@@ -1064,11 +1060,12 @@ public class AssetInfoFormatter {
         map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
         map.put(getMessage("assetDeptName"), this.getAssetDeptName());
         map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("manufactureTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getManufactureId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("makerShortName"), this.getMakerShortName());
         map.put(getMessage("deviceName"), this.getDeviceName());
         map.put(getMessage("registrationNo"), this.getRegistrationNo());
         map.put(getMessage("vendor"), this.getVendor());
-        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("vendorTel"), this.getSupplierTel(supliers, assetInfo.getSupplierId()));
         map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
         map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
@@ -1107,7 +1104,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());
-        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("maitananceTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getMaitananceId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("qrCode"), this.getQrCode());
         map.put(getMessage("locationCode"), this.getLocationCode());
         map.put(getMessage("locationName"), this.getLocationName());

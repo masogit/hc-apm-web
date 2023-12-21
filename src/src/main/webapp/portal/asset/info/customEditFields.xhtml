@@ -325,6 +325,12 @@
             <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactureTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactureTel}</label>
+            <p:inputText id="manufactureTel" value="#{assetInfoEditController.selected.manufactureTel}" class="inputManufacture" readonly="true" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
         <h:panelGroup>
             <label class="label">#{msg.makerShortName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['makerShortName'].required? '*':''}</span></label>
@@ -366,9 +372,8 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitananceTel')}" >
         <h:panelGroup>
-            <label class="label">#{msg.maitananceTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required? '*':''}</span></label>
-            <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" required="#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required}"
-                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" class="maitananceChange" readonly="true" />
+            <label class="label">#{msg.maitananceTel}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" class="maitananceChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nationalStandardCode')}" >
