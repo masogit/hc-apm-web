@@ -1531,7 +1531,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             coWorkerList.forEach(item -> item.setCreatedDate(null));
         }
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch,picBeforeList,picAfterList);
         //保存保养清单中的数据
         saveCheckItemData();
         selected = null;
@@ -2581,7 +2581,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch,picBeforeList,picAfterList);
     }
 
     public void stagingPmOrder() {
@@ -2589,7 +2589,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList,picBeforeList,picAfterList);
         //保存检查项
         saveCheckItemData();
         cancel();
