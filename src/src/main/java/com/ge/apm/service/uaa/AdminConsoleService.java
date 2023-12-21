@@ -1141,6 +1141,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	private UnstructuredDataCollectionRepository collectionRepository;
 	@Autowired
 	private PmOrderRuleCheckListRepository orderRuleCheckListRepository;
+	@Transactional
 	public void batchUpdatePmOrderFields() {
 		try {
 			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
@@ -1154,7 +1155,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					break;
 				}
 				logger.info("batchUpdatePmOrderFields {}, {}", 5000, offset * 5000);
-				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+				Set<String> ruleUidList = orders.stream().map(V2_PmOrder::getPmRuleUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+				Set<String> orderUidList = orders.stream().map(V2_PmOrder::getId).collect(Collectors.toSet());
 				List<RelRuleAsset> relRuleAssets = adminConsoleMapper.findRelRuleAssetByAssetUidList(assetUidList);
 				Map<String, String> relRuleAssetMap = MapUtil.newHashMap();
 				for (RelRuleAsset relRuleAsset : relRuleAssets) {
@@ -1163,7 +1166,13 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#3", relRuleAsset.getRuleUID());
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#4", relRuleAsset.getRuleUID4());
 				}
+				List<UnstructuredDataCollection> dataCollectionList = collectionRepository.findCKByBoUuidIn(orderUidList, "pm-checklist-report");
+				Map<String, List<UnstructuredDataCollection>> dataCollectionMap = dataCollectionList.stream().collect(Collectors.groupingBy(UnstructuredDataCollection::getBoUuid));
+				List<PmOrderRuleCheckList> checkItemList = orderRuleCheckListRepository.findAllByRuleUIDBatch(ruleUidList);
+				Map<String, List<PmOrderRuleCheckList>> checkItemMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getRuleUID));
 				List<V2_PmOrder> saveList = ListUtil.newArrayList();
+				List<UnstructuredDataCollection> deleteDataCollectionList = ListUtil.newArrayList();
+				List<UnstructuredDataCollection> saveDataCollectionList = ListUtil.newArrayList();
 				for (V2_PmOrder order : orders) {
 					String ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
 					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
@@ -1172,7 +1181,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						saveList.add(order);
 						// 更新检查项
 						Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
-						List<UnstructuredDataCollection> dataCollections = collectionRepository.findCKByBoUuid(order.getId(), "pm-checklist-report");
+
+						List<UnstructuredDataCollection> dataCollections = Optional.ofNullable(dataCollectionMap.get(order.getId())).orElse(ListUtil.empty());
 						if (order.isFinished() && ObjectUtil.isEmpty(dataCollections)) {
 							continue;
 						}
@@ -1186,24 +1196,29 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						unColl.setBoUuid(order.getId());
 						unColl.setSchemaId(pmOrderRule.getPerformanceReport());
 						List<UnstructuredData> dataList = ListUtil.newArrayList();
-						List<PmOrderRuleCheckList> items = orderRuleCheckListRepository.findAllByRuleUID(pmOrderRule.getUid());
+						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
 						for (PmOrderRuleCheckList item : items) {
 							UnstructuredData unstructuredData = dataMap.get(item.getUid());
 							UnstructuredData data = new UnstructuredData();
 							data.setKey(item.getUid());
-							if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId()))) {
+							if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId())) && ObjectUtil.isAllNotEmpty(unstructuredData.getClazz(), unstructuredData.getValueSerialized())) {
 								data.setValue(unstructuredData.getValue());
 							}
 							data.setName(item.getName());
 							data.setRemark(item.getRemark());
+							data.setPeriod(item.getPeriod());
 							data.setClazz("java.lang.String");
 							dataList.add(data);
 						}
 						unColl.setData(dataList);
-						collectionRepository.delete(dataCollections);
-						collectionRepository.save(unColl);
+						deleteDataCollectionList.addAll(dataCollections);
+						saveDataCollectionList.add(unColl);
 					}
 				}
+				Set<String> collectionIds = deleteDataCollectionList.stream().map(UnstructuredDataCollection::getId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+				adminConsoleMapper.deleteUnStructureDataByCollectionIds(collectionIds);
+				adminConsoleMapper.deleteUnStructureDataCollectionByIds(collectionIds);
+				collectionRepository.save(saveDataCollectionList);
 				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
 				for (Map.Entry<String, List<V2_PmOrder>> entry : pmOrderMap.entrySet()) {
 					List<String> orderIds = entry.getValue().stream().map(V2_PmOrder::getId).collect(Collectors.toList());
@@ -1212,6 +1227,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 			}
 		} catch (Exception e) {
+
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
 		}
 	}

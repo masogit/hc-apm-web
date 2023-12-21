@@ -1,11 +1,12 @@
 package com.ge.apm.view.pm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.dao.UnstructuredDataRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.bo.parser.SchemaParser;
@@ -22,8 +23,8 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
-import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +76,12 @@ public class PmReportService {
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private UnstructuredDataCollectionRepository dataCollectionRepository;
+
+    @Autowired
+    private UnstructuredDataRepository unstructuredDataDao;
 
     /**
      * Render Dynamic Table content.
@@ -201,7 +208,7 @@ public class PmReportService {
         return "n/a";
     }
 
-    private Map<String, Object> populateReportContent(V2_PmOrder pmOrder, List<UnstructuredDataCollection> reportList, Map<String, UnstructuredData> hmCheck, List<V2_WorkOrderCoworker> coWorkerList, List<V2_WorkOrder_Detail> accessoryList, List<PmOrderSteps> pmOrderSteps, List<PmOrderRuleCheckList> pmCheckItemList) {
+    private Map<String, Object> populateReportContent(V2_PmOrder pmOrder, List<UnstructuredDataCollection> reportList, Map<String, UnstructuredData> hmCheck, List<V2_WorkOrderCoworker> coWorkerList, List<V2_WorkOrder_Detail> accessoryList, List<PmOrderSteps> pmOrderSteps, List<PmOrderRuleCheckList> pmCheckItemList, List<UnstructuredData> dataList) {
         Map<String, Object> content = new HashMap<>();
 
         // Device information
@@ -428,17 +435,31 @@ public class PmReportService {
 
         // Check List
         List<Map<String, Object>> checkListTable = new ArrayList<>();
-        if (pmCheckItemList != null) {
-            for (PmOrderRuleCheckList item : pmCheckItemList) {
-                Map<String, Object> checkListMap = new HashMap<>();
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.NAME.toString(), item.getName());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.PERIOD.toString(), item.getPeriod());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.CONTENT.toString(), item.getRemark());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), FieldValueMessageController.fieldValue("checkItem", getCheckListResult(item.getUid(), hmCheck)));
-
-                checkListTable.add(checkListMap);
+        for (UnstructuredData data : dataList) {
+            Map<String, Object> checkListMap = new HashMap<>();
+            checkListMap.put(MaintenanceTemplate.CheckListInfo.NAME.toString(), data.getName());
+            checkListMap.put(MaintenanceTemplate.CheckListInfo.PERIOD.toString(), data.getPeriod());
+            checkListMap.put(MaintenanceTemplate.CheckListInfo.CONTENT.toString(), data.getRemark());
+            String valueData = "n/a";
+            try {
+                valueData = (String) data.getValue();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), FieldValueMessageController.fieldValue("checkItem", valueData));
+            checkListTable.add(checkListMap);
         }
+//        if (pmCheckItemList != null) {
+//            for (PmOrderRuleCheckList item : pmCheckItemList) {
+//                Map<String, Object> checkListMap = new HashMap<>();
+//                checkListMap.put(MaintenanceTemplate.CheckListInfo.NAME.toString(), item.getName());
+//                checkListMap.put(MaintenanceTemplate.CheckListInfo.PERIOD.toString(), item.getPeriod());
+//                checkListMap.put(MaintenanceTemplate.CheckListInfo.CONTENT.toString(), item.getRemark());
+//                checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), FieldValueMessageController.fieldValue("checkItem", getCheckListResult(item.getUid(), hmCheck)));
+//
+//                checkListTable.add(checkListMap);
+//            }
+//        }
         content.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), checkListTable);
 
 
@@ -538,9 +559,9 @@ public class PmReportService {
 
          List<PmOrderRuleCheckList> pmCheckItemList = null;
         Map<String, UnstructuredData> hmCheck = null;
-        //        if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+        UnstructuredDataCollection unsD = dataCollectionRepository.findCKByUId(pmOrder.getId());
+        List<UnstructuredData> dataList = Optional.ofNullable(unsD).map(UnstructuredDataCollection::getId).map(unstructuredDataDao::findByCollectionId).orElse(ListUtil.empty());
         if(rule != null){
-            // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
             pmCheckItemList = pmOrderService.getPmOrderRuleCheckLists(pmOrder, rule);
             hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
         }
@@ -567,7 +588,7 @@ public class PmReportService {
 
         if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
-        Map<String, Object> datas = populateReportContent(pmOrder, reportList, hmCheck, coWorkerList, accessoryList, pmOrderSteps, pmCheckItemList);
+        Map<String, Object> datas = populateReportContent(pmOrder, reportList, hmCheck, coWorkerList, accessoryList, pmOrderSteps, pmCheckItemList, dataList);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
