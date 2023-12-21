@@ -161,6 +161,9 @@ public class WorkOrderExportService {
         if (ObjectUtil.isNotEmpty(v2WorkOrderReportDto.getAssetTypeGroupEncodedSet())) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, v2WorkOrderReportDto.getAssetTypeGroupEncodedSet()));
         }
+        if (StringUtils.isNotEmpty(v2WorkOrderReportDto.getSrNum())) {
+            searchFilters.add(new SearchFilter("srNum", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSrNum()));
+        }
         List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(),v2WorkOrderReportDto.getClinicalDept());
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         if(!assetIds.isEmpty()) {
