@@ -145,6 +145,24 @@
             </h:panelGroup>
         </p:panelGrid>
     </h:form>
+    <h:form id="searchBySrNum">
+        <p:fieldset legend="#{msg.FilterCondition}">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <label class="label">工单号*</label>
+                    <p:inputText value="#{workOrderReportExportController.srNumStr}" required="true" requiredMessage="工单号不得为空"/>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <p:commandButton value="工单号检索" actionListener="#{workOrderReportExportController.previewDataBySrNum}"
+                                 icon="ui-icon-arrowthick-1-s" validateClient="true"
+                                 update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
+                </p:commandButton>
+            </h:panelGroup>
+        </p:panelGrid>
+    </h:form>
 
     <h:form id="dataListForm">
         <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item" widgetVar="varDataList"
