@@ -27,7 +27,7 @@
                 </h:outputText>
             </p:column>
             <p:column headerText="#{msg.department}" >
-                <h:outputText value="#{item.department}"/>
+                <h:outputText value="#{adverseEventManagementController.reporterList(item.department)}"/>
             </p:column>
 
             <p:column headerText="#{msg.occurredPlace}" >

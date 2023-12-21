@@ -33,4 +33,5 @@ public class V2WorkOrderReportDto implements Serializable {
     private List<OrgInfo> clinicalDeptList;
     private Map<String,String> filterMap = MapUtil.newHashMap();
     private Set<String> assetTypeGroupEncodedSet;
+    private String srNum;
 }
