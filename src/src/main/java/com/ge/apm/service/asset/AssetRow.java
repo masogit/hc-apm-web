@@ -346,8 +346,11 @@ public class AssetRow {
 //                if (DELETE_MARK.equals(fieldValueOfString)) {
 //                    fieldValueOfString = null;
 //                }
-                fieldValueOfString=fieldValueOfString.split(" ")[0];
-
+                if (!StringUtils.isEmpty(fieldValueOfString)) {
+                    fieldValueOfString=fieldValueOfString.split(" ")[0];
+                }else{
+                    fieldValueOfString = null;
+                }
                 method.invoke(assetInfo, fieldValueOfString);
             } else {
                 //if empty, keep the old value, so there is no else clause

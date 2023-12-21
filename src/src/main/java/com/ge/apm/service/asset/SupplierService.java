@@ -146,7 +146,7 @@ public class SupplierService {
         supplierDao.save(supplier);
 
         assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
-        assetInfoDao.updateMaintainerName(supplier.getName(), supplier.getTel(), String.valueOf(supplier.getId()), supplier.getTenantUID());
+        assetInfoDao.updateMaintainerName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
         assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
 
     }

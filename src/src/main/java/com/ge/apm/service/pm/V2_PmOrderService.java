@@ -563,7 +563,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment,
-                                String currentPersonIdBatch) {
+                                String currentPersonIdBatch,List<V2_BlobObject> picBeforeList,List<V2_BlobObject> picAfterList) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
@@ -590,6 +590,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setCoworkers(coDetails);
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
         formData.setAssignee(currentPersonIdBatch); // （修改记录验收人）
+        formData.setAttachmentsTwo(attachment);
+        formData.setAttachments(picAfterList);
+        formData.setPrePmAttachments(picBeforeList);
         String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
@@ -652,7 +655,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
 
-    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
+    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment,List<V2_BlobObject> picBeforeList,List<V2_BlobObject> picAfterList) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         //formData.setAttachments(attachment);
@@ -666,6 +669,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         selectedPmOrder.setCurrentStepName("暂时保存");
         formData.setDetails(accDetails);
         formData.setCoworkers(coDetails);
+        formData.setAttachmentsTwo(attachment);
+        formData.setAttachments(picAfterList);
+        formData.setPrePmAttachments(picBeforeList);
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));

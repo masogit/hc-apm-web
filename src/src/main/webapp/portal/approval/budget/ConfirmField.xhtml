@@ -43,13 +43,13 @@
                               <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmEquipmentCategory}" required="true" requiredMessage="设备品目 #{msg.ValidationRequire}"/>
                            </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">采购确认数量(台)<span style="color: red">*</span></p:outputLabel>
+                                <p:outputLabel class="label">确认数量(台)<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" class="confirm" required="true" requiredMessage="数量(台) #{msg.ValidationRequire}"
                                                 value="#{multiLevelApprovalController.confirmBudget.confirmQuantity}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                 <p:outputLabel class="label">采购确认价格(万元)<span style="color: red">*</span></p:outputLabel>
-                                 <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                                 <p:outputLabel class="label">确认预算价(万元)<span style="color: red">*</span></p:outputLabel>
+                                 <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
                                                  value="#{multiLevelApprovalController.confirmBudget.confirmPrice}"/>
                              </h:panelGroup>
                               <h:panelGroup>
@@ -85,7 +85,7 @@
                               </h:panelGroup>
                               <h:panelGroup>
                                   <p:outputLabel class="label">栏标价(万元)<span style="color: red">*</span></p:outputLabel>
-                                  <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="栏标价(万元) #{msg.ValidationRequire}"
+                                  <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="栏标价(万元) #{msg.ValidationRequire}"
                                                   value="#{multiLevelApprovalController.confirmBudget.confirmMaximumPrice}" />
                               </h:panelGroup>
                               <h:panelGroup>

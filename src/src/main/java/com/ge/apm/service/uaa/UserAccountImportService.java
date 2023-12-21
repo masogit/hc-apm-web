@@ -34,6 +34,7 @@ import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 
 @Service
@@ -590,14 +591,18 @@ public class UserAccountImportService {
     }
 
     private void addClinicalUserOrg(List<UserOrgInfo> listUserOrgInfo, OrgInfo tempOrgInfo, String userUid) {
-        List<OrgInfo> listOrgInfo = orgInfoRepository.fetchOrgByParentUid(tempOrgInfo.getUid());
-        if (listOrgInfo != null) {
+        List<OrgInfo> listOrgInfo = orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(tempOrgInfo.getUid()));
+        if (!CollectionUtils.isEmpty(listOrgInfo)) {
             for (OrgInfo tempOrg : listOrgInfo) {
-                UserOrgInfo tempUserOrgInfo = new UserOrgInfo();
-                tempUserOrgInfo.setOrgType(tempOrg.getOrgType());
-                tempUserOrgInfo.setOrgUid(tempOrg.getUid());
-                tempUserOrgInfo.setUserUid(userUid);
-                listUserOrgInfo.add(tempUserOrgInfo);
+                String uid = tempOrg.getUid();
+                boolean b = listUserOrgInfo.stream().anyMatch(item -> item.getOrgUid().equals(uid));
+                if(!b){
+                    UserOrgInfo tempUserOrgInfo = new UserOrgInfo();
+                    tempUserOrgInfo.setOrgType(tempOrg.getOrgType());
+                    tempUserOrgInfo.setOrgUid(uid);
+                    tempUserOrgInfo.setUserUid(userUid);
+                    listUserOrgInfo.add(tempUserOrgInfo);
+                }
             }
         }
     }

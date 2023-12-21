@@ -329,6 +329,9 @@ public class WorkOrderReportProvider {
                     str = new StringBuilder(str.substring(0, str.length() - 1));
                     sb.append(" and ai.asset_type in (").append(str).append(") ");
                     break;
+                case "srNum":
+                    sb.append(" and sr.sr_num = '").append(value).append("'");
+                    break;
                 default:
                     break;
             }
