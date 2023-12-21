@@ -156,6 +156,12 @@
             <p:inputText id="manufacture" value="#{assetInfoDetailController.selected.manufacture}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'manufactureTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.manufactureTel}</label>
+            <p:inputText id="manufactureTel" value="#{assetInfoDetailController.selected.manufactureTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'makerShortName')}">
         <h:panelGroup >
             <label class="label">#{msg.makerShortName}</label>

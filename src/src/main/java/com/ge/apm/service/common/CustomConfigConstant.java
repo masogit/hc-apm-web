@@ -67,7 +67,7 @@ public class CustomConfigConstant {
                 "assetOwnerName", "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3",
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
-                "manufacture", "makerShortName",
+                "manufacture", "manufactureTel", "makerShortName",
                 "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassificationCode","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
@@ -110,7 +110,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
-                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
+                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "manufactureTel", "makerShortName", "vendor", "vendorTel",
                 "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
@@ -127,7 +127,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "manufactureTel", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {

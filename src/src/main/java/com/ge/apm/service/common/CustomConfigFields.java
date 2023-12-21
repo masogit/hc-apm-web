@@ -32,6 +32,7 @@ public enum CustomConfigFields {
     clinicalOwnerName(fieldName, "clinicalOwnerName" ,Text),  //使用责任人
     clinicalOwnerTel(fieldName, "clinicalOwnerTel" ,Text),   //使用责任人电话
     manufacture(fieldName, "manufacture" ,Text),   //制造商
+    manufactureTel(fieldName, "manufactureTel" ,Text),   //制造商电话
     makerShortName(label, "makerShortName" ,Text),   //品牌/制造商简称
     vendor(fieldName, "vendor" ,Text),    //供应商
     vendorTel(fieldName, "vendorTel" ,Text),   //供应商电话

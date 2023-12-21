@@ -792,9 +792,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         public GetAllElement invoke() {
-            List<String> uids = new ArrayList();
-            Set<Integer> parendAssetIds= new HashSet<Integer>();//父id集合
-            Set<Integer> suplierIds = new HashSet<Integer>();//供应商id集合
+            List<String> uids = new ArrayList<>();
+            Set<Integer> parendAssetIds= new HashSet<>();//父id集合
+            Set<Integer> suplierIds = new HashSet<>();//供应商id集合
             for (int i = 0; i < assetList.size(); i++) {
                 uids.add(assetList.get(i).getUid());
                 if(null !=assetList.get(i).getParentAssetId()){
@@ -802,6 +802,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 }
                 if(null!= assetList.get(i).getSupplierId()){
                     suplierIds.add(assetList.get(i).getSupplierId());
+                }
+                if(null!= assetList.get(i).getMaitananceId()){
+                    suplierIds.add(Integer.parseInt(assetList.get(i).getMaitananceId()));
+                }
+                if(null!= assetList.get(i).getManufactureId()){
+                    suplierIds.add(Integer.parseInt(assetList.get(i).getManufactureId()));
                 }
             }
 

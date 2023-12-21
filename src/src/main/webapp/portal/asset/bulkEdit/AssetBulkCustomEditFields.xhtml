@@ -252,6 +252,13 @@
         </h:panelGroup>
     </c:if>
 
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'manufactureTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactureTel}</label>
+            <p:inputText id="manufactureTel" value="#{assetInfoBulkEditController.selected.manufactureTel}" class="inputManufacture" readonly="true" />
+        </h:panelGroup>
+    </c:if>
+
     <!-- 供应商 下拉-->
     <c:if test="#{assetInfoBulkEditController.displayControl('vendor')}">
         <h:panelGroup><!--供应商 下拉-->
