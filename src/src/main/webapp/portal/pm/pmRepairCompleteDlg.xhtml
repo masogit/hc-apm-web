@@ -234,7 +234,6 @@
                                     <h:panelGroup>
                                         <p:selectOneMenu value="#{item.value}">
                                             <p:ajax listener="#{v2PmOrderController.hmCheckSet(item.key)}"></p:ajax>
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>
                                             <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
                                             <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
