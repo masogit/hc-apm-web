@@ -5,8 +5,13 @@
  */
 package com.ge.apm.dao;
 import com.ge.apm.domain.UnstructuredDataCollection;
+
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**
@@ -22,6 +27,9 @@ public interface UnstructuredDataCollectionRepository extends GenericRepositoryU
 
     @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type=?2",nativeQuery = true)
     public List<UnstructuredDataCollection> findCKByBoUuid(String boUuid,String boType);
+
+    @Query(value = "select * from unstructured_data_collection where bo_uuid in (?1) and bo_type=?2",nativeQuery = true)
+    public List<UnstructuredDataCollection> findCKByBoUuidIn(Collection<String> boUuids, String boType);
 
     @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type='pm-checklist-report'",nativeQuery = true)
     public UnstructuredDataCollection findCKByUId(String boUuid);

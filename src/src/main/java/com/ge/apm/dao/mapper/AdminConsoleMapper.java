@@ -3,6 +3,7 @@ package com.ge.apm.dao.mapper;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.V2_PmOrder;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -43,4 +44,22 @@ public interface AdminConsoleMapper {
 
     @Update("update  shared_asset_request set data_type = #{dataType} where site_uid = #{siteUid} and data_type is null")
     void updateBySiteUidSharedAssetRequest(@Param("dataType") Integer dataType,@Param("siteUid") String siteUid);
+
+    @Delete({
+            "<script>" +
+                    "delete from unstructured_data_collection where id in " +
+                    "<foreach item = 'item' index = 'index' collection = 'ids' open='(' separator=',' close=')'>" +
+                    "#{item}" +
+                    "</foreach>"+
+                    "</script>"})
+    int deleteUnStructureDataCollectionByIds(@Param("ids") Collection<String> ids);
+
+    @Delete({
+            "<script>" +
+                    "delete from unstructured_data where collection_id in " +
+                    "<foreach item = 'item' index = 'index' collection = 'collectionIds' open='(' separator=',' close=')'>" +
+                    "#{item}" +
+                    "</foreach>"+
+                    "</script>"})
+    int deleteUnStructureDataByCollectionIds(@Param("collectionIds") Collection<String> collectionIds);
 }
