@@ -1221,16 +1221,16 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				Set<String> collectionIds = deleteDataCollectionList.stream().map(UnstructuredDataCollection::getId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 				if(!CollectionUtils.isEmpty(collectionIds)){
-					adminConsoleMapper.deleteUnStructureDataByCollectionIds(collectionIds);   //TODO　判断非空
-					adminConsoleMapper.deleteUnStructureDataCollectionByIds(collectionIds);   //TODO　判断非空　
+					adminConsoleMapper.deleteUnStructureDataByCollectionIds(collectionIds);
+					adminConsoleMapper.deleteUnStructureDataCollectionByIds(collectionIds);
 				}
 				if(!CollectionUtils.isEmpty(saveDataCollectionList)){
-					collectionRepository.save(saveDataCollectionList);//TODO　判断非空　
+					collectionRepository.save(saveDataCollectionList);
 				}
 				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
 				for (Map.Entry<String, List<V2_PmOrder>> entry : pmOrderMap.entrySet()) {
 					List<String> orderIds = entry.getValue().stream().map(V2_PmOrder::getId).collect(Collectors.toList());
-					PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());   //TODO 判断非空
+					PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());
 					if(!CollectionUtils.isEmpty(orderIds) && pmOrderRule!=null){
 						adminConsoleMapper.updatePmOrderByIds(pmOrderRule, orderIds);
 					}
