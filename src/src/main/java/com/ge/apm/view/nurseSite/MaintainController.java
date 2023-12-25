@@ -156,7 +156,11 @@ public class MaintainController implements ServerEventInterface{
 		wrapper.ge("nsm.schedule_date", start);
 		wrapper.le("nsm.schedule_date", end);
 		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
-			wrapper.in("nsm.clinical_dept_uid", orgUidList);
+			wrapper.eq("nsm.tenant_uid", currentUser.getTenantUID());
+
+			wrapper.and().in("nsm.site_uid", orgUidList).or().in("nsm.tenant_uid", orgUidList)
+					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
+			.or().in("nsm.clinical_dept_uid", orgUidList);
 		} else {
 			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
