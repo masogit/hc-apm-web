@@ -179,7 +179,14 @@
 								<p:commandLink actionListener="#{maintainConfigController.removeOption(optionItem)}" process="@this" update=":checkItemCreateForm:optionsTable :checkItemCreateForm:DefaultValue" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
 							</p:column>
 						</p:dataTable>
-
+						<h:panelGroup>
+							<label class="label" style="font-size: medium; font-weight: bold">是否必填</label>
+							<p:selectOneRadio id="enable" value="#{maintainConfigController.objCheckItem.required}">
+								<p:ajax event="change" process="@this" />
+								<f:selectItem itemLabel="是" itemValue="true"/>
+								<f:selectItem itemLabel="否" itemValue="false"/>
+							</p:selectOneRadio>
+						</h:panelGroup>
 					</h:panelGroup>
 				</p:panelGrid>
 				<p:commandButton validateClient="true" actionListener="#{maintainConfigController.saveCheckListItem}"

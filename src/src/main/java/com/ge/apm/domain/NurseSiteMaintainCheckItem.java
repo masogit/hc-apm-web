@@ -80,6 +80,9 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	private String defaultValue;
 	@Column(name="options",columnDefinition = "TEXT")
 	private String options;
+
+	@Column(name="required")
+	private Boolean required;
 	public String getId() {
 		return id;
 	}
@@ -278,5 +281,16 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 				return "";
 			}
 		}
+	}
+
+	public Boolean getRequired() {
+		if(required == null){
+			required = Boolean.FALSE;
+		}
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
 	}
 }
