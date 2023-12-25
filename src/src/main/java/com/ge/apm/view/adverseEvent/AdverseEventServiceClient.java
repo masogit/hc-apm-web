@@ -52,18 +52,22 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (!isOkay(response)) {
             //如果失败则清除附件
-            adverseEvents.getDeviceFaultPerformFile().removeIf(v -> {
-                if (StringUtils.isEmpty(v.getId())) {
-                    return blobService.deleteBlobFilesByStorageId(v.getObjectId());
-                }
-                return false;
-            });
-            adverseEvents.getHarmPerformFile().removeIf(v -> {
-                if (StringUtils.isEmpty(v.getId())) {
-                    return blobService.deleteBlobFilesByStorageId(v.getObjectId());
-                }
-                return false;
-            });
+            if (!ObjectUtils.isEmpty(adverseEvents.getDeviceFaultPerformFile())) {
+                adverseEvents.getDeviceFaultPerformFile().removeIf(v -> {
+                    if (StringUtils.isEmpty(v.getId())) {
+                        return blobService.deleteBlobFilesByStorageId(v.getObjectId());
+                    }
+                    return false;
+                });
+            }
+            if (!ObjectUtils.isEmpty(adverseEvents.getDeviceFaultPerformFile())) {
+                adverseEvents.getHarmPerformFile().removeIf(v -> {
+                    if (StringUtils.isEmpty(v.getId())) {
+                        return blobService.deleteBlobFilesByStorageId(v.getObjectId());
+                    }
+                    return false;
+                });
+            }
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             String message = responseMap.get("message").toString();
             throw new RuntimeException(message);
