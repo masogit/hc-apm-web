@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -85,9 +86,14 @@ public class MaintainController implements ServerEventInterface{
 
 	private UaaService uaaService;
 
+	private OrgInfoRepository orgInfoRepository;
+
+	private List<String> userDeptScopeOrg;
+
 	@PostConstruct
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
+		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 
 		userContextService = WebUtil.getBean(UserContextService.class);
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -110,6 +116,7 @@ public class MaintainController implements ServerEventInterface{
 //		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
 		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
+		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
 //			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 //		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
@@ -162,7 +169,7 @@ public class MaintainController implements ServerEventInterface{
 					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
 			.or().in("nsm.clinical_dept_uid", orgUidList);
 		} else {
-			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().filter(item-> userDeptScopeOrg.contains(item.getUid())).map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
 		}
 		wrapper.groupBy("nsm.id");
