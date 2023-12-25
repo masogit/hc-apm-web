@@ -89,11 +89,11 @@
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="productInfo">
                                 <h:panelGroup>
                                     <label class="label">产品名称<span style="color:red">*</span></label>
-                                    <p:inputText id="productName" value="#{adverseEventApproveController.selected.assetName}" required="true"  requiredMessage="产品名称不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:inputText id="productName" value="#{adverseEventApproveController.selected.productName}" required="true"  requiredMessage="产品名称不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">注册证编号<span style="color:red">*</span></label>
-                                    <p:inputText id="registrationNum" value="#{adverseEventApproveController.selected.deviceNum}" required="true"  requiredMessage="注册证编号不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:inputText id="registrationNum" value="#{adverseEventApproveController.selected.registrationNum}" required="true"  requiredMessage="注册证编号不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
                                     <label class="label">曾用注册证编号</label>
