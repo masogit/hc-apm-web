@@ -10,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
@@ -234,6 +235,10 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type="edit";
+	}
+
+	public String editFeature(String tenantUid) {
+		return UrlEncryptController.encodeUrlParam("FeatureSetting?tenantUid="+ tenantUid);
 	}
 
 	public void prepareEdit(String type) {
