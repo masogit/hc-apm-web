@@ -1231,7 +1231,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 unColl.setBoType("pm-checklist-report");
                 PmOrderRule pmOrderRule = pmOrderService.acqPmOrderRule(selectedPmOrder);
                 if (pmOrderRule != null) {
-                    unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+                    unColl.setSchemaId(pmOrderRule.getUid());
                 }
                 //将检查项的数据保存到UnstructuredDataCollection中.
                 while (it.hasNext()) {
