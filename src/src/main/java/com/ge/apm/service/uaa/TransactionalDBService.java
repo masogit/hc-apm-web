@@ -24,12 +24,12 @@ public class TransactionalDBService {
     private UnstructuredDataCollectionRepository collectionRepository;
 
     @Transactional
-    public void savePmOrderDB(Map<String, PmOrderRule> ruleMap, List<V2_PmOrder> saveList, List<UnstructuredDataCollection> saveDataCollectionList, Set<String> collectionIds) {
+    public void savePmOrderDB(Map<String, PmOrderRule> ruleMap, List<V2_PmOrder> saveList, List<UnstructuredDataCollection> saveDataCollectionList, Set<String> collectionIds) throws InterruptedException {
+        Thread.sleep(1000);
         if(!CollectionUtils.isEmpty(collectionIds)){
             adminConsoleMapper.deleteUnStructureDataByCollectionIds(collectionIds);
             adminConsoleMapper.deleteUnStructureDataCollectionByIds(collectionIds);
         }
-        System.out.println("save =============================================");
         if(!CollectionUtils.isEmpty(saveDataCollectionList)){
             try {
                 collectionRepository.save(saveDataCollectionList);
@@ -44,6 +44,7 @@ public class TransactionalDBService {
             PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());
             if(!CollectionUtils.isEmpty(orderIds) && pmOrderRule!=null){
                 adminConsoleMapper.updatePmOrderByIds(pmOrderRule, orderIds);
+                Thread.sleep(500);
             }
         }
     }
