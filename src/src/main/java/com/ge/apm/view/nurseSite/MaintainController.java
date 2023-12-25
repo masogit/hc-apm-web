@@ -126,7 +126,7 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID()) ||  orgUidList.contains(item.getTenantUID()) ||  orgUidList.contains(item.getInstitutionUID())  ||  orgUidList.contains(item.getHospitalUID()) ||  orgUidList.contains(item.getSiteUID()) ).collect(Collectors.toList());
 		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
