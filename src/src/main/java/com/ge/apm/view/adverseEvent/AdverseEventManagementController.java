@@ -249,6 +249,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             selectSite = (OrgInfo) event.getTreeNode().getData();
         }
+        loadClinicalDeptList();
     }
 
     public void onAdverseSelectSiteTreeNode(NodeSelectEvent event) {
@@ -266,7 +267,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public TreeNode getDeptOrgTree() {
-        return uaaService.getOrgAccessTreeByUser(UserContextService.getCurrentUserAccount());
+        return uaaService.getOrgTreeBySite(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
     @Override
