@@ -46,18 +46,24 @@
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
-                <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">
-                    <h:outputLabel   value="#{userContextService.loginUserOrgInfo.orgFullName}"/>
-                    <!--                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}" id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">-->
-                    <!--                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />-->
-                    <!--                        <f:selectItem itemLabel="" itemValue=""/>-->
-                    <!--                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />-->
-                    <!--                    </h:selectOneMenu>-->
-                </h:form>
+<!--                <i class="fa fa-user-circle fa-2x" aria-hidden="true"-->
+<!--                   title="#{userContextService.userName}-#{userContextService.loginUserOrgInfo.orgFullName}"></i>-->
             </div>
-            <div class="profile-name">
-                #{userContextService.userName}
+            <div class="btn-group closed" style="font-size: 14px; text-align: right;" >
+                <a class="btn btn-primary"><i class="fa fa-building fa-fw"></i>#{userContextService.loginUserOrgInfo.orgFullName}</a>
+                <a class="btn btn-primary"><i class="fa fa-user fa-fw"></i>#{userContextService.userName}</a>
             </div>
+<!--            <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">-->
+<!--                <h:outputLabel   value="#{userContextService.loginUserOrgInfo.orgFullName}"/>-->
+<!--                &lt;!&ndash;                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}" id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <f:selectItem itemLabel="" itemValue=""/>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />&ndash;&gt;-->
+<!--                &lt;!&ndash;                    </h:selectOneMenu>&ndash;&gt;-->
+<!--            </h:form>-->
+<!--            <div class="profile-name">-->
+<!--                #{userContextService.userName}-->
+<!--            </div>-->
         </div>
     </div>
     <p:dialog widgetVar="statusDialog" modal="false" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
