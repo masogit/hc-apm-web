@@ -134,10 +134,7 @@ public class AssetInfoDetailController {
         Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).map(supplierIds::add);
         Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).map(supplierIds::add);
         List<Supplier> suppliers = supplierDao.findByIdIn(supplierIds);
-        Map<Integer, String> supplierMap = MapUtil.newHashMap();
-        if (ObjectUtil.isNotEmpty(suppliers)) {
-            supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getTel));
-        }
+        Map<Integer, String> supplierMap = suppliers.stream().collect(HashMap::new, (map, item) -> map.put(item.getId(), item.getTel()), HashMap::putAll);
         selected.setVendorTel(supplierMap.get(selected.getSupplierId()));
         selected.setManufactureTel(supplierMap.get(Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).orElse(null)));
         selected.setMaitananceTel(supplierMap.get(Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).orElse(null)));
