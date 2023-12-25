@@ -325,6 +325,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setOriginPlace(assetSelected.getProductPlace());
         this.selected.setDeviceNum(assetSelected.getDepartNum());
         this.selected.setRegistrationNum(assetSelected.getRegistrationNo());
+        this.selected.setProductName(assetSelected.getName());
         this.selected.setPreviouslyRegistrationReport(false);
         this.selected.setProductionDate(assetSelected.getManufactDate());
         this.selected.setModel(assetSelected.getFunctionType());
@@ -340,6 +341,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setPreviouslyRegistrationReport(null);
         this.selected.setProductionDate(null);
         this.selected.setModel(null);
+        this.selected.setProductName(assetSelected.getName());
     }
 
     @Override
