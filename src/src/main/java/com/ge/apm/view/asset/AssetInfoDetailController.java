@@ -20,6 +20,8 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
@@ -132,7 +134,10 @@ public class AssetInfoDetailController {
         Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).map(supplierIds::add);
         Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).map(supplierIds::add);
         List<Supplier> suppliers = supplierDao.findByIdIn(supplierIds);
-        Map<Integer, String> supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getTel));
+        Map<Integer, String> supplierMap = MapUtil.newHashMap();
+        if (ObjectUtil.isNotEmpty(suppliers)) {
+            supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getTel));
+        }
         selected.setVendorTel(supplierMap.get(selected.getSupplierId()));
         selected.setManufactureTel(supplierMap.get(Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).orElse(null)));
         selected.setMaitananceTel(supplierMap.get(Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).orElse(null)));
