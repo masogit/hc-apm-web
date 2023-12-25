@@ -7,9 +7,9 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
-        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
-        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+<!--        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>-->
+<!--        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>-->
+<!--        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>-->
         <style type="text/css">
             .grid-radio td {
                 padding: .5rem;
@@ -524,7 +524,7 @@
                             </h:panelGroup>
                         </p:tab>
                     </p:accordionPanel>
-                        
+
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup id="buttonGroup">
                             <p:commandButton value="事件暂存" actionListener="#{adverseEventManagementController.tempSaveAdverseEvent(1)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventManagementController.selected.status eq null or adverseEventManagementController.selected.status == 0 or adverseEventManagementController.selected.status == 1}" validateClient="true" update="AdverseEventCreateForm AdverseEventSearchForm"/>
