@@ -342,4 +342,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public OrgInfo findFirstByTenantUIDAndOrgCode(String tenantUID, String orgCode);
 
+
+    @Query(nativeQuery = true, value = "select  distinct o.uid from org_info o , user_org uo " +
+            " where uo.org_uid in (o.tenant_uid, o.institution_uid,o.hospital_uid,o.site_uid, o.uid) and uo.user_uid = ? and o.org_type = 4 ")
+    List<String> getUserDeptScope(String userUID);
+
 }
