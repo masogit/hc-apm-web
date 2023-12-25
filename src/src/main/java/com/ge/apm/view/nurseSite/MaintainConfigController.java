@@ -797,6 +797,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(checkItem.getFieldType());
 		String options = checkItem.getOptions();
+		p.setRequired(checkItem.getRequired());
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{

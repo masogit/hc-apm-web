@@ -142,7 +142,14 @@
                             </p:dataTable>
 
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label" style="font-size: medium; font-weight: bold">是否必填</label>
+                            <p:selectOneRadio id="enable" value="#{maintainCheckItemController.selected.required}">
+                                <p:ajax event="change" process="@this" />
+                                <f:selectItem itemLabel="是" itemValue="true"/>
+                                <f:selectItem itemLabel="否" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
 					</p:panelGrid>
 
 					<p:commandButton validateClient="true" actionListener="#{maintainCheckItemController.save}" update=":growl,:maintainConfigCheckItemListForm"
