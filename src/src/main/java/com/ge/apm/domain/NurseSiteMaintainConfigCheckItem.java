@@ -5,6 +5,7 @@ import com.ge.apm.domain.pure.TableOption;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,7 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private List<TableOption> options=new ArrayList<>();
 	private Boolean checkValue=Boolean.TRUE;
 	private Date dateValue;
+	private Boolean required;
 	public String getId() {
 		return id;
 	}
@@ -174,5 +176,16 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 				return "";
 			}
 		}
+	}
+
+	public Boolean getRequired() {
+		if(required == null){
+			required=Boolean.FALSE;
+		}
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
 	}
 }

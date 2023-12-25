@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
@@ -29,6 +30,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -361,7 +363,13 @@ public class MaintainController implements ServerEventInterface{
 	// }
 	// }
 	// }
-
+	private void addErrMessage(String str) {
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,str, null);
+		FacesContext currentInstance = FacesContext.getCurrentInstance();
+		HttpServletResponse response = (HttpServletResponse) currentInstance.getExternalContext().getResponse();
+		response.setStatus(400);
+		currentInstance.addMessage(null, message);
+	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
 		FacesContext.getCurrentInstance().addMessage(null, message);

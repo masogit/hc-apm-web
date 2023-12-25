@@ -200,6 +200,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(checkItem.getFieldType());
+		p.setRequired(checkItem.getRequired());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);

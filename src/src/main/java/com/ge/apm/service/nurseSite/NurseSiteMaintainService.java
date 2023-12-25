@@ -205,6 +205,7 @@ public class NurseSiteMaintainService {
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(fieldType);
+		p.setRequired(checkItem.getRequired());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
