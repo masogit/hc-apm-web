@@ -126,7 +126,7 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID()) ||  orgUidList.contains(item.getTenantUID()) ||  orgUidList.contains(item.getInstitutionUID())  ||  orgUidList.contains(item.getHospitalUID()) ||  orgUidList.contains(item.getSiteUID()) ).collect(Collectors.toList());
 		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
@@ -156,7 +156,11 @@ public class MaintainController implements ServerEventInterface{
 		wrapper.ge("nsm.schedule_date", start);
 		wrapper.le("nsm.schedule_date", end);
 		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
-			wrapper.in("nsm.clinical_dept_uid", orgUidList);
+			wrapper.eq("nsm.tenant_uid", currentUser.getTenantUID());
+
+			wrapper.and().in("nsm.site_uid", orgUidList).or().in("nsm.tenant_uid", orgUidList)
+					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
+			.or().in("nsm.clinical_dept_uid", orgUidList);
 		} else {
 			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
