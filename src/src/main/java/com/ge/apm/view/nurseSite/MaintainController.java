@@ -8,6 +8,7 @@ import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -80,8 +81,12 @@ public class MaintainController implements ServerEventInterface{
 
 	private boolean isSelectAll = Boolean.FALSE;
 
+	private UaaService uaaService;
+
 	@PostConstruct
 	protected void init() {
+		uaaService = WebUtil.getBean(UaaService.class);
+
 		userContextService = WebUtil.getBean(UserContextService.class);
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		nurseSiteMaintainService.init();
@@ -99,10 +104,12 @@ public class MaintainController implements ServerEventInterface{
 		this.loadMaintainData();
 		OrgInfo selectedOrg = searchController.getSelectedOrg();
 		List<String> accessOrgDeptUidAll = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
-		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
-		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
-			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-		}
+//		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
+//		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
+		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+//			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+//		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
 		wrapper.in("nsmc.clinical_dept_uid", accessOrgDeptUidAll);
 		wrapper.eq("nsmc.deleted", false);
