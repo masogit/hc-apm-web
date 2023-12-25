@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -80,8 +82,17 @@ public class MaintainController implements ServerEventInterface{
 
 	private boolean isSelectAll = Boolean.FALSE;
 
+	private UaaService uaaService;
+
+	private OrgInfoRepository orgInfoRepository;
+
+	private List<String> userDeptScopeOrg;
+
 	@PostConstruct
 	protected void init() {
+		uaaService = WebUtil.getBean(UaaService.class);
+		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+
 		userContextService = WebUtil.getBean(UserContextService.class);
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		nurseSiteMaintainService.init();
@@ -99,10 +110,13 @@ public class MaintainController implements ServerEventInterface{
 		this.loadMaintainData();
 		OrgInfo selectedOrg = searchController.getSelectedOrg();
 		List<String> accessOrgDeptUidAll = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
-		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
-		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
-			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-		}
+//		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
+//		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
+		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
+//			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+//		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
 		wrapper.in("nsmc.clinical_dept_uid", accessOrgDeptUidAll);
 		wrapper.eq("nsmc.deleted", false);
@@ -117,7 +131,7 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID()) ||  orgUidList.contains(item.getTenantUID()) ||  orgUidList.contains(item.getInstitutionUID())  ||  orgUidList.contains(item.getHospitalUID()) ||  orgUidList.contains(item.getSiteUID()) ).collect(Collectors.toList());
 		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
@@ -147,9 +161,13 @@ public class MaintainController implements ServerEventInterface{
 		wrapper.ge("nsm.schedule_date", start);
 		wrapper.le("nsm.schedule_date", end);
 		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
-			wrapper.in("nsm.clinical_dept_uid", orgUidList);
+			wrapper.eq("nsm.tenant_uid", currentUser.getTenantUID());
+
+			wrapper.and().in("nsm.site_uid", orgUidList).or().in("nsm.tenant_uid", orgUidList)
+					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
+			.or().in("nsm.clinical_dept_uid", orgUidList);
 		} else {
-			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().filter(item-> userDeptScopeOrg.contains(item.getUid())).map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
 		}
 		wrapper.groupBy("nsm.id");
