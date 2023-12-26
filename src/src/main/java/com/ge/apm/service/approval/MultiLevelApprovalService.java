@@ -45,10 +45,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -1455,7 +1457,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public void saveConfirmInfoBudgetApp(String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm) {
+    public void saveConfirmInfoBudgetApp(PurchaseOrderInfo purchaseOrderInfoV,String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm) {
         BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
         budgetApplicationAsset.setConfirmApplicationDeptId(budgetApplicationAssetConfirm.getConfirmApplicationDeptId());
         budgetApplicationAsset.setConfirmEquipmentCategory(budgetApplicationAssetConfirm.getConfirmEquipmentCategory());
@@ -1471,5 +1473,23 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         budgetApplicationAsset.setConfirmMaximumPrice(budgetApplicationAssetConfirm.getConfirmMaximumPrice());
         budgetApplicationAsset.setConfirmRemark(budgetApplicationAssetConfirm.getConfirmRemark());
         budgetApplicationAssetRepository.save(budgetApplicationAsset);
+
+        //处理采购数量和采购金额
+        List<SearchFilter> searchFilterAssets = new ArrayList<>();
+        searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                SearchFilter.Operator.EQ,purchaseOrderInfoV.getId()));
+        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
+        int applicationQuantitySumResult = 0;
+        for(BudgetApplicationAsset curApplicationBudget:budgetApplicationAssets){
+            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
+            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                    0:curApplicationBudget.getConfirmQuantity();
+        }
+        purchaseOrderInfoV.setTotalPrice(totalAmount.get());
+        purchaseOrderInfoV.setPurchaseQuantity(applicationQuantitySumResult);
+        purchaseOrderInfoRepository.save(purchaseOrderInfoV);
+
     }
 }
