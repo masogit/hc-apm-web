@@ -1220,6 +1220,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 								dataList.add(data);
 							}
 						}
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
 					}
 					if (ObjectUtil.isEmpty(pmOrderRule)) {
 						continue;
@@ -1249,7 +1258,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				// 保存数据库
 				logger.info("batchUpdatePmOrderFields save db ===== orderSize : {} collectionSize : {}", saveList.size(), saveDataCollectionList.size());
-				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
+//				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
 			}
 		} catch (Exception e) {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
