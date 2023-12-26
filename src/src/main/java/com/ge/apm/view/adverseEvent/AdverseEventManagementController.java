@@ -131,8 +131,11 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
+        if (selectSite.getOrgType() == 4) {
+            selectSite = configCacheService.findOrgByUid(selectSite.getSiteUID());
+        }
+        selectAdverseSite = userContextService.getLoginUserOrgInfo();
         String selectedId = WebUtil.getRequestParameter("selectedId");
-        selectAdverseSite = selectSite;
         this.selectedMap = new HashMap();
         injuryPerformance = new ArrayList<>();
         mechanicalFailure = new ArrayList<>();
@@ -209,7 +212,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     //获取设备列表
     @Override
     protected Page<AdverseEvents> loadData(PageRequest pageRequest) {
-        return adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr);
+        return adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "report");
     }
 
     public String reporterList(String uid) {
@@ -267,7 +270,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public TreeNode getDeptOrgTree() {
-        return uaaService.getOrgTreeBySite(UserContextService.getCurrentUserAccount().getSiteUID());
+        return uaaService.getOrgAccessTreeByUser(UserContextService.getCurrentUserAccount());
     }
 
     @Override
@@ -359,17 +362,21 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
         processFile();
         selected.setStatus(status);
-        AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
-        if (!ObjectUtils.isEmpty(result)) {
-            selected = result;
-            if (status == 2 || status == 5) {
-                //提交后页面设置为只读并隐藏设备查询列表
-                readOnlyCreateForm = true;
-                renderedSearchForm = false;
+        try {
+            AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
+            if (!ObjectUtils.isEmpty(result)) {
+                selected = result;
+                if (status == 2 || status == 5) {
+                    //提交后页面设置为只读并隐藏设备查询列表
+                    readOnlyCreateForm = true;
+                    renderedSearchForm = false;
+                }
+                injuryPerformance.clear();
+                mechanicalFailure.clear();
+                MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
-            injuryPerformance.clear();
-            mechanicalFailure.clear();
-            MessageUtil.outPutReturnFacesMessage("save success", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }
 
