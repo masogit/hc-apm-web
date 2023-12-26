@@ -34,7 +34,8 @@ public class TransactionalDBService {
                 try {
                     collectionRepository.save(dataCollection);
                 } catch (Exception e) {
-                    logger.error("savePmOrderDBerr : {}", JSON.toJSONString(dataCollection), e);
+                    logger.error("savePmOrderDBerr dataCollection : {}", JSON.toJSONString(dataCollection), e);
+                    logger.error("savePmOrderDBerr saveDataCollectionList : {}", JSON.toJSONString(saveDataCollectionList), e);
                     throw new RuntimeException(e);
                 }
             }
