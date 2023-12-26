@@ -2917,11 +2917,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return unstructuredDataDao.findByCollectionId(unsD.getId());
     }
 
+    public  List<UnstructuredData> getOrderCheckList(V2_PmOrder v2PmOrder){
+        UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
+        if(unsD==null){
+            return Collections.emptyList();
+        }
+        return unstructuredDataDao.findByCollectionId(unsD.getId());
+    }
+
     //hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
     public void loadHmCheck(V2_PmOrder v2PmOrder) {
         hmCheck = new   HashMap<>();
         //pmCheckItemList:检查项
-        pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
+        pmCheckItemList = getOrderCheckList(v2PmOrder);
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
         if (ObjectUtil.isNotEmpty(unDataCollection)) {
             for (UnstructuredData data : pmCheckItemList) {
