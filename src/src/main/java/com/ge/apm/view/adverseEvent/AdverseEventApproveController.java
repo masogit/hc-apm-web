@@ -124,7 +124,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         if (StringUtils.isEmpty(eventStatusFilter)) {
             eventStatusFilter = "2,3,4,6,7,8";
         }
-        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr);
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "approve");
         currentPageAdverse = pageResult.getContent();
         return pageResult;
     }
@@ -182,16 +182,20 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
 
     public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
         selected.setStatus(status);
-        AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
-        if (!ObjectUtils.isEmpty(result)) {
-            selected = result;
-            if (status == 2 || status == 3) {
-                //提交后页面设置为只读并隐藏设备查询列表
-                readOnlyEditForm = false;
-            } else {
-                readOnlyEditForm = true;
+        try {
+            AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
+            if (!ObjectUtils.isEmpty(result)) {
+                selected = result;
+                if (status == 2 || status == 3) {
+                    //提交后页面设置为只读并隐藏设备查询列表
+                    readOnlyEditForm = false;
+                } else {
+                    readOnlyEditForm = true;
+                }
+                MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
-            MessageUtil.outPutReturnFacesMessage("save success", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }
 
@@ -200,7 +204,11 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
             MessageUtil.outPutReturnFacesMessage("请勾选需要上报的工单", FacesMessage.SEVERITY_INFO);
             return;
         }
-        adverseEventServiceClient.sendReportMail(UserContextService.getAccessToken(), emails.split(","), selectedMap.keySet().toArray(new String[selectedMap.size()]));
+        try {
+            adverseEventServiceClient.sendReportMail(UserContextService.getAccessToken(), emails.split(","), selectedMap.keySet().toArray(new String[selectedMap.size()]));
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+        }
         selectedMap.clear();
         MessageUtil.outPutReturnFacesMessage("发送成功！", FacesMessage.SEVERITY_INFO);
     }

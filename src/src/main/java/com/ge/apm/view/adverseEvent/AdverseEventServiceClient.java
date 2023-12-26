@@ -7,7 +7,7 @@ import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +26,7 @@ import java.util.*;
 
 @Service
 public class AdverseEventServiceClient extends MicroServiceInvoker {
-
+    @Autowired
     private BlobFileService blobService;
 
     public AdverseEvents tempSaveAdverseEvents(String token, AdverseEvents adverseEvents) throws RuntimeException{
@@ -79,14 +79,14 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         return JSON.parseObject(JSON.toJSONString(body.get("data")), AdverseEvents.class);
     }
 
-    public Page<AdverseEvents> getAdverseEventsById(String token, PageRequest pageRequest, String status, String queryStr) {
+    public Page<AdverseEvents> getAdverseEventsById(String token, PageRequest pageRequest, String status, String queryStr, String findType) {
         HttpEntity<String> requestEntity = new HttpEntity<>(createHttpHeaders(token));
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.add("page", (pageRequest.getPageNumber() == 0?1:pageRequest.getPageNumber()+1) + "");
         paramMap.add("pageSize", pageRequest.getPageSize() + "");
         paramMap.add("status", status);
         paramMap.add("queryStr", queryStr);
-        String gatewayURL = getGatewayURL(GatewayURL.ADVERSE_EVENTS_LIST);
+        String gatewayURL = getGatewayURL(findType.equals("report")?GatewayURL.ADVERSE_EVENTS_LIST:GatewayURL.APPROVE_ADVERSE_EVENTS_LIST);
         UriComponentsBuilder builderUrl = UriComponentsBuilder.fromHttpUrl(gatewayURL).queryParams(paramMap);
         ResponseEntity<String> response = template.exchange(builderUrl.toUriString(), HttpMethod.GET, requestEntity, String.class);
         if (response.getStatusCode() == HttpStatus.OK) {

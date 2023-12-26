@@ -48,8 +48,8 @@
                                                 value="#{multiLevelApprovalController.confirmBudget.confirmQuantity}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                 <p:outputLabel class="label">确认预算价(万元)<span style="color: red">*</span></p:outputLabel>
-                                 <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                                 <p:outputLabel class="label">确认预算价<span style="color: red">*</span></p:outputLabel>
+                                 <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="预算 #{msg.ValidationRequire}"
                                                  value="#{multiLevelApprovalController.confirmBudget.confirmPrice}"/>
                              </h:panelGroup>
                               <h:panelGroup>
@@ -84,8 +84,8 @@
                                   <p:inputText  value="#{multiLevelApprovalController.confirmBudget.confirmBrand}" class="confirm" required="true" requiredMessage="意向品牌 #{msg.ValidationRequire}" />
                               </h:panelGroup>
                               <h:panelGroup>
-                                  <p:outputLabel class="label">栏标价(万元)<span style="color: red">*</span></p:outputLabel>
-                                  <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="栏标价(万元) #{msg.ValidationRequire}"
+                                  <p:outputLabel class="label">栏标价<span style="color: red">*</span></p:outputLabel>
+                                  <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="栏标价 #{msg.ValidationRequire}"
                                                   value="#{multiLevelApprovalController.confirmBudget.confirmMaximumPrice}" />
                               </h:panelGroup>
                               <h:panelGroup>
@@ -98,7 +98,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{multiLevelApprovalController.saveConfirmInfoBudgetApp()}"
                                      value="#{msg.Save}" id="saveButton"
-                                     update=":BudgetApplicationDialogConfirm approvalDialogPurForm:budgetApplicationConfirmlist :growl"
+                                     update=":BudgetApplicationDialogConfirm approvalDialogPurForm:budgetApplicationConfirmlist approvalDialogPurForm:purchaseQuantity  approvalDialogPurForm:totalPrice  :growl"
                                      oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');"/>
                     <p:commandButton value="取消" immediate="true" icon="ui-icon-arrow-back" oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');" />
                 </h:panelGroup>

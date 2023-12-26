@@ -415,7 +415,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         if(budgetApplicationAsset.getApplicationPrice()!= null && budgetApplicationAsset.getApplicationQuantity()!= null){
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
-                    .setScale(4, BigDecimal.ROUND_DOWN));
+                    .setScale(2, RoundingMode.HALF_UP));
             budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
             budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
         }
@@ -424,7 +424,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         if(budgetApplicationAsset.getOfflineApplicationPrice()!= null && budgetApplicationAsset.getOfflineApplicationQuantity()!= null){
             budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
-                    .setScale(4, BigDecimal.ROUND_DOWN));
+                    .setScale(2, RoundingMode.HALF_UP));
             budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
             budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
         }

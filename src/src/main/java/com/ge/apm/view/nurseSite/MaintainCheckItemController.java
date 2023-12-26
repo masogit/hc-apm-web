@@ -96,6 +96,9 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         	if(this.selected.getKey()==null){
         		this.selected.setKey(date.getTime());
         	}
+        	if(StringUtils.isBlank(this.selected.getFieldType())){
+				this.selected.setRequired(Boolean.FALSE);
+			}
         	dao.save(this.selected);
         	nurseSiteMaintainService.updateNurseSiteMaintainCheckItem(this.selected, this.selected.getSiteUID());
             WebUtil.addSuccessMessage("保存成功");
@@ -210,6 +213,14 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 	public boolean dateType(){
 		if(selected != null){
 			return StringUtils.isEmpty(selected.getFieldType()) || "Date".equals(selected.getFieldType());
+		}else{
+			return false;
+		}
+	}
+
+	public  boolean  emptyType(){
+		if(selected != null){
+			return StringUtils.isEmpty(selected.getFieldType());
 		}else{
 			return false;
 		}
