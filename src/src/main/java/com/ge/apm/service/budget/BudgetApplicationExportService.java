@@ -42,7 +42,7 @@ public class BudgetApplicationExportService {
     public static final String FILE_TITLE = "医疗仪器设备年度采购申报表";
     public static final String OVER_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/over_fifty_thousand.docx";
     public static final String LESS_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/less_fifty_thousand.docx";
-    public static final int TOTAL_SPLIT = 5;
+    public static final int TOTAL_SPLIT = 50000;
     public static final String FILE_NAME_ROOT = "年度采购申购单";
 
     public static final String PURCHASE_ROOT = "采购汇总下载";
@@ -211,7 +211,6 @@ public class BudgetApplicationExportService {
                 mm.put("machineDeptOpinions", "");
             }
 
-
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
                 mm.put("importedOr", "");
@@ -324,7 +323,6 @@ public class BudgetApplicationExportService {
             return fileName;
         }
     }
-
 
     /**
      * 生成采购单文件
