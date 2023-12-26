@@ -1149,6 +1149,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		try {
 			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
 			Map<String, PmOrderRule> ruleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, t -> t));
+			List<PmOrderRuleCheckList> checkItemList = adminConsoleMapper.findAllPmOrderRuleCheckList();
+			Map<String, List<PmOrderRuleCheckList>> checkItemMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getRuleUID));
+			Map<String, List<PmOrderRuleCheckList>> checkUidMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getUid));
 			int offset = 0;
 			logger.info("batchUpdatePmOrderFields start");
 			while (true) {
@@ -1159,7 +1162,6 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				logger.info("batchUpdatePmOrderFields {}, {}", 5000, offset * 5000);
 				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-				Set<String> ruleUidList = orders.stream().map(V2_PmOrder::getPmRuleUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 				Set<String> orderUidList = orders.stream().map(V2_PmOrder::getId).collect(Collectors.toSet());
 				List<RelRuleAsset> relRuleAssets = adminConsoleMapper.findRelRuleAssetByAssetUidList(assetUidList);
 				Map<String, String> relRuleAssetMap = MapUtil.newHashMap();
@@ -1171,95 +1173,78 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				List<UnstructuredDataCollection> dataCollectionList = collectionRepository.findCKByBoUuidIn(orderUidList, "pm-checklist-report");
 				Map<String, List<UnstructuredDataCollection>> dataCollectionMap = dataCollectionList.stream().collect(Collectors.groupingBy(UnstructuredDataCollection::getBoUuid));
-				Map<String, List<PmOrderRuleCheckList>> checkItemMap = MapUtil.newHashMap();
-				if (ObjectUtil.isNotEmpty(ruleUidList)) {
-					List<PmOrderRuleCheckList> checkItemList = orderRuleCheckListRepository.findAllByRuleUIDBatch(ruleUidList);
-					checkItemMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getRuleUID));
-				}
 				List<V2_PmOrder> saveList = ListUtil.newArrayList();
-				List<UnstructuredDataCollection> deleteDataCollectionList = ListUtil.newArrayList();
 				List<UnstructuredDataCollection> saveDataCollectionList = ListUtil.newArrayList();
 				for (V2_PmOrder order : orders) {
-					String ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
-					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
+					UnstructuredDataCollection dataCollection = new UnstructuredDataCollection();
+					dataCollection.setBoType("pm-checklist-report");
+					dataCollection.setBoUuid(order.getId());
+					Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
+					List<UnstructuredData> dataList = ListUtil.newArrayList();
+					List<UnstructuredDataCollection> dataCollections = dataCollectionMap.get(order.getId());
+					if (order.isFinished() && ObjectUtil.isAllEmpty(dataCollections, order.getPmRuleUid())) {
+						continue;
+					}
 					if (ObjectUtil.isEmpty(order.getRuleLevel())) {
 						continue;
+					}
+					String ruleUid = order.getPmRuleUid();
+					if (ObjectUtil.isNotEmpty(dataCollections)) {
+						dataCollection = dataCollections.get(0);
+						dataMap = dataCollection.getData().stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
+					}
+					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
+						pmOrderRule = ruleMap.get(ruleUid);
 					}
 					if (ObjectUtil.isEmpty(pmOrderRule) && 4 == order.getRuleLevel()) {
 						pmOrderRule = ruleMap.get(order.getPmRuleUid());
 					}
-					if (ObjectUtil.isNotEmpty(pmOrderRule)) {
-						order.setPmRuleUid(pmOrderRule.getUid());
-						saveList.add(order);
-						// 更新检查项
-						Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
-						List<UnstructuredDataCollection> dataCollections = Optional.ofNullable(dataCollectionMap.get(order.getId())).orElse(ListUtil.empty());
-						if (order.isFinished() && ObjectUtil.isEmpty(dataCollections)) {
-							continue;
-						}
-						if (ObjectUtil.isNotEmpty(dataCollections)) {
-							UnstructuredDataCollection dataCollection = dataCollections.get(0);
-							List<UnstructuredData> dataList = dataCollection.getData();
-							dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
-						}
-						UnstructuredDataCollection unColl = new UnstructuredDataCollection();
-						unColl.setBoType("pm-checklist-report");
-						unColl.setBoUuid(order.getId());
-						unColl.setSchemaId(pmOrderRule.getUid());
-						List<UnstructuredData> dataList = ListUtil.newArrayList();
-						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
-						Map<String, PmOrderRuleCheckList> checkListMap = items.stream().collect(Collectors.toMap(PmOrderRuleCheckList::getUid, t -> t));
-						if (order.isFinished() || "Acceptance".equals(order.getCurrentStepId())) {
-							for (Map.Entry<String, UnstructuredData> dataEntry : dataMap.entrySet()) {
-								PmOrderRuleCheckList item = checkListMap.get(dataEntry.getKey());
-								UnstructuredData data = new UnstructuredData();
-								BeanUtils.copyProperties(dataEntry.getValue(), data);
-								data.setId(null);
-								data.setCollectionId(null);
-								data.setName(item.getName());
-								data.setRemark(item.getRemark());
-								data.setPeriod(item.getPeriod());
-								dataList.add(data);
-								unColl.setSchemaId(item.getRuleUID());
+					if (ObjectUtil.isNotEmpty(dataMap) && !dataMap.keySet().isEmpty()) {
+						for (Map.Entry<String, UnstructuredData> dataEntry : dataMap.entrySet()) {
+							List<PmOrderRuleCheckList> checkListList = checkUidMap.get(dataEntry.getKey());
+							if (ObjectUtil.isNotEmpty(checkListList) && checkListList.size() == 1) {
+								PmOrderRuleCheckList item = checkListList.get(0);
+								dataCollection.setSchemaId(item.getRuleUID());
 								order.setPmRuleUid(item.getRuleUID());
-							}
-						} else {
-							for (PmOrderRuleCheckList item : items) {
-//								UnstructuredData unstructuredData = dataMap.get(item.getUid());
-//								if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId()))) {
-//									if (ObjectUtil.isAllNotEmpty(unstructuredData.getClazz(), unstructuredData.getValueSerialized())) {
-//										data.setValue(unstructuredData.getValue());
-//										PmOrderRule rule = ruleMap.get(item.getRuleUID());
-//										if (ObjectUtil.isNotEmpty(rule)) {
-//											unColl.setSchemaId(rule.getUid());
-//											order.setPmRuleUid(rule.getUid());
-//										}
-//									} else {
-//										continue;
-//									}
-//								}
-//								if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId())) && ObjectUtil.isAllNotEmpty(unstructuredData.getClazz(), unstructuredData.getValueSerialized())) {
-//									data.setValue(unstructuredData.getValue());
-//								}
-								UnstructuredData data = new UnstructuredData();
-								data.setKey(item.getUid());
+								pmOrderRule = ruleMap.get(item.getRuleUID());
+								UnstructuredData data = dataEntry.getValue();
 								data.setName(item.getName());
 								data.setRemark(item.getRemark());
 								data.setPeriod(item.getPeriod());
-								data.setClazz("java.lang.String");
 								dataList.add(data);
 							}
-						}
-						deleteDataCollectionList.addAll(dataCollections);
-						if (ObjectUtil.isNotEmpty(dataList)) {
-							unColl.setData(dataList);
-							saveDataCollectionList.add(unColl);
 						}
 					}
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						continue;
+					}
+					order.setPmRuleUid(pmOrderRule.getUid());
+					saveList.add(order);
+					boolean isEnd = order.isFinished() || "Acceptance".equals(order.getCurrentStepId());
+					if (ObjectUtil.isEmpty(dataCollection.getId()) && isEnd) {
+						continue;
+					}
+					dataCollection.setSchemaId(pmOrderRule.getUid());
+					if (ObjectUtil.isEmpty(dataMap) && ObjectUtil.isEmpty(dataCollection.getId())) {
+						// 更新检查项
+						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
+						for (PmOrderRuleCheckList item : items) {
+							UnstructuredData data = new UnstructuredData();
+							data.setKey(item.getUid());
+							data.setName(item.getName());
+							data.setRemark(item.getRemark());
+							data.setPeriod(item.getPeriod());
+							dataList.add(data);
+						}
+					}
+					dataCollection.setData(dataList);
+					saveDataCollectionList.add(dataCollection);
 				}
-				Set<String> collectionIds = deleteDataCollectionList.stream().map(UnstructuredDataCollection::getId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 				// 保存数据库
-				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList, collectionIds);
+				logger.info("batchUpdatePmOrderFields save db ===== orderSize : {} collectionSize : {}", saveList.size(), saveDataCollectionList.size());
+				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
 			}
 		} catch (Exception e) {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);

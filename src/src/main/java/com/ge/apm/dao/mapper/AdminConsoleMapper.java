@@ -1,6 +1,7 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.domain.PmOrderRule;
+import com.ge.apm.domain.PmOrderRuleCheckList;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.V2_PmOrder;
 import org.apache.ibatis.annotations.Delete;
@@ -14,8 +15,10 @@ import java.util.List;
 public interface AdminConsoleMapper {
     @Select("select * from pm_order_rule")
     List<PmOrderRule> findAllPmOrderRule();
+    @Select("select * from pm_order_rule_check_list")
+    List<PmOrderRuleCheckList> findAllPmOrderRuleCheckList();
 
-    @Select("select * from v2_pm_order limit #{limit} offset #{offset}")
+    @Select("select * from v2_pm_order order by last_modified_date desc limit #{limit} offset #{offset}")
     List<V2_PmOrder> limitPmOrder(@Param("limit") int limit, @Param("offset") int offset);
 
     @Select({
