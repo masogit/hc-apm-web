@@ -607,6 +607,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public void saveCheckListItem(){
+		if(StringUtils.isBlank(objPairCheckItem.getFieldType())){
+			objPairCheckItem.setRequired(Boolean.FALSE);
+		}
     	if(this.internalCreate){
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				if(listPairCheckItem.getName().equals(objPairCheckItem.getName())){
@@ -616,6 +619,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					return;
 				}
 			}
+
 			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
 		}else{
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
@@ -1003,6 +1007,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			return StringUtils.isEmpty(objPairCheckItem.getFieldType()) || "Date".equals(objPairCheckItem.getFieldType());
 		}else{
     		return false;
+		}
+	}
+	public boolean emptyType(){
+		if(objPairCheckItem != null){
+			return StringUtils.isEmpty(objPairCheckItem.getFieldType());
+		}else{
+			return false;
 		}
 	}
 

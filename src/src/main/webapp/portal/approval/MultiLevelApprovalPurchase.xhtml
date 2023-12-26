@@ -60,7 +60,7 @@
                         <h:panelGroup>
                             <p:outputLabel class="label">采购金额</p:outputLabel>
                             <h:outputText id="totalPrice"  value="#{multiLevelApprovalController.purchaseOrderInfo.totalPrice}">
-                                <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -197,10 +197,10 @@
                             <p:column headerText="确认数量（台）">
                                 <h:outputText value="#{item.confirmQuantity}"/>
                             </p:column>
-                            <p:column headerText="确认预算价（万元）">
+                            <p:column headerText="确认预算价">
                                 <h:outputText value="#{item.confirmPrice}"/>
                             </p:column>
-                            <p:column headerText="拦标价（万元）">
+                            <p:column headerText="拦标价">
                                 <h:outputText value="#{item.confirmMaximumPrice}"/>
                             </p:column>
                             <p:column headerText="备注">
@@ -235,8 +235,8 @@
                                 <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}" required="true" requiredMessage="器械科审核意见 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">拦标价（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4"  required="true" requiredMessage="拦标价（万元） #{msg.ValidationRequire}"
+                                <p:outputLabel class="label">拦标价<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4"  required="true" requiredMessage="拦标价 #{msg.ValidationRequire}"
                                                 value="#{multiLevelApprovalController.purchaseOrderInfo.meetingMaximumPrice}"/>
                             </h:panelGroup>
                             <h:panelGroup>

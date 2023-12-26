@@ -381,10 +381,10 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
         int applicationQuantitySumResult = 0;
         for(BudgetApplicationAsset curApplicationBudget:curApplicationBudgetAssets){
-            totalAmount.set(totalAmount.get().add(curApplicationBudget.getOfflineApplicationAmount()==null?
-                    new BigDecimal(0):curApplicationBudget.getOfflineApplicationAmount()));
-            applicationQuantitySumResult += curApplicationBudget.getOfflineApplicationQuantity()==null?
-                    0:curApplicationBudget.getOfflineApplicationQuantity();
+            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
+            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                    0:curApplicationBudget.getConfirmQuantity();
         }
         selected.setTotalPrice(totalAmount.get());
         selected.setPurchaseQuantity(applicationQuantitySumResult);
@@ -589,7 +589,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void saveConfirmInfoBudgetApp() {
-        purchaseOrderService.saveConfirmInfoBudgetApp(this.budgetAssetId,this.confirmBudget);
+        purchaseOrderService.saveConfirmInfoBudgetApp(this.budgetAssetId,this.confirmBudget,this.selected);
         WebUtil.addSuccessMessage("操作成功！");
     }
 

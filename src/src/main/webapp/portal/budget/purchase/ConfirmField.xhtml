@@ -18,8 +18,8 @@
                                         value="#{purchaseOrderController.confirmBudget.confirmQuantity}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                         <p:outputLabel class="label">确认预算价(万元)<span style="color: red">*</span></p:outputLabel>
-                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" class="confirm" required="true" requiredMessage="预算(万元) #{msg.ValidationRequire}"
+                         <p:outputLabel class="label">确认预算价<span style="color: red">*</span></p:outputLabel>
+                         <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="确认预算价 #{msg.ValidationRequire}"
                                          value="#{purchaseOrderController.confirmBudget.confirmPrice}"/>
                      </h:panelGroup>
                 </p:panelGrid>
@@ -29,7 +29,7 @@
                        </h:panelGroup>
                        <p:commandButton validateClient="true" actionListener="#{purchaseOrderController.saveConfirmInfoBudgetApp()}"
                                          value="#{msg.Save}" id="saveConfirmButton"
-                                         update=":BudgetApplicationDialogConfirm PurchaseApplicationEditForm:budgetApplicationConfirmlist :growl"
+                                         update=":BudgetApplicationDialogConfirm PurchaseApplicationEditForm:budgetApplicationConfirmlist PurchaseApplicationEditForm:purchaseQuantity PurchaseApplicationEditForm:totalPrice :growl"
                                          oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');"/>
                         <p:commandButton value="取消" immediate="true"  oncomplete="handleSubmit(args, 'BudgetApplicationDialogConfirm');" />
                    </p:panelGrid>

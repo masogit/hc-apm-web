@@ -47,6 +47,8 @@
                 <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
                 <p:menuitem id="um096" value="资产转科情况" outcome="/portal/asset/departmentConvert.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEPARTMENT_CONVERT')}"/>
                 <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
+                <p:menuitem id="um098" value="不良事件上报" outcome="/portal/adverseEventManagement/adverseEventList.xhtml" rendered="true"/>
+                <p:menuitem id="um099" value="不良事件审核" outcome="/portal/adverseEventManagement/adverseEventApproveList.xhtml" rendered="true"/>
             </p:submenu>
 
             <!-- 特种设备管理 -->
@@ -289,12 +291,6 @@
                 <p:menuitem id="mirage_tenantSupplierMapping" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MANAGEMENT_TENANT_BINDING')}" value="租户供应商绑定" outcome="/portal/mirage/mirage.xhtml?route=/orgSupplierMapping"    />
                 <p:menuitem id="mirage_AssetBindSupplier" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MANAGEMENT_ASSET_BINDING')}" value="供应商设备绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplier"    />
                 <p:menuitem id="mirage_AssetBindSupplierFE" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MANAGEMENT_FE_BINDING')}" value="维修工程师绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplierFE"    />
-            </p:submenu>
-
-            <!-- 不良事件 -->
-            <p:submenu id="um002" label="不良事件" icon="fa fa-bug fa-fw">
-                <p:menuitem id="um0021" value="不良事件上报" outcome="/portal/adverseEventManagement/adverseEventList.xhtml" rendered="true"/>
-                <p:menuitem id="um0022" value="不良事件审核" outcome="/portal/adverseEventManagement/adverseEventApproveList.xhtml" rendered="true"/>
             </p:submenu>
 
             <!-- IoT设备使用概览 -->

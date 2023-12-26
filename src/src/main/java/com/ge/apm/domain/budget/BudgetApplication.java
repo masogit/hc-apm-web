@@ -483,9 +483,10 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     }
 
     public BigDecimal getTotalAmount() {
-        return totalAmount == null ? BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_DOWN)
-                : totalAmount.setScale(4, BigDecimal.ROUND_DOWN);
+        return totalAmount == null ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
+                : totalAmount.setScale(2, RoundingMode.HALF_UP);
     }
+
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;

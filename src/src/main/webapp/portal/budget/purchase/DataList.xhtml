@@ -30,7 +30,7 @@
             </p:column>
             <p:column headerText="采购金额">
                 <h:outputText value="#{item.totalPrice}">
-                    <f:convertNumber minFractionDigits="2" maxFractionDigits="4"/>
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                 </h:outputText>
             </p:column>
             <p:column headerText="操作人" >
@@ -90,7 +90,7 @@
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
-                                 action="#{purchaseOrderController.intoActionModel('Create')}"/>
+                                 action="#{purchaseOrderController.intoActionModel('Create')}" rendered="#{purchaseOrderController.tabIndex eq 0}"/>
                 <!--启用和已经在审批流程中的数据不可以删除和编辑-->
                 <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                  title="#{msg.Edit}"
