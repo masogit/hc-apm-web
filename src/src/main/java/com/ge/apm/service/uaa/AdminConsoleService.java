@@ -1258,7 +1258,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				// 保存数据库
 				logger.info("batchUpdatePmOrderFields save db ===== orderSize : {} collectionSize : {}", saveList.size(), saveDataCollectionList.size());
-//				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
+				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
 			}
 		} catch (Exception e) {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
