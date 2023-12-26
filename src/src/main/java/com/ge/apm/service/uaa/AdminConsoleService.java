@@ -1210,6 +1210,10 @@ public class AdminConsoleService extends MicroServiceInvoker {
 								order.setPmRuleUid(item.getRuleUID());
 								pmOrderRule = ruleMap.get(item.getRuleUID());
 								UnstructuredData data = dataEntry.getValue();
+								String valueSerialized = data.getValueSerialized();
+								if ("null".equals(valueSerialized) || ObjectUtil.isEmpty(valueSerialized)) {
+									data.setValue("pass");
+								}
 								data.setName(item.getName());
 								data.setRemark(item.getRemark());
 								data.setPeriod(item.getPeriod());
@@ -1233,6 +1237,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						for (PmOrderRuleCheckList item : items) {
 							UnstructuredData data = new UnstructuredData();
 							data.setKey(item.getUid());
+							data.setValue("pass");
 							data.setName(item.getName());
 							data.setRemark(item.getRemark());
 							data.setPeriod(item.getPeriod());
