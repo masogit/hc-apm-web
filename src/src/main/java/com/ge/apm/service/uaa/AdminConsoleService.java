@@ -1244,6 +1244,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						// 更新检查项
 						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
 						for (PmOrderRuleCheckList item : items) {
+							if (item.getStatus() == 0) {
+								continue;
+							}
 							UnstructuredData data = new UnstructuredData();
 							data.setKey(item.getUid());
 							data.setValue("pass");
