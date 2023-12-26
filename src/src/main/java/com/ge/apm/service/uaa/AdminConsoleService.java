@@ -1255,6 +1255,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							data.setPeriod(item.getPeriod());
 							dataList.add(data);
 						}
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
 					}
 					dataCollection.setData(dataList);
 					saveDataCollectionList.add(dataCollection);
