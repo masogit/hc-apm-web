@@ -41,6 +41,9 @@
 							<h:outputText rendered="#{(item.fieldType ne 'Select')}" value="#{item.defaultValue}" />
 							<h:outputText rendered="#{item.fieldType eq 'Select'}" value="#{item.optionStr()}" />
 						</p:column>
+						<p:column headerText="是否必填">
+							<h:outputText value="#{empty item.name?'':item.required?'是':'否'}" />
+						</p:column>
 						<p:column headerText="#{msg.Actions}">
 							<p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":checkItemEditDlg"
 								 actionListener="#{maintainConfigController.createObjCheckItem}" oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.name}" />
@@ -149,7 +152,7 @@
 					<h:panelGroup >
 						<label >#{msg.fieldType}：</label>
 						<p:selectOneMenu value="#{maintainConfigController.objCheckItem.fieldType}" >
-							<p:ajax  listener="#{maintainConfigController.onRuleChange}" update="optionsTable DefaultValue"  />
+							<p:ajax  listener="#{maintainConfigController.onRuleChange}" update="optionsTable DefaultValue requiredRadio"  />
 							<f:selectItem itemLabel="无类型" itemValue=""/>
 							<f:selectItem itemLabel="#{msg.ComponentTypeInputText}" itemValue="#{'Text'}"/>
 							<f:selectItem itemLabel="#{msg.ComponentTypeNumber}" itemValue="#{'Number'}"/>
@@ -191,13 +194,15 @@
 								<p:commandLink actionListener="#{maintainConfigController.removeOption(optionItem)}" process="@this" update=":checkItemEditForm:optionsTable :checkItemEditForm:DefaultValue" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
 							</p:column>
 						</p:dataTable>
-						<h:panelGroup>
+						<h:panelGroup id="requiredRadio">
+							<c:if test="#{!maintainConfigController.emptyType()}">
 							<label class="label" style="font-size: medium; font-weight: bold">是否必填</label>
 							<p:selectOneRadio id="enable" value="#{maintainConfigController.objCheckItem.required}">
 								<p:ajax event="change" process="@this" />
 								<f:selectItem itemLabel="是" itemValue="true"/>
 								<f:selectItem itemLabel="否" itemValue="false"/>
 							</p:selectOneRadio>
+							</c:if>
 						</h:panelGroup>
 					</h:panelGroup>
 				</p:panelGrid>
