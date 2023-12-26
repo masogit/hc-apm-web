@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -382,11 +383,28 @@ public class PurchaseOrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveConfirmInfoBudgetApp(String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm) {
+    public void saveConfirmInfoBudgetApp(String budgetAssetId,BudgetApplicationAsset budgetApplicationAssetConfirm,PurchaseOrderInfo purchaseOrderInfoCur) {
         BudgetApplicationAsset budgetApplicationAsset = budgetApplicationAssetRepository.findById(budgetAssetId);
         budgetApplicationAsset.setConfirmQuantity(budgetApplicationAssetConfirm.getConfirmQuantity());
         budgetApplicationAsset.setConfirmPrice(budgetApplicationAssetConfirm.getConfirmPrice());
         budgetApplicationAssetRepository.save(budgetApplicationAsset);
+        //UPDATE 采购单数量
+        List<SearchFilter> searchFilterAssets = new ArrayList<>();
+        searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                SearchFilter.Operator.EQ, purchaseOrderInfoCur.getId()));
+        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets,new Sort(Sort.Direction.DESC, "createdDate"));
+        AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
+        int applicationQuantitySumResult = 0;
+        for(BudgetApplicationAsset curApplicationBudget:budgetApplicationAssets){
+            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
+            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                    0:curApplicationBudget.getConfirmQuantity();
+        }
+        purchaseOrderInfoCur.setTotalPrice(totalAmount.get());
+        purchaseOrderInfoCur.setPurchaseQuantity(applicationQuantitySumResult);
+        purchaseOrderInfoRepository.save(purchaseOrderInfoCur);
+
     }
 
 }

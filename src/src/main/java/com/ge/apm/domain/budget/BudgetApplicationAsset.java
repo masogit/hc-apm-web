@@ -293,7 +293,7 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "confirm_maximum_price", scale = 2)
     private BigDecimal confirmMaximumPrice;
 
-    @Column(name = "confirm_rmark", scale = 2)
+    @Column(name = "confirm_rmark")
     @Size(max = 1024)
     private String confirmRemark;
 
@@ -796,8 +796,8 @@ public class BudgetApplicationAsset implements Serializable {
     }
 
     public BigDecimal getApplicationAmount() {
-        return applicationAmount == null ? BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_DOWN)
-                : applicationAmount.setScale(4, BigDecimal.ROUND_DOWN);
+        return applicationAmount == null ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
+                : applicationAmount.setScale(2, RoundingMode.HALF_UP);
     }
 
     public void setApplicationAmount(BigDecimal applicationAmount) {
@@ -903,7 +903,7 @@ public class BudgetApplicationAsset implements Serializable {
     public BigDecimal getConfirmAmount() {
         if(this!=null && this.getConfirmPrice()!= null && this.getConfirmQuantity()!= null){
             return this.getConfirmPrice().multiply(new BigDecimal(this.getConfirmQuantity()))
-                    .setScale(4, BigDecimal.ROUND_DOWN);
+                    .setScale(2, RoundingMode.HALF_UP);
         }
         return confirmAmount;
 
@@ -916,7 +916,7 @@ public class BudgetApplicationAsset implements Serializable {
     public BigDecimal getConfirmMaximumTotalPrice() {
         if(this!=null && this.getConfirmMaximumPrice()!= null && this.getConfirmQuantity()!= null){
             return this.getConfirmMaximumPrice().multiply(new BigDecimal(this.getConfirmQuantity()))
-                    .setScale(4, BigDecimal.ROUND_DOWN);
+                    .setScale(2, RoundingMode.HALF_UP);
         }
         return confirmMaximumTotalPrice;
     }

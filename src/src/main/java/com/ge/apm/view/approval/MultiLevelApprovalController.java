@@ -751,7 +751,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
 
     public void saveConfirmInfoBudgetApp() {
-        multiLevelApprovalService.saveConfirmInfoBudgetApp(budgetAssetId,this.confirmBudget);
+        multiLevelApprovalService.saveConfirmInfoBudgetApp(this.purchaseOrderInfo,budgetAssetId,this.confirmBudget);
     }
     /**
      * 申购单信息
