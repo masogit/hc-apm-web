@@ -56,6 +56,9 @@ public class NurseSiteMaintainData {
 
 	@Column(name="variable_text",columnDefinition = "TEXT")
 	private String variableText;
+	// 是否必填
+	@Column(name="required")
+	private Boolean required;
 	//0:null,1:true,2:false
 	@Transient
 	private Integer checkValueWeb;
@@ -153,6 +156,17 @@ public class NurseSiteMaintainData {
 			this.checkValue=null;
 		}
 		this.checkValueWeb = checkValueWeb;
+	}
+
+	public Boolean getRequired() {
+		if(required == null){
+			required = Boolean.FALSE;
+		}
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
 	}
 
 	@Override

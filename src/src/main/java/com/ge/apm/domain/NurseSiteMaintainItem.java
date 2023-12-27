@@ -441,4 +441,12 @@ public class NurseSiteMaintainItem implements Serializable {
 	public Boolean getIsFinish() { return isFinish; }
 
 	public void setIsFinish(Boolean finish) { isFinish = finish; }
+
+	public String getUsingDeptUid() {
+		return usingDeptUid;
+	}
+
+	public void setUsingDeptUid(String usingDeptUid) {
+		this.usingDeptUid = usingDeptUid;
+	}
 }
