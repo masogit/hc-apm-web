@@ -360,6 +360,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             renderedSearchForm = true;
             return;
         }
+        int oldStatus = selected.getStatus();
         processFile();
         selected.setStatus(status);
         try {
@@ -376,6 +377,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
                 MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
         } catch (Exception e) {
+            selected.setStatus(oldStatus);
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }

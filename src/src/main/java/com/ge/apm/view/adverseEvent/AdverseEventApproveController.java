@@ -181,6 +181,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     }
 
     public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
+        int oldStatus = selected.getStatus();
         selected.setStatus(status);
         try {
             AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
@@ -195,6 +196,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
                 MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
         } catch (Exception e) {
+            selected.setStatus(oldStatus);
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }
