@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -127,7 +128,7 @@ public class FilterSiteOrgTreeComponentController {
     }
 
     public String getSelectedOrgName() {
-        return null == selectedOrg ? WebUtil.getMessage("AllHospitals") : selectedOrg.getName();
+        return Optional.ofNullable(selectedOrg).map(OrgInfo::getName).orElse(null);
     }
 
     public void filterTreeNodeByName() {
