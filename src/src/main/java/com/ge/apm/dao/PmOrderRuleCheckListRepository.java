@@ -1,5 +1,6 @@
 package com.ge.apm.dao;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,8 +21,8 @@ public interface PmOrderRuleCheckListRepository extends GenericRepository<PmOrde
 	@Query("select o from PmOrderRuleCheckList o where o.ruleUID = ?1 and o.status = 1")
 	public List<PmOrderRuleCheckList> findAllByRuleUID(String ruleUID);
 
-	@Query("select o from PmOrderRuleCheckList o where o.ruleUID in ?1 and o.status = 1")
-	public List<PmOrderRuleCheckList> findAllByRuleUIDBatch(List<String> ruleList);
+	@Query("select o from PmOrderRuleCheckList o where o.ruleUID in (?1) and o.status = 1")
+	public List<PmOrderRuleCheckList> findAllByRuleUIDBatch(Collection<String> ruleList);
 
 	@Query("select o from PmOrderRuleCheckList o where o.ruleUID = ?1")
 	public List<PmOrderRuleCheckList> findAllByRuleUID_full(String ruleUID);

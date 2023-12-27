@@ -103,6 +103,9 @@ public class NurseSiteMaintainItemHistory {
     @Column(name="comment")
     private String comment="";
 
+    @Column(name = "using_dept_uid")
+    private String usingDeptUid;    //使用科室
+
     @Transient
     private boolean needGetItem=true;
 
