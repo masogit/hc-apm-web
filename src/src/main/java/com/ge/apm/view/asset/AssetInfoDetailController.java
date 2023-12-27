@@ -68,6 +68,7 @@ public class AssetInfoDetailController {
     private SysAuthGroupRepository sysAuthGroupDao;
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserAccountRepository userAccountRepository;
+    private AssetInfoService assetInfoService;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -116,6 +117,7 @@ public class AssetInfoDetailController {
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = Boolean.parseBoolean(terminateStr);
@@ -124,27 +126,11 @@ public class AssetInfoDetailController {
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
         userContextService = WebUtil.getBean(UserContextService.class);
         countyArea = userContextService.isCountyArea();
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
 
-        List<Integer> supplierIds = ListUtil.newArrayList(-1);
-        Optional.ofNullable(selected.getSupplierId()).map(supplierIds::add);
-        Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).map(supplierIds::add);
-        Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).map(supplierIds::add);
-        List<Supplier> suppliers = supplierDao.findByIdIn(supplierIds);
-        Map<Integer, String> supplierMap = suppliers.stream().collect(HashMap::new, (map, item) -> map.put(item.getId(), item.getTel()), HashMap::putAll);
-        selected.setVendorTel(supplierMap.get(selected.getSupplierId()));
-        selected.setManufactureTel(supplierMap.get(Optional.ofNullable(selected.getManufactureId()).map(Integer::parseInt).orElse(null)));
-        selected.setMaitananceTel(supplierMap.get(Optional.ofNullable(selected.getMaitananceId()).map(Integer::parseInt).orElse(null)));
-        if (selected.getSupplierId() != null) {
-            Supplier supplier = supplierDao.findById(selected.getSupplierId());
-            if (supplier != null) {
-                selected.setVendorTel(supplier.getTel());
-            }
-        }
-
+        assetInfoService.setSupplier(ListUtil.newArrayList(selected));
         maintanceType = aimService.getMaintanceType(selected);
         assetEvents  = aimService.getAssetEventsList(selected);
 

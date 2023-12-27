@@ -79,7 +79,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserRoleRepository userRoleRepository;
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
-
+    private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     //选定的院区
     private OrgInfo selectSite;
@@ -223,6 +223,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -345,22 +346,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("assetUsedLifecycle");
         }
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
-
         currentPageAssets = res.getContent();
 
-        //设置OneQrCodeStatus
-//        currentPageAssets.forEach(item -> {
-//            if(item.getQrCodeLib()!=null){
-//                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
-//            }
-//            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
-//        });
-
         addMisingClinicalDeptOrg(currentPageAssets);
-
         setWarrantyAlerts(currentPageAssets);
-
-        setSupplier(currentPageAssets);
+        assetInfoService.setSupplier(currentPageAssets);
 
         Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
@@ -1335,12 +1325,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        /*if (filterAssetStatus != null) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
-        }
-        if (assetId != null) {
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
-        }*/
         if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
             Date warrantyDate = new Date();
             //2个月内，则是保修到期时间在2个月后时间之前所有
@@ -1350,18 +1334,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             varWarrantyDateTo = c.getTime();
             searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
             searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
-            //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-            //filterWarrantyDate = null;
         }
     }
-
-    private void setSupplier(List<AssetInfo> assets){
-        Set<Integer> supplierIds = assets.stream().map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        List<Supplier> supplierList = supplierDao.findByIdIn(supplierIds);
-        Map<Integer, Supplier> supplierMap = supplierList.stream().collect(Collectors.toMap(Supplier::getId, t -> t));
-        assets.forEach(item -> item.setSupplier(supplierMap.get(item.getSupplierId()) != null ? supplierMap.get(item.getSupplierId()) : new Supplier()));
-    }
-
     public String selectCreatedBy(String loginName) {
         UserAccount userAccount = createdByMap.get(loginName);
         String createdBy = null;

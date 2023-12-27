@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.service.uaa.UaaService;
@@ -39,6 +40,7 @@ public class AssetInfoService {
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
     SysAuthGroupRepository authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+    SupplierRepository supplierDao = WebUtil.getBean(SupplierRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     V2_WorkOrderService woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -244,5 +246,21 @@ public class AssetInfoService {
         Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
         Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
+    }
+
+    public void setSupplier(List<AssetInfo> assets){
+        List<Integer> supplierIds = ListUtil.newArrayList(-1);
+        for (AssetInfo asset : assets) {
+            Optional.ofNullable(asset.getSupplierId()).map(supplierIds::add);
+            Optional.ofNullable(asset.getManufactureId()).map(Integer::parseInt).map(supplierIds::add);
+            Optional.ofNullable(asset.getMaitananceId()).map(Integer::parseInt).map(supplierIds::add);
+        }
+        List<Supplier> suppliers = supplierDao.findByIdIn(supplierIds);
+        Map<Integer, String> supplierMap = suppliers.stream().collect(HashMap::new, (map, item) -> map.put(item.getId(), item.getTel()), HashMap::putAll);
+        for (AssetInfo asset : assets) {
+            asset.setVendorTel(supplierMap.get(asset.getSupplierId()));
+            asset.setManufactureTel(supplierMap.get(Optional.ofNullable(asset.getManufactureId()).map(Integer::parseInt).orElse(null)));
+            asset.setMaitananceTel(supplierMap.get(Optional.ofNullable(asset.getMaitananceId()).map(Integer::parseInt).orElse(null)));
+        }
     }
 }
