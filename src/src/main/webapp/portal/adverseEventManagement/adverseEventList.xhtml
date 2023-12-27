@@ -34,7 +34,7 @@
                         <p:commandButton value="审核完成" disabled="#{adverseEventManagementController.eventStatusFilter eq '6,8'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('6,8')}" />
                     </h:panelGrid>
                     <h:panelGrid id="searchStrSet" columns="2" cellpadding="5">
-                        <label class="label">设备名称筛选：</label>
+                        <label class="label">资产名称筛选：</label>
                         <p:inputText id="queryStr" value="#{adverseEventManagementController.queryStr}">
                             <p:ajax event="blur" process="@this" update="adverseEventsList" />
                         </p:inputText>
@@ -59,7 +59,7 @@
                                     item.status == 4?'已退回':
                                     item.status == 5?'已作废':
                                     item.status == 6?'审核完成':
-                                    item.status == 7?'上报中':
+                                    item.status == 7?'带上报':
                                     item.status == 8?'上报完成':
                                     item.status == 9?'买方填写':
                                     '未知'  }"/>
@@ -75,9 +75,6 @@
                         <p:column headerText="#{msg.department}" >
                             <h:outputText value="#{adverseEventManagementController.reporterList(item.department)}"/>
                         </p:column>
-                        <p:column headerText="伤害程度" >
-                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="priorityItem priorityItem#{item.harmDegree}"/>
-                        </p:column>
                         <p:column headerText="#{msg.occurredPlace}" >
                             <h:outputText value="#{item.occurredPlace}"/>
                         </p:column>
@@ -90,6 +87,9 @@
                         </p:column>
                         <p:column headerText="#{msg.productName}" >
                             <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column headerText="伤害程度" >
+                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="#{item.harmDegree != 1?'':'priorityItem priorityItem1'}"/>
                         </p:column>
                         <p:column headerText="操作" exportable="false">
                             <p:commandButton value="更多操作" action="#{adverseEventManagementController.onSelectAdverseEvent(item.id)}" onstart="prepareAdverseWindow();" oncomplete="openAdverseWindow(xhr, status, args)"/>
