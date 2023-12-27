@@ -180,7 +180,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         return adverseEventsRepository;
     }
 
-    public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
+    public void tempSaveAdverseEvent(Integer status) throws RuntimeException {
         int oldStatus = selected.getStatus();
         selected.setStatus(status);
         try {
@@ -247,5 +247,9 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
 
     public boolean getReadOnlyEditForm() {
         return this.readOnlyEditForm;
+    }
+
+    public void preReturn() {
+        this.selected.setReturnReason(null);
     }
 }

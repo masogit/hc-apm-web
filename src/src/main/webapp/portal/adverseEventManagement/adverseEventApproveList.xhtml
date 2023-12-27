@@ -87,7 +87,9 @@
                         <p:column headerText="#{msg.department}" >
                             <h:outputText value="#{adverseEventApproveController.reporterList(item.department)}"/>
                         </p:column>
-
+                        <p:column headerText="伤害程度" >
+                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="priorityItem priorityItem#{item.harmDegree}"/>
+                        </p:column>
                         <p:column headerText="#{msg.occurredPlace}" >
                             <h:outputText value="#{item.occurredPlace}"/>
                         </p:column>

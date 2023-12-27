@@ -152,7 +152,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setDepartment(selectSite.getUid());
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
-            if (selected.getStatus() != null && selected.getStatus() == 1) {
+            if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
                 renderedSearchForm = true;
                 readOnlyCreateForm = false;
             } else {
