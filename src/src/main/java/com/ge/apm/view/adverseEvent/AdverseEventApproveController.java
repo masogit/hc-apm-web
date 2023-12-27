@@ -15,10 +15,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -251,5 +249,9 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
 
     public void preReturn() {
         this.selected.setReturnReason(null);
+    }
+
+    public boolean harmDegreeLever(Integer harmDegree) {
+        return harmDegree != null && harmDegree == 1;
     }
 }

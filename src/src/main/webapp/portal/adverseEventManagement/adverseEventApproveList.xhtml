@@ -35,7 +35,7 @@
                 </h:form>
                 <h:form id="adverseListForm">
                     <h:panelGrid id="searchStrSet" columns="2" cellpadding="5">
-                        <label class="label">备名称筛选：</label>
+                        <label class="label">资产名称筛选：</label>
                         <p:inputText id="queryStr" value="#{adverseEventApproveController.queryStr}">
                             <p:ajax event="blur" process="@this" update="adverseEventsApproveList" />
                         </p:inputText>
@@ -87,9 +87,6 @@
                         <p:column headerText="#{msg.department}" >
                             <h:outputText value="#{adverseEventApproveController.reporterList(item.department)}"/>
                         </p:column>
-                        <p:column headerText="伤害程度" >
-                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="priorityItem priorityItem#{item.harmDegree}"/>
-                        </p:column>
                         <p:column headerText="#{msg.occurredPlace}" >
                             <h:outputText value="#{item.occurredPlace}"/>
                         </p:column>
@@ -102,6 +99,9 @@
                         </p:column>
                         <p:column headerText="#{msg.productName}" >
                             <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column headerText="伤害程度">
+                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="#{item.harmDegree != 1?'':'priorityItem priorityItem1'}"/>
                         </p:column>
                         <p:column headerText="操作" exportable="false">
                             <p:commandButton value="更多操作" action="#{adverseEventApproveController.onSelectAdverseEvent(item.id)}" onstart="prepareAdverseWindow();" oncomplete="openAdverseWindow(xhr, status, args)"/>
