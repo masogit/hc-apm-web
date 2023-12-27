@@ -55,70 +55,70 @@ import static com.ge.healthcare.cn.common.cons.ApmFunction.*;
 @Service
 public class AdminConsoleService extends MicroServiceInvoker {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
 	UserAccountMapper userAccountMapper;
-	
+
 	@Autowired
 	UserAccountRepository userAccountRepository;
 
 	@Autowired
 	AssetInfoRepository assetInfoRepository;
-	
+
 	@Autowired
 	TenantInfoRepository tenantInfoRepository;
-	
+
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
 
 	@Autowired
 	UserOrgInfoRepository userOrgDao;
-	
+
 	@Autowired
 	UserOrgInfoRepository userOrgInfoRepository;
-	
+
 	@Autowired
 	SysRoleRepository sysRoleRepository;
-	
+
 	@Autowired
 	UserRoleRepository userRoleRepository;
 
 	@Autowired
 	CustomRoleRepository customRoleRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
-	
+
 	@Autowired
 	AssetLifecycleEventRepository assetLifecycleEventRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
-	
+
 	@Autowired
 	I18nMessageRepository i18nRepository;
-	
+
 	@Autowired
 	BatchJobRepository batchJobRepository;
-	
+
 	@Autowired
-    RestTemplate template;
-	
+	RestTemplate template;
+
 	@Autowired
 	BlobFileService blobFileService;
-	
+
 	@Autowired
 	BlobObjectRepository blobObjectRepository;
 
@@ -157,24 +157,24 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private AdminConsoleMapper adminConsoleMapper;
-	
+
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
-	
+	private String baseURL;
+
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
-	
+
 	public List<SysRole> getSysRole(){
 		return sysRoleRepository.find();
 	}
 	public void saveSysRole(SysRole s){
 		sysRoleRepository.save(s);
 	}
-	
+
 	public List<I18nMessage> getI18Menus(){
 		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_VERSION);
 		return list18;
 	}
-	
+
 	public void addVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
@@ -298,7 +298,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
 	}
-	
+
 	public void deleteInvalidOrder(){
 		nurseSiteMaintainDataRepository.deleteInvalid();
 		nurseSiteMaintainItemRepository.deleteInvalid();
@@ -360,7 +360,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			nurseSiteMaintainRepository.updateErrorMaintain(setIds, originStatus, newStatus);
 		}
 	}
-	
+
 	@Transactional
 	public void tUpdateNurseSiteDeleteAsset(List<NurseSiteMaintainConfigItem> listR){
 		Set<String> setAssetUid=new HashSet<String>();
@@ -413,8 +413,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					Date startTime = tempEvent.getScheduleDate();
 					if (closeTime != null && closeTime.after(currentDate)) {
 						if(tempEvent.getCheckStatus().equals(0)){
-	            			listErrorDateEvent.add(tempEvent.getId());
-	            		}
+							listErrorDateEvent.add(tempEvent.getId());
+						}
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
@@ -425,8 +425,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							ca.add(Calendar.DAY_OF_YEAR, 60);
 							if (ca.getTime().before(currentDate)) {
 								if(tempEvent.getCheckStatus().equals(0)){
-			            			listErrorDateEvent.add(tempEvent.getId());
-			            		}
+									listErrorDateEvent.add(tempEvent.getId());
+								}
 								tempEvent.setScheduleDate(null);
 								startTime=null;
 							}
@@ -453,8 +453,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					if(status.equals(1)){
 						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
 							if(tempEvent.getCheckStatus().equals(0)){
-		            			listErrorDateEvent.add(tempEvent.getId());
-		            		}
+								listErrorDateEvent.add(tempEvent.getId());
+							}
 							tempEvent.setScheduleDate(null);
 						}
 					}
@@ -554,7 +554,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			}
 		}
 	}
-	
+
 	public void dailyUpdateNurseSiteJob(Date date){
 		BatchJob batchJob = new BatchJob();
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
@@ -564,7 +564,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		batchJob.setName(BatchJob.NAME_NURSESITE);
 		batchJobRepository.save(batchJob);
 	}
-	
+
 	public void deleteObjectHub(){
 		String gatewayURL = getGatewayURL(GatewayURL.SEARCH_FILE);
 		Set<String> setSkip=new HashSet<String>();
@@ -573,59 +573,59 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			int pageSize=1000;
 			boolean blnDelete=false;
 			String tempGateway=gatewayURL+"?page="+page+"&pageSize="+pageSize;
-	        try {
-	        	ResponseEntity<LinkedHashMap> response =template.getForEntity(tempGateway,LinkedHashMap.class);
-	            if (isOkay(response)) {
-	                LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-	                Collection<LinkedHashMap<String, Object>> listData = (Collection<LinkedHashMap<String, Object>>) responseMap.get("data");
-	                try {
-	                	if(listData!=null && listData.size()>0){
-	                		for(Map<String,Object> objMap:listData){
-	                			String id=(String)objMap.get("id");
-	                			if(!setSkip.contains(id)){
-	                				List<V2_BlobObject> listObj=blobObjectRepository.findAllByObjectStorageId(id);
-		                			if(listObj==null || listObj.size()==0){
-		                				blnDelete=true;
-		                				logger.info("delete storageId:"+id);
-		                				blobFileService.deleteBlobFilesByStorageId(id);
-		                			}
-		                			else{
-		                				setSkip.add(id);
-		                			}
-	                			}
-	                		}
-	                	}
-	                	else{
-	                		break;
-	                	}
-	    			} catch (Exception e) {
-	    				// TODO: handle exception
-	    				logger.error(e.getMessage());
-	    			}
-	            }
+			try {
+				ResponseEntity<LinkedHashMap> response =template.getForEntity(tempGateway,LinkedHashMap.class);
+				if (isOkay(response)) {
+					LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+					Collection<LinkedHashMap<String, Object>> listData = (Collection<LinkedHashMap<String, Object>>) responseMap.get("data");
+					try {
+						if(listData!=null && listData.size()>0){
+							for(Map<String,Object> objMap:listData){
+								String id=(String)objMap.get("id");
+								if(!setSkip.contains(id)){
+									List<V2_BlobObject> listObj=blobObjectRepository.findAllByObjectStorageId(id);
+									if(listObj==null || listObj.size()==0){
+										blnDelete=true;
+										logger.info("delete storageId:"+id);
+										blobFileService.deleteBlobFilesByStorageId(id);
+									}
+									else{
+										setSkip.add(id);
+									}
+								}
+							}
+						}
+						else{
+							break;
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						logger.error(e.getMessage());
+					}
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				logger.error(e.getMessage());
 			}
-	        if(!blnDelete){
-	        	++page;
-	        }
-	        if(setSkip.size()>100000){
-	        	setSkip.clear();
-	        }
+			if(!blnDelete){
+				++page;
+			}
+			if(setSkip.size()>100000){
+				setSkip.clear();
+			}
 		}
 	}
 	public String getGatewayURL(GatewayURL url) {
-        return baseURL + url.toString();
-    }
+		return baseURL + url.toString();
+	}
 	public Boolean isOkay(ResponseEntity res) {
 
-        if (!res.getStatusCode().equals(HttpStatus.OK)) {
-            return false;
-        }
-        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
-        return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
-    }
+		if (!res.getStatusCode().equals(HttpStatus.OK)) {
+			return false;
+		}
+		LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
+		return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
+	}
 
 	public void updatePmOrders(String userUid,String date) {
 		String token = UserContextService.getAccessToken();
@@ -635,7 +635,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		url = url.concat("&date=").concat(date);
 		ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class,userUid,date);
 		if (isOkay(response)) {
-			 List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
+			List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
 			logger.info("批量创建保养失败记录：{}",pmOrders);
 		} else {
 		}
@@ -1084,7 +1084,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	}
 
 
-    public void batchUpdateI18nMsgType() {
+	public void batchUpdateI18nMsgType() {
 		String msgType="riskGradeNew";
 		List<SearchFilter> searchFilters=new ArrayList<>();
 		searchFilters.add(new SearchFilter("useNewRiskGrade", SearchFilter.Operator.EQ,Boolean.TRUE));
@@ -1141,10 +1141,17 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	private UnstructuredDataCollectionRepository collectionRepository;
 	@Autowired
 	private PmOrderRuleCheckListRepository orderRuleCheckListRepository;
+	@Autowired
+	private TransactionalDBService transactionalDBService;
+
+
 	public void batchUpdatePmOrderFields() {
 		try {
 			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
 			Map<String, PmOrderRule> ruleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, t -> t));
+			List<PmOrderRuleCheckList> checkItemList = adminConsoleMapper.findAllPmOrderRuleCheckList();
+			Map<String, List<PmOrderRuleCheckList>> checkItemMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getRuleUID));
+			Map<String, List<PmOrderRuleCheckList>> checkUidMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getUid));
 			int offset = 0;
 			logger.info("batchUpdatePmOrderFields start");
 			while (true) {
@@ -1154,7 +1161,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					break;
 				}
 				logger.info("batchUpdatePmOrderFields {}, {}", 5000, offset * 5000);
-				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+				Set<String> orderUidList = orders.stream().map(V2_PmOrder::getId).collect(Collectors.toSet());
 				List<RelRuleAsset> relRuleAssets = adminConsoleMapper.findRelRuleAssetByAssetUidList(assetUidList);
 				Map<String, String> relRuleAssetMap = MapUtil.newHashMap();
 				for (RelRuleAsset relRuleAsset : relRuleAssets) {
@@ -1163,57 +1171,113 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#3", relRuleAsset.getRuleUID());
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#4", relRuleAsset.getRuleUID4());
 				}
+				List<UnstructuredDataCollection> dataCollectionList = collectionRepository.findCKByBoUuidIn(orderUidList, "pm-checklist-report");
+				Map<String, List<UnstructuredDataCollection>> dataCollectionMap = dataCollectionList.stream().collect(Collectors.groupingBy(UnstructuredDataCollection::getBoUuid));
 				List<V2_PmOrder> saveList = ListUtil.newArrayList();
+				List<UnstructuredDataCollection> saveDataCollectionList = ListUtil.newArrayList();
 				for (V2_PmOrder order : orders) {
-					String ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
+					UnstructuredDataCollection dataCollection = new UnstructuredDataCollection();
+					dataCollection.setBoType("pm-checklist-report");
+					dataCollection.setBoUuid(order.getId());
+					Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
+					List<UnstructuredData> dataList = ListUtil.newArrayList();
+					List<UnstructuredDataCollection> dataCollections = dataCollectionMap.get(order.getId());
+					if (order.isFinished() && ObjectUtil.isAllEmpty(dataCollections, order.getPmRuleUid())) {
+						continue;
+					}
+					if (ObjectUtil.isEmpty(order.getRuleLevel())) {
+						continue;
+					}
+					String ruleUid = order.getPmRuleUid();
+					if (ObjectUtil.isNotEmpty(dataCollections)) {
+						dataCollection = dataCollections.get(0);
+						dataMap = dataCollection.getData().stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
+					}
 					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
-					if (ObjectUtil.isNotEmpty(pmOrderRule)) {
-						order.setPmRuleUid(pmOrderRule.getUid());
-						saveList.add(order);
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
+						pmOrderRule = ruleMap.get(ruleUid);
+					}
+					if (ObjectUtil.isEmpty(pmOrderRule) && 4 == order.getRuleLevel()) {
+						pmOrderRule = ruleMap.get(order.getPmRuleUid());
+					}
+					if (ObjectUtil.isNotEmpty(dataMap) && !dataMap.keySet().isEmpty()) {
+						for (Map.Entry<String, UnstructuredData> dataEntry : dataMap.entrySet()) {
+							List<PmOrderRuleCheckList> checkListList = checkUidMap.get(dataEntry.getKey());
+							if (ObjectUtil.isNotEmpty(checkListList) && checkListList.size() == 1) {
+								PmOrderRuleCheckList item = checkListList.get(0);
+								dataCollection.setSchemaId(item.getRuleUID());
+								order.setPmRuleUid(item.getRuleUID());
+								pmOrderRule = ruleMap.get(item.getRuleUID());
+								UnstructuredData data = dataEntry.getValue();
+								String valueSerialized = data.getValueSerialized();
+								if ("null".equals(valueSerialized) || ObjectUtil.isEmpty(valueSerialized)) {
+									data.setValue("pass");
+								}
+								data.setName(item.getName());
+								data.setRemark(item.getRemark());
+								data.setPeriod(item.getPeriod());
+								dataList.add(data);
+							}
+						}
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
+					}
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						continue;
+					}
+					order.setPmRuleUid(pmOrderRule.getUid());
+					saveList.add(order);
+					boolean isEnd = order.isFinished() || "Acceptance".equals(order.getCurrentStepId());
+					if (ObjectUtil.isEmpty(dataCollection.getId()) && isEnd) {
+						continue;
+					}
+					dataCollection.setSchemaId(pmOrderRule.getUid());
+					if (ObjectUtil.isEmpty(dataMap) && ObjectUtil.isEmpty(dataCollection.getId())) {
 						// 更新检查项
-						Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
-						List<UnstructuredDataCollection> dataCollections = collectionRepository.findCKByBoUuid(order.getId(), "pm-checklist-report");
-						if (order.isFinished() && ObjectUtil.isEmpty(dataCollections)) {
-							continue;
-						}
-						if (ObjectUtil.isNotEmpty(dataCollections)) {
-							UnstructuredDataCollection dataCollection = dataCollections.get(0);
-							List<UnstructuredData> dataList = dataCollection.getData();
-							dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
-						}
-						UnstructuredDataCollection unColl = new UnstructuredDataCollection();
-						unColl.setBoType("pm-checklist-report");
-						unColl.setBoUuid(order.getId());
-						unColl.setSchemaId(pmOrderRule.getPerformanceReport());
-						List<UnstructuredData> dataList = ListUtil.newArrayList();
-						List<PmOrderRuleCheckList> items = orderRuleCheckListRepository.findAllByRuleUID(pmOrderRule.getUid());
+						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
 						for (PmOrderRuleCheckList item : items) {
-							UnstructuredData unstructuredData = dataMap.get(item.getUid());
+							if (item.getStatus() == 0) {
+								continue;
+							}
 							UnstructuredData data = new UnstructuredData();
 							data.setKey(item.getUid());
-							if (ObjectUtil.isNotEmpty(unstructuredData) && (order.isFinished() || "Acceptance".equals(order.getCurrentStepId()))) {
-								data.setValue(unstructuredData.getValue());
-							}
+							data.setValue("pass");
 							data.setName(item.getName());
 							data.setRemark(item.getRemark());
-							data.setClazz("java.lang.String");
+							data.setPeriod(item.getPeriod());
 							dataList.add(data);
 						}
-						unColl.setData(dataList);
-						collectionRepository.delete(dataCollections);
-						collectionRepository.save(unColl);
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
 					}
+					dataCollection.setData(dataList);
+					saveDataCollectionList.add(dataCollection);
 				}
-				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
-				for (Map.Entry<String, List<V2_PmOrder>> entry : pmOrderMap.entrySet()) {
-					List<String> orderIds = entry.getValue().stream().map(V2_PmOrder::getId).collect(Collectors.toList());
-					PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());
-					adminConsoleMapper.updatePmOrderByIds(pmOrderRule, orderIds);
-				}
+				// 保存数据库
+				logger.info("batchUpdatePmOrderFields save db ===== orderSize : {} collectionSize : {}", saveList.size(), saveDataCollectionList.size());
+				logger.info("savePmOrderDB saveDataCollectionList : {}", JSON.toJSONString(saveDataCollectionList));
+				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
 			}
 		} catch (Exception e) {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
+			throw new RuntimeException(e);
 		}
+		logger.info("batchUpdatePmOrderFields 同步结束");
 	}
 
 	public void batchUpdateSharedAssetRequest() {
