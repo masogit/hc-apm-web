@@ -9,10 +9,10 @@
     <div class="ui-g">
         <div class="ui-g-12 card">
             <h:form enctype="multipart/form-data" rendered="#{measureFromExcelController.customRoleAuth.authSearch}">
-                <h:panelGroup>
-                    <apm:filterSiteOrgByOrgTree/>
-                </h:panelGroup>
                 <p:fieldset  legend="批量导入计量数据" id="uploaderContainer">
+                    <h:panelGroup>
+                        <apm:filterSiteOrgByOrgTree/>
+                    </h:panelGroup>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
                                       dragDropSupport="false" multiple="false" auto="true"
