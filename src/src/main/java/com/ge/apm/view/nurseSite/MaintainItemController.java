@@ -180,6 +180,12 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 							showLables.add(p);
 							NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = new NurseSiteMaintainConfigCheckItem();
 							BeanUtils.copyProperties(p,nurseSiteMaintainConfigCheckItem);
+							Optional<Boolean> first = listTempData.stream().filter(item -> item.getCheckItem().equals(p.getName())).map(item -> item.getRequired()).findFirst();
+							if (first.isPresent()) {
+								nurseSiteMaintainConfigCheckItem.setRequired(first.get());
+							}else{
+								nurseSiteMaintainConfigCheckItem.setRequired(Boolean.FALSE);
+							}
 							listCheckData.add(nurseSiteMaintainConfigCheckItem);
 						}
 					}

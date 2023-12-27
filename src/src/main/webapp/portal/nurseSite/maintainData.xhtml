@@ -44,7 +44,7 @@
 										<h:panelGrid columns="3" layout="grid" styleClass="showcase-text-align-center">
 											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" />
 											<h:panelGroup>
-											<label class="label"><span style="color:red;margin-left: -50px">#{item3.required? '*':''}</span></label>
+											<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
 											<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item3.required}" rendered="#{item3.fieldType eq 'Text'}"/>
 											<p:inputNumber value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item3.required}" rendered="#{ item3.fieldType eq 'Number'}"/>
 											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}" required="#{item3.required}" rendered="#{ item3.fieldType eq 'Select'}">

@@ -2223,6 +2223,7 @@ public class NurseSiteMaintainService {
 							jsonObj.put("fieldType", item.getFieldType());
 							jsonObj.put("defaultValue", item.getDefaultValue());
 							jsonObj.put("options", item.getOptions());
+							jsonObj.put("required", item.getRequired());
 						}
 					}
 					if(find){
