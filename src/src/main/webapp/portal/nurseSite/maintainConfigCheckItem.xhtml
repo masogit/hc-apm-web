@@ -50,8 +50,8 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
                                              actionListener="#{maintainCheckItemController.prepareCreate}" update=":maintainConfigcheckItemEditDlg"
-                                             oncomplete="PF('maintainConfigcheckItemEditDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"/>
-                            <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"
+                                             oncomplete="PF('maintainConfigcheckItemEditDlg').show()" />
+                            <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
                                              update="maintainConfigcheckItemEditDlg" oncomplete="PF('maintainConfigcheckItemEditDlg').show()" disabled="#{empty maintainCheckItemController.selected}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"  disabled="#{empty maintainCheckItemController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"
                                              actionListener="#{maintainCheckItemController.delete}" update=":maintainConfigCheckItemListForm:datalist">

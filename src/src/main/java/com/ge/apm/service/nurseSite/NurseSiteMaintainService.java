@@ -436,8 +436,10 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 	
-	public List<NurseSiteMaintainCheckItem> loadWholeCheckItem(String siteUid){
-		return nurseSiteMaintainCheckItemRepository.findBySiteUid(siteUid);
+	public List<NurseSiteMaintainCheckItem> loadWholeCheckItem(String tenantUID){
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUID));
+		return nurseSiteMaintainCheckItemRepository.findBySearchFilter(searchFilters);
 	}
 	
 	public void loadSelectedCheckItem(List<NurseSiteMaintainCheckItem> listWhole,List<NurseSiteMaintainCheckItem> listSelected,NurseSiteMaintainConfig config){
@@ -2203,7 +2205,12 @@ public class NurseSiteMaintainService {
 	}
 	
 	public void updateNurseSiteMaintainCheckItem(NurseSiteMaintainCheckItem item,String siteUid){
-		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySearchFilter(searchFilters);
 		List<NurseSiteMaintainConfig> listModifyConfig=new ArrayList<NurseSiteMaintainConfig>();
 		if(listConfig!=null && listConfig.size()>0){
 			boolean find=false;

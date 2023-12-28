@@ -45,14 +45,14 @@
 											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" />
 											<h:panelGroup>
 											<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
-											<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item3.required}" rendered="#{item3.fieldType eq 'Text'}"/>
-											<p:inputNumber value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item3.required}" rendered="#{ item3.fieldType eq 'Number'}"/>
-											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}" required="#{item3.required}" rendered="#{ item3.fieldType eq 'Select'}">
+											<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{item3.fieldType eq 'Text'}"/>
+											<p:inputNumber value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item3.fieldType eq 'Number'}"/>
+											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item3.fieldType eq 'Select'}">
 												<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 												<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 											</p:selectOneMenu>
-											<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}" required="#{item3.required}" rendered="#{ item3.fieldType eq 'Date'}"
-														pattern="yyyy/MM/dd"  requiredMessage="开始时间 #{msg.ValidationRequire}"
+											<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}" required="#{item2.getDataValue(item3.name).required}"  rendered="#{ item3.fieldType eq 'Date'}"
+														pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
 														showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 											</h:panelGroup>
 										</h:panelGrid>
@@ -109,14 +109,14 @@
 								</td>
 								<td>
 									<label class="label"><span style="color:red;margin-left: -200px">#{item.required? '*':''}</span></label>
-									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" rendered="#{ item.fieldType eq 'Text'}"/>
-									<p:inputNumber value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" rendered="#{ item.fieldType eq 'Number'}"/>
-									<p:selectOneMenu  value="#{item.defaultValue}" required="#{item.required}" rendered="#{ item.fieldType eq 'Select'}">
+									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Text'}"/>
+									<p:inputNumber value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Number'}"/>
+									<p:selectOneMenu  value="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Select'}">
 										<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 										<f:selectItems value="#{item.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 									</p:selectOneMenu>
 									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}" required="#{item.required}" rendered="#{ item.fieldType eq 'Date'}"
-												pattern="yyyy/MM/dd"  requiredMessage="开始时间 #{msg.ValidationRequire}"
+												pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
 												showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 								</td>
 							</tr>

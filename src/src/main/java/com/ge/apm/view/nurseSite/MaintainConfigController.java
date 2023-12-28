@@ -81,6 +81,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
   	private List<NurseSiteMaintainCheckItem> listWholeCheckItems;
+  	private List<NurseSiteMaintainCheckItem> listWholeCheckItemsAll;
   	private List<NurseSiteMaintainCheckItem> listSelectedCheckItems;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
   	private TableOption tableOption;
@@ -213,7 +214,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     public void onServerEvent(String eventName, Object eventObject) {
     	if(eventObject!=null){
     		try {
-    			listCheckAssets=(List<AssetInfo>)eventObject;
+    			if("changeSite".equals(eventName)){
+    				loadWholeCheckItem(currentUser.getTenantUID());
+				}else if ("change".equals(eventName)){
+					listCheckAssets=(List<AssetInfo>)eventObject;
+				}else{
+
+				}
     			checkSaveDisable();
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -271,7 +278,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		//TODO
         assetSelectController.loadData4Create();
-        loadWholeCheckItem(currentUser.getSiteUID());
+        loadWholeCheckItem(currentUser.getTenantUID());
 	}
 	
 	@Override
@@ -284,7 +291,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		setDefaultValueForAssetList();
 		//TODO
         assetSelectController.loadData4Edit(this.selected);
-        loadWholeCheckItem(currentUser.getSiteUID());
+        loadWholeCheckItem(selected.getTenantUID());
         loadSelectedCheckItem();
 	}
 	
@@ -367,8 +374,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			loadParentOrgInfo();
 		}
 	}
-	private void loadWholeCheckItem(String siteUid){
-		listWholeCheckItems=nurseSiteMaintainService.loadWholeCheckItem(siteUid);
+	private void loadWholeCheckItem(String tenantUID){
+    	if(CollectionUtils.isEmpty(listWholeCheckItemsAll)){
+			listWholeCheckItemsAll = nurseSiteMaintainService.loadWholeCheckItem(tenantUID);
+		}
+		OrgInfo selectedOrg = assetSelectController.getSelectedOrg();
+		this.listWholeCheckItems = listWholeCheckItemsAll.stream().filter(item->{
+			String siteUID = item.getSiteUID();
+			return siteUID.equals(selectedOrg.getSiteUID())
+					|| siteUID.equals(selectedOrg.getHospitalUID())
+					|| siteUID.equals(selectedOrg.getInstitutionUID())
+					|| siteUID.equals(selectedOrg.getTenantUID());
+		}).collect(Collectors.toList());
 		if(listSelectedCheckItems==null){
 			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
 		}
