@@ -23,6 +23,8 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -85,7 +88,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     @Getter@Setter
     private List<I18nMessage> assetGroupSecondaryList;
     @Getter@Setter
-    private Map<String, Boolean> selectedMap; //复选的设备
+    private Map<String, Boolean> selectedMap;
+    private boolean canExport;
     @Getter@Setter
     private Sort lastPageSort; //export use
     @Getter@Setter
@@ -112,7 +116,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private String eventStatusFilter = "";
     @Getter@Setter
     private String queryStr = "";
-
+    @Getter@Setter
+    private StreamedContent exportPdf;
 
     @Override
     protected void init() {
@@ -212,7 +217,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     //获取设备列表
     @Override
     protected Page<AdverseEvents> loadData(PageRequest pageRequest) {
-        return adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "report");
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "report");
+        currentPageAdverse = pageResult.getContent();
+        return pageResult;
     }
 
     public String reporterList(String uid) {
@@ -221,10 +228,12 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     public void setEventStatus(String status) {
         queryStr = "";
+        selectedMap.clear();
         this.eventStatusFilter = status;
     }
 
     public void setQueryStr(String queryStr) {
+        selectedMap.clear();
         this.queryStr = queryStr;
     }
 
@@ -280,9 +289,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = !currentPageAdverse.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        boolean isSelectedAll = !currentPageAdverse.stream().anyMatch(item -> !selectedMap.containsKey(item.getWorkOrderNum()) || !selectedMap.get(item.getWorkOrderNum()));
         for (AdverseEvents item : currentPageAdverse) {
-            selectedMap.put(item.getUid(), !isSelectedAll);
+            selectedMap.put(item.getWorkOrderNum(), !isSelectedAll);
         }
     }
 
@@ -360,7 +369,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             renderedSearchForm = true;
             return;
         }
-        int oldStatus = selected.getStatus();
+        Integer oldStatus = selected.getStatus();
         processFile();
         selected.setStatus(status);
         try {
@@ -395,6 +404,26 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
     }
 
+    public void downLoadPdf() {
+        if (CollectionUtils.isEmpty(selectedMap)) {
+            MessageUtil.outPutReturnFacesMessage("请勾选需要的工单", FacesMessage.SEVERITY_INFO);
+            return;
+        }
+        try {
+            selectedMap = selectedMap.entrySet().stream()
+                    .filter(entry -> entry.getValue())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            TempFileUtil tempFileUtil = adverseEventServiceClient.downLoadPdf(UserContextService.getAccessToken(), selectedMap.keySet().toArray(new String[selectedMap.size()]));
+            exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(tempFileUtil.getContents())), tempFileUtil.getContentType(), tempFileUtil.getFileName());
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+        }
+    }
+
+    public boolean getCanExport() {
+        this.canExport = !selectedMap.values().stream().anyMatch(Boolean::booleanValue);
+        return canExport;
+    }
 
     public AdverseEventsFile saveTempFile(TempFileUtil tempFile) {
         V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());

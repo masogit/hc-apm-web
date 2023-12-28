@@ -50,13 +50,13 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,,20,50,100">
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column width="36" id="checkBoxColumn" visible="#{adverseEventApproveController.eventStatusFilter eq 6 or adverseEventApproveController.eventStatusFilter eq 7}" exportable="false">
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
                             <p:selectBooleanCheckbox value="#{adverseEventApproveController.selectedMap[item.workOrderNum]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this adverseEventsApproveList" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{adverseEventApproveController.onSelectAllOfPage}" update="@(.selectCheckBox) batchSendButton" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{adverseEventApproveController.onSelectAllOfPage}" update="@(.selectCheckBox) batchSendButton batchExportButton" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -108,8 +108,8 @@
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="batchSendButton" title="批量发送"  icon="ui-icon-check" disabled="#{adverseEventApproveController.canSendMail}" rendered="#{adverseEventApproveController.eventStatusFilter eq 6 or adverseEventApproveController.eventStatusFilter eq 7}" update="dlgSendMailDisable " oncomplete="PF('dlgSendMailDisable').show()"/>
-                            <p:commandButton id="export" title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="adverseEventsApproveList" fileName="不良事件列表"/>
+                            <p:commandButton id="batchExportButton" ajax="false" title="批量导出PDF" actionListener="#{adverseEventApproveController.downLoadPdf()}" icon="ui-icon-file-download" disabled="#{adverseEventApproveController.canSendMail}" validateClient="true" update=":growl" >
+                                <p:fileDownload value="#{adverseEventApproveController.exportPdf}"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
