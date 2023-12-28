@@ -478,6 +478,7 @@ public class NurseSiteMaintainService {
 				obj.put("fieldType",fieldType);
 				obj.put("defaultValue",defaultValue);
 				obj.put("options",item.getOptions());
+				obj.put("required",item.getRequired());
 				arr.add(obj);
 			}
 		}
