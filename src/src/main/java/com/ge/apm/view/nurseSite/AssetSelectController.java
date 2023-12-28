@@ -173,6 +173,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             log.info("selectedOrg: {}", selectedOrg.getShortName());
             this.deptList = assetSelectService.loadDeptListByOrg(selectedOrg);
         }
+        this.callingController.onServerEvent("changeSite",selectedOrg);
     }
 
     public void findAssets2Maintain() {
