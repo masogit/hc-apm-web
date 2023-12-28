@@ -48,6 +48,17 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,,20,50,100">
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
+                            <p:selectBooleanCheckbox value="#{adverseEventManagementController.selectedMap[item.workOrderNum]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this adverseEventsList" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{adverseEventManagementController.onSelectAllOfPage}" update="@(.selectCheckBox) batchExportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
                         <p:column headerText="#{msg.workOrderNum}" >
                             <h:outputText value="#{item.workOrderNum}"/>
                         </p:column>
@@ -95,8 +106,8 @@
                             <p:commandButton value="更多操作" action="#{adverseEventManagementController.onSelectAdverseEvent(item.id)}" onstart="prepareAdverseWindow();" oncomplete="openAdverseWindow(xhr, status, args)"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="adverseEventsList" fileName="不良事件列表"/>
+                            <p:commandButton id="batchExportButton" ajax="false" title="批量导出PDF" actionListener="#{adverseEventManagementController.downLoadPdf()}" icon="ui-icon-file-download" disabled="#{adverseEventManagementController.canExport}" validateClient="true">
+                                <p:fileDownload value="#{adverseEventManagementController.exportPdf}"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
@@ -110,6 +121,19 @@
             }
             function openAdverseWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#adverseListForm\\:adverseEventsList\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
             }
         </script>
     </ui:define>

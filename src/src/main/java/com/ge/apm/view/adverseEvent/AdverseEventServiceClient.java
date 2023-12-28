@@ -7,6 +7,7 @@ import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.TempFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -139,5 +140,23 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
             String message = responseMap.get("message").toString();
             throw new RuntimeException(message);
         }
+    }
+
+    public TempFileUtil downLoadPdf(String token, String[] workOrderNums) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("workOrderNums", workOrderNums);
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(jsonObject, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ADVERSE_EVENTS_EXPORT_PDF);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String message = responseMap.get("message").toString();
+            throw new RuntimeException(message);
+        }
+        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
+        if (ObjectUtils.isEmpty(body.get("data"))) {
+            return new TempFileUtil();
+        }
+        return JSON.parseObject(JSON.toJSONString(body.get("data")), TempFileUtil.class);
     }
 }

@@ -159,7 +159,8 @@ public enum GatewayURL {
     APPROVE_TEMP_SAVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveStagingAdverseEvent"),
     // 不良事件发送邮件
     ADVERSE_EVENTS_SENDMAIL("/hcapmassetservice/api/apm/asset/adverse/events/sendMail"),
-
+    // 不良事件pdf
+    ADVERSE_EVENTS_EXPORT_PDF("/hcapmassetservice/api/apm/asset/adverse/events/exportPdf"),
 
     RESET_USER_TO_REDIS("/hcapmgateway/api/apm/security/userAccounts/resetUser/{loginName}"),
     REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),

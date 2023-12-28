@@ -17,6 +17,8 @@ import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,9 +32,11 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -81,6 +85,8 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     private Integer assetType = 1;
 
     private boolean canSendMail;
+    @Getter@Setter
+    private StreamedContent exportPdf;
 
     @Override
     protected void init() {
@@ -205,6 +211,9 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
             return;
         }
         try {
+            selectedMap = selectedMap.entrySet().stream()
+                    .filter(entry -> entry.getValue())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             adverseEventServiceClient.sendReportMail(UserContextService.getAccessToken(), emails.split(","), selectedMap.keySet().toArray(new String[selectedMap.size()]));
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
@@ -221,6 +230,22 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         adverseEventServiceClient.sendReportMail(UserContextService.getAccessToken(), emails.split(","), new String[]{this.selected.getWorkOrderNum()});
         selectedMap.clear();
         MessageUtil.outPutReturnFacesMessage("发送成功！", FacesMessage.SEVERITY_INFO);
+    }
+
+    public void downLoadPdf() {
+        if (CollectionUtils.isEmpty(selectedMap)) {
+            MessageUtil.outPutReturnFacesMessage("请勾选需要的工单", FacesMessage.SEVERITY_INFO);
+            return;
+        }
+        try {
+            selectedMap = selectedMap.entrySet().stream()
+                    .filter(entry -> entry.getValue())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            TempFileUtil tempFileUtil = adverseEventServiceClient.downLoadPdf(UserContextService.getAccessToken(), selectedMap.keySet().toArray(new String[selectedMap.size()]));
+            exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(tempFileUtil.getContents())), tempFileUtil.getContentType(), tempFileUtil.getFileName());
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+        }
     }
 
     public void removeTempHarmPerform(TempFileUtil file) {
