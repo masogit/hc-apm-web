@@ -9,25 +9,32 @@
 				<p:outputLabel class="pageTitle" value="临床助手日常检查" />
 			</div>
 			<div class="ui-g-12 card">
-				<table style="float:right;width:240px;height:150px;font-family: Century" >  <!--	status-->
-					<tr style="background-color: #777D81" ><td style="color: whitesmoke ;float: left">　　未检查</td></tr>  <!--	0 1-->
-					<tr  style="background-color: #0000FF"><td style="color: whitesmoke ;float: left">　　进行中</td></tr>  <!--	4 -->
-					<tr style="background-color: #008000" ><td style="color: whitesmoke ;float: left">　　通　过，未延期，无备注</td></tr>  <!--	2-->
-					<tr style="background-color: #90EE90"><td style="color: black ;float: left">　　通　过，未延期，有备注</td></tr>    <!--	5 -->
-					<tr  style="background-color: #FFFFE0" ><td style="color: black ;float: left">　　通　过，延　期，无备注</td></tr>  <!--	7 -->
-					<tr  style="background-color: #FFD700"><td style="color: black ;float: left">　　通　过，延　期，有备注</td></tr> <!--	6 -->
-					<tr style="background-color: #FFC0CB"><td style="color: black ;float: left">　　有问题，未延期</td></tr>   <!--	8 -->
-					<tr style="background-color: #FF0000"><td style="color: whitesmoke;float: left">　　有问题，延　期</td></tr>    <!--	3-->
-				</table>
-				<p:growl widgetVar="messages" id="messages" showDetail="true" />
-				<h:form id="maintainHeaderForm" rendered="#{not empty maintainController}">
-					<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg"
-						oncomplete="PF('maintainBatchCompleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
-					<p:commandButton id="batchCreateButton" actionListener="#{maintainController.onCheckDefault}" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
-					<p:commandButton id="batchDeleteButton" actionListener="#{maintainController.onCheckDefault}" value="批量删除" title="批量删除" update=":maintainBatchDeleteDlg" oncomplete="PF('maintainBatchDeleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}"/>
-					<br />
-					<ui:include src="/portal/asset/searchDivMaintainMain.xhtml"></ui:include>
-				</h:form>
+				<div class="ui-g-12 card">
+				<div style="width: 1400px;height: 225px;float: left">
+					<p:growl widgetVar="messages" id="messages" showDetail="true" />
+					<h:form id="maintainHeaderForm" rendered="#{not empty maintainController}">
+						<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg"
+										 oncomplete="PF('maintainBatchCompleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
+						<p:commandButton id="batchCreateButton" actionListener="#{maintainController.onCheckDefault}" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
+						<p:commandButton id="batchDeleteButton" actionListener="#{maintainController.onCheckDefault}" value="批量删除" title="批量删除" update=":maintainBatchDeleteDlg" oncomplete="PF('maintainBatchDeleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}"/>
+						<br /><br /><br /><br />
+						<ui:include src="/portal/asset/searchDivMaintainMain.xhtml"></ui:include>
+					</h:form>
+
+				</div>
+				<div style="float: right">
+					<table style="float:right;width:240px;height:150px;font-family: Century" >  <!--	status-->
+						<tr style="background-color: #777D81" ><td style="color: whitesmoke ;float: left">　　未检查</td></tr>  <!--	0 1-->
+						<tr  style="background-color: #0000FF"><td style="color: whitesmoke ;float: left">　　进行中</td></tr>  <!--	4 -->
+						<tr style="background-color: #008000" ><td style="color: whitesmoke ;float: left">　　通　过，未延期，无备注</td></tr>  <!--	2-->
+						<tr style="background-color: #90EE90"><td style="color: black ;float: left">　　通　过，未延期，有备注</td></tr>    <!--	5 -->
+						<tr  style="background-color: #FFFFE0" ><td style="color: black ;float: left">　　通　过，延　期，无备注</td></tr>  <!--	7 -->
+						<tr  style="background-color: #FFD700"><td style="color: black ;float: left">　　通　过，延　期，有备注</td></tr> <!--	6 -->
+						<tr style="background-color: #FFC0CB"><td style="color: black ;float: left">　　有问题，未延期</td></tr>   <!--	8 -->
+						<tr style="background-color: #FF0000"><td style="color: whitesmoke;float: left">　　有问题，延　期</td></tr>    <!--	3-->
+					</table>
+				</div>
+                </div>
 				<h:form id="maintainForm">
 					<h:panelGrid columnClasses="value">
 
