@@ -379,15 +379,31 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                     }
                 }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
                     confirmMessage += "本次扣除"+qyt+"个探头任意名额；";
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头任意名额；";
+                    if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                            ZkbFePartOrderService.testStatusFalseValue.equals(this.selected.getProvideNewContract())){
+                        thisDeductionMessage = "不能提供全新合同,本次扣除"+qyt+"个探头任意名额；";
+                    }else{
+                        thisDeductionMessage = "本次扣除"+qyt+"个探头任意名额；";
+                    }
                     confirmMessage += "探头任意剩余名额为"+probeQuota+"。";
                 }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
                     confirmMessage += "本次扣除"+qyt+"个探头特殊名额；";
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头特殊名额；";
+
+                    if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                            ZkbFePartOrderService.testStatusFalseValue.equals(this.selected.getProvideNewContract())){
+                        thisDeductionMessage = "不能提供全新合同,本次扣除"+qyt+"个探头特殊名额；";
+                    }else{
+                        thisDeductionMessage = "本次扣除"+qyt+"个探头特殊名额；";
+                    }
                     confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
                 }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
                     confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                    if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                            ZkbFePartOrderService.testStatusFalseValue.equals(this.selected.getProvideNewContract())){
+                        thisDeductionMessage = "不能提供全新合同,本次扣除"+qyt+"个探头普通名额；";
+                    }else{
+                        thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                    }
                     confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
                 }
             }
@@ -412,6 +428,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
         }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())) {
             qyt = 1;
+            if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                    ZkbFePartOrderService.testStatusFalseValue.equals(this.selected.getProvideNewContract())){
+                qyt = 2;
+            }
             if ("High".equals(this.selected.getZkbPoProbeQuotaType())) {
                 if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
                     qyt = 4;
@@ -485,6 +505,18 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if(!zkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
                 return ;
+            }
+        }
+        //YHAAO-20623
+        //ZKB CCS 2.0 offer 需要区分超声高端机New和old，并实现相关逻辑
+        if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
+            List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
+                    (this.selectZkbFePartOrder.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(zkbContractAssetList) && this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                //gefe超声高端机只能申请 申请外修 内修在  zkbfe
+                WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                this.contractError = true;
+                return;
             }
         }
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());
@@ -660,10 +692,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             return "";
         }
         ZkbContract zkbContract = this.contractList.get(0);
-        if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())&& ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag()))
-        {
-            if(CollectionUtils.isEmpty(this.v2_blobObjectList))
-            {
+        if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())&&
+                ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getProvideNewContract())){
+            if(CollectionUtils.isEmpty(this.v2_blobObjectList)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("请上传院方合同证明"));
                 return "";
             }
@@ -1277,5 +1309,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public void setNotGeAssetBox(String notGeAssetBox) {
         this.notGeAssetBox = notGeAssetBox;
+    }
+
+    public void initProvideNewContract(){
+        if(StringUtils.isBlank(this.selected.getProvideNewContract()))
+            this.selected.setProvideNewContract("t");
     }
 }

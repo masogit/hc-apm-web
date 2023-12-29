@@ -363,6 +363,13 @@ public class ZkbFePartOrder {
     private String newCatFlag;
 
     /**
+     * 是都可以提供全新合同
+     */
+    @Column(name = "provide_new_contract")
+    private String provideNewContract;
+
+
+    /**
      * 是否全新探头
      */
     @Column(name = "second_new_cat_flag")
@@ -640,6 +647,25 @@ public class ZkbFePartOrder {
 
     @Column(name = "cat_model_non_ge")
     private String catModelNonGe;
+
+    @Transient
+    private Integer repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
+
+    public Integer getRepairForm() {
+        return repairForm;
+    }
+
+    public void setRepairForm(Integer repairForm) {
+        this.repairForm = repairForm;
+    }
+
+    public String getProvideNewContract() {
+        return provideNewContract;
+    }
+
+    public void setProvideNewContract(String provideNewContract) {
+        this.provideNewContract = provideNewContract;
+    }
 
     public String getCatModelNonGe() {
         return catModelNonGe;
