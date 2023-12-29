@@ -1094,6 +1094,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     public ZkbFePartOrder calDeductQtyByNew(ZkbFePartOrder zkbFePartOrder) {
         zkbFePartOrder.setQty(1);
+       if( ZkbFePartOrderService.testStatusTrueValue.equals(zkbFePartOrder.getNewCatFlag())&&
+                ZkbFePartOrderService.testStatusFalseValue.equals(zkbFePartOrder.getProvideNewContract())){
+           zkbFePartOrder.setQty(2);
+       }
         if ("High".equals(zkbFePartOrder.getZkbPoProbeQuotaType())) {
             if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
@@ -1416,6 +1420,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             selected.setAssetGroup(assetInfo.getAssetGroup().toString());
             selected.setProductNumber(assetInfo.getFunctionType());
             selected.setAssetType(assetInfo.getAssetType());
+            selected.setRepairForm(assetInfo.getRepairForm());
             if (assetTypeHighMachineValue.equals(assetInfo.getAssetType())) {
                 selected.setArtificialType(highArtificialTypeValue);
             }
