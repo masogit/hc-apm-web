@@ -198,6 +198,20 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
         }
     }
 
+    public String batchAutoGenerateFinacingNum(LinkedHashMap<String,Object> requestBody){
+        HttpEntity<LinkedHashMap> requestEntity = new HttpEntity<LinkedHashMap>(requestBody);
+        String gatewayURL = getGatewayURL(GatewayURL.AUTO_GENERATE_BATCH_FINANCING_NUM);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            LinkedHashMap<String, Object> responseMap =  response.getBody();
+            logger.info("invoke autoGenerateFinacingNum over,result is {}",responseMap.get("data"));
+            return (String) responseMap.get("data");
+        }else {
+            logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
+            return null;
+        }
+    }
+
     public Map<String, Object> getAcker(String token, String pmOrderId) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
