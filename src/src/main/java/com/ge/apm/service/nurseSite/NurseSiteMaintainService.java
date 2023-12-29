@@ -670,6 +670,12 @@ public class NurseSiteMaintainService {
 					p.setCheckItem(obj.getString("name"));
 					p.setIndex(obj.getLong("key"));
 					// p.setCheckValue(false);
+					if(obj.containsKey("required")){
+						Boolean required = obj.getBoolean("required");
+						p.setRequired(required);
+					}else{
+						p.setRequired(Boolean.FALSE);
+					}
 					p.setItem(item);
 					listData.add(p);
 				}
