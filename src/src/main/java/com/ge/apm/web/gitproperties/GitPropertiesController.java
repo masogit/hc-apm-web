@@ -50,7 +50,9 @@ public class GitPropertiesController {
         commonProperties.setCommitEmail(commonCommitEmail);
         commonProperties.setCommitFull(commonCommitFull);
         commonProperties.setBranch(commonBranch);
-        map.put("project.version",commitId);
+        HashMap<String, String> versionMap = new HashMap<>();
+        versionMap.put("version",commitId);
+        map.put("project",versionMap);
         map.put("hc-apm-web",gitProperties);
         map.put("hc-apm-common",commonProperties);
         return map;
