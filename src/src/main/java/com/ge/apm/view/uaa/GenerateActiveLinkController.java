@@ -66,7 +66,7 @@ public class GenerateActiveLinkController {
         // 获取当前项目的请求地址
         String requestURL = request.getRequestURL().toString().replace("/admin/adminActiveLinkGenerate.xhtml", "");
 
-        link = requestURL + "/ActiveFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+        link = requestURL + "/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
 
     }
 }
