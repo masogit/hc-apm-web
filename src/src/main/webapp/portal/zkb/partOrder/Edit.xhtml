@@ -267,7 +267,7 @@
                                 <c:if test="#{!(zkbPartOrderEditController.selected.artificialType eq '1')}">
                                     <label class="label" >是否需要Dongle*</label>
                                 </c:if>
-                                <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" valueChangeListener="#{zkbPartOrderEditController.ssaKeyFlagChange2}" >
+                                <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}"  >
                                     <p:ajax event="change" update="scoreFlagGroup remainQty exchangeTypeGroup"  listener="#{zkbPartOrderEditController.ssaKeyFlagChange}"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
