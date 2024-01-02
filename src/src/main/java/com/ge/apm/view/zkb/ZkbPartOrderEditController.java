@@ -680,7 +680,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        quotaTips = zkbPartOrderService.preSave(selected,selectedContract,assetInfo);
+        quotaTips = zkbPartOrderEditService.preSave(selected,selectedContract,assetInfo);
 
     }
 
