@@ -24,7 +24,6 @@
                                 </c:forEach>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractNo}*</label>
                             <p:inputText id="contractNo" value="#{zkbContractEditController.selected.contractNo}" required="true" requiredMessage="#{msg.zkbContract_contractNo} #{msg.ValidationRequire}" />
@@ -46,7 +45,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
-                                <p:ajax event="itemSelect" update="panelGrid2" listener="#{zkbContractEditController.contractTypeSelect}" />
+                                <p:ajax event="itemSelect" update="panelGrid2 quotaDeductType" listener="#{zkbContractEditController.contractTypeSelect}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -77,8 +76,6 @@
                                 <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
-
                         <h:panelGroup>
                             <label class="label">2022年起探头高低端名额分类*</label>
                             <p:selectOneMenu  value="#{zkbContractEditController.selected.assetQuotaType}" required="true" requiredMessage="2022年起探头高低端名额分类 #{msg.ValidationRequire}">
@@ -135,7 +132,6 @@
                             <label class="label">#{msg.zkbContract_spareQuota_use}</label>
                             <p:spinner id="spareQuotaUse" value="#{zkbContractEditController.selected.spareQuotaUse}" min="0" max="1000" ><p:ajax /></p:spinner>
                         </h:panelGroup>
-
                         <c:if test="#{!(zkbContractEditController.selected.quotaDeductType eq 'New')}">
                             <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">#{msg.zkbContract_probeQuota_total}</label>
