@@ -293,7 +293,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         // 获取当前项目的请求地址
         String requestURL = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
 
-        link = requestURL + "/ActiveFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+        link = requestURL + "/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
 
     }
 
