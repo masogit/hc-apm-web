@@ -376,6 +376,12 @@ public class ZkbFePartOrder {
     private String secondNewCatFlag;
 
     /**
+     * 是都可以提供全新合同
+     */
+    @Column(name = "second_provide_new_contract")
+    private String secondProvideNewContract;
+
+    /**
      * 收货人
      */
     @Column(name = "receiver")
@@ -1467,5 +1473,13 @@ public class ZkbFePartOrder {
 
     public void setMaintainFlag(String maintainFlag) {
         this.maintainFlag = maintainFlag;
+    }
+
+    public String getSecondProvideNewContract() {
+        return secondProvideNewContract;
+    }
+
+    public void setSecondProvideNewContract(String secondProvideNewContract) {
+        this.secondProvideNewContract = secondProvideNewContract;
     }
 }
