@@ -240,6 +240,14 @@ public class ZkbContractImportService {
             zkbContract.setProbeQuota(contractInfoVO.getProbeQuota());
             zkbContract.setProbeQuotaUse(contractInfoVO.getProbeQuotaUse());
 
+            zkbContract.setProbeQuotaNormalTotal(contractInfoVO.getProbeQuotaNormalTotal() == null ? 0 : contractInfoVO.getProbeQuotaNormalTotal());
+            zkbContract.setProbeQuotaNormal(contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal());
+            zkbContract.setProbeQuotaNormalUse(contractInfoVO.getProbeQuotaNormalUse() == null ? 0 : contractInfoVO.getProbeQuotaNormalUse());
+
+            zkbContract.setProbeQuotaSpecialTotal(contractInfoVO.getProbeQuotaSpecialTotal() == null ? 0 : contractInfoVO.getProbeQuotaSpecialTotal());
+            zkbContract.setProbeQuotaSpecial(contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial());
+            zkbContract.setProbeQuotaSpecialUse(contractInfoVO.getProbeQuotaSpecialUse() == null ? 0 : contractInfoVO.getProbeQuotaSpecialUse());
+
             zkbContract.setSpareArtificailTotal(contractInfoVO.getSpareArtificailTotal());
             zkbContract.setSpareArtificail(contractInfoVO.getSpareArtificail());
             zkbContract.setSpareArtificailUse(contractInfoVO.getSpareArtificailUse());
@@ -258,6 +266,8 @@ public class ZkbContractImportService {
 
             zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaUse() - zkbContract.getSpareQuota());
             zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaUse() - zkbContract.getProbeQuota());
+            zkbContract.setProbeQuotaNormalApply(zkbContract.getProbeQuotaNormalTotal() - zkbContract.getProbeQuotaNormalUse() - zkbContract.getProbeQuotaNormal());
+            zkbContract.setProbeQuotaSpecialApply(zkbContract.getProbeQuotaSpecialTotal() - zkbContract.getProbeQuotaSpecialUse() - zkbContract.getProbeQuotaSpecial());
             zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimes());
             zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailUse() - zkbContract.getSpareArtificail());
             zkbContract.setPartHighQuotaApply(zkbContract.getPartHighQuotaTotal() - zkbContract.getPartHighQuota() - zkbContract.getPartHighQuotaUse());
