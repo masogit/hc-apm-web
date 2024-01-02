@@ -23,7 +23,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,50,100,500"> 
 
-                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton editVersionButton2 viewButton deleteButton disableButton"/>
+                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton disableButton"/>
                     <p:ajax event="filter" listener="#{tenantInfoController.onFilter}" oncomplete="rc();"/>
                     
                     <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -115,11 +115,11 @@
                         <h:outputText value="#{item.isDeleted ? msg.True2Yes : msg.False2No }"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate('create')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
-                        <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
-                        <p:commandButton id="editButton" rendered="#{tenantInfoController.showTestTenant}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show();saveButton()" disabled="#{empty tenantInfoController.selected}" />
-                        <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update="#{tenantInfoController.openNewMenuRoles ? ':NewSiteInfoEditVersionDlg':':SiteInfoEditVersionDlg'}" oncomplete="#{tenantInfoController.openNewMenuRoles ? 'PF(\'NewSiteInfoEditVersionDialog\')':'PF(\'SiteInfoEditVersionDialog\')'}.show()" disabled="#{empty tenantInfoController.selected}"/>
-                        <p:commandButton id="editVersionButton2" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" action="#{tenantInfoController.editFeature(tenantInfoController.selected.uid)}"  disabled="#{empty tenantInfoController.selected}"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate('create')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
+                        <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
+                        <p:commandButton id="editButton" rendered="#{tenantInfoController.showTestTenant}" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show();saveButton()" disabled="#{empty tenantInfoController.selected}" />
+<!--                        <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update="#{tenantInfoController.openNewMenuRoles ? ':NewSiteInfoEditVersionDlg':':SiteInfoEditVersionDlg'}" oncomplete="#{tenantInfoController.openNewMenuRoles ? 'PF(\'NewSiteInfoEditVersionDialog\')':'PF(\'SiteInfoEditVersionDialog\')'}.show()" disabled="#{empty tenantInfoController.selected}"/>-->
+                        <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" title="版本功能" action="#{tenantInfoController.editFeature(tenantInfoController.selected.uid)}"  disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="disableButton" rendered="#{userContextService.partnerAccount}" icon="ui-icon-lock-outline" process="@this" title="#{msg.disableTenant}" actionListener="#{tenantInfoController.markDeleted}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -127,7 +127,7 @@
                         <p:commandButton id="deleteButton" rendered="#{tenantInfoController.showTestTenant}" process="@this" icon="ui-icon-close" title="#{msg.delete}" actionListener="#{tenantInfoController.delete}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="SiteInfo_export"/>
                         </p:commandButton>
                     </f:facet>

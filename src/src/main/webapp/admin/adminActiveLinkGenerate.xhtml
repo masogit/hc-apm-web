@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<h1>激活控制台</h1>
+		<h:form id="activeLinkGenerateForm">
+			<p:fieldset legend="根据医院生成激活链接">
+				<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" id="usePlaceDecHi">
+					<h:panelGroup>
+						<label class="label">租户</label>
+						<p:selectOneMenu id="tenant" value="#{generateActiveLinkController.tenantInfo}" var="t" converter="tenantInfoConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.TenantInfo} #{msg.ValidationRequire}" style="width:50%">
+							<p:ajax update=":activeLinkGenerateForm"/>
+							<f:selectItem itemLabel="请选择" itemValue="#{null}"/>
+							<f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+							<p:column>
+								<h:outputText value="#{t.name}" />
+							</p:column>
+						</p:selectOneMenu>
+					</h:panelGroup>
+					<h:panelGroup>
+						<label class="label">医院</label>
+						<p:selectOneMenu id="hospital" value="#{generateActiveLinkController.hospital}" var="t" converter="orgInfoColumnFilterConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.OrgInfo} #{msg.ValidationRequire}" style="width:50%">
+							<p:ajax listener="#{generateActiveLinkController.generateActiveLink}" update=":activeLinkGenerateForm"/>
+							<f:selectItems value="#{generateActiveLinkController.orgList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+							<p:column>
+								<h:outputText value="#{t.name}" />
+							</p:column>
+						</p:selectOneMenu>
+					</h:panelGroup>
+					<h:panelGroup>
+						<p:inputTextarea placeholder="链接地址" id="link" value="#{generateActiveLinkController.link}" readonly="true" style="width:50%"/>
+					</h:panelGroup>
+				</p:panelGrid>
+
+			</p:fieldset>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

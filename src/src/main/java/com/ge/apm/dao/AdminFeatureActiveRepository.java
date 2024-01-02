@@ -17,4 +17,6 @@ import java.util.List;
 public interface AdminFeatureActiveRepository extends GenericRepositoryUUID<AdminFeatureActive>{
 
     List<AdminFeatureActive> findByTenantUID(String tenantUID);
+
+    List<AdminFeatureActive> findByHospitalUID(String hospitalUID);
 }
