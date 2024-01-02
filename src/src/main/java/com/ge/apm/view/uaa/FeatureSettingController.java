@@ -1,24 +1,40 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AdminFeatureActive;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.MessageUtil;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +48,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository featureActiveRepository;
     private OrgInfoRepository orgDao;
+    private UserCommonService userService;
 
     @Getter
     @Setter
@@ -65,6 +82,30 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Setter
     private List<String> selectHospitalUidList;
 
+    @Getter
+    @Setter
+    private Map<String, Boolean> selectHospitalMap = new HashMap<>();
+
+    @Getter
+    @Setter
+    private OrgInfo selectHospital;
+
+    @Getter
+    @Setter
+    private List<AdminFeatureActive> adminFeatureActives;
+
+    @Getter
+    @Setter
+    private List<AdminFeatureActive> filterAdminFeatureActives = new ArrayList<>();
+
+    @Getter
+    @Setter
+    private Integer tabIndex = 0;
+
+    @Getter
+    @Setter
+    private String link;
+
     @Override
     protected void init() {
 
@@ -72,7 +113,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         featureActiveRepository = WebUtil.getBean(AdminFeatureActiveRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(TenantInfoRepository.class);
-
+        userService = WebUtil.getBean(UserCommonService.class);
 
         String tenantUid = "";
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -85,10 +126,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
         edition = tenantConfig.getString("edition");
         cpmURL = tenantConfig.getString("cpmURL");
-
-
+        selectedFeature = "ALL";
         hospitalList = orgDao.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
-        buildActiveMap();
+        buildActiveMap(tenantInfo.getFeatureList());
 
     }
 
@@ -97,17 +137,54 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         return dao;
     }
 
+    public void changeTab(TabChangeEvent event) {
 
+    }
 
-    private void buildActiveMap() {
-        List<AdminFeatureActive> adminFeatureActives = featureActiveRepository.findByTenantUID(tenantInfo.getUid());
-        List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+    public void changeListener() {
+        Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(edition)).collect(Collectors.toSet()).stream().findFirst();
+        buildActiveMap(JSON.toJSONString(features.get().getFeatureList()));
+    }
+
+    public void changeActiveListener() {
+        if (StringUtils.hasText(selectedFeature) && selectedFeature.equals("ALL")) {
+            filterAdminFeatureActives = adminFeatureActives;
+        } else {
+            filterAdminFeatureActives = adminFeatureActives.stream().filter(v -> v.getFeatureKey().equals(selectedFeature)).collect(Collectors.toList());
+            List<String> activeHospital = filterAdminFeatureActives.stream().map(AdminFeatureActive::getHospitalUID).collect(Collectors.toList());
+            hospitalList.stream().filter(hospital -> !activeHospital.contains(hospital.getUid())).forEach(hospital -> {
+                AdminFeatureActive featureActive = new AdminFeatureActive();
+                featureActive.setFeatureKey(selectedFeature);
+                featureActive.setHospitalUID(hospital.getUid());
+                featureActive.setTenantUID(hospital.getTenantUID());
+                filterAdminFeatureActives.add(featureActive);
+            });
+        }
+    }
+
+    private void buildActiveMap(String features) {
+        adminFeatureActives = featureActiveRepository.findByTenantUID(tenantInfo.getUid());
+        filterAdminFeatureActives = adminFeatureActives;
+        List<String> featureList = JSONArray.parseArray(features).toJavaList(String.class);
         tenantFeatureMap = Arrays.asList(ApmFeature.values()).stream()
-                .collect(Collectors.toMap(ApmFeature::getFeatureName, i-> featureList.contains(i.getFeatureName())));
+                .collect(Collectors.toMap(ApmFeature::name, i-> featureList.contains(i.name())));
+        if (StringUtils.hasText(selectedFeature) && !selectedFeature.equals("ALL")) {
+            changeActiveListener();
+        }
+    }
+
+    public List<ApmAdminActiveFeature> findAdminActiveFeatures() {
+        List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+        return Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
+    }
+
+    public void hospitalChange() {
+        if (StringUtils.isEmpty(selectedFeature)) {
+            selectHospitalMap.clear();
+        }
     }
 
     public void featureChange(String feature) {
-
         if (Strings.isNullOrEmpty(feature)) {
             return;
         }
@@ -129,35 +206,95 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                     tenantFeatureMap.put("NURSESITE_RECORD", false);
                 }
                 break;
+            case "PARTS":
+                if (tenantFeatureMap.get("PARTS")) {
+                    tenantFeatureMap.put("PARTS_APPLY", false);
+                }
+                break;
+            case "PARTS_APPLY":
+                if (tenantFeatureMap.get("PARTS_APPLY")) {
+                    tenantFeatureMap.put("PARTS", false);
+                }
+                break;
         }
-
-
     }
 
-
-    public void addHospital() {
-
-        List<AdminFeatureActive> addActives = selectHospitalUidList.stream().map(i -> {
-            AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
-            adminFeatureActive.setFeatureKey(selectedFeature);
-            adminFeatureActive.setHospitalUID(i);
-            adminFeatureActive.setTenantUID(tenantInfo.getUid());
-            adminFeatureActive.setCreateDate(new Date());
-            return adminFeatureActive;
-        }).collect(Collectors.toList());
-        featureActiveRepository.save(addActives);
-        buildActiveMap();
+    public void addHospital(AdminFeatureActive adminFeatureActive) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        adminFeatureActive.setActiveUser(userAccount.getUid());
+        adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+        adminFeatureActive.setCreateDate(new Date());
+        adminFeatureActive.setActiveDate(new Date());
+        featureActiveRepository.save(adminFeatureActive);
+        buildActiveMap(tenantInfo.getFeatureList());
+        MessageUtil.outPutReturnFacesMessage("激活成功", FacesMessage.SEVERITY_INFO);
     }
 
     public void saveFeatures(){
-        JSONObject tenantConfig = JSONObject.parseObject(tenantInfo.getTenantConfig());
-        tenantConfig.put("edition",edition);
-        tenantConfig.put("cpmURL",cpmURL);
+        try {
+            JSONObject tenantConfig = JSONObject.parseObject(tenantInfo.getTenantConfig());
+            tenantConfig.put("edition",edition);
+            tenantConfig.put("cpmURL",cpmURL);
+            JSONArray featureArray = new JSONArray();
+            tenantFeatureMap.forEach((k,v) -> {
+                if (v) {
+                    featureArray.add(k);
+                }
+            });
+            tenantInfo.setFeatureList(featureArray.toJSONString());
+            dao.save(tenantInfo);
+            MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+        }
+    }
 
-        JSONArray featureArray = new JSONArray();
-        featureArray.addAll(tenantFeatureMap.keySet());
-        tenantInfo.setFeatureList(featureArray.toJSONString());
-        dao.save(tenantInfo);
+    public String getUserName(String userUid) {
+        if (StringUtils.hasText(userUid)) {
+            UserAccount user = userService.getUserByUid(userUid);
+            return null == user ? "" : user.getName();
+        }
+        return "";
+    }
+
+    public String getRoleName(String role) {
+        if (StringUtils.hasText(role)) {
+            Map<String, String> roles = Arrays.stream(ApmSystemRole.values()).collect(Collectors.toMap(ApmSystemRole::name, ApmSystemRole::getRoleName));
+            return Arrays.stream(role.split(",")).map(v -> Optional.ofNullable(roles.get(v)).orElse(ApmSystemRole.existSysRole.getRoleName())).collect(Collectors.joining(","));
+        }
+        return "";
+    }
+
+    public String getHospitalName(String uid) {
+        if (StringUtils.hasText(uid)) {
+            return hospitalList.stream().filter(v -> v.getUid().equals(uid)).findFirst().orElse(new OrgInfo()).getName();
+        }
+        return "";
+    }
+
+    public String getFeatureName(String featureName) {
+        if (StringUtils.hasText(featureName)) {
+            return ApmAdminActiveFeature.valueOf(featureName).getFeatureName();
+        }
+        return "";
+    }
+
+    public Boolean isActive(String userUid) {
+        return StringUtils.hasText(userUid);
+    }
+
+    public void generateActiveLink(String hospitalUID) throws IOException {
+        if (StringUtils.isEmpty(hospitalUID)) {
+            link = "";
+        }
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        // 获取 HttpServletRequest 对象
+        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
+        // 获取当前项目的请求地址
+        String requestURL = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
+
+        link = requestURL + "/ActiveFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+
     }
 
 }

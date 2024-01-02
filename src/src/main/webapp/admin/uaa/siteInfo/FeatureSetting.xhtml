@@ -6,34 +6,36 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+        <style type="text/css">
+            .radiolabelPF {
+                margin-left: 7px;
+                margin-right: 40px;
+            }
+        </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.SiteInfo}"/>
             </div>
-
-
             <div class="ui-g-12 card">
                 <h:form id="SiteInfoEditVersionForm">
-
-
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">版本</label>
-                            <p:selectOneMenu value="#{featureSettingController.edition}">
-                                <p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
+                            <p:selectOneMenu value="#{featureSettingController.edition}" disabled="#{featureSettingController.tabIndex == 1}">
+                                <p:ajax update=":SiteInfoEditVersionForm" listener="#{featureSettingController.changeListener}"></p:ajax>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">设备运营管理链接</label>
-                            <p:inputText value="#{featureSettingController.cpmURL}"></p:inputText>
+                            <p:inputText value="#{featureSettingController.cpmURL}" disabled="#{featureSettingController.tabIndex == 1}"></p:inputText>
                         </h:panelGroup>
                     </p:panelGrid>
 
-                    <p:tabView  id="tabView">
+                    <p:tabView  id="tabView" activeIndex="#{featureSettingController.tabIndex}">
+                        <p:ajax event="tabChange" listener="#{featureSettingController.changeTab}" update=":SiteInfoEditVersionForm"/>
                         <p:tab title="功能设置">
-
                         <p:fieldset id="assetGroup" legend="设备档案">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
@@ -188,6 +190,15 @@
                                             listener="#{featureSettingController.featureChange('ASSET_DEP_CONVERT')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>设备转科菜单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['ASSET_ADVERSE_EVENT']}"
+                                        itemLabel="不良事件">
+                                    <p:ajax update="assetGroup"
+                                            listener="#{featureSettingController.featureChange('ASSET_ADVERSE_EVENT')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>不良事件菜单</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
@@ -627,18 +638,83 @@
 
                         </p:tab>
                         <p:tab title="医院功能激活">
-
-
+                            <p:fieldset id="activeFeature" legend="激活功能项">
+                                <p:selectOneRadio value="#{featureSettingController.selectedFeature}" id="selectedActiveFeature" layout="custom">
+                                    <p:ajax event="change" listener="#{featureSettingController.changeActiveListener}" update="@this activeHospital"/>
+                                    <f:selectItem itemValue="ALL"/>
+                                    <f:selectItems value="#{featureSettingController.findAdminActiveFeatures()}" var="item" itemValue="#{item}" />
+                                </p:selectOneRadio>
+                                <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <p:radioButton for="selectedActiveFeature" itemIndex="0"/>
+                                        <h:outputLabel value="全部已激活" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                    <c:forEach items="#{featureSettingController.findAdminActiveFeatures()}" var="item" varStatus="status" >
+                                        <h:panelGroup>
+                                            <p:radioButton for="selectedActiveFeature" itemIndex="#{status.index +1}"/>
+                                            <h:outputLabel value="#{item.featureName}" styleClass="radiolabelPF"/>
+                                        </h:panelGroup>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="activeHospital" legend="激活院区列表">
+                                <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 1}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                             scrollable="false"
+                                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                             sortMode="single"
+                                             paginatorTemplate="{Toolbar}"
+                                             rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="操作" exportable="false">
+                                        <p:commandButton id="active" process="@this" value="#{featureSettingController.isActive(item.activeUser)?'已激活':'激活'}" disabled="#{featureSettingController.isActive(item.activeUser)}" actionListener="#{featureSettingController.addHospital(item)}" update="datalist" class="btn btn-sm btn-gray">
+                                            <p:confirm header="激活确认" message="是否确认激活！" icon="ui-icon-alert"/>
+                                        </p:commandButton>
+                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeUser)}"
+                                                         actionListener="#{featureSettingController.generateActiveLink(item.hospitalUID)}" class="btn btn-sm btn-gray"
+                                                         update="Links " oncomplete="PF('Links').show()"
+                                        >
+                                        </p:commandButton>
+                                    </p:column>
+                                    <p:column headerText="医院名称">
+                                        <h:outputText value="#{featureSettingController.getHospitalName(item.hospitalUID)}"/>
+                                    </p:column>
+                                    <p:column headerText="功能模块" visible="false">
+                                        <h:outputText value="#{featureSettingController.getFeatureName(item.featureKey)}"/>
+                                    </p:column>
+                                    <p:column headerText="是否激活" visible="false">
+                                        <h:outputText value="#{featureSettingController.isActive(item.activeUser)?'已激活':'未激活'}"/>
+                                    </p:column>
+                                    <p:column headerText="激活人" >
+                                        <h:outputText value="#{featureSettingController.getUserName(item.activeUser)}"/>
+                                    </p:column>
+                                    <p:column headerText="激活人角色" >
+                                        <h:outputText value="#{featureSettingController.getRoleName(item.activeRole)}"/>
+                                    </p:column>
+                                    <p:column  headerText="激活时间">
+                                        <h:outputText value="#{item.activeDate}" >
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                            <p:dataExporter type="xls" target="datalist" fileName="ActiveFeature"/>
+                                        </p:commandButton>
+                                    </f:facet>
+                                </p:dataTable>
+                            </p:fieldset>
                         </p:tab>
                     </p:tabView>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{featureSettingController.saveFeatures}"
-                                     value="#{msg.Save}" update=":growl" icon="ui-icon-check"
-                                     oncomplete="handleSubmit(args, 'SiteInfoEditVersionDialog');"/>
-                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button"
-                                     icon="ui-icon-cancel"
-                                     onclick="PF('SiteInfoEditVersionDialog').hide()"/>
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0}" actionListener="#{featureSettingController.saveFeatures}"
+                                     value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
                 </h:form>
+                <p:dialog modal="true" id="Links" widgetVar="Links" header="激活链接" appendTo="@(body)">
+                    <h:panelGrid columns="1" cellpadding="5">
+                        <h:panelGroup>
+                            <label class="label">激活链接</label>
+                            <p:inputTextarea readonly="true" value="#{featureSettingController.link}" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:dialog>
             </div>
         </div>
 
