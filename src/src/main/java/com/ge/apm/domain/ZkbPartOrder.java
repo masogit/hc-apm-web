@@ -702,6 +702,31 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "work_station_flag")
     private String workStationFlag;
 
+    /**
+     * 是都可以提供全新合同
+     */
+    @Column(name = "provide_new_contract")
+    private String provideNewContract;
+
+    @Column(name = "provide_new_contract_second")
+    private String provideNewContractSecond;
+
+    public String getProvideNewContractSecond() {
+        return provideNewContractSecond;
+    }
+
+    public void setProvideNewContractSecond(String provideNewContractSecond) {
+        this.provideNewContractSecond = provideNewContractSecond;
+    }
+
+    public String getProvideNewContract() {
+        return provideNewContract;
+    }
+
+    public void setProvideNewContract(String provideNewContract) {
+        this.provideNewContract = provideNewContract;
+    }
+
     public String getWorkStationFlag() {
         return workStationFlag;
     }

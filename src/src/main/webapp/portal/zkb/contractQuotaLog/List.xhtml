@@ -40,8 +40,14 @@
                             <h:outputText value="#{item.businessType}"/>
                         </p:column>-->
 
-                       <p:column headerText="名额类型">
+                       <p:column headerText="名额类型" filterBy="#{item.orderType}" filterMatchMode="EQ">
                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractQuotaOrderType',item.orderType)}"/>
+                           <f:facet name="filter">
+                               <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                   <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractQuotaOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               </p:selectOneMenu>
+                           </f:facet>
                        </p:column>
                        <p:column headerText="操作类型">
                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractQuotaOpType',item.opType)}"/>
