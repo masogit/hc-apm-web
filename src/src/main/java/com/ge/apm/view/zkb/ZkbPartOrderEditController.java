@@ -826,11 +826,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(this.selected.getQty() == null){
             return;
         }
-        if(CopyByInvok.F.equals(selected.getProvideNewContract())){
-            this.selected.setQty(2);
-        }else if(CopyByInvok.T.equals(selected.getProvideNewContract())){
-            this.selected.setQty(1);
-        }
+        zkbPartOrderEditService.provideNewContractChange(selected);
         calcRemainQty();
     }
 

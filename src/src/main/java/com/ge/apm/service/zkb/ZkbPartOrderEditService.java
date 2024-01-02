@@ -101,7 +101,8 @@ public class ZkbPartOrderEditService {
                         }
                     }
                 } else {
-                    if (ZkbContract.ContractType.CCS.toString().equals(ct.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(ct.getContractType())) {
+                    if (ZkbContract.ContractType.CCS.toString().equals(ct.getContractType()) ||
+                        ZkbContract.ContractType.Biomed.toString().equals(ct.getContractType())) {
                         if (ct.getSpareQuota() == null || ct.getSpareQuota() < 0) {
                             return "合同备件数量小于0，请检查！";
                         }
@@ -402,6 +403,28 @@ public class ZkbPartOrderEditService {
         return valueTypeTips;
     }
 
+    public void provideNewContractChange(ZkbPartOrder selected){
+        if(selected.getQty() == null){
+            return;
+        }
+        int basicQty = 1;
+        if(ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+            ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(selected.getContractCatId());
+            if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                basicQty = 4;
+            }else{
+                basicQty = 0;
+            }
+        }
+        if(CopyByInvok.F.equals(selected.getProvideNewContract())){
+            selected.setQty(basicQty * 2);
+        }else if(CopyByInvok.T.equals(selected.getProvideNewContract())){
+            selected.setQty(basicQty);
+        }else {
+            selected.setQty(basicQty);
+        }
+    }
+
     /**
      * 申请保存前必填项Check，
      * @return
@@ -451,7 +474,7 @@ public class ZkbPartOrderEditService {
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                errorLog.append("附件不能为空！");
+                //errorLog.append("附件不能为空！");
             }
         }else{
             if("t".equals(selected.getScoreFlag())){
