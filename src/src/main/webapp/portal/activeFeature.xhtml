@@ -41,9 +41,6 @@
                     </p:fieldset>
                     <br/>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <p:selectBooleanCheckbox value="#{activeFeatureController.confirm}" itemLabel="*我已阅读相关用户协议并确认激活功能模块:" style="color: #bcbec1">
-                            <p:ajax update="saveButton"/>
-                        </p:selectBooleanCheckbox>
                         <p:scrollPanel style="width:580px;height:300px" mode="native">
                             <p>为明确双方的权利和义务， 用户启用本服务前，须仔细阅读本协议服务条款。</p>
                             <p>当您勾选选择“已阅读相关用户协议并确认激活功能模块”，即表示您已经达成本协议，承诺并遵守本协议的规定， 确认激活功能模块，同意并接受全部服务条款及条件。</p>
@@ -54,9 +51,12 @@
                             <p>#{msg.Lisence14}</p>
                             <p>#{msg.Lisence15}</p>
                         </p:scrollPanel>
+                        <p:selectBooleanCheckbox value="#{activeFeatureController.confirm}" itemLabel="*我已阅读相关用户协议并确认激活功能模块:" style="color: #bcbec1">
+                            <p:ajax update="saveButton"/>
+                        </p:selectBooleanCheckbox>
                     </p:panelGrid>
                     <p:commandButton id="saveButton" disabled="#{!activeFeatureController.confirm}" validateClient="true" actionListener="#{activeFeatureController.addHospital}"
-                                     value="#{msg.Save}" update=":activeForm " icon="ui-icon-check"/>
+                                     value="#{msg.Activate}" update=":activeForm " icon="ui-icon-check"/>
                 </h:form>
             </div>
         </div>

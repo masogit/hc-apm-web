@@ -106,6 +106,10 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Setter
     private String link;
 
+    @Getter
+    @Setter
+    private String hospitalStr;
+
     @Override
     protected void init() {
 
@@ -159,6 +163,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                 featureActive.setTenantUID(hospital.getTenantUID());
                 filterAdminFeatureActives.add(featureActive);
             });
+        }
+        if (StringUtils.hasText(hospitalStr)) {
+            filterAdminFeatureActives = filterAdminFeatureActives.stream().filter(v -> getHospitalName(v.getHospitalUID()).contains(hospitalStr)).collect(Collectors.toList());
         }
     }
 

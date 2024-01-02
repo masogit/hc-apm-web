@@ -89,7 +89,7 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         paramMap.add("queryStr", queryStr);
         String gatewayURL = getGatewayURL(findType.equals("report")?GatewayURL.ADVERSE_EVENTS_LIST:GatewayURL.APPROVE_ADVERSE_EVENTS_LIST);
         UriComponentsBuilder builderUrl = UriComponentsBuilder.fromHttpUrl(gatewayURL).queryParams(paramMap);
-        ResponseEntity<String> response = template.exchange(builderUrl.toUriString(), HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> response = template.exchange(builderUrl.build(false).toUriString(), HttpMethod.GET, requestEntity, String.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             String result = response.getBody();
             JSONObject jsonObject = JSONObject.parseObject(result);

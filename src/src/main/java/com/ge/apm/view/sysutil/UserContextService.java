@@ -570,6 +570,13 @@ public class UserContextService implements Serializable {
         return adminActive.get(featureName) == null?"(未激活)":"";
     }
 
+    public boolean canRender(String featureName) {
+        if (null == adminActive) {
+            return false;
+        }
+        return adminActive.get(featureName) == null?false:true;
+    }
+
     public Set<ApmSystemRole> getApmSysRole() {
         if (CollectionUtils.isEmpty(apmSystemRoles)) {
             UserAccount user = getLoginUser();

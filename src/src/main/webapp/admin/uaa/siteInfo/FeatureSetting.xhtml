@@ -658,6 +658,12 @@
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset id="activeHospital" legend="激活院区列表">
+                                <h:panelGroup>
+                                    <label class="label">医院名称:</label>
+                                    <p:inputText   id="contractName" placeholder="模糊匹配,输入后点击任意空白处" value="#{featureSettingController.hospitalStr}" style="width: 50%">
+                                        <p:ajax event="blur" listener="#{featureSettingController.changeActiveListener}" update="datalist"/>
+                                    </p:inputText>
+                                </h:panelGroup>
                                 <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 1}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                              scrollable="false"
                                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -677,7 +683,7 @@
                                     <p:column headerText="医院名称">
                                         <h:outputText value="#{featureSettingController.getHospitalName(item.hospitalUID)}"/>
                                     </p:column>
-                                    <p:column headerText="功能模块" visible="false">
+                                    <p:column headerText="功能模块">
                                         <h:outputText value="#{featureSettingController.getFeatureName(item.featureKey)}"/>
                                     </p:column>
                                     <p:column headerText="是否激活" visible="false">
