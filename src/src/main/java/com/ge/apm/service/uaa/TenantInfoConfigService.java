@@ -631,7 +631,7 @@ public class TenantInfoConfigService {
 	}
 
 	public TreeNode getRoot() {
-		if (root == null) {
+		if (root == null || (root.getChildCount() < 1)) {
 			buildRoot();
 		}
 		return root;
