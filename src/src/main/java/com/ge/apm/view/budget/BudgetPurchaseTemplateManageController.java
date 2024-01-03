@@ -1,6 +1,7 @@
 package com.ge.apm.view.budget;
 
 import com.ge.apm.dao.BudgetPurchaseTemplateManageRepository;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetPurchaseTemplateManage;
 import com.ge.apm.service.asset.BlobFileService;
@@ -13,6 +14,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -34,6 +36,7 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
     public static final String CREATE = "Create";
     public static final String EDIT = "Edit";
 
+    private UserAccount account = UserContextService.getCurrentUserAccount();
 
     private BudgetPurchaseTemplateManageRepository budgetPurchaseTemplateManageRepository;
     private BlobFileService blobService;
@@ -52,6 +55,7 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
         return budgetPurchaseTemplateManageRepository.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -89,6 +93,10 @@ public class BudgetPurchaseTemplateManageController extends GenericCRUDUUIDContr
             selected.setTemplateType(BudgetPurchaseTemplateManage.TemplateTypeEnum.PurchaseTemplate.toString());
             selected.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             selected.setCreatedDate(new Date());
+            selected.setTenantUID(account.getTenantUID());
+            selected.setInstitutionUID(account.getTenantUID());
+            selected.setHospitalUID(account.getTenantUID());
+            selected.setSiteUID(account.getTenantUID());
             budgetPurchaseTemplateManageRepository.save(selected);
             for(V2_BlobObject b : blobObjectList) {
                 b.setBoUuid(selected.getId());
