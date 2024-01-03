@@ -393,7 +393,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             	}
             	if(setOrgInfoUid.size()>0){
             		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
-                    searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
+//                    searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
                     ++count;
             	}
             }

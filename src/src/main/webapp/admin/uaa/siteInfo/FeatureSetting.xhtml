@@ -659,7 +659,7 @@
                             </p:fieldset>
                             <p:fieldset id="activeHospital" legend="激活院区列表">
                                 <h:panelGroup>
-                                    <label class="label">医院名称:</label>
+                                    <label class="label">医院名称：</label>
                                     <p:inputText   id="contractName" placeholder="模糊匹配,输入后点击任意空白处" value="#{featureSettingController.hospitalStr}" style="width: 50%">
                                         <p:ajax event="blur" listener="#{featureSettingController.changeActiveListener}" update="datalist"/>
                                     </p:inputText>
