@@ -1,9 +1,12 @@
 package com.ge.apm.view.report;
 
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
@@ -19,12 +22,16 @@ public class DaVinciController {
 
     private String dashboardId;
     private MicroServiceUtil microServiceUtil;
+    private UserAccount currentUser;
 
+    private MqUtils mqUtils;
     @PostConstruct
     protected void init() {
         microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         this.dashboardId = (String) UrlEncryptController.getValueFromMap(encodeStr, "dashboardId");
+        currentUser = UserContextService.getCurrentUserAccount();
+        mqUtils = WebUtil.getBean(MqUtils.class);
     }
 
     public String openNewWindowView(String configItemValue) {
@@ -33,6 +40,7 @@ public class DaVinciController {
     }
 
     public String view() {
+        mqUtils.sendUserAccessRecords(currentUser,"view", AccessRecordsFeature.ASSET_DEVICE_OVERDUE.getFeatureCode());
         String daVinciShareLink = microServiceUtil.getDaVinciShareLink(UserContextService.getAccessToken(), dashboardId);
         logger.info("daVinciShareLink ================================== {}", daVinciShareLink);
         return daVinciShareLink;
