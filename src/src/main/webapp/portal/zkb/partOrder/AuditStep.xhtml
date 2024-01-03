@@ -778,19 +778,19 @@
                                 <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType eq 'HighValue') and !(userContextService.zkbUser) and empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <label class="label">是否全新探头</label>
                                     <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderAuditController.selected.newCatFlag}" required="true" requiredMessage="是否全新探头 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
-                                        <p:ajax update="orderedGrid"/>
+                                        <p:ajax update="orderedGrid provideNewContractSecond" listener="#{zkbPartOrderAuditController.newCatFlagChange}"/>
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.newCatFlag eq 't' and zkbPartOrderAuditController.zkbContract.quotaDeductType eq 'New'}">
                                     <label class="label">是否可以提供全新合同</label>
-                                    <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.provideNewContractSecond}" required="true" requiredMessage="是否可以提供全新合同 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" >
-                                        <p:ajax update="orderedGrid"/>
+                                    <p:selectOneMenu id="provideNewContractSecond" value="#{zkbPartOrderAuditController.selected.provideNewContractSecond}" required="true" requiredMessage="是否可以提供全新合同 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" >
+                                        <p:ajax update="orderedGrid"  />
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
-                                    <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度2" rendered="#{zkbPartOrderAuditController.selected.provideNewContractSecond eq 'f'}"/>
+                                    <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度翻倍" rendered="#{zkbPartOrderAuditController.selected.provideNewContractSecond eq 'f'}"/>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <c:choose>

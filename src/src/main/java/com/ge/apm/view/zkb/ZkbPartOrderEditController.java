@@ -803,7 +803,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
             //新逻辑中如果为全新探头，且是否可以全新合同选择否时名额翻倍
             if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
-                if(CopyByInvok.F.equals(selected.getProvideNewContract())){
+                if(StrUtil.isEmpty(selected.getProvideNewContract())){
+                    this.selected.setProvideNewContract(CopyByInvok.T);
+                }else if(CopyByInvok.F.equals(selected.getProvideNewContract())){
                     this.selected.setQty(selected.getQty() * 2);
                 }else if(CopyByInvok.T.equals(selected.getProvideNewContract())){
                     this.selected.setQty(selected.getQty() / 2);

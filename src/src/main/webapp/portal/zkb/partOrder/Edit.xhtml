@@ -641,8 +641,7 @@
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                            <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度2" rendered="#{zkbPartOrderEditController.selected.provideNewContract eq 'f'}"/>
-
+                            <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度翻倍" rendered="#{zkbPartOrderEditController.selected.provideNewContract eq 'f'}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>
