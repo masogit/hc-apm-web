@@ -75,7 +75,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
         if(StringUtils.isNotEmpty(searchForm.getYear())){
             updateSearchFilter(new SearchFilter("year", SearchFilter.Operator.LIKE, searchForm.getYear()));
         }
-        mqUtils.sendUserAccessRecords(currentUser," BudgetEntry", AccessRecordsFeature.BUDGET.getFeatureCode());
+        mqUtils.sendUserAccessRecords(currentUser,"BudgetEntry", AccessRecordsFeature.BUDGET.getFeatureCode());
         return purchaseBudgetConfigRepository.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
