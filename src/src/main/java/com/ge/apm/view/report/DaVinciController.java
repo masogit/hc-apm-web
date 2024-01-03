@@ -40,7 +40,7 @@ public class DaVinciController {
     }
 
     public String view() {
-        mqUtils.sendUserAccessRecords(currentUser," view", AccessRecordsFeature.ASSET_DEVICE_OVERDUE.getFeatureCode());
+        mqUtils.sendUserAccessRecords(currentUser,"view", AccessRecordsFeature.ASSET_DEVICE_OVERDUE.getFeatureCode());
         String daVinciShareLink = microServiceUtil.getDaVinciShareLink(UserContextService.getAccessToken(), dashboardId);
         logger.info("daVinciShareLink ================================== {}", daVinciShareLink);
         return daVinciShareLink;
