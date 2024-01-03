@@ -65,6 +65,16 @@
 					<p:ajax listener="#{searchController.onThreeQrCodeChange()}" update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect" />
 				</p:inputText>
 			</h:panelGroup>
+
+			<h:panelGroup rendered="#{searchController.blnSerialNum}">
+				<label class="label">制造商序列号</label>
+				<p:inputText id="blnSerialNum" value="#{searchController.serialNum}" placeholder="制造商序列号" maxlength="100"
+							 style="width: 250px">
+					<p:ajax listener="#{searchController.onThreeQrCodeChange()}" update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect" />
+				</p:inputText>
+			</h:panelGroup>
+
+
 			<h:panelGroup rendered="#{searchController.blnAssetSelect}">
 				<label class="label">设备</label>
 				<p:autoComplete id="idCSAssetSelect" dropdown="true" scrollHeight="300" value="#{searchController.selectedAssetInfo}"

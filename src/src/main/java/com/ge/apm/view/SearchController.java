@@ -47,6 +47,7 @@ public class SearchController {
 	public static final String STR_QRCODE = "qrCode";
 	public static final String STR_DEPTNUM = "departNum";
 	public static final String STR_FINANCENUM = "financingNum";
+	public static final String STR_SERIALNUM = "serialNum";
 	protected UserAccount currentUser;
 	protected I18nMessageRepository i18nDao;
 	SearchService searchService;
@@ -65,6 +66,7 @@ public class SearchController {
 	String threeQrCode;
 	ServerEventInterface callingController;
 	String updateViewIDs;
+	String serialNum;
 
 	// 1:contractedit,2:pcc,3:nursesite
 	protected int type = 0;
@@ -87,6 +89,7 @@ public class SearchController {
 	boolean blnFilterValied = true;
 	boolean blnFilterDelete = true;
 	boolean blnUpdate = false;
+	boolean blnSerialNum = false;
 	List<SearchFilter> listSearchFilter;
 	DualListModel<AssetInfo> availableAssets;
 	List<AssetInfo> listUnSelectedAssetInfo;
@@ -164,6 +167,7 @@ public class SearchController {
 			blnPickList = true;
 			blnAssetGroup = true;
 			blnThreeQrCode = true;
+			blnSerialNum = true;
 			// fetchSiteOrgList();
 			fetchDeptOrgList(selectedOrg);
 			// fetchOriginPickListAssetInfo();
@@ -440,6 +444,10 @@ public class SearchController {
 			if (StringUtils.isNotEmpty(functionType)) {
 				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_FUNCTIONTYPE, Operator.LIKE, functionType, "1*"));
+			}
+			if (StringUtils.isNotEmpty(serialNum)) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_SERIALNUM, Operator.LIKE, serialNum, "1*"));
 			}
 			if (StringUtils.isNotEmpty(threeQrCode)) {
 				filterCount++;
@@ -786,4 +794,19 @@ public class SearchController {
 		this.blnAssetUpdate = blnAssetUpdate;
 	}
 
+	public boolean isBlnSerialNum() {
+		return blnSerialNum;
+	}
+
+	public void setBlnSerialNum(boolean blnSerialNum) {
+		this.blnSerialNum = blnSerialNum;
+	}
+
+	public String getSerialNum() {
+		return serialNum;
+	}
+
+	public void setSerialNum(String serialNum) {
+		this.serialNum = serialNum;
+	}
 }
