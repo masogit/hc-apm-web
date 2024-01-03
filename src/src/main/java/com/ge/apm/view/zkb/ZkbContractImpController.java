@@ -41,9 +41,6 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     private List<Map<String, Object>> impContractCourseMapList;
     private List<Map<String, Object>> impContractAssetMapList;
     private List<Map<String, Object>> impContractCatMapList;
-
-
-    private ZkbContractService zkbContractService;
     private ZkbContractImportService zkbContractImportService;
     private List<Map<String, Object>> errorContractList = new ArrayList<>();
     private List<Map<String, Object>> errorContractCourseList = new ArrayList<>();
@@ -56,7 +53,6 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
         super.init();
         dao = WebUtil.getBean(ZkbContractRepository.class);
         zkbContractImportService = WebUtil.getBean(ZkbContractImportService.class);
-        zkbContractService = WebUtil.getBean(ZkbContractService.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
@@ -98,16 +94,13 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     public void impContractOp(ExcelDocument doc){
         try {
             importContractMapList = zkbContractImportService.getContractMapFromTemplate(doc);
-            if(importContractMapList != null && importContractMapList.size() > 0){
+            if(importContractMapList != null && !importContractMapList.isEmpty()){
                 zkbContractImportService.importData(importContractMapList,currentUser);
                 errorContractList = zkbContractImportService.filterErrorRecords(importContractMapList);
-                if(errorContractList ==null){
-                    errorContractList = new ArrayList<>();
-                }
+                if(errorContractList ==null) errorContractList = new ArrayList<>();
             }else {
                 errorContractList = new ArrayList<>();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,7 +109,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     public void impContractCourseOp(ExcelDocument doc){
         try {
             impContractCourseMapList = zkbContractImportService.getContractCourseMapFromTemplate(doc);
-            if(impContractCourseMapList != null && impContractCourseMapList.size() > 0){
+            if(impContractCourseMapList != null && !impContractCourseMapList.isEmpty()){
                 zkbContractImportService.importCourseData(impContractCourseMapList);
                 errorContractCourseList = zkbContractImportService.filterCourseErrorRecords(impContractCourseMapList);
                 if(errorContractCourseList == null){
@@ -133,7 +126,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     public void impContractAssetOp(ExcelDocument doc){
         try {
             impContractAssetMapList = zkbContractImportService.getContractAssetMapFromTemplate(doc);
-            if(impContractAssetMapList != null && impContractAssetMapList.size() > 0){
+            if(impContractAssetMapList != null && !impContractAssetMapList.isEmpty()){
                 zkbContractImportService.importAssetData(impContractAssetMapList,currentUser);
                 errorContractAssetList = zkbContractImportService.filterErrorRecords(impContractAssetMapList);
                 if(errorContractAssetList == null){
@@ -151,7 +144,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     public void impContractCatOp(ExcelDocument doc){
         try {
             impContractCatMapList = zkbContractImportService.getContractCatMapFromTemplate(doc);
-            if(impContractCatMapList != null && impContractCatMapList.size() > 0){
+            if(impContractCatMapList != null && !impContractCatMapList.isEmpty()){
                 zkbContractImportService.importCatData(impContractCatMapList,currentUser);
                 errorContractCatList = zkbContractImportService.filterErrorRecords(impContractCatMapList);
                 if(errorContractCatList == null){

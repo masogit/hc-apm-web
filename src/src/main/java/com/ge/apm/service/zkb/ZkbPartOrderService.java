@@ -1218,7 +1218,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag()) && CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
 
                     }else{
-                        subApplyQty(zkbContract,zkbPartOrder, (0- qty),userAccount,false);
+                        subApplyQty(zkbContract,zkbPartOrder, -qty,userAccount,false);
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
@@ -1229,12 +1229,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 subUseQty(zkbContract, zkbPartOrder, qty,userAccount);
             }
             if (ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
-                for (ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()) {
-                    zkbPartOrderItemRepository.save(i);
-                }
+                zkbPartOrderItemRepository.save(zkbPartOrder.getZkbPartOrderItems());
             }
-        }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())) {
-
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ClosePending.toString())){
             if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                 if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
@@ -1269,6 +1265,47 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
     }
+
+    public boolean probeOrderNewCatChangeCheck(ZkbPartOrder selected, ZkbContract zkbContract){
+        boolean result = false;
+        if(selected.getQty() == 0){
+            return result;
+        }
+        if(selected.getNewCatFlag().equals(selected.getTenantNewCatFlag())){
+            if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                if(selected.getProvideNewContractSecond().equals(selected.getProvideNewContract())){
+                    //名额不发生变化
+                }else if(CopyByInvok.T.equals(selected.getProvideNewContractSecond()) && StrUtil.isEmpty(selected.getProvideNewContract())){
+                    //名额不发生变化
+                }else{
+                    if(CopyByInvok.T.equals(selected.getProvideNewContractSecond())){
+                        //名额需要2 -->  1
+                    }else if(CopyByInvok.F.equals(selected.getProvideNewContractSecond())){
+                        //名额需要1 -->  2
+                        result = true;
+                    }
+                }
+            }else{
+                //名额不发生变化
+            }
+        }else {
+            if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                if(CopyByInvok.F.equals(selected.getProvideNewContractSecond())){
+                    //名额需要1 -->  2
+                    result = true;
+                }else {
+                    //名额不发生变化
+                }
+            }else{
+                if(CopyByInvok.F.equals(selected.getProvideNewContract())){
+                    //名额需要2 -->  1
+                }
+            }
+        }
+        return result;
+    }
+
+
 
     public void probeOrderNewCatChangeCalcQty(ZkbPartOrder zkbPartOrder, ZkbContract zkbContract){
         if(StrUtil.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
@@ -1664,17 +1701,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                 }
             }else {
-                Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+                int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
                 double l = total * 0.7;
-                Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+                int molecule = (zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
                 if(molecule > l){
                     return true;
                 }
             }
         }else if("PCB MVS".equals(zkbContract.getContractType())){
-            Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+            int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
             double l = total * 0.7;
-            Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+            int molecule = (zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
             if(molecule > l){
                 return true;
             }
