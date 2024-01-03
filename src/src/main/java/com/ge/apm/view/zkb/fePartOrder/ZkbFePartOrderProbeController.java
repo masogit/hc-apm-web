@@ -514,8 +514,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
             List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
                     (this.selectZkbFePartOrder.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(zkbContractAssetList) && this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
-                //gefe超声高端机只能申请 申请外修 内修在  zkbfe
+            if((ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))
+                    && CollectionUtils.isNotEmpty(zkbContractAssetList) && this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                //gefe 合同类型 ccs/biomed 超声高端机只能申请 申请外修 内修在  zkbfe
                 WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
                 this.contractError = true;
                 return;
