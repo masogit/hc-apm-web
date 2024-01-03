@@ -1058,6 +1058,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void newCatFlagChange(){
+        if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+            if(StrUtil.isEmpty(selected.getProvideNewContractSecond())){
+                selected.setProvideNewContractSecond(CopyByInvok.T);
+            }
+        }else {
+            selected.setProvideNewContractSecond(null);
+        }
+    }
+
     public Boolean isCanModifyUnOrder(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())){
