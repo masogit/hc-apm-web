@@ -626,7 +626,7 @@
                             <label class="label">探头型号</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.catModelNonGe}" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}" > <p:ajax /></p:inputText>
                         </h:panelGroup>
-                        <h:panelGroup >
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 'f'}">
                             <label class="label">是否全新探头</label>
                             <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}"  >
                                 <p:ajax event="change" update="proveFile qty remainQty zkbPartOrderProbeGrid" listener="#{zkbPartOrderEditController.tenantNewCatFlagChange}"/>

@@ -209,7 +209,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
                 this.selected.setReturnQty(this.selected.getQty());
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-                this.selected.setNeedLetterFlag(CopyByInvok.F);
+                if(canEditFlag){
+                    this.selected.setNeedLetterFlag(CopyByInvok.F);
+                    this.selected.setNewCatFlag(this.selected.getTenantNewCatFlag());
+                    this.selected.setProvideNewContractSecond(this.selected.getProvideNewContract());
+                }
             }
 
             if(this.selected.getZkbPartOrderCat() != null){
@@ -1401,23 +1405,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     boolean result = zkbPartOrderService.probeOrderNewCatChangeCheck(selected, zkbContract);
                     if(result){
                         if (ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())) {
-                            if (c.getProbeQuota() < (selected.getQty() /2)) {
+                            if (c.getProbeQuota() < selected.getQty()) {
                                 WebUtil.addErrorMessage("探头任意剩余名额不足，请联系供应商！", "");
                                 return "";
                             }
                         } else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())) {
-                            if (c.getProbeQuotaNormal() < (selected.getQty() /2)) {
+                            if (c.getProbeQuotaNormal() < selected.getQty()) {
                                 WebUtil.addErrorMessage("探头普通剩余名额不足，请联系供应商！", "");
                                 return "";
                             }
                         } else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())) {
-                            if (c.getProbeQuotaSpecial() < (selected.getQty() /2)) {
+                            if (c.getProbeQuotaSpecial() < selected.getQty()) {
                                 WebUtil.addErrorMessage("探头特殊剩余名额不足，请联系供应商！", "");
                                 return "";
                             }
                         } else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())) {
                             if (CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())) {
-                                if (c.getProbeQuotaNormal() < (selected.getQty() /2)) {
+                                if (c.getProbeQuotaNormal() < selected.getQty()) {
                                     WebUtil.addErrorMessage("探头普通剩余名额不足，请联系供应商！", "");
                                     return "";
                                 }
