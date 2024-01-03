@@ -282,8 +282,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 return;
             }
         }
+        WorkflowConfig config = configService.findConfigBySite(selectedOrg.getSiteUID());
+        if(config==null){
+            WebUtil.addErrorMessage("找不到对应配置!");
+            return;
+        }
         saveArrivalList();
-        if(Boolean.TRUE.equals(selected.getEnableGenerateQrcode())){
+        if(Boolean.TRUE.equals(selected.getEnableGenerateQrcode()) &&  !StringUtils.isEmpty(config.getAssetCodeConfig()) && "DFQ".equals(config.getAssetCodeConfig())){
             String financingNum = assetFinacingNumGenerateService.batchAutoGenerateFinacingNum(null,
                     null, selectedOrg.getSiteUID() , null, qrCodePrefix,selected.getId(),selected.getQuantity());
             if (null == financingNum || financingNum.startsWith("error:")) {
