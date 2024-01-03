@@ -783,7 +783,7 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.newCatFlag eq 't' and zkbPartOrderAuditController.zkbContract.quotaDeductType eq 'New'}">
+                                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.newCatFlag eq 't' and zkbPartOrderAuditController.zkbContract.quotaDeductType eq 'New' and !(userContextService.zkbUser)}">
                                     <label class="label">是否可以提供全新合同</label>
                                     <p:selectOneMenu id="provideNewContractSecond" value="#{zkbPartOrderAuditController.selected.provideNewContractSecond}" required="true" requiredMessage="是否可以提供全新合同 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" >
                                         <p:ajax update="orderedGrid"  />
