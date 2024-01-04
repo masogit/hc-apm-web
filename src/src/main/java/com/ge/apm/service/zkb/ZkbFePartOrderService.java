@@ -1101,6 +1101,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if ("High".equals(zkbFePartOrder.getZkbPoProbeQuotaType())) {
             if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
+                if( ZkbFePartOrderService.testStatusTrueValue.equals(zkbFePartOrder.getNewCatFlag())&&
+                        ZkbFePartOrderService.testStatusFalseValue.equals(zkbFePartOrder.getProvideNewContract())){
+                    zkbFePartOrder.setQty(8);
+                }
             } else {
                 zkbFePartOrder.setQty(0);
             }
