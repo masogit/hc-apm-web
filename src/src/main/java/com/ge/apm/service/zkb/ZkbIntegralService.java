@@ -211,7 +211,7 @@ public class ZkbIntegralService {
         if(zkbIntegral.getCoefficient().equals(initCoefficient)){
             return initCoefficient;
         }else if(zkbIntegral.getCoefficient() > initCoefficient){
-            int subDay = ZkbPartOrderService.getBetweenDay(zkbIntegral.getValidityDate(),new Date());
+            int subDay = CopyByInvok.getBetweenDay(zkbIntegral.getValidityDate(),new Date());
             if(subDay > 0){
                 return initCoefficient;
             }else{
