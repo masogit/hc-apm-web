@@ -63,4 +63,7 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 
     @Query("select w from WorkflowConfig w where w.siteUID in ?1 or w.institutionUID in ?1 or w.tenantUID in ?1 or w.hospitalUID in ?1")
     List<WorkflowConfig> findWorkflowConfig(List<String> uids);
+
+    @Query("select w from WorkflowConfig w where w.isActiveSupplier = true ")
+    public List<WorkflowConfig> findIsActiveSupplier();
 }

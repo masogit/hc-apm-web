@@ -35,4 +35,7 @@ public interface AdverseEventsRepository extends GenericRepository<AdverseEvents
     List<AdverseEvents> findByIdIn(Set<Integer> keySet);
 
     AdverseEvents findByUid(String uid);
+
+    @Query(value = "select DISTINCT(hospital_uid) FROM adverse_events", nativeQuery = true)
+    List<String> findByAllUseHospital();
 }
