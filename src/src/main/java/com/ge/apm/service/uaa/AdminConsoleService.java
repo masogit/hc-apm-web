@@ -1348,6 +1348,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			if (ObjectUtil.isNotEmpty(tenantInfo)) {
 				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
 				featureList.add(ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+				if (featureList.contains("ASSET_SUPPLIER")) {
+					featureList.remove("ASSET_SUPPLIER");
+				}
 				tenantInfo.setFeatureList(JSON.toJSONString(featureList));
 				tenantInfoRepository.save(tenantInfo);
 			}
