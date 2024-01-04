@@ -473,6 +473,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             if (null != supplier){
                 selected.setManufactureId(supplier.getId().toString());
                 selected.setManufacture(supplier.getName());
+                selected.setManufactureTel(supplier.getTel());
                 selectedObjectMap.put("manufacturer", supplier.getUid() == null ? null : supplierDao.findByUid(supplier.getUid()));
             }
         }
