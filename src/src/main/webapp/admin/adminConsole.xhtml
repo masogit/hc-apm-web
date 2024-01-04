@@ -60,10 +60,23 @@
 							</p:treeNode>
 						</p:tree>
 					</p:scrollPanel>
+				</p:fieldset>
+				<br/>
+				<p:fieldset legend="更新系统角色默认菜单">
 					<p:commandButton actionListener="#{adminConsoleController.updateSysMenu()}" value="更新系统角色默认菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
 				<br/>
+				<p:fieldset legend="租户医院功能激活">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantHospitalActive()}" disabled="true" value="租户医院功能激活" update=":growl"></p:commandButton>
+				</p:fieldset>
 				<br/>
+				<p:fieldset legend="批量更新租户供应商小程序菜单和激活已使用的医院">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantSupplier()}" disabled="false" value="批量更新租户供应商小程序菜单" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<br/>
+				<p:fieldset legend="批量更新租户不良事件菜单和激活已使用的医院">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantAdverseEvent()}" disabled="false" value="批量更新租户不良事件菜单" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

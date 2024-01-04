@@ -14,10 +14,14 @@ import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -41,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.DbMessageSource;
 
+import javax.faces.application.FacesMessage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -157,6 +162,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private AdminConsoleMapper adminConsoleMapper;
+
+	@Autowired
+	private AdminFeatureActiveRepository adminFeatureActiveRepository;
+
+	@Autowired
+	private TenantOptionConfigRepository tenantOptionConfigRepository;
+
+	@Autowired
+	private AdverseEventsRepository adverseEventsRepository;
 
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
 	private String baseURL;
@@ -1295,5 +1309,98 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				adminConsoleMapper.updateBySiteUidSharedAssetRequest(1,siteUid);
 			}
 		}
+	}
+
+	public void batchUpdateTenantHospitalActive() {
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		UserAccount userAccount = UserContextService.getCurrentUserAccount();
+		Set<String> waitFeatures = Arrays.stream(ApmAdminActiveFeature.values()).map(ApmAdminActiveFeature::name).collect(Collectors.toSet());
+		for (TenantInfo tenantInfo : tenantInfos) {
+			if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+				List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+				List<OrgInfo> hospitals = orgInfoRepository.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
+				if (!CollectionUtils.isEmpty(featureList) && !CollectionUtils.isEmpty(hospitals)) {
+					hospitals.forEach(v -> {
+						Set<String> features = adminFeatureActiveRepository.findByHospitalUID(v.getHospitalUID()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+						List<AdminFeatureActive> waitList = new ArrayList<>();
+						waitFeatures.stream().filter(key -> !features.contains(key) && featureList.contains(key)).forEach(feature -> {
+							AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+							adminFeatureActive.setActiveUser(userAccount.getUid());
+							adminFeatureActive.setFeatureKey(feature);
+							adminFeatureActive.setHospitalUID(v.getUid());
+							adminFeatureActive.setTenantUID(v.getTenantUID());
+							adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+							adminFeatureActive.setCreateDate(new Date());
+							adminFeatureActive.setActiveDate(new Date());
+							waitList.add(adminFeatureActive);
+						});
+						adminFeatureActiveRepository.save(waitList);
+					});
+				}
+			}
+		}
+	}
+
+	public void batchUpdateTenantSupplier() {
+		List<TenantOptionConfig> tenantOptionConfigs = tenantOptionConfigRepository.findIsActiveSupplier();
+		tenantOptionConfigs.stream().map(TenantOptionConfig::getTenantUid).collect(Collectors.toSet()).forEach(uid -> {
+			TenantInfo tenantInfo = tenantInfoRepository.findByUid(uid);
+			if (ObjectUtil.isNotEmpty(tenantInfo)) {
+				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+				featureList.add(ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+				tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+				tenantInfoRepository.save(tenantInfo);
+			}
+		});
+		List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findIsActiveSupplier();
+		List<AdminFeatureActive> waitList = new ArrayList<>();
+		workflowConfigs.forEach(config -> {
+			OrgInfo info = orgInfoRepository.getByUid(config.getHospitalUID());
+			if (info.getOrgLevel() == 2) {
+				Set<String> features = adminFeatureActiveRepository.findByHospitalUID(config.getHospitalUID()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+				if (!features.contains(ApmFeature.ASSET_SUPPLIER_APPLICATION.name())) {
+					AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+					adminFeatureActive.setFeatureKey(ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+					adminFeatureActive.setHospitalUID(config.getHospitalUID());
+					adminFeatureActive.setTenantUID(config.getTenantUID());
+					adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+					adminFeatureActive.setCreateDate(new Date());
+					adminFeatureActive.setActiveDate(new Date());
+					waitList.add(adminFeatureActive);
+				}
+			}
+		});
+		adminFeatureActiveRepository.save(waitList);
+	}
+
+	public void batchUpdateTenantAdverseEvent() {
+		List<TenantInfo> tenantInfoList = tenantInfoRepository.getAllActiveAdverseEvent();
+		tenantInfoList.forEach(tenantInfo -> {
+			if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+				featureList.add(ApmFeature.ASSET_ADVERSE_EVENT.name());
+				tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+				tenantInfoRepository.save(tenantInfo);
+			}
+		});
+		List<String> hospitals = adverseEventsRepository.findByAllUseHospital();
+		List<AdminFeatureActive> waitList = new ArrayList<>();
+		hospitals.forEach(uid -> {
+			OrgInfo info = orgInfoRepository.getByUid(uid);
+			if (info.getOrgLevel() == 2) {
+				Set<String> features = adminFeatureActiveRepository.findByHospitalUID(uid).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+				if (!features.contains(ApmFeature.ASSET_ADVERSE_EVENT.name())) {
+					AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+					adminFeatureActive.setFeatureKey(ApmFeature.ASSET_ADVERSE_EVENT.name());
+					adminFeatureActive.setHospitalUID(info.getUid());
+					adminFeatureActive.setTenantUID(info.getTenantUID());
+					adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+					adminFeatureActive.setCreateDate(new Date());
+					adminFeatureActive.setActiveDate(new Date());
+					waitList.add(adminFeatureActive);
+				}
+			}
+		});
+		adminFeatureActiveRepository.save(waitList);
 	}
 }

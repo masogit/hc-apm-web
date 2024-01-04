@@ -85,4 +85,7 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     @Query(value = "SELECT ti.* from zkb_contract zkbc inner join tenant_info ti on zkbc.tenant_uid = ti.uid where ti.type='3' and NOT ((end_date < ?1) OR (start_date > ?2)) and zkbc.contract_amount='oneMillionMore' ", nativeQuery = true)
     List<TenantInfo> findTenantInfoListByContractDate(Date firstDay,Date lastDay);
 
+    @Query("select w from TenantInfo w where w.isEnablesAdverseEvents = true ")
+    public List<TenantInfo> getAllActiveAdverseEvent();
+
 }

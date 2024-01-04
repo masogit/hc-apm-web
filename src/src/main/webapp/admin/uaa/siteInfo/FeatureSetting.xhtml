@@ -130,30 +130,12 @@
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER']}"
-                                        itemLabel="供应商管理">
+                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER_APPLICATION']}"
+                                        itemLabel="供应商小程序">
                                     <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_SUPPLIER')}"/>
+                                            listener="#{featureSettingController.featureChange('ASSET_SUPPLIER_APPLICATION')}"/>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER_EVALUATION']}"
-                                        itemLabel="供应商评价">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_SUPPLIER_EVALUATION')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商评价菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER_EMPOWERMENT']}"
-                                        itemLabel="供应商负责人赋权">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_SUPPLIER_EMPOWERMENT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商负责人赋权菜单</p:outputLabel>
+                                <p:outputLabel>供应商小程序</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:selectBooleanCheckbox
@@ -671,10 +653,10 @@
                                              paginatorTemplate="{Toolbar}"
                                              rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="操作" exportable="false">
-                                        <p:commandButton id="active" process="@this" value="#{featureSettingController.isActive(item.activeUser)?'已激活':'激活'}" disabled="#{featureSettingController.isActive(item.activeUser)}" actionListener="#{featureSettingController.addHospital(item)}" update="datalist" class="btn btn-sm btn-gray">
+                                        <p:commandButton id="active" process="@this" value="#{featureSettingController.isActive(item.activeRole)?'已激活':'激活'}" disabled="#{featureSettingController.isActive(item.activeRole)}" actionListener="#{featureSettingController.addHospital(item)}" update="datalist" class="btn btn-sm btn-gray">
                                             <p:confirm header="激活确认" message="是否确认激活！" icon="ui-icon-alert"/>
                                         </p:commandButton>
-                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeUser)}"
+                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeRole)}"
                                                          actionListener="#{featureSettingController.generateActiveLink(item.hospitalUID)}" class="btn btn-sm btn-gray"
                                                          update="Links " oncomplete="PF('Links').show()"
                                         >
