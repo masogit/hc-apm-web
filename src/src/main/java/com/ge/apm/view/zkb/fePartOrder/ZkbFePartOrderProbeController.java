@@ -373,7 +373,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
                     if("FourInOne".equals(this.selected.getContractCatSnNo())){
                         confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
-                        thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                        if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())&&
+                                ZkbFePartOrderService.testStatusFalseValue.equals(this.selected.getProvideNewContract())){
+                            thisDeductionMessage = "不能提供全新合同,本次扣除"+qyt+"个探头普通名额；";
+                        }else{
+                            thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                        }
                         confirmMessage += "探头普通剩余名额为"+(probeQuotaNormal+(this.selected.getQty()-qyt))+"。";
                     }else{
                         confirmMessage += "本次申请不扣除名额！";
