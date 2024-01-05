@@ -7,6 +7,7 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -16,6 +17,7 @@ import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -110,6 +112,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     @Override
     protected void init() {
+        AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
+        accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/TemporallyPurchase/List.xhtml", UserContextService.getCurrentUserAccount());
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
         budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);

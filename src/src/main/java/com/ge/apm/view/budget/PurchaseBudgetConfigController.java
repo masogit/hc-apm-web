@@ -6,6 +6,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -53,16 +54,14 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
     @Getter@Setter
     private PurchaseBudgetConfig searchForm = new PurchaseBudgetConfig();
 
-    private MqUtils mqUtils;
-
-
     @Override
     protected void init() {
         purchaseBudgetConfigRepository = WebUtil.getBean(PurchaseBudgetConfigRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         purchaseBudgetConfigService = WebUtil.getBean(PurchaseBudgetConfigService.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        mqUtils = WebUtil.getBean(MqUtils.class);
+        AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
+        accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/config/List.xhtml",currentUser);
 
     }
 
@@ -75,7 +74,6 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
         if(StringUtils.isNotEmpty(searchForm.getYear())){
             updateSearchFilter(new SearchFilter("year", SearchFilter.Operator.LIKE, searchForm.getYear()));
         }
-        mqUtils.sendUserAccessRecords(currentUser,"BudgetEntry", AccessRecordsFeature.BUDGET.getFeatureCode());
         return purchaseBudgetConfigRepository.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
