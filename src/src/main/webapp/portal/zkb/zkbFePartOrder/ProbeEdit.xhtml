@@ -369,9 +369,11 @@
                                 and zkbFePartOrderProbeController.showZkbPoProbeQuotaType and zkbFePartOrderProbeController.selected.secondNewCatFlag.equals('t')}">
                             <label class="label">是否可以提供全新合同*</label>
                             <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondProvideNewContract}"  >
+                                <p:ajax event="change" update="secondProvideNewContract" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                             </p:selectOneMenu>
+                            <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度翻倍" rendered="#{zkbFePartOrderProbeController.selected.qty ne 0 and zkbFePartOrderProbeController.selected.secondProvideNewContract eq 'f'}"/>
                         </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()  and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">

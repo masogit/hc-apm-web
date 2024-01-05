@@ -23,6 +23,7 @@ import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -89,6 +90,8 @@ public class MaintainController implements ServerEventInterface{
 	private OrgInfoRepository orgInfoRepository;
 
 	private List<String> userDeptScopeOrg;
+
+	private Boolean checkRequired=Boolean.TRUE;
 
 	@PostConstruct
 	protected void init() {
@@ -375,11 +378,8 @@ public class MaintainController implements ServerEventInterface{
 	// }
 	// }
 	private void addErrMessage(String str) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,str, null);
-		FacesContext currentInstance = FacesContext.getCurrentInstance();
-		HttpServletResponse response = (HttpServletResponse) currentInstance.getExternalContext().getResponse();
-		response.setStatus(400);
-		currentInstance.addMessage(null, message);
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+		WebUtil.addErrorMessageKey(str);
 	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
@@ -451,10 +451,42 @@ public class MaintainController implements ServerEventInterface{
 	}
 
 	public void saveMaintain() {
+		if(!checkRequired())return;
 		Date currentDate = new Date();
 		if (nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser)) {
 			lazyEventModel.updateEvent(event);
 			addMessage("工单已保存");
+		}
+	}
+	private boolean checkRequired(){
+		checkRequired = Boolean.TRUE;
+		if(nurseSiteMaintain == null) return checkRequired;
+		List<NurseSiteMaintainItem> listNurseSiteMaintainItem = nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(CollectionUtils.isEmpty(listNurseSiteMaintainItem)) return checkRequired;
+		for (NurseSiteMaintainItem nurseSiteMaintainItem : listNurseSiteMaintainItem) {
+			List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
+			if(CollectionUtils.isEmpty(listData)) continue;
+			checkItemDataRequired(nurseSiteMaintainItem,listData);
+		}
+		return checkRequired;
+	}
+
+	private void checkItemDataRequired(NurseSiteMaintainItem nurseSiteMaintainItem,List<NurseSiteMaintainData> listData) {
+		String str="必填检查项未填写，不允许保存";
+		String assetName = nurseSiteMaintainItem.getAssetInfo().getName();
+		boolean hasChecked = listData.stream().anyMatch(item -> item.getCheckValue() != null || StringUtils.isNotBlank(item.getVariableText()));
+		if(!hasChecked) return;
+		for (NurseSiteMaintainData listDatum : listData) {
+			Boolean required = listDatum.getRequired();
+			if(Boolean.TRUE.equals(required)){
+				Boolean checkValue = listDatum.getCheckValue();
+				String variableText = listDatum.getVariableText();
+				if(checkValue == null || StringUtils.isBlank(variableText)){
+					checkRequired = Boolean.FALSE;
+					String checkItem = listDatum.getCheckItem();
+					addErrMessage(assetName+",检查项："+checkItem+" (勾选项、输入项), "+str);
+				}
+			}
 		}
 	}
 

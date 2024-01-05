@@ -531,6 +531,11 @@ public class UserContextService implements Serializable {
         return userContextService.getLoginUser();
     }
 
+    public static Set<String> getCurrentUserFunction() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.getFunctionListByFeatureAndRoles();
+    }
+
     public static List<CustomRole> getCustomRole(Integer userId){
     	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
     	return userContextService.getListCustomRole(userId);

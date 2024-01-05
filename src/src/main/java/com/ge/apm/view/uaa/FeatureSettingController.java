@@ -249,6 +249,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                 }
             });
             tenantInfo.setFeatureList(featureArray.toJSONString());
+            tenantInfo.setLastModifiedDate(new Date());
             dao.save(tenantInfo);
             MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
         } catch (Exception e) {

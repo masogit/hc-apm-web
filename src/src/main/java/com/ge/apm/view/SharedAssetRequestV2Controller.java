@@ -433,19 +433,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         List<String> orgUidList =new ArrayList<>();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = userContextService.getSelectSite();
+        UserAccount user = UserContextService.getCurrentUserAccount();
         if(selectSite == null){
-            UserAccount user = UserContextService.getCurrentUserAccount();
              orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         }else{
             orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
         }
 
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
-        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*"));
 
 //        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
 //            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
