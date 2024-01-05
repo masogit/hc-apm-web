@@ -2,6 +2,7 @@ package com.ge.apm.service.approval;
 
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
@@ -139,8 +140,17 @@ public class WxMessageService extends MicroServiceInvoker {
     @Autowired
     private UserAccountRepository userAccountRepository;
 
+    @Autowired
+    private ConfigItemValueRepository configItemValueRepository;
+
+
+
     @Async
     public  void submitAssetApprovalSendMessage(AssetInfo assetInfo,String token) {
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(assetInfo.getSiteUID(),assetInfo.getHospitalUID(),assetInfo.getInstitutionUID(),assetInfo.getTenantUID(),"assetReviewMessage");
+        if(Boolean.FALSE.toString().equalsIgnoreCase(value)){
+            return;
+        }
         List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
         List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
         Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
