@@ -435,7 +435,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         OrgInfo selectSite = userContextService.getSelectSite();
         UserAccount user = UserContextService.getCurrentUserAccount();
         if(selectSite == null){
-             orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            orgUidList = userOrgDao.findAccessUidByUserUid(user.getUid());
+
         }else{
             orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
         }
