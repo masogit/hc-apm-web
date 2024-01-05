@@ -1409,9 +1409,13 @@ public class NurseSiteMaintainService {
 				Map<String, NurseSiteMaintainConfigCheckItem> collect = listCheckData.stream().collect(Collectors.toMap(NurseSiteMaintainConfigCheckItem::getName, (item) -> item));
 				List<NurseSiteMaintainData> collect1 = listMaintainDataByParentIds.stream().map(item -> {
 					NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = collect.get(item.getCheckItem());
-						item.setCheckValue(true);
 					if(nurseSiteMaintainConfigCheckItem != null){
-						item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+						Boolean checkValue = nurseSiteMaintainConfigCheckItem.getCheckValue();
+						if(Boolean.TRUE.equals(checkValue)){
+							item.setCheckValue(checkValue);
+							item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+						}
+
 					}
 					return item;
 				}).collect(Collectors.toList());
