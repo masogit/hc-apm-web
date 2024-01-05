@@ -66,18 +66,14 @@ public class ZkbIntegralService {
     @Transactional(rollbackFor = Exception.class)
     public String kpiScoreHandler(String tenantUID, Integer kpi,String recordType, UserAccount userAccount,String kpiMonth)  {
         try {
-            boolean flag = true;
             String errorLog = "";
             if (StringUtils.isEmpty(tenantUID)){
-                flag = false;
                 errorLog += "tenantUID为空 ";
             }
             if (kpi == null){
-                flag = false;
                 errorLog += "kpi为空";
             }
             if (StringUtils.isEmpty(recordType)){
-                flag = false;
                 errorLog += "recordType为空 ";
             }
             if(StringUtils.isNotEmpty(errorLog.trim())){
@@ -174,7 +170,7 @@ public class ZkbIntegralService {
         ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
         zkbIntegralRecord.setRecordType(recordType);
         if(ZkbIntegralRecord.RecordType.QuotaDeduct.toString().equals(recordType)){
-            zkbIntegralRecord.setScore(0 - score);
+            zkbIntegralRecord.setScore(-score);
         }else if(ZkbIntegralRecord.RecordType.QuotaReturn.toString().equals(recordType)){
             zkbIntegralRecord.setScore(score);
         }
@@ -186,7 +182,7 @@ public class ZkbIntegralService {
 
     @Transactional(rollbackFor = Exception.class)
     public void save(ZkbIntegral zkbIntegral,UserAccount userAccount){
-        Integer score = 0;
+        Integer score;
         if(StringUtils.isEmpty(zkbIntegral.getId())){
             score = zkbIntegral.getIntegralTotal();
             zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
@@ -258,8 +254,7 @@ public class ZkbIntegralService {
     }
 
     public List<ZkbIntegralRecord> queryRecordByIntegralId(String integralId){
-        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
-        return zkbIntegralRecords;
+        return zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
     }
 
     public HashMap<String,Object> createZkbPartOrderData(List<ZkbIntegral> zkbIntegralList){
@@ -267,7 +262,7 @@ public class ZkbIntegralService {
         List<String> ids = new ArrayList<>();
         List<Map<String, Object>> zkbIntegralDataRecordList = new ArrayList<>();
         HashMap<String, String> tenMap = new HashMap<>();
-        if(zkbIntegralList.size() > 0){
+        if(!zkbIntegralList.isEmpty()){
             for(ZkbIntegral p : zkbIntegralList){
                 ids.add(p.getId());
                 Map<String, Object> zkbIntegralDataMap = new HashMap<>(4);
@@ -285,7 +280,7 @@ public class ZkbIntegralService {
             }
         }
 
-        if(zkbIntegralList.size() > 0 && ids.size() > 0){
+        if(!zkbIntegralList.isEmpty()){
             zkbIntegralDataRecordList = createZkbIntegralRecordData(ids,tenMap);
         }
         HashMap<String,Object> map = new HashMap<>(2);
