@@ -469,7 +469,8 @@
                     </p:panelGrid>
                 </p:fieldset>
 
-                <p:fieldset id="measure" legend="#{msg.MeasurementConfiguration}">
+                <!--YHAAO-20745 流程配置项去除计量相关配置-->
+                <p:fieldset id="measure" legend="#{msg.MeasurementConfiguration}" rendered="false">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup >
                             <label class="label">#{msg.staff_tile_meter}#{msg.dispatchUserName}</label>
