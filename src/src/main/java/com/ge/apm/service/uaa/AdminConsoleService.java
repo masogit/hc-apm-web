@@ -1362,7 +1362,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	}
 
 	/**
-	 * 批量删除并更新所有租户单独收费的 调剂中心 指控评审 预算管理
+	 * 批量删除并更新所有租户单独收费的 调剂中心 指控评审 预算管理  并激活已使用的医院
 	 * */
 	public void batchUpdateTenantFeature() {
 		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
