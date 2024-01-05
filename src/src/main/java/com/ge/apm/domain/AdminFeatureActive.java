@@ -18,13 +18,13 @@ public class AdminFeatureActive {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    @Column(name = "feature_key")
+    @Column(name = "feature_key", columnDefinition = "CHAR(32)")
     private String featureKey;
 
-    @Column(name = "active_role")
+    @Column(name = "active_role", columnDefinition = "CHAR(255)")
     private String activeRole;
 
-    @Column(name = "active_user")
+    @Column(name = "active_user", columnDefinition = "CHAR(64)")
     private String activeUser;
 
     // 创建日期
