@@ -102,14 +102,15 @@
 							<tr style="border: 1px solid black">
 
 								<td >
-									<p:selectBooleanCheckbox value="#{item.checkValue}">
-										<p:ajax process="@this" update="checkDataForm"  />
+									<p:selectBooleanCheckbox value="#{item.checkValue}" id="checkbox">
+										<p:ajax process="@this" update="foo"  />
 									</p:selectBooleanCheckbox>
 								</td>
 								<td style="border-right: 1px solid black">
 									<h:outputText value="#{item.name}" />
 								</td>
 								<td>
+								<h:panelGroup id="foo">
 									<label class="label"><span style="color:red;margin-left: -200px">#{item.checkValue and item.required? '*':''}</span></label>
 									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Text'}"/>
 									<p:inputText type="number" value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Number'}"/>
@@ -120,13 +121,14 @@
 									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}" required="#{item.checkValue and item.required}" rendered="#{ item.fieldType eq 'Date'}"
 												pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
 												showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+								</h:panelGroup>
 								</td>
 							</tr>
 						</p:repeat>
 				</table>
 			<p:commandButton value="批量通过" validateClient="true" actionListener="#{maintainItemController.saveCheckData()}" update=":messages" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
-			<p:commandButton value="全选" immediate="true" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
-			<p:commandButton value="全不选" immediate="true" actionListener="#{maintainItemController.resetCheckData2()}" update=":checkDataForm"  />
+			<p:commandButton value="全选" immediate="true" actionListener="#{maintainItemController.resetCheckData()}" update="checkDataForm" />
+			<p:commandButton value="全不选" immediate="true" actionListener="#{maintainItemController.resetCheckData2()}" update="checkDataForm"  />
 		</h:form>
 	</p:dialog>
 </ui:composition>
