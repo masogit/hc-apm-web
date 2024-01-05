@@ -102,20 +102,22 @@
 							<tr style="border: 1px solid black">
 
 								<td >
-									<p:selectBooleanCheckbox value="#{item.checkValue}"></p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{item.checkValue}">
+										<p:ajax process="@this" update="checkDataForm"  />
+									</p:selectBooleanCheckbox>
 								</td>
 								<td style="border-right: 1px solid black">
 									<h:outputText value="#{item.name}" />
 								</td>
 								<td>
-									<label class="label"><span style="color:red;margin-left: -200px">#{item.required? '*':''}</span></label>
-									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Text'}"/>
-									<p:inputText type="number" value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Number'}"/>
-									<p:selectOneMenu  value="#{item.defaultValue}" required="#{item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Select'}">
+									<label class="label"><span style="color:red;margin-left: -200px">#{item.checkValue and item.required? '*':''}</span></label>
+									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Text'}"/>
+									<p:inputText type="number" value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Number'}"/>
+									<p:selectOneMenu  value="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Select'}">
 										<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 										<f:selectItems value="#{item.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 									</p:selectOneMenu>
-									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}" required="#{item.required}" rendered="#{ item.fieldType eq 'Date'}"
+									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}" required="#{item.checkValue and item.required}" rendered="#{ item.fieldType eq 'Date'}"
 												pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
 												showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 								</td>
