@@ -285,9 +285,9 @@ public class AdminConsoleController {
 		new Thread(() -> adminConsoleService.batchUpdateSharedAssetRequest()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-	@Deprecated
-	public void batchUpdateTenantHospitalActive(){
-		new Thread(() -> adminConsoleService.batchUpdateTenantHospitalActive()).start();
+
+	public void batchUpdateTenantFeature(){
+		new Thread(() -> adminConsoleService.batchUpdateTenantFeature()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
