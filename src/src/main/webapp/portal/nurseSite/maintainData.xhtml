@@ -42,17 +42,17 @@
 								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
 									<td >
 										<h:panelGrid columns="3" layout="grid" styleClass="showcase-text-align-center">
-											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" />
+											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}"  />
 											<h:panelGroup>
 											<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
-											<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{item3.fieldType eq 'Text'}"/>
-											<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item3.fieldType eq 'Number'}"/>
-											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}" required="#{item2.getDataValue(item3.name).required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item3.fieldType eq 'Select'}">
+											<p:inputText  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text'}"/>
+											<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number'}"/>
+											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select'}">
 												<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 												<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 											</p:selectOneMenu>
-											<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}" required="#{item2.getDataValue(item3.name).required}"  rendered="#{ item3.fieldType eq 'Date'}"
-														pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
+											<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date'}"
+														pattern="yyyy/MM/dd"
 														showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 											</h:panelGroup>
 										</h:panelGrid>
@@ -77,7 +77,7 @@
 					<p:commandButton id="btnCheckData" immediate="true" value="检查项" update="checkDataDlg" oncomplete="PF('checkDataDlg').show()" />
 					<p:commandButton id="checkRightButton" immediate="true"  value="全部勾选(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable" />
 					<p:commandButton id="addButton" validateClient="true" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
-									 oncomplete="PF('maintain').update();PF('maintainDialog').hide();"	   rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
+									 oncomplete="handleSaveSubmit(args)" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 					<p:commandButton id="deleteButton" value="删除" immediate="true" actionListener="#{maintainController.deleteMaintain}" update=":messages"
 									 disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}">
 						<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
@@ -102,34 +102,46 @@
 							<tr style="border: 1px solid black">
 
 								<td >
-									<p:selectBooleanCheckbox value="#{item.checkValue}" id="checkbox">
-										<p:ajax process="@this" update="foo"  />
-									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{item.checkValue}" ></p:selectBooleanCheckbox>
 								</td>
 								<td style="border-right: 1px solid black">
 									<h:outputText value="#{item.name}" />
 								</td>
 								<td>
-								<h:panelGroup id="foo">
-									<label class="label"><span style="color:red;margin-left: -200px">#{item.checkValue and item.required? '*':''}</span></label>
-									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Text'}"/>
-									<p:inputText type="number" value="#{item.defaultValue}" placeholder="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Number'}"/>
-									<p:selectOneMenu  value="#{item.defaultValue}" required="#{item.checkValue and item.required}" requiredMessage="必填检查项未填写，不允许保存" rendered="#{ item.fieldType eq 'Select'}">
+									<label class="label"><span style="color:red;margin-left: -200px">#{item.required? '*':''}</span></label>
+									<p:inputText value="#{item.defaultValue}" placeholder="#{item.defaultValue}"   rendered="#{ item.fieldType eq 'Text'}"/>
+									<p:inputText type="number" value="#{item.defaultValue}" placeholder="#{item.defaultValue}"   rendered="#{ item.fieldType eq 'Number'}"/>
+									<p:selectOneMenu  value="#{item.defaultValue}"   rendered="#{ item.fieldType eq 'Select'}">
 										<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 										<f:selectItems value="#{item.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 									</p:selectOneMenu>
-									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}" required="#{item.checkValue and item.required}" rendered="#{ item.fieldType eq 'Date'}"
-												pattern="yyyy/MM/dd"  requiredMessage="必填检查项未填写，不允许保存"
+									<p:calendar timeZone="GMT+8" id="startTime1" value="#{item.dateValue}"  rendered="#{ item.fieldType eq 'Date'}"
+												pattern="yyyy/MM/dd"
 												showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-								</h:panelGroup>
 								</td>
 							</tr>
 						</p:repeat>
 				</table>
-			<p:commandButton value="批量通过" validateClient="true" actionListener="#{maintainItemController.saveCheckData()}" update=":messages" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
+			<p:commandButton value="批量通过" validateClient="true" actionListener="#{maintainItemController.saveCheckData()}" update=":messages" oncomplete="handleSaveAllSubmit(args)" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 			<p:commandButton value="全选" immediate="true" actionListener="#{maintainItemController.resetCheckData()}" update="checkDataForm" />
 			<p:commandButton value="全不选" immediate="true" actionListener="#{maintainItemController.resetCheckData2()}" update="checkDataForm"  />
 		</h:form>
+		<h:outputScript>
+			function handleSaveSubmit(args) {
+				if (!args.validationFailed){
+				    PF("maintain").update();
+					PF('maintainDialog').hide();
+				}
+			}
+			function handleSaveAllSubmit(args) {
+				if (!args.validationFailed){
+					PF('checkDataDlg').hide();
+					PF('maintainDialog').hide();
+					PF('maintain').update();
+				}
+			}
+
+		</h:outputScript>
 	</p:dialog>
 </ui:composition>
 </html>
