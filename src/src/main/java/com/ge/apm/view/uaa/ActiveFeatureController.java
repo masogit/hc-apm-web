@@ -96,11 +96,11 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userService = WebUtil.getBean(UserCommonService.class);
         dao = WebUtil.getBean(AdminFeatureActiveRepository.class);
-        selectHospital = configCacheService.findOrgByUid(hospitalUID);
+        selectHospital = orgDao.findByUid(hospitalUID);
         if (ObjectUtils.isEmpty(selectHospital)) {
             return;
         }
-        tenantInfo = configCacheService.getTenantByUid(selectHospital.getTenantUID());
+        tenantInfo = tenantInfoRepository.findByUid(selectHospital.getTenantUID());
         if (ObjectUtils.isEmpty(tenantInfo) || !selectHospital.getTenantUID().equals(userContextService.getLoginUser().getTenantUID())) {
             WebUtil.redirectTo("/accessdeniedzh.xhtml");
             return;

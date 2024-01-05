@@ -1376,6 +1376,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					if (CollectionUtils.isEmpty(requests)) {
 						featureList.remove(ApmFeature.ADJUST_ASSET.name());
 						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
 						waitSaveTenant.add(tenantInfo);
 					} else {
 						Set<String> hospitals = requests.stream().map(SharedAssetRequest::getHospitalUID).collect(Collectors.toSet());
@@ -1389,6 +1391,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					if (CollectionUtils.isEmpty(requests)) {
 						featureList.remove(ApmFeature.AUDIT.name());
 						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
 						waitSaveTenant.add(tenantInfo);
 					} else {
 						Set<String> siteUid = requests.stream().map(AuditCase::getSiteUid).collect(Collectors.toSet());
@@ -1402,6 +1406,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					List<BudgetApplication> requests = budgetApplicationRepository.findByTenantUID(tenantInfo.getUid());
 					if (CollectionUtils.isEmpty(requests)) {
 						featureList.remove(ApmFeature.BUDGET.name());
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
 						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
 						waitSaveTenant.add(tenantInfo);
 					} else {
