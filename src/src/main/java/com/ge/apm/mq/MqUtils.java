@@ -117,9 +117,9 @@ public class MqUtils {
     }
 
 
-    @Async
     public void sendUserAccessRecords(UserAccount userAccount,String businessType,String featureName){
         try {
+            userAccount=userAccount!=null?userAccount:UserContextService.getCurrentUserAccount();
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("user",userAccount);
             jsonObject.put("featureName",featureName);
