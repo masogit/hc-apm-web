@@ -140,7 +140,6 @@ public class TenantInfo implements Serializable {
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
