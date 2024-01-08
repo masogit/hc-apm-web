@@ -30,4 +30,77 @@
         <where>${ew.sqlSegment}</where>
     </select>
 
+    <select id="searchMaintainConfig" resultMap="maintainConfigBean">
+        select nsmc.* from nurse_site_maintain_config nsmc
+        <where>
+            nsmc.deleted is false
+            <choose>
+                <when test="assetTypes != null and assetTypes.size > 0">
+                    <include refid="queryConfigItemIds"/>
+                </when>
+                <otherwise>
+                    <if test="tenantUid != null">
+                        and nsmc.tenant_uid = #{tenantUid}
+                    </if>
+                    <if test="orgUidList != null and orgUidList.size > 0">
+                        and (
+                        nsmc.institution_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsmc.hospital_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsmc.site_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsmc.clinical_dept_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        )
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+        order by modify_date desc
+    </select>
+
+    <sql id="queryConfigItemIds">
+        and nsmc.id in (
+        select distinct nsmi.parent_id from nurse_site_maintain_config_item nsmi join asset_info ai on nsmi.asset_uid = ai.uid
+        <if test="tenantUid != null">
+            and ai.tenant_uid = #{tenantUid}
+        </if>
+        <if test="orgUidList != null and orgUidList.size > 0">
+            and (
+            ai.site_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            or ai.institution_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            or ai.hospital_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            or ai.clinical_dept_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="assetTypes != null and assetTypes.size > 0">
+            and ai.asset_type in
+            <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+        )
+    </sql>
+
 </mapper>

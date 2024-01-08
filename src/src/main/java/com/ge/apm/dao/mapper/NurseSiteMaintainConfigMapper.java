@@ -7,7 +7,10 @@ import com.ge.apm.domain.NurseSiteMaintainConfig;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface NurseSiteMaintainConfigMapper extends BaseMapper<NurseSiteMaintainConfig> {
     List<NurseSiteMaintainConfig> findJoinAssetList(Pagination pagination, @Param("ew") Wrapper<NurseSiteMaintainConfig> wrapper);
+
+    List<NurseSiteMaintainConfig> searchMaintainConfig(Map<String, Object> param);
 }
