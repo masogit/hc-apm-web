@@ -34,7 +34,7 @@ public class TenantOptionalConfigService  {
         tenantInfo.setQrCodeEditable(qrCodeEditable);
 
         tenantInfoDao.save(tenantInfo);
-        configCacheService.cleanTenantCacheByUid(selectedTenant.getUid());
+        //configCacheService.cleanTenantCacheByUid(selectedTenant.getUid());
 
     }
 

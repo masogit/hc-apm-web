@@ -75,7 +75,6 @@ public class ConfigCacheService {
         return tenantOptionConfig;
     }
 
-    @Cacheable(cacheNames = "springCache", key = "'TenantInfo_Uid.'+#uid")
     public TenantInfo getTenantByUid(String uid){
         return tenantDao.findByuid(uid);
     }
@@ -83,10 +82,6 @@ public class ConfigCacheService {
 
     @CacheEvict(cacheNames = "springCache", key = "'WorkflowConfig_siteUid.'+#siteUid")
     public void  cleanWorkflowConfigCache (String siteUid){
-    }
-
-    @CacheEvict(cacheNames = "springCache", key = "'TenantInfo_Uid.'+#uid")
-    public void  cleanTenantCacheByUid (String uid){
     }
 
     @CacheEvict(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
