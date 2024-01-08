@@ -365,7 +365,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		jsonObject.put("edition", tenantConfigService.getEdition());
 		selected.setTenantConfig(jsonObject.toJSONString());
 		dao.save(selected);
-		configCacheService.cleanTenantCacheByUid(selected.getUid());
+		//configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();
@@ -438,7 +438,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void markDeleted() {
 		selected.setIsDeleted(true);
 		dao.save(selected);
-		configCacheService.cleanTenantCacheByUid(selected.getUid());
+		//configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	@Override
