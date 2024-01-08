@@ -225,7 +225,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">审批单价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}" disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"
+                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="审批单价 #{msg.ValidationRequire}" disabled="#{budgetBayController.selected.applicationStep eq 'Complete'}"
                                                 value="#{budgetBayController.curSelectApplicationBudgetAsset.offlineApplicationPrice}">
                                     <p:ajax listener="#{budgetBayController.calcAmountOffline(budgetBayController.curSelectApplicationBudgetAsset)}" update="@this offlineApplicationAmount"/>
                                 </p:inputNumber>

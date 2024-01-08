@@ -22,6 +22,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -362,6 +363,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
+            assetInfoService.setSupplier(ListUtil.newArrayList(selected));
         }
         if(selected ==null){
             try {
@@ -471,6 +473,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             if (null != supplier){
                 selected.setManufactureId(supplier.getId().toString());
                 selected.setManufacture(supplier.getName());
+                selected.setManufactureTel(supplier.getTel());
                 selectedObjectMap.put("manufacturer", supplier.getUid() == null ? null : supplierDao.findByUid(supplier.getUid()));
             }
         }
@@ -727,16 +730,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             case "supplier":
                 selected.setSupplierId(supplier == null ? null : supplier.getId());
                 selected.setVendor(supplier == null ? null : supplier.getName());
-                selected.setVendorTel(supplier == null ? null : supplier.getTel());
+                selected.setVendorTel(Optional.ofNullable(supplier).map(Supplier::getTel).orElse(null));
                 break;
             case "maintainer":
                 selected.setMaitananceId(supplier == null ? null : supplier.getId().toString());
                 selected.setMaitanance(supplier == null ? null : supplier.getName());
-                selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
+                selected.setMaitananceTel(Optional.ofNullable(supplier).map(Supplier::getTel).orElse(null));
                 break;
             case "manufacturer":
                 selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
                 selected.setManufacture(supplier == null ? null : supplier.getName());
+                selected.setManufactureTel(Optional.ofNullable(supplier).map(Supplier::getTel).orElse(null));
+                break;
+            default:
                 break;
         }
     }

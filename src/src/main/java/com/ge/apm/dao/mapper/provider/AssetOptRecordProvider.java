@@ -97,10 +97,17 @@ public class AssetOptRecordProvider {
 		SearchFilter.Operator op = searchFilter.operator;
 		if (op.equals(SearchFilter.Operator.IN)) {
 			String strValue = getSetValue(value);
-			if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid in " + strValue + " and ");
-			} else if (tempColumn.equals("assetInfo.assetType")) {
-				sb.append("b.asset_type in " + strValue + " and ");
+			if ("assetInfo.assetType".equals(tempColumn)) {
+				sb.append("b.asset_type in ").append(strValue).append(" and ");
+			}
+			if ("assetInfo.orgUidList".equals(tempColumn)) {
+				sb.append("(");
+				sb.append("b.tenant_uid in ").append(strValue);
+				sb.append("or b.institution_uid in ").append(strValue);
+				sb.append("or b.hospital_uid in ").append(strValue);
+				sb.append("or b.site_uid in ").append(strValue);
+				sb.append("or b.clinical_dept_uid in ").append(strValue);
+				sb.append("or b.asset_dept_uid in ").append(strValue).append(")").append(" and ");
 			}
 		} else {
 			if (tempColumn.equals("assetInfo.siteUID")) {

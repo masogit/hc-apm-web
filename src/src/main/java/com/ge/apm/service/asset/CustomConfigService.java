@@ -154,6 +154,8 @@ public class CustomConfigService {
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
         List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
         exportFields.remove("vendorTel");
+        exportFields.remove("manufactureTel");
+        exportFields.remove("maitananceTel");
 
         removeDisabledExportFields(exportFields);
         if(exportFields.remove("medicalApparatusClassification")){

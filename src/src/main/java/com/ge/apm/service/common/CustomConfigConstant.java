@@ -30,7 +30,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup","spare01","spare02","spare03","spare04","spare05");
     }
 
     //只读字段
@@ -67,7 +67,7 @@ public class CustomConfigConstant {
                 "assetOwnerName", "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3",
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
-                "manufacture", "makerShortName",
+                "manufacture", "manufactureTel", "makerShortName",
                 "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassificationCode","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
@@ -110,7 +110,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
-                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
+                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "manufactureTel", "makerShortName", "vendor", "vendorTel",
                 "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
@@ -127,7 +127,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "manufactureTel", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {

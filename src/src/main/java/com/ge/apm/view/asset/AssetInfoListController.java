@@ -79,7 +79,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserRoleRepository userRoleRepository;
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
-
+    private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     //选定的院区
     private OrgInfo selectSite;
@@ -92,6 +92,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterSpare01;
 
     private Set<String> spare01Set;
+
+
+    private String filterSpare02;
+
+    private Set<String> spare02Set;
+
+
+    private String filterSpare03;
+
+    private Set<String> spare03Set;
+
+    private String filterSpare04;
+
+    private Set<String> spare04Set;
+    private String filterSpare05;
+
+    private Set<String> spare05Set;
+
+
+
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
     @Getter
@@ -203,6 +223,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -325,22 +346,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("assetUsedLifecycle");
         }
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
-
         currentPageAssets = res.getContent();
 
-        //设置OneQrCodeStatus
-//        currentPageAssets.forEach(item -> {
-//            if(item.getQrCodeLib()!=null){
-//                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
-//            }
-//            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
-//        });
-
         addMisingClinicalDeptOrg(currentPageAssets);
-
         setWarrantyAlerts(currentPageAssets);
-
-        setSupplier(currentPageAssets);
+        assetInfoService.setSupplier(currentPageAssets);
 
         Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
@@ -521,6 +531,27 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("spare01", SearchFilter.Operator.IN, new ArrayList<>(spare01Set), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "spare01".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
+        if (spare02Set != null && !spare02Set.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("spare02", SearchFilter.Operator.IN, new ArrayList<>(spare02Set), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "spare02".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (spare03Set != null && !spare03Set.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("spare03", SearchFilter.Operator.IN, new ArrayList<>(spare03Set), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "spare03".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (spare04Set != null && !spare04Set.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("spare04", SearchFilter.Operator.IN, new ArrayList<>(spare04Set), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "spare04".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (spare05Set != null && !spare05Set.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("spare05", SearchFilter.Operator.IN, new ArrayList<>(spare05Set), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "spare05".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
     }
 
@@ -997,7 +1028,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public List<String> autoCompleteSpare01Name(String query) {
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
-        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare01", siteId);
 
         if (spare01List == null) {
             return Collections.emptyList();
@@ -1010,6 +1041,76 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         return result;
     }
+
+
+
+    public List<String> autoCompleteSpare02Name(String query) {
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare02", siteId);
+
+        if (spare01List == null) {
+            return Collections.emptyList();
+        }
+
+        List<I18nMessage> res = spare01List.stream()
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().contains(query))
+                .collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+        return result;
+    }
+    public List<String> autoCompleteSpare03Name(String query) {
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare03", siteId);
+
+        if (spare01List == null) {
+            return Collections.emptyList();
+        }
+
+        List<I18nMessage> res = spare01List.stream()
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().contains(query))
+                .collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+        return result;
+    }
+    public List<String> autoCompleteSpare04Name(String query) {
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare04", siteId);
+
+        if (spare01List == null) {
+            return Collections.emptyList();
+        }
+
+        List<I18nMessage> res = spare01List.stream()
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().contains(query))
+                .collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+        return result;
+    }
+    public List<String> autoCompleteSpare05Name(String query) {
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare05", siteId);
+
+        if (spare01List == null) {
+            return Collections.emptyList();
+        }
+
+        List<I18nMessage> res = spare01List.stream()
+                .filter(item ->Strings.isNullOrEmpty(query) ||  item.getValueZh().contains(query))
+                .collect(Collectors.toList());
+        List<String> result =  res.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+        return result;
+    }
+
+
+
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
@@ -1038,7 +1139,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
-        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("TCM", siteId);
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare01", siteId);
 
         if (!Strings.isNullOrEmpty(filterSpare01) && !spare01List.stream().anyMatch(item -> filterSpare01.equals(item.getValueZh()))) {
             filterSpare01 = null;
@@ -1054,6 +1155,106 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
+
+
+    public void onSpare02FilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSpare02 = (String) ((SelectEvent) event).getObject();
+        }
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare02", siteId);
+
+        if (!Strings.isNullOrEmpty(filterSpare02) && !spare01List.stream().anyMatch(item -> filterSpare02.equals(item.getValueZh()))) {
+            filterSpare02 = null;
+        }
+
+        if (filterSpare02 != null) {
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getValueZh().equals(filterSpare02)).collect(Collectors.toList());
+
+            Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
+            spare02Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            spare02Set = Collections.emptySet();
+        }
+
+    }
+
+
+    public void onSpare03FilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSpare03 = (String) ((SelectEvent) event).getObject();
+        }
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare03", siteId);
+
+        if (!Strings.isNullOrEmpty(filterSpare03) && !spare01List.stream().anyMatch(item -> filterSpare03.equals(item.getValueZh()))) {
+            filterSpare03 = null;
+        }
+
+        if (filterSpare03 != null) {
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getValueZh().equals(filterSpare03)).collect(Collectors.toList());
+
+            Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
+            spare03Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            spare03Set = Collections.emptySet();
+        }
+
+    }
+    public void onSpare04FilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSpare04 = (String) ((SelectEvent) event).getObject();
+        }
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare04", siteId);
+
+        if (!Strings.isNullOrEmpty(filterSpare04) && !spare01List.stream().anyMatch(item -> filterSpare04.equals(item.getValueZh()))) {
+            filterSpare04 = null;
+        }
+
+        if (filterSpare04 != null) {
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getValueZh().equals(filterSpare04)).collect(Collectors.toList());
+
+            Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
+            spare04Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            spare04Set = Collections.emptySet();
+        }
+
+    }
+
+    public void onSpare05FilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSpare05 = (String) ((SelectEvent) event).getObject();
+        }
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+
+        List<I18nMessage> spare01List = FieldValueMessageController.getFieldValueList("spare05", siteId);
+
+        if (!Strings.isNullOrEmpty(filterSpare05) && !spare01List.stream().anyMatch(item -> filterSpare05.equals(item.getValueZh()))) {
+            filterSpare05 = null;
+        }
+
+        if (filterSpare05 != null) {
+            List<I18nMessage> i18nMessagesByName = spare01List.stream().filter(item -> item.getValueZh().equals(filterSpare05)).collect(Collectors.toList());
+
+            Set<I18nMessage> matchedList = i18nMessageService.collectSpare01InExstingList(i18nMessagesByName, spare01List);
+            spare05Set = matchedList.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            spare05Set = Collections.emptySet();
+        }
+
+    }
+
+
 
 
 
@@ -1124,12 +1325,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        /*if (filterAssetStatus != null) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
-        }
-        if (assetId != null) {
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
-        }*/
         if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
             Date warrantyDate = new Date();
             //2个月内，则是保修到期时间在2个月后时间之前所有
@@ -1139,18 +1334,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             varWarrantyDateTo = c.getTime();
             searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
             searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
-            //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-            //filterWarrantyDate = null;
         }
     }
-
-    private void setSupplier(List<AssetInfo> assets){
-        Set<Integer> supplierIds = assets.stream().map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        List<Supplier> supplierList = supplierDao.findByIdIn(supplierIds);
-        Map<Integer, Supplier> supplierMap = supplierList.stream().collect(Collectors.toMap(Supplier::getId, t -> t));
-        assets.forEach(item -> item.setSupplier(supplierMap.get(item.getSupplierId()) != null ? supplierMap.get(item.getSupplierId()) : new Supplier()));
-    }
-
     public String selectCreatedBy(String loginName) {
         UserAccount userAccount = createdByMap.get(loginName);
         String createdBy = null;
@@ -1462,5 +1647,69 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setSpare01Set(Set<String> spare01Set) {
         this.spare01Set = spare01Set;
+    }
+
+    public String getFilterSpare02() {
+        return filterSpare02;
+    }
+
+    public void setFilterSpare02(String filterSpare02) {
+        this.filterSpare02 = filterSpare02;
+    }
+
+    public Set<String> getSpare02Set() {
+        return spare02Set;
+    }
+
+    public void setSpare02Set(Set<String> spare02Set) {
+        this.spare02Set = spare02Set;
+    }
+
+    public String getFilterSpare03() {
+        return filterSpare03;
+    }
+
+    public void setFilterSpare03(String filterSpare03) {
+        this.filterSpare03 = filterSpare03;
+    }
+
+    public Set<String> getSpare03Set() {
+        return spare03Set;
+    }
+
+    public void setSpare03Set(Set<String> spare03Set) {
+        this.spare03Set = spare03Set;
+    }
+
+    public String getFilterSpare04() {
+        return filterSpare04;
+    }
+
+    public void setFilterSpare04(String filterSpare04) {
+        this.filterSpare04 = filterSpare04;
+    }
+
+    public Set<String> getSpare04Set() {
+        return spare04Set;
+    }
+
+    public void setSpare04Set(Set<String> spare04Set) {
+        this.spare04Set = spare04Set;
+    }
+
+    public String getFilterSpare05() {
+        return filterSpare05;
+    }
+
+    public void setFilterSpare05(String filterSpare05) {
+        this.filterSpare05 = filterSpare05;
+    }
+
+    public Set<String> getSpare05Set() {
+        return spare05Set;
+    }
+
+    public void setSpare05Set(Set<String> spare05Set) {
+        this.spare05Set = spare05Set;
     }
 }

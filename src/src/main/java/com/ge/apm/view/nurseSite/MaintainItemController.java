@@ -17,6 +17,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private Map<String,Boolean> mapCheckData;
 	private List<NurseSiteMaintainConfigCheckItem> listCheckData=new ArrayList<>();
 	private MaintainController maintainController;
+	private Boolean checkRequired=Boolean.TRUE;
 	@PostConstruct
 	public void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -105,10 +107,33 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 //				listCheckData.add(label);
 //			}
 //		}
-
+		if(!checkRequired()) return;
 		//nurseSiteMaintain.setCheckData(listCheckData);
 		nurseSiteMaintain.setListCheckData(this.listCheckData);
 		completeMaintain();
+	}
+
+	private boolean checkRequired() {
+		checkRequired = Boolean.TRUE;
+		String str="必填检查项未填写，不允许保存";
+		List<NurseSiteMaintainConfigCheckItem> listCheckData = this.listCheckData;
+		for (NurseSiteMaintainConfigCheckItem listDatum : listCheckData) {
+			Boolean required = listDatum.getRequired();
+			if(Boolean.TRUE.equals(required)){
+				Boolean checkValue = listDatum.getCheckValue();
+				String defaultValue = listDatum.getDefaultValue();
+				if(!Boolean.TRUE.equals(checkValue)|| StringUtils.isBlank(defaultValue)){
+					checkRequired = Boolean.FALSE;
+					String checkItem = listDatum.getName();
+					addErrMessage("检查项："+checkItem+" (勾选项、输入项), "+str);
+				}
+			}
+		}
+		return checkRequired;
+	}
+	private void addErrMessage(String str) {
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+		WebUtil.addErrorMessageKey(str);
 	}
 	public void resetCheckData(){
 //		for(String label: mapCheckData.keySet()){
@@ -180,6 +205,12 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 							showLables.add(p);
 							NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = new NurseSiteMaintainConfigCheckItem();
 							BeanUtils.copyProperties(p,nurseSiteMaintainConfigCheckItem);
+							Optional<Boolean> first = listTempData.stream().filter(item -> item.getCheckItem().equals(p.getName())).map(item -> item.getRequired()).findFirst();
+							if (first.isPresent()) {
+								nurseSiteMaintainConfigCheckItem.setRequired(first.get());
+							}else{
+								nurseSiteMaintainConfigCheckItem.setRequired(Boolean.FALSE);
+							}
 							listCheckData.add(nurseSiteMaintainConfigCheckItem);
 						}
 					}
@@ -200,6 +231,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(checkItem.getFieldType());
+		p.setRequired(checkItem.getRequired());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);

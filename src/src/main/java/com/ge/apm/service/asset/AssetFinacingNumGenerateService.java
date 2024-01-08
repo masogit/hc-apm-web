@@ -55,6 +55,33 @@ public class AssetFinacingNumGenerateService {
         return null;
     }
 
+
+
+    public String batchAutoGenerateFinacingNum(Integer assetId, String nationalStardCode, String uid, Integer majorAssetId, String prefix,String primaryKey,int count) {
+        LinkedHashMap<String, Object> param = new LinkedHashMap<>();
+        LOGGER.info("autoGenerateFinacingNum begin ,assetId is {},code is {},uid is {},majorAssetId is {},prefix is {}",
+                assetId, nationalStardCode, uid, majorAssetId, prefix);
+        param.put("assetId", assetId);
+        param.put("nationalStardCode", nationalStardCode);
+        param.put("uid", uid);
+        param.put("majorAssetId", majorAssetId);
+        param.put("prefix", prefix);
+        param.put("primaryKey", primaryKey);
+        param.put("count", count);
+        try {
+            String result = pmOrderRequestApiService.batchAutoGenerateFinacingNum(param);
+            if (null == result) {
+                WebUtil.addErrorMessage("无法自动生成资产编码");
+            }
+            LOGGER.info("autoGenerateFinacingNum end , sn is {}",result);
+            return result;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 //    public AssetSeriaNumConfig findConfigByUid(String tenantUID, String uid) {
 //        List<AssetSeriaNumConfig> configs = assetSeriaNumConfigRepository.findByTenantUID(tenantUID);
 //        if(CollectionUtils.isEmpty(configs)) {

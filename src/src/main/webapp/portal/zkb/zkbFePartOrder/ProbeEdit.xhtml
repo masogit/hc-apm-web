@@ -276,7 +276,7 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset  id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingAssignment')}">
-                <p:fieldset id="uploadContractEvidence" rendered="#{zkbFePartOrderProbeController.selected.newCatFlag eq 't' and zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
+                <p:fieldset id="uploadContractEvidence" rendered="#{zkbFePartOrderProbeController.selected.provideNewContract eq 't' and zkbFePartOrderProbeController.selected.newCatFlag eq 't' and zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
                 <p:panelGrid>
                     <h:panelGroup>
                         <p:dataList id="contractEvidenceList" value="#{zkbFePartOrderProbeController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -300,13 +300,18 @@
                     <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.notGeAsset.equals('t')}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}" value="#{zkbFePartOrderProbeController.selected.newCatFlag}" >
-                            <p:ajax event="change" update="managementFieldset confirmMessage thisDeductionMessage" />
-
+                            <p:ajax event="change" listener="#{zkbFePartOrderProbeController.initProvideNewContract()}"  update="managementFieldset confirmMessage thisDeductionMessage " />
                             <f:selectItem  itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
+                    <h:panelGroup id="provideNewContract_display" rendered="#{zkbFePartOrderProbeController.selected.newCatFlag.equals('t') and !zkbFePartOrderProbeController.selected.notGeAsset.equals('t') and zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
+                        <label class="label">是否可以提供全新合同*</label>
+                        <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" required="true"  value="#{zkbFePartOrderProbeController.selected.provideNewContract}" >
+                            <p:ajax event="change" update="managementFieldset confirmMessage thisDeductionMessage" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                     <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('WaitingAssignment')}">
                         <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderProbeController.selected.tenantAssignUser}"  />
@@ -354,9 +359,22 @@
                     <h:panelGroup rendered="#{(zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondNewCatFlag}"  >
+                            <p:ajax event="change" update="secondProvideNewContract" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="secondProvideNewContract">
+                        <h:panelGroup rendered="#{(zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')
+                                and zkbFePartOrderProbeController.showZkbPoProbeQuotaType and zkbFePartOrderProbeController.selected.secondNewCatFlag.equals('t')}">
+                            <label class="label">是否可以提供全新合同*</label>
+                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondProvideNewContract}"  >
+                                <p:ajax event="change" update="secondProvideNewContract" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel style="color: red;margin-left: 20px;" value="不能提供全新合同扣减额度翻倍" rendered="#{zkbFePartOrderProbeController.selected.qty ne 0 and zkbFePartOrderProbeController.selected.secondProvideNewContract eq 'f'}"/>
+                        </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()  and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <c:choose>

@@ -458,9 +458,59 @@ public class AssetInfoFormatter {
 
         if (assetInfo.getSpare01() == null) return null;
 
-        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare01(), importService.spare01List);
 
         return value;
+    }
+    public String getSpare02AsString() {
+
+        if (assetInfo.getSpare02() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare02(), importService.spare02List);
+
+        return value;
+    }
+    public String getSpare03AsString() {
+
+        if (assetInfo.getSpare03() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare03(), importService.spare03List);
+
+        return value;
+    }
+    public String getSpare04AsString() {
+
+        if (assetInfo.getSpare04() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare04(), importService.spare04List);
+
+        return value;
+    }
+    public String getSpare05AsString() {
+
+        if (assetInfo.getSpare05() == null) return null;
+
+//        String value = findMatchTreeValue(assetInfo.getSpare01(), importService.spare01List);
+        String value = findMatchKeyValue(assetInfo.getSpare05(), importService.spare05List);
+
+        return value;
+    }
+
+    private String findMatchKeyValue(String spare01, List<I18nMessage> spare01List) {
+
+        String msgKey = String.valueOf(spare01);
+        for (I18nMessage msg: spare01List) {
+            if (msg.getMsgKey().equals(msgKey)) {
+                return msg.getMsgKey()+" "+msg.getValueZh();
+            }
+        }
+
+        return null;
+
     }
 
     private String findMatchTreeValue(String spare01, List<I18nMessage> spare01List) {
@@ -838,14 +888,9 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public String getVendorTel(Map supliers){
-        Integer vendorId = assetInfo.getSupplierId();
-        if(vendorId != null){
-            //Supplier supplier= supplierDao.getById(vendorId);
-            /*if(null!=supplier && null!=supplier.getTel()){
-                return  supplier.getTel();
-            }*/
-            return  (String) supliers.get(vendorId);
+    public String getSupplierTel(Map supliers, Integer supplierId){
+        if(supplierId != null){
+            return  (String) supliers.get(supplierId);
         }
         return null;
     }
@@ -883,11 +928,12 @@ public class AssetInfoFormatter {
         map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
         map.put(getMessage("assetDeptName"), this.getAssetDeptName());
         map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("manufactureTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getManufactureId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("makerShortName"), this.getMakerShortName());
         map.put(getMessage("deviceName"), this.getDeviceName());
         map.put(getMessage("registrationNo"), this.getRegistrationNo());
         map.put(getMessage("vendor"), this.getVendor());
-        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("vendorTel"), this.getSupplierTel(supliers, assetInfo.getSupplierId()));
         map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
         map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
@@ -921,7 +967,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());
-        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("maitananceTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getMaitananceId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("qrCode"), this.getQrCode());
         map.put(getMessage("locationCode"), this.getLocationCode());
         map.put(getMessage("locationName"), this.getLocationName());
@@ -1014,11 +1060,12 @@ public class AssetInfoFormatter {
         map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
         map.put(getMessage("assetDeptName"), this.getAssetDeptName());
         map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("manufactureTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getManufactureId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("makerShortName"), this.getMakerShortName());
         map.put(getMessage("deviceName"), this.getDeviceName());
         map.put(getMessage("registrationNo"), this.getRegistrationNo());
         map.put(getMessage("vendor"), this.getVendor());
-        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("vendorTel"), this.getSupplierTel(supliers, assetInfo.getSupplierId()));
         map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
         map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
@@ -1057,7 +1104,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());
-        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("maitananceTel"), this.getSupplierTel(supliers, Optional.ofNullable(assetInfo.getMaitananceId()).map(Integer::parseInt).orElse(null)));
         map.put(getMessage("qrCode"), this.getQrCode());
         map.put(getMessage("locationCode"), this.getLocationCode());
         map.put(getMessage("locationName"), this.getLocationName());
@@ -1115,6 +1162,10 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
 
         map.put(getMessage("spare01"), this.getSpare01AsString());
+        map.put(getMessage("spare02"), this.getSpare02AsString());
+        map.put(getMessage("spare03"), this.getSpare03AsString());
+        map.put(getMessage("spare04"), this.getSpare04AsString());
+        map.put(getMessage("spare05"), this.getSpare05AsString());
 
         return map;
 

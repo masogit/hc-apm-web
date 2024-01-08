@@ -172,15 +172,15 @@ public class BudgetApplicationExportService {
                 mm.put("deptName", budgetApplication.getApplicationDept().getName());
             }
             mm.put("assetName", budgetApplicationAsset.getApplicationAssetName());
-            mm.put("num", budgetApplicationAsset.getApplicationQuantity());
-            mm.put("price", budgetApplicationAsset.getApplicationPrice());
-            mm.put("total", budgetApplicationAsset.getApplicationAmount());
+            mm.put("num", budgetApplicationAsset.getConfirmQuantity());
+            mm.put("price", budgetApplicationAsset.getConfirmPrice());
+            mm.put("total", budgetApplicationAsset.getConfirmAmount());
             Calendar calendar=Calendar.getInstance();
             calendar.setTime(budgetApplication.getApplicationDate());
             int year = calendar.get(Calendar.YEAR);
             mm.put("year", year);
             int applyYear = calendar.get(Calendar.YEAR);
-            int applyMonth = calendar.get(Calendar.MONTH);
+            int applyMonth = calendar.get(Calendar.MONTH) + 1;
             int applyDay = calendar.get(Calendar.DAY_OF_MONTH);
             mm.put("applyYear", applyYear);
             mm.put("applyMonth", applyMonth);
@@ -210,7 +210,6 @@ public class BudgetApplicationExportService {
             }else{
                 mm.put("machineDeptOpinions", "");
             }
-
 
             //是否采购进口产品
             if(StringUtils.isEmpty(budgetApplicationAsset.getImportedOr())){
@@ -324,7 +323,6 @@ public class BudgetApplicationExportService {
             return fileName;
         }
     }
-
 
     /**
      * 生成采购单文件

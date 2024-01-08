@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.UserSchedule;
+import com.ge.apm.domain.dto.UserScheduleDto;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,4 +34,7 @@ public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedu
     void batchDeleteWorkSchedule(List<String> collect, Date startBatchDate, Date endBatchDate, String name,List<String> scheduleDateStage,String siteUid);
 
     List<UserSchedule> findByUserUIDInAndScheduleDateBetween(List<String>userLis,Date startDate,Date endDate);
+    @Query(value="select new com.ge.apm.domain.dto.UserScheduleDto(us.id,us.userUID,us.scheduleDate,us.type,us.scheduleDateStage,us.auditStatus,us.manHours,us.tenantUID,us.institutionUID,us.hospitalUID,us.siteUID,us.createdBy,us.createdDate,us.lastModifiedBy,us.lastModifiedDate)" +
+            " from UserSchedule us  where us.type = ?1 and us.siteUID = ?2 ")
+    List<UserScheduleDto> findBySiteUidAndType(String type, String siteUid);
 }

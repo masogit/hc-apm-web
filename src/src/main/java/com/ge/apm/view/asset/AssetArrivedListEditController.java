@@ -104,6 +104,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String imageZoom;
     private String imageName;
 
+    private String qrCodePrefix;
 
     @Getter
     @Setter
@@ -269,6 +270,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void submitArrivalList() {
+        if(Boolean.TRUE.equals(selected.getEnableGenerateQrcode())  &&  StringUtils.isNotEmpty(qrCodePrefix) && qrCodePrefix.length()>3  ){
+            WebUtil.addErrorMessage("二维码前缀过长!");
+            return;
+        }
+
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             ContractInfoItem contractInfoItem = contractService.getContractItem(selected.getContractItemId());
             if (selected.getQuantity() > contractInfoItem.getContractAssetQuantity()) {
@@ -276,11 +282,25 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 return;
             }
         }
+        WorkflowConfig config = configService.findConfigBySite(selectedOrg.getSiteUID());
+        if(config==null){
+            WebUtil.addErrorMessage("找不到对应配置!");
+            return;
+        }
         saveArrivalList();
+        if(Boolean.TRUE.equals(selected.getEnableGenerateQrcode()) &&  !StringUtils.isEmpty(config.getAssetCodeConfig()) && "DFQ".equals(config.getAssetCodeConfig())){
+            String financingNum = assetFinacingNumGenerateService.batchAutoGenerateFinacingNum(null,
+                    null, selectedOrg.getSiteUID() , null, qrCodePrefix,selected.getId(),selected.getQuantity());
+            if (null == financingNum || financingNum.startsWith("error:")) {
+                WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+                return;
+            }
+        }
         if (aiService.submitArrivalList(selected.getId())) {
             WebUtil.addSuccessMessage("到货清单已经提交");
         } else {
             WebUtil.addErrorMessage("到货清单提交失败");
+            return;
         };
 
         // YHAAO-16616 到货清单提交后，展开的信息要根据上次记录带入
@@ -1306,4 +1326,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selected.setClinicalDeptName(null);
         selected.setClinicalDeptUID(null);
     }
+
+
+    public String getQrCodePrefix() {
+        return qrCodePrefix;
+    }
+
+    public void setQrCodePrefix(String qrCodePrefix) {
+        this.qrCodePrefix = qrCodePrefix;
+    }
+
 }

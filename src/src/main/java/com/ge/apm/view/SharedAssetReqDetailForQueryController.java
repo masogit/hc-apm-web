@@ -68,7 +68,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     private String oneSearchStr;
     private Object clinicalDeptName;
     private List<String> assetAllocateFields;
-    private Boolean whethertoenableunattended;
+    List<ConfigItemValue> configItemValueList;
     public String getOneSearchStr() {
         return oneSearchStr;
     }
@@ -388,20 +388,34 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         return "";
     }
     public boolean  openWhethertoenableunattended(){
-        if(whethertoenableunattended == null){
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            whethertoenableunattended= checkWhethertoenableunattended(currentUserAccount);
-        }
-
-       return whethertoenableunattended;
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            OrgInfo selectSite = userContextService.getSelectSite();
+            if(selectSite == null){
+                UserAccount loginUser = userContextService.getLoginUser();
+                return checkWhethertoenableunattended(loginUser.getSiteUID());
+            }else{
+                return checkWhethertoenableunattended(selectSite.getSiteUID());
+            }
     }
-    private boolean checkWhethertoenableunattended(UserAccount currentUserAccount){
-        String key="whetherToEnableUnattended";
-        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserAccount.getSiteUID(),
-                currentUserAccount.getHospitalUID(),
-                currentUserAccount.getInstitutionUID(),
-                currentUserAccount.getTenantUID(), key);
-       return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
+    private boolean checkWhethertoenableunattended(String siteUid){
+        if(configItemValueList == null){
+            String key="whetherToEnableUnattended";
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            List<SearchFilter> searchFilters=new ArrayList<>();
+            searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ,key,"1*"));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ,currentUserAccount.getSiteUID(),"1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.EQ,currentUserAccount.getHospitalUID(),"1*2+"));
+            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.EQ,currentUserAccount.getInstitutionUID(),"1*2+"));
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,currentUserAccount.getTenantUID(),"1*2+"));
+            configItemValueList = configItemValueRepository.findBySearchFilter(searchFilters);
+        }
+        Optional<ConfigItemValue> first = configItemValueList.stream().filter(item -> item.getSiteUid().equals(siteUid)).findFirst();
+        if(first.isPresent()){
+            ConfigItemValue configItemValue = first.get();
+            return Boolean.TRUE.toString().equalsIgnoreCase(configItemValue.getValue());
+        }
+        return  Boolean.FALSE;
+
     }
     public void  initAssetAllocateFields(){
         if(!openWhethertoenableunattended())  {

@@ -676,11 +676,15 @@ public class UaaService {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
         if (ownnedOrg.getOrgType() == 4) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
-            UserOrgInfo userOrg = new UserOrgInfo();
-            userOrg.setUserUid(user.getUid());
-            userOrg.setOrgUid(ownnedOrg.getUid());
-            userOrg.setOrgType(ownnedOrg.getOrgType());
-            userOrgDao.save(userOrg);
+            List<OrgInfo> hospitalChildrenByUids = orgInfoDao.getHospitalChildrenByUids(Arrays.asList(ownnedOrg.getUid()));
+            List<UserOrgInfo> collect = hospitalChildrenByUids.stream().map(item -> {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(item.getUid());
+                userOrg.setOrgType(item.getOrgType());
+                return userOrg;
+            }).collect(Collectors.toList());
+            userOrgDao.save(collect);
         } else {
             OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
             if (org != null) {

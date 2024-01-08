@@ -139,6 +139,10 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "update_date")
 	private Date updateDate;
+
+	@Column(name = "using_dept_uid")
+	private String usingDeptUid;    //使用科室
+
 	@Transient
 	private Map<String, NurseSiteMaintainConfigCheckItem> configMap;
     public String getUpdateByUid() {
@@ -437,4 +441,12 @@ public class NurseSiteMaintainItem implements Serializable {
 	public Boolean getIsFinish() { return isFinish; }
 
 	public void setIsFinish(Boolean finish) { isFinish = finish; }
+
+	public String getUsingDeptUid() {
+		return usingDeptUid;
+	}
+
+	public void setUsingDeptUid(String usingDeptUid) {
+		this.usingDeptUid = usingDeptUid;
+	}
 }

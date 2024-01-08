@@ -12,6 +12,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
@@ -432,7 +433,7 @@ public class SharedAssetStockService {
             for (String s : orgInfoUidsByparentUid) {
                 WorkflowConfig configBySite = configService.findConfigBySite(s);
                 String deptForSharedAsset = null;
-                if(StringUtils.isNotEmpty(deptForSharedAsset = configBySite.getDeptForSharedAsset())){
+                if(ObjectUtil.isNotNull(configBySite) && StringUtils.isNotEmpty(deptForSharedAsset = configBySite.getDeptForSharedAsset())){
                     workflowConfigList.add(deptForSharedAsset);
                 }
             }
@@ -443,6 +444,9 @@ public class SharedAssetStockService {
             if(StringUtils.isNotEmpty(deptForSharedAsset = configBySite.getDeptForSharedAsset())){
                 workflowConfigList.add(deptForSharedAsset);
             }
+        }
+        if (CollectionUtils.isEmpty(workflowConfigList)) {
+            workflowConfigList.add("-1");
         }
         return workflowConfigList;
     }

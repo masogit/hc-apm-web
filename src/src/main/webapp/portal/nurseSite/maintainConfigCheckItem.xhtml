@@ -44,11 +44,14 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="是否必填">
+                            <h:outputText value="#{item.required?'是':'否'}" />
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
                                              actionListener="#{maintainCheckItemController.prepareCreate}" update=":maintainConfigcheckItemEditDlg"
-                                             oncomplete="PF('maintainConfigcheckItemEditDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"/>
-                            <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"
+                                             oncomplete="PF('maintainConfigcheckItemEditDlg').show()" />
+                            <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
                                              update="maintainConfigcheckItemEditDlg" oncomplete="PF('maintainConfigcheckItemEditDlg').show()" disabled="#{empty maintainCheckItemController.selected}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"  disabled="#{empty maintainCheckItemController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_EDIT')}"
                                              actionListener="#{maintainCheckItemController.delete}" update=":maintainConfigCheckItemListForm:datalist">
@@ -97,7 +100,7 @@
                         <h:panelGroup >
                             <label >#{msg.fieldType}：</label>
                             <p:selectOneMenu value="#{maintainCheckItemController.selected.fieldType}" >
-                                <p:ajax listener="#{maintainCheckItemController.onRuleChange}"  update="optionsTable   DefaultValue"  />
+                                <p:ajax listener="#{maintainCheckItemController.onRuleChange}"  update="optionsTable  DefaultValue requiredRadio"  />
                                 <f:selectItem itemLabel="无类型" itemValue="#{''}"/>
                                 <f:selectItem itemLabel="#{msg.ComponentTypeInputText}" itemValue="#{'Text'}"/>
 <!--                                <f:selectItem itemLabel="#{msg.ComponentTypeSwitch}" itemValue="#{'Switch'}"/>-->
@@ -142,7 +145,16 @@
                             </p:dataTable>
 
                         </h:panelGroup>
-
+                        <h:panelGroup id="requiredRadio" >
+                            <c:if test="#{!maintainCheckItemController.emptyType()}">
+                            <label class="label" style="font-size: medium; font-weight: bold">是否必填</label>
+                            <p:selectOneRadio tabindex="2" id="enable" value="#{maintainCheckItemController.selected.required}" >
+                                <p:ajax event="change" process="@this" />
+                                <f:selectItem itemLabel="是" itemValue="true"/>
+                                <f:selectItem itemLabel="否" itemValue="false"/>
+                            </p:selectOneRadio>
+                            </c:if>
+                        </h:panelGroup>
 					</p:panelGrid>
 
 					<p:commandButton validateClient="true" actionListener="#{maintainCheckItemController.save}" update=":growl,:maintainConfigCheckItemListForm"

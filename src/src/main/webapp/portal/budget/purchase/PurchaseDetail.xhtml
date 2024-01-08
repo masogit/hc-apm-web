@@ -88,16 +88,16 @@
              <p:column headerText="意向品牌">
                  <h:outputText value="#{item.confirmBrand}"/>
              </p:column>
-             <p:column headerText="采购确认数量（台）">
+             <p:column headerText="确认数量（台）">
                  <h:outputText value="#{item.confirmQuantity}"/>
              </p:column>
-             <p:column headerText="采购确认价格（万元）">
+             <p:column headerText="确认预算价">
                  <h:outputText value="#{item.confirmPrice}"/>
              </p:column>
-             <p:column headerText="采购确认总价（万元）">
+             <p:column headerText="确认预算总价">
                  <h:outputText value="#{item.confirmAmount}"/>
              </p:column>
-             <p:column headerText="拦标价（万元）">
+             <p:column headerText="拦标价">
                  <h:outputText value="#{item.confirmMaximumPrice}"/>
              </p:column>
              <p:column headerText="备注">
@@ -140,7 +140,7 @@
                    <h:outputText value="#{purchaseOrderController.selected.meetingEquipmentDeptOpin}"/>
                </h:panelGroup>
                <h:panelGroup>
-                   <p:outputLabel class="label">拦标价（万元）<span style="color: red">*</span></p:outputLabel>
+                   <p:outputLabel class="label">拦标价<span style="color: red">*</span></p:outputLabel>
                    <h:outputText value="#{purchaseOrderController.selected.meetingMaximumPrice}">
                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                    </h:outputText>

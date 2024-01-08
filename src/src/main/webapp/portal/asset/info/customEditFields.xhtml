@@ -318,11 +318,17 @@
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
             <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacturer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('manufacture')}" forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"
                             completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacturer')}" update="@(.manufacturerChange)"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacturer')}" update="@(.manufacturerChange)"/>
             </p:autoComplete>
 
             <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactureTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactureTel}</label>
+            <p:inputText id="manufactureTel" value="#{assetInfoEditController.selected.manufactureTel}" class="manufacturerChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
@@ -340,7 +346,7 @@
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
                             completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}" />
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}"  update="@(.vendorChange)"/>
             </p:autoComplete>
             <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
@@ -366,9 +372,8 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitananceTel')}" >
         <h:panelGroup>
-            <label class="label">#{msg.maitananceTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required? '*':''}</span></label>
-            <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" required="#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required}"
-                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" class="maitananceChange" readonly="true" />
+            <label class="label">#{msg.maitananceTel}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" class="maitananceChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nationalStandardCode')}" >
@@ -1064,7 +1069,7 @@
             <label class="label">#{msg.spare01}</label>
             <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('TCM')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1095,7 +1100,7 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare05')}">
         <h:panelGroup>
             <label class="label">#{msg.spare05}</label>
             <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">

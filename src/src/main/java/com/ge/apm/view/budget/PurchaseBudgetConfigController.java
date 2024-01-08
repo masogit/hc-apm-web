@@ -5,12 +5,15 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -51,13 +54,15 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
     @Getter@Setter
     private PurchaseBudgetConfig searchForm = new PurchaseBudgetConfig();
 
-
     @Override
     protected void init() {
         purchaseBudgetConfigRepository = WebUtil.getBean(PurchaseBudgetConfigRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         purchaseBudgetConfigService = WebUtil.getBean(PurchaseBudgetConfigService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
+        accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/config/List.xhtml",currentUser);
+
     }
 
     @Override

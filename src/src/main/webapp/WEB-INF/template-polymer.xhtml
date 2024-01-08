@@ -50,10 +50,12 @@
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
-                #{userContextService.loginUserOrgInfo.orgFullName}
-            </div>
-            <div class="profile-name">
-                #{userContextService.userName}
+                <div class="btn-group closed"  >
+                    <a class="btn btn-primary">
+                        <i class="fa fa-building  fa-fw"></i>#{userContextService.loginUserOrgInfo.orgFullName}
+                        <i class="fa fa-user  fa-fw"></i>#{userContextService.userName}
+                    </a>
+                </div>
             </div>
         </div>
     </div>

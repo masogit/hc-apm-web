@@ -144,6 +144,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
     @Transient
     private String plainPassword;
 
@@ -218,6 +221,14 @@ public class TenantInfo implements Serializable {
             return false;
         }
         return qrCodeEditable;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public void setQrCodeEditable(boolean qrCodeEditable) {

@@ -240,6 +240,14 @@ public class ZkbContractImportService {
             zkbContract.setProbeQuota(contractInfoVO.getProbeQuota());
             zkbContract.setProbeQuotaUse(contractInfoVO.getProbeQuotaUse());
 
+            zkbContract.setProbeQuotaNormalTotal(contractInfoVO.getProbeQuotaNormalTotal() == null ? 0 : contractInfoVO.getProbeQuotaNormalTotal());
+            zkbContract.setProbeQuotaNormal(contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal());
+            zkbContract.setProbeQuotaNormalUse(contractInfoVO.getProbeQuotaNormalUse() == null ? 0 : contractInfoVO.getProbeQuotaNormalUse());
+
+            zkbContract.setProbeQuotaSpecialTotal(contractInfoVO.getProbeQuotaSpecialTotal() == null ? 0 : contractInfoVO.getProbeQuotaSpecialTotal());
+            zkbContract.setProbeQuotaSpecial(contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial());
+            zkbContract.setProbeQuotaSpecialUse(contractInfoVO.getProbeQuotaSpecialUse() == null ? 0 : contractInfoVO.getProbeQuotaSpecialUse());
+
             zkbContract.setSpareArtificailTotal(contractInfoVO.getSpareArtificailTotal());
             zkbContract.setSpareArtificail(contractInfoVO.getSpareArtificail());
             zkbContract.setSpareArtificailUse(contractInfoVO.getSpareArtificailUse());
@@ -248,16 +256,18 @@ public class ZkbContractImportService {
             zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
             zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
 
-            zkbContract.setCcsbMaintenanceQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
-            zkbContract.setCcsbMaintenanceQuota(contractInfoVO.getGeArtificialSupportTimes());
-            zkbContract.setCcsbMaintenanceQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+            zkbContract.setCcsbMaintenanceQuotaTotal(contractInfoVO.getCcsbMaintenanceQuotaTotal());
+            zkbContract.setCcsbMaintenanceQuota(contractInfoVO.getCcsbMaintenanceQuota());
+            zkbContract.setCcsbMaintenanceQuotaUse(contractInfoVO.getCcsbMaintenanceQuotaUse());
 
-            zkbContract.setPartHighQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
-            zkbContract.setPartHighQuota(contractInfoVO.getGeArtificialSupportTimes());
-            zkbContract.setPartHighQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+            zkbContract.setPartHighQuotaTotal(contractInfoVO.getPartHighQuotaTotal());
+            zkbContract.setPartHighQuota(contractInfoVO.getPartHighQuota());
+            zkbContract.setPartHighQuotaUse(contractInfoVO.getPartHighQuotaUse());
 
             zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaUse() - zkbContract.getSpareQuota());
             zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaUse() - zkbContract.getProbeQuota());
+            zkbContract.setProbeQuotaNormalApply(zkbContract.getProbeQuotaNormalTotal() - zkbContract.getProbeQuotaNormalUse() - zkbContract.getProbeQuotaNormal());
+            zkbContract.setProbeQuotaSpecialApply(zkbContract.getProbeQuotaSpecialTotal() - zkbContract.getProbeQuotaSpecialUse() - zkbContract.getProbeQuotaSpecial());
             zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimes());
             zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailUse() - zkbContract.getSpareArtificail());
             zkbContract.setPartHighQuotaApply(zkbContract.getPartHighQuotaTotal() - zkbContract.getPartHighQuota() - zkbContract.getPartHighQuotaUse());
@@ -314,6 +324,8 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
+            newZkbContract.setLastModifiedDate(new Date());
+            newZkbContract.setLastModifiedBy(currentUser.getLoginName());
             if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
                 if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());

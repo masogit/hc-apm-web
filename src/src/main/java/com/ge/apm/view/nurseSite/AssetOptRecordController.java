@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -15,12 +16,12 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAuth;
 import com.ge.apm.service.nurseSite.AssetOptRecordService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
-import org.primefaces.event.SelectEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
@@ -34,10 +35,11 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 	private UserAccount currentUser;
 	private AssetOptRecordService service;
 	private AssetOptRecordMapper dao;
+	private UaaService uaaService;
 	private String assetGroupFilter;
 	private OrgInfo selectOrgInfo;
-	private List<String> setUserUuids;
 	private UserAuth customRoleAuth;
+	private List<String> orgUidList;
 	@Override
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -49,10 +51,10 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		searchController.setType(5);
 		searchController.updateData();
 		dao = WebUtil.getBean(AssetOptRecordMapper.class);
-		setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
+		uaaService = WebUtil.getBean(UaaService.class);
+		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
-		// test
 	}
 
 	@Override
@@ -63,17 +65,15 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<>();
 		}
-		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUuids, "1*"));
-		if (selectOrgInfo.getOrgType() == 0) {
-			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 1) {
-			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
+		if (selectOrgInfo.getOrgType() == 1) {
+			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
 		} else if (selectOrgInfo.getOrgType() == 2) {
-			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
 		} else if (selectOrgInfo.getOrgType() == 3) {
-			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
 		}
+		searchFilters.add(new SearchFilter("assetInfo.orgUidList", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 		if (currentUser.isEnableAssetTypeGroup()) {
 			searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
 		}

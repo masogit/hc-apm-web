@@ -205,6 +205,7 @@ public class NurseSiteMaintainService {
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(fieldType);
+		p.setRequired(checkItem.getRequired());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
@@ -435,8 +436,10 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 	
-	public List<NurseSiteMaintainCheckItem> loadWholeCheckItem(String siteUid){
-		return nurseSiteMaintainCheckItemRepository.findBySiteUid(siteUid);
+	public List<NurseSiteMaintainCheckItem> loadWholeCheckItem(String tenantUID){
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUID));
+		return nurseSiteMaintainCheckItemRepository.findBySearchFilter(searchFilters);
 	}
 	
 	public void loadSelectedCheckItem(List<NurseSiteMaintainCheckItem> listWhole,List<NurseSiteMaintainCheckItem> listSelected,NurseSiteMaintainConfig config){
@@ -475,6 +478,7 @@ public class NurseSiteMaintainService {
 				obj.put("fieldType",fieldType);
 				obj.put("defaultValue",defaultValue);
 				obj.put("options",item.getOptions());
+				obj.put("required",item.getRequired());
 				arr.add(obj);
 			}
 		}
@@ -666,6 +670,12 @@ public class NurseSiteMaintainService {
 					p.setCheckItem(obj.getString("name"));
 					p.setIndex(obj.getLong("key"));
 					// p.setCheckValue(false);
+					if(obj.containsKey("required")){
+						Boolean required = obj.getBoolean("required");
+						p.setRequired(required);
+					}else{
+						p.setRequired(Boolean.FALSE);
+					}
 					p.setItem(item);
 					listData.add(p);
 				}
@@ -1399,9 +1409,13 @@ public class NurseSiteMaintainService {
 				Map<String, NurseSiteMaintainConfigCheckItem> collect = listCheckData.stream().collect(Collectors.toMap(NurseSiteMaintainConfigCheckItem::getName, (item) -> item));
 				List<NurseSiteMaintainData> collect1 = listMaintainDataByParentIds.stream().map(item -> {
 					NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = collect.get(item.getCheckItem());
-						item.setCheckValue(true);
 					if(nurseSiteMaintainConfigCheckItem != null){
-						item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+						Boolean checkValue = nurseSiteMaintainConfigCheckItem.getCheckValue();
+						if(Boolean.TRUE.equals(checkValue)){
+							item.setCheckValue(checkValue);
+							item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+						}
+
 					}
 					return item;
 				}).collect(Collectors.toList());
@@ -2202,7 +2216,12 @@ public class NurseSiteMaintainService {
 	}
 	
 	public void updateNurseSiteMaintainCheckItem(NurseSiteMaintainCheckItem item,String siteUid){
-		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
+		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySearchFilter(searchFilters);
 		List<NurseSiteMaintainConfig> listModifyConfig=new ArrayList<NurseSiteMaintainConfig>();
 		if(listConfig!=null && listConfig.size()>0){
 			boolean find=false;
@@ -2222,6 +2241,7 @@ public class NurseSiteMaintainService {
 							jsonObj.put("fieldType", item.getFieldType());
 							jsonObj.put("defaultValue", item.getDefaultValue());
 							jsonObj.put("options", item.getOptions());
+							jsonObj.put("required", item.getRequired());
 						}
 					}
 					if(find){

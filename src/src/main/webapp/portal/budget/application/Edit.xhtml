@@ -129,8 +129,6 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('sourceFunding')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-
-
                             <h:panelGroup>
                                 <p:outputLabel class="label">科室现有同类设备数量</p:outputLabel>
                                 <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete'}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" value="#{budgetController.curSelectApplicationBudgetAsset.similarDevicesNumber}">
@@ -333,7 +331,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">审批单价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}" disabled="#{budgetController.selected.applicationStep eq 'Complete'}"
+                                <p:inputNumber  minValue="0" decimalPlaces="2" required="true" requiredMessage="审批单价 #{msg.ValidationRequire}" disabled="#{budgetController.selected.applicationStep eq 'Complete'}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.offlineApplicationPrice}">
                                     <p:ajax listener="#{budgetController.calcAmountOffline(budgetController.curSelectApplicationBudgetAsset)}" update="@this offlineApplicationAmount"/>
                                 </p:inputNumber>
