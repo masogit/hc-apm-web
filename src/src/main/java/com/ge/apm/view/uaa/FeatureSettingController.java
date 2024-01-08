@@ -124,7 +124,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         if (encodeStr != null) {
             tenantUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "tenantUid");
         }
-        tenantInfo = configCacheService.getTenantByUid(tenantUid);
+        tenantInfo = dao.findByUid(tenantUid);
 
         JSONObject tenantConfig = JSONObject.parseObject(tenantInfo.getTenantConfig());
 
@@ -250,7 +250,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             });
             tenantInfo.setFeatureList(featureArray.toJSONString());
             tenantInfo.setLastModifiedDate(new Date());
+            tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             dao.save(tenantInfo);
+            configCacheService.cleanTenantCacheByUid(tenantInfo.getUid());
             MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
