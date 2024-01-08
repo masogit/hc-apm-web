@@ -24,4 +24,6 @@ public interface AuditCaseRepository extends GenericRepositoryUUID<AuditCase> {
     @Query(value = "update audit_case set status = 2 where uid = ?1", nativeQuery = true)
     void expiredCase(String caseUid);
 
+    public List<AuditCase> findByTenantUid(String tenantUID);
+
 }

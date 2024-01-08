@@ -16,6 +16,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -80,6 +81,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
   	private List<NurseSiteMaintainCheckItem> listWholeCheckItems;
+  	private List<NurseSiteMaintainCheckItem> listWholeCheckItemsAll;
   	private List<NurseSiteMaintainCheckItem> listSelectedCheckItems;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
   	private TableOption tableOption;
@@ -150,8 +152,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
+		Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+		Sort sort = pageRequest.getSort();
+		if (ObjectUtil.isNotEmpty(sort)) {
+			for (Sort.Order order : sort) {
+				Sort.Direction direction = order.getDirection();
+				String property = ZipUtil.camelToUnderline(order.getProperty());
+				wrapper.orderBy("nsmc." + property, "ASC".equals(direction.name()));
+			}
+		}
 		if (currentUser.isEnableAssetTypeGroup()) {
 			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
 		}
@@ -204,7 +214,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     public void onServerEvent(String eventName, Object eventObject) {
     	if(eventObject!=null){
     		try {
-    			listCheckAssets=(List<AssetInfo>)eventObject;
+    			if("changeSite".equals(eventName)){
+    				loadWholeCheckItem(currentUser.getTenantUID());
+				}else if ("change".equals(eventName)){
+					listCheckAssets=(List<AssetInfo>)eventObject;
+				}else{
+
+				}
     			checkSaveDisable();
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -262,7 +278,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		//TODO
         assetSelectController.loadData4Create();
-        loadWholeCheckItem(currentUser.getSiteUID());
+        loadWholeCheckItem(currentUser.getTenantUID());
 	}
 	
 	@Override
@@ -275,7 +291,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		setDefaultValueForAssetList();
 		//TODO
         assetSelectController.loadData4Edit(this.selected);
-        loadWholeCheckItem(currentUser.getSiteUID());
+        loadWholeCheckItem(selected.getTenantUID());
         loadSelectedCheckItem();
 	}
 	
@@ -358,8 +374,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			loadParentOrgInfo();
 		}
 	}
-	private void loadWholeCheckItem(String siteUid){
-		listWholeCheckItems=nurseSiteMaintainService.loadWholeCheckItem(siteUid);
+	private void loadWholeCheckItem(String tenantUID){
+    	if(CollectionUtils.isEmpty(listWholeCheckItemsAll)){
+			listWholeCheckItemsAll = nurseSiteMaintainService.loadWholeCheckItem(tenantUID);
+		}
+		OrgInfo selectedOrg = assetSelectController.getSelectedOrg();
+		this.listWholeCheckItems = listWholeCheckItemsAll.stream().filter(item->{
+			String siteUID = item.getSiteUID();
+			return siteUID.equals(selectedOrg.getSiteUID())
+					|| siteUID.equals(selectedOrg.getHospitalUID())
+					|| siteUID.equals(selectedOrg.getInstitutionUID())
+					|| siteUID.equals(selectedOrg.getTenantUID());
+		}).collect(Collectors.toList());
 		if(listSelectedCheckItems==null){
 			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
 		}
@@ -598,6 +624,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public void saveCheckListItem(){
+		if(StringUtils.isBlank(objPairCheckItem.getFieldType())){
+			objPairCheckItem.setRequired(Boolean.FALSE);
+		}
     	if(this.internalCreate){
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				if(listPairCheckItem.getName().equals(objPairCheckItem.getName())){
@@ -607,6 +636,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					return;
 				}
 			}
+
 			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
 		}else{
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
@@ -788,6 +818,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		p.setDescription(checkItem.getDescription());
 		p.setFieldType(checkItem.getFieldType());
 		String options = checkItem.getOptions();
+		p.setRequired(checkItem.getRequired());
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{
@@ -993,6 +1024,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			return StringUtils.isEmpty(objPairCheckItem.getFieldType()) || "Date".equals(objPairCheckItem.getFieldType());
 		}else{
     		return false;
+		}
+	}
+	public boolean emptyType(){
+		if(objPairCheckItem != null){
+			return StringUtils.isEmpty(objPairCheckItem.getFieldType());
+		}else{
+			return false;
 		}
 	}
 

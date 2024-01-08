@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SupplierService {
@@ -146,7 +143,7 @@ public class SupplierService {
         supplierDao.save(supplier);
 
         assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
-        assetInfoDao.updateMaintainerName(supplier.getName(), supplier.getTel(), String.valueOf(supplier.getId()), supplier.getTenantUID());
+        assetInfoDao.updateMaintainerName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
         assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
 
     }
@@ -236,17 +233,17 @@ public class SupplierService {
 
     }
 
-    public boolean
-    activeSupplier(){
-        UserAccount user = UserContextService.getCurrentUserAccount();
-
-        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-        if(null != configBySite){
-           return configBySite.getActiveSupplier() != null && configBySite.getActiveSupplier();
-        }
-
-        return false;
-
+    public boolean activeSupplier(){
+        //UserAccount user = UserContextService.getCurrentUserAccount();
+        Set<String> functions = UserContextService.getCurrentUserFunction();
+        return functions.contains("ASSET_SUPPLIER_APPLICATION_EDIT");
+//
+//        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+//        if(null != configBySite){
+//           return configBySite.getActiveSupplier() != null && configBySite.getActiveSupplier();
+//        }
+//
+//        return false;
     }
 
     public boolean validateSupplierCode(Supplier supplier){

@@ -322,16 +322,24 @@ public class NurseSiteMaintainJob {
 
     public void updateUnCheckedMaintainData(String userUid, NurseSiteMaintainConfig nurseSiteMaintainConfig) {
         // ‘覆盖历史未完成检查’，先删除，然后新建未完成的检查，如果是‘修改将来未完成检查’，只需要删除更新配置后的未完成检查
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         if(nurseSiteMaintainConfig.getApplyDirectly()){
-            List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfig(nurseSiteMaintainConfig.getId());
-            Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
-                    .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
-                            i.getSequence())).collect(Collectors.toSet());
-            deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
-            createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+            try {
+                String format = sdf.format(new Date());
+                Date parse = sdf.parse(format);
+                List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfig(nurseSiteMaintainConfig.getId());
+                listMaintain=listMaintain.stream().filter(item-> item.getScheduleDate() != null && parse.before(item.getScheduleDate())).collect(Collectors.toList());
+                Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
+                        .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                                i.getSequence())).collect(Collectors.toSet());
+                deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+                createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.error("修改历史未完成检查异常:", e);
+            }
 
         }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 String date = sdf.format(nurseSiteMaintainConfig.getApplyFeatureTime());
                 Date applyFeatureTime = sdf.parse(date);
@@ -342,7 +350,8 @@ public class NurseSiteMaintainJob {
 
                 deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
                 createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig);
-            } catch (ParseException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
                 LOGGER.error("修改将来未完成检查异常:", e);
             }
         }

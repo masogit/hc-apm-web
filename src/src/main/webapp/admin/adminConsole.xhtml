@@ -39,18 +39,6 @@
 					</p:panelGrid>
 					<p:commandButton actionListener="#{adminConsoleController.updateVersion()}" value="批量更新所有租户" update=":growl"></p:commandButton>
 				</p:fieldset>
-<!--				<p:fieldset legend="批量矫正护士站SiteUid，从跟随创建人变为跟随设备（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteUID()}" value="批量更新所有租户护士站UID" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量删除护士站中报废，待报废，已删除的设备（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteDeleteAsset()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量删除护士站无效工单（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.deleteInvalidOrder()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量更新护士站状态（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteStatus()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
 				<p:fieldset legend="为系统角色配置菜单">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
@@ -72,49 +60,22 @@
 							</p:treeNode>
 						</p:tree>
 					</p:scrollPanel>
+				</p:fieldset>
+				<br/>
+				<p:fieldset legend="更新系统角色默认菜单">
 					<p:commandButton actionListener="#{adminConsoleController.updateSysMenu()}" value="更新系统角色默认菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
-<!--				<p:fieldset legend="触发护士站日常更新Job（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:calendar value="#{adminConsoleController.selectDate}"></p:calendar>-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.dailyUpdateNurseSiteJob()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量更新AssetLifecycleEvent表中错误数据，表示checkStatus字段（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetLifecycleEvent()}" value="批量更新所有租户" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-
-
-
-<!--				<p:fieldset legend="批量更新AssetHistory表中AssetJson数据，（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetHistoryEvent()}" value="批量更新设备历史表中数据" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-				<!-- <p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
-					<p:commandButton actionListener="#{adminConsoleController.deleteObjectHub()}" value="批量更新所有租户" update=":growl"></p:commandButton>
-				</p:fieldset> -->
-				<p:fieldset legend="批量更新workflow表配置到config_item数据(无人值守设备预约锁定时长 YHAAO-20276)，（只用点击一次即可，请勿重复点击）">
-					<p:commandButton actionListener="#{adminConsoleController.batchSynchronizationConfig()}" value="批量同步配置" update=":growl"></p:commandButton>
+				<br/>
+				<p:fieldset legend="租户医院功能激活">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantFeature()}" disabled="false" value="批量删除并更新所有租户单独收费的 调剂中心 指控评审 预算管理" update=":growl"></p:commandButton>
 				</p:fieldset>
-<!--				<p:fieldset legend="批量根据旧菜单项计算并保存到新菜单模块">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.batchAnalyseMenus()}" value="批量计算" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量更新租户消息提醒规则，（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateReminderRule()}" value="批量更新" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-<!--				<p:fieldset legend="批量更新租户或院区的资产审核用户并赋予自定义角色，（只用点击一次即可，请勿重复点击）">-->
-<!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetApprove()}" value="批量更新" update=":growl"></p:commandButton>-->
-<!--				</p:fieldset>-->
-					<p:fieldset legend="批量补录简易备件出入库单号，（只用点击一次即可，请勿重复点击）">
-						<p:commandButton actionListener="#{adminConsoleController.batchUpdateSparPart()}" value="批量更新" update=":growl"></p:commandButton>
-					</p:fieldset>
-
-					<p:fieldset legend="批量更新设备使用风险等级">
-						<p:commandButton actionListener="#{adminConsoleController.batchUpdateI18nMsgType()}" value="批量更新" update=":growl"></p:commandButton>
-					</p:fieldset>
-
-				<p:fieldset legend="批量更新设备表的创建人为name">
-					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetInfo()}" value="批量更新" update=":growl"></p:commandButton>
+				<br/>
+				<p:fieldset legend="批量更新租户供应商小程序菜单和激活已使用的医院">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantSupplier()}" disabled="false" value="批量更新租户供应商小程序菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
-				<p:fieldset legend="批量更新保养工单规则名称、保养周期、保养周期单位字段，（只用点击一次即可，请勿重复点击）">
-					<p:commandButton actionListener="#{adminConsoleController.batchUpdatePmOrderFields()}" value="批量更新" update=":growl"></p:commandButton>
+				<br/>
+				<p:fieldset legend="批量更新租户不良事件菜单和激活已使用的医院">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantAdverseEvent()}" disabled="false" value="批量更新租户不良事件菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
 			</h:panelGroup>
 		</h:form>

@@ -86,6 +86,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Integer stock=0;
     private boolean isReturn=false;
     private ConfigService configService;
+    private ConfigItemValueRepository configItemValueRepository;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -201,6 +202,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -431,19 +433,20 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         List<String> orgUidList =new ArrayList<>();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = userContextService.getSelectSite();
+        UserAccount user = UserContextService.getCurrentUserAccount();
         if(selectSite == null){
-            UserAccount user = UserContextService.getCurrentUserAccount();
-             orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            orgUidList = userOrgDao.findAccessUidByUserUid(user.getUid());
+
         }else{
             orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
         }
 
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
-        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*"));
 
 //        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
 //            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -1085,7 +1088,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             cal.set(Calendar.MILLISECOND, 0);
             cal.add(Calendar.DAY_OF_MONTH, 1);
             selected.setInvalidTime(cal.getTime());
-
+            setDataType();
             dao.save(selected);
             apdDao.save(selected.getSartList());
 
@@ -2142,6 +2145,22 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else{
             return Boolean.FALSE;
         }
+    }
+    private void setDataType(){
+        boolean b = checkWhethertoenableunattended(selected.getSiteUID(), selected.getHospitalUID(), selected.getInstitutionUID(), selected.getTenantUID());
+        if(b){
+            selected.setDataType(2);
+        }else{
+            selected.setDataType(1);
+        }
+    }
+    private boolean checkWhethertoenableunattended(String siteUid,String hospitalUID,String InstitutionUID,String tenantUID){
+        String key="whetherToEnableUnattended";
+        String byKeyAndSiteForUseParent = configItemValueRepository.findByKeyAndSiteForUseParent(siteUid,
+                hospitalUID,
+                InstitutionUID,
+                tenantUID, key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
     }
 }
     

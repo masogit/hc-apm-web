@@ -19,6 +19,9 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
@@ -65,6 +68,7 @@ public class AssetInfoDetailController {
     private SysAuthGroupRepository sysAuthGroupDao;
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserAccountRepository userAccountRepository;
+    private AssetInfoService assetInfoService;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -113,51 +117,41 @@ public class AssetInfoDetailController {
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-        terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
+        terminate = Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if(selectedId!=null) selected = assetDao.findByUid(selectedId);
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
         userContextService = WebUtil.getBean(UserContextService.class);
         countyArea = userContextService.isCountyArea();
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
 
+        assetInfoService.setSupplier(ListUtil.newArrayList(selected));
+        maintanceType = aimService.getMaintanceType(selected);
+        assetEvents  = aimService.getAssetEventsList(selected);
 
-        if(selected!=null) {
-            if (selected.getSupplierId() != null) {
-                Supplier supplier = supplierDao.findById(selected.getSupplierId());
-                if (supplier != null) {
-                    selected.setVendorTel(supplier.getTel());
-                }
-            }
-
-            maintanceType = aimService.getMaintanceType(selected);
-            assetEvents  = aimService.getAssetEventsList(selected);
-
-            if (null != selected.getMedicalApparatusClassification()) {
-                selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
-            }
-            if (null != selected.getAssetType()) {
-                selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
-            }
-
-            //ge mvc data
-            if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
-                mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
-                MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
-                if (found != null) {
-                    mvsAssetInfo = found;
-                }
-            }
-
-            List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
-            this.selected.setTags(existingTags);
+        if (null != selected.getMedicalApparatusClassification()) {
+            selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
+        }
+        if (null != selected.getAssetType()) {
+            selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
         }
 
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
+            MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
+            if (found != null) {
+                mvsAssetInfo = found;
+            }
+        }
+
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+        this.selected.setTags(existingTags);
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {

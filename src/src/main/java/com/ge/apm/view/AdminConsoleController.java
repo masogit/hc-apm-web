@@ -125,6 +125,7 @@ public class AdminConsoleController {
 			}
 		}
 	}
+	@Deprecated
 	public void updateNurseSiteUID(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -136,6 +137,7 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	@Deprecated
 	public void updateNurseSiteDeleteAsset(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -147,6 +149,7 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	@Deprecated
 	public void updateNurseSiteStatus(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -171,6 +174,7 @@ public class AdminConsoleController {
 			versionLabelKey.add(listLabel.get(i)+","+listKey.get(i));
 		}
 	}
+	@Deprecated
 	public void dailyUpdateNurseSiteJob(){
 		if(selectDate==null){
 			Calendar ca=Calendar.getInstance();
@@ -179,6 +183,7 @@ public class AdminConsoleController {
 		adminConsoleService.dailyUpdateNurseSiteJob(selectDate);
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	@Deprecated
 	public void deleteObjectHub(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -190,7 +195,7 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-	
+	@Deprecated
 	public void deleteInvalidOrder(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -202,7 +207,7 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-	
+	@Deprecated
 	public void batchUpdateAssetLifecycleEvent(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -215,7 +220,7 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
-
+	@Deprecated
 	public void batchUpdateAssetHistoryEvent(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -227,7 +232,7 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchSynchronizationConfig(){
 		Thread t=new Thread(new Runnable() {
 			@Override
@@ -239,40 +244,61 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchAnalyseMenus(){
 		new Thread(() -> adminConsoleService.analyseMenus()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchUpdateReminderRule(){
 		new Thread(() -> adminConsoleService.batchUpdateReminderRule()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchUpdateAssetApprove(){
 		new Thread(() -> adminConsoleService.batchUpdateAssetApprove()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchUpdateSparPart(){
 		new Thread(() -> adminConsoleService.batchUpdateSparPart()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchUpdateI18nMsgType(){
 		new Thread(() -> adminConsoleService.batchUpdateI18nMsgType()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
-
+	@Deprecated
 	public void  batchUpdateAssetInfo(){
 		new Thread(() -> adminConsoleService.batchUpdateAssetInfo()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-
+	@Deprecated
 	public void  batchUpdatePmOrderFields(){
 		new Thread(() -> adminConsoleService.batchUpdatePmOrderFields()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	@Deprecated
+	public void batchUpdateSharedAssetRequest(){
+		new Thread(() -> adminConsoleService.batchUpdateSharedAssetRequest()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void batchUpdateTenantFeature(){
+		new Thread(() -> adminConsoleService.batchUpdateTenantFeature()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void batchUpdateTenantSupplier(){
+		new Thread(() -> adminConsoleService.batchUpdateTenantSupplier()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void batchUpdateTenantAdverseEvent(){
+		new Thread(() -> adminConsoleService.batchUpdateTenantAdverseEvent()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
 }

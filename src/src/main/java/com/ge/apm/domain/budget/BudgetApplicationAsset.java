@@ -293,7 +293,7 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "confirm_maximum_price", scale = 2)
     private BigDecimal confirmMaximumPrice;
 
-    @Column(name = "confirm_rmark", scale = 2)
+    @Column(name = "confirm_rmark")
     @Size(max = 1024)
     private String confirmRemark;
 

@@ -436,7 +436,7 @@ public class MeasuringService {
         return noFoundList;
     }
 
-    public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
+    public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, OrgInfo selectedOrg) throws IOException, ParseException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setLenient(false);
@@ -457,10 +457,10 @@ public class MeasuringService {
                 HSSFRow row = sheet.getRow(j);
 
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
-                detail.setTenantUID(user.getTenantUID());
-                detail.setInstitutionUID(user.getInstitutionUID());
-                detail.setHospitalUID(user.getHospitalUID());
-                detail.setSiteUID(user.getSiteUID());
+                detail.setTenantUID(selectedOrg.getTenantUID());
+                detail.setInstitutionUID(selectedOrg.getInstitutionUID());
+                detail.setHospitalUID(selectedOrg.getHospitalUID());
+                detail.setSiteUID(selectedOrg.getSiteUID());
 
                 if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
                     detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
@@ -539,19 +539,14 @@ public class MeasuringService {
                 if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
                     switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
                         case "A级合格":
-                            status = 1;
-                            break;
                         case "合格":
+                        case "校准合格":
                             status = 1;
                             break;
                         case "不合格":
                             status = 2;
                             break;
-                        case "无结果":
-                            status = 3;
-                            break;
-                        case "校准合格":
-                            status = 1;
+                        default:
                             break;
                     }
                 }

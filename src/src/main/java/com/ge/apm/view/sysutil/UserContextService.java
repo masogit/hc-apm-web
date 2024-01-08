@@ -16,6 +16,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.web.cboard.CBoardController;
+import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -30,6 +31,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -62,6 +64,7 @@ public class UserContextService implements Serializable {
     private Set<String> apmFunctionList = null;
     private Set<ApmSystemRole> apmSystemRoles = null;
     private Set<String> apmFeatures = null;
+    private Map<String, Boolean> adminActive = null; //单独激活项
     private Boolean activeSupplierFlag = null;
     private String selectedSiteUid;
     private Boolean flagIsUltraSoundTenant = null;
@@ -528,6 +531,11 @@ public class UserContextService implements Serializable {
         return userContextService.getLoginUser();
     }
 
+    public static Set<String> getCurrentUserFunction() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.getFunctionListByFeatureAndRoles();
+    }
+
     public static List<CustomRole> getCustomRole(Integer userId){
     	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
     	return userContextService.getListCustomRole(userId);
@@ -541,11 +549,37 @@ public class UserContextService implements Serializable {
     public Set<String> getFeatureList() {
         if (CollectionUtils.isEmpty(apmFeatures)) {
             apmFeatures = ((List<String>)JSON.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
+            AdminFeatureActiveRepository featureActiveRepository = WebUtil.getBean(AdminFeatureActiveRepository.class);
+            adminActive = new HashMap<>();
+            UserAccount userAccount = Optional.ofNullable(getLoginUser()).orElse(new UserAccount());
+            if (userAccount.getOrgLevel() >= 2) {
+                if (!ObjectUtils.isEmpty(featureActiveRepository)) {
+                    // 查找单独激活菜单
+                    List<AdminFeatureActive> featureActives = featureActiveRepository.findByHospitalUID(userAccount.getHospitalUID());
+                    featureActives.forEach(v -> adminActive.put(v.getFeatureKey(), Boolean.TRUE));
+                }
+            } else {
+                Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> apmFeatures.contains(v.name())).forEach(v -> adminActive.put(v.name(), Boolean.TRUE));
+            }
             CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
         // 设置资产分类
         setAssetTypeGroup();
         return apmFeatures;
+    }
+
+    public String isActive(String featureName) {
+        if (null == adminActive) {
+            return "(未激活)";
+        }
+        return adminActive.get(featureName) == null?"(未激活)":"";
+    }
+
+    public boolean canRender(String featureName) {
+        if (null == adminActive) {
+            return false;
+        }
+        return adminActive.get(featureName) == null?false:true;
     }
 
     public Set<ApmSystemRole> getApmSysRole() {

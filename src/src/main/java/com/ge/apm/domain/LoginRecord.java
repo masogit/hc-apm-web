@@ -23,6 +23,11 @@ public class LoginRecord {
 	@Column(name = "login_name")
 	private String loginName;
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "login_name",referencedColumnName = "login_name", insertable = false,updatable = false)
+	private UserAccount userAccount;
+
+
 	@NotNull
 	@Size(min = 1, max = 255)
 	@Column(name = "login_url")

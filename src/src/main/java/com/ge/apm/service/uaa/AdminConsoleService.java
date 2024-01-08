@@ -9,15 +9,20 @@ import com.ge.apm.dao.mapper.AdminConsoleMapper;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.dto.AssetDto;
 import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -41,6 +46,7 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.DbMessageSource;
 
+import javax.faces.application.FacesMessage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -55,70 +61,70 @@ import static com.ge.healthcare.cn.common.cons.ApmFunction.*;
 @Service
 public class AdminConsoleService extends MicroServiceInvoker {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
 	UserAccountMapper userAccountMapper;
-	
+
 	@Autowired
 	UserAccountRepository userAccountRepository;
 
 	@Autowired
 	AssetInfoRepository assetInfoRepository;
-	
+
 	@Autowired
 	TenantInfoRepository tenantInfoRepository;
-	
+
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
 
 	@Autowired
 	UserOrgInfoRepository userOrgDao;
-	
+
 	@Autowired
 	UserOrgInfoRepository userOrgInfoRepository;
-	
+
 	@Autowired
 	SysRoleRepository sysRoleRepository;
-	
+
 	@Autowired
 	UserRoleRepository userRoleRepository;
 
 	@Autowired
 	CustomRoleRepository customRoleRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
-	
+
 	@Autowired
 	AssetLifecycleEventRepository assetLifecycleEventRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
-	
+
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
-	
+
 	@Autowired
 	I18nMessageRepository i18nRepository;
-	
+
 	@Autowired
 	BatchJobRepository batchJobRepository;
-	
+
 	@Autowired
-    RestTemplate template;
-	
+	RestTemplate template;
+
 	@Autowired
 	BlobFileService blobFileService;
-	
+
 	@Autowired
 	BlobObjectRepository blobObjectRepository;
 
@@ -157,24 +163,42 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private AdminConsoleMapper adminConsoleMapper;
-	
+
+	@Autowired
+	private AdminFeatureActiveRepository adminFeatureActiveRepository;
+
+	@Autowired
+	private TenantOptionConfigRepository tenantOptionConfigRepository;
+
+	@Autowired
+	private AdverseEventsRepository adverseEventsRepository;
+
+	@Autowired
+	private SharedAssetRequestRepository sharedAssetRequestRepository;
+
+	@Autowired
+	private AuditCaseRepository auditCaseRepository;
+
+	@Autowired
+	private BudgetApplicationRepository budgetApplicationRepository;
+
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
-	
+	private String baseURL;
+
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
-	
+
 	public List<SysRole> getSysRole(){
 		return sysRoleRepository.find();
 	}
 	public void saveSysRole(SysRole s){
 		sysRoleRepository.save(s);
 	}
-	
+
 	public List<I18nMessage> getI18Menus(){
 		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_VERSION);
 		return list18;
 	}
-	
+
 	public void addVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
@@ -298,7 +322,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
 	}
-	
+
 	public void deleteInvalidOrder(){
 		nurseSiteMaintainDataRepository.deleteInvalid();
 		nurseSiteMaintainItemRepository.deleteInvalid();
@@ -360,7 +384,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			nurseSiteMaintainRepository.updateErrorMaintain(setIds, originStatus, newStatus);
 		}
 	}
-	
+
 	@Transactional
 	public void tUpdateNurseSiteDeleteAsset(List<NurseSiteMaintainConfigItem> listR){
 		Set<String> setAssetUid=new HashSet<String>();
@@ -413,8 +437,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					Date startTime = tempEvent.getScheduleDate();
 					if (closeTime != null && closeTime.after(currentDate)) {
 						if(tempEvent.getCheckStatus().equals(0)){
-	            			listErrorDateEvent.add(tempEvent.getId());
-	            		}
+							listErrorDateEvent.add(tempEvent.getId());
+						}
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
@@ -425,8 +449,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 							ca.add(Calendar.DAY_OF_YEAR, 60);
 							if (ca.getTime().before(currentDate)) {
 								if(tempEvent.getCheckStatus().equals(0)){
-			            			listErrorDateEvent.add(tempEvent.getId());
-			            		}
+									listErrorDateEvent.add(tempEvent.getId());
+								}
 								tempEvent.setScheduleDate(null);
 								startTime=null;
 							}
@@ -453,8 +477,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					if(status.equals(1)){
 						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
 							if(tempEvent.getCheckStatus().equals(0)){
-		            			listErrorDateEvent.add(tempEvent.getId());
-		            		}
+								listErrorDateEvent.add(tempEvent.getId());
+							}
 							tempEvent.setScheduleDate(null);
 						}
 					}
@@ -554,7 +578,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			}
 		}
 	}
-	
+
 	public void dailyUpdateNurseSiteJob(Date date){
 		BatchJob batchJob = new BatchJob();
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
@@ -564,7 +588,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		batchJob.setName(BatchJob.NAME_NURSESITE);
 		batchJobRepository.save(batchJob);
 	}
-	
+
 	public void deleteObjectHub(){
 		String gatewayURL = getGatewayURL(GatewayURL.SEARCH_FILE);
 		Set<String> setSkip=new HashSet<String>();
@@ -573,59 +597,59 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			int pageSize=1000;
 			boolean blnDelete=false;
 			String tempGateway=gatewayURL+"?page="+page+"&pageSize="+pageSize;
-	        try {
-	        	ResponseEntity<LinkedHashMap> response =template.getForEntity(tempGateway,LinkedHashMap.class);
-	            if (isOkay(response)) {
-	                LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-	                Collection<LinkedHashMap<String, Object>> listData = (Collection<LinkedHashMap<String, Object>>) responseMap.get("data");
-	                try {
-	                	if(listData!=null && listData.size()>0){
-	                		for(Map<String,Object> objMap:listData){
-	                			String id=(String)objMap.get("id");
-	                			if(!setSkip.contains(id)){
-	                				List<V2_BlobObject> listObj=blobObjectRepository.findAllByObjectStorageId(id);
-		                			if(listObj==null || listObj.size()==0){
-		                				blnDelete=true;
-		                				logger.info("delete storageId:"+id);
-		                				blobFileService.deleteBlobFilesByStorageId(id);
-		                			}
-		                			else{
-		                				setSkip.add(id);
-		                			}
-	                			}
-	                		}
-	                	}
-	                	else{
-	                		break;
-	                	}
-	    			} catch (Exception e) {
-	    				// TODO: handle exception
-	    				logger.error(e.getMessage());
-	    			}
-	            }
+			try {
+				ResponseEntity<LinkedHashMap> response =template.getForEntity(tempGateway,LinkedHashMap.class);
+				if (isOkay(response)) {
+					LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+					Collection<LinkedHashMap<String, Object>> listData = (Collection<LinkedHashMap<String, Object>>) responseMap.get("data");
+					try {
+						if(listData!=null && listData.size()>0){
+							for(Map<String,Object> objMap:listData){
+								String id=(String)objMap.get("id");
+								if(!setSkip.contains(id)){
+									List<V2_BlobObject> listObj=blobObjectRepository.findAllByObjectStorageId(id);
+									if(listObj==null || listObj.size()==0){
+										blnDelete=true;
+										logger.info("delete storageId:"+id);
+										blobFileService.deleteBlobFilesByStorageId(id);
+									}
+									else{
+										setSkip.add(id);
+									}
+								}
+							}
+						}
+						else{
+							break;
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						logger.error(e.getMessage());
+					}
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				logger.error(e.getMessage());
 			}
-	        if(!blnDelete){
-	        	++page;
-	        }
-	        if(setSkip.size()>100000){
-	        	setSkip.clear();
-	        }
+			if(!blnDelete){
+				++page;
+			}
+			if(setSkip.size()>100000){
+				setSkip.clear();
+			}
 		}
 	}
 	public String getGatewayURL(GatewayURL url) {
-        return baseURL + url.toString();
-    }
+		return baseURL + url.toString();
+	}
 	public Boolean isOkay(ResponseEntity res) {
 
-        if (!res.getStatusCode().equals(HttpStatus.OK)) {
-            return false;
-        }
-        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
-        return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
-    }
+		if (!res.getStatusCode().equals(HttpStatus.OK)) {
+			return false;
+		}
+		LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
+		return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
+	}
 
 	public void updatePmOrders(String userUid,String date) {
 		String token = UserContextService.getAccessToken();
@@ -635,7 +659,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		url = url.concat("&date=").concat(date);
 		ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class,userUid,date);
 		if (isOkay(response)) {
-			 List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
+			List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
 			logger.info("批量创建保养失败记录：{}",pmOrders);
 		} else {
 		}
@@ -1084,7 +1108,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	}
 
 
-    public void batchUpdateI18nMsgType() {
+	public void batchUpdateI18nMsgType() {
 		String msgType="riskGradeNew";
 		List<SearchFilter> searchFilters=new ArrayList<>();
 		searchFilters.add(new SearchFilter("useNewRiskGrade", SearchFilter.Operator.EQ,Boolean.TRUE));
@@ -1137,10 +1161,21 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	}
 
+	@Autowired
+	private UnstructuredDataCollectionRepository collectionRepository;
+	@Autowired
+	private PmOrderRuleCheckListRepository orderRuleCheckListRepository;
+	@Autowired
+	private TransactionalDBService transactionalDBService;
+
+
 	public void batchUpdatePmOrderFields() {
 		try {
 			List<PmOrderRule> pmOrderRules = adminConsoleMapper.findAllPmOrderRule();
 			Map<String, PmOrderRule> ruleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, t -> t));
+			List<PmOrderRuleCheckList> checkItemList = adminConsoleMapper.findAllPmOrderRuleCheckList();
+			Map<String, List<PmOrderRuleCheckList>> checkItemMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getRuleUID));
+			Map<String, List<PmOrderRuleCheckList>> checkUidMap = checkItemList.stream().collect(Collectors.groupingBy(PmOrderRuleCheckList::getUid));
 			int offset = 0;
 			logger.info("batchUpdatePmOrderFields start");
 			while (true) {
@@ -1150,7 +1185,8 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					break;
 				}
 				logger.info("batchUpdatePmOrderFields {}, {}", 5000, offset * 5000);
-				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+				Set<String> assetUidList = orders.stream().map(V2_PmOrder::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+				Set<String> orderUidList = orders.stream().map(V2_PmOrder::getId).collect(Collectors.toSet());
 				List<RelRuleAsset> relRuleAssets = adminConsoleMapper.findRelRuleAssetByAssetUidList(assetUidList);
 				Map<String, String> relRuleAssetMap = MapUtil.newHashMap();
 				for (RelRuleAsset relRuleAsset : relRuleAssets) {
@@ -1159,24 +1195,248 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#3", relRuleAsset.getRuleUID());
 					relRuleAssetMap.put(relRuleAsset.getAssetUID() + "#4", relRuleAsset.getRuleUID4());
 				}
+				List<UnstructuredDataCollection> dataCollectionList = collectionRepository.findCKByBoUuidIn(orderUidList, "pm-checklist-report");
+				Map<String, List<UnstructuredDataCollection>> dataCollectionMap = dataCollectionList.stream().collect(Collectors.groupingBy(UnstructuredDataCollection::getBoUuid));
 				List<V2_PmOrder> saveList = ListUtil.newArrayList();
+				List<UnstructuredDataCollection> saveDataCollectionList = ListUtil.newArrayList();
 				for (V2_PmOrder order : orders) {
-					String ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
-					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
-					if (ObjectUtil.isNotEmpty(pmOrderRule)) {
-						order.setPmRuleUid(pmOrderRule.getUid());
-						saveList.add(order);
+					UnstructuredDataCollection dataCollection = new UnstructuredDataCollection();
+					dataCollection.setBoType("pm-checklist-report");
+					dataCollection.setBoUuid(order.getId());
+					Map<String, UnstructuredData> dataMap = MapUtil.newHashMap();
+					List<UnstructuredData> dataList = ListUtil.newArrayList();
+					List<UnstructuredDataCollection> dataCollections = dataCollectionMap.get(order.getId());
+					if (order.isFinished() && ObjectUtil.isAllEmpty(dataCollections, order.getPmRuleUid())) {
+						continue;
 					}
+					if (ObjectUtil.isEmpty(order.getRuleLevel())) {
+						continue;
+					}
+					String ruleUid = order.getPmRuleUid();
+					if (ObjectUtil.isNotEmpty(dataCollections)) {
+						dataCollection = dataCollections.get(0);
+						dataMap = dataCollection.getData().stream().collect(Collectors.toMap(UnstructuredData::getKey, t -> t));
+					}
+					PmOrderRule pmOrderRule = ruleMap.get(ruleUid);
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
+						pmOrderRule = ruleMap.get(ruleUid);
+					}
+					if (ObjectUtil.isEmpty(pmOrderRule) && 4 == order.getRuleLevel()) {
+						pmOrderRule = ruleMap.get(order.getPmRuleUid());
+					}
+					if (ObjectUtil.isNotEmpty(dataMap) && !dataMap.keySet().isEmpty()) {
+						for (Map.Entry<String, UnstructuredData> dataEntry : dataMap.entrySet()) {
+							List<PmOrderRuleCheckList> checkListList = checkUidMap.get(dataEntry.getKey());
+							if (ObjectUtil.isNotEmpty(checkListList) && checkListList.size() == 1) {
+								PmOrderRuleCheckList item = checkListList.get(0);
+								dataCollection.setSchemaId(item.getRuleUID());
+								order.setPmRuleUid(item.getRuleUID());
+								pmOrderRule = ruleMap.get(item.getRuleUID());
+								UnstructuredData data = dataEntry.getValue();
+								String valueSerialized = data.getValueSerialized();
+								if ("null".equals(valueSerialized) || ObjectUtil.isEmpty(valueSerialized)) {
+									data.setValue("pass");
+								}
+								data.setName(item.getName());
+								data.setRemark(item.getRemark());
+								data.setPeriod(item.getPeriod());
+								dataList.add(data);
+							}
+						}
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
+					}
+					if (ObjectUtil.isEmpty(pmOrderRule)) {
+						continue;
+					}
+					order.setPmRuleUid(pmOrderRule.getUid());
+					saveList.add(order);
+					boolean isEnd = order.isFinished() || "Acceptance".equals(order.getCurrentStepId());
+					if (ObjectUtil.isEmpty(dataCollection.getId()) && isEnd) {
+						continue;
+					}
+					dataCollection.setSchemaId(pmOrderRule.getUid());
+					if (ObjectUtil.isEmpty(dataMap) && ObjectUtil.isEmpty(dataCollection.getId())) {
+						// 更新检查项
+						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
+						for (PmOrderRuleCheckList item : items) {
+							if (item.getStatus() == 0) {
+								continue;
+							}
+							UnstructuredData data = new UnstructuredData();
+							data.setKey(item.getUid());
+							data.setValue("pass");
+							data.setName(item.getName());
+							data.setRemark(item.getRemark());
+							data.setPeriod(item.getPeriod());
+							dataList.add(data);
+						}
+						List<UnstructuredData> removeList = ListUtil.newArrayList();
+						Map<String, List<UnstructuredData>> collect = dataList.stream().collect(Collectors.groupingBy(t -> t.getCollectionId() + "#" + t.getKey()));
+						for (Map.Entry<String, List<UnstructuredData>> entry : collect.entrySet()) {
+							List<UnstructuredData> value = entry.getValue();
+							if (value.size() > 1) {
+								removeList.addAll(value);
+							}
+						}
+						dataList.removeAll(removeList);
+					}
+					dataCollection.setData(dataList);
+					saveDataCollectionList.add(dataCollection);
 				}
-				Map<String, List<V2_PmOrder>> pmOrderMap = saveList.stream().collect(Collectors.groupingBy(V2_PmOrder::getPmRuleUid));
-				for (Map.Entry<String, List<V2_PmOrder>> entry : pmOrderMap.entrySet()) {
-					List<String> orderIds = entry.getValue().stream().map(V2_PmOrder::getId).collect(Collectors.toList());
-					PmOrderRule pmOrderRule = ruleMap.get(entry.getKey());
-					adminConsoleMapper.updatePmOrderByIds(pmOrderRule, orderIds);
-				}
+				// 保存数据库
+				logger.info("batchUpdatePmOrderFields save db ===== orderSize : {} collectionSize : {}", saveList.size(), saveDataCollectionList.size());
+				logger.info("savePmOrderDB saveDataCollectionList : {}", JSON.toJSONString(saveDataCollectionList));
+				transactionalDBService.savePmOrderDB(ruleMap, saveList, saveDataCollectionList);
 			}
 		} catch (Exception e) {
 			logger.error("batchUpdatePmOrderFields error : {} ", e.getMessage(), e);
+			throw new RuntimeException(e);
+		}
+		logger.info("batchUpdatePmOrderFields 同步结束");
+	}
+
+	public void batchUpdateSharedAssetRequest() {
+		List<ConfigItemValue> whetherToEnableUnattended = configItemValueRepository.findByKey("whetherToEnableUnattended");
+		if(CollectionUtils.isEmpty(whetherToEnableUnattended)) return;
+		List<String> strings = adminConsoleMapper.selectGroupBySiteUidSharedAssetRequest();
+		if(CollectionUtils.isEmpty(strings)) return;
+		Map<String, Boolean> collect = whetherToEnableUnattended.stream().collect(Collectors.toMap(ConfigItemValue::getSiteUid, item -> Boolean.TRUE.toString().equals(item.getValue())));
+		for (String siteUid : strings) {
+			if(collect.containsKey(siteUid)){
+				Boolean aBoolean = collect.get(siteUid);
+				Integer dataType=aBoolean?2:1;
+				adminConsoleMapper.updateBySiteUidSharedAssetRequest(dataType,siteUid);
+			}else{
+				adminConsoleMapper.updateBySiteUidSharedAssetRequest(1,siteUid);
+			}
+		}
+	}
+
+	public void batchUpdateTenantSupplier() {
+		List<TenantOptionConfig> tenantOptionConfigs = tenantOptionConfigRepository.findIsActiveSupplier();
+		tenantOptionConfigs.stream().map(TenantOptionConfig::getTenantUid).collect(Collectors.toSet()).forEach(uid -> {
+			TenantInfo tenantInfo = tenantInfoRepository.findByUid(uid);
+			if (ObjectUtil.isNotEmpty(tenantInfo)) {
+				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+				featureList.add(ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+				if (featureList.contains("ASSET_SUPPLIER")) {
+					featureList.remove("ASSET_SUPPLIER");
+				}
+				tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+				tenantInfoRepository.save(tenantInfo);
+			}
+		});
+		List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findIsActiveSupplier();
+		List<AdminFeatureActive> waitList = new ArrayList<>();
+		workflowConfigs.forEach(config -> {
+			buildActiveFeatureByHospitalUid(config.getHospitalUID(), waitList, ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+		});
+		adminFeatureActiveRepository.save(waitList);
+	}
+
+	public void batchUpdateTenantAdverseEvent() {
+		List<TenantInfo> tenantInfoList = tenantInfoRepository.getAllActiveAdverseEvent();
+		tenantInfoList.forEach(tenantInfo -> {
+			if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+				featureList.add(ApmFeature.ASSET_ADVERSE_EVENT.name());
+				tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+				tenantInfoRepository.save(tenantInfo);
+			}
+		});
+		List<String> hospitals = adverseEventsRepository.findByAllUseHospital();
+		List<AdminFeatureActive> waitList = new ArrayList<>();
+		hospitals.forEach(uid -> {
+			buildActiveFeatureByHospitalUid(uid, waitList, ApmFeature.ASSET_ADVERSE_EVENT.name());
+		});
+		adminFeatureActiveRepository.save(waitList);
+	}
+
+	/**
+	 * 批量删除并更新所有租户单独收费的 调剂中心 指控评审 预算管理  并激活已使用的医院
+	 * */
+	public void batchUpdateTenantFeature() {
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		List<TenantInfo> waitSaveTenant = new ArrayList<>();
+		List<AdminFeatureActive> waitSaveActiveHospital = new ArrayList<>();
+		tenantInfos.forEach(tenantInfo -> {
+			if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+				if (featureList.contains(ApmFeature.ADJUST_ASSET.name())) {
+					List<SharedAssetRequest> requests = sharedAssetRequestRepository.findByTenantUID(tenantInfo.getUid());
+					if (CollectionUtils.isEmpty(requests)) {
+						featureList.remove(ApmFeature.ADJUST_ASSET.name());
+						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
+						waitSaveTenant.add(tenantInfo);
+					} else {
+						Set<String> hospitals = requests.stream().map(SharedAssetRequest::getHospitalUID).collect(Collectors.toSet());
+						hospitals.forEach(hospitalUid -> {
+							buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.ADJUST_ASSET.name());
+						});
+					}
+				}
+				if (featureList.contains(ApmFeature.AUDIT.name())) {
+					List<AuditCase> requests = auditCaseRepository.findByTenantUid(tenantInfo.getUid());
+					if (CollectionUtils.isEmpty(requests)) {
+						featureList.remove(ApmFeature.AUDIT.name());
+						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
+						waitSaveTenant.add(tenantInfo);
+					} else {
+						Set<String> siteUid = requests.stream().map(AuditCase::getSiteUid).collect(Collectors.toSet());
+						List<OrgInfo> orgInfoList = orgInfoRepository.findInUIds(siteUid);
+						orgInfoList.forEach(orgInfo -> {
+							buildActiveFeatureByHospitalUid(orgInfo.getHospitalUID(), waitSaveActiveHospital, ApmFeature.AUDIT.name());
+						});
+					}
+				}
+				if (featureList.contains(ApmFeature.BUDGET.name())) {
+					List<BudgetApplication> requests = budgetApplicationRepository.findByTenantUID(tenantInfo.getUid());
+					if (CollectionUtils.isEmpty(requests)) {
+						featureList.remove(ApmFeature.BUDGET.name());
+						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
+						tenantInfo.setLastModifiedDate(new Date());
+						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+						waitSaveTenant.add(tenantInfo);
+					} else {
+						Set<String> hospitals = requests.stream().map(BudgetApplication::getHospitalUID).collect(Collectors.toSet());
+						hospitals.forEach(hospitalUid -> {
+							buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.BUDGET.name());
+						});
+					}
+				}
+			}
+		});
+		tenantInfoRepository.save(waitSaveTenant);
+		adminFeatureActiveRepository.save(waitSaveActiveHospital);
+	}
+
+	private void buildActiveFeatureByHospitalUid(String uid, List<AdminFeatureActive> waitSave, String featureKey) {
+		OrgInfo info = orgInfoRepository.getByUid(uid);
+		if (info.getOrgLevel() == 2) {
+			Set<String> features = adminFeatureActiveRepository.findByHospitalUID(uid).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+			if (!features.contains(featureKey)) {
+				AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+				adminFeatureActive.setFeatureKey(featureKey);
+				adminFeatureActive.setHospitalUID(info.getUid());
+				adminFeatureActive.setTenantUID(info.getTenantUID());
+				adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+				adminFeatureActive.setCreateDate(new Date());
+				adminFeatureActive.setActiveDate(new Date());
+				waitSave.add(adminFeatureActive);
+			}
 		}
 	}
 }

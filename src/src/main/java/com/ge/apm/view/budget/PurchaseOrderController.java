@@ -381,8 +381,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
         int applicationQuantitySumResult = 0;
         for(BudgetApplicationAsset curApplicationBudget:curApplicationBudgetAssets){
-            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmPrice()==null?
-                    new BigDecimal(0):curApplicationBudget.getConfirmPrice()));
+            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
             applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
                     0:curApplicationBudget.getConfirmQuantity();
         }
@@ -589,7 +589,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
     }
 
     public void saveConfirmInfoBudgetApp() {
-        purchaseOrderService.saveConfirmInfoBudgetApp(this.budgetAssetId,this.confirmBudget);
+        purchaseOrderService.saveConfirmInfoBudgetApp(this.budgetAssetId,this.confirmBudget,this.selected);
         WebUtil.addSuccessMessage("操作成功！");
     }
 
@@ -597,7 +597,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         List<SearchFilter> searchFilterAssets = new ArrayList<>();
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ, this.selected.getId()));
-        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        this.curApplicationBudgetAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets,new Sort(Sort.Direction.DESC, "createdDate"));
         if (CollectionUtils.isNotEmpty(this.curApplicationBudgetAssets)) {
             this.curApplicationBudgetAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId() != null).forEach(baa -> {
                 OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());

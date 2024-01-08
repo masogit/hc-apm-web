@@ -45,6 +45,9 @@ public class UnstructuredData implements Serializable {
     @Size(max = 1024)
     private String remark;//项目内容
 
+    @Column(name = "period")
+    private Integer period;//周期，以‘月’为单位
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -117,5 +120,13 @@ public class UnstructuredData implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Integer getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Integer period) {
+        this.period = period;
     }
 }

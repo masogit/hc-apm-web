@@ -1,24 +1,21 @@
 package com.ge.apm.view.nurseSite;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.SearchController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
@@ -26,21 +23,19 @@ import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAuth;
-import com.ge.apm.domain.CustomRoleAuthConstant;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.view.SearchController;
-import com.ge.apm.view.sysutil.UserContextService;
-
+import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -90,8 +85,19 @@ public class MaintainController implements ServerEventInterface{
 
 	private boolean isSelectAll = Boolean.FALSE;
 
+	private UaaService uaaService;
+
+	private OrgInfoRepository orgInfoRepository;
+
+	private List<String> userDeptScopeOrg;
+
+	private Boolean checkRequired=Boolean.TRUE;
+
 	@PostConstruct
 	protected void init() {
+		uaaService = WebUtil.getBean(UaaService.class);
+		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+
 		userContextService = WebUtil.getBean(UserContextService.class);
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		nurseSiteMaintainService.init();
@@ -108,12 +114,16 @@ public class MaintainController implements ServerEventInterface{
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		OrgInfo selectedOrg = searchController.getSelectedOrg();
-		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
-		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
-			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-		}
+		List<String> accessOrgDeptUidAll = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+//		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
+//		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
+		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
+//			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+//		}
 		Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
-		wrapper.in("nsmc.clinical_dept_uid", orgUidList);
+		wrapper.in("nsmc.clinical_dept_uid", accessOrgDeptUidAll);
 		wrapper.eq("nsmc.deleted", false);
 		wrapper.groupBy("nsmc.id");
 		wrapper.orderBy("nsmc.modify_date", false);
@@ -126,7 +136,8 @@ public class MaintainController implements ServerEventInterface{
 			listNurseSiteMaintainConfig = configMapper.findJoinAssetList(new Pagination(1, 5000), wrapper);
 		}
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID()) ||  orgUidList.contains(item.getTenantUID()) ||  orgUidList.contains(item.getInstitutionUID())  ||  orgUidList.contains(item.getHospitalUID()) ||  orgUidList.contains(item.getSiteUID()) ).collect(Collectors.toList());
+		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
@@ -155,9 +166,13 @@ public class MaintainController implements ServerEventInterface{
 		wrapper.ge("nsm.schedule_date", start);
 		wrapper.le("nsm.schedule_date", end);
 		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
-			wrapper.in("nsm.clinical_dept_uid", orgUidList);
+			wrapper.eq("nsm.tenant_uid", currentUser.getTenantUID());
+
+			wrapper.and().in("nsm.site_uid", orgUidList).or().in("nsm.tenant_uid", orgUidList)
+					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
+			.or().in("nsm.clinical_dept_uid", orgUidList);
 		} else {
-			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().filter(item-> userDeptScopeOrg.contains(item.getUid())).map(OrgInfo::getUid).collect(Collectors.toList());
 			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
 		}
 		wrapper.groupBy("nsm.id");
@@ -362,7 +377,10 @@ public class MaintainController implements ServerEventInterface{
 	// }
 	// }
 	// }
-
+	private void addErrMessage(String str) {
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+		WebUtil.addErrorMessageKey(str);
+	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -433,10 +451,42 @@ public class MaintainController implements ServerEventInterface{
 	}
 
 	public void saveMaintain() {
+		if(!checkRequired())return;
 		Date currentDate = new Date();
 		if (nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser)) {
 			lazyEventModel.updateEvent(event);
 			addMessage("工单已保存");
+		}
+	}
+	private boolean checkRequired(){
+		checkRequired = Boolean.TRUE;
+		if(nurseSiteMaintain == null) return checkRequired;
+		List<NurseSiteMaintainItem> listNurseSiteMaintainItem = nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(CollectionUtils.isEmpty(listNurseSiteMaintainItem)) return checkRequired;
+		for (NurseSiteMaintainItem nurseSiteMaintainItem : listNurseSiteMaintainItem) {
+			List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
+			if(CollectionUtils.isEmpty(listData)) continue;
+			checkItemDataRequired(nurseSiteMaintainItem,listData);
+		}
+		return checkRequired;
+	}
+
+	private void checkItemDataRequired(NurseSiteMaintainItem nurseSiteMaintainItem,List<NurseSiteMaintainData> listData) {
+		String str="必填检查项未填写，不允许保存";
+		String assetName = nurseSiteMaintainItem.getAssetInfo().getName();
+		boolean hasChecked = listData.stream().anyMatch(item -> item.getCheckValue() != null || (StringUtils.isNotBlank(item.getVariableText()) && !Boolean.FALSE.toString().equalsIgnoreCase(item.getVariableText())));
+		if(!hasChecked) return;
+		for (NurseSiteMaintainData listDatum : listData) {
+			Boolean required = listDatum.getRequired();
+			if(Boolean.TRUE.equals(required)){
+				Boolean checkValue = listDatum.getCheckValue();
+				String variableText = listDatum.getVariableText();
+				if(checkValue == null || StringUtils.isBlank(variableText)){
+					checkRequired = Boolean.FALSE;
+					String checkItem = listDatum.getCheckItem();
+					addErrMessage(assetName+",检查项："+checkItem+" (勾选项、输入项), "+str);
+				}
+			}
 		}
 	}
 
@@ -540,7 +590,8 @@ public class MaintainController implements ServerEventInterface{
 				}
 			}
 			else{
-				showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
+				List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
+				showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 			}
 		}
 		loadMaintainData();

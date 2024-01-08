@@ -66,6 +66,7 @@ public enum GatewayURL {
     CREATE_PM_ORDER_BY_CONTINUEFAILEDPMORDER("/hcapmworkflowservice/api/apm/pmOrders/continueFailedPmOrder"),
     CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     AUTO_GENERATE_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/finacing_num"),
+    AUTO_GENERATE_BATCH_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/batch/finacing_num"),
     CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
     PM_GET_ACKER("/hcapmassetservice/api/apm/asset/pmorders/{pmOrderId}/acker"),
     PM_GET_ACKER_FOR_BATCH_COMPLETE("/hcapmassetservice/api/apm/asset/pmorders/acker"),
@@ -144,8 +145,23 @@ public enum GatewayURL {
 
     // 不良事件详情
     GET_ADVERSE_EVENTS_INFO("/hcapmassetservice/api/apm/asset/adverse/events/getDetailByUid/{uid}"),
-    // 不良事件审批
+    GET_ADVERSE_EVENTS_INFO_BY_ID("/hcapmassetservice/api/apm/asset/adverse/events/getDetail/{id}"),
+    // // 审核不良事件上报工单 （通过、退回）
     APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent"),
+    // 上报人不良事件列表
+    ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/reporterList"),
+    // 不良事件作废
+    ADVERSE_EVENTS_INVALID("/hcapmassetservice/api/apm/asset/adverse/events/invalidAdverseEvent"),
+    // 不良事件暂存上报
+    ADD_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/addAdverseEvent"),
+    // 审核人不良事件列表
+    APPROVE_ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/approveList"),
+    // 审核暂存
+    APPROVE_TEMP_SAVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveStagingAdverseEvent"),
+    // 不良事件发送邮件
+    ADVERSE_EVENTS_SENDMAIL("/hcapmassetservice/api/apm/asset/adverse/events/sendMail"),
+    // 不良事件pdf
+    ADVERSE_EVENTS_EXPORT_PDF("/hcapmassetservice/api/apm/asset/adverse/events/exportPdf"),
 
     RESET_USER_TO_REDIS("/hcapmgateway/api/apm/security/userAccounts/resetUser/{loginName}"),
     REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),

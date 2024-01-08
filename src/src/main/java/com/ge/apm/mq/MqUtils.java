@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
@@ -113,5 +114,20 @@ public class MqUtils {
         jsonObject.put("assetInfo", str);
         mqContextDTO.setJsonObject(jsonObject);
         sendToMq(mqContextDTO);
+    }
+
+
+    public void sendUserAccessRecords(UserAccount userAccount,String businessType,String featureName){
+        try {
+            userAccount=userAccount!=null?userAccount:UserContextService.getCurrentUserAccount();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("user",userAccount);
+            jsonObject.put("featureName",featureName);
+            jsonObject.put("businessType",businessType);
+            MqContext build = MqContext.builder().jsonObject(jsonObject).exChange(RabbitConfig.ACCESS_RECORDS_CHANGE).routingKey(RabbitConfig.ACCESS_RECORDS_KEY).type("UserAccessRecords").time(new Date()).build();
+            sendToMq(build);
+        }catch (Exception e){
+            log.error("sendUserAccessRecords error :",e);
+        }
     }
 }

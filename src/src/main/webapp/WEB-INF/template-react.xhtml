@@ -46,17 +46,12 @@
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
-                <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">
-                    <h:outputLabel   value="#{userContextService.loginUserOrgInfo.orgFullName}"/>
-<!--                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}" id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">-->
-<!--                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />-->
-<!--                        <f:selectItem itemLabel="" itemValue=""/>-->
-<!--                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />-->
-<!--                    </h:selectOneMenu>-->
-                </h:form>
-            </div>
-            <div class="profile-name">
-                #{userContextService.userName}
+                <div class="btn-group closed" >
+                    <a class="btn btn-primary">
+                        <i class="fa fa-building  fa-fw"></i>#{userContextService.loginUserOrgInfo.orgFullName}
+                        <i class="fa fa-user  fa-fw"></i>#{userContextService.userName}
+                    </a>
+                </div>
             </div>
         </div>
     </div>

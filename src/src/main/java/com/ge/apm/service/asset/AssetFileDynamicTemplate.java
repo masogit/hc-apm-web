@@ -216,6 +216,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("networkingStatus"), networkingStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare02"), spare02List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare03"), spare03List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare04"), spare04List, true);
+        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare05"), spare05List, true);
 
         dynamicListSheet.setSelected(false);
     }
@@ -352,6 +356,29 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+    private void createDropdownWithKeyNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
+
+        List<String> msgs = new ArrayList<>(msgList.size());
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            for (I18nMessage i18nMessage : msgList) {
+                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh());
+            }
+        } else {
+            for (I18nMessage i18nMessage : msgList) {
+                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueEn());
+            }
+        }
+
+        createDropdownOnly(dynamicListSheet, rowNum, name, msgs, optional);
+
+        Name namedCell = workBook.getXSSFWorkbook().createName();
+        namedCell.setNameName(getRangeName(name));
+        String cellRange = getRangeFormulaWithHorizontalList(dynamicListSheet.getSheetName(), rowNum);
+        namedCell.setRefersToFormula(cellRange);
+
+    }
+
+
     private void createDropdownWithStaticList(int rowNum, String name, boolean optional, String... items) {
 
         createDropdownOnly(staticListSheet, rowNum, name, Arrays.asList(items), optional);
@@ -476,11 +503,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public ExcelDocumentStreamingWriter initExcelWriter(int size, List<String> exportFields, List<OrgInfo> clinicalDeptList) {
         logger.info("export asset meta data");
         writeMetaData(exportFields);
-
         if (!crossSite) {
             logger.info("export clinical dept list");
             writeClinicalDeptList(clinicalDeptList);
         }
+        writeI18nMessage(spare01List);
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
@@ -582,7 +609,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int startRow = EXCEL_ORG_DATA_ROW;
         for (I18nMessage i18nMessage: messages) {
 
-            writer.writeRowData(startRow, new String[]{i18nMessage.getValueZh()});
+            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh()});
 
             ++startRow;
         }
@@ -616,10 +643,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields,List<I18nMessage> tcm) throws IOException {
-
-        if (!crossSite) {
-            writeI18nMessage(tcm);
-        }
+        writeI18nMessage(tcm);
     }
 
     public InputStream getInputStream() throws IOException {
@@ -768,9 +792,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         public GetAllElement invoke() {
-            List<String> uids = new ArrayList();
-            Set<Integer> parendAssetIds= new HashSet<Integer>();//父id集合
-            Set<Integer> suplierIds = new HashSet<Integer>();//供应商id集合
+            List<String> uids = new ArrayList<>();
+            Set<Integer> parendAssetIds= new HashSet<>();//父id集合
+            Set<Integer> suplierIds = new HashSet<>();//供应商id集合
             for (int i = 0; i < assetList.size(); i++) {
                 uids.add(assetList.get(i).getUid());
                 if(null !=assetList.get(i).getParentAssetId()){
@@ -778,6 +802,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 }
                 if(null!= assetList.get(i).getSupplierId()){
                     suplierIds.add(assetList.get(i).getSupplierId());
+                }
+                if(null!= assetList.get(i).getMaitananceId()){
+                    suplierIds.add(Integer.parseInt(assetList.get(i).getMaitananceId()));
+                }
+                if(null!= assetList.get(i).getManufactureId()){
+                    suplierIds.add(Integer.parseInt(assetList.get(i).getManufactureId()));
                 }
             }
 

@@ -87,6 +87,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "manufacture_id")
     private String manufactureId;//制造商Id
 
+    @Transient
+    @TableField(exist = false)
+    private String manufactureTel;//制造商电话
+
     @Size(max = 64)
     @Column(name = "vendor")
     private String vendor;//供应商名称 =Supplier.name
@@ -105,8 +109,8 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "maitanance")
     private String maitanance;//维修商
 
-    @Size(max = 32)
-    @Column(name = "maitanance_tel")
+    @Transient
+    @TableField(exist = false)
     private String maitananceTel;//维修电话
 
     @Size(max = 64)
@@ -1852,6 +1856,14 @@ public class AssetInfo implements ChineseName,Serializable {
             this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
         }
 
+    }
+
+    public String getManufactureTel() {
+        return manufactureTel;
+    }
+
+    public void setManufactureTel(String manufactureTel) {
+        this.manufactureTel = manufactureTel;
     }
 
     public String getVendor() {

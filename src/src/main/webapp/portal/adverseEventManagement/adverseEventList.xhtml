@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <style>
+            .ui-chkbox{
+                width: 18px !IMPORTANT;
+            }
+        </style>
+
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="不良事件上报"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="adverseListForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <p:commandButton value="新增上报" process="@this" action="adverseEventCreate.xhtml?faces-redirect=true" />
+                        <p:commandButton value="全部" disabled="#{empty adverseEventManagementController.eventStatusFilter or adverseEventManagementController.eventStatusFilter eq null}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('')}" />
+                        <p:commandButton value="暂存中" disabled="#{adverseEventManagementController.eventStatusFilter eq '1'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('1')}" />
+                        <p:commandButton value="审核中" disabled="#{adverseEventManagementController.eventStatusFilter eq '2,3'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('2,3')}" />
+                        <p:commandButton value="已退回" disabled="#{adverseEventManagementController.eventStatusFilter eq '4'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('4')}" />
+                        <p:commandButton value="已作废" disabled="#{adverseEventManagementController.eventStatusFilter eq '5'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('5')}" />
+                        <p:commandButton value="审核完成" disabled="#{adverseEventManagementController.eventStatusFilter eq '6,8'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('6,8')}" />
+                    </h:panelGrid>
+                    <h:panelGrid id="searchStrSet" columns="2" cellpadding="5">
+                        <label class="label">资产名称或科室名称筛选：</label>
+                        <p:inputText id="queryStr" value="#{adverseEventManagementController.queryStr}">
+                            <p:ajax event="blur" process="@this" update="adverseEventsList" />
+                        </p:inputText>
+                    </h:panelGrid>
+                    <p:dataTable id="adverseEventsList" value="#{adverseEventManagementController.lazyModel}"
+                                 var="item" widgetVar="varDataList" lazy="true"
+                                 selectionMode="single" scrollable="false" selection="#{adverseEventManagementController.selected}"
+                                 rowKey="#{item.id}"
+                                 paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="10" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,,20,50,100">
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
+                            <p:selectBooleanCheckbox value="#{adverseEventManagementController.selectedMap[item.workOrderNum]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this adverseEventsList" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{adverseEventManagementController.onSelectAllOfPage}" update="@(.selectCheckBox) batchExportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.workOrderNum}" >
+                            <h:outputText value="#{item.workOrderNum}"/>
+                        </p:column>
+                        <p:column headerText="状态" >
+                            <h:outputText
+                                    value="#{item.status == 1?'暂存':
+                                    item.status == 2?'待审核':
+                                    item.status == 3?'审核中':
+                                    item.status == 4?'已退回':
+                                    item.status == 5?'已作废':
+                                    item.status == 6?'审核完成':
+                                    item.status == 7?'待上报':
+                                    item.status == 8?'上报完成':
+                                    item.status == 9?'买方填写':
+                                    '未知'  }"/>
+                        </p:column>
+                        <p:column headerText="#{msg.reporterName}" >
+                            <h:outputText value="#{item.reporterName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.reportDate}" >
+                            <h:outputText value="#{item.reportDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.department}" >
+                            <h:outputText value="#{adverseEventManagementController.reporterList(item.department)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.occurredPlace}" >
+                            <h:outputText value="#{item.occurredPlace}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.assetName}" >
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.deviceNum}" >
+                            <h:outputText value="#{item.deviceNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column headerText="伤害程度" >
+                            <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="#{item.harmDegree != 1?'':'priorityItem priorityItem1'}"/>
+                        </p:column>
+                        <p:column headerText="操作" exportable="false">
+                            <p:commandButton value="更多操作" action="#{adverseEventManagementController.onSelectAdverseEvent(item.id)}" onstart="prepareAdverseWindow();" oncomplete="openAdverseWindow(xhr, status, args)"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchExportButton" ajax="false" title="批量导出PDF" actionListener="#{adverseEventManagementController.downLoadPdf()}" icon="ui-icon-file-download" disabled="#{adverseEventManagementController.canExport}" validateClient="true">
+                                <p:fileDownload value="#{adverseEventManagementController.exportPdf}"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <script>
+            function prepareAdverseWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAdverseWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#adverseListForm\\:adverseEventsList\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+        </script>
+    </ui:define>
+</ui:composition>
