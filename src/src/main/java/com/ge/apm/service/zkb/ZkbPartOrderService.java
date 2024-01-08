@@ -292,7 +292,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
 
-        Integer days = getBetweenDay(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()) + 1;
+        Integer days = CopyByInvok.getBetweenDay(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()) + 1;
         if(days > 7 || days < 1){
             return "";
         }else{
@@ -397,38 +397,62 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return flag;
     }
 
-    public static int getBetweenDay(Date date1, Date date2) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String sd1 = format.format(date1);
-        String sd2 = format.format(date2);
-        try {
-            date1 = format.parse(sd1);
-            date2 = format.parse(sd2);
-        } catch (ParseException e) {
-            e.printStackTrace();
+    public String normalCheck(ZkbPartOrder selected){
+        StringBuilder errorLog = new StringBuilder();
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
+                if(StrUtil.isEmpty(selected.getSrNo())){
+                    errorLog.append("SR#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getActivityNo())){
+                    errorLog.append("Act#不能为空，\r\n");
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(StrUtil.isEmpty(selected.getOrderNo())){
+                    errorLog.append("Order#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getNotGeAsset()) && StrUtil.isEmpty(selected.getPrice())){
+                    errorLog.append("价格不能为空，\r\n");
+                }
+                if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType()) && StrUtil.isEmpty(selected.getNewCatFlag())){
+                    errorLog.append("是否全新探头不能为空，\r\n");
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
+                if(StrUtil.isEmpty(selected.getReturnType())){
+                    errorLog.append("归还类型不能为空，\r\n");
+                }
+                if("DOA".equals(selected.getReturnType())){
+                    if(StrUtil.isEmpty(selected.getPartSerialNumber())){
+                        errorLog.append("Part Serial Number不能为空，\r\n");
+                    }
+                    if(StrUtil.isEmpty(selected.getPartQualityIssue())){
+                        errorLog.append("故障描述不能为空，\r\n");
+                    }
+                }
+
+                if(StrUtil.isEmpty(selected.getWaybillNo())){
+                    errorLog.append("运单号不能为空，\r\n");
+                }
+                if(selected.getReturnDate() == null){
+                    errorLog.append("归还日期不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getNewCatSn())){
+                    errorLog.append("新探头SN编号不能为空，\r\n");
+                }
+            }
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(StrUtil.isEmpty(selected.getSrNo())){
+                    errorLog.append("SR#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getActivityNo())){
+                    errorLog.append("Act#不能为空，\r\n");
+                }
+            }
         }
-        long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
-        if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
-            days++;
-        }
-        return (int)days;
+        return errorLog.toString();
     }
 
-    public int getBetweenDay(String sd1, String sd2) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date date1 = format.parse(sd1);
-            Date date2 = format.parse(sd2);
-            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
-            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
-                days++;
-            }
-            return (int)days;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
         List<SearchFilter> filters = new ArrayList<>();
@@ -531,7 +555,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public boolean checkContractLastDay(ZkbContract zkbContract,String orderType){
-        if(getBetweenDay(zkbContract.getEndDate(),new Date()) == 0){
+        if(CopyByInvok.getBetweenDay(zkbContract.getEndDate(),new Date()) == 0){
             return true;
         }
         return false;
@@ -2435,7 +2459,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     /**
-     * ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+     * ZKB FE 当备件/探头/工具归还时需要选择为好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
      * 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
      * 小于0 返回  true 否则 返回 false
      */
@@ -2731,7 +2755,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
         //3.名额修改
         if(ce != 0 ){
-            //ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+            //ZKB FE 当备件/探头/工具归还时需要选择为好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
             // 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
             if(checkRemaining(zkbContract,zkbPartOrder,ce,currentUser)){
                 arg = true;
@@ -2759,7 +2783,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //3.名额修改
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(ce != 0 ){
-            //ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+            //ZKB FE 当备件/探头/工具归还时需要选择为好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
             // 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
             if (checkRemaining(zkbContract,zkbPartOrder,ce,account)){
                 arg = true;
