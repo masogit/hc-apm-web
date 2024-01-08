@@ -474,7 +474,7 @@ public class MaintainController implements ServerEventInterface{
 	private void checkItemDataRequired(NurseSiteMaintainItem nurseSiteMaintainItem,List<NurseSiteMaintainData> listData) {
 		String str="必填检查项未填写，不允许保存";
 		String assetName = nurseSiteMaintainItem.getAssetInfo().getName();
-		boolean hasChecked = listData.stream().anyMatch(item -> item.getCheckValue() != null || StringUtils.isNotBlank(item.getVariableText()));
+		boolean hasChecked = listData.stream().anyMatch(item -> item.getCheckValue() != null || (StringUtils.isNotBlank(item.getVariableText()) && !Boolean.FALSE.toString().equalsIgnoreCase(item.getVariableText())));
 		if(!hasChecked) return;
 		for (NurseSiteMaintainData listDatum : listData) {
 			Boolean required = listDatum.getRequired();

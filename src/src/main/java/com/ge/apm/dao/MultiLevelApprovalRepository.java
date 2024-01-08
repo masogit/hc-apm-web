@@ -36,4 +36,7 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     public List<MultiLevelApproval> findByBusinessUid(String businessUid);
 
     public List<MultiLevelApproval> findByBusinessUidIn(List<String> woId);
+
+    @Query(value = "select count(m.id) from multi_level_approval m  where m.workflow_config_approve_uid = ?1 and ( m.approval_status = 0 or m.approval_status = 1   ) ",nativeQuery = true)
+    int getIncompleteApprovalConfig(String id);
 }
