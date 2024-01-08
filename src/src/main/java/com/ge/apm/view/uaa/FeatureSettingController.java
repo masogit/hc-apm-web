@@ -45,6 +45,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
     TenantInfoRepository dao;
 
+    private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository featureActiveRepository;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
@@ -112,6 +113,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Override
     protected void init() {
 
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         featureActiveRepository = WebUtil.getBean(AdminFeatureActiveRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(TenantInfoRepository.class);
@@ -250,6 +252,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             tenantInfo.setLastModifiedDate(new Date());
             tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             dao.save(tenantInfo);
+            configCacheService.cleanTenantCacheByUid(tenantInfo.getUid());
             MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
