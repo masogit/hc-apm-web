@@ -252,6 +252,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             tenantInfo.setLastModifiedDate(new Date());
             tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             dao.save(tenantInfo);
+            configCacheService.cleanTenantCacheByUid(tenantInfo.getUid());
             MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
