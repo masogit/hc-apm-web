@@ -76,8 +76,8 @@
 					<p:commandButton immediate="true" actionListener="#{maintainItemController.next()}" value="下一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnNext}"></p:commandButton>
 					<p:commandButton id="btnCheckData" immediate="true" value="检查项" update="checkDataDlg" oncomplete="PF('checkDataDlg').show()" />
 					<p:commandButton id="checkRightButton" immediate="true"  value="全部勾选(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable" />
-					<p:commandButton id="addButton" validateClient="true" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
-									 oncomplete="handleSaveSubmit(args)" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
+					<p:commandButton id="addButton" validateClient="true" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":maintainForm :messages "
+									 oncomplete="PF('maintain').update();handleSaveSubmit(args);" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 					<p:commandButton id="deleteButton" value="删除" immediate="true" actionListener="#{maintainController.deleteMaintain}" update=":messages"
 									 disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}">
 						<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
@@ -131,13 +131,15 @@
 				if (!args.validationFailed){
 				    PF("maintain").update();
 					PF('maintainDialog').hide();
+					location.reload();
 				}
 			}
 			function handleSaveAllSubmit(args) {
 				if (!args.validationFailed){
 					PF('checkDataDlg').hide();
-					PF('maintainDialog').hide();
 					PF('maintain').update();
+					PF('maintainDialog').hide();
+					location.reload();
 				}
 			}
 
