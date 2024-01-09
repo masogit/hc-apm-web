@@ -27,9 +27,9 @@
                                      rendered="#{sharedAssetTypeController.selected != null}">
 
                             <h:panelGroup>
-                                <label class='label'>调剂设备名称*</label>
+                                <label class='label'>#{msg.AdjustmentEquipmentName}*</label>
                                 <p:inputText id="swapName" value="#{sharedAssetTypeController.selected.swapName}"
-                                             required="true" requiredMessage="调剂设备名称 #{msg.ValidationRequire}"/>
+                                             required="true" requiredMessage="#{msg.AdjustmentEquipmentName} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
