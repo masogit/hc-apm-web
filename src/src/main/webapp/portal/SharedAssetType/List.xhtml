@@ -55,7 +55,7 @@
                     <p:ajax event="rowSelect" listener="#{sharedAssetTypeController.onChanged}"  update="createButton editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{sharedAssetTypeController.onFilter}" update="createButton editButton deleteButton"/>
 
-                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" filterBy="#{item.swapName}" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}" filterBy="#{item.swapName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="单价" sortBy="#{item.unitPrice}">
