@@ -63,7 +63,7 @@
                         <p:column headerText="设备编号" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
-                        <p:column headerText="调剂设备名称">
+                        <p:column headerText="#{msg.AdjustmentEquipmentName}">
                             <h:outputText value="#{item.sharedAssetTypeEntity.swapName}"/>
                         </p:column>
 
