@@ -110,8 +110,6 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Setter
     private String hospitalStr;
 
-    private Set<String> listActive = new HashSet<>();
-
     @Override
     protected void init() {
 
@@ -120,7 +118,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userService = WebUtil.getBean(UserCommonService.class);
-        listActive = Arrays.stream(ApmAdminActiveFeature.values()).map(ApmAdminActiveFeature::name).collect(Collectors.toSet());
+
         String tenantUid = "";
         String encodeStr = WebUtil.getRequestParameter("str");
         if (encodeStr != null) {
@@ -286,15 +284,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
     public String getFeatureName(String featureName) {
         if (StringUtils.hasText(featureName)) {
-            try {
-                if (listActive.contains(featureName)) {
-                    return ApmAdminActiveFeature.valueOf(featureName.toString().trim()).getFeatureName();
-                }
-            } catch (Exception e) {
-                logger.error(featureName + "匹配异常！" + JSON.toJSONString(listActive) + e.getMessage());
-            }
+            return ApmAdminActiveFeature.valueOf(featureName).getFeatureName();
         }
-        return "未匹配的" + featureName;
+        return "";
     }
 
     public Boolean isActive(String userUid) {
