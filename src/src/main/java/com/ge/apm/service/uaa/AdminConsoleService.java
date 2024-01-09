@@ -1339,8 +1339,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		List<AdminFeatureActive> waitList = new ArrayList<>();
 		workflowConfigs.forEach(config -> {
 			buildActiveFeatureByHospitalUid(config.getHospitalUID(), waitList, ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+			adminFeatureActiveRepository.save(waitList);
+			waitList.clear();
 		});
-		adminFeatureActiveRepository.save(waitList);
 	}
 
 	public void batchUpdateTenantAdverseEvent() {
@@ -1357,8 +1358,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		List<AdminFeatureActive> waitList = new ArrayList<>();
 		hospitals.forEach(uid -> {
 			buildActiveFeatureByHospitalUid(uid, waitList, ApmFeature.ASSET_ADVERSE_EVENT.name());
+			adminFeatureActiveRepository.save(waitList);
+			waitList.clear();
 		});
-		adminFeatureActiveRepository.save(waitList);
 	}
 
 	/**
