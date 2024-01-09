@@ -97,7 +97,7 @@
 
                      <p:ajax event="rowSelect" update="editButton"/>
                 
-                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
+                    <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}" >
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >

@@ -125,9 +125,9 @@
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
-                    <p:column headerText="类型" sortBy="#{item.dataType}" rendered="#{not empty userContextService.selectSite}">
-                        <h:outputText value="#{item.dataType eq 1?'调剂中心':'无人值守'}"/>
-                    </p:column>
+<!--                    <p:column headerText="类型" sortBy="#{item.dataType}" rendered="#{not empty userContextService.selectSite}">-->
+<!--                        <h:outputText value="#{item.dataType eq 1?'调剂中心':'无人值守'}"/>-->
+<!--                    </p:column>-->
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
