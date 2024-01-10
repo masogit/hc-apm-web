@@ -33,7 +33,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -114,15 +113,10 @@ public class MaintainController implements ServerEventInterface{
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
-		OrgInfo selectedOrg = searchController.getSelectedOrg();
-		List<String> accessOrgDeptUidAll = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
-//		List<OrgInfo> accessOrgDeptList = nurseSiteMaintainService.findAccessOrgDeptList(selectedOrg.getSiteUID());
-//		if (ObjectUtil.isNotEmpty(accessOrgDeptList)) {
+		selectedSite = searchController.getSelectedOrg();
 		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
 		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
-//			orgUidList = accessOrgDeptList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-//		}
 		Map<String, Object> param = MapUtil.newHashMap();
 		param.put("tenantUid", currentUser.getTenantUID());
 		param.put("orgUidList", orgUidList);
