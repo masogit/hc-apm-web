@@ -129,8 +129,9 @@ public class MaintainController implements ServerEventInterface{
             listNurseSiteMaintainConfig = configMapper.searchMaintainConfig(param);
         }
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID()) ||  orgUidList.contains(item.getTenantUID()) ||  orgUidList.contains(item.getInstitutionUID())  ||  orgUidList.contains(item.getHospitalUID()) ||  orgUidList.contains(item.getSiteUID()) ).collect(Collectors.toList());
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedSite.getSiteUID().equals(item.getClinicalDeptUID()) ||  selectedSite.getSiteUID().equals(item.getTenantUID()) ||  selectedSite.getSiteUID().equals(item.getInstitutionUID())  ||  selectedSite.getSiteUID().equals(item.getHospitalUID()) ||  selectedSite.getSiteUID().equals(item.getSiteUID()) ).collect(Collectors.toList());
 		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
+		listCheckClinicalOrgInfo = nurseSiteMaintainService.findAccessOrgDeptList(selectedSite.getSiteUID());
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
@@ -597,11 +598,18 @@ public class MaintainController implements ServerEventInterface{
 
 	public void onClinicalOrgInfoChange() {
 		if (showListNurseSiteMaintainConfig == null) {
-			showListNurseSiteMaintainConfig = new ArrayList<NurseSiteMaintainConfig>();
+			showListNurseSiteMaintainConfig = new ArrayList<>();
 		} else {
 			showListNurseSiteMaintainConfig.clear();
 		}
-		if (listNurseSiteMaintainConfig != null) {
+
+		if (ObjectUtil.isNotEmpty(selectedDept)) {
+			showListNurseSiteMaintainConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedDept.getUid().equals(item.getClinicalDeptUID())).collect(Collectors.toList());
+		} else if (ObjectUtil.isNotEmpty(selectedSite)) {
+			showListNurseSiteMaintainConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedSite.getUid().equals(item.getSiteUID())).collect(Collectors.toList());
+		}
+		loadMaintainData();
+/*		if (listNurseSiteMaintainConfig != null) {
 			if(listCheckClinicalOrgInfo!=null && listCheckClinicalOrgInfo.size()>0){
 				Set<String> setClinicalDeptUid = new HashSet<String>();
 				for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
@@ -619,7 +627,7 @@ public class MaintainController implements ServerEventInterface{
 				showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 			}
 		}
-		loadMaintainData();
+		loadMaintainData();*/
 	}
 
 	public void onClinicalParentOrgInfoChange() {
