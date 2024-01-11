@@ -86,11 +86,6 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         if (ObjectUtil.isNotEmpty(orgUidList)) {
             param.put("orgUidList", orgUidList);
         }
-        List<Map<String, Object>> detailOrderList = inventoryOrderMapper.findDetailOrder(param);
-        List<Integer> detailAssetList = detailOrderList.stream().map(map -> Integer.parseInt(map.get("assetid").toString())).collect(Collectors.toList());
-        if (ObjectUtil.isNotEmpty(detailAssetList)) {
-            param.put("detailAssetList", detailAssetList);
-        }
         Long count = inventoryOrderMapper.findNoneOrderCount(param);
         Sort sort = pageRequest.getSort();
         StringBuilder orderBy = new StringBuilder();
@@ -104,53 +99,6 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         List<AssetInfo> resultList = inventoryOrderMapper.findNoneOrderList(param);
         return new PageImpl<>(resultList, pageRequest, count);
     }
-
-/*    @Override
-	protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-		//before
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-
-		List<SearchFilter> searchFilters = this.searchFilters;
-		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
-		}
-        List<SearchFilter> InventoryOrderDetailSearchFilters = new ArrayList<>();
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
-        InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
-        //全院视图
-        List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
-        if(!orderIdList.isEmpty()){
-            InventoryOrderDetailSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
-        }
-        List<InventoryOrderDetail> inventoryOrderDetailList = dao.findBySearchFilter(InventoryOrderDetailSearchFilters);
-        List<Integer> idList = new ArrayList<>();
-        if(!inventoryOrderDetailList.isEmpty()){
-            for ( InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList) {
-                idList.add(inventoryOrderDetail.getAssetInfo().getId());
-            }
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.NotIN, idList,"1*"));
-        }
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
-        searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true,"1*"));
-        Page<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFilters,pageRequest);
-		//after
-		return assetInfoList;
-	}*/
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
