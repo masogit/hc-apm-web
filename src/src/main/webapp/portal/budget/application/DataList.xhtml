@@ -76,9 +76,12 @@
                                            pattern="#{userContextService.timeFormat14()}"/>
                  </h:outputText>
             </p:column>
-            <p:column headerText="采购状态" rendered="#{budgetController.tabIndex eq 3}">
+            <p:column headerText="采购状态" rendered="#{budgetController.tabIndex eq 3 }">
                 <h:outputText value="#{fieldMsg.fieldValue('procureStatus', item.procureStatus)}"/>
             </p:column>
+           <!-- <p:column headerText="采购信息确认状态" rendered="#{budgetController.tabIndex eq 4}">
+                <h:outputText value="#{fieldMsg.fieldValue('budgetConfirmStatus', item.confirmStatus)}"/>
+            </p:column>-->
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"

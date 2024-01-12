@@ -404,7 +404,6 @@ public class PurchaseOrderService {
         purchaseOrderInfoCur.setTotalPrice(totalAmount.get());
         purchaseOrderInfoCur.setPurchaseQuantity(applicationQuantitySumResult);
         purchaseOrderInfoRepository.save(purchaseOrderInfoCur);
-
     }
 
 }

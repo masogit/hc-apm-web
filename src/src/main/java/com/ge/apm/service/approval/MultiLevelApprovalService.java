@@ -14,6 +14,7 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
 import com.ge.apm.service.asset.AssetLifecyleService;
+import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -57,7 +58,8 @@ import java.util.stream.Collectors;
 public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     protected static final Logger logger = Logger.getLogger(MultiLevelApprovalService.class);
-
+    @Autowired
+    private PurchaseBudgetConfigService purchaseBudgetConfigService;
     @Autowired
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Autowired
@@ -867,6 +869,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             if(multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP && multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT) {
                                 this.sendWxMsg(paramList, message,"审批通过","");
                             }
+                            try {
+                                purchaseBudgetConfigService.sendWxMsgPurchase(purchaseOrderInfo, UserContextService.getAccessToken(),"RESULT");
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                         switch (multiLevelApproval.getBusinessType()) {
 
@@ -938,6 +945,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                         updatePurchase(purchaseOrderInfo,
                                                 PurchaseOrderInfo.PURCHASESTEP.ToConfirmedInfoMeet.toString(),
                                                 PurchaseOrderInfo.PURCHASESTEPSTATUS.ConfirmedInfo.toString(),null,null);
+                                        try {
+                                            purchaseBudgetConfigService.sendWxMsgPurchase(purchaseOrderInfo, UserContextService.getAccessToken(),null);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
                                     }else if(approvalLevel==2){//第二级  过会信息 填写设备科
                                         updatePurchase(purchaseOrderInfo,
                                                 PurchaseOrderInfo.PURCHASESTEP.ToConfirmedInfoTendered.toString(),

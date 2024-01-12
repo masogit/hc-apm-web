@@ -149,7 +149,7 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
         try {
-            budgetPurchaseTemplateManageList = budgetPurchaseTemplateManageRepository.find();
+            budgetPurchaseTemplateManageList = budgetPurchaseTemplateManageRepository.findByTenantUID(account.getTenantUID());
             curApplicationBudgetAssets = new ArrayList<BudgetApplicationAsset>();
             if (PurchaseOrderController.CREATE_ACTION.equals(action)) {
                 this.prepareCreate();

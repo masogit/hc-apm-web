@@ -42,6 +42,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -70,6 +71,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private UserAccount account = UserContextService.getCurrentUserAccount();
     @Getter  @Setter
     private Integer tabIndex = 0;
+    @Getter  @Setter
     private Integer tabIndexList = 0;
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
@@ -85,6 +87,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private BudgetAssetInfo curSelectBudgetAssetInfo;
     @Getter  @Setter
     private List<V2_BlobObject> attachList;
+    private PageUtil<BudgetApplication> pageUtil = new PageUtil<>();
     // 弹窗列表
     @Getter  @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
@@ -200,12 +203,14 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             case "s4":
                 tabIndex = 4;
                 break;
+            case "s5":
+                tabIndex = 5;
+                break;
             default:
                 tabIndex = 0;
                 break;
         }
     }
-
 
 
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
@@ -217,7 +222,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             return emptyPage;
         }
         List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
-        return new PageImpl(dataList,pageRequest,dataList.size());
+        return pageUtil.pageNum(dataList,pageRequest);
     }
 
     public void exportExcel(String orderType){
@@ -241,7 +246,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ,
                 BudgetApplication.OrderType.BAP.toString()));
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-        removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");
+        removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");removeFilterOnField("confirmStatus");
         if (tabIndex == 0) {//待办
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1,4)));
         } else if(tabIndex == 1){//待审核
@@ -250,7 +255,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "PendingComplete"));
         } else if(tabIndex == 3){//完成
             searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "Complete"));
-        } else if(tabIndex == 4){//全部
+        } else if(tabIndex == 4){//采购信息确认
+            searchFilters.add(new SearchFilter("confirmStatus", SearchFilter.Operator.IsNull, null));
+        }else if(tabIndex == 5){//全部
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
 
@@ -298,6 +305,14 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
+    }
+
+    public String confirmApplication() {
+        this.selected.setConfirmStatus("Confirmed");
+        boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
+        this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
+        actionMessage(isOk);
+        return this.backList();
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
