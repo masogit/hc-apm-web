@@ -193,7 +193,7 @@
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['MULTILEVEL_APPROVE']}"
                                         itemLabel="多级审批">
-                                    <p:ajax update="assetGroup"
+                                    <p:ajax update="approve"
                                             listener="#{featureSettingController.featureChange('MULTILEVEL_APPROVE')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>多级审批菜单</p:outputLabel>
@@ -232,7 +232,7 @@
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['SPECIAL_ASSET']}"
                                         itemLabel="特种设备管理">
-                                    <p:ajax update="assetGroup"
+                                    <p:ajax update="specialAsset"
                                             listener="#{featureSettingController.featureChange('SPECIAL_ASSET')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>特种设备管理菜单</p:outputLabel>
@@ -567,7 +567,7 @@
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['LOG_AUDIT']}"
                                         itemLabel="日志审计">
-                                    <p:ajax update="mvsAsset"
+                                    <p:ajax update="logAudit"
                                             listener="#{featureSettingController.featureChange('LOG_AUDIT')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>日志审计</p:outputLabel>

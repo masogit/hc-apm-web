@@ -74,7 +74,7 @@
                         <p:ajax event="rowSelect" />
                         <p:ajax event="filter" listener="#{sharedAssetReqTypeController.onFilter}" />  
 
-                        <p:column headerText="调剂设备名称" sortBy="#{item.expectDate}" >
+                        <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
                         <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
