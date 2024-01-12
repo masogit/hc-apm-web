@@ -19,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -358,6 +359,19 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return ;
             }
         }
+        //YHAAO-20623
+        //ZKB CCS 2.0 offer 需要区分超声高端机New和old，并实现相关逻辑
+        if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
+            List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
+                    (this.selectZkbFePartOrder.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
+            if((ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))
+                    && CollectionUtils.isNotEmpty(zkbContractAssetList) && this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                //gefe 合同类型 ccs/biomed 超声高端机只能申请 申请外修 内修在  zkbfe
+                WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                this.contractError = true;
+                return;
+            }
+        }
         /**
          * 需要兼容历史数据
          */
@@ -608,9 +622,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         String format = "yyyy-MM-dd";
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
-        //GE FE合同到期后400下单前增加Commercial角色进行审批   非599合同才有commercial审批
+        //GE FE合同到期后400下单前增加Commercial角色进行审批
         //人工叫报修时间  备件探头叫申请时间  申请时间如果小于开始时间，大于结束时间需要commercial
-        if (((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)&&!"Y".equals(zkbContract.getFiveNineNineFlag())) &&!"t".equals(this.selected.getNotGeAsset())  ){
+        if ((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)
+                && !"t".equals(this.selected.getNotGeAsset())){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
         String result = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),

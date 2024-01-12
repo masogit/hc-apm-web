@@ -64,7 +64,7 @@
                     <p:ajax event="rowSelect" />
                     <p:ajax event="filter" listener="#{sharedAssetReqTypeController.onFilter}" />  
                         
-                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
+                    <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}" >
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="申请借用数" sortBy="#{item.applyQty}"  >
