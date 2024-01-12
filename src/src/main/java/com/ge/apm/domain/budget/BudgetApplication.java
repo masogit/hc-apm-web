@@ -1,14 +1,12 @@
 package com.ge.apm.domain.budget;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Formula;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -18,7 +16,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
-import java.util.List;
+
 import java.util.Set;
 
 /**
@@ -207,6 +205,17 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     @Transient
     private String applicantDeptName ;//申请科室
+
+    @Column(name = "confirm_status")
+    private String confirmStatus;
+
+    public String getConfirmStatus() {
+        return confirmStatus;
+    }
+
+    public void setConfirmStatus(String confirmStatus) {
+        this.confirmStatus = confirmStatus;
+    }
 
     public String getApplicantDeptName() {
         return applicantDeptName;

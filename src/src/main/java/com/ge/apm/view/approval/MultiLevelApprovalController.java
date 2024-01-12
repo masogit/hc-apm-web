@@ -10,6 +10,7 @@ import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -26,6 +27,7 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -68,7 +70,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     private boolean signatureNurseRendered = false;
     private String signatureNurse;
-
+    @Setter @Getter
+    private boolean budgetConfirmArg = false;
     public String getSignatureNurse() {
         return signatureNurse;
     }
@@ -228,7 +231,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 primaryApprovalData = budgetApplication;
                 secondaryApprovalData = budgetApplication.getBudgetAssets();
                 signatureNurseRendered = false;
-                if(BudgetApplication.OrderType.BAP.toString().equals(budgetApplication.getOrderType()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
+                if("T".equals(budgetApplicationAsset.getUsedOperatingRoom())){
                     signatureNurseRendered = true;
                 }
                 break;
@@ -248,6 +251,21 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     this.companyInfos = venderInfoList.stream().filter(vi -> VenderInfo.BidType.Company.toString().equals(vi.getBidType())).collect(Collectors.toList());
                 }
                 this.purchaseOrderInfo = purchaseOrderInfo;
+
+
+                List<SearchFilter> searchFilterAssets = new ArrayList<>();
+                searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
+                        SearchFilter.Operator.EQ,purchaseOrderInfo.getId()));
+                List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+                if(!CollectionUtils.isEmpty(budgetApplicationAssets) &&
+                        PurchaseOrderInfo.PURCHASESTEP.ToConfirmedInfoMeet.toString().equals(purchaseOrderInfo.getOrderStep())){
+                    budgetApplicationAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
+                        if(StringUtils.isBlank(baa.getBudgetApplication().getConfirmStatus()) ||
+                                "UnConfirm".equals(baa.getBudgetApplication().getConfirmStatus())){
+                            budgetConfirmArg = true;
+                        }
+                    });
+                }
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
@@ -324,7 +342,26 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      * 供采购使用
      * @return
      */
+    public void purchaseInfoSave() throws Exception {
+        MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        purchaseOrderInfoRepository.save(this.purchaseOrderInfo);
+        WebUtil.addSuccessMessage("采购过会信息保存成功！");
+    }
+
+    /**
+     * 供采购使用
+     * @return
+     */
     public void purchaseInfoSubmit() throws Exception {
+        if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2){
+            handValidateData(this.purchaseOrderInfo);
+        };
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
@@ -341,7 +378,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         if (!CollectionUtils.isEmpty(budgetApplicationAssets)){
             try {
                 budgetApplicationAssets.stream().forEach(baa -> {
-                    if(baa.getConfirmMaximumPrice()==null || StringUtils.isBlank(baa.getConfirmRemark())){
+                    if(StringUtils.isBlank(baa.getConfirmNotice()) || StringUtils.isBlank(baa.getConfirmEquipmentCategory())){
                         throw new RuntimeException();
                     }
                 });
@@ -356,6 +393,54 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         selected = null;
         this.needSignature = false;
         this.resetSignature();
+    }
+
+    public void handValidateData(PurchaseOrderInfo purchaseOrderInfo){
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEngineerOpinion())){
+            WebUtil.addWarnMessage("专业工程师意见不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingExistingBrands())){
+            WebUtil.addWarnMessage("医院现有品牌不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingFeeItems())){
+            WebUtil.addWarnMessage("收费项目不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingConsumableDescription())){
+            WebUtil.addWarnMessage("耗材或试剂说明不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEquipmentDeptOpin())){
+            WebUtil.addWarnMessage("器械科审核意见不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(purchaseOrderInfo.getMeetingApproveDate()==null){
+            WebUtil.addWarnMessage("审核时间不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingPurchasingImports())){
+            WebUtil.addWarnMessage("是否采购进口产品不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingRemarks())){
+            WebUtil.addWarnMessage("备注不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(purchaseOrderInfo.getMeetingDate()==null){
+            WebUtil.addWarnMessage("过会日期不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
     }
 
     /**
@@ -762,7 +847,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         List<SearchFilter> searchFilterAssets = new ArrayList<>();
         searchFilterAssets.add(new SearchFilter("budgetApplication.purchaseId",
                 SearchFilter.Operator.EQ,purchaseOrderInfo.getId()));
-        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets);
+        List<BudgetApplicationAsset> budgetApplicationAssets = budgetApplicationAssetRepository.findBySearchFilter(searchFilterAssets,new Sort(Sort.Direction.DESC, "createdDate"));
         if(!CollectionUtils.isEmpty(budgetApplicationAssets)){
             budgetApplicationAssets.stream().filter(baa -> baa.getConfirmApplicationDeptId()!=null).forEach(baa ->{
                 OrgInfo confirmOrg = orgDao.findById(baa.getConfirmApplicationDeptId());

@@ -4820,6 +4820,11 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('procureStatus', 'Purchased', '已采购', 'Purchased', NULL, -1);
 
 
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetConfirmStatus', 'UnConfirm', '未确认', 'Unpurchased', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetConfirmStatus', 'Confirmed', '已确认', 'Purchased', NULL, -1);
+
+
+
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationT_F', 'T', '是', 'T', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetApplicationT_F', 'F', '否', 'F', NULL, -1);
 
