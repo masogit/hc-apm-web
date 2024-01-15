@@ -301,4 +301,9 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
+	public void updateNurseSiteMaintainConfigPyCode() {
+		new Thread(() -> adminConsoleService.updateNurseSiteMaintainConfigPyCode()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
 }
