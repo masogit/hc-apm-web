@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -24,6 +25,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,6 +135,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private StreamedContent assetTemplateFile;
     private AssetLifecyleService assetLifecyleService;
 
+    private AssetInfoMapper assetInfoMapper;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -159,6 +163,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         parentAssetService = WebUtil.getBean(AssetInfoParentAssetService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
@@ -177,23 +182,123 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
-        if (lastPageSort.getOrderFor("lastModifiedDate")!=null) { // default sort desc
-            lastPageSort = new Sort(new Sort.Order(Sort.Direction.DESC,"lastModifiedDate"));
-            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),lastPageSort);
-        }
+//        if (lastPageSort.getOrderFor("lastModifiedDate")!=null) { // default sort desc
+//            lastPageSort = new Sort(new Sort.Order(Sort.Direction.DESC,"lastModifiedDate"));
+//            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),lastPageSort);
+//        }
+
+        String orderBySql=buildOrderBy(lastPageSort);
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
         selected = null;
-        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+//        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+        HashMap<String, Object> param = new HashMap<>();
+        covQueryCondition(searchFilters, param);
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        if(orderBySql!=null){
+            param.put("orderBy", orderBySql);
+
+        }
+        List<AssetInfo> list= assetInfoMapper.toBeTerminatedList(param);
+        Long count= assetInfoMapper.toBeTerminatedListCount(param);
+        PageImpl<AssetInfo> res = new PageImpl<>(list, pageRequest, count);
         currentPageAssets = res.getContent();
-
         addMissingClinicalDeptOrg(currentPageAssets);
-
         return res;
     }
 
+    private String buildOrderBy(Sort lastPageSort) {
+        String sql=null;
+        if(lastPageSort==null){
+            sql="order by al.create_time desc";
+        }else{
+            switch (lastPageSort.iterator().next().getProperty()) {
+                case "namePyCode":
+                    sql="order by ai.name_py_code ";
+                    break;
+                case "functionType":
+                    sql="order by ai.function_type ";
+                    break;
+                case "serialNum":
+                    sql="order by ai.serial_num ";
+                    break;
+                case "departNum":
+                    sql="order by ai.depart_num ";
+                    break;
+                case "assetGroup":
+                    sql="order by ai.asset_group ";
+                    break;
+                case "assetGroupSecondary":
+                    sql="order by ai.asset_group_secondary ";
+                    break;
+                case "manufacture":
+                    sql="order by ai.manufacture ";
+                    break;
+                case "vendor":
+                    sql="order by ai.vendor ";
+                    break;
+                case "subjectProject":
+                    sql="ai.subject_project ";
+                    break;
+                case "warrantyDate":
+                    sql="order by ai.warranty_date ";
+                    break;
+                case "createdDate":
+                    sql="order by ai.created_date ";
+                    break;
+                case "financingNum":
+                    sql="order by ai.financing_num ";
+                    break;
+                case "qrCode":
+                    sql="order by ai.qr_code ";
+                    break;
+                case "aliasName":
+                    sql="order by ai.alias_name ";
+                    break;
+                case "assetOwnerName":
+                    sql="order by ai.asset_owner_name ";
+                    break;
+                case "assetUsage":
+                    sql="order by ai.asset_usage ";
+                    break;
+                case "capitalSource":
+                    sql="order by ai.capital_source ";
+                    break;
+                case "capitalSource2":
+                    sql="order by ai.capital_source2 ";
+                    break;
+                case "emergencyEquipment":
+                    sql="order by ai.emergency_equipment ";
+                    break;
+                case "importEquipment":
+                    sql="order by ai.import_equipment ";
+                    break;
+                case "proprietaryClass":
+                    sql="order by ai.proprietary_class ";
+                    break;
+
+
+                default:
+                    break;
+
+            }
+            if(sql!=null){
+                if("ASC".equalsIgnoreCase(lastPageSort.iterator().next().getDirection().name())){
+                    sql=sql+"asc";
+                }else{
+                    sql=sql+"desc";
+                }
+            }
+
+        }
+
+
+        return sql;
+    }
     public void exportToBeTerminatedAppraisalFile() {
         try {
             toBeTerminatedAppraisalFile = null;
@@ -273,21 +378,21 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         if (orgUids.isEmpty()) {
             return;
         }
-        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
-        if(!CollectionUtils.isEmpty(uids)){
-            List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_TO_TERMINATED);
-//        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByAssetUidsAndStatusGroupAssetUid(uids,4);
-            Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
-            currentPageAssets.forEach(item -> {
-                List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
-                if(!CollectionUtils.isEmpty(assetLifecycles)){
-                    List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
-                    item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
-                    item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
-                }
-
-            });
-        }
+//        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
+//        if(!CollectionUtils.isEmpty(uids)){
+//            List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_TO_TERMINATED);
+////        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByAssetUidsAndStatusGroupAssetUid(uids,4);
+//            Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
+//            currentPageAssets.forEach(item -> {
+//                List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
+//                if(!CollectionUtils.isEmpty(assetLifecycles)){
+//                    List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
+//                    item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
+//                    item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
+//                }
+//
+//            });
+//        }
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
         Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
@@ -872,4 +977,90 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     public String getParentAssetNameByAssetId(int assetId) {
         return parentAssetService.getParentAssetNameByAssetId(assetId);
     }
+
+
+
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "isDeleted":
+                    param.put("isDeleted", searchFilter.value);
+                    break;
+                case "isValid":
+                    param.put("isValid", searchFilter.value);
+                    break;
+                case "status":
+                    param.put("status", searchFilter.value);
+                    break;
+                case "siteUID":
+                    param.put("orgUidList", searchFilter.value);
+                    break;
+                case "oneSearchStr":
+                    param.put("oneSearchStr", searchFilter.value);
+                    break;
+                case "assetDeptOrgUidSet":
+                    param.put("assetDeptOrgUidSet", searchFilter.value);
+                    break;
+                case "clinicalDeptOrgUidSet":
+                    param.put("clinicalDeptOrgUidSet", searchFilter.value);
+                    break;
+                case "selectSite":
+                    param.put("selectSite", searchFilter.value);
+                    break;
+                case "mvsEquip":
+                    param.put("mvsEquip", searchFilter.value);
+                    break;
+                case "qrCode":
+                    param.put("qrCode", searchFilter.value);
+                    break;
+                case "name":
+                    param.put("name", searchFilter.value);
+                    break;
+                case "assetGroup":
+                    param.put("assetGroup", searchFilter.value);
+                    break;
+                case "functionType":
+                    param.put("functionType", searchFilter.value);
+                    break;
+                case "financingNum":
+                    param.put("financingNum", searchFilter.value);
+                    break;
+                case "departNum":
+                    param.put("departNum", searchFilter.value);
+                    break;
+                case "makerShortName":
+                    param.put("makerShortName", searchFilter.value);
+                    break;
+                case "vendor":
+                    param.put("vendor", searchFilter.value);
+                    break;
+                case "usageStatus":
+                    param.put("usageStatus",Integer.parseInt(searchFilter.value.toString()));
+                    break;
+                case "terminationCause":
+                    param.put("terminationCause", searchFilter.value);
+                    break;
+                case "warrantyDate":
+                    param.put("warrantyDate", searchFilter.value);
+                    break;
+
+
+
+                default:
+                    break;
+            }
+        }
+
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            param.put("clinicalDeptOrgUidSet", clinicalDeptOrgUidSet);
+        }
+        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+            param.put("assetDeptOrgUidSet", assetDeptOrgUidSet);
+        }
+        if (null != selectSite) {
+            param.put("selectSite", selectSite.getUid());
+        }
+    }
+
 }

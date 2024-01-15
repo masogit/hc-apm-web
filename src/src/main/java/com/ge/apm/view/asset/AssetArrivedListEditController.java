@@ -291,7 +291,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if(Boolean.TRUE.equals(selected.getEnableGenerateQrcode()) &&  !StringUtils.isEmpty(config.getAssetCodeConfig()) && "DFQ".equals(config.getAssetCodeConfig())){
             String financingNum = assetFinacingNumGenerateService.batchAutoGenerateFinacingNum(null,
                     null, selectedOrg.getSiteUID() , null, qrCodePrefix,selected.getId(),selected.getQuantity());
-            if (null == financingNum || financingNum.startsWith("error:")) {
+            if(null == financingNum ){
+                return;
+            }
+            if (financingNum.startsWith("error:")) {
                 WebUtil.addErrorMessage(financingNum.replace("error:", ""));
                 return;
             }
