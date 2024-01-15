@@ -146,7 +146,7 @@ public class BudgetPersistService {
         application.setLastModifiedDate(new Date());
         application.setOrderType(orderType);
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        if("4".equals(orgInfo.getOrgType())){
+        if(orgInfo.getOrgType()==4){
             application.setApplicationDeptName(orgInfo.getName());
             application.setApplicationDept(orgInfo);
         }
