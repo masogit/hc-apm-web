@@ -58,6 +58,154 @@
         select ai.* from asset_info ai left join nurse_site_maintain_config_item_jn nsmci on ai.uid = nsmci.asset_uid
         <where>${ew.sqlSegment}</where>
     </select>
+    <select id="toBeTerminatedList" resultType="com.ge.apm.domain.AssetInfo">
+
+        select  ai.*,al.modify_time as terminateOperationDate ,al.modify_by terminateOperation from asset_info ai left join (select a1.* from  asset_lifecycle  a1 inner join  ( select max(create_time) create_time,asset_uid from asset_lifecycle  where   current_status = 4  group by    asset_uid  )  a2 on     a1.asset_uid=a2.asset_uid and a1.create_time=a2.create_time) al on ai.uid=al.asset_uid
+
+        <include refid="queryCondition"/>
+
+       <if test="orderBy!=null">
+           ${orderBy}
+       </if>
+        LIMIT #{page} OFFSET #{offset}
+    </select>
+
+    <select id="toBeTerminatedListCount" resultType="long">
+        select  count(*) from asset_info ai
+        <include refid="queryCondition"/>
+
+    </select>
+
+    <sql id="queryCondition">
+        <where>
+            <if test="isDeleted != null">
+                AND ai.is_deleted = #{isDeleted}
+            </if>
+            <if test="isValid != null">
+                AND ai.is_valid = #{isValid}
+            </if>
+            <if test="status != null">
+                AND ai.status = #{status}
+            </if>
+            <if test="orgUidList != null and orgUidList.size > 0">
+                AND (
+                ai.institution_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR ai.hospital_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR ai.site_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR ai.clinical_dept_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR ai.asset_dept_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR ai.tenant_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="oneSearchStr != null">
+                AND (
+                  ai.name like concat('%',#{name},'%')
+                  or
+                  ai.name_py_code like concat('%',#{namePyCode},'%')
+                  or
+                  ai.depart_num like concat('%',#{departNum},'%')
+                or
+                ai.financing_num like concat('%',#{financingNum},'%')
+                or
+                ai.qr_code like concat('%',#{qrCode},'%')
+
+                or
+                ai.serial_num like concat('%',#{serialNum},'%')
+
+                or
+                ai.manufacture like concat('%',#{manufacture},'%')
+
+                or
+                ai.clinical_dept_name like concat('%',#{clinicalDeptName},'%')
+                )
+            </if>
+
+            <if test="name != null">
+                AND ai.name like concat('%',#{name},'%')
+            </if>
+
+            <if test="functionType != null">
+                AND ai.functionType like concat('%',#{functionType},'%')
+            </if>
+            <if test="financingNum != null">
+                AND ai.financingNum like concat('%',#{financingNum},'%')
+            </if>
+            <if test="departNum != null">
+                AND ai.depart_num = #{departNum}
+            </if>
+            <if test="makerShortName != null">
+                AND ai.make_short_name like concat('%',#{makerShortName},'%')
+            </if>
+
+
+            <if test="vendor != null">
+                AND ai.vendor like concat('%',#{vendor},'%')
+            </if>
+
+            <if test="usageStatus != null">
+                AND ai.usage_status =#{usageStatus}
+            </if>
+            <if test="terminationCause != null">
+                AND ai.termination_cause like concat('%',#{terminationCause},'%')
+            </if>
+            <if test="assetGroup != null">
+                AND ai.asset_group =#{assetGroup}
+            </if>
+            <if test="mvsEquip != null">
+                AND ai.mvs_equip =#{mvsEquip}
+            </if>
+
+            <if test="qrCode != null">
+                AND ai.qr_code  like concat('%',#{qrCode},'%')
+            </if>
+            <if test="warrantyDate != null">
+                AND ai.warranty_date  ge #{warrantyDate}
+            </if>
+
+           <if test="assetDeptOrgUidSet != null">
+               AND
+               ai.asset_dept_uid IN
+               <foreach item="item" collection="assetDeptOrgUidSet" separator="," open="(" close=")" index="">
+                   #{item}
+               </foreach>
+           </if>
+            <if test="clinicalDeptOrgUidSet != null">
+                AND
+                ai.clinical_dept_uid IN
+                <foreach item="item" collection="clinicalDeptOrgUidSet" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="selectSite != null">
+                AND (
+                ai.institution_uid IN  #{selectSite}
+                OR ai.hospital_uid IN   #{selectSite}
+                OR ai.site_uid IN   #{selectSite}
+                OR ai.clinical_dept_uid IN  #{selectSite}
+                )
+            </if>
+        </where>
+    </sql>
+
 
 
 </mapper>
