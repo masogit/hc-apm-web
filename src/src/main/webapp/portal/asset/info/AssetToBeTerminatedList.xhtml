@@ -58,7 +58,7 @@
             <p:dataTable id="datalist" value="#{assetInfoToBeTerminatedListController.lazyModel}" var="item" widgetVar="varDataList"
                          selectionMode="single" selection="#{assetInfoToBeTerminatedListController.selected}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                         rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.lastModifiedDate}"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="ascending"
                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -571,11 +571,11 @@
                         </p:selectOneMenu>
                     </f:facet>
                 </p:column>
-                <p:column headerText="#{msg.terminateDate}">
-                    <h:outputText value="#{item.terminateOperationDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                    </h:outputText>
-                </p:column>
+<!--                <p:column headerText="#{msg.terminateDate}">-->
+<!--                    <h:outputText value="#{item.terminateOperationDate}">-->
+<!--                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
+<!--                    </h:outputText>-->
+<!--                </p:column>-->
                 <p:column headerText="报废操作人">
                     <h:outputText value="#{item.terminateOperation}"/>
                 </p:column>
