@@ -95,7 +95,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     private UserAccountRepository userAccountRepository;
 
-    private List<String> configTypeList = Arrays.asList("OrderExtraPending","OrderPending","CommercialPending","ClosePending");
+    private List<String> configTypeList = Arrays.asList("OrderExtraPending","OrderPending","CommercialPending","ClosePending", "OperationsTeam");
 
     /**
      * 是否同步创建或更新GeFeConfig用户角色
@@ -320,6 +320,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             geFeConfigType = "Commercial";
         }else if(zkbPartOrderUserConfig.getConfigType().equals("ClosePending")){
             geFeConfigType = "GEAdmin";
+        }else if(zkbPartOrderUserConfig.getConfigType().equals("OperationsTeam")){
+            geFeConfigType = "OperationsTeam";
         }
         if(geFeConfigType != null){
             List<ZkbFePartOrderUserConfig> list = null;
