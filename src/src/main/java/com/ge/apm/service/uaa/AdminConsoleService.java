@@ -17,6 +17,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
@@ -1443,5 +1444,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				waitSave.add(adminFeatureActive);
 			}
 		}
+	}
+
+	public void updateNurseSiteMaintainConfigPyCode() {
+		Iterable<NurseSiteMaintainConfig> configs = nurseSiteMaintainConfigRepository.findAll();
+		configs.forEach(v -> {
+			if (StringUtils.isNotEmpty(v.getName())) {
+				v.setNamePyCode(PinyinUtil.getShortPinyin(v.getName()).toLowerCase().replaceAll("[^0-9a-zA-Z]", ""));
+				nurseSiteMaintainConfigRepository.save(v);
+			}
+		});
 	}
 }
