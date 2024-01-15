@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
@@ -96,4 +97,9 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
 	@Select("select  ai.id,ua.name as userName  from asset_info  ai left join user_account ua on ai.created_by=ua.login_name  where ua.id is not null and ua.login_name!=ua.name order by ai.id desc limit 2000")
 	List<AssetDto> findByCreatedByIsLoginName();
+
+	List<AssetInfo> toBeTerminatedList(HashMap<String, Object> param);
+
+	Long toBeTerminatedListCount(HashMap<String, Object> param);
+
 }
