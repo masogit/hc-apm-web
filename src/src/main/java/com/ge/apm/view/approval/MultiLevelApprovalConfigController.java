@@ -239,10 +239,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if(selected.getId() != null){
             MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
             enable = multiLevelApprovalConfig.getEnable();
-//            if(checkExistMultiLevelApproval()){
-//                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
-//                return;
-//            }
+            if(checkExistMultiLevelApproval()){
+                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
+                return;
+            }
         }
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
@@ -460,18 +460,18 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //    }
 
 
-//    @Override
-//    public  void delete( ){
-//       if(checkExistMultiLevelApproval()){
-//           WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
-//           return;
-//       }
-//       super.delete();
-//    }
-//
-//
-//    public boolean checkExistMultiLevelApproval(){
-//        int count= multiLevelApprovalRepository.getIncompleteApprovalConfig(selected.getId());
-//        return count>0;
-//    }
+    @Override
+    public  void delete( ){
+       if(checkExistMultiLevelApproval()){
+           WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
+           return;
+       }
+       super.delete();
+    }
+
+
+    public boolean checkExistMultiLevelApproval(){
+        int count= multiLevelApprovalRepository.getIncompleteApprovalConfig(selected.getId());
+        return count>0;
+    }
 }
