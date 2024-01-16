@@ -180,6 +180,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList,Integer createType) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());
+        formData.setAssetUid(asset.getUid());
         formData.setAssetStatus(String.valueOf(asset.getStatus()));
         if (null != newServiceRequest.getConfirmedDownTime()) {
             formData.setConfirmedDownTime(TimeUtils.getStrDate(newServiceRequest.getConfirmedDownTime(), "yyyy-MM-dd HH:mm:ss"));
@@ -312,6 +313,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 class ServiceRequestForm {
 
     Integer assetId;
+
+    String assetUid;
     String requestReason;
     String voiceId;
     List<V2_BlobObject> attachments;
@@ -493,6 +496,14 @@ class ServiceRequestForm {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
     }
 }
 
@@ -787,6 +798,7 @@ class WorkOrderActionForm {
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
     }
+
 }
 
 class WorkOrderForm {

@@ -49,6 +49,9 @@ public class V2_ServiceRequest implements Serializable {
     @NotNull
     private Integer assetId;
 
+    @Column(name="asset_uid",columnDefinition = "CHAR(32)")
+    private String assetUid;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
@@ -568,6 +571,14 @@ public class V2_ServiceRequest implements Serializable {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
     }
 
     @Override
