@@ -1,9 +1,5 @@
 package com.ge.apm.view.nurseSite;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
@@ -53,7 +49,6 @@ public class MaintainController implements ServerEventInterface{
 	private List<OrgInfo> listCheckClinicalOrgInfo;
 	private OrgInfo selectedParentOrgInfo;
 	private NurseSiteMaintainConfigMapper configMapper;
-	private NurseSiteMaintainItemRepository maintainItemRepository;
 
 	private List<Integer> listSequence;
 	private Integer selectSequence = 1;
@@ -104,7 +99,6 @@ public class MaintainController implements ServerEventInterface{
 		searchController = WebUtil.getBean(SearchController.class);
 		maintainItemController = WebUtil.getBean(MaintainItemController.class);
 		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
-		maintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setBlnOrgTreeUpdate(true);
@@ -114,7 +108,7 @@ public class MaintainController implements ServerEventInterface{
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		selectedSite = searchController.getSelectedOrg();
-		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 
 		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
 		Map<String, Object> param = MapUtil.newHashMap();
@@ -129,7 +123,7 @@ public class MaintainController implements ServerEventInterface{
             listNurseSiteMaintainConfig = configMapper.searchMaintainConfig(param);
         }
 		showListNurseSiteMaintainConfig = new ArrayList<>();
-		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedSite.getSiteUID().equals(item.getClinicalDeptUID()) ||  selectedSite.getSiteUID().equals(item.getTenantUID()) ||  selectedSite.getSiteUID().equals(item.getInstitutionUID())  ||  selectedSite.getSiteUID().equals(item.getHospitalUID()) ||  selectedSite.getSiteUID().equals(item.getSiteUID()) ).collect(Collectors.toList());
+		List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedSite.getSiteUID().equals(item.getSiteUID())).collect(Collectors.toList());
 		showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
 		listCheckClinicalOrgInfo = nurseSiteMaintainService.findAccessOrgDeptList(selectedSite.getSiteUID());
 		loadUserParentOrgInfo();
@@ -138,46 +132,6 @@ public class MaintainController implements ServerEventInterface{
 	}
 	public List<NurseSiteMaintainExport> getMaintainDataList(String assetUid){
 		return nurseSiteMaintainService.getMaintainDataList(assetUid);
-	}
-	private List<NurseSiteMaintain> searchMaintainData1(Date start, Date end) {
-		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
-			return ListUtil.empty();
-		}
-		Calendar ca = Calendar.getInstance();
-		if (start == null) {
-			ca.set(Calendar.DAY_OF_MONTH, 1);
-			start = ca.getTime();
-		}
-		if (end == null) {
-			ca.add(Calendar.MONTH, 1);
-			end = ca.getTime();
-		}
-
-		Wrapper<NurseSiteMaintain> wrapper = new EntityWrapper<>();
-		if (currentUser.isEnableAssetTypeGroup()) {
-			wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
-		}
-		wrapper.ge("nsm.schedule_date", start);
-		wrapper.le("nsm.schedule_date", end);
-		if (ObjectUtil.isEmpty(listCheckClinicalOrgInfo)) {
-			wrapper.eq("nsm.tenant_uid", currentUser.getTenantUID());
-
-			wrapper.andNew().in("nsm.site_uid", orgUidList).or().in("nsm.tenant_uid", orgUidList)
-					.or().in("nsm.institution_uid", orgUidList).or().in("nsm.hospital_uid",orgUidList)
-			.or().in("nsm.clinical_dept_uid", orgUidList);
-		} else {
-			List<String> listUidTemp = listCheckClinicalOrgInfo.stream().filter(item-> userDeptScopeOrg.contains(item.getUid())).map(OrgInfo::getUid).collect(Collectors.toList());
-			wrapper.in("nsm.clinical_dept_uid", listUidTemp);
-		}
-		wrapper.groupBy("nsm.id");
-		wrapper.orderBy("nsm.schedule_date");
-		List<NurseSiteMaintain> joinAssetList = nurseSiteMaintainService.findJoinAssetList(wrapper);
-		List<NurseSiteMaintain> listData = ListUtil.empty();
-		if (ObjectUtil.isNotEmpty(joinAssetList)) {
-			Set<String> maintainIds = joinAssetList.stream().map(NurseSiteMaintain::getId).collect(Collectors.toSet());
-			listData = nurseSiteMaintainService.findByIds(maintainIds);
-		}
-		return listData;
 	}
 
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
@@ -208,12 +162,7 @@ public class MaintainController implements ServerEventInterface{
 		if (currentUser.isEnableAssetTypeGroup()) {
 			param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
 		}
-		List<NurseSiteMaintain> listData = nurseSiteMaintainService.searchMaintain(param);
-		return listData;
-	}
-
-	private List<NurseSiteMaintain> findDefaultMaintain(Date startDate, Date endDate) {
-		return nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
+		return nurseSiteMaintainService.searchMaintain(param);
 	}
 
 	private void loadMaintainData() {
@@ -225,7 +174,6 @@ public class MaintainController implements ServerEventInterface{
 
 			@Override
 			public void loadEvents(Date start, Date end) {
-				// mapDayIndex.clear();
 				if (initStartDate == null || initEndDate == null || start.getTime() != initStartDate.getTime() || end.getTime() != initEndDate.getTime()) {
 					listMaintainData = searchMaintainData(start, end);
 					initStartDate = start;
@@ -267,11 +215,8 @@ public class MaintainController implements ServerEventInterface{
 	}
 
 	private void loadUserParentOrgInfo() {
-		if (orgUidList.size() > 0) {
-			checkListParentOrgInfo = nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
-			listOrgInfo = new ArrayList<OrgInfo>();
-			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
-		}
+		checkListParentOrgInfo = nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
+		listOrgInfo = new ArrayList<>();
 	}
 
 	private void setDefaultParentOrgInfo() {
@@ -280,56 +225,8 @@ public class MaintainController implements ServerEventInterface{
 	}
 
 	private void loadUserOrgInfo() {
-		if (orgUidList.size() > 0) {
-			// listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
-			listOrgInfo = nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
-			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
-		}
+		listOrgInfo = nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
 	}
-
-
-	// private String getShowTitle_backup(NurseSiteMaintain
-	// tempNurseSiteMaintain) {
-	// //0：未检查,1:已检查，2:通过，3有问题
-	// String strStatus="未检查";
-	// if(tempNurseSiteMaintain.getStatus()==null ||
-	// tempNurseSiteMaintain.getStatus()==0){
-	// }
-	// else if(tempNurseSiteMaintain.getStatus()==1){
-	// strStatus="已检查";
-	// }
-	// else if(tempNurseSiteMaintain.getStatus()==2){
-	// strStatus="通过";
-	// }
-	// else if(tempNurseSiteMaintain.getStatus()==3){
-	// strStatus="有问题";
-	// }
-	// int dayIndex=0;
-	// if(mapDayIndex.containsKey(tempNurseSiteMaintain.getConfigId())){
-	// dayIndex=mapDayIndex.get(tempNurseSiteMaintain.getConfigId());
-	// }
-	// Date newDate=tempNurseSiteMaintain.getScheduleDate();
-	// Calendar newCa=Calendar.getInstance();
-	// newCa.setTime(newDate);
-	// if(dayDate==null){
-	// dayIndex=1;
-	// }
-	// else{
-	// Calendar oldCa=Calendar.getInstance();
-	// oldCa.setTime(dayDate);
-	// if(oldCa.get(Calendar.DAY_OF_YEAR)==newCa.get(Calendar.DAY_OF_YEAR)){
-	// dayIndex++;
-	// }
-	// else{
-	// dayIndex=1;
-	// mapDayIndex.clear();
-	// }
-	// }
-	// dayDate=newDate;
-	// mapDayIndex.put(tempNurseSiteMaintain.getConfigId(), dayIndex);
-	// String str=tempNurseSiteMaintain.getName()+"-"+dayIndex+"-"+strStatus;
-	// return str;
-	// }
 
 	private void loadMaintainConfig() {
 		if (nurseSiteMaintainConfig != null) {
@@ -342,16 +239,14 @@ public class MaintainController implements ServerEventInterface{
 			String tempTypeValue = nurseSiteMaintainConfig.getTypeValue();
 			Integer tempIntTypeValue = null;
 			if (listSequence == null) {
-				listSequence = new ArrayList<Integer>();
+				listSequence = new ArrayList<>();
 			} else {
 				listSequence.clear();
 			}
 			if (tempType != null && tempType == 1) {
 				tempIntTypeValue = Integer.parseInt(tempTypeValue);
-				if (tempIntTypeValue != null) {
-					for (int i = 1; i <= tempIntTypeValue; ++i) {
-						listSequence.add(i);
-					}
+				for (int i = 1; i <= tempIntTypeValue; ++i) {
+					listSequence.add(i);
 				}
 			}
 			nurseSiteMaintain = nurseSiteMaintainService.createMaintain(userClickDate, currentUser, nurseSiteMaintainConfig, listCheckAssets, selectSequence);
@@ -363,46 +258,6 @@ public class MaintainController implements ServerEventInterface{
 		listMaintainData.add(tempNurseSiteMaintain);
 	}
 
-//	private List<NurseSiteMaintain> getMaintainDataNeedToRemove(List<NurseSiteMaintain> listSave) {
-//		List<NurseSiteMaintain> existMaintainDataNoCheck = nurseSiteMaintainService.getDefaultMaintainDataUnchecked(orgUidList, startBatchDate, endBatchDate, 
-//				nurseSiteMaintainConfig.getId());
-//		List<NurseSiteMaintain> existMaintainDataChecked = nurseSiteMaintainService.getDefaultMaintainDataChecked(orgUidList, startBatchDate, endBatchDate,
-//				nurseSiteMaintainConfig.getId());
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-//		Set<String> setCheckedMaintainStr = new HashSet<String>();
-//		if (existMaintainDataChecked != null && existMaintainDataChecked.size() > 0) {
-//			for (int i = 0; i < existMaintainDataChecked.size(); ++i) {
-//				NurseSiteMaintain tempMaintain = existMaintainDataChecked.get(i);
-//				setCheckedMaintainStr.add(sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence());
-//			}
-//		}
-//		if (listSave != null && listSave.size() > 0) {
-//			for (int i = 0; i > -1 && i < listSave.size(); ++i) {
-//				NurseSiteMaintain tempMaintain = listSave.get(i);
-//				String str = sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence();
-//				if (setCheckedMaintainStr.contains(str)) {
-//					listSave.remove(i);
-//					--i;
-//				}
-//			}
-//		}
-//		return existMaintainDataNoCheck;
-//	}
-
-	// private void afterBatchCreateMaintain(List<NurseSiteMaintain>
-	// listCreate,List<NurseSiteMaintain> listExist){
-	// for(int i=0;i<listExist.size();++i){
-	// NurseSiteMaintain tempExist=listExist.get(i);
-	// for(int j=0;j>-1&&j<listCreate.size();++j){
-	// NurseSiteMaintain tempCreate=listCreate.get(j);
-	// if(tempExist.getConfigId().equals(tempCreate.getConfigId()) &&
-	// tempExist.getSequence().equals(tempCreate.getSequence())){
-	// listCreate.remove(j);
-	// --j;
-	// }
-	// }
-	// }
-	// }
 	private void addErrMessage(String str) {
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 		WebUtil.addErrorMessageKey(str);
@@ -609,25 +464,6 @@ public class MaintainController implements ServerEventInterface{
 			showListNurseSiteMaintainConfig = listNurseSiteMaintainConfig.stream().filter(item -> selectedSite.getUid().equals(item.getSiteUID())).collect(Collectors.toList());
 		}
 		loadMaintainData();
-/*		if (listNurseSiteMaintainConfig != null) {
-			if(listCheckClinicalOrgInfo!=null && listCheckClinicalOrgInfo.size()>0){
-				Set<String> setClinicalDeptUid = new HashSet<String>();
-				for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-					setClinicalDeptUid.add(listCheckClinicalOrgInfo.get(i).getUid());
-				}
-				for (int i = 0; i < listNurseSiteMaintainConfig.size(); ++i) {
-					String tempUid = listNurseSiteMaintainConfig.get(i).getClinicalDeptUID();
-					if (setClinicalDeptUid.contains(tempUid)) {
-						showListNurseSiteMaintainConfig.add(listNurseSiteMaintainConfig.get(i));
-					}
-				}
-			}
-			else{
-				List<NurseSiteMaintainConfig> currentSiteConfig = listNurseSiteMaintainConfig.stream().filter(item -> orgUidList.contains(item.getClinicalDeptUID())).collect(Collectors.toList());
-				showListNurseSiteMaintainConfig.addAll(currentSiteConfig);
-			}
-		}
-		loadMaintainData();*/
 	}
 
 	public void onClinicalParentOrgInfoChange() {
@@ -715,22 +551,19 @@ public class MaintainController implements ServerEventInterface{
 		startCalendar.setTime(startBatchDate);
 		Calendar endCalendar = Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
-		if(userContextService.accessContainsOfJiangNing() && !userContextService.hasRole("AssetHead")) {
-
-	    }
 		Integer type = nurseSiteMaintainConfig.getType();
 		String typeValue = nurseSiteMaintainConfig.getTypeValue();
-		List<NurseSiteMaintain> listMaintainData = new ArrayList<NurseSiteMaintain>();
+		List<NurseSiteMaintain> listMaintainData = new ArrayList<>();
 		Integer sum = 0;
 		if (StringUtils.isNotEmpty(typeValue)) {
-			String arr[] = typeValue.split(",");
+			String[] arr = typeValue.split(",");
 			if (type == 1) {
 				// value,hours,1-24
-				Integer intTypeValue = Integer.parseInt(typeValue);
+				int intTypeValue = Integer.parseInt(typeValue);
 				while (startCalendar.getTimeInMillis() <= endCalendar.getTimeInMillis()) {
 					String currName = nurseSiteMaintainConfig.getName();
 					List<NurseSiteMaintain> ns = nurseSiteMaintainService.checkAgain(currName,startCalendar.getTime());
-					if(ns.size()>0){
+					if(!ns.isEmpty()){
 						sum++;
 						startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 						continue;
@@ -738,7 +571,6 @@ public class MaintainController implements ServerEventInterface{
 					for (int i = 0; i < intTypeValue; ++i) {
 						Date date = null;
 						try {
-							// startCalendar.set(Calendar.HOUR_OF_DAY, i);
 							date = startCalendar.getTime();
 						} catch (Exception e) {
 							LOGGER.error(e.getMessage());
@@ -821,11 +653,9 @@ public class MaintainController implements ServerEventInterface{
 			}
 		}
 		if(!sum.equals(0)){
-//			addMessage("部分工单已创建，已跳过");
 			addMessage("部分工单已创建，已跳过");
-			sum=0;
 		}
-		if (listMaintainData.size() > 0) {
+		if (!listMaintainData.isEmpty()) {
 			nurseSiteMaintainService.save(listMaintainData);
 		}
 		nurseSiteMaintainService.addBatchJob("create", nurseSiteMaintainConfig, startBatchDate, endBatchDate, currentUser.getUid(), null);
@@ -846,17 +676,17 @@ public class MaintainController implements ServerEventInterface{
 			WebUtil.addErrorMessage("只能批量完成当月的单子！");
 			return "maintainMain?faces-redirect=true";
 		}
-		List<NurseSiteMaintain> listNewNurseSiteMaintain = null;
-		if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
-			listNewNurseSiteMaintain = findDefaultMaintain(startBatchDate, endBatchDate);
-		} else {
-			List<String> listUidTemp = new ArrayList<String>();
-			for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
+		List<NurseSiteMaintain> listNewNurseSiteMaintain = ListUtil.newArrayList();
+		for (NurseSiteMaintain temp : listMaintainData) {
+			long scheduleTime = temp.getScheduleDate().getTime();
+			boolean flag = scheduleTime >= startBatchDate.getTime()
+					&& scheduleTime <= endBatchDate.getTime()
+					&& (ObjectUtil.isNotEmpty(selectedDept) ? temp.getClinicalDeptUID().equals(selectedDept.getUid()) : temp.getSiteUID().equals(selectedSite.getUid()));
+			if (flag) {
+				listNewNurseSiteMaintain.add(temp);
 			}
-			listNewNurseSiteMaintain = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, startBatchDate, endBatchDate);
 		}
-		if (listNewNurseSiteMaintain != null && listNewNurseSiteMaintain.size() > 0) {
+		if (!listNewNurseSiteMaintain.isEmpty()) {
 			String signatureId = null;
 			if (StringUtils.isNotEmpty(signatureContent)) {
 				signatureId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
@@ -865,13 +695,10 @@ public class MaintainController implements ServerEventInterface{
 				signatureId = "";
 			}
 			nurseSiteMaintainService.completeMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
-			if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
-				nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(), signatureId + ",");
-			} else {
-				for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-					nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
-							signatureId + "," + listCheckClinicalOrgInfo.get(i).getUid());
-				}
+			Set<String> clinicalDeptSet = listNewNurseSiteMaintain.stream().map(NurseSiteMaintain::getClinicalDeptUID).collect(Collectors.toSet());
+			for (String clinicalDeptUid : clinicalDeptSet) {
+				nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
+						signatureId + "," + clinicalDeptUid);
 			}
 			addMessage("工单后台完成中，请稍候刷新页面查看。");
 		} else {
