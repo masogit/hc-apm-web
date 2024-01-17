@@ -142,7 +142,7 @@
 							<p:ajax process="@this" listener="#{generatePmOrdersController.prepareAssetRuleList()}" update="@this @(.batch-terminated) GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 						</p:selectBooleanCheckbox>
 						<f:facet name="header"  >
-							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{generatePmOrdersController.isAllAssetSelected}">
 								<p:ajax listener="#{generatePmOrdersController.onSelectAllOfPage}" update="@(.selectCheckBox) :GeneratePmOrderForm:dataScroller GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 							</p:selectBooleanCheckbox>
 						</f:facet>
@@ -214,7 +214,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
-									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"></p:ajax>
+									<p:ajax listener="#{generatePmOrdersController.updatePMType()}"></p:ajax>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
