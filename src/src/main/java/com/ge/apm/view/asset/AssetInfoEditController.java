@@ -1572,6 +1572,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         //parent asset and child asset will be in the same dept
         if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
             return false;
+        }else{
+            selected.setParentAssetUid(assetInfo.getUid());
         }
 
         if(selected.getSiteId()==46){
