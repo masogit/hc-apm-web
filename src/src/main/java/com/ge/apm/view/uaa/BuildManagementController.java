@@ -4,9 +4,11 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.BuildManagementService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -15,8 +17,11 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +32,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +51,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     private UserCommonService userCommonService;
     private TenantInfoRepository tenantInfoRepository;
     private BuildManagementRepository buildManagementRepository;
+    private BuildManagementService buildManagementService;
 
     private boolean acShow = false;
     private boolean isShow = false;
@@ -87,6 +94,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         blobObjectService = WebUtil.getBean(BlobFileService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        buildManagementService = WebUtil.getBean(BuildManagementService.class);
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -218,11 +226,74 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
             OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
-            uaaService.expendedTreeNode(orgTree, retrieval, -1, -1);
+            expendedTreeNode(orgTree, retrieval, -1, -1);
         }else{
-            uaaService.filterTreeNode(orgTree, retrieval, -1, -1);
+            filterTreeNode(orgTree, retrieval, -1, -1);
         }
     }
+    public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doFilterTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
+    }
+    private void doFilterTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doFilterTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+            item.setType("hidden");
+            Object object = item.getData();
+            OrgInfo org=new OrgInfo();
+            BeanUtils.copyProperties(object,org);
+            if(!org.getName().contains(filterKeyword) && (org.getNamePyCode()==null?true:!org.getNamePyCode().contains(filterKeyword))) return;
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
+    }
+    public void expendedTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doExpendedTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
+    }
+
+    private void doExpendedTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doExpendedTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+
+            item.setType("hidden");
+            Object object = item.getData();
+            OrgInfo org=new OrgInfo();
+            BeanUtils.copyProperties(object,org);
+
+            //if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
+            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+//            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
+
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
+    }
+
 
     public List<OrgInfo> getHospitalListBySiteId() {
         return uaaService.getHospitalListBySiteId(tenantId);
@@ -379,6 +450,19 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
             }else{
                 buildOrdTree();
             }
+        }
+    }
+    public void deleteSelectedBuild() {
+        failureType=null;
+        if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectSite)) {
+            return ;
+        }
+        if (selectedNode.getData() instanceof  BuildManagement) {
+            BuildManagement buildManagement = (BuildManagement) selectedNode.getData();
+            buildManagementRepository.delete(buildManagement);
+            buildOrdTree();
+        }else{
+            WebUtil.addErrorMessage("请选择楼宇层级");
         }
     }
 
@@ -607,6 +691,12 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         return tenantInfos;
 
     }
+    private StreamedContent excelFile;
+    public void exportExcel() throws IOException {
+//        ExcelDocument doc = buildManagementService.exportOrg();
+        ExcelDocument doc1 = buildManagementService.exportBuildManagement(orgTree);
+        excelFile = new DefaultStreamedContent(doc1.getStream(), "application/vnd.ms-excel", "APM_BuildManagement_Export.xlsx");
+    }
 
     public boolean getAcShow() {
         return acShow;
@@ -734,5 +824,13 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
 
     public void setFailureType(Integer failureType) {
         this.failureType = failureType;
+    }
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
     }
 }
