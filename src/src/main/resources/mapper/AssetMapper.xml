@@ -39,9 +39,9 @@
         mcd.certificate_no,
         mcd.status,
         ai.measuring_type,
-        ai.last_check_company,
+        mcd.check_company last_check_company,
         ai.last_metering_date,
-        ai.next_metering_date,
+        mcd.valid_date_to next_metering_date,
         mcd.check_date,
         mcd.id as bo_uuid
         FROM asset_info ai
