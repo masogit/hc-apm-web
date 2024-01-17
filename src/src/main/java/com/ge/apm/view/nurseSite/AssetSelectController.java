@@ -13,7 +13,6 @@ import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,6 +173,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             this.deptList = assetSelectService.loadDeptListByOrg(selectedOrg);
         }
         this.callingController.onServerEvent("changeSite",selectedOrg);
+        isSelectAll = false;
     }
 
     public void findAssets2Maintain() {
@@ -402,6 +402,18 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 //            }
         }
         return count;
+    }
+
+    private Boolean isSelectAll = Boolean.FALSE;
+
+    public void updateSelectAll() {
+        if (ObjectUtil.isNotEmpty(listCheckOrgInfo)) {
+            listCheckOrgInfo.clear();
+            isSelectAll = false;
+        } else {
+            listCheckOrgInfo = new ArrayList<>(deptList);
+            isSelectAll = true;
+        }
     }
 
 }
