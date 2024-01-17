@@ -366,6 +366,8 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
+    @Column(name="parent_asset_uid",columnDefinition = "CHAR(32)")
+    private String parentAssetUid;
 
     @Column(name = "inventory_status")
     private Integer inventoryStatus;
@@ -3103,6 +3105,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public Date getLastPmDateFour() { return lastPmDateFour; }
 
     public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
+
+    public String getParentAssetUid() {
+        return parentAssetUid;
+    }
+
+    public void setParentAssetUid(String parentAssetUid) {
+        this.parentAssetUid = parentAssetUid;
+    }
 
     public void clearDefaultValue(){
         this.isChecked=null;
