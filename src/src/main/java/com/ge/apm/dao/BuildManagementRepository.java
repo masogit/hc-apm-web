@@ -12,4 +12,8 @@ public interface BuildManagementRepository extends GenericRepositoryUUID<BuildMa
 
     @Query(value="select o.* from build_management o where o.parent_id=?1 order by o.name asc ",nativeQuery=true)
     List<BuildManagement> findByParent(Integer parentId);
+
+
+    @Query(value="select o.* from build_management o where o.tenant_uid=?1 ",nativeQuery=true)
+    List<BuildManagement> findByTenantUID(String tenantUID);
 }

@@ -151,6 +151,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select o.* from org_info o where o.uid=?1 and o.org_type=4", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc5(String siteUID);
 
+    @Query(value = "select o.* from org_info o where o.tenant_uid=?1 and o.org_type !=?2 ", nativeQuery = true)
+    public List<OrgInfo> getByTenantUIDAndOrgTypeNotEq(String tenantUID,int orgType);
+
     public List<OrgInfo> findBySiteUIDAndOrgTypeIn(String siteUID, Integer[] orgTypes);
 
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
