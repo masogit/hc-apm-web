@@ -490,6 +490,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sta == 8){
             pageName = "Edit_1";
             selected.setMsgEndTime(new Date());
+            selected.setMsgAccepter(selected.getApplicant());
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
             this.save();
@@ -517,7 +518,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sta == 2){
             pageName = "Edit_1";
 //            selected.setMsgAccepter(this.selected.getApplicant());
-            selected.setMsgAccepter(this.getNameByLoginName(selected.getApplicant()));
+            selected.setAccepter(this.getNameByLoginName(selected.getApplicant()));
 //            selected.setMsgBeginTime(this.getTime("借用"));
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
@@ -552,7 +553,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
 
-     public void getAssetInfoR(Date times) throws ParseException{//查询并插入归还设备信息
+     public void getAssetInfoR(Date times,String msgAccepter) throws ParseException{//查询并插入归还设备信息
          Optional.ofNullable(dao.findById(selected.getId()).getState()).ifPresent(val -> {
              if (val != 8) {
                  WebUtil.addErrorMessage("申请已取消或已完成交付，不能录入设备，请返回并刷新！");
@@ -660,6 +661,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                              sard.setFinancingNum(infoVo.getFinancingNum());
                              sard.setClinicalDeptForReturnUid(this.selected.getClinicalDeptUid());
                              sard.setClinicalDeptForReturnName(this.selected.getClinicalDeptName());
+                             sard.setMsgAccepter(msgAccepter.isEmpty() ? selected.getApplicant() : msgAccepter);
                              SharedAssetType swapTypeVo = swapDao.findById(applySwapType.getSharedAssetTypeId());
 
                              if (times == null) {

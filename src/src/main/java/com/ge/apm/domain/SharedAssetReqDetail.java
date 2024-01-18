@@ -88,6 +88,9 @@ public class SharedAssetReqDetail implements Serializable{
     
     @Column(name = "accepter")
     private String accepter;//设备接收人：默认等于申请人或上一条
+
+    @Column(name = "msg_ccepter")
+    private String msgAccepter; // 设备归还人
     
     @Column(name = "accessories", columnDefinition = "text")
     private String accessories;//附件信息
@@ -1101,5 +1104,13 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setBrandName(String brandName) {
         this.brandName = brandName;
+    }
+
+    public String getMsgAccepter() {
+        return msgAccepter;
+    }
+
+    public void setMsgAccepter(String msgAccepter) {
+        this.msgAccepter = msgAccepter;
     }
 }

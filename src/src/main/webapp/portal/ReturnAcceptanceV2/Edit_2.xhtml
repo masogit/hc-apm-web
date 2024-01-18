@@ -120,34 +120,33 @@
                     <p:dataTable id="datalists" value="#{sharedAssetReqDetailV2Controller.lazyModel}" var="item" widgetVar="varDataListdetail"
                     selectionMode="single" selection="#{sharedAssetReqDetailV2Controller.selected}"
                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                    
+                    paginatorTemplate=" {CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,50,100,500" >   
-                
+                    rowsPerPageTemplate="20,50,100,500" >
+                        <p:ajax event="rowSelect"  update="editButton"/>
                         <p:column headerText="设备名称" sortBy="#{item.assetName}">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
                         <p:column headerText="设备编号" sortBy="#{item.assetNumber}"  >
                             <h:outputText value="#{item.assetNumber}"/>
                         </p:column>
-<!--                        <p:column headerText="状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
-                            <h:outputText value="借用中" rendered="#{item.state eq '0'}"></h:outputText> 
-                            <h:outputText value="已归还" rendered="#{item.state eq '1'}"></h:outputText> 
-                        </p:column>-->
+
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
                             <h:outputText value="#{item.chargingBeginTime}">
                                 <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="设备归还人"  >
+                            <h:outputText value="#{item.msgAccepter}"/>
+                        </p:column>
                         <p:column headerText="费用(¥)" >
                             <h:outputText value="#{sharedAssetReqDetailV2Controller.getTotalAmount(item)}"/>
                         </p:column>
-<!--                        <p:column headerText="设备接收人" sortBy="#{item.accepter}"  >
-                            <h:outputText value="#{item.accepter}"/>
-                        </p:column>-->
+<!--                        <p:column style="width:100px">-->
+<!--                            <p:rowEditor editTitle="#{msg.Edit}" />-->
+<!--                        </p:column>-->
 <!--                        <p:column headerText="备注" sortBy="#{item.remark}">
                             <h:outputText value="#{item.remark}"/>
                         </p:column>-->
@@ -159,10 +158,13 @@
                     </f:facet>  -->
                         <p:columnGroup type="footer">
                             <p:row>
-                                <p:column footerText="总费用: " colspan="3" style="text-align:right"/>
+                                <p:column footerText="总费用: " colspan="4" style="text-align:right"/>
                                 <p:column footerText="¥#{sharedAssetRequestV2Controller.total}" />
                             </p:row>
                         </p:columnGroup>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" update="IouApplyDetailEditDlg" oncomplete="PF('IouApplyDetailEditDialog').show()" disabled="#{empty sharedAssetReqDetailV2Controller.selected}"  />
+                        </f:facet>
                     </p:dataTable>
                 </p:fieldset>
                 <h:panelGroup id="display">
@@ -170,6 +172,22 @@
                     <!--<p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>-->
                 </h:panelGroup>
             </h:form>
+                <p:dialog id="IouApplyDetailEditDlg" widgetVar="IouApplyDetailEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetRequestV2Controller.CRUDActionName} 归还设备-设备归还人">
+                    <h:form id="IouApplyDetailEditForm">
+                        <h:panelGroup >
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                                <h:panelGroup>
+                                    <label class='label'>设备归还人</label>
+                                    <p:inputText id="msgAccepter" value="#{sharedAssetReqDetailV2Controller.selected.msgAccepter}" />
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <br/>
+                            <p:commandButton validateClient="true" actionListener="#{sharedAssetReqDetailV2Controller.saveMsgAccepter}" value="#{msg.Save}" update=":IouEditForm:datalists" icon="ui-icon-check" oncomplete="PF('IouApplyDetailEditDialog').hide()"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('IouApplyDetailEditDialog').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
          </div>  
         </div> 
     </ui:define>  
