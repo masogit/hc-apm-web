@@ -490,7 +490,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sta == 8){
             pageName = "Edit_1";
             selected.setMsgEndTime(new Date());
-            selected.setMsgAccepter(selected.getApplicant());
+            selected.setMsgAccepter(this.getNameByLoginName(selected.getApplicant()));
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
             this.save();

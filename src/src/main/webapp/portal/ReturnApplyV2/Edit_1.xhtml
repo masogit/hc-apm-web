@@ -194,7 +194,7 @@
                             </p:row>
                         </p:columnGroup>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" update="IouApplyDetailEditDlg1" oncomplete="PF('IouApplyDetailEditDialog1').show()" disabled="#{empty sharedAssetReqDetailV2Controller.selected}"  />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{sharedAssetReqDetailV2Controller.prepareEdit()}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update="IouApplyDetailEditDlg1" oncomplete="PF('IouApplyDetailEditDialog1').show()" disabled="#{empty sharedAssetReqDetailV2Controller.selected}"  />
                         </f:facet>
                     </p:dataTable>
                    
