@@ -191,7 +191,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneQrCodeStatus;
     private boolean countyArea = false;
     private UserAccount user;
-    private Map<String, UserAccount> createdByMap;
+//    private Map<String, UserAccount> createdByMap;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -352,8 +352,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setWarrantyAlerts(currentPageAssets);
         assetInfoService.setSupplier(currentPageAssets);
 
-        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
+//        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+//        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
         Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());
         currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
@@ -1336,14 +1336,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
         }
     }
-    public String selectCreatedBy(String loginName) {
+/*    public String selectCreatedBy(String loginName) {
         UserAccount userAccount = createdByMap.get(loginName);
         String createdBy = null;
         if (ObjectUtil.isNotEmpty(userAccount)) {
             createdBy = userAccount.getName();
         }
         return createdBy;
-    }
+    }*/
 
     /**
      *

@@ -882,7 +882,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'createdBy')}" >
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
-            <p:autoComplete id="createdBy" value="#{assetInfoBulkEditController.selectCreatedBy(assetInfoBulkEditController.selected.createdBy)}"  readonly="true"/>
+            <p:autoComplete id="createdBy" value="#{assetInfoBulkEditController.selected.createdBy}"  readonly="true"/>
         </h:panelGroup>
     </c:if>
     <!--  资产分类  -->
