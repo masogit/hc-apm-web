@@ -533,12 +533,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map supliers = getAllElement.getSupliers();
         Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
 
-        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
+//        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, String> userMap = MapUtil.newHashMap();
-        if (ObjectUtil.isNotEmpty(loginNames)) {
-            List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
-            userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
-        }
+//        if (ObjectUtil.isNotEmpty(loginNames)) {
+//            List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
+//            userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
+//        }
         for (AssetInfo assetInfo: assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
