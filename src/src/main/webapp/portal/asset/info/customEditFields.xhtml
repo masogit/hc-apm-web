@@ -987,7 +987,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'createdBy')}" >
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
-            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selectCreatedBy(assetInfoEditController.selected.createdBy)}"  readonly="true"/>
+            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selected.createdBy}"  readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->

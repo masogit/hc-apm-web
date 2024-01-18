@@ -376,7 +376,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 e.printStackTrace();
             }
         }
-        ownerList = ucService.getWorkerList(selected.getId(), "");
+        ownerList = new ArrayList<>();
+//        ownerList = ucService.getWorkerList(selected.getId(), "");
         config = configService.findConfigBySite(selected.getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -511,7 +512,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
             UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
             if (null != submitter) {
-                selected.setCreatedBy(submitter.getUid());
+                selected.setCreatedBy(submitter.getName());
             }
         }
         selected.setCreatedDate(createRequest.getSubmitDate());
