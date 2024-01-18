@@ -1144,7 +1144,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
         map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
 
-        map.put(getMessage("createdBy"), userMap.get(assetInfo.getCreatedBy()));
+        map.put(getMessage("createdBy"), assetInfo.getCreatedBy());
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
         map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
         map.put(getMessage("UUID"), this.getUid());
