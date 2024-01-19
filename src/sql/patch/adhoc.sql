@@ -8,3 +8,5 @@ insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) s
 --https://ge-hc.atlassian.net/browse/YHAAO-20653 维修工单增加asset_uid字段刷历史数据
 update v2_service_request sr set asset_uid =(select ai.uid from asset_info  ai where ai.id=sr.asset_id);
 update v2_work_order wo set asset_uid =(select uid from asset_info ai where wo.asset_id =ai.id  );
+--https://ge-hc.atlassian.net/browse/YHAAO-20655 资产表增加parent_asset_uid字段刷历史数据
+update asset_info ai set parent_asset_uid =(select uid from asset_info ai2 where ai.parent_asset_id=ai2.id) where ai.parent_asset_id is not null;
