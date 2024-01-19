@@ -620,7 +620,8 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
     }
 
   public void saveMsgAccepter(){
-      this.save();
+      dao.save(selected);
+      WebUtil.addSuccessMessage("设备归还人修改成功");
   }
     
 }
