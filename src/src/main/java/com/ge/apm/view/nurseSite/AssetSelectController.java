@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -13,6 +14,8 @@ import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +91,15 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     
     private List<OrgInfo> listCheckOrgInfo;
 
+    private String locationName;
+    private String locationCode;
+    private BuildManagementRepository buildManagementRepository;
+
+    private List<BuildManagement>  managementList=new ArrayList<>();
+
+
+    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
+
     @Override
     protected GenericRepositoryUUID<AssetInfo> getDAO() {
         return null;
@@ -103,6 +115,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssetUids5 = new HashMap<>(32);
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
+        buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
     }
 
     public void loadData4Create() {
@@ -400,6 +413,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 //            if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
 //                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
 //            }
+            if(StringUtils.isNotBlank(this.getLocationCode())) {
+                searchFilters.add(new SearchFilter("locationCode", SearchFilter.Operator.EQ, this.getLocationCode(), "1*"));
+                ++count;
+            }
         }
         return count;
     }
@@ -413,6 +430,68 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         } else {
             listCheckOrgInfo = new ArrayList<>(deptList);
             isSelectAll = true;
+        }
+    }
+
+    private void updateManagementOnSiteChange() {
+
+         managementList=   buildManagementRepository.findBySiteUidTree(selectedOrg.getSiteUID());
+
+//        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selectedOrg.getSiteUID());
+//        if(org.apache.commons.collections.CollectionUtils.isEmpty(managementList)){
+//            return;
+//        }
+//        TreeNode root = new DefaultTreeNode("root", null, null);
+//        if (!org.apache.commons.collections4.CollectionUtils.isEmpty(managementList)) {
+//            managementList.forEach(val -> root.getChildren().add(new DefaultTreeNode("org", val, null)));
+//            componentFloor(root);
+//        }
+    }
+
+    private void componentFloor(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            componentRoom(val);
+        });
+    }
+
+    private void componentRoom(TreeNode orgTree) {
+        orgTree.getChildren().forEach(val -> {
+            BuildManagement buildManagement = (BuildManagement) val.getData();
+            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
+            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
+            managementList.addAll(buildFloorList);
+        });
+    }
+
+    public List<String> managementListString(String query) {
+        updateManagementOnSiteChange();
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(managementList)){
+            List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
+            Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
+            managementMap=collect;
+            return list;
+        }
+        return new ArrayList<>();
+
+    }
+
+    public void locationNamechangeSelect(SelectEvent event){
+        setLocationCode(null);
+        setLocationName(locationName);
+        if(event==null){
+            return;
+        }
+        String code =(String) event.getObject();
+        if(StringUtils.isNotBlank(code)){
+            List<BuildManagement> list = managementMap.get(code);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(list)){
+                BuildManagement buildManagement = list.get(0);
+                setLocationCode(buildManagement.getNamePyCode());
+                setLocationName(buildManagement.getName());
+            }
         }
     }
 
