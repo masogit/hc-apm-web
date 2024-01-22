@@ -360,7 +360,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      */
     public void purchaseInfoSubmit() throws Exception {
         if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2){
-            handValidateData(this.purchaseOrderInfo);
+            if(!handValidateData(this.purchaseOrderInfo)){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            };
         };
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
         boolean approvalIng = multiLevelApproval.getApprovalIng();
@@ -395,52 +398,54 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.resetSignature();
     }
 
-    public void handValidateData(PurchaseOrderInfo purchaseOrderInfo){
+    public boolean handValidateData(PurchaseOrderInfo purchaseOrderInfo){
+        boolean validateArg = true;
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEngineerOpinion())){
             WebUtil.addWarnMessage("专业工程师意见不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingExistingBrands())){
             WebUtil.addWarnMessage("医院现有品牌不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingFeeItems())){
             WebUtil.addWarnMessage("收费项目不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingConsumableDescription())){
             WebUtil.addWarnMessage("耗材或试剂说明不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEquipmentDeptOpin())){
             WebUtil.addWarnMessage("器械科审核意见不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(purchaseOrderInfo.getMeetingApproveDate()==null){
             WebUtil.addWarnMessage("审核时间不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingPurchasingImports())){
             WebUtil.addWarnMessage("是否采购进口产品不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingRemarks())){
             WebUtil.addWarnMessage("备注不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
         if(purchaseOrderInfo.getMeetingDate()==null){
             WebUtil.addWarnMessage("过会日期不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            validateArg = false;
         }
+        return validateArg;
     }
 
     /**
