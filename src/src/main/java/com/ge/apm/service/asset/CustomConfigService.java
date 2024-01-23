@@ -16,6 +16,7 @@ import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -41,7 +42,7 @@ public class CustomConfigService {
     @Autowired
     CustomConfigRepository customConfigDao;
     @Autowired
-    OrgInfoRepository orgDao;
+    ConfigCacheService configCacheService;
     @Autowired
     ConfigService configService;
     @Autowired
@@ -61,7 +62,7 @@ public class CustomConfigService {
 
     @Cacheable(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
     public CustomConfigObject getCurrentCustomConfig(String siteUid) {
-        OrgInfo org = orgDao.findByUid(siteUid);
+        OrgInfo org = configCacheService.findOrgByUid(siteUid);
         if (configService.isInsulateTenant(org.getTenantUID())) {
             CustomConfig res = getCustomConfigBySite(siteUid);
             return res == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);

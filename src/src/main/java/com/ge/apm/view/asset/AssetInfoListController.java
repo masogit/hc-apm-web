@@ -969,7 +969,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getSiteOrgName(String siteUID) {
-        OrgInfo org = orgDao.getByUid(siteUID);
+        OrgInfo org = configCacheService.findOrgByUid(siteUID);
         if (org != null) {
             return org.getName();
         }
@@ -1307,7 +1307,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
-        return orgDao.getByUid(uid);
+        return configCacheService.findOrgByUid(uid);
     }
 
     //getter and setter

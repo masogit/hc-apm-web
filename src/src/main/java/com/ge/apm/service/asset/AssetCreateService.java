@@ -87,7 +87,7 @@ public class AssetCreateService {
     }
 
     public String getSiteName(String siteUid) {
-        OrgInfo org = orgDao.getByUid(siteUid);
+        OrgInfo org = configCacheService.findOrgByUid(siteUid);
         return getOrgFullName(org);
     }
 
@@ -222,7 +222,7 @@ public class AssetCreateService {
     }
 
     public List<UserAccount> getAssetOwnerList(String deptUid) {
-        OrgInfo dept = orgDao.getByUid(deptUid);
+        OrgInfo dept = configCacheService.findOrgByUid(deptUid);
         List<String> deptUids = Arrays.asList(deptUid, dept.getTenantUID(), dept.getInstitutionUID(), dept.getHospitalUID(), dept.getSiteUID());
         return userDao.findByAssetAccess(deptUids);
     }
@@ -243,7 +243,7 @@ public class AssetCreateService {
 
     public String getOrgName(String orgUid) {
         if (orgUid != null) {
-            OrgInfo org = orgDao.getByUid(orgUid);
+            OrgInfo org = configCacheService.findOrgByUid(orgUid);
             return org == null ? null : org.getName();
         }
         return null;
@@ -262,7 +262,7 @@ public class AssetCreateService {
     }
     
     public Boolean needAssetApproval(String siteUid){
-        OrgInfo siteOrg = orgDao.getByUid(siteUid);
+        OrgInfo siteOrg = configCacheService.findOrgByUid(siteUid);
         List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
         List<CustomRole> customRoles = customeRoleDao.findCustomRolesBySiteUIdsAndFunction(siteUidList, ApmFunction.ASSET_AUDIT_APPROVE.name());
         //List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
@@ -274,7 +274,7 @@ public class AssetCreateService {
     }
 
     public List<UserAccount> getAssetApprovalUser(String siteUid){
-        OrgInfo siteOrg = orgDao.getByUid(siteUid);
+        OrgInfo siteOrg = configCacheService.findOrgByUid(siteUid);
         List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
         List<CustomRole> customRoles = customeRoleDao.findCustomRolesBySiteUIdsAndFunction(siteUidList, ApmFunction.ASSET_AUDIT_APPROVE.name());
         //List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
