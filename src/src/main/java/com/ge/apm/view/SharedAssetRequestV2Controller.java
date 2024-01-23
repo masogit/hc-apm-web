@@ -1364,6 +1364,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
+            String accepter = selected.getAccepter();
+            sardList.forEach(item->{
+                item.setAccepter(accepter);
+            });
            // 只能同院区调剂不存在多个WorkflowConfig
             WorkflowConfig configBySite = configService.findConfigBySite(selected.getSiteUID());
             String deptForSharedAsset = "";
@@ -1440,6 +1444,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
+            String msgAccepter = selected.getMsgAccepter();
+            sardList.forEach(item->{
+                item.setMsgAccepter(msgAccepter);
+            });
             // 只能同院区调剂不存在多个WorkflowConfig
             WorkflowConfig configBySite = configService.findConfigBySite(selected.getSiteUID());
             String deptForSharedAsset = "";
