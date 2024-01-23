@@ -80,14 +80,9 @@
                 </p:selectOneMenu>
             </h:panelGroup>
 
-
             <h:panelGroup>
                 <label class="label">#{msg.locationName}</label>
-                <p:autoComplete dropdown="true" value="#{assetSelectController.locationName}"
-                                scrollHeight="300"  forceSelection="true" requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" completeMethod="#{assetSelectController.managementListString}"
-                                class="locationNameChange" id="locationNameChange" >
-                    <p:ajax event="itemSelect" listener="#{assetSelectController.locationNamechangeSelect}"/>
-                </p:autoComplete>
+                <p:inputText value="#{assetSelectController.locationName}"/>
             </h:panelGroup>
 
 

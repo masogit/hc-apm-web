@@ -413,8 +413,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 //            if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
 //                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
 //            }
-            if(StringUtils.isNotBlank(this.getLocationCode())) {
-                searchFilters.add(new SearchFilter("locationCode", SearchFilter.Operator.EQ, this.getLocationCode(), "1*"));
+            if(StringUtils.isNotBlank(this.getLocationName())) {
+                searchFilters.add(new SearchFilter("locationName", SearchFilter.Operator.LIKE, this.getLocationName(), "1*"));
                 ++count;
             }
         }
