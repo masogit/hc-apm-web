@@ -40,6 +40,7 @@
                 </p:selectBooleanCheckbox>
 				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
 					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">
+                    <p:ajax update="@parent:selectAll" listener="#{assetSelectController.updateItem()}"/>
 					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					<p:column style="float: left;text-align:left;">
 						<h:outputText value="#{t.name}" />

@@ -399,20 +399,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 ++count;
             }
             
-            if(listCheckOrgInfo!=null && listCheckOrgInfo.size()>0){
-            	Set<String> setOrgInfoUid=new HashSet<String>();
-            	for(int i=0;i<listCheckOrgInfo.size();++i){
-            		setOrgInfoUid.add(listCheckOrgInfo.get(i).getUid());
-            	}
-            	if(setOrgInfoUid.size()>0){
+            if(listCheckOrgInfo!=null && !listCheckOrgInfo.isEmpty()){
+            	Set<String> setOrgInfoUid=new HashSet<>();
+                for (OrgInfo orgInfo : listCheckOrgInfo) {
+                    setOrgInfoUid.add(orgInfo.getUid());
+                }
+            	if(!setOrgInfoUid.isEmpty()){
             		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
-//                    searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
                     ++count;
             	}
             }
-//            if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
-//                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
-//            }
             if(StringUtils.isNotBlank(this.getLocationName())) {
                 searchFilters.add(new SearchFilter("locationName", SearchFilter.Operator.LIKE, this.getLocationName(), "1*"));
                 ++count;
@@ -424,54 +420,26 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private Boolean isSelectAll = Boolean.FALSE;
 
     public void updateSelectAll() {
-        if (ObjectUtil.isNotEmpty(listCheckOrgInfo)) {
-            listCheckOrgInfo.clear();
-            isSelectAll = false;
-        } else {
+        if (Boolean.TRUE.equals(isSelectAll)) {
             listCheckOrgInfo = new ArrayList<>(deptList);
-            isSelectAll = true;
+        } else {
+            listCheckOrgInfo.clear();
         }
     }
 
+    public void updateItem() {
+        isSelectAll = deptList.size() == listCheckOrgInfo.size();
+    }
+
     private void updateManagementOnSiteChange() {
-
-         managementList=   buildManagementRepository.findBySiteUidTree(selectedOrg.getSiteUID());
-
-//        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selectedOrg.getSiteUID());
-//        if(org.apache.commons.collections.CollectionUtils.isEmpty(managementList)){
-//            return;
-//        }
-//        TreeNode root = new DefaultTreeNode("root", null, null);
-//        if (!org.apache.commons.collections4.CollectionUtils.isEmpty(managementList)) {
-//            managementList.forEach(val -> root.getChildren().add(new DefaultTreeNode("org", val, null)));
-//            componentFloor(root);
-//        }
-    }
-
-    private void componentFloor(TreeNode orgTree) {
-        orgTree.getChildren().forEach(val -> {
-            BuildManagement buildManagement = (BuildManagement) val.getData();
-            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
-            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
-            componentRoom(val);
-        });
-    }
-
-    private void componentRoom(TreeNode orgTree) {
-        orgTree.getChildren().forEach(val -> {
-            BuildManagement buildManagement = (BuildManagement) val.getData();
-            List<BuildManagement> buildFloorList = Optional.ofNullable(buildManagementRepository.findByParent(buildManagement.getId())).orElse(new ArrayList<>());
-            buildFloorList.forEach(item -> val.getChildren().add(new DefaultTreeNode("org", item, null)));
-            managementList.addAll(buildFloorList);
-        });
+        managementList=   buildManagementRepository.findBySiteUidTree(selectedOrg.getSiteUID());
     }
 
     public List<String> managementListString(String query) {
         updateManagementOnSiteChange();
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(managementList)){
             List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
-            Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
-            managementMap=collect;
+            managementMap= managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
             return list;
         }
         return new ArrayList<>();
