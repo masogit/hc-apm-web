@@ -311,9 +311,9 @@ public class BuildManagementService {
     private void export(TreeNode child, List<Map<String, Object>> resultList) {
         List<TreeNode> children = child.getChildren();
         for (TreeNode treeNode : children) {
-            if(!"org".equalsIgnoreCase(treeNode.getType())){
-                continue;
-            }
+//            if(!"org".equalsIgnoreCase(treeNode.getType())){
+//                continue;
+//            }
             if (treeNode.getChildren().size() > 0) {
                 export(treeNode, resultList);
             }

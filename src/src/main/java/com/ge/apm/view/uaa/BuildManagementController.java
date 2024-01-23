@@ -184,7 +184,13 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     }
 
     private void getChildren(TreeNode orgTree) {
+        ArrayList<TreeNode> treeNodes = new ArrayList<>();
         orgTree.getChildren().stream().forEach(item -> {
+            OrgInfo org = (OrgInfo) item.getData();
+            if(org.getOrgType()==4){
+                treeNodes.add(item);
+                return;
+            }
             componentBuild(item);
             if (!CollectionUtils.isEmpty(item.getChildren())) {
                 item.getChildren().stream().forEach(child1 -> {
@@ -194,6 +200,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
                 });
             }
         });
+        orgTree.getChildren().removeAll(treeNodes);
     }
 
     public void buildOrdTree() {
@@ -282,7 +289,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
             BeanUtils.copyProperties(object,org);
 
             //if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
-            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+//            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
 //            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
 
             nodeList.add(item);
@@ -459,7 +466,22 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         }
         if (selectedNode.getData() instanceof  BuildManagement) {
             BuildManagement buildManagement = (BuildManagement) selectedNode.getData();
-            buildManagementRepository.delete(buildManagement);
+            List<AssetInfo> list;
+            List<BuildManagement> deleteIds=new ArrayList<>();
+            if(buildManagement.getBuildType()==6){
+                 list= assetInfoRepository.findByLocationCode(buildManagement.getNamePyCode());
+                deleteIds.add(buildManagement);
+            }else{
+                List<BuildManagement>  buildManagementList= buildManagementRepository.findByTree(buildManagement.getId());
+                List<String> collect = buildManagementList.stream().filter(item->item.getBuildType()==6).map(BuildManagement::getNamePyCode).collect(Collectors.toList());
+                list= assetInfoRepository.findByLocationCodeIn(collect);
+                deleteIds.addAll(buildManagementList);
+            }
+           if(CollectionUtils.isNotEmpty(list)){
+               WebUtil.addErrorMessage("选中记录已关联设备，请将设备安装位置解绑后再删除！");
+               return;
+           }
+            buildManagementRepository.delete(deleteIds);
             buildOrdTree();
         }else{
             WebUtil.addErrorMessage("请选择楼宇层级");
@@ -643,6 +665,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
                 isShow = selected.getOrgType() == 2;
                 acShow = selected.getOrgType() == 4;
             }
+            selectBuild=null;
         }
         if (node.getData() instanceof BuildManagement) {
             selectBuild = (BuildManagement) node.getData();
@@ -675,6 +698,13 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     public boolean getIsShjyDept() {
         //判断是否是九院科室
         if (selected.getSiteId().equals(SHANGHAIJIUYUAN_SITEID)&&selected.getOrgType().equals(4)){
+            return true;
+        }
+        return false;
+    }
+    public boolean getIsDelete() {
+
+        if(selectBuild!=null){
             return true;
         }
         return false;

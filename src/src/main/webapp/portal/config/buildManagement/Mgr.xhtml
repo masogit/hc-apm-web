@@ -53,7 +53,7 @@
                                     <p:commandButton id="createBuild" process="@this" icon="ui-icon-plus" value="#{msg.Create} 楼栋" actionListener="#{buildManagementController.prepareCreate(4)}" update="@form:editPanel"/>
                                     <p:commandButton id="createFloor" process="@this" icon="ui-icon-plus" value="#{msg.Create} 楼层" actionListener="#{buildManagementController.prepareCreate(5)}" update="@form:editPanel"/>
                                     <p:commandButton id="createRoom" process="@this" icon="ui-icon-plus" value="#{msg.Create} 房间" actionListener="#{buildManagementController.prepareCreate(6)}" update="@form:editPanel"/>
-                                    <p:commandButton id="deleteButton"  process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{buildManagementController.deleteSelectedBuild}" update="@form">
+                                    <p:commandButton id="deleteButton"  process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{buildManagementController.deleteSelectedBuild}" update="@form" disabled="#{!buildManagementController.isDelete}" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </h:panelGrid>
