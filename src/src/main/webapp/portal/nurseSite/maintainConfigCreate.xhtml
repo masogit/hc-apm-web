@@ -60,7 +60,7 @@
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" id="idTypeGroup">
 				<h:panelGroup>
 					<label class="label">检查类型*</label>
-					<p:selectOneRadio value="#{maintainConfigController.selected.type}" required="true" requiredMessage="保养报告类型不能为空" layout="responsive" columns="1">
+					<p:selectOneRadio value="#{maintainConfigController.selected.type}" required="true" requiredMessage="检查类型不能为空" layout="responsive" columns="1">
 						<p:ajax event="change" update=":maintainConfigCreateForm:idTypeGroup" process="@this"></p:ajax>
 						<f:selectItem itemLabel="每天" itemValue="1" />
 						<f:selectItem itemLabel="每周" itemValue="2" />
