@@ -135,6 +135,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
+        this.locationName = null;
         this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
