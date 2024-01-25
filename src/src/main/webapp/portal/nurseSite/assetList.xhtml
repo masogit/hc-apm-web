@@ -35,7 +35,7 @@
             <h:panelGroup>
                 <!--指代所属科室或使用科室-->
                 <label class="label">科室</label>
-                <p:selectBooleanCheckbox id="selectAll" value="#{assetSelectController.isSelectAll}" itemLabel="全选">
+                <p:selectBooleanCheckbox id="selectAll" value="#{assetSelectController.isSelectAll}" itemLabel="全选" rendered="#{!assetSelectController.is4Edit}">
                     <p:ajax update="@parent:deptOrgInfoCreate" listener="#{assetSelectController.updateSelectAll()}"/>
                 </p:selectBooleanCheckbox>
 				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
