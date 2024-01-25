@@ -603,6 +603,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
 
         changeAssetOrg(orgInfo);
+        updateManagementOnSiteChange();
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -644,6 +645,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private void updateManagementOnSiteChange() {
+        managementList.clear();
         List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
         if(CollectionUtils.isEmpty(managementList)){
             return;

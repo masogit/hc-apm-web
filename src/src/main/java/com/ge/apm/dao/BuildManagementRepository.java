@@ -27,4 +27,8 @@ public interface BuildManagementRepository extends GenericRepositoryUUID<BuildMa
     List<BuildManagement> findBySiteUidTree(String siteUID);
 
     BuildManagement findByUid(String value);
+
+
+    @Query(value="select o.* from build_management o where o.name_py_code=?1 ",nativeQuery=true)
+    BuildManagement findByNamePyCode(String locationCode);
 }
