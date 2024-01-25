@@ -216,11 +216,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("networkingStatus"), networkingStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("productSegment"), productSegmentList, true);
         createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare02"), spare02List, true);
         createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare03"), spare03List, true);
         createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare04"), spare04List, true);
         createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("spare05"), spare05List, true);
-        createDropdownWithKeyNamedRange(rowNum++, WebUtil.getMessage("productSegment"), productSegmentList, true);
 
         dynamicListSheet.setSelected(false);
     }
