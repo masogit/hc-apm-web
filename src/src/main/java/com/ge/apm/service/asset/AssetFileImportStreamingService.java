@@ -239,13 +239,15 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("spare04")), "setSpare04", true);
                 assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("spare05")), "setSpare05", true);
 
+                assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("UCMID")), "setUCMID", true);
+                assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("productFamily")), "setProductFamily", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("productSegment")), "setProductSegment", productSegmentList, map, null);
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
                     supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);
                 } else {
                     supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
                 }
-
 
                 map.put("asset", asset);
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
