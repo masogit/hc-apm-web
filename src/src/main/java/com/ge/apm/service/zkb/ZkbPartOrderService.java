@@ -453,7 +453,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return errorLog.toString();
     }
 
-
+    /**
+     * 按照申请单中的申请数量与名额总数进行比较，不超过30%；如果总是小于10，则申请数量不能超过3个
+     * @param zkbPartOrder
+     * @param zkbContract
+     * @return
+     */
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
