@@ -354,9 +354,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         //selectedAsset.setDept(selectedDept);
         //selectedAsset.setDeptId(selectedDept.getId());
         selectedAsset.setTenantUID(account.getTenantUID());
-        selectedAsset.setInstitutionUID(account.getTenantUID());
-        selectedAsset.setHospitalUID(account.getTenantUID());
-        selectedAsset.setSiteUID(account.getTenantUID());
+        selectedAsset.setInstitutionUID(account.getInstitutionUID());
+        selectedAsset.setHospitalUID(account.getHospitalUID());
+        selectedAsset.setSiteUID(account.getSiteUID());
         boolean isOk = persistService.saveAsset(selectedAsset);
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
@@ -635,7 +635,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         // 科室
 //        updateAssetSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, selectedDept.getId()));
         // 现在只要是同一租户下的设备都能看到
-        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedDept.getTenantUID()));
+        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
         updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
