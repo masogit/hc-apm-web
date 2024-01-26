@@ -464,6 +464,9 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectSite)) {
             return ;
         }
+        if(selectedNode==null || selectedNode.getData()==null){
+            return;
+        }
         if (selectedNode.getData() instanceof  BuildManagement) {
             BuildManagement buildManagement = (BuildManagement) selectedNode.getData();
             List<AssetInfo> list;

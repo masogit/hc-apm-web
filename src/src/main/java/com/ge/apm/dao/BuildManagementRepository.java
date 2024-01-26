@@ -25,4 +25,10 @@ public interface BuildManagementRepository extends GenericRepositoryUUID<BuildMa
 
     @Query(value = "with recursive cte_bm as( select bm.* from build_management bm where bm.site_uid = ?1 union select bm.* from build_management bm join cte_bm cte on bm.parent_id = cte.id   ) select * from cte_bm where org_type=6",nativeQuery=true)
     List<BuildManagement> findBySiteUidTree(String siteUID);
+
+    BuildManagement findByUid(String value);
+
+
+    @Query(value="select o.* from build_management o where o.name_py_code=?1 ",nativeQuery=true)
+    BuildManagement findByNamePyCode(String locationCode);
 }

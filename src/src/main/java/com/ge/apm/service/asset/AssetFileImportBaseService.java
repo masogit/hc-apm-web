@@ -78,7 +78,6 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     public List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
     public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
-    //public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
     public List<I18nMessage> assetStatusList = assetCreateService.getAssetStatusList();
     public List<I18nMessage> assetValueCategoryList = FieldValueMessageController.getFieldValueList("assetValueCategory", siteId);
     public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
@@ -86,6 +85,7 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> networkingStatusList = FieldValueMessageController.getFieldValueList("networkingStatus", siteId);
     public List<I18nMessage> proprietaryClassList = FieldValueMessageController.getFieldValueList("proprietaryClass", siteId);
     public List<I18nMessage> assetQualityList = FieldValueMessageController.getFieldValueList("assetQuality", siteId);
+    public List<I18nMessage> productSegmentList = FieldValueMessageController.getFieldValueList("productSegment", siteId);
 
     @Autowired
     protected AssetInfoRepository assetDao;
