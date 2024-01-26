@@ -10,7 +10,7 @@
 			</div>
 			<div class="ui-g-12 card">
 				<div class="ui-g-12 card">
-				<div style="width: 1150px;height: 225px;float: left">
+				<div style="width: 1000px;height: 225px;float: left">
 					<p:growl widgetVar="messages" id="messages" showDetail="true" />
 					<h:form id="maintainHeaderForm" rendered="#{not empty maintainController}">
 						<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg"
@@ -22,8 +22,8 @@
 					</h:form>
 
 				</div>
-				<div style="float: right">
-					<table style="float:right;width:240px;height:150px;font-family: Century" >  <!--	status-->
+				<div style="float: right; position: absolute;right: 30px">
+					<table style="float:right;width:210px;height:150px;font-family: Century" >  <!--	status-->
 						<tr style="background-color: #777D81" ><td style="color: whitesmoke ;float: left">　　未检查</td></tr>  <!--	0 1-->
 						<tr  style="background-color: #0000FF"><td style="color: whitesmoke ;float: left">　　进行中</td></tr>  <!--	4 -->
 						<tr style="background-color: #008000" ><td style="color: whitesmoke ;float: left">　　通　过，未延期，无备注</td></tr>  <!--	2-->
