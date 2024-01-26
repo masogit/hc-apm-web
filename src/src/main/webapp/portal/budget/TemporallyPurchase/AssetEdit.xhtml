@@ -51,7 +51,7 @@
                                  value="#{msg.Save}" id="saveButton"
                                  update="display :AssetEditDlg AssetSelectForm:assetDatalist :growl"
                                  oncomplete="handleSubmit(args, 'AssetEditDialog');"
-                                 disabled="#{empty budgetBayController.selectedDept}"/>
+                                 />
                 <p:commandButton immediate="true" value="#{msg.Cancel}"
                                  onclick="PF('AssetEditDialog').hide()"/>
             </h:panelGroup>
