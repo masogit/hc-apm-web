@@ -116,6 +116,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        this.isSelectAll = Boolean.FALSE;
     }
 
     public void loadData4Create() {
@@ -139,6 +140,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
+        this.isSelectAll = Boolean.FALSE;
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
