@@ -16,7 +16,7 @@
 			<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 				<h:panelGroup>
 					<label class="label">增加检查项*</label>
-					<p:selectManyMenu id="addCheckList2" value="#{maintainConfigController.listSelectedCheckItems}" var="t" converter="nurseSiteMaintainCheckItemConverter" required="false"
+					<p:selectManyMenu id="addCheckList2" value="#{maintainConfigController.listSelectedCheckItems}" var="t" converter="nurseSiteMaintainCheckItemConverter" required="true" requiredMessage="检查项不能为空"
 						filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
 						<p:ajax process="@this" listener="#{maintainConfigController.onSelectedCheckItemChange}" update=":maintainConfigEditForm:saveButtonId"></p:ajax>
 						<f:selectItems value="#{maintainConfigController.listWholeCheckItems}" var="item" itemLabel="#{item.name} #{item.description}" itemValue="#{item}" />
