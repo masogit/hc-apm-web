@@ -1826,7 +1826,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean getAssetScrapEnable(){
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"assetScrap");
-        return  value.equals("true")?true:false;
+        return  StringUtils.isNotEmpty(value)?value.equals("true"):false;
 
     }
 
@@ -1854,6 +1854,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
         return dao.secondment(selected.getUid())>0;
+    }
+
+    public void checkSerialNumExists () {
+        List<AssetInfo> list = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
+        if (CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("制造商序列号已存在！");
+        }
     }
 
     public boolean isApproval() {
