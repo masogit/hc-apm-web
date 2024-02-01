@@ -771,12 +771,6 @@
                             <label class ="label" >#{msg.AssetIDPrefix}</label>
                             <p:inputText id="prefix" value="#{workflowConfigController.selected.prefix}" maxlength="3" ><p:ajax process="@this"></p:ajax></p:inputText>
                         </h:panelGroup>
-
-                        <h:panelGroup rendered="#{userContextService.isActiveSupplier()}">
-                            <label class="label">是否激活供应商</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.activeSupplier}"/>
-                        </h:panelGroup >
-
                         <h:panelGroup>
                             <label class="label">是否启用待报废权限控制</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableScrappedControl}"/>
