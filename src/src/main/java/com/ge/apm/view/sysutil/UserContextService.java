@@ -65,7 +65,7 @@ public class UserContextService implements Serializable {
     private Set<ApmSystemRole> apmSystemRoles = null;
     private Set<String> apmFeatures = null;
     private Map<String, Boolean> adminActive = null; //单独激活项
-    private Boolean activeSupplierFlag = null;
+    private Boolean enableMaterialsInterfaceFlag = null;
     private String selectedSiteUid;
     private Boolean flagIsUltraSoundTenant = null;
     private Boolean flagIsAgentTenant = null;
@@ -1343,20 +1343,18 @@ public class UserContextService implements Serializable {
     }
 
     /**
-     * 判断租户是否已激活供应商
+     * 判断租户是否启用物资接口
      * @return
      */
-    public boolean activeSupplier(){
-        if(activeSupplierFlag == null){
-            activeSupplierFlag = Boolean.FALSE;
+    public boolean enableMaterialsInterface(){
+        if(enableMaterialsInterfaceFlag == null){
+            enableMaterialsInterfaceFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
-            ConfigService configService = WebUtil.getBean(ConfigService.class);
-            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-            if (BooleanUtils.isTrue(configBySite.getActiveSupplier())) {
-                activeSupplierFlag = Boolean.TRUE;
-            }
+            String enableMaterialsInterface = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableMaterialsInterface");
+            enableMaterialsInterfaceFlag=Boolean.TRUE.toString().equalsIgnoreCase(enableMaterialsInterface);
         }
-        return activeSupplierFlag;
+
+        return enableMaterialsInterfaceFlag;
     }
 
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {

@@ -5,3 +5,5 @@ update user_account ua set is_active = false , is_deleted = true ,telephone = nu
 delete from user_wx_app uwa  where not exists(select 1 from supplier_user su where su.user_id = uwa.user_id and uwa.app_name='hc-apm-supplier');
 -- YHAAO-20850 临床可否查看调剂计费信息
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '临床可否查看调剂计费信息', 'enableViewingAdjustmentBillingInformation', '临床可否查看调剂计费信息', 'f', 't', 3 where not exists (select * from config_item where key = 'enableViewingAdjustmentBillingInformation');
+-- YHAAO-20945 是否启用物资接口
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '是否启用物资接口', 'enableMaterialsInterface', '是否启用物资接口', 'f', 't', 3 where not exists (select * from config_item where key = 'enableMaterialsInterface');
