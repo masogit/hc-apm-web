@@ -30,6 +30,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1427,6 +1428,33 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		logger.error("异常租户:" + JSON.toJSONString(exTenant));
 		tenantInfoRepository.save(waitSaveTenant);
 		adminFeatureActiveRepository.save(waitSaveActiveHospital);
+	}
+
+	public void batchActiveDigitalAssetStaff() {
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		String featureKey = ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name();
+		tenantInfos.forEach(tenantInfo -> {
+			List<AdminFeatureActive> waitList = new ArrayList<>();
+			if (BooleanUtils.isTrue(tenantInfo.getIsEnabled())) {
+				List<OrgInfo> hospitals = orgInfoRepository.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
+				hospitals.forEach(info -> {
+					if (info.getOrgLevel() == 2) {
+						Set<String> features = adminFeatureActiveRepository.findByHospitalUID(info.getUid()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+						if (!features.contains(featureKey)) {
+							AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+							adminFeatureActive.setFeatureKey(featureKey);
+							adminFeatureActive.setHospitalUID(info.getUid());
+							adminFeatureActive.setTenantUID(info.getTenantUID());
+							adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+							adminFeatureActive.setCreateDate(new Date());
+							adminFeatureActive.setActiveDate(new Date());
+							waitList.add(adminFeatureActive);
+						}
+					}
+				});
+				adminFeatureActiveRepository.save(waitList);
+			}
+		});
 	}
 
 	private void buildActiveFeatureByHospitalUid(String uid, List<AdminFeatureActive> waitSave, String featureKey) {

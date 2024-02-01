@@ -16,10 +16,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.web.cboard.CBoardController;
-import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
-import com.ge.healthcare.cn.common.cons.ApmFeature;
-import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.*;
 import com.google.common.base.Strings;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
@@ -260,6 +257,16 @@ public class UserContextService implements Serializable {
 
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
+    }
+
+    public List<String> menuOrder() {
+        List<String> defaultMenuOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
+        if (getTenantInfo().getEnablesMenuOrder()) {
+            defaultMenuOrder = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class)
+                    .stream().filter(defaultMenuOrder::contains)
+                    .collect(Collectors.toList());
+        }
+        return defaultMenuOrder;
     }
 
     public boolean accessContainsFunctionMenu(String functionName) {
@@ -560,6 +567,7 @@ public class UserContextService implements Serializable {
                 }
             } else {
                 Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> apmFeatures.contains(v.name())).forEach(v -> adminActive.put(v.name(), Boolean.TRUE));
+                adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
             }
             CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
@@ -916,11 +924,34 @@ public class UserContextService implements Serializable {
     }
     public String isActive(){
         UserAccount currentUser = getLoginUser();
-        if(!currentUser.getIsActive() && currentUser.getId() != 0){
-            return "1";//need active
+        if((!currentUser.getIsActive() && currentUser.getId() != 0)){
+            return "1";//need active user
+        } if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2 && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
+            return "2";//need active DIGITAL_MEDICAL_ENGINEERING
+        } else {
+            return "0";
+        }
+    }
+
+    public String isUserActive(){
+        UserAccount currentUser = getLoginUser();
+        if((!currentUser.getIsActive() && currentUser.getId() != 0)){
+            return "1";
         }else {
             return "0";
         }
+    }
+
+    public String isActiveDigital() {
+        if (isUserActive().equals("0") && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
+            return "1";
+        } else {
+            return "0";
+        }
+    }
+
+    public void afterActiveDigital() {
+        adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
     }
 
     /* 
