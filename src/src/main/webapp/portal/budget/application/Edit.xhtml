@@ -36,7 +36,7 @@
                                         <p:tree id="orgTreeEdit" value="#{budgetController.orgTreeEdit}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0"  >
                                            <p:ajax process="@this" event="select"
-                                                    update=":BudgetApplicationEditForm @parent:dept "
+                                                    update="@parent:dept "
                                                     listener="#{budgetController.onSelectTreeNode}"
                                                     oncomplete="PF('varOrgEdit').hide();" />
                                             <p:ajax process="@this" event="expand"/>

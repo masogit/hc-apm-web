@@ -339,7 +339,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     //供应商责任人停用
     public void onRefuse(SupplierUser supplierUser){
-        supplierService.deleteByID(supplierUser.getId());
+        try {
+            supplierService.deleteByID(supplierUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         initSupplierUser();
     }
 
