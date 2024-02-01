@@ -690,9 +690,26 @@
                                 </p:dataTable>
                             </p:fieldset>
                         </p:tab>
+                        <p:tab title="菜单顺序切换">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup id="enablesMenuOrder">
+                                    <p:selectBooleanCheckbox itemLabel="是否使用版菜单顺序配置" value="#{featureSettingController.tenantInfo.enablesMenuOrder}"/>
+                                </h:panelGroup>
+                                <p:orderList id="myList"
+                                             value="#{featureSettingController.orderedItems}"
+                                             var="item"
+                                             itemLabel="#{featureSettingController.getOrderFeatureName(item)}"
+                                             itemValue="#{item}"
+                                             controlsLocation="none"
+                                             responsive="true">
+                                </p:orderList>
+                            </p:panelGrid>
+                        </p:tab>
                     </p:tabView>
                     <br/>
                     <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0}" actionListener="#{featureSettingController.saveFeatures}"
+                                     value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 2}" actionListener="#{featureSettingController.saveMenuOrder}"
                                      value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
                 </h:form>
                 <p:dialog modal="true" id="Links" widgetVar="Links" header="激活链接" appendTo="@(body)">
