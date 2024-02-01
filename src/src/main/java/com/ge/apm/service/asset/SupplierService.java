@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
@@ -234,16 +235,8 @@ public class SupplierService {
     }
 
     public boolean activeSupplier(){
-        //UserAccount user = UserContextService.getCurrentUserAccount();
-        Set<String> functions = UserContextService.getCurrentUserFunction();
-        return functions.contains("ASSET_SUPPLIER_APPLICATION_EDIT");
-//
-//        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-//        if(null != configBySite){
-//           return configBySite.getActiveSupplier() != null && configBySite.getActiveSupplier();
-//        }
-//
-//        return false;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
     }
 
     public boolean validateSupplierCode(Supplier supplier){
