@@ -11,6 +11,9 @@
                 margin-left: 7px;
                 margin-right: 40px;
             }
+            .ui-orderlist .ui-orderlist-list {
+                height: 600px;
+            }
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
@@ -691,7 +694,7 @@
                             </p:fieldset>
                         </p:tab>
                         <p:tab title="菜单顺序切换">
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup id="enablesMenuOrder">
                                     <p:selectBooleanCheckbox itemLabel="是否使用版菜单顺序配置" value="#{featureSettingController.tenantInfo.enablesMenuOrder}"/>
                                 </h:panelGroup>
