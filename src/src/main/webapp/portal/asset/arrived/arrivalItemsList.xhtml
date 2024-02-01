@@ -12,7 +12,7 @@
             </div>
 
             <div class="ui-g-12 card">
-                <h:panelGrid columns="2" rendered="#{userContextService.activeSupplier()}" style="margin-bottom: 0px;">
+                <h:panelGrid columns="2" rendered="#{userContextService.enableMaterialsInterface()}" style="margin-bottom: 0px;">
                     <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="待验收的到货单合同号："></h:outputText>
                     <p:inputTextarea value="#{assetArrivedItemsController.mergeContractNum}" rows="1" cols="50" readonly="true" placeholder="#{empty assetArrivedItemsController.mergeContractNum?'没有待验收合同记录':''}"></p:inputTextarea>
                 </h:panelGrid>
@@ -35,7 +35,7 @@
                         <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.contractNum}"/>
                         </p:column>
-                        <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.activeSupplier()}">
+                        <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.enableMaterialsInterface()}">
                             <h:outputText value="#{item.arrivalList.approvalNo}"/>
                         </p:column>
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
@@ -58,7 +58,7 @@
                         <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.arrivalList.agent}" filterBy="#{item.arrivalList.agent}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.agent}"/>
                         </p:column>
-                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
+                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.enableMaterialsInterface()}">
                             <f:facet name="filter">
                                 <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
                             </f:facet>
@@ -75,7 +75,7 @@
                             </h:outputText>
                         </p:column>
                         <c:choose>
-                            <c:when test="#{userContextService.activeSupplier()}">
+                            <c:when test="#{userContextService.enableMaterialsInterface()}">
                                 <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.functionType}"/>
                                 </p:column>
@@ -109,10 +109,10 @@
                         </p:column>
                         <p:column headerText="操作" exportable="false">
                             
-                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier() and userContextService.accessContainsFunctionMenu('INSTALL_STORE_EDIT')}"  update=":AssetArrivalItemListForm:datalist" >接单
+                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.enableMaterialsInterface() and userContextService.accessContainsFunctionMenu('INSTALL_STORE_EDIT')}"  update=":AssetArrivalItemListForm:datalist" >接单
                                 <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                             </p:commandLink>
-                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
+                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.enableMaterialsInterface()}"  update=":AssetArrivalItemListForm:datalist" >接单
                                 <p:confirm header="接单" message="注意：同合同号、同科室的会默认全部接单!" icon="ui-icon-warning"/>
                             </p:commandLink>
                             <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
@@ -144,7 +144,7 @@
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                            <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.activeSupplier()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
+                            <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.enableMaterialsInterface()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
