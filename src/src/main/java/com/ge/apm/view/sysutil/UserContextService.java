@@ -927,7 +927,7 @@ public class UserContextService implements Serializable {
         if((!currentUser.getIsActive() && currentUser.getId() != 0)){
             return "1";//need active user
         } if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2 && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
-            return "2";//need active DIGITAL_MEDICAL_ENGINEERING
+            return "1";//need active DIGITAL_MEDICAL_ENGINEERING
         } else {
             return "0";
         }
