@@ -927,6 +927,13 @@ public class UserContextService implements Serializable {
         if((!currentUser.getIsActive() && currentUser.getId() != 0)){
             return "1";//need active user
         } else {
+            if (currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2) {
+                AdminFeatureActiveRepository featureActiveRepository = WebUtil.getBean(AdminFeatureActiveRepository.class);
+                AdminFeatureActive featureActive = featureActiveRepository.findByHospitalUIDAndFeatureKey(currentUser.getHospitalUID(), ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name());
+                if (ObjectUtils.isEmpty(featureActive)) {
+                    return "1";
+                }
+            }
             return "0";
         }
     }
