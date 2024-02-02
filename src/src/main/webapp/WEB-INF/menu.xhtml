@@ -6,7 +6,16 @@
     xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:pu="http://primefaces.org/ultima">
-
+    <style type="text/css">
+        #ActiveDigitalDlg {
+            width: 650px !important;
+            height: 500px !important;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
     <h:form id="menuform">
         <c:if test="${userContextService.getLoginUser() != null}">
             <c:choose>
@@ -86,4 +95,45 @@
           }
         </script>
     </h:form>
+    <p:dialog id="ActiveDigitalDlg" modal="true" resizable="true" draggable="true" header="欢迎登陆APM管理平台！" closable="false">
+        <h:form id = "ActiveDigitalForm">
+            <p:fieldset id="FirstActiveDigital" legend="数字医工首次激活" >
+                <p:scrollPanel style="width:580px;height:300px" mode="native">
+                    <p>为明确双方的权利和义务， 用户启用本服务前，须仔细阅读本协议服务条款。</p>
+                    <p>当您勾选选择“已阅读相关用户协议并确认激活功能模块”，即表示您已经达成本协议，承诺并遵守本协议的规定， 确认激活功能模块，同意并接受全部服务条款及条件。</p>
+                    <p>#{msg.Lisence2}</p>
+                    <p>#{msg.Lisence11}</p>
+                    <p>#{msg.Lisence12}</p>
+                    <p>#{msg.Lisence13}</p>
+                    <p>#{msg.Lisence14}</p>
+                    <p>#{msg.Lisence15}</p>
+                </p:scrollPanel>
+                <br/>
+                <p:selectBooleanCheckbox value="#{activeFeatureController.confirm}" itemLabel="*我已阅读相关用户协议并确认激活功能模块:" style="color: #bcbec1">
+                    <p:ajax update="saveDigitalButton"/>
+                </p:selectBooleanCheckbox>
+            </p:fieldset>
+            <p:commandButton id="saveDigitalButton" disabled="#{!activeFeatureController.confirm}" validateClient="true" actionListener="#{activeFeatureController.activeDigital}"
+                             value="#{msg.Activate}" update="ActiveDigitalForm " oncomplete="handleSubmitDigital(args, 'ActiveDigitalDlg');" icon="ui-icon-check"/>
+            <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
+        </h:form>
+
+    </p:dialog>
+
+    <script type="text/javascript">
+        function handleSubmitDigital(args, dialog) {
+            var jqDialog = jQuery('#' + dialog);
+            if (args.validationFailed) {
+                jqDialog.show();
+            } else {
+                jqDialog.hide();
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        var isActive = "#{userContextService.isActiveNew()}";
+        if(isActive == '1'){
+            jQuery('#' + 'ActiveDigitalDlg').show();
+        }
+    </script>
 </ui:composition>

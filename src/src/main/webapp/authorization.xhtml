@@ -9,7 +9,7 @@
 <ui:composition>
 
     <p:dialog id="ActiveDlg" widgetVar="ActiveDlg" width="650" height="480" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.WelcomeToAPMManagementPlatform}" closable="false">
-        <h:form id = "ActiveForm" rendered="#{userContextService.isUserActive() eq '1'}">
+        <h:form id = "ActiveForm">
             <p:fieldset id="changePassword" legend="#{msg.FirstUserLoginActivation}" >
                 <p:scrollPanel style="width:580px;height:300px" mode="native">
                     <p>为明确双方的权利和义务， 用户启用本服务前，须仔细阅读本协议服务条款。</p>
@@ -32,32 +32,11 @@
                              oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!userAccountController.agree}"/>
             <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
         </h:form>
-        <h:form id = "ActiveDigitalForm" rendered="#{userContextService.isActiveDigital() eq '2'}">
-            <p:fieldset id="FirstActiveDigital" legend="数字医工首次激活" >
-                <p:scrollPanel style="width:580px;height:300px" mode="native">
-                    <p>为明确双方的权利和义务， 用户启用本服务前，须仔细阅读本协议服务条款。</p>
-                    <p>当您勾选选择“已阅读相关用户协议并确认激活功能模块”，即表示您已经达成本协议，承诺并遵守本协议的规定， 确认激活功能模块，同意并接受全部服务条款及条件。</p>
-                    <p>#{msg.Lisence2}</p>
-                    <p>#{msg.Lisence11}</p>
-                    <p>#{msg.Lisence12}</p>
-                    <p>#{msg.Lisence13}</p>
-                    <p>#{msg.Lisence14}</p>
-                    <p>#{msg.Lisence15}</p>
-                </p:scrollPanel>
-                <br/>
-                <p:selectBooleanCheckbox value="#{activeFeatureController.confirm}" itemLabel="*我已阅读相关用户协议并确认激活功能模块:" style="color: #bcbec1">
-                    <p:ajax update="saveDigitalButton"/>
-                </p:selectBooleanCheckbox>
-            </p:fieldset>
-            <p:commandButton id="saveDigitalButton" disabled="#{!activeFeatureController.confirm}" validateClient="true" actionListener="#{activeFeatureController.activeDigital}"
-                             value="#{msg.Activate}" update=":ActiveDigitalForm " oncomplete="handleSubmit(args, 'ActiveDlg');" icon="ui-icon-check"/>
-            <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
-        </h:form>
     </p:dialog>
 
     <script>
         activeFunction = function () {
-            var isActive = "#{userContextService.isActiveNew()}";
+            var isActive = "#{userContextService.isActive()}";
             if(isActive == '1'){
                 PF('ActiveDlg').show();
             }
