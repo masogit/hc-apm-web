@@ -24,7 +24,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">版本</label>
-                            <p:selectOneMenu value="#{featureSettingController.edition}" disabled="#{featureSettingController.tabIndex == 1}">
+                            <p:selectOneMenu value="#{featureSettingController.edition}" disabled="#{featureSettingController.tabIndex == 1 or featureSettingController.tabIndex == 2}">
                                 <p:ajax update=":SiteInfoEditVersionForm" listener="#{featureSettingController.changeListener}"></p:ajax>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -32,7 +32,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">设备运营管理链接</label>
-                            <p:inputText value="#{featureSettingController.cpmURL}" disabled="#{featureSettingController.tabIndex == 1}"></p:inputText>
+                            <p:inputText value="#{featureSettingController.cpmURL}" disabled="#{featureSettingController.tabIndex == 1 or featureSettingController.tabIndex == 2}"></p:inputText>
                         </h:panelGroup>
                     </p:panelGrid>
 
