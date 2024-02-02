@@ -943,7 +943,8 @@ public class UserContextService implements Serializable {
     }
 
     public String isActiveDigital() {
-        if (isUserActive().equals("0") && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
+        UserAccount currentUser = getLoginUser();
+        if (currentUser.getIsActive() && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
             return "2";
         } else {
             return "0";
