@@ -12,4 +12,5 @@ insert into public.config_item (uid, category, default_value, description, key, 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启维保截止日期搜索', 'enableWarrantyDateSearch', '是否开启维保截止日期搜索', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWarrantyDateSearch');
 INSERT INTO public.config_item_value("uid", "hospital_uid", "institution_uid", "key", "site_uid", "tenant_uid", "value")  select replace(uuid_generate_v4()::text,'-',''), '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'enableWarrantyDateSearch', '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'true';
 
-
+--YHAAO-20981 多级审批配置筛选条件字段长度
+ALTER TABLE public.multi_level_approval_config ALTER COLUMN configration TYPE text USING configration::text;
