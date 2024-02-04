@@ -30,8 +30,10 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmServiceName;
 import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -252,6 +254,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             this.sendWxMsg(paramList,message,"待审批",linkUrl);
                         }
+                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
+
                         return multiLevel;
                     }
                 }
@@ -786,6 +790,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
                         }
+                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
                     } else {
                         com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel);
                         if (node != null) {

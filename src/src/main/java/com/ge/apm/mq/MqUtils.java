@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 
 import com.ge.apm.callback.DataDelVO;
+import com.ge.healthcare.cn.common.cons.ApmServiceName;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.domain.AssetInfo;
@@ -126,6 +127,27 @@ public class MqUtils {
             jsonObject.put("businessType",businessType);
             MqContext build = MqContext.builder().jsonObject(jsonObject).exChange(RabbitConfig.ACCESS_RECORDS_CHANGE).routingKey(RabbitConfig.ACCESS_RECORDS_KEY).type("UserAccessRecords").time(new Date()).build();
             sendToMq(build);
+        }catch (Exception e){
+            log.error("sendUserAccessRecords error :",e);
+        }
+    }
+
+
+    public void sendApprovalMessage(UserAccount userAccount,int businessType,String businessUid,Integer status){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("businessUid",businessUid);
+            jsonObject.put("businessType",businessType);
+            jsonObject.put("approvalStatus",status);
+            UserAccount user = new UserAccount();
+            user.setName(userAccount.getName());
+            user.setId(userAccount.getId());
+            user.setLoginName(userAccount.getLoginName());
+            jsonObject.put("user",user);
+            MqContext mqContext = MqContext.builder().time(new Date()).routingKey(RabbitConfig.APPROVAL_KEY).exChange(RabbitConfig.EVENT_NOTIFICATION_CHANGE).serviceName(ApmServiceName.WEB.getValue()).className("MultiLevelApprovalService").methodName("getMultiLevelApprovalPersonByAgree")
+                    .jsonObject(jsonObject)
+                    .build();
+            sendToMq(mqContext);
         }catch (Exception e){
             log.error("sendUserAccessRecords error :",e);
         }
