@@ -7,7 +7,9 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 505389829
@@ -83,6 +85,25 @@ public class MultiLevelApprovalConfig implements Serializable {
      */
     @Transient
     private String equipType;
+    /**
+     * 资产分类
+     */
+    @Transient
+    private List<String> selectAssetTypes=new ArrayList<>();
+
+    @Transient
+    private  List<String> aa;
+
+    /**
+     * 所属科室
+     */
+    @Transient
+    private List<String> selectAssetClinicalDeptUids=new ArrayList<>();
+    /**
+     * 设备分类
+     */
+    @Transient
+    private List<String> selectAssetGroups=new ArrayList<>();
 
     /**
      * 创建日期
@@ -157,5 +178,29 @@ public class MultiLevelApprovalConfig implements Serializable {
                 ", createdBy='" + createdBy + '\'' +
                 ", tenantUID='" + tenantUID + '\'' +
                 '}';
+    }
+
+    public List<String> getSelectAssetTypes() {
+        return selectAssetTypes;
+    }
+
+    public void setSelectAssetTypes(List<String> selectAssetTypes) {
+        this.selectAssetTypes = selectAssetTypes;
+    }
+
+    public List<String> getSelectAssetClinicalDeptUids() {
+        return selectAssetClinicalDeptUids;
+    }
+
+    public void setSelectAssetClinicalDeptUids(List<String> selectAssetClinicalDeptUids) {
+        this.selectAssetClinicalDeptUids = selectAssetClinicalDeptUids;
+    }
+
+    public List<String> getSelectAssetGroups() {
+        return selectAssetGroups;
+    }
+
+    public void setSelectAssetGroups(List<String> selectAssetGroups) {
+        this.selectAssetGroups = selectAssetGroups;
     }
 }
