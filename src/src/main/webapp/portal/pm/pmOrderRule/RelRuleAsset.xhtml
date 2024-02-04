@@ -199,8 +199,14 @@
                                </c:if>
                            </p:selectOneMenu>
                        </h:panelGroup>
-                    </p:panelGrid>
-                    
+                       <h:panelGroup rendered="#{relRuleAssetController.enableWarrantyDateSearch}">
+                           <label class ="label">#{msg.warrantyDate}</label>
+                           <p:calendar  timeZone="GMT+8" id="warrantyDate" pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.warrantyDate}" showOn="button" showButtonPanel="true" >
+                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this"/>
+
+                           </p:calendar>
+                       </h:panelGroup>
+                   </p:panelGrid>
                     <p:pickList id="AssetsPickList" widgetVar="varPickList" value="#{relRuleAssetController.availableAssets}" var="item"
                                 itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
@@ -226,7 +232,7 @@
                          <p:column style="float: left;width:25%;">
                             <h:outputText value="#{item.clinicalDeptName}" />
                         </p:column>
-                        <p:column>
+                        <p:column style="float: left;width:20%;">
                             <h:outputText value="#{item.functionType}" />
                         </p:column>
                     </p:pickList>

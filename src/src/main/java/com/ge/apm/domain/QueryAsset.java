@@ -28,6 +28,7 @@ public class QueryAsset {
  	private String mainDirectory;
  	private String secondDirectory;
 	private Integer emergencyEquipment;
+	private Date warrantyDate;
 
 
 	public String getMainDirectory() {
@@ -196,5 +197,14 @@ public class QueryAsset {
 
 	public void setEmergencyEquipment(Integer emergencyEquipment) {
 		this.emergencyEquipment = emergencyEquipment;
+	}
+
+
+	public Date getWarrantyDate() {
+		return warrantyDate;
+	}
+
+	public void setWarrantyDate(Date warrantyDate) {
+		this.warrantyDate = warrantyDate;
 	}
 }
