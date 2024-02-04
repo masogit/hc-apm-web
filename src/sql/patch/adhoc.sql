@@ -7,3 +7,10 @@ delete from user_wx_app uwa  where not exists(select 1 from supplier_user su whe
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '临床可否查看调剂计费信息', 'enableViewingAdjustmentBillingInformation', '临床可否查看调剂计费信息', 'f', 't', 3 where not exists (select * from config_item where key = 'enableViewingAdjustmentBillingInformation');
 -- YHAAO-20945 是否启用物资接口
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '是否启用物资接口', 'enableMaterialsInterface', '是否启用物资接口', 'f', 't', 3 where not exists (select * from config_item where key = 'enableMaterialsInterface');
+
+-- YHAAO-20863 是否开启维保截止日期搜索
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启维保截止日期搜索', 'enableWarrantyDateSearch', '是否开启维保截止日期搜索', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWarrantyDateSearch');
+INSERT INTO public.config_item_value("uid", "hospital_uid", "institution_uid", "key", "site_uid", "tenant_uid", "value")  select replace(uuid_generate_v4()::text,'-',''), '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'enableWarrantyDateSearch', '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'true';
+
+--YHAAO-20981 多级审批配置筛选条件字段长度
+ALTER TABLE public.multi_level_approval_config ALTER COLUMN configration TYPE text USING configration::text;

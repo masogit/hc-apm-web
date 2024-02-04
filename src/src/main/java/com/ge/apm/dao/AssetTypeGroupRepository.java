@@ -120,4 +120,7 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
             "        )  \n" +
             "        select uag.user_uid from cte_child_auth_group join user_asset_group uag on cte_child_auth_group.uid = uag.asset_group_uid", nativeQuery = true)
     List<String> getUserUidListByEncoded(@Param("encoded") String encoded);
+
+    @Query(value = "select sag.* from asset_type_group sag where sag.parent_uid is null and tenant_uid=?1", nativeQuery = true)
+    List<AssetTypeGroup> getTopAuthGroupAndTenantUid(String tenantUid);
 }
