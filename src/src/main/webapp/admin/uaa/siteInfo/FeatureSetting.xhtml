@@ -659,7 +659,7 @@
                                         <p:commandButton id="active" process="@this" value="#{featureSettingController.isActive(item.activeRole)?'已激活':'激活'}" disabled="#{featureSettingController.isActive(item.activeRole)}" actionListener="#{featureSettingController.addHospital(item)}" update="datalist" class="btn btn-sm btn-gray">
                                             <p:confirm header="激活确认" message="是否确认激活！" icon="ui-icon-alert"/>
                                         </p:commandButton>
-                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeRole)}"
+                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeRole) and featureSettingController.selectedFeature ne 'DIGITAL_MEDICAL_ENGINEERING'}"
                                                          actionListener="#{featureSettingController.generateActiveLink(item.hospitalUID)}" class="btn btn-sm btn-gray"
                                                          update="Links " oncomplete="PF('Links').show()"
                                         >
