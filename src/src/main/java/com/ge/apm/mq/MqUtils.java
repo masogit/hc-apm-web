@@ -149,7 +149,7 @@ public class MqUtils {
                     .build();
             sendToMq(mqContext);
         }catch (Exception e){
-            log.error("sendUserAccessRecords error :",e);
+            log.error("sendApprovalMessage error :",e);
         }
     }
 }
