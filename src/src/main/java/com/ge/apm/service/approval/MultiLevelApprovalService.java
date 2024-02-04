@@ -120,7 +120,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         logger.info("approvableTarget" + approvableTarget);
         BigDecimal totalPrice = approvableTarget.getTotalPriceToBigDecimal();
         MultiLevelApprovalConfig multiLevelApprovalConfig =
-                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice, approvalFlag);
+                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice, approvalFlag,approvableTarget);
         return multiLevelApprovalConfig;
     }
 
@@ -425,16 +425,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * 根据金额查询审批配置信息
      *
      */
-    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag) {
+    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag,ApprovableTarget approvableTarget) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID()));
         for (String orgUid : orgUidList) {
             MultiLevelApprovalConfig approveConfig = null;
             if (approvalFlag) {
-                approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount);
+                approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount,approvableTarget);
             } else {
-                approveConfig = getApproveConfigByOrgUidApprovalFlag(orgUid, busiType, amount);
+                approveConfig = getApproveConfigByOrgUidApprovalFlag(orgUid, busiType, amount,approvableTarget);
             }
             if (null != approveConfig) {
                 return approveConfig;
@@ -443,11 +443,18 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    MultiLevelApprovalConfig getApproveConfigByOrgUid(String orgUid, String busiType, BigDecimal amount) {
+    MultiLevelApprovalConfig getApproveConfigByOrgUid(String orgUid, String busiType, BigDecimal amount,ApprovableTarget approvableTarget) {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        boolean enableAssetType= user.isEnableAssetTypeGroup();
+
+        if(approvableTarget.getApprovalAssetInfo()!=null){
+            configList = filterConfigs(configList, approvableTarget, enableAssetType);
+        }
         if (null != configList && configList.size() > 0) {
             logger.info("多级审核  configList : " + configList.toString());
             if (ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT.equals(busiType)) {
@@ -459,11 +466,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    MultiLevelApprovalConfig getApproveConfigByOrgUidApprovalFlag(String orgUid, String busiType, BigDecimal amount) {
+    MultiLevelApprovalConfig getApproveConfigByOrgUidApprovalFlag(String orgUid, String busiType, BigDecimal amount,ApprovableTarget approvableTarget) {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean enableAssetType= user.isEnableAssetTypeGroup();
+        if(approvableTarget.getApprovalAssetInfo()!=null){
+            configList = filterConfigs(configList, approvableTarget, enableAssetType);
+        }
         if (null != configList && configList.size() > 0) {
             if (ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType)
                     || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType) ) {
@@ -474,6 +486,68 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
         return null;
     }
+    public List<MultiLevelApprovalConfig> filterConfigs(List<MultiLevelApprovalConfig> configList, ApprovableTarget approvableTarget, boolean enableAssetType) {
+        List<MultiLevelApprovalConfig> collect = configList.stream()
+                .filter(config -> config.getConfigration() != null)
+                .map(config -> {
+                    Map<String, Object> map = JSON.parseObject(config.getConfigration(), Map.class);
+                    List<String> assetType = (List<String>) map.get("selectAssetTypes");
+                    List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
+                    List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
+
+                    return new AbstractMap.SimpleEntry<>(config,
+                            isConfigMatch(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType));
+                })
+                .filter(entry -> entry.getValue())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(collect)){
+          collect= configList.stream().filter(config -> config.getConfigration() != null)
+                    .map(config -> {
+                        Map<String, Object> map = JSON.parseObject(config.getConfigration(), Map.class);
+                        List<String> assetType = (List<String>) map.get("selectAssetTypes");
+                        List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
+                        List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
+
+                        return new AbstractMap.SimpleEntry<>(config,
+                                isConfigNull(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType));
+                    }).filter(entry -> entry.getValue())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+
+        return collect;
+    }
+
+    private boolean isConfigNull(ApprovableTarget approvableTarget, List<String> assetType, List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
+        if (enableAssetType) {
+            return CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
+                    && CollectionUtils.isEmpty(selectAssetGroups)
+                    && CollectionUtils.isEmpty(assetType);
+
+        } else {
+            return CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
+                    && CollectionUtils.isEmpty(selectAssetGroups);
+        }
+    }
+
+    private boolean isConfigMatch(ApprovableTarget approvableTarget, List<String> assetType,
+                                  List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
+        if (enableAssetType) {
+            return !CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
+                    && !CollectionUtils.isEmpty(selectAssetGroups)
+                    && !CollectionUtils.isEmpty(assetType)
+                    && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup()))
+                    && assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType())
+                    && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID());
+        } else {
+            return !CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
+                    && !CollectionUtils.isEmpty(selectAssetGroups)
+                    && selectAssetGroups.contains(approvableTarget.getApprovalAssetInfo().getAssetGroup())
+                    && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID());
+        }
+    }
+
 
     //获取备件库存审批流
     MultiLevelApprovalConfig getPartsSteam(List<MultiLevelApprovalConfig> configList, BigDecimal amount) {
