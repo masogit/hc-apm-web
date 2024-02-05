@@ -320,7 +320,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
         }
-        if(userContextService.activeSupplier() && selected.getContractNum() != null){
+        if(userContextService.enableMaterialsInterface() && selected.getContractNum() != null){
             Set<String> ids = new HashSet<>();
             ids.add(selected.getId());
             ids.add(selected.getContractNum());

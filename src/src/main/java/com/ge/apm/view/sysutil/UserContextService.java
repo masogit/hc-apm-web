@@ -16,10 +16,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.web.cboard.CBoardController;
-import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
-import com.ge.healthcare.cn.common.cons.ApmFeature;
-import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.*;
 import com.google.common.base.Strings;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,7 +62,7 @@ public class UserContextService implements Serializable {
     private Set<ApmSystemRole> apmSystemRoles = null;
     private Set<String> apmFeatures = null;
     private Map<String, Boolean> adminActive = null; //单独激活项
-    private Boolean activeSupplierFlag = null;
+    private Boolean enableMaterialsInterfaceFlag = null;
     private String selectedSiteUid;
     private Boolean flagIsUltraSoundTenant = null;
     private Boolean flagIsAgentTenant = null;
@@ -260,6 +257,16 @@ public class UserContextService implements Serializable {
 
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
+    }
+
+    public List<String> menuOrder() {
+        List<String> defaultMenuOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
+        if (getTenantInfo().getEnablesMenuOrder()) {
+            defaultMenuOrder = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class)
+                    .stream().filter(defaultMenuOrder::contains)
+                    .collect(Collectors.toList());
+        }
+        return defaultMenuOrder;
     }
 
     public boolean accessContainsFunctionMenu(String functionName) {
@@ -560,6 +567,7 @@ public class UserContextService implements Serializable {
                 }
             } else {
                 Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> apmFeatures.contains(v.name())).forEach(v -> adminActive.put(v.name(), Boolean.TRUE));
+                adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
             }
             CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
@@ -916,11 +924,24 @@ public class UserContextService implements Serializable {
     }
     public String isActive(){
         UserAccount currentUser = getLoginUser();
-        if(!currentUser.getIsActive() && currentUser.getId() != 0){
-            return "1";//need active
-        }else {
+        if((!currentUser.getIsActive() && currentUser.getId() != 0)){
+            return "1";//need active user
+        } else {
             return "0";
         }
+    }
+
+    public String isActiveNew(){
+        UserAccount currentUser = getLoginUser();
+        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2 && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
+            return "1";//need active DIGITAL_MEDICAL_ENGINEERING
+        } else {
+            return "0";
+        }
+    }
+
+    public void afterActiveDigital() {
+        adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
     }
 
     /* 
@@ -1343,20 +1364,18 @@ public class UserContextService implements Serializable {
     }
 
     /**
-     * 判断租户是否已激活供应商
+     * 判断租户是否启用物资接口
      * @return
      */
-    public boolean activeSupplier(){
-        if(activeSupplierFlag == null){
-            activeSupplierFlag = Boolean.FALSE;
+    public boolean enableMaterialsInterface(){
+        if(enableMaterialsInterfaceFlag == null){
+            enableMaterialsInterfaceFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
-            ConfigService configService = WebUtil.getBean(ConfigService.class);
-            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-            if (BooleanUtils.isTrue(configBySite.getActiveSupplier())) {
-                activeSupplierFlag = Boolean.TRUE;
-            }
+            String enableMaterialsInterface = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableMaterialsInterface");
+            enableMaterialsInterfaceFlag=Boolean.TRUE.toString().equalsIgnoreCase(enableMaterialsInterface);
         }
-        return activeSupplierFlag;
+
+        return enableMaterialsInterfaceFlag;
     }
 
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {

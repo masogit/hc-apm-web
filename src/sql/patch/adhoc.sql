@@ -1,16 +1,16 @@
--- https://ge-hc.atlassian.net/browse/YHAAO-20766
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'EquipmentSwap', '设备调配中心', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'EquipmentSwap');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'BatchEquipmentSwap', '设备批量调配', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'BatchEquipmentSwap');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'SwappedEquipmentConfiguration', '调配设备配置', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'SwappedEquipmentConfiguration');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'SwappedEquipmentNameSettings', '调配名称设置', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'SwappedEquipmentNameSettings');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'AdjustmentEquipmentName', '调配设备名称', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'AdjustmentEquipmentName');
+-- YHAAO-20824 供应商管理--微信小程序解绑租户
+-- 置空停用的用户
+update user_account ua set is_active = false , is_deleted = true ,telephone = null ,wechat_id=null ,wx_union_id=null from  user_wx_app uwa  left join supplier_user  su on su.user_id = uwa.user_id where ua.id = uwa.user_id and su.id is null and uwa.app_name='hc-apm-supplier';
+-- 删除停用供应商用户中间表
+delete from user_wx_app uwa  where not exists(select 1 from supplier_user su where su.user_id = uwa.user_id and uwa.app_name='hc-apm-supplier');
+-- YHAAO-20850 临床可否查看调剂计费信息
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '临床可否查看调剂计费信息', 'enableViewingAdjustmentBillingInformation', '临床可否查看调剂计费信息', 'f', 't', 3 where not exists (select * from config_item where key = 'enableViewingAdjustmentBillingInformation');
+-- YHAAO-20945 是否启用物资接口
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '是否启用物资接口', 'enableMaterialsInterface', '是否启用物资接口', 'f', 't', 3 where not exists (select * from config_item where key = 'enableMaterialsInterface');
 
---https://ge-hc.atlassian.net/browse/YHAAO-20653 维修工单增加asset_uid字段刷历史数据
-update v2_service_request sr set asset_uid =(select ai.uid from asset_info  ai where ai.id=sr.asset_id);
-update v2_work_order wo set asset_uid =(select uid from asset_info ai where wo.asset_id =ai.id  );
---https://ge-hc.atlassian.net/browse/YHAAO-20655 资产表增加parent_asset_uid字段刷历史数据
-update asset_info ai set parent_asset_uid =(select uid from asset_info ai2 where ai.parent_asset_id=ai2.id) where ai.parent_asset_id is not null;
+-- YHAAO-20863 是否开启维保截止日期搜索
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启维保截止日期搜索', 'enableWarrantyDateSearch', '是否开启维保截止日期搜索', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWarrantyDateSearch');
+INSERT INTO public.config_item_value("uid", "hospital_uid", "institution_uid", "key", "site_uid", "tenant_uid", "value")  select replace(uuid_generate_v4()::text,'-',''), '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'enableWarrantyDateSearch', '68fc4f19938546d7bdfaf2d405cd6e6d', '68fc4f19938546d7bdfaf2d405cd6e6d', 'true';
 
---广元his数据上传，新增账号
-INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), '1dee1cec8d7f440dbf26a2d1f21a8580', '1dee1cec8d7f440dbf26a2d1f21a8580', '广元市中心医院本院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='1dee1cec8d7f440dbf26a2d1f21a8580');
-INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date) select replace(uuid_generate_v4()::text,'-',''), '86c1f747f1904e2190f240016412f179', '86c1f747f1904e2190f240016412f179', '广元市中心医院妇儿院区', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='86c1f747f1904e2190f240016412f179')
+--YHAAO-20981 多级审批配置筛选条件字段长度
+ALTER TABLE public.multi_level_approval_config ALTER COLUMN configration TYPE text USING configration::text;

@@ -77,11 +77,13 @@
 <!--				<p:fieldset legend="批量更新租户不良事件菜单和激活已使用的医院">-->
 <!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateTenantAdverseEvent()}" disabled="false" value="批量更新租户不良事件菜单" update=":growl"></p:commandButton>-->
 <!--				</p:fieldset>-->
+<!--				<p:fieldset legend="批量更新检查项设置的NamePyCode以用于排序">-->
+<!--					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteMaintainConfigPyCode()}" disabled="false" value="批量更新检查项设置的NamePyCode以用于排序" update=":growl"></p:commandButton>-->
+<!--				</p:fieldset>-->
 				<br/>
-				<p:fieldset legend="批量更新检查项设置的NamePyCode以用于排序">
-					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteMaintainConfigPyCode()}" disabled="false" value="批量更新检查项设置的NamePyCode以用于排序" update=":growl"></p:commandButton>
+				<p:fieldset legend="批量更激活有所有医院的数字医工">
+					<p:commandButton actionListener="#{adminConsoleController.batchActiveDigitalAssetStaff()}" disabled="false" value="批量更激活有所有医院的数字医工" update=":growl"></p:commandButton>
 				</p:fieldset>
-
 			</h:panelGroup>
 		</h:form>
 	</ui:define>
