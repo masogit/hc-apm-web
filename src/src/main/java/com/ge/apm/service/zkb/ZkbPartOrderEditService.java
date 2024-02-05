@@ -308,6 +308,7 @@ public class ZkbPartOrderEditService {
                 if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
                     selected.setHighCatFlag(CopyByInvok.F);
                 }
+                selected.setProvideNewContract(CopyByInvok.T);
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             selected.setScoreFlag(CopyByInvok.F);
