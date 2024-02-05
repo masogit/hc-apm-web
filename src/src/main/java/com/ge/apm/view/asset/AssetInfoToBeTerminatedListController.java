@@ -214,7 +214,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private String buildOrderBy(Sort lastPageSort) {
         String sql=null;
         if(lastPageSort==null){
-            sql="order by al.create_time desc";
+            sql="order by al.create_time desc nulls last";
         }else{
             switch (lastPageSort.iterator().next().getProperty()) {
                 case "namePyCode":
