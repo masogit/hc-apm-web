@@ -37,7 +37,7 @@
                         <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.agent}" filterBy="#{item.agent}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.agent}"/>
                         </p:column>
-                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalDate}" filterBy="#{item.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
+                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalDate}" filterBy="#{item.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.enableMaterialsInterface()}">
                             <f:facet name="filter">
                                 <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedListController.arrivalFormatTime}"/>
                             </f:facet>
@@ -48,7 +48,7 @@
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE" rendered="#{not userContextService.activeSupplier()}">
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE" rendered="#{not userContextService.enableMaterialsInterface()}">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>
                         <p:column headerText="#{msg.quantity}" sortBy="#{item.quantity}">
@@ -63,7 +63,7 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.processType)}"/>
                         </p:column>
-                        <p:column headerText="供应商联系人绑定" sortBy="#{item.supplierUserId}" filterBy="#{item.supplierUserId}" filterMatchMode="EQ" rendered="#{userContextService.activeSupplier()}">
+                        <p:column headerText="供应商联系人绑定" sortBy="#{item.supplierUserId}" filterBy="#{item.supplierUserId}" filterMatchMode="EQ" rendered="#{userContextService.enableMaterialsInterface()}">
                             <h:outputText value="未绑定" rendered="#{empty item.supplierUserId}"/>
                             <h:outputText value="已绑定" rendered="#{not empty item.supplierUserId}"/>
                             <f:facet name="filter">
@@ -73,7 +73,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{not userContextService.activeSupplier()}">
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{not userContextService.enableMaterialsInterface()}">
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListStatus', item.status)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -82,7 +82,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{userContextService.activeSupplier()}">
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{userContextService.enableMaterialsInterface()}">
                             <h:outputText value="#{assetArrivedListController.getArrivalListStatus(item.id, item.status)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetArrivedListController.statusFlag}">
@@ -92,7 +92,7 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="batchEditButton" icon="fa fa-cogs" class="btnEdit" title="绑定供应商（批量）" action="#{assetArrivedListController.batchDistribute}" update="datalist" rendered="#{userContextService.activeSupplier()}"/>
+                            <p:commandButton id="batchEditButton" icon="fa fa-cogs" class="btnEdit" title="绑定供应商（批量）" action="#{assetArrivedListController.batchDistribute}" update="datalist" rendered="#{userContextService.enableMaterialsInterface()}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetArrivedListController.createAction}" update="datalist"  rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_EDIT')}"/>
                             <p:commandButton id="viewButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{assetArrivedListController.editAction}" update="datalist " disabled="#{empty assetArrivedListController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_EDIT')}"/>
                             <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="另存为" action="#{assetArrivedListController.saveAsAction}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_EDIT')}"/>

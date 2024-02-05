@@ -311,7 +311,21 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         }
         return null;
     }
+    @Override
+    public String getAssetType() {
+        if (null != assetInfo) {
+           return assetInfo.getAssetType();
+        }
+        return null;
+    }
 
+    @Override
+    public AssetInfo getApprovalAssetInfo() {
+        if (null != assetInfo) {
+            return assetInfo;
+        }
+        return null;
+    }
 
     public void setBusinessDigest(String businessDigest) {
         this.businessDigest = businessDigest;

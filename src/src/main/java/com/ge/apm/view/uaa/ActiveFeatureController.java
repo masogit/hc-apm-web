@@ -162,6 +162,23 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
     }
 
+    public void activeDigital() {
+        AdminFeatureActiveRepository dao = WebUtil.getBean(AdminFeatureActiveRepository.class);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+        adminFeatureActive.setHospitalUID(userAccount.getHospitalUID());
+        adminFeatureActive.setTenantUID(userAccount.getTenantUID());
+        adminFeatureActive.setActiveUser(userAccount.getUid());
+        adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+        adminFeatureActive.setCreateDate(new Date());
+        adminFeatureActive.setActiveDate(new Date());
+        adminFeatureActive.setFeatureKey(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name());
+        dao.save(adminFeatureActive);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        userContextService.afterActiveDigital();
+        MessageUtil.outPutReturnFacesMessage("激活成功", FacesMessage.SEVERITY_INFO);
+    }
+
     public String getFeatureName(String feature) {
         return ApmAdminActiveFeature.valueOf(feature).name();
     }

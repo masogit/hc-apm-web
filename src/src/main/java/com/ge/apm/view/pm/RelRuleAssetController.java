@@ -29,6 +29,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -96,6 +97,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private OrgInfo userOrgInfo;
     private String zkbBatch;
     private List<AssetTypeGroup> assetTypeGroupList;
+
+    private ConfigItemValueRepository configItemValueRepository;
     @Override
     protected void init() {
         this.filterByHospital = false;
@@ -121,6 +124,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         supplierService = WebUtil.getBean(SupplierService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = new ArrayList<>();
@@ -379,7 +383,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (queryAsset.getEmergencyEquipment()!=null) {
             assetFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, queryAsset.getEmergencyEquipment()));
         }
+        if (queryAsset.getWarrantyDate() != null) {
 
+            assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.EQ, queryAsset.getWarrantyDate()));
+        }
 
         if (clinicalOrgInfo != null){
             Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
@@ -740,6 +747,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         List<OrgInfo> orgInfos = orgInfoRepository.findBySearchFilter(filter);
         orgInfos.sort(new OrgInfoComparator());
         return orgInfos;
+    }
+    
+    public boolean isEnableWarrantyDateSearch(){
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),"enableWarrantyDateSearch");
+        return Boolean.FALSE.toString().equalsIgnoreCase(value)?false:true;
     }
 
     public OrgInfo getClinicalOrgInfo() {
