@@ -254,8 +254,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             this.sendWxMsg(paramList,message,"待审批",linkUrl);
                         }
-                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
-
+                        if(multiLevelApproval.getBusinessType()==ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT){
+                            mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
+                        }
                         return multiLevel;
                     }
                 }
