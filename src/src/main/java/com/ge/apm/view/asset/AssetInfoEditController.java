@@ -977,9 +977,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         // do other stuff after save
         int status = selected.getStatus();
-        if(status != assetLifecyleStatus){
-            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
-        }
+//        if(status != assetLifecyleStatus){
+//            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
+//        }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
@@ -1273,7 +1273,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setStatus(4);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
@@ -1293,7 +1293,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setTerminateDate(null);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 

@@ -1113,7 +1113,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         assetInfoDao.save(assetInfo);
 
         saveAssetHistoryIfUpdated(assetInfo);
-        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
     }
     public void saveAssetHistoryIfUpdated(AssetInfo newAsset) {
         MqContext mqContext = new MqContext();

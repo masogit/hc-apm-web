@@ -638,7 +638,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         assetInfo.setTerminateDate(new Date());
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
         dao.save(assetInfo);
-        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
     }
 
