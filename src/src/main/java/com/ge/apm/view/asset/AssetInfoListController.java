@@ -37,6 +37,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -659,8 +660,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
+        assetHistoryService.deleteAsset(asset);
         logger.info("delete asset successful. assetName: {}", asset.getName());
-        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
     public void cancleWarranty(String assetUid) {
