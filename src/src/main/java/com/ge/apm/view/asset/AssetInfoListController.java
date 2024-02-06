@@ -793,7 +793,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(assetInfo);
             assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
-            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
         this.selectedMap.clear();
     }
