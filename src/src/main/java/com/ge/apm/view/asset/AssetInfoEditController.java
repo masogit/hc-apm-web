@@ -545,6 +545,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
 
         selectedObjectMap.put("measuringOwner", selected.getMeasuringOwnerId() == null ? null : userDao.findById(selected.getMeasuringOwnerId()));
+        selectedObjectMap.put("patrolInspectionOwnerName", selected.getPatrolInspectionOwnerUID() == null ? null : userDao.findByUid(selected.getPatrolInspectionOwnerUID()));
 
 
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
@@ -717,6 +718,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+            case "patrolInspectionOwnerName":
+                selected.setPatrolInspectionOwnerUID(null == selectedUser ? null : selectedUser.getUid());
+                selected.setPatrolInspectionOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setPatrolInspectionOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
         }
 
 
