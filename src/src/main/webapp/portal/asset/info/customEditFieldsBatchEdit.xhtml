@@ -150,8 +150,32 @@
 
         </h:panelGroup>
     </c:if>
+<!--    巡检负责人-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'patrolInspectionOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerName}</label>
+            <p:autoComplete id="patrolInspectionOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['patrolInspectionOwnerName']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('patrolInspectionOwnerName')}"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
 
-
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'patrolInspectionOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerTel}</label>
+            <p:inputText id="patrolInspectionOwnerTel" value="#{assetInfoBulkEditController.selected.patrolInspectionOwnerTel}"
+                         readonly="true" class="patrolInspectionOwnerName"/>
+        </h:panelGroup>
+    </c:if>
     <!--计量负责人-->
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measuringOwner')}" >
         <h:panelGroup >

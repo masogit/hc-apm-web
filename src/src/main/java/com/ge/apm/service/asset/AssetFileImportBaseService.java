@@ -417,7 +417,22 @@ public class AssetFileImportBaseService {
             }
 
         }
+        if (newAsset.getPatrolInspectionOwnerName() == null) {
+            AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + "未设置");
+        } else {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getPatrolInspectionOwnerName());
+            if (userAccounts.size() != 1) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "无此用户/无法关联");
+                newAsset.setPmOwnerName(null);
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "此用户已停用");
+                newAsset.setPmOwnerName(null);
+            }else {
+                newAsset.setPatrolInspectionOwnerUID(userAccounts.get(0).getUid());
+                newAsset.setPatrolInspectionOwnerTel(userAccounts.get(0).getTelephone());
+            }
 
+        }
         Supplier supplier;
         //导入供应商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
