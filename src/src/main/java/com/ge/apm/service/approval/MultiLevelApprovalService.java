@@ -500,59 +500,39 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                     List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
                     List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
 
-                    return new AbstractMap.SimpleEntry<>(config,
-                            isConfigMatch(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType));
+                    int matchCount = getMatchCount(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType);
+
+                    // 返回包含原始对象和匹配数量的SimpleEntry
+                    return new AbstractMap.SimpleEntry<>(config, matchCount);
                 })
-                .filter(entry -> entry.getValue())
+                .filter(entry -> entry.getValue()!=  0) // 过滤掉不满足条件的项
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // 按照匹配数量从大到小排序（升序比较时交换两个参数的位置）
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(collect)){
-          collect= configList.stream().filter(config -> config.getConfigration() != null)
-                    .map(config -> {
-                        Map<String, Object> map = JSON.parseObject(config.getConfigration(), Map.class);
-                        List<String> assetType = (List<String>) map.get("selectAssetTypes");
-                        List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
-                        List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
-
-                        return new AbstractMap.SimpleEntry<>(config,
-                                isConfigNull(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType));
-                    }).filter(entry -> entry.getValue())
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-        }
-
         return collect;
     }
 
-    private boolean isConfigNull(ApprovableTarget approvableTarget, List<String> assetType, List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
-        if (enableAssetType) {
-            return CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
-                    && CollectionUtils.isEmpty(selectAssetGroups)
-                    && CollectionUtils.isEmpty(assetType);
-
-        } else {
-            return CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
-                    && CollectionUtils.isEmpty(selectAssetGroups);
+    private int getMatchCount(ApprovableTarget approvableTarget, List<String> assetType,
+                              List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
+        // 如果至少有一个集合非空并且不包含对应的值，则返回0，表示不匹配
+        if ((CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && !selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()))
+                || (CollectionUtils.isNotEmpty(selectAssetGroups) && !selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())))
+                || (enableAssetType && CollectionUtils.isNotEmpty(assetType) && !assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType()))) {
+            return 0;
         }
-    }
 
-    private boolean isConfigMatch(ApprovableTarget approvableTarget, List<String> assetType,
-                                  List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
+        // 否则计算匹配的数量
+        int count = 0;
         if (enableAssetType) {
-            return !CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
-                    && !CollectionUtils.isEmpty(selectAssetGroups)
-                    && !CollectionUtils.isEmpty(assetType)
-                    && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup()))
-                    && assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType())
-                    && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID());
+            count += CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(selectAssetGroups) && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(assetType) && assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType()) ? 1 : 0;
         } else {
-            return !CollectionUtils.isEmpty(selectAssetClinicalDeptUids)
-                    && !CollectionUtils.isEmpty(selectAssetGroups)
-                    && selectAssetGroups.contains(approvableTarget.getApprovalAssetInfo().getAssetGroup())
-                    && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID());
+            count += CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(selectAssetGroups) && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())) ? 1 : 0;
         }
+        return count;
     }
-
 
     //获取备件库存审批流
     MultiLevelApprovalConfig getPartsSteam(List<MultiLevelApprovalConfig> configList, BigDecimal amount) {
