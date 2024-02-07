@@ -5249,3 +5249,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('spare01', '14-01-05', '康复训练设备', '康复训练设备',null,'-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('spare01', '14-01-06', '结扎治疗设备', '结扎治疗设备',null,'-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AdjustmentEquipmentName', '调剂设备名称', 'Name of adjustment equipment', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh,value_en,value_tw, site_id) VALUES ('field_name', 'patrolInspectionOwnerName','巡检负责人', 'Patrol inspection owner name', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en,value_tw, site_id) VALUES ('field_name','patrolInspectionOwnerTel','巡检负责人电话','Patrol inspection owner tel',  NULL, '-1');

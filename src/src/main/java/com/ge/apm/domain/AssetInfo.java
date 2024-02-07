@@ -550,6 +550,15 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "pm_owner_id")
     private Integer pmOwnerId;//保养负责人
 
+    @Column(name = "patrol_inspection_owner_uid")
+    private String patrolInspectionOwnerUID;//保养巡检负责人
+
+    @Column(name = "patrol_inspection_owner_name")
+    private String patrolInspectionOwnerName;//保养巡检负责人名称
+
+    @Column(name = "patrol_inspection_owner_tel")
+    private String patrolInspectionOwnerTel;//保养巡检负责人电话
+
     @Column(name = "measuring_owner_id")
     private Integer measuringOwnerId;//计量负责人
 
@@ -2629,6 +2638,30 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setPmOwnerId(Integer pmOwnerId) {
         this.pmOwnerId = pmOwnerId;
+    }
+
+    public String getPatrolInspectionOwnerUID() {
+        return patrolInspectionOwnerUID;
+    }
+
+    public void setPatrolInspectionOwnerUID(String patrolInspectionOwnerUID) {
+        this.patrolInspectionOwnerUID = patrolInspectionOwnerUID;
+    }
+
+    public String getPatrolInspectionOwnerName() {
+        return patrolInspectionOwnerName;
+    }
+
+    public void setPatrolInspectionOwnerName(String patrolInspectionOwnerName) {
+        this.patrolInspectionOwnerName = patrolInspectionOwnerName;
+    }
+
+    public String getPatrolInspectionOwnerTel() {
+        return patrolInspectionOwnerTel;
+    }
+
+    public void setPatrolInspectionOwnerTel(String patrolInspectionOwnerTel) {
+        this.patrolInspectionOwnerTel = patrolInspectionOwnerTel;
     }
 
     public String getPmOwnerName() {
