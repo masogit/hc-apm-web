@@ -283,4 +283,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     List<UserAccount> findByClinicalDeptUID(String clinicalDeptUID);
 
     UserAccount findByUid(String patrolInspectionOwnerUID);
+
+    List<UserAccount> findByTenantUIDAndNameAndIsDeleted(String tenantUID, String assetOwnerName, boolean b);
 }
