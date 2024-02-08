@@ -15,6 +15,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -89,10 +90,13 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 Map<String, Object> map = new LinkedHashMap();
 
                 AssetInfo asset;
+                AssetInfo dbAsset = new AssetInfo();
 
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
+                    dbAsset = new AssetInfo();
+                    BeanUtils.copyProperties(asset,dbAsset);
                     if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
 
                     //save old data to compare later
@@ -251,6 +255,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 }
 
                 map.put("asset", asset);
+                map.put("oldAsset", dbAsset);
+
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 
