@@ -1378,6 +1378,10 @@ public class UserContextService implements Serializable {
         return enableMaterialsInterfaceFlag;
     }
 
+    public boolean activeSupplier(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
+    }
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
         RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
         return roleMsgRelRepository.getRoleMsgRels(userId);
