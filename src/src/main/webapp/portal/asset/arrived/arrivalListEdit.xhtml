@@ -62,7 +62,7 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-                                    <c:if test="#{not userContextService.enableMaterialsInterface()}">
+                                    <c:if test="#{not userContextService.activeSupplier()}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.arrivalDate}*</label>
                                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
@@ -91,7 +91,7 @@
                                             <p:ajax update="@this" listener="#{assetArrivedListEditController.onQuantityChange}"  />
                                         </p:inputNumber>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{not userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">#{msg.arrivalListOrigin}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.origin}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
@@ -101,8 +101,8 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{not userContextService.enableMaterialsInterface() and assetArrivedListEditController.isReadOnly()}"/>
-                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{userContextService.enableMaterialsInterface() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{not userContextService.activeSupplier() and assetArrivedListEditController.isReadOnly()}"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractNum}</label>
@@ -116,7 +116,7 @@
                                         <label class="label">#{msg.arrivalListAgent}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{not userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true"
                                                         disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
@@ -125,7 +125,7 @@
                                         </p:autoComplete>
                                         <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
                                         <p:autoComplete id="vendor" dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true"
                                                         completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
@@ -134,7 +134,7 @@
                                         </p:autoComplete>
                                         <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
                                         <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -167,7 +167,7 @@
                                         <p:inputText  rendered="#{assetArrivedListEditController.selected.enableGenerateQrcode}"   value="#{assetArrivedListEditController.qrCodePrefix}"/>
                                     </h:panelGroup>
 
-                                    <c:if test="#{userContextService.enableMaterialsInterface()}">
+                                    <c:if test="#{userContextService.activeSupplier()}">
                                         <h:panelGroup >
                                             <label class="label">合同签订日期</label>
                                             <p:calendar value="#{assetArrivedListEditController.selected.contractDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
@@ -286,11 +286,11 @@
                                                          requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                         </h:panelGroup>
                                     </c:if>
-                                    <h:panelGroup rendered="#{not userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">保修时长(年)</label>
                                         <p:inputNumber value="#{assetArrivedListEditController.easyInstallItem.warrantyYear}"  minValue="0" decimalPlaces="2"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">质保时间（月）</label>
                                         <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedListEditController.easyInstallItem.warrantyMonth}"/>
                                     </h:panelGroup>
@@ -426,7 +426,7 @@
                                             </p:selectOneRadio>
                                         </h:panelGroup>
                                     </c:if>
-                                    <h:panelGroup rendered="#{userContextService.enableMaterialsInterface()}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">入库单号</label>
                                         <p:inputText value="#{assetArrivedListEditController.easyInstallItem.arrivalList.receiptNumber}" />
                                     </h:panelGroup>
@@ -533,7 +533,7 @@
                                                 paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <c:choose>
-                                                    <c:when test="#{userContextService.enableMaterialsInterface()}">
+                                                    <c:when test="#{userContextService.activeSupplier()}">
                                                         <f:facet name="header">临床验收确认</f:facet>
                                                     </c:when>
                                                     <c:otherwise>
@@ -562,7 +562,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload disabled="#{userContextService.enableMaterialsInterface()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload disabled="#{userContextService.activeSupplier()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <c:if test="#{assetArrivedListEditController.selected.status eq 2}">
@@ -710,7 +710,7 @@
                                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <c:choose>
-                                                    <c:when test="#{userContextService.enableMaterialsInterface()}">
+                                                    <c:when test="#{userContextService.activeSupplier()}">
                                                         <f:facet name="header">临床验收确认</f:facet>
                                                     </c:when>
                                                     <c:otherwise>
@@ -789,7 +789,7 @@
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>
                                 </p:column>
-                                <p:column headerText="#{msg.functionType}" rendered="#{userContextService.enableMaterialsInterface()}">
+                                <p:column headerText="#{msg.functionType}" rendered="#{userContextService.activeSupplier()}">
                                     <h:outputText value="#{item.functionType}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.serialNum}">
@@ -817,10 +817,10 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                                 </p:column>
                                 <p:column headerText="操作">
-                                    <p:commandLink actionListener="#{assetArrivedListEditController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.enableMaterialsInterface()}"  update="itemList" >接单
+                                    <p:commandLink actionListener="#{assetArrivedListEditController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
-                                    <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.enableMaterialsInterface()}"  update="itemList" >接单
+                                    <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
                                     <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
@@ -832,7 +832,7 @@
 
                             </p:dataTable>
                             <h:panelGroup >
-                                <h:panelGrid columns="2" rendered="#{userContextService.enableMaterialsInterface() and assetArrivedListEditController.getInstalledCount() gt 0}">
+                                <h:panelGrid columns="2" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}">
                                     <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="是否允许供应商编辑：" title="已完成或部分安装完成的到货单允许编辑修改信息"></h:outputText>
                                     <p:selectBooleanCheckbox value="#{assetArrivedListEditController.selected.isEdit}">
                                         <p:ajax listener="#{assetArrivedListEditController.updateIsEdit()}" process="@this" update=":AssetArrivalEditForm :growl"/>
@@ -938,7 +938,7 @@
             function updatePreviewImg(){
                 arrivalListImg.update();
                 // arrivalListImg.show();
-                // if(#{userContextService.enableMaterialsInterface()}){
+                // if(#{userContextService.activeSupplier()}){
                 //     arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:'+id));
                 // }
                 // new Viewer(document.getElementById('AssetArrivalEditForm:'+id));
