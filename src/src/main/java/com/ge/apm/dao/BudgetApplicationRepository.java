@@ -24,4 +24,7 @@ public interface BudgetApplicationRepository extends GenericRepositoryUUID<Budge
 
     List<BudgetApplication> findByIdIn(List<String> ids);
 
+    BudgetApplication findByApplicationNum(String applicationNum);
+
+
 }

@@ -131,14 +131,14 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         org = orgDao.findById(account.getOrgInfoId());
 
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
         orgTreeEdit = initOrgTree(treeNodeEdit);
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
-        //新跳转记录一下  index  在  tabIndexList   返回的时候  再赋值给  tabIndex
+        //新跳转记录一下  index  在  tabIndexList   返回的时候  再赋值给  tabIndex 慢
         String tabIndexStr = (String) WebUtil.getRequestParameter("tabIndex");
         if(StringUtils.isNotBlank(tabIndexStr)){
             this.tabIndex = Integer.parseInt(tabIndexStr);
@@ -438,8 +438,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
         }
     }
     public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
@@ -447,8 +447,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
         }
     }
 
