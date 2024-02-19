@@ -25,8 +25,9 @@ public class BudgetApplicationProvider {
                 "  t.application_step," +
                 "  t.procure_status," +
                 "  t.confirm_status," +
+                "  t.data_source," +
                 "  uap.name as approveName," +
-                "  oi.name as applicantDeptName," +
+                "  oi.name as applicationDeptName," +
                 "  t.approval_date" +
                 "  from budget_application t" +
                 "  inner join budget_application_asset baa on t.id = baa.application_id" +
