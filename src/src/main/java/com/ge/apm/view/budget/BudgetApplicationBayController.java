@@ -28,10 +28,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -43,6 +40,8 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -50,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -86,7 +86,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private BudgetAssetInfo curSelectBudgetAssetInfo;
     @Getter @Setter
     private List<V2_BlobObject> attachList;
-
+    @Getter  @Setter
+    private TreeNode orgImportTree;
     // 弹窗列表
     @Getter @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
@@ -133,6 +134,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        TreeNode treeNodeImport = uaaService.getOrgTreeByParentIdWithSelectedChildren(account.getSiteUID(), account.getUid());
+        orgImportTree = initOrgTree(treeNodeImport);
         orgTree = initOrgTree(treeNode);
         orgTreeEdit = initOrgTree(treeNodeEdit);
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
@@ -665,6 +668,84 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         return render;
     }
+    /**  **************************批量导入************************** **/
+    @Getter  @Setter
+    private OrgInfo selectedImportOrg;
+    @Getter  @Setter
+    private String selectedImportOrgName;
+    @Getter  @Setter
+    private UploadedFile file;
+    @Getter  @Setter
+    private List<BudgetApplication> errorImportList;
+
+    public void handleFileUploadImport(FileUploadEvent event) throws IOException, ParseException, NoSuchFieldException, IllegalAccessException {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.file = event.getFile();
+        if(this.selectedImportOrg==null){
+            OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+            selectedImportOrg = orgDao.findByUid(account.getSiteUID());
+        }
+        errorImportList = persistService.handleExcel(file, account,selectedImportOrg,BudgetApplication.OrderType.BAY.toString());
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void exportAssetExcelTemplate() throws IOException {
+
+       /* CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //field name using english
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        //field name using chinese
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
+
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        template.exportSampleAsset(orgList, exportFields);
+        template.exportSampleAsset(orgList, exportFields,tcm);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isLocale()){
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        }else{
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
+        }*/
+        logger.info(" export asset excel template successful. ");
+    }
+
+    public List<BudgetApplication> getErrorImportList() {
+        return errorImportList;
+    }
+
+    /**
+     * 编辑区域部门选择
+     * @param event
+     */
+    public void onSelectedImportTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        this.setSelectedImportOrgName(orgInfo.getName());
+        this.setSelectedImportOrg(orgInfo);
+    }
+
+    /**
+     * 删除按钮
+     * @param
+     */
+    public boolean deleteButtonStatus() {
+        boolean args = true;
+        if(this.selected != null &&
+                (this.selected.getApplicationStatus() == 1||
+                        ("EXCEL_IMPORT".equals(this.selected.getDataSource()) && ("Unpurchased".equals(this.selected.getProcureStatus()))))){
+            args = false;
+        }
+        return args;
+    }
+    /**  **************************批量导入**************************           **/
 
 
 
