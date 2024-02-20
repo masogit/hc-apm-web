@@ -333,7 +333,7 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
         } else {
 
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getAssetOwnerName(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName(dbAsset.getAssetOwnerName());
@@ -350,7 +350,7 @@ public class AssetFileImportBaseService {
         if (newAsset.getAssetOwnerName2() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getAssetOwnerName2(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName2());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName2(dbAsset.getAssetOwnerName2());
@@ -368,7 +368,7 @@ public class AssetFileImportBaseService {
         if (newAsset.getAssetOwnerName3() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getAssetOwnerName3(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName3());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName3(dbAsset.getAssetOwnerName3());
@@ -386,7 +386,7 @@ public class AssetFileImportBaseService {
         if (newAsset.getClinicalOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getClinicalOwnerName(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getClinicalOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
                 newAsset.setClinicalOwnerName(dbAsset.getClinicalOwnerName());
@@ -404,7 +404,7 @@ public class AssetFileImportBaseService {
         if (newAsset.getPmOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getPmOwnerName(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPmOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
                 newAsset.setPmOwnerName(dbAsset.getPmOwnerName());
@@ -420,7 +420,7 @@ public class AssetFileImportBaseService {
         if (newAsset.getPatrolInspectionOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndNameAndIsDeleted(tenantUID, newAsset.getPatrolInspectionOwnerName(),false);
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPatrolInspectionOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "无此用户/无法关联");
                 newAsset.setPatrolInspectionOwnerName(dbAsset.getPatrolInspectionOwnerName());

@@ -284,5 +284,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findByUid(String patrolInspectionOwnerUID);
 
-    List<UserAccount> findByTenantUIDAndNameAndIsDeleted(String tenantUID, String assetOwnerName, boolean b);
+
+
+    @Query(value = "select * from user_account where tenant_uid=?1 and name=?2 and (is_deleted = false or is_deleted is null) ", nativeQuery = true)
+    List<UserAccount> findByTenantUIDAndNameAndValid(String tenantUID, String assetOwnerName);
 }
