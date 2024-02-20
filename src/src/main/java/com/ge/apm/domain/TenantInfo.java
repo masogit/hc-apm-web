@@ -184,7 +184,7 @@ public class TenantInfo implements Serializable {
     private Boolean isEnablesNewMenu; // 控制控制租户是否启动新菜单配置 （true/false 默认不显示）
 
     @Column(name="is_enables_menu_order", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
-    private Boolean isEnablesMenuOrder; // 控制控制租户是否启动新菜单自定义顺序排列 （true/false 默认启动用）
+    private Boolean isEnablesMenuOrder; // 控制控制租户是否启动新菜单自定义顺序排列 （true/false 默认不启动）
 
     public Boolean getEnablesMenuOrder() {
         return BooleanUtils.isTrue(isEnablesMenuOrder);
