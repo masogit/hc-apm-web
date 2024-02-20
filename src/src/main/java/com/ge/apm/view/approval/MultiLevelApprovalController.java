@@ -384,12 +384,18 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     if(StringUtils.isBlank(baa.getConfirmNotice()) || StringUtils.isBlank(baa.getConfirmEquipmentCategory())){
                         throw new RuntimeException();
                     }
-                    if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null || baa.getConfirmMaximumPrice() == null){
-                        throw new RuntimeException();
+                    if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                        if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null || baa.getConfirmMaximumPrice() == null){
+                            throw new RuntimeException();
+                        }
                     }
                 });
             } catch(Exception e) {
-                WebUtil.addWarnMessage("产品信息或申购单数量/价格确认未完成，请检查后重试！");
+                if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                    WebUtil.addWarnMessage("申购单数量/价格确认未完成，请检查后重试！");
+                }else {
+                    WebUtil.addWarnMessage("申购单信息确认未完成，请检查后重试！");
+                }
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
