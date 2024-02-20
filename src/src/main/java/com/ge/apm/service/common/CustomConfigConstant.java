@@ -65,7 +65,7 @@ public class CustomConfigConstant {
         return Arrays.asList(
                 "departNum", "name", "aliasName",
                 "assetOwnerName", "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3",
-                "pmOwnerName", "pmOwnerTel", "measuringOwner",
+                "pmOwnerName", "pmOwnerTel", "patrolInspectionOwnerName","patrolInspectionOwnerTel","measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
                 "manufacture", "manufactureTel", "makerShortName",
                 "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassificationCode","medicalApparatusClassification","assetGroup",
