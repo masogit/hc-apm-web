@@ -695,9 +695,6 @@
                         </p:tab>
                         <p:tab title="菜单顺序切换">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                <h:panelGroup id="enablesMenuOrder">
-                                    <p:selectBooleanCheckbox itemLabel="是否使用新版菜单顺序配置" value="#{featureSettingController.tenantInfo.enablesMenuOrder}"/>
-                                </h:panelGroup>
                                 <p:orderList id="myList"
                                              value="#{featureSettingController.orderedItems}"
                                              var="item"
@@ -706,6 +703,9 @@
                                              controlsLocation="none"
                                              responsive="true">
                                 </p:orderList>
+                                <h:panelGroup id="enablesMenuOrder">
+                                    <p:selectBooleanCheckbox itemLabel="是否使用新版菜单顺序配置" value="#{featureSettingController.tenantInfo.enablesMenuOrder}"/>
+                                </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
                     </p:tabView>
