@@ -45,7 +45,7 @@
                 </h:outputText>
             </p:column>
             <p:column headerText="申请科室" >
-                <h:outputText value="#{item.applicantDeptName}"/>
+                <h:outputText value="#{item.applicationDeptName}"/>
             </p:column>
             <p:column headerText="#{msg.Applicant}" >
                 <h:outputText value="#{item.applicantName}"/>
@@ -76,9 +76,12 @@
                                            pattern="#{userContextService.timeFormat14()}"/>
                  </h:outputText>
             </p:column>
-            <p:column headerText="采购状态" rendered="#{budgetController.tabIndex eq 3}">
+            <p:column headerText="采购状态" rendered="#{budgetController.tabIndex eq 3 }">
                 <h:outputText value="#{fieldMsg.fieldValue('procureStatus', item.procureStatus)}"/>
             </p:column>
+           <!-- <p:column headerText="采购信息确认状态" rendered="#{budgetController.tabIndex eq 4}">
+                <h:outputText value="#{fieldMsg.fieldValue('budgetConfirmStatus', item.confirmStatus)}"/>
+            </p:column>-->
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
@@ -96,7 +99,7 @@
                     <p:fileDownload value="#{budgetController.exportFile}"/>
                 </p:commandButton>-->
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
-                                 disabled="#{empty budgetController.selected or budgetController.selected.applicationStatus ne 1}" actionListener="#{budgetController.delete}"  rendered="#{budgetController.tabIndex eq 0 }">
+                                 disabled="#{budgetController.deleteButtonStatus()}" actionListener="#{budgetController.delete}" >
                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                 </p:commandButton>
                 <p:commandButton id="exportZipButton" ajax="false" title="下载压缩文件" actionListener="#{budgetController.exportAll}"
@@ -104,6 +107,9 @@
                                  icon="ui-icon-circle-triangle-s" class="btn btn-sm btn-gray">
                     <p:fileDownload value="#{budgetController.exportFile}"/>
                 </p:commandButton>
+
+                <p:commandButton id="importButton" ajax="false" title="年度申购信息导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n"  class="btn btn-sm btn-gray">
+                        </p:commandButton>
             </f:facet>
         </p:dataTable>
     </h:form>

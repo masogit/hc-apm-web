@@ -13,11 +13,12 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.zkb.CopyByInvok;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
@@ -51,6 +52,7 @@ public class BudgetApplicationExportService {
     public static final String SUPPLIER_FILE_TITLE = "预供应商";
     public static final String ATTACHMENT = "附件";
 
+    private static Logger logger = LoggerFactory.getLogger(BudgetApplicationExportService.class);
 
 
     @Autowired
@@ -340,7 +342,14 @@ public class BudgetApplicationExportService {
         for (V2_BlobObject v : blobObjects) {
             String fn = v.getObjectName();
             String newFileName = handleRepeatFileName(nameMap, fn);
-            StreamedContent sf = msService.downloadSingleFile(v.getObjectStorageId());
+            StreamedContent sf = null;
+            try{
+                sf = msService.downloadSingleFile(v.getObjectStorageId());
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("file download fail", e);
+                continue;
+            }
             if(StringUtils.isEmpty(preFileName)){
                 zout.putNextEntry(new ZipEntry(newFileName));
             }else{

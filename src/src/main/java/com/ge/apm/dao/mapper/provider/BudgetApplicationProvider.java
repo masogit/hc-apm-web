@@ -24,8 +24,10 @@ public class BudgetApplicationProvider {
                 "  t.application_status," +
                 "  t.application_step," +
                 "  t.procure_status," +
+                "  t.confirm_status," +
+                "  t.data_source," +
                 "  uap.name as approveName," +
-                "  oi.name as applicantDeptName," +
+                "  oi.name as applicationDeptName," +
                 "  t.approval_date" +
                 "  from budget_application t" +
                 "  inner join budget_application_asset baa on t.id = baa.application_id" +
@@ -55,7 +57,10 @@ public class BudgetApplicationProvider {
             if("applicationStep".equals(tempColumn)) {
                 sb.append(" and t.application_step = '"+value.toString()+"'");
             }
-
+            if("confirmStatus".equals(tempColumn)) {
+                sb.append(" and t.confirm_status is null");
+                sb.append(" and exists (select 1 from purchase_order po where po.id = t.purchase_id and po.order_step = 'ToConfirmedInfoMeet' )");
+            }
             if("applicationDeptId".equals(tempColumn)) {
                 sb.append(" and t.applicant_dept_id = "+value+"");
             }
@@ -73,7 +78,6 @@ public class BudgetApplicationProvider {
             if("applicantName".equals(tempColumn)) {
                 sb.append(" and ua.name = '"+value.toString()+"'");
             }
-
             if("applicationAssetName".equals(tempColumn)) {
                 sb.append(" and baa.application_asset_name like '%"+value.toString()+"%'");
             }
@@ -94,7 +98,6 @@ public class BudgetApplicationProvider {
             if("hospitalUID".equals(tempColumn)) {
                 sb.append(" and t.hospital_uid = '"+value.toString()+"'");
             }
-
             if("institutionUID".equals(tempColumn)) {
                 sb.append(" and t.institution_uid = '"+value.toString()+"'");
             }

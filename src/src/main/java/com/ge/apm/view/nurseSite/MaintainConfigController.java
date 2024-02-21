@@ -159,7 +159,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			for (Sort.Order order : sort) {
 				Sort.Direction direction = order.getDirection();
 				String property = ZipUtil.camelToUnderline(order.getProperty());
-				wrapper.orderBy("nsmc." + property, "ASC".equals(direction.name()));
+				wrapper.orderBy("nsmc." + property , "ASC".equals(direction.name()));
 			}
 		}
 		if (currentUser.isEnableAssetTypeGroup()) {

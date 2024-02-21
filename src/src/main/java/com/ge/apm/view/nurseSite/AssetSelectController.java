@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +91,15 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     
     private List<OrgInfo> listCheckOrgInfo;
 
+    private String locationName;
+    private String locationCode;
+    private BuildManagementRepository buildManagementRepository;
+
+    private List<BuildManagement>  managementList=new ArrayList<>();
+
+
+    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
+
     @Override
     protected GenericRepositoryUUID<AssetInfo> getDAO() {
         return null;
@@ -104,6 +115,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssetUids5 = new HashMap<>(32);
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
+        buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        this.isSelectAll = Boolean.FALSE;
     }
 
     public void loadData4Create() {
@@ -123,9 +136,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
+        this.locationName = null;
         this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
+        this.isSelectAll = Boolean.FALSE;
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
@@ -174,6 +189,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             this.deptList = assetSelectService.loadDeptListByOrg(selectedOrg);
         }
         this.callingController.onServerEvent("changeSite",selectedOrg);
+        isSelectAll = false;
     }
 
     public void findAssets2Maintain() {
@@ -386,22 +402,68 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 ++count;
             }
             
-            if(listCheckOrgInfo!=null && listCheckOrgInfo.size()>0){
-            	Set<String> setOrgInfoUid=new HashSet<String>();
-            	for(int i=0;i<listCheckOrgInfo.size();++i){
-            		setOrgInfoUid.add(listCheckOrgInfo.get(i).getUid());
-            	}
-            	if(setOrgInfoUid.size()>0){
+            if(listCheckOrgInfo!=null && !listCheckOrgInfo.isEmpty()){
+            	Set<String> setOrgInfoUid=new HashSet<>();
+                for (OrgInfo orgInfo : listCheckOrgInfo) {
+                    setOrgInfoUid.add(orgInfo.getUid());
+                }
+            	if(!setOrgInfoUid.isEmpty()){
             		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
-//                    searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
                     ++count;
             	}
             }
-//            if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
-//                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
-//            }
+            if(StringUtils.isNotBlank(this.getLocationName())) {
+                searchFilters.add(new SearchFilter("locationName", SearchFilter.Operator.LIKE, this.getLocationName(), "1*"));
+                ++count;
+            }
         }
         return count;
+    }
+
+    private Boolean isSelectAll = Boolean.FALSE;
+
+    public void updateSelectAll() {
+        if (Boolean.TRUE.equals(isSelectAll)) {
+            listCheckOrgInfo = new ArrayList<>(deptList);
+        } else {
+            listCheckOrgInfo.clear();
+        }
+    }
+
+    public void updateItem() {
+        isSelectAll = deptList.size() == listCheckOrgInfo.size();
+    }
+
+    private void updateManagementOnSiteChange() {
+        managementList=   buildManagementRepository.findBySiteUidTree(selectedOrg.getSiteUID());
+    }
+
+    public List<String> managementListString(String query) {
+        updateManagementOnSiteChange();
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(managementList)){
+            List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
+            managementMap= managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
+            return list;
+        }
+        return new ArrayList<>();
+
+    }
+
+    public void locationNamechangeSelect(SelectEvent event){
+        setLocationCode(null);
+        setLocationName(locationName);
+        if(event==null){
+            return;
+        }
+        String code =(String) event.getObject();
+        if(StringUtils.isNotBlank(code)){
+            List<BuildManagement> list = managementMap.get(code);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(list)){
+                BuildManagement buildManagement = list.get(0);
+                setLocationCode(buildManagement.getNamePyCode());
+                setLocationName(buildManagement.getName());
+            }
+        }
     }
 
 }

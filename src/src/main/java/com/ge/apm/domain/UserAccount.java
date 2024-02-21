@@ -152,6 +152,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "wechat_id")
 	private String weChatId;
 
+	@Column(name = "wx_union_id")
+	private String wxUnionId;
+
 	@Column(name = "leader_user_id")
 	private Integer leaderUserId;
 
@@ -723,6 +726,14 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setWeChatId(String weChatId) {
 		this.weChatId = weChatId;
+	}
+
+	public String getWxUnionId() {
+		return wxUnionId;
+	}
+
+	public void setWxUnionId(String wxUnionId) {
+		this.wxUnionId = wxUnionId;
 	}
 
 	public Integer getLeaderUserId() {

@@ -63,7 +63,7 @@
 
                         <p:ajax event="rowSelect" update="editButton"/>
 
-                        <p:column headerText="调剂设备名称" sortBy="#{item.swapName}">
+                        <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}">
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
                         <p:column headerText="申请借用数" sortBy="#{item.applyQty}" >
@@ -102,7 +102,7 @@
                             <h:outputText value="计费开始时间："/>
                             <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                             <h:outputText value="设备接收人："/>
-                            <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selected.accepter}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableLeaseManHour}">
                             <h:outputText value="工时"/>
@@ -118,7 +118,7 @@
                         <h:panelGroup >
                             <p:messages id="messages" closable="true" style="width: 900px" />
                             <p:inputText id="applyAssetInfo" placeholder="资产编号/设备编号/二维码" maxlength="100" style="width: 200px" value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
-                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.msgAccepter)}" />
+                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.accepter)}" />
                         </h:panelGroup>
                     </p:panelGrid>
 

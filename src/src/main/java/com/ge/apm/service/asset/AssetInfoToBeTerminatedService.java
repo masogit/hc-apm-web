@@ -41,7 +41,7 @@ public class AssetInfoToBeTerminatedService{
         assetInfo.setTerminateDate(new Date());
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
         dao.save(assetInfo);
-        assetLifecyleService.saveLifecycle(originStatus,assetInfo,userAccount);
+//        assetLifecyleService.saveLifecycle(originStatus,assetInfo,userAccount);
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
     }
 

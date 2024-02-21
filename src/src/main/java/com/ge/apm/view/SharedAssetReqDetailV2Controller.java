@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple3;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -617,6 +618,10 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
         Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
         return billingDetail._3.doubleValue();
     }
-    
+
+  public void saveMsgAccepter(){
+      dao.save(selected);
+      WebUtil.addSuccessMessage("设备归还人修改成功");
+  }
     
 }

@@ -790,6 +790,16 @@
                                     <h:outputText value="#{item.pmOwnerTel}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'patrolInspectionOwnerName'}">
+                                <p:column headerText="#{msg.patrolInspectionOwnerName}" sortBy="#{item.patrolInspectionOwnerName}" filterBy="#{item.patrolInspectionOwnerName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.patrolInspectionOwnerName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'patrolInspectionOwnerTel'}">
+                                <p:column headerText="#{msg.patrolInspectionOwnerTel}" sortBy="#{item.patrolInspectionOwnerTel}" filterBy="#{item.patrolInspectionOwnerTel}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.patrolInspectionOwnerTel}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'assetTags'}">
                                 <p:column headerText="#{msg.assetTags}" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetTagsView}"/>
@@ -797,7 +807,7 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'createdBy'}">
                                 <p:column headerText="#{msg.createdBy}" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{assetInfoListController.selectCreatedBy(item.createdBy)}"/>
+                                    <h:outputText value="#{item.createdBy}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetQuality' and assetInfoListController.countyArea}">

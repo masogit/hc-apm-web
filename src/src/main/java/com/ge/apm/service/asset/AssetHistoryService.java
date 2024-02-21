@@ -425,6 +425,18 @@ public class AssetHistoryService {
         mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
+    public void deleteAsset(AssetInfo newAsset) {
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AssetHistoryService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("deleteAsset");
+        mqContext.setDescribe("删除设备");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+    }
+
     public  <T> T depCopy(T srcList) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         try {

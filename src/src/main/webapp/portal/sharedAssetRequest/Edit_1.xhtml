@@ -100,7 +100,7 @@
                                <p:column headerText="设备编号" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{item.assetNumber}"/>
                                </p:column>
-                               <p:column headerText="调剂设备名称" sortBy="#{item.assetNumber}">
+                               <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{sharedAssetReqDetailController.getSwapName(item.sharedAssetTypeId)}"/>
                                </p:column>
 <!--                               <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">

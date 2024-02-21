@@ -94,6 +94,17 @@ public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endDate;
 
+    @Column(name = "contract_end_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date contractEndDate;
+
+    @Column(name = "contract_start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date contractStartDate;
+
+
     /**
      * 申请步骤APPLICATIONSTEP
      * 信息已确认 过会已完成  完成
@@ -110,6 +121,21 @@ public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
         ToConfirmedInfo, ToConfirmedInfoMeet,ToConfirmedInfoTendered,Complete
     }
 
+    public Date getContractEndDate() {
+        return contractEndDate;
+    }
+
+    public void setContractEndDate(Date contractEndDate) {
+        this.contractEndDate = contractEndDate;
+    }
+
+    public Date getContractStartDate() {
+        return contractStartDate;
+    }
+
+    public void setContractStartDate(Date contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
 
     @Column(name = "order_step")
     private String orderStep;
@@ -198,6 +224,11 @@ public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
     @Column(name = "meeting_purchasing_imports")
     private String meetingPurchasingImports;
 
+    @Column(name = "meeting_approve_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date meetingApproveDate;
+
     @Column(name = "meeting_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -220,6 +251,13 @@ public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
     @Column(name = "company_id")
     private String companyId;
 
+    public Date getMeetingApproveDate() {
+        return meetingApproveDate;
+    }
+
+    public void setMeetingApproveDate(Date meetingApproveDate) {
+        this.meetingApproveDate = meetingApproveDate;
+    }
 
     public String getVenderName() {
         return venderName;

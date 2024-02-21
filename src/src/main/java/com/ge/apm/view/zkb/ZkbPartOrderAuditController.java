@@ -623,7 +623,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("数据已被操作，不需要重复进行！");
             return "";
         }
-        String checkResult = zkbPartOrderStatusService.normalCheck(selected);
+        String checkResult = zkbPartOrderService.normalCheck(selected);
         if(StrUtil.isNotEmpty(checkResult)){
             WebUtil.addErrorMessage(checkResult,"");
             return "";

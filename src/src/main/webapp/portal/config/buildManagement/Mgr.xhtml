@@ -23,15 +23,15 @@
 
                     <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:400px;">
-                            <h:panelGroup rendered="false">
+                            <h:panelGroup rendered="true">
                                 <p:inputText id="retrieval" value="#{buildManagementController.retrieval}">
                                     <!--<p:ajax listener="#{buildManagementController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>-->
                                 </p:inputText>
                                 <p:commandButton id = "portalMgrSearch" icon="ui-icon-location-searching" actionListener="#{buildManagementController.filterNode()}" update="orgTree editPanel :growl"/>
-<!--                                <p:commandButton id = "portalMgrExport" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{orgImportController.exportExcel}" update=":growl"-->
-<!--                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >-->
-<!--                                    <p:fileDownload value="#{orgImportController.excelFile}" />-->
-<!--                                </p:commandButton>-->
+                                <p:commandButton id = "portalMgrExport" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{buildManagementController.exportExcel}" update=":growl"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                    <p:fileDownload value="#{buildManagementController.excelFile}" />
+                                </p:commandButton>
                             </h:panelGroup>
                             <p:scrollPanel style="height:98%;border: 0" mode="native">
                                 <p:tree id="orgTree"  class="tree" style="width:98%;border:0;" value="#{buildManagementController.orgTree}" var="node" selectionMode="single" selection="#{buildManagementController.selectedNode}" highlight="true">
@@ -53,7 +53,7 @@
                                     <p:commandButton id="createBuild" process="@this" icon="ui-icon-plus" value="#{msg.Create} 楼栋" actionListener="#{buildManagementController.prepareCreate(4)}" update="@form:editPanel"/>
                                     <p:commandButton id="createFloor" process="@this" icon="ui-icon-plus" value="#{msg.Create} 楼层" actionListener="#{buildManagementController.prepareCreate(5)}" update="@form:editPanel"/>
                                     <p:commandButton id="createRoom" process="@this" icon="ui-icon-plus" value="#{msg.Create} 房间" actionListener="#{buildManagementController.prepareCreate(6)}" update="@form:editPanel"/>
-                                    <p:commandButton id="deleteButton" rendered="false" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{buildManagementController.deleteSelectedOrg}" update="@form" oncomplete="deleteAfter();">
+                                    <p:commandButton id="deleteButton"  process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{buildManagementController.deleteSelectedBuild}" update="@form" disabled="#{!buildManagementController.isDelete}" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </h:panelGrid>

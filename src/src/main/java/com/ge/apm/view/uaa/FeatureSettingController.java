@@ -14,10 +14,7 @@ import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
-import com.ge.healthcare.cn.common.cons.ApmFeature;
-import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.*;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -110,6 +107,10 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Setter
     private String hospitalStr;
 
+    @Getter
+    @Setter
+    private List<String> orderedItems = new ArrayList<>();
+
     @Override
     protected void init() {
 
@@ -142,7 +143,22 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     }
 
     public void changeTab(TabChangeEvent event) {
-
+        if (tabIndex == 2) {
+            List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+            List<String> defaultOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(Enum::name).collect(Collectors.toList());
+            if (tenantInfo.getEnablesMenuOrder()) {
+                orderedItems = featureList.stream()
+                        .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
+                        .collect(Collectors.toList());
+            } else {
+                orderedItems = featureList.stream()
+                        .sorted(Comparator.comparingInt(defaultOrder::indexOf))  // 根据 defaultOrder 的顺序排序
+                        .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
+                        .collect(Collectors.toList());
+            }
+        } else {
+            orderedItems = new ArrayList<>();
+        }
     }
 
     public void changeListener() {
@@ -182,7 +198,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
     public List<ApmAdminActiveFeature> findAdminActiveFeatures() {
         List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
-        return Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
+        List<ApmAdminActiveFeature> features = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
+        features.add(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING);
+        return features;
     }
 
     public void hospitalChange() {
@@ -240,8 +258,8 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     public void saveFeatures(){
         try {
             JSONObject tenantConfig = JSONObject.parseObject(tenantInfo.getTenantConfig());
-            tenantConfig.put("edition",edition);
-            tenantConfig.put("cpmURL",cpmURL);
+            tenantConfig.put("edition", edition);
+            tenantConfig.put("cpmURL", cpmURL);
             JSONArray featureArray = new JSONArray();
             tenantFeatureMap.forEach((k,v) -> {
                 if (v) {
@@ -253,6 +271,23 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             dao.save(tenantInfo);
             configCacheService.cleanTenantCacheByUid(tenantInfo.getUid());
+            MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+        }
+    }
+
+    public void saveMenuOrder(){
+        try {
+            List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+            orderedItems.addAll(featureList.stream()
+                    .filter(s -> !orderedItems.contains(s))
+                    .collect(Collectors.toList()));
+            tenantInfo.setFeatureList(JSON.toJSONString(orderedItems));
+            tenantInfo.setLastModifiedDate(new Date());
+            tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            dao.save(tenantInfo);
+            changeTab(null);
             MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
@@ -285,6 +320,13 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     public String getFeatureName(String featureName) {
         if (StringUtils.hasText(featureName)) {
             return ApmAdminActiveFeature.valueOf(featureName).getFeatureName();
+        }
+        return "";
+    }
+
+    public String getOrderFeatureName(String featureName) {
+        if (StringUtils.hasText(featureName)) {
+            return ApmFeatureDefaultOrder.valueOf(featureName).getFeatureName();
         }
         return "";
     }

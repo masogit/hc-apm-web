@@ -52,7 +52,7 @@
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,50,100,500" editable="true">   
                              
-                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}">
+                    <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}">
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="申请借用数" sortBy="#{item.applyQty}">

@@ -227,7 +227,7 @@ public class AssetCreateController {
         if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
             UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
             if (null != submitter) {
-                newAsset.setCreatedBy(submitter.getUid());
+                newAsset.setCreatedBy(submitter.getName());
             }
         }
         newAsset.setCreatedDate(createRequest.getSubmitDate());

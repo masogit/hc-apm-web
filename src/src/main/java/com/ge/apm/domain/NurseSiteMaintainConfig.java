@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.*;
 
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.service.utils.PinyinUtil;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +89,9 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	
 	@Column(name="name")
 	private String name;
+
+	@Column(name = "name_py_code")
+	private String namePyCode;
 	
 	@Column(name="apply_directly")
 	private Boolean applyDirectly=false;
@@ -220,6 +225,17 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+		if (!StringUtils.isEmpty(name)) {
+			this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+		}
+	}
+
+	public String getNamePyCode() {
+		return namePyCode;
+	}
+
+	public void setNamePyCode(String namePyCode) {
+		this.namePyCode = namePyCode;
 	}
 
 	public String getCheckItemsDetail() {

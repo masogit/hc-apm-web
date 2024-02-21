@@ -19,4 +19,7 @@ public interface AdminFeatureActiveRepository extends GenericRepositoryUUID<Admi
     List<AdminFeatureActive> findByTenantUID(String tenantUID);
 
     List<AdminFeatureActive> findByHospitalUID(String hospitalUID);
+
+    AdminFeatureActive findByHospitalUIDAndFeatureKey(String hospitalUID, String featureKey);
+
 }

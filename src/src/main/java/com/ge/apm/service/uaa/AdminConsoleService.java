@@ -17,6 +17,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
@@ -29,6 +30,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1339,8 +1341,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		List<AdminFeatureActive> waitList = new ArrayList<>();
 		workflowConfigs.forEach(config -> {
 			buildActiveFeatureByHospitalUid(config.getHospitalUID(), waitList, ApmFeature.ASSET_SUPPLIER_APPLICATION.name());
+			adminFeatureActiveRepository.save(waitList);
+			waitList.clear();
 		});
-		adminFeatureActiveRepository.save(waitList);
 	}
 
 	public void batchUpdateTenantAdverseEvent() {
@@ -1357,8 +1360,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		List<AdminFeatureActive> waitList = new ArrayList<>();
 		hospitals.forEach(uid -> {
 			buildActiveFeatureByHospitalUid(uid, waitList, ApmFeature.ASSET_ADVERSE_EVENT.name());
+			adminFeatureActiveRepository.save(waitList);
+			waitList.clear();
 		});
-		adminFeatureActiveRepository.save(waitList);
 	}
 
 	/**
@@ -1368,59 +1372,89 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
 		List<TenantInfo> waitSaveTenant = new ArrayList<>();
 		List<AdminFeatureActive> waitSaveActiveHospital = new ArrayList<>();
+		Map<String, String> exTenant = new HashMap<>();
 		tenantInfos.forEach(tenantInfo -> {
-			if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
-				Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
-				if (featureList.contains(ApmFeature.ADJUST_ASSET.name())) {
-					List<SharedAssetRequest> requests = sharedAssetRequestRepository.findByTenantUID(tenantInfo.getUid());
-					if (CollectionUtils.isEmpty(requests)) {
-						featureList.remove(ApmFeature.ADJUST_ASSET.name());
-						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
-						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
-						tenantInfo.setLastModifiedDate(new Date());
-						waitSaveTenant.add(tenantInfo);
-					} else {
-						Set<String> hospitals = requests.stream().map(SharedAssetRequest::getHospitalUID).collect(Collectors.toSet());
-						hospitals.forEach(hospitalUid -> {
-							buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.ADJUST_ASSET.name());
-						});
+			try {
+				if (StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+					Set<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class).stream().collect(Collectors.toSet());
+					if (featureList.contains(ApmFeature.ADJUST_ASSET.name())) {
+						List<SharedAssetRequest> requests = sharedAssetRequestRepository.findByTenantUID(tenantInfo.getUid());
+						if (CollectionUtils.isEmpty(requests)) {
+							featureList.remove(ApmFeature.ADJUST_ASSET.name());
+							tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+							tenantInfo.setLastModifiedDate(new Date());
+							waitSaveTenant.add(tenantInfo);
+						} else {
+							Set<String> hospitals = requests.stream().map(SharedAssetRequest::getHospitalUID).collect(Collectors.toSet());
+							hospitals.forEach(hospitalUid -> {
+								buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.ADJUST_ASSET.name());
+							});
+						}
+					}
+					if (featureList.contains(ApmFeature.AUDIT.name())) {
+						List<AuditCase> requests = auditCaseRepository.findByTenantUid(tenantInfo.getUid());
+						if (CollectionUtils.isEmpty(requests)) {
+							featureList.remove(ApmFeature.AUDIT.name());
+							tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+							tenantInfo.setLastModifiedDate(new Date());
+							waitSaveTenant.add(tenantInfo);
+						} else {
+							Set<String> siteUid = requests.stream().map(AuditCase::getSiteUid).collect(Collectors.toSet());
+							List<OrgInfo> orgInfoList = orgInfoRepository.findInUIds(siteUid);
+							orgInfoList.forEach(orgInfo -> {
+								buildActiveFeatureByHospitalUid(orgInfo.getHospitalUID(), waitSaveActiveHospital, ApmFeature.AUDIT.name());
+							});
+						}
+					}
+					if (featureList.contains(ApmFeature.BUDGET.name())) {
+						List<BudgetApplication> requests = budgetApplicationRepository.findByTenantUID(tenantInfo.getUid());
+						if (CollectionUtils.isEmpty(requests)) {
+							featureList.remove(ApmFeature.BUDGET.name());
+							tenantInfo.setLastModifiedDate(new Date());
+							tenantInfo.setFeatureList(JSON.toJSONString(featureList));
+							waitSaveTenant.add(tenantInfo);
+						} else {
+							Set<String> hospitals = requests.stream().map(BudgetApplication::getHospitalUID).collect(Collectors.toSet());
+							hospitals.forEach(hospitalUid -> {
+								buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.BUDGET.name());
+							});
+						}
 					}
 				}
-				if (featureList.contains(ApmFeature.AUDIT.name())) {
-					List<AuditCase> requests = auditCaseRepository.findByTenantUid(tenantInfo.getUid());
-					if (CollectionUtils.isEmpty(requests)) {
-						featureList.remove(ApmFeature.AUDIT.name());
-						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
-						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
-						tenantInfo.setLastModifiedDate(new Date());
-						waitSaveTenant.add(tenantInfo);
-					} else {
-						Set<String> siteUid = requests.stream().map(AuditCase::getSiteUid).collect(Collectors.toSet());
-						List<OrgInfo> orgInfoList = orgInfoRepository.findInUIds(siteUid);
-						orgInfoList.forEach(orgInfo -> {
-							buildActiveFeatureByHospitalUid(orgInfo.getHospitalUID(), waitSaveActiveHospital, ApmFeature.AUDIT.name());
-						});
-					}
-				}
-				if (featureList.contains(ApmFeature.BUDGET.name())) {
-					List<BudgetApplication> requests = budgetApplicationRepository.findByTenantUID(tenantInfo.getUid());
-					if (CollectionUtils.isEmpty(requests)) {
-						featureList.remove(ApmFeature.BUDGET.name());
-						tenantInfo.setLastModifiedBy(Optional.ofNullable(UserContextService.getCurrentUserAccount()).orElse(new UserAccount()).getName());
-						tenantInfo.setLastModifiedDate(new Date());
-						tenantInfo.setFeatureList(JSON.toJSONString(featureList));
-						waitSaveTenant.add(tenantInfo);
-					} else {
-						Set<String> hospitals = requests.stream().map(BudgetApplication::getHospitalUID).collect(Collectors.toSet());
-						hospitals.forEach(hospitalUid -> {
-							buildActiveFeatureByHospitalUid(hospitalUid, waitSaveActiveHospital, ApmFeature.BUDGET.name());
-						});
-					}
-				}
+			} catch (Exception e) {
+				exTenant.put(tenantInfo.getUid(), tenantInfo.getName());
 			}
 		});
+		logger.error("异常租户:" + JSON.toJSONString(exTenant));
 		tenantInfoRepository.save(waitSaveTenant);
 		adminFeatureActiveRepository.save(waitSaveActiveHospital);
+	}
+
+	public void batchActiveDigitalAssetStaff() {
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		String featureKey = ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name();
+		tenantInfos.forEach(tenantInfo -> {
+			List<AdminFeatureActive> waitList = new ArrayList<>();
+			if (BooleanUtils.isTrue(tenantInfo.getIsEnabled())) {
+				List<OrgInfo> hospitals = orgInfoRepository.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
+				hospitals.forEach(info -> {
+					if (info.getOrgLevel() == 2) {
+						Set<String> features = adminFeatureActiveRepository.findByHospitalUID(info.getUid()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+						if (!features.contains(featureKey)) {
+							AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+							adminFeatureActive.setFeatureKey(featureKey);
+							adminFeatureActive.setHospitalUID(info.getUid());
+							adminFeatureActive.setTenantUID(info.getTenantUID());
+							adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+							adminFeatureActive.setCreateDate(new Date());
+							adminFeatureActive.setActiveDate(new Date());
+							waitList.add(adminFeatureActive);
+						}
+					}
+				});
+				adminFeatureActiveRepository.save(waitList);
+			}
+		});
 	}
 
 	private void buildActiveFeatureByHospitalUid(String uid, List<AdminFeatureActive> waitSave, String featureKey) {
@@ -1438,5 +1472,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				waitSave.add(adminFeatureActive);
 			}
 		}
+	}
+
+	public void updateNurseSiteMaintainConfigPyCode() {
+		Iterable<NurseSiteMaintainConfig> configs = nurseSiteMaintainConfigRepository.findAll();
+		configs.forEach(v -> {
+			if (StringUtils.isNotEmpty(v.getName())) {
+				v.setNamePyCode(PinyinUtil.getShortPinyin(v.getName()).toLowerCase().replaceAll("[^0-9a-zA-Z]", ""));
+				nurseSiteMaintainConfigRepository.save(v);
+			}
+		});
 	}
 }

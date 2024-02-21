@@ -37,6 +37,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -191,7 +192,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneQrCodeStatus;
     private boolean countyArea = false;
     private UserAccount user;
-    private Map<String, UserAccount> createdByMap;
+//    private Map<String, UserAccount> createdByMap;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -352,8 +353,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setWarrantyAlerts(currentPageAssets);
         assetInfoService.setSupplier(currentPageAssets);
 
-        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
+//        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+//        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
         Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());
         currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
@@ -659,8 +660,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
+        assetHistoryService.deleteAsset(asset);
         logger.info("delete asset successful. assetName: {}", asset.getName());
-        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
     public void cancleWarranty(String assetUid) {
@@ -793,7 +795,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(assetInfo);
             assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
-            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
         this.selectedMap.clear();
     }
@@ -969,7 +971,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getSiteOrgName(String siteUID) {
-        OrgInfo org = orgDao.getByUid(siteUID);
+        OrgInfo org = configCacheService.findOrgByUid(siteUID);
         if (org != null) {
             return org.getName();
         }
@@ -1307,7 +1309,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
-        return orgDao.getByUid(uid);
+        return configCacheService.findOrgByUid(uid);
     }
 
     //getter and setter
@@ -1336,14 +1338,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
         }
     }
-    public String selectCreatedBy(String loginName) {
+/*    public String selectCreatedBy(String loginName) {
         UserAccount userAccount = createdByMap.get(loginName);
         String createdBy = null;
         if (ObjectUtil.isNotEmpty(userAccount)) {
             createdBy = userAccount.getName();
         }
         return createdBy;
-    }
+    }*/
 
     /**
      *

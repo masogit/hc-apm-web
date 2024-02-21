@@ -70,7 +70,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	@Getter @Setter
 	private PmOrderRule pmOrderRule;
 	@Getter @Setter
-	private Boolean isAllRuleSelected = true;
+	private Boolean isAllRuleSelected = Boolean.TRUE;
+	@Getter @Setter
+	private Boolean isAllAssetSelected = Boolean.FALSE;
 	//复选的设备
 	@Getter @Setter
 	private Map<String, Boolean> selectedMap;
@@ -78,7 +80,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private Map<String, Boolean> selectedRuleMap;
 	private SupplierService supplierService;
 
-	private GeneratePmOrders4Controller generatePmOrders4Controller;
     private TenantInfo selectedTenant;
     private List<OrgInfo> selectedUserOrg;
     private OrgInfo selectedOrg;
@@ -94,6 +95,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private List<AssetTypeGroup> assetTypeGroupList;
 	private boolean isYmyg = false;
 	private OrgInfo userOrgInfo;
+
+	private ConfigItemValueRepository configItemValueRepository;
 
 	private List<AssetRuleModel> onlyOneModels = new ArrayList<>();//只存在唯一一个质控绑定规则的记录默认批量创建
 	private List<AssetRuleModel> notOnlyOneModels = new ArrayList<>();//存在多个绑定规则的列表（需用户选择是否批量创建）
@@ -113,12 +116,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
 		supplierService = WebUtil.getBean(SupplierService.class);
         configService = WebUtil.getBean(ConfigService.class);
-		targetAssets = new ArrayList<AssetInfo>();
+		configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);targetAssets = new ArrayList<>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
 		siteUid = user.getSiteUID();
-		//initAssets();
 		selectedMap = new HashMap<>();
 		selectedRuleMap = new HashMap<>();
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -128,9 +130,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		userOrgInfo = orgInfoRepository.getByUid(user.getSiteUID());
 		selectedUserOrg.add(userOrgInfo);
 		isYmyg = UserContextService.isYiMaiYangGuangTenantForServer();
-        //initTree(user.getTenantUID());
 		initOrgTree();
-		generatePmOrders4Controller = WebUtil.getBean(GeneratePmOrders4Controller.class);
 		assetTypeGroupList = user.getAssetTypeGroupList();
 	}
 
@@ -159,19 +159,16 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		TreeNode node = event.getTreeNode();
 		if (!isYmyg) {
 			selectedUserOrg.clear();
-			//selectedUserOrg.add(userOrgInfo);
 		} else {
 			setTreeNodes(node, true);
 		}
 		selectedUserOrg.add((OrgInfo) node.getData());
-		//addFilter();
 	}
 
 	public void onUnSelectOrgForUser(NodeUnselectEvent event) {
 		TreeNode node = event.getTreeNode();
 		setTreeNodes(node, false);
 		selectedUserOrg.remove((OrgInfo)node.getData());
-		//addFilter();
 	}
 
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
@@ -188,32 +185,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			setTreeNodes(item, isSelected);
 		}
 	}
-
-    private void initTree(String tenantUid) {
-        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-		selectedTenant = tempTenantInfo;
-		orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
-/*        if(UserContextService.isInsulate()){
-            //隔离租户
-            selectedTenant = tempTenantInfo;
-            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
-        }else{
-            //非隔离租户
-            selectedTenant = tenantInfoRepository.findByuid(tenantUid);
-            OrgInfo rootOrg = new OrgInfo();
-            rootOrg.setId(-1);
-            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-            orgTree = new DefaultTreeNode("root", null, null);
-            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
-        }*/
-
-        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
-        if (null != selectedUserOrg) {
-            selectedUserOrg.setSelected(true);
-            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
-        }
-    }
 
     public String getOrgFullName(List<OrgInfo> org) {
 		StringBuilder sb = new StringBuilder();
@@ -251,7 +222,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         prepareAssetRuleList();
 	}
 	public void onSelectRuleAllOfPage() {
-//        selectedRuleMap.put("header",!selectedRuleMap.get("header"));
         boolean b = notOnlyOneModels.stream().anyMatch(e -> !selectedRuleMap.get(e.getUniqueUid()));
 			notOnlyOneModels.stream().forEach(e -> {
                 selectedRuleMap.put(e.getUniqueUid(), b);
@@ -336,6 +306,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
 		}
+		if (queryAsset.getWarrantyDate() != null) {
+
+			assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.EQ, queryAsset.getWarrantyDate()));
+		}
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
@@ -382,13 +356,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         }
-/*        if(selectedUserOrg != null){
-            if(selectedUserOrg.getOrgType() == 0){
-                filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
-            }
-        }else{
-            filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
-        }*/
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -401,17 +368,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return filter;
 	}
 
-/*	public void addFilter() {
-		sourceAssets = getAssetList();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
-	}*/
-
 	public void addFilter(){
+		isAllAssetSelected = Boolean.TRUE;
 		assetInfoList.clear();
 		assetInfoList = getAssetList();
 		selectedMap = new HashMap<>();
@@ -466,7 +424,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}else{
 			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
 		}
-        //filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         if(StringUtils.isNotEmpty(name)){
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
             filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
@@ -492,7 +449,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public void generatePmOrdersForMuliPMRule4() {
-		List<AssetRuleModel> models = new ArrayList<>();
+		List<AssetRuleModel> models;
 		selectedNotOnlyOneModels = notOnlyOneModels.stream().filter(e->selectedRuleMap.get(e.getUniqueUid())).collect(Collectors.toList());
 		batchCreateModels.addAll(selectedNotOnlyOneModels);
 		batchCreateModels.addAll(onlyOneModels);
@@ -514,9 +471,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			long end = System.currentTimeMillis();
 			LOGGER.info("批量生成保养工单结束，耗时 : {} 秒 !",(end - start)/1000);
 			WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
-			//WebUtil.addSuccessMessage("工单生成成功！");
 		} catch(Exception e){
-			//WebUtil.addErrorMessage("工单生成失败！");
 			e.printStackTrace();
 			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
 		}
@@ -618,9 +573,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                     selectedRuleMap.put(e.getUniqueUid(),true);
                 });
                 isAllRuleSelected = true;
-//                selectedRuleMap.put("header",true);
             }else {
-//                selectedRuleMap.put("header",false);
                 isAllRuleSelected = false;
             }
         }
@@ -776,7 +729,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
     }
 	public void updatePMType(){
-		addFilter();
 	    notOnlyOneModels.stream().forEach(e->{
 	        e.setPmType(pmType);
         });
@@ -786,9 +738,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
     }
 
-/*	public void removeItem(String uid){
-		assetInfoList = assetInfoList.stream().filter( assetInfo -> !assetInfo.getUid().equals(uid)).collect(Collectors.toList());
-	}*/
+	public boolean isEnableWarrantyDateSearch(){
+		String value = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),"enableWarrantyDateSearch");
+		return Boolean.FALSE.toString().equalsIgnoreCase(value)?false:true;
+	}
 
 	public String getName(AssetInfo assetInfo){
 		return StringUtils.isEmpty(assetInfo.getName()) ? "  " : assetInfo.getName();

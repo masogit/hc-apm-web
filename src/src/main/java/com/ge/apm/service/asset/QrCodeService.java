@@ -9,6 +9,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
@@ -63,7 +64,7 @@ public class QrCodeService {
     ConfigService configService;
 
     @Autowired
-    private OrgInfoRepository orgDao;
+    private ConfigCacheService cacheService;
 
     @Autowired
     private BlobFileService blobObjectService;
@@ -409,7 +410,7 @@ public class QrCodeService {
     }
 
     public QrCodeTemplate getTemplateBySiteUid(String siteUid) {
-        OrgInfo siteOrg = orgDao.findByUid(siteUid);
+        OrgInfo siteOrg = cacheService.findOrgByUid(siteUid);
         return siteOrg == null ? null : Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getSiteUID()))
                 .orElse(Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getHospitalUID()))
                         .orElse(Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getInstitutionUID()))

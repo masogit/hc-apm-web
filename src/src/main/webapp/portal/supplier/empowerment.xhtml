@@ -20,15 +20,7 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="AssetEmpowermentForm">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <h:panelGroup><!--供应商 下拉-->
-                            <label class="label">#{msg.vendor}</label>
-                            <p:autoComplete id="supplier" dropdown="true" value="#{supplierEmpowermentController.selectedSupplierUid}" scrollHeight="300" forceSelection="true"
-                                            completeMethod="#{supplierEmpowermentController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
-                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="AssetEmpowermentForm:datalist selectedUser"/>
-                                <p:ajax listener="#{supplierEmpowermentController.onSupplierChange()}" />
-                            </p:autoComplete>
-                        </h:panelGroup>
+                    <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}" id="siteUid">
                             <p:commandButton id="btnOrg" value="#{empty supplierEmpowermentController.selectSite? msg.AllHospitals:supplierEmpowermentController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
@@ -46,6 +38,14 @@
                                     </p:tree>
                                 </p:scrollPanel>
                             </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup><!--供应商 下拉-->
+                            <label class="label">#{msg.vendor}</label>
+                            <p:autoComplete id="supplier" dropdown="true" value="#{supplierEmpowermentController.selectedSupplierUid}" scrollHeight="300" forceSelection="true"
+                                            completeMethod="#{supplierEmpowermentController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
+                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="AssetEmpowermentForm:datalist selectedUser"/>
+                                <p:ajax listener="#{supplierEmpowermentController.onSupplierChange()}" />
+                            </p:autoComplete>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:dataTable id="datalist" value="#{supplierEmpowermentController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
@@ -194,7 +194,10 @@
                         </p:autoComplete>
                     </h:panelGroup>
                 </h:form>
+            <h:panelGroup>
+                <p></p>
                 <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{supplierEmpowermentController.doEmpowerment()}" value="授权" update=":AssetEmpowermentForm:datalist"/>
+            </h:panelGroup>
             </div>
         </div>
         <script>

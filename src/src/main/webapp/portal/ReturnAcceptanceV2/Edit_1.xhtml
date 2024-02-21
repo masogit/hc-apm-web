@@ -97,7 +97,7 @@
 
                      <p:ajax event="rowSelect" update="editButton"/>
                 
-                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
+                    <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.swapName}" >
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
@@ -131,6 +131,8 @@
                             <label class='label'>计费结束时间</label>
                             <!--<p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="      归还结束时间" value="#{sharedAssetRequestV2Controller.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>-->
                             <p:calendar  pattern="yyyy/MM/dd HH:mm" placeholder="      归还结束时间" value="#{sharedAssetRequestV2Controller.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                            <h:outputText value="设备归还人："/>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableReturnManHour}">
                             <h:outputText value="工时"/>
@@ -149,7 +151,7 @@
                             <p:inputText id="applyAssetInfo" maxlength="100" style="width: 200px" placeholder="资产编号/设备编号/二维码"  value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
                             <p:commandButton icon="ui-icon-search" class="btn btn-sm btn-gray"
                                              update="datalistDetail datalistOperation , messages returnAssetValidator"
-                                             action="#{sharedAssetRequestV2Controller.getAssetInfoR(sharedAssetRequestV2Controller.selected.msgEndTime)}"
+                                             action="#{sharedAssetRequestV2Controller.getAssetInfoR(sharedAssetRequestV2Controller.selected.msgEndTime,sharedAssetRequestV2Controller.selected.msgAccepter)}"
                                              oncomplete="openReturnAssetValidator(xhr, status, args)"
                                              actionListener="hideGrowl()"/>
                             

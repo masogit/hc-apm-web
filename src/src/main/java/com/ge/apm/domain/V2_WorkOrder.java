@@ -59,6 +59,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @NotNull
     private Integer assetId;
 
+    @Column(name="asset_uid",columnDefinition = "CHAR(32)")
+    private String assetUid;
+
     @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
@@ -390,7 +393,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public int getBusinessType() {
         return  ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT;
     }
+    @Override
+    public String getAssetType() {
+        if (null != assetInfo) {
+            return assetInfo.getAssetType();
+        }
+        return null;
+    }
 
+    @Override
+    public AssetInfo getApprovalAssetInfo() {
+        if (null != assetInfo) {
+            return assetInfo;
+        }
+        return null;
+    }
     public Integer getDispatchMode() {
         return dispatchMode;
     }
@@ -1013,6 +1030,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setPartApproveSignature(String partApproveSignature) {
         this.partApproveSignature = partApproveSignature;
+    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
     }
 
     public Integer getEntryType() {

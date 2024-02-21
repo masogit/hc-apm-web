@@ -44,8 +44,8 @@
                         </p:overlayPanel>
                       </c:if>
                         <!--<p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 2}"/>-->
-                        <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 1}"/>
-                        <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == -1}"/>
+                        <p:commandButton value="已配#{msg.AdjustmentEquipmentName}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 1}"/>
+                        <p:commandButton value="未配置#{msg.AdjustmentEquipmentName}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == -1}"/>
                     </h:panelGrid>
 
                     <p:dataTable id="datalist" value="#{sharedAssetInfoController.lazyModel}" var="item" widgetVar="varDataList"
@@ -127,7 +127,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="调剂设备名称" sortBy="#{item.sharedAssetTypeUid}" filterBy="#{item.sharedAssetTypeUid}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.AdjustmentEquipmentName}" sortBy="#{item.sharedAssetTypeUid}" filterBy="#{item.sharedAssetTypeUid}" filterMatchMode="LIKE">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetInfoController.filterSatId}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -170,7 +170,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">调剂设备名称</label>
+                                <label class="label">#{msg.AdjustmentEquipmentName}</label>
                                 <p:selectOneMenu value="#{sharedAssetInfoController.selected.sharedAssetTypeUid}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{sharedAssetInfoController.allType()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
@@ -228,7 +228,7 @@
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="margin-bottom: 20px">
 
                             <h:panelGroup>
-                                <label class="label">调剂设备名称</label>
+                                <label class="label">#{msg.AdjustmentEquipmentName}</label>
                                 <p:selectOneMenu value="#{sharedAssetInfoController.batchSharedAssetTypeUid}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{sharedAssetInfoController.allType()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>

@@ -40,27 +40,27 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("pageSize",pageSize);
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SEARCH_ASSET_HISTORY);
-        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        if (isOkay(response)) {
-            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-//            String dat = JSON.toJSONString(responseMap.get("data"));
-//            Page<AssetHistory> assetHistoryPage = JSON.parseObject(dat, new TypeReference<Page<AssetHistory>>() {});
-            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
-            String content = JSON.toJSONString(data.get("content"));
-            List<AssetHistory> assetHistories = JSON.parseObject(content, new TypeReference<List<AssetHistory>>() {});
-            if(assetHistories==null){
-                assetHistories=new ArrayList<>();
+        try {
+            ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            if (isOkay(response)) {
+                LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+                LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+                String content = JSON.toJSONString(data.get("content"));
+                List<AssetHistory> assetHistories = JSON.parseObject(content, new TypeReference<List<AssetHistory>>() {});
+                if(assetHistories==null){
+                    assetHistories=new ArrayList<>();
+                }
+                int totalElements = (int)data.get("totalElements");
+                PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
+                Page<AssetHistory> jsonPage = new PageImpl<>(assetHistories, pageRequest, totalElements);
+                return jsonPage;
             }
-            int totalElements = (int)data.get("totalElements");
-            PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
-            Page<AssetHistory> jsonPage = new PageImpl<>(assetHistories, pageRequest, totalElements);
-            return jsonPage;
-        } else {
-            logger.info("searchAssetHistory Failed ");
-            PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
-            Page<AssetHistory> jsonPage = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
-            return jsonPage;
+        } catch (Exception e) {
+            logger.info("searchAssetHistory Failed : {}", e.getMessage(), e);
         }
+        PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
+        Page<AssetHistory> jsonPage = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+        return jsonPage;
     }
 
     public Page<Object> searchHistory(List<SearchFilter> searchFilters, String token, int pageNum, int pageSize, String esIndex){

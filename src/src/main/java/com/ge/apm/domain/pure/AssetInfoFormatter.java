@@ -1047,6 +1047,8 @@ public class AssetInfoFormatter {
 
         map.put(getMessage("pmOwnerName"), this.getPmOwnerName());
         map.put(getMessage("pmOwnerTel"), assetInfo.getPmOwnerTel());
+        map.put(getMessage("patrolInspectionOwnerName"), assetInfo.getPatrolInspectionOwnerName());
+        map.put(getMessage("patrolInspectionOwnerTel"), assetInfo.getPatrolInspectionOwnerTel());
         map.put(getMessage("measuringOwner"), assetInfo.getMeasuringOwnerName());
 
         if (crossSite) {
@@ -1144,7 +1146,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
         map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
 
-        map.put(getMessage("createdBy"), userMap.get(assetInfo.getCreatedBy()));
+        map.put(getMessage("createdBy"), assetInfo.getCreatedBy());
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
         map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
         map.put(getMessage("UUID"), this.getUid());
@@ -1167,8 +1169,16 @@ public class AssetInfoFormatter {
         map.put(getMessage("spare04"), this.getSpare04AsString());
         map.put(getMessage("spare05"), this.getSpare05AsString());
 
+        map.put(getMessage("UCMID"), assetInfo.getUCMID());
+        map.put(getMessage("productFamily"), assetInfo.getProductFamily());
+        map.put(getMessage("productSegment"), this.getProductSegmentAsString());
         return map;
 
+    }
+
+    public String getProductSegmentAsString() {
+        if (assetInfo.getProductSegment() == null) return null;
+        return findMatchValue(assetInfo.getProductSegment(), importService.productSegmentList);
     }
 
     private String getMedicalApparatusClassificationName(String medicalApparatusClassification) {
@@ -1182,9 +1192,6 @@ public class AssetInfoFormatter {
     }
 
     private String getMessage(String key) {
-//        if(!messageCacheMap.containsKey(key)) {
-//            messageCacheMap.put(key, WebUtil.getMessage(key));
-//        }
         return WebUtil.getMessage(key);
     }
 

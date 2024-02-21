@@ -24,13 +24,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -39,8 +37,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -48,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -63,7 +65,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     private Page<BudgetApplication> emptyPage = new PageImpl<BudgetApplication>(Collections.emptyList());
     private UserAccount account = UserContextService.getCurrentUserAccount();
+    @Getter @Setter
     private Integer tabIndex = 0;
+    @Getter @Setter
     private Integer tabIndexList = 0;
 
 
@@ -82,7 +86,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private BudgetAssetInfo curSelectBudgetAssetInfo;
     @Getter @Setter
     private List<V2_BlobObject> attachList;
-
+    @Getter  @Setter
+    private TreeNode orgImportTree;
     // 弹窗列表
     @Getter @Setter
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
@@ -93,6 +98,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
 
+    private PageUtil<BudgetApplication> pageUtil = new PageUtil<>();
 
     private UserContextService userContextService;
     private BudgetPersistService persistService;
@@ -109,7 +115,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private TreeNode orgTreeEdit;
     @Getter @Setter
     private OrgInfo selectedDept;
-
+    @Getter @Setter
+    private List<String> removeFileBlobId = new ArrayList<>();
     @Override
     protected void init() {
         AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
@@ -125,13 +132,16 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         org = orgDao.findById(account.getOrgInfoId());
 
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        TreeNode treeNodeImport = uaaService.getOrgTreeByParentIdWithSelectedChildren(account.getSiteUID(), account.getUid());
+        orgImportTree = initOrgTree(treeNodeImport);
         orgTree = initOrgTree(treeNode);
         orgTreeEdit = initOrgTree(treeNodeEdit);
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
+        //新跳转记录一下  index  在  tabIndexList   返回的时候  再赋值给  tabIndex 慢
         String tabIndexStr = (String) WebUtil.getRequestParameter("tabIndex");
         if(StringUtils.isNotBlank(tabIndexStr)){
             this.tabIndex = Integer.parseInt(tabIndexStr);
@@ -193,12 +203,14 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             case "s4":
                 tabIndex = 4;
                 break;
+            case "s5":
+                tabIndex = 5;
+                break;
             default:
                 tabIndex = 0;
                 break;
         }
     }
-
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
                 || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
@@ -208,7 +220,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             return emptyPage;
         }
         List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
-        return new PageImpl(dataList,pageRequest,dataList.size());
+        return pageUtil.pageNum(dataList,pageRequest);
     }
 
     @Getter
@@ -235,7 +247,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         updateSearchFilter(new SearchFilter("orderType", SearchFilter.Operator.EQ, BudgetApplication.OrderType.BAY.toString()));
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-        removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");
+        removeFilterOnField("applicationStatus");removeFilterOnField("applicationStep");removeFilterOnField("confirmStatus");
         if (tabIndex == 0) {//待办
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1,4)));
         } else if(tabIndex == 1){//待审核
@@ -244,10 +256,11 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "PendingComplete"));
         } else if(tabIndex == 3){//完成
             searchFilters.add(new SearchFilter("applicationStep", SearchFilter.Operator.EQ, "Complete"));
-        } else if(tabIndex == 4){//全部
+        } else if(tabIndex == 4){//采购信息确认
+            searchFilters.add(new SearchFilter("confirmStatus", SearchFilter.Operator.IsNull, null));
+        } else if(tabIndex == 5){//全部
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
-
         queryByUserRole(org);
 
         return searchFilters;
@@ -277,9 +290,17 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     public void saveApplication() {
         persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
-        boolean isOk = persistService.saveApplication(selected,this.attachList,null);
+        boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
         actionMessage(isOk);
+    }
+
+    public String confirmApplication() {
+        this.selected.setConfirmStatus("Confirmed");
+        boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
+        this.curSelectApplicationBudgetAsset = selected.getBudgetAssets().iterator().next();
+        actionMessage(isOk);
+        return this.backList();
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
@@ -295,7 +316,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }else{
             persistService.handleCommonField(selected,applicationStatus,applicationStep,
                     account,crudActionName,this.curSelectBudgetAssetInfo);
-             persistService.saveApplication(selected,this.attachList,null);
+             persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         }
         return this.backList();
     }
@@ -320,9 +341,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         //selectedAsset.setDept(selectedDept);
         //selectedAsset.setDeptId(selectedDept.getId());
         selectedAsset.setTenantUID(account.getTenantUID());
-        selectedAsset.setInstitutionUID(account.getTenantUID());
-        selectedAsset.setHospitalUID(account.getTenantUID());
-        selectedAsset.setSiteUID(account.getTenantUID());
+        selectedAsset.setInstitutionUID(account.getInstitutionUID());
+        selectedAsset.setHospitalUID(account.getHospitalUID());
+        selectedAsset.setSiteUID(account.getSiteUID());
         boolean isOk = persistService.saveAsset(selectedAsset);
         WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
                 + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
@@ -420,8 +441,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
         }
     }
     public void calcAmountOffline(BudgetApplicationAsset budgetApplicationAsset) {
@@ -429,8 +450,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
         }
     }
 
@@ -535,26 +556,26 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     public boolean budgetApprovalsDisplay(){
         return (CollectionUtils.isNotEmpty(this.selected.getBudgetApprovals())&&this.selected.getBudgetApprovals().size()>0)?true:false;
     }
-/*
+
     public void removeAttachmentById(String blobId) {
-        blobService.deleteBlobFileById(blobId);
+        this.removeFileBlobId.add(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
+        if (null != blobObject ) {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_BUDGET);
-            if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
+           /* if (Optional.ofNullable(selected.getId()).isPresent()) { // 编辑
                 blobObject.setBoUuid(selected.getBudgetAssets().iterator().next().getId());
-            }
+            }*/
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-    }*/
+    }
 
 
     public void searchAsset() {
@@ -604,7 +625,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         // 科室
 //        updateAssetSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, selectedDept.getId()));
         // 现在只要是同一租户下的设备都能看到
-        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedDept.getTenantUID()));
+        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
         updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
@@ -647,6 +668,84 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         return render;
     }
+    /**  **************************批量导入************************** **/
+    @Getter  @Setter
+    private OrgInfo selectedImportOrg;
+    @Getter  @Setter
+    private String selectedImportOrgName;
+    @Getter  @Setter
+    private UploadedFile file;
+    @Getter  @Setter
+    private List<BudgetApplication> errorImportList;
+
+    public void handleFileUploadImport(FileUploadEvent event) throws IOException, ParseException, NoSuchFieldException, IllegalAccessException {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.file = event.getFile();
+        if(this.selectedImportOrg==null){
+            OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+            selectedImportOrg = orgDao.findByUid(account.getSiteUID());
+        }
+        errorImportList = persistService.handleExcel(file, account,selectedImportOrg,BudgetApplication.OrderType.BAY.toString());
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void exportAssetExcelTemplate() throws IOException {
+
+       /* CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //field name using english
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        //field name using chinese
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
+
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        template.exportSampleAsset(orgList, exportFields);
+        template.exportSampleAsset(orgList, exportFields,tcm);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isLocale()){
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        }else{
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
+        }*/
+        logger.info(" export asset excel template successful. ");
+    }
+
+    public List<BudgetApplication> getErrorImportList() {
+        return errorImportList;
+    }
+
+    /**
+     * 编辑区域部门选择
+     * @param event
+     */
+    public void onSelectedImportTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        this.setSelectedImportOrgName(orgInfo.getName());
+        this.setSelectedImportOrg(orgInfo);
+    }
+
+    /**
+     * 删除按钮
+     * @param
+     */
+    public boolean deleteButtonStatus() {
+        boolean args = true;
+        if(this.selected != null &&
+                (this.selected.getApplicationStatus() == 1||
+                        ("EXCEL_IMPORT".equals(this.selected.getDataSource()) && ("Unpurchased".equals(this.selected.getProcureStatus()))))){
+            args = false;
+        }
+        return args;
+    }
+    /**  **************************批量导入**************************           **/
 
 
 

@@ -15,6 +15,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -89,10 +90,13 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 Map<String, Object> map = new LinkedHashMap();
 
                 AssetInfo asset;
+                AssetInfo dbAsset = new AssetInfo();
 
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
+                    dbAsset = new AssetInfo();
+                    BeanUtils.copyProperties(asset,dbAsset);
                     if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
 
                     //save old data to compare later
@@ -126,6 +130,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner2")), "setAssetOwnerName2", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner3")), "setAssetOwnerName3", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("PMOwner")), "setPmOwnerName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("patrolInspectionOwnerName")), "setPatrolInspectionOwnerName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("clinicalDeptId")), "setClinicalDeptName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("assetDeptName")), "setAssetDeptName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("manufacture")), "setManufacture", true);
@@ -239,6 +244,9 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("spare04")), "setSpare04", true);
                 assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("spare05")), "setSpare05", true);
 
+                assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("UCMID")), "setUCMID", true);
+                assetRow.setFieldStringTrimValue(trimMsgKey(WebUtil.getMessage("productFamily")), "setProductFamily", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("productSegment")), "setProductSegment", productSegmentList, map, null);
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
                     supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);
@@ -246,8 +254,9 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                     supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
                 }
 
-
                 map.put("asset", asset);
+                map.put("oldAsset", dbAsset);
+
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 

@@ -26,13 +26,16 @@
                 <p:column headerText="确认数量（台）">
                     <h:outputText value="#{item.confirmQuantity}"/>
                 </p:column>
-                <p:column headerText="确认预算价（万元）">
+                <p:column headerText="确认预算价">
                     <h:outputText value="#{item.confirmPrice}"/>
                 </p:column>
-                <p:column headerText="拦标价（万元）">
+                <p:column headerText="确认预算价总价">
+                    <h:outputText value="#{item.confirmAmount}"/>
+                </p:column>
+                <p:column headerText="拦标价">
                     <h:outputText value="#{item.confirmMaximumPrice}"/>
                 </p:column>
-                <p:column headerText="拦标价总价（万元）">
+                <p:column headerText="拦标价总价">
                     <h:outputText value="#{item.confirmMaximumTotalPrice}"/>
                 </p:column>
                 <p:column headerText="设备品目">
@@ -64,8 +67,32 @@
                     <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                 </p:selectOneMenu>
             </h:panelGroup>
+            <h:panelGroup>
+                <p:outputLabel class="label">合同开始时间</p:outputLabel>
+                <p:calendar mode="popup" showOn="button"
+                            value="#{multiLevelApprovalController.purchaseOrderInfo.contractStartDate}"
+                            timeZone="#{userContextService.getTimeZone()}"
+                            pattern="#{userContextService.timeFormat()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            showButtonPanel="true"
+                            navigator="true" mask="true">
+                    <p:ajax event="dateSelect" update="@this"/>
+                </p:calendar>
+            </h:panelGroup>
+            <h:panelGroup>
+                <p:outputLabel class="label">合同结束时间</p:outputLabel>
+                <p:calendar mode="popup" showOn="button"
+                            value="#{multiLevelApprovalController.purchaseOrderInfo.contractEndDate}"
+                            timeZone="#{userContextService.getTimeZone()}"
+                            pattern="#{userContextService.timeFormat()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            showButtonPanel="true"
+                            navigator="true" mask="true">
+                    <p:ajax event="dateSelect" update="@this"/>
+                </p:calendar>
+            </h:panelGroup>
             <h:panelGroup >
-                <p:outputLabel class="label">过会日期</p:outputLabel>
+                <p:outputLabel class="label">过会日期<span style="color: red">*</span></p:outputLabel>
                 <p:calendar mode="popup" showOn="button" disabled="true"
                             value="#{multiLevelApprovalController.purchaseOrderInfo.meetingDate}"
                             timeZone="#{userContextService.getTimeZone()}"
