@@ -308,6 +308,7 @@ public class ZkbPartOrderEditService {
                 if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
                     selected.setHighCatFlag(CopyByInvok.F);
                 }
+                selected.setProvideNewContract(CopyByInvok.T);
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             selected.setScoreFlag(CopyByInvok.F);
@@ -474,7 +475,7 @@ public class ZkbPartOrderEditService {
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                //errorLog.append("附件不能为空！");
+                errorLog.append("附件不能为空！");
             }
         }else{
             if("t".equals(selected.getScoreFlag())){

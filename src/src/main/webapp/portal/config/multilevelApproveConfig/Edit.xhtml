@@ -6,7 +6,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+    xmlns:apm="http://www.ge.com/tags/apm">
 
 <ui:composition>
 
@@ -99,7 +100,45 @@
                             <f:convertNumber pattern="0" type="number"/>
                         </p:inputNumber>
                     </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">#{msg.assetTypeGroup}</label>-->
+<!--                        <apm:selectAssetTypeGroup readonly="true"/>-->
+<!--                    </h:panelGroup>-->
+
+<!--                    <h:panelGroup id = "clinicalDeptName">-->
+<!--                        <label class="label">#{msg.clinicalDeptName}</label>-->
+<!--                        <p:autoComplete dropdown="true" value="#{multiLevelApprovalConfigController.selected.clinicalDeptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{multiLevelApprovalConfigController.autoCompleteDept}">-->
+<!--                            <p:ajax event="itemSelect" listener="#{multiLevelApprovalConfigController.onClinicalDeptChange}"/>-->
+<!--                        </p:autoComplete>-->
+<!--                    </h:panelGroup>-->
                 </p:panelGrid>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                    <p:fieldset legend="设备分类">
+                        <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
+                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetGroups}" layout="pageDirection">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectManyCheckbox>
+                        </p:scrollPanel>
+                    </p:fieldset>
+                    <p:fieldset legend="所属科室">
+                        <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
+                            <p:outputPanel id="checkboxPanel">
+                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection">
+                                <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}" var="item" itemLabel="#{item.name }" itemValue="#{item.uid}"/>
+                            </p:selectManyCheckbox>
+                            </p:outputPanel>
+                        </p:scrollPanel>
+                    </p:fieldset>
+                    <p:fieldset legend="设备分类" rendered="#{multiLevelApprovalConfigController.enableAssetType}">
+                        <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
+                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetTypes}" layout="pageDirection">
+                                <f:selectItems  value="#{multiLevelApprovalConfigController.assetTypeList}"  var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
+                            </p:selectManyCheckbox>
+                        </p:scrollPanel>
+                    </p:fieldset>
+                </p:panelGrid>
+
             </p:fieldset>
 
             <p:fieldset id="approver" legend="审批节点">
@@ -197,7 +236,7 @@
 
                         <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalConditionEnable}">
                             <p:fieldset legend="审批节点-角色">
-                                <p:selectOneMenu  value="#{multiLevelApprovalConfigController.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                <p:selectOneMenu  value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}审批角色" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItem itemLabel="临床科室主任" itemValue="DeptHead" />
                                     <f:selectItem itemLabel="工程师" itemValue="AssetStaff"  />
@@ -205,7 +244,7 @@
                             </p:fieldset>
 
                             <p:fieldset legend="审批节点-条件">
-                                <p:selectOneMenu   value="#{multiLevelApprovalConfigController.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                <p:selectOneMenu   value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItem itemLabel="工单设备所属科室" itemValue="1" />
                                 </p:selectOneMenu>

@@ -366,6 +366,8 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
+    @Column(name="parent_asset_uid",columnDefinition = "CHAR(32)")
+    private String parentAssetUid;
 
     @Column(name = "inventory_status")
     private Integer inventoryStatus;
@@ -547,6 +549,15 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "pm_owner_id")
     private Integer pmOwnerId;//保养负责人
+
+    @Column(name = "patrol_inspection_owner_uid")
+    private String patrolInspectionOwnerUID;//保养巡检负责人
+
+    @Column(name = "patrol_inspection_owner_name")
+    private String patrolInspectionOwnerName;//保养巡检负责人名称
+
+    @Column(name = "patrol_inspection_owner_tel")
+    private String patrolInspectionOwnerTel;//保养巡检负责人电话
 
     @Column(name = "measuring_owner_id")
     private Integer measuringOwnerId;//计量负责人
@@ -2629,6 +2640,30 @@ public class AssetInfo implements ChineseName,Serializable {
         this.pmOwnerId = pmOwnerId;
     }
 
+    public String getPatrolInspectionOwnerUID() {
+        return patrolInspectionOwnerUID;
+    }
+
+    public void setPatrolInspectionOwnerUID(String patrolInspectionOwnerUID) {
+        this.patrolInspectionOwnerUID = patrolInspectionOwnerUID;
+    }
+
+    public String getPatrolInspectionOwnerName() {
+        return patrolInspectionOwnerName;
+    }
+
+    public void setPatrolInspectionOwnerName(String patrolInspectionOwnerName) {
+        this.patrolInspectionOwnerName = patrolInspectionOwnerName;
+    }
+
+    public String getPatrolInspectionOwnerTel() {
+        return patrolInspectionOwnerTel;
+    }
+
+    public void setPatrolInspectionOwnerTel(String patrolInspectionOwnerTel) {
+        this.patrolInspectionOwnerTel = patrolInspectionOwnerTel;
+    }
+
     public String getPmOwnerName() {
         return pmOwnerName;
     }
@@ -3103,6 +3138,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public Date getLastPmDateFour() { return lastPmDateFour; }
 
     public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
+
+    public String getParentAssetUid() {
+        return parentAssetUid;
+    }
+
+    public void setParentAssetUid(String parentAssetUid) {
+        this.parentAssetUid = parentAssetUid;
+    }
 
     public void clearDefaultValue(){
         this.isChecked=null;

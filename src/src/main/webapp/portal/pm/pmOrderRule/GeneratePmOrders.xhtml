@@ -73,15 +73,12 @@
 						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
                                            forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
-							   <!--<p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
-							   <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>-->
 						   </p:autoComplete>
 					   </h:panelGroup>
 
 						  <h:panelGroup >
 							 <label class ="label">#{msg.assetName}</label>
 							 <p:inputText  value="#{generatePmOrdersController.queryAsset.name}">
-									<!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />-->
 							 </p:inputText>
 						 </h:panelGroup>
 
@@ -95,7 +92,6 @@
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
 		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}">
-		                             <!-- <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
@@ -106,7 +102,6 @@
 							 <p:autoComplete id="manufacture" value="#{generatePmOrdersController.queryAsset.manufacture}" dropdown="true" scrollHeight="300" style="max-width: 200px"
                                              forceSelection="true" completeMethod="#{generatePmOrdersController.getSupplier}"
                                              var="t" itemLabel="#{t}" itemValue="#{t}">
-								 <!--<p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"/>
 								 <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"/>-->
 							 </p:autoComplete>
 		                 </h:panelGroup>
@@ -114,14 +109,12 @@
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>
 		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}">
-	                                    <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 	                          </p:inputText>
 		                 </h:panelGroup>
 
 						   <h:panelGroup >
 							   <label class ="label">#{msg.brand}</label>
 							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}">
-								   <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />-->
 							   </p:inputText>
 						   </h:panelGroup>
 						   <h:panelGroup  >
@@ -135,6 +128,11 @@
 								   </p:selectOneRadio>
 							  </c:if>
 						   </h:panelGroup>
+					   <h:panelGroup rendered="#{generatePmOrdersController.enableWarrantyDateSearch}">
+						   <label class ="label">#{msg.warrantyDate}</label>
+						   <p:calendar  timeZone="GMT+8" id="warrantyDate" pattern="yyyy/MM/dd" mask="true" value="#{generatePmOrdersController.queryAsset.warrantyDate}" showOn="button" showButtonPanel="true" >
+						   </p:calendar>
+					   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"/>
@@ -149,7 +147,7 @@
 							<p:ajax process="@this" listener="#{generatePmOrdersController.prepareAssetRuleList()}" update="@this @(.batch-terminated) GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 						</p:selectBooleanCheckbox>
 						<f:facet name="header"  >
-							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{generatePmOrdersController.isAllAssetSelected}">
 								<p:ajax listener="#{generatePmOrdersController.onSelectAllOfPage}" update="@(.selectCheckBox) :GeneratePmOrderForm:dataScroller GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 							</p:selectBooleanCheckbox>
 						</f:facet>
@@ -169,11 +167,6 @@
 					<p:column headerText="#{msg.ManufacturerSerialNumber}" >
 						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
 					</p:column>
-<!--					<p:column headerText="#{msg.Operation}" >
-						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
-                                         icon="ui-icon-close" style="zoom: 0.7"/>
-					</p:column>-->
-
 				</p:dataTable>
 			</p:fieldset>
 
@@ -212,61 +205,8 @@
 					</p:column>
 
 				</p:dataTable>
-<!--				<p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.generatePmOrdersForMuliPMRule4()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
-<!--				<p:commandButton id="close" value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{generatePmOrdersController.cancel()}" immediate="true" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
-
 			</p:fieldset>
-			<!--<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300" rows="#{generatePmOrdersController.total}">
-
-				<f:facet name="header">
-					<h:panelGrid columns="5" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
-						<h:outputText value="资产名称" />
-						<h:outputText value="设备编号" />
-						<h:outputText value="使用科室" />
-						<h:outputText value="设备类型" />
-						<h:outputText value="资产编号" />
-					</h:panelGrid>
-				</f:facet>
-				<h:panelGrid columns="6" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
-					<h:outputText value="#{generatePmOrdersController.getName(item)}" />
-					<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
-					<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
-					<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
-					<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
-					<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}"  update="dataScroller" icon="ui-icon-close" style="width: 30px; height: 30px;"/>
-				</h:panelGrid>
-			</p:dataScroller>-->
-
-
-
-<!--                <p:fieldset id="assets" legend="筛选资产">
-                    <p:pickList id="AssetsPickList" value="#{generatePmOrdersController.availableAssets}" var="item"
-                                itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
-                                showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                                required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
-                        <f:facet name="sourceCaption">待选设备</f:facet>
-                        <f:facet name="targetCaption">已选设备</f:facet>
-                        <p:ajax event="transfer" listener="#{generatePmOrdersController.onAssetsTransfer}" />
-                        <p:column style="float: left;width:25%;">
-                            <h:outputText value="#{item.name}" />
-                        </p:column>
-                        <p:column style="float: left;width:30%;">
-                            <h:outputText value="#{item.departNum}" />
-                        </p:column>
-&lt;!&ndash;                        <p:column style="float: left;width:20%;">
-                            <h:outputText value="#{generatePmOrdersController.getOrgName(item.siteUID)}" />
-                        </p:column>&ndash;&gt;
-                         <p:column style="float: left;width:25%;">
-                            <h:outputText value="#{item.clinicalDeptName}" />
-                        </p:column>
-						<p:column>
-							<h:outputText value="#{item.functionType}" />
-						</p:column>
-                    </p:pickList>
-
-                </p:fieldset>-->
                     <br/> <br/>
-
                     <p:fieldset id="config" legend="#{msg.ConfigureWorkorder}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -279,8 +219,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
-									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"></p:ajax>
-                                    <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
+									<p:ajax listener="#{generatePmOrdersController.updatePMType()}"></p:ajax>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -298,50 +237,6 @@
         </h:form>
         </div>
       </div>
-
-
-<!--		<p:dialog class ="pmCreateDialogBatch" id="pmCreateDialogBatch" widgetVar="pmCreateDialogBatch" modal="true"  resizable="false" draggable="true" width="800" closable="false" appendTo="@this" header="#{msg.BatchCreate}">-->
-<!--			<p:dataTable id="datalist" value="#{generatePmOrders4Controller.notOnlyOneModels}" var="item" widgetVar="varDataListgl"-->
-<!--						 paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"-->
-<!--						 rowKey="#{item.uniqueUid}"-->
-<!--						 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"-->
-<!--						 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"-->
-<!--						 rows="20" emptyMessage="#{msg.noRecordFound}"-->
-<!--						 rowsPerPageTemplate="20,50,100,500">-->
-
-<!--				<p:column width="36"  id="checkBoxRulesColumn">-->
-<!--					<p:selectBooleanCheckbox value="#{generatePmOrders4Controller.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesBox">-->
-<!--						<p:ajax process="@this" listener="#{generatePmOrders4Controller.updateCheckBox()}" update="@this @(.selectRulesCheckBoxHeader)" />-->
-<!--					</p:selectBooleanCheckbox>-->
-<!--					<f:facet name="header"  >-->
-<!--						<p:selectBooleanCheckbox id="selectRulesCheckBoxHeader" class="selectRulesCheckBoxHeader" value="#{generatePmOrders4Controller.isAllSelected}" >-->
-<!--							<p:ajax listener="#{generatePmOrders4Controller.onSelectRuleAllOfPage()}" process="@this" update="@this @(.checkBoxRulesBox) " />-->
-<!--						</p:selectBooleanCheckbox>-->
-<!--					</f:facet>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.assetName}">-->
-<!--					<h:outputText value="#{item.assetName}"/>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.pmRuleName}">-->
-<!--					<h:outputText value="#{item.pmRuleName}"/>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.level}">-->
-<!--					<h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour', item.level)}"/>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.period}">-->
-<!--					<h:outputText value="#{item.period}"/>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.planTime}">-->
-<!--					<h:outputText value="#{item.planTime}"/>-->
-<!--				</p:column>-->
-<!--				<p:column headerText="#{msg.pmType}">-->
-<!--					<h:outputText value="#{fieldMsg.fieldValue('pmType', item.pmType)}"/>-->
-<!--				</p:column>-->
-
-<!--			</p:dataTable>-->
-<!--			<p:commandButton validateClient="true" actionListener="#{generatePmOrders4Controller.generatePmOrdersForMuliPMRule4()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
-<!--			<p:commandButton id="close" value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{generatePmOrders4Controller.cancel()}" immediate="true" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
-<!--		</p:dialog>-->
 
 		<script type="text/javascript">
 			function updateSelectAllCheckBox() {

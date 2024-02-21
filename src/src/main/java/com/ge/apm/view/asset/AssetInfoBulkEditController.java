@@ -1209,6 +1209,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "patrolInspectionOwnerName":
+                selected.setPatrolInspectionOwnerUID(null == selectedUser ? null : selectedUser.getUid());
+                selected.setPatrolInspectionOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setPatrolInspectionOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
         }
 
 

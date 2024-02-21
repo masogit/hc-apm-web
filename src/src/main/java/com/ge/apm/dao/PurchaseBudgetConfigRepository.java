@@ -14,8 +14,8 @@ import java.util.List;
  */
 public interface PurchaseBudgetConfigRepository extends GenericRepositoryUUID<PurchaseBudgetConfig> {
 
-    List<PurchaseBudgetConfig> findByYearAndTenantUID(String year,String tenantUID);
-    List<PurchaseBudgetConfig> findByYearAndTenantUIDAndIdIsNot(String year,String id,String tenantUID);
+    List<PurchaseBudgetConfig> findByYearAndTenantUIDAndSiteUID(String year,String tenantUID,String siteUID);
+    List<PurchaseBudgetConfig> findByYearAndTenantUIDAndSiteUIDAndIdIsNot(String year,String id,String tenantUID,String siteUID);
 
     @Query(value = "select * from purchase_budget_config c where c.tenant_uid =?1 and c.site_uid = ?2 and c.start_date <= ?3 and c.end_date >= ?3", nativeQuery = true)
     List<PurchaseBudgetConfig> queryEffiveConfig(String tenantUid, String siteUid, Date date);

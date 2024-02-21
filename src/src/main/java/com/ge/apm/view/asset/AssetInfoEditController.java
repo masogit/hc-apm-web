@@ -376,6 +376,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 e.printStackTrace();
             }
         }
+        ownerList = new ArrayList<>();
         ownerList = ucService.getWorkerList(selected.getId(), "");
         config = configService.findConfigBySite(selected.getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
@@ -511,7 +512,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
             UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
             if (null != submitter) {
-                selected.setCreatedBy(submitter.getUid());
+                selected.setCreatedBy(submitter.getName());
             }
         }
         selected.setCreatedDate(createRequest.getSubmitDate());
@@ -544,6 +545,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
 
         selectedObjectMap.put("measuringOwner", selected.getMeasuringOwnerId() == null ? null : userDao.findById(selected.getMeasuringOwnerId()));
+        selectedObjectMap.put("patrolInspectionOwnerName", selected.getPatrolInspectionOwnerUID() == null ? null : userDao.findByUid(selected.getPatrolInspectionOwnerUID()));
 
 
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
@@ -602,6 +604,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
 
         changeAssetOrg(orgInfo);
+        updateManagementOnSiteChange();
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -643,6 +646,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private void updateManagementOnSiteChange() {
+        managementList.clear();
         List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
         if(CollectionUtils.isEmpty(managementList)){
             return;
@@ -714,6 +718,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "patrolInspectionOwnerName":
+                selected.setPatrolInspectionOwnerUID(null == selectedUser ? null : selectedUser.getUid());
+                selected.setPatrolInspectionOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setPatrolInspectionOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
         }
 
 
@@ -974,9 +984,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         // do other stuff after save
         int status = selected.getStatus();
-        if(status != assetLifecyleStatus){
-            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
-        }
+//        if(status != assetLifecyleStatus){
+//            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
+//        }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
@@ -1270,7 +1280,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setStatus(4);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
@@ -1290,7 +1300,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setTerminateDate(null);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 
@@ -1572,6 +1582,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         //parent asset and child asset will be in the same dept
         if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
             return false;
+        }else{
+            selected.setParentAssetUid(assetInfo.getUid());
         }
 
         if(selected.getSiteId()==46){
@@ -1821,7 +1833,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean getAssetScrapEnable(){
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"assetScrap");
-        return  value.equals("true")?true:false;
+        return  StringUtils.isNotEmpty(value)?value.equals("true"):false;
 
     }
 
@@ -1849,6 +1861,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
         return dao.secondment(selected.getUid())>0;
+    }
+
+    public void checkSerialNumExists () {
+        List<AssetInfo> list = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
+        if (CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("制造商序列号已存在！");
+        }
     }
 
     public boolean isApproval() {

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
@@ -103,9 +104,19 @@ public class SupplierService {
         supplierUser.setStatus(SupplierUser.Status.Approved.name());
         supplierUserDao.save(supplierUser);
     }
-
-    public void deleteByID(String id){
-        supplierUserDao.delete(id);
+    @Transactional
+    public void deleteByID(SupplierUser supplierUser){
+        UserAccount user = supplierUser.getUserAccount();
+        if(user != null){
+            user.setIsActive(Boolean.FALSE);
+            user.setIsDeleted(Boolean.TRUE);
+            user.setTelephone(null);
+            user.setWeChatId(null);
+            user.setWxUnionId(null);
+            userAccountDao.save(user);
+        }
+        supplierUserDao.deleteUserWxApp(supplierUser.getUserID());
+        supplierUserDao.delete(supplierUser.getId());
     }
 
     @Transactional
@@ -234,16 +245,8 @@ public class SupplierService {
     }
 
     public boolean activeSupplier(){
-        //UserAccount user = UserContextService.getCurrentUserAccount();
-        Set<String> functions = UserContextService.getCurrentUserFunction();
-        return functions.contains("ASSET_SUPPLIER_APPLICATION_EDIT");
-//
-//        WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-//        if(null != configBySite){
-//           return configBySite.getActiveSupplier() != null && configBySite.getActiveSupplier();
-//        }
-//
-//        return false;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
     }
 
     public boolean validateSupplierCode(Supplier supplier){

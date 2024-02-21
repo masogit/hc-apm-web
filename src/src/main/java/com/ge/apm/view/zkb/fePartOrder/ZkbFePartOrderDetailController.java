@@ -22,6 +22,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/9/23
@@ -325,6 +326,17 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             contractError = true;
+        }
+        if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
+            List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
+                    (this.selected.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
+            if((ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))
+                    && CollectionUtils.isNotEmpty(zkbContractAssetList) && this.zkbAssetInfo.getRepairForm()!=null && 2 != this.zkbAssetInfo.getRepairForm()){
+                //gefe 合同类型 ccs/biomed 超声高端机只能申请 申请外修 内修在  zkbfe
+                WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                this.contractError = true;
+                return;
+            }
         }
         if(2==zkbAssetInfo.getAssetGroup()//超声
                 &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机

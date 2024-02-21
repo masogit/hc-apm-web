@@ -269,6 +269,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
                         spareArtificialFlag = true;
                     }
+                }else{
+                    radiationQuotaTypeFlag = false;
+                    selected.setRadiationQuotaType(null);
                 }
             }
         }

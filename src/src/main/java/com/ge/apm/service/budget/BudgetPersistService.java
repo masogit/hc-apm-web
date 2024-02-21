@@ -20,6 +20,11 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,7 +49,34 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Service
 public class BudgetPersistService {
+
+
     private static Logger logger = LoggerFactory.getLogger(BudgetPersistService.class);
+    //主表字段
+    private final String[] BUDGET_HEADER_FIELD = {"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate","approvalLoginName","approvalDate"};  //主表字段名
+    //设备明细字段
+    private final String[] ASSET_HEADER_FIELD = {"applicationAssetName","applicationAssetCategory","recommendedBrand","standards","model","applicationQuantity","unit",
+            "applicationPrice","sourceFunding","similarDevicesNumber","similarDevicesUse","importedOr","majorFunction","deviceConfiguration",
+            "technicalParameter","equipmentUtilization","benefitAnalysis","productComparison","serviceLife","chargingStandards","yearIncome","usage",
+            "placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","description","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion",
+            "offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark"};  //明细字段名
+    private final String[] ASSET_HEADER_FIELD_BIGDECIMAL_TYPE = {"applicationPrice","chargingStandards","yearIncome","offlineApplicationPrice"}; //bigdecima数字类型字段
+    private final String[] ASSET_HEADER_FIELD_INTEGER_TYPE = {"applicationQuantity","similarDevicesNumber","offlineApplicationQuantity"}; //integer类型字段
+    //日期类型
+    private final String[] HEADER_FIELD_DATE_TYPE = {"applicationDate","offlineApprovalDate","approvalDate"}; //日期类型字段
+    //下拉字段名  ，需value  和中文转换
+    private final String[] ASSET_HEADER_FIELD_DROP_INDEX = {"sourceFunding","importedOr","placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork"}; //下拉字段
+    //主表必填字段
+    private final String[][] BUDGET_FIELD_REQUIRE = {{"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate","approvalLoginName","approvalDate"},
+                                                     {"申请编号"       ,"申请科室"             ,"病区代码"  ,"申请人登录账号"      ,"申请日期(YYYY/MM/DD)","审核人登录账号"   ,"审核日期(YYYY/MM/DD)"}}; //主表必填字段名称，和中文名
+    //明细必填字段
+    private final String[][] ASSET_FIELD_REQUIRE = {{"applicationAssetName","applicationAssetCategory","recommendedBrand","standards","model","applicationQuantity","unit","applicationPrice","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion","offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark","usedOperatingRoom"},
+                                                    {"设备名称"              ,"设备品类"                  ,"推荐品牌"         ,"规格"      ,"型号"  ,"数量"                ,"单位" ,"预算单价"         ,"审批时间(YYYY/MM/DD)" ,"审批意见"                ,"审批结论"                  ,"记录人"                   ,"审批数量"                   ,"审批单价"                 ,"备注"                  ,"是否在手术室使用"}}; //明细必填字段
+
+    private final int ASSET_BEGIN = 7;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
@@ -144,20 +182,23 @@ public class BudgetPersistService {
         application.setCreatedDate(new Date());
         application.setLastModifiedBy(account.getLoginName());
         application.setLastModifiedDate(new Date());
+        application.setDataSource("SYSTEM");
         application.setOrderType(orderType);
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        application.setApplicationDeptName(orgInfo.getName());
-        application.setApplicationDept(orgInfo);
-        application.setCourtyardArea(getCourtyardArea(orgInfo));
+        if(orgInfo.getOrgType()==4){
+            application.setApplicationDeptName(orgInfo.getName());
+            application.setApplicationDept(orgInfo);
+        }
+        OrgInfo orgArea = getCourtyardAreaOrg(orgInfo);
+        application.setCourtyardArea(orgArea.getName());
+        application.setCourtyardAreaId(orgArea.getId());
     }
 
-    public String getCourtyardArea(OrgInfo orgInfo){
-        String orgName = new String();
+    public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo){
         if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
-            orgName = orgInfo.getName();
-            return orgName;
+            return orgInfo;
         }
-        return getCourtyardArea(orgInfo.getParentOrg());
+        return getCourtyardAreaOrg(orgInfo.getParentOrg());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -322,6 +363,10 @@ public class BudgetPersistService {
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;
         String applicationNum = orderType + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        BudgetApplication budgetApplicationExist = budgetApplicationDao.findByApplicationNum(applicationNum);
+        if(budgetApplicationExist != null){
+                applicationNum = applicationNum+"_1";
+        }
         budgetApplication.setApplicationNum(applicationNum);
         budgetApplication.setApplicationNumIndex(index);
         return budgetApplication;
@@ -401,4 +446,261 @@ public class BudgetPersistService {
             }
         }
     }
+
+    public List<BudgetApplication> handleExcel(UploadedFile file, UserAccount user,OrgInfo selectOrgInfo,String orderType) throws IOException, NoSuchFieldException, IllegalAccessException {
+        List<BudgetApplication> tempBudgetList = new ArrayList<BudgetApplication>();
+        Workbook workbook = this.createExcel(file);
+        Sheet sheet = workbook.getSheetAt(0);
+        if (sheet == null) {
+            return null;
+        }
+        for(int j = 1 ; j < sheet.getLastRowNum(); j ++){
+            Row row = sheet.getRow(j+1);
+            if(row==null){
+                continue;
+            }
+            String errorInfo = "";
+            BudgetApplication budgetApplication = new BudgetApplication();
+            Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
+            BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
+            budgetApplicationAssetSet.add(budgetApplicationAsset);
+            budgetApplication.setBudgetAssets(budgetApplicationAssetSet);
+            budgetApplication = initCreateBudget(user,selectOrgInfo,orderType);
+            budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+            for(int i = 0 ; i< BUDGET_HEADER_FIELD.length ; i++){
+                String mtName = "set"+BUDGET_HEADER_FIELD[i].substring(0, 1).toUpperCase() + BUDGET_HEADER_FIELD[i].substring(1);
+                if(row.getCell(i) != null && StringUtils.isNotBlank(CellType.NUMERIC.equals(row.getCell(i).getCellTypeEnum()) ?
+                        new DecimalFormat("##############.#####").format(row.getCell(i).getNumericCellValue()) : row.getCell(i).getStringCellValue())){
+                    String opt = CellType.NUMERIC.equals(row.getCell(i).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(i).getNumericCellValue()) : row.getCell(i).getStringCellValue();
+                    try {
+                        if(Arrays.asList(HEADER_FIELD_DATE_TYPE).contains(BUDGET_HEADER_FIELD[i])){
+                            Method method = BudgetApplication.class.getMethod(mtName,Date.class);
+                            if(HSSFDateUtil.isCellDateFormatted(row.getCell(i))){
+                                Date optDate = row.getCell(i).getDateCellValue();
+                                method.invoke(budgetApplication, optDate);
+                            }
+                        }else{
+                            Method method = BudgetApplication.class.getMethod(mtName,String.class);
+                            method.invoke(budgetApplication, opt);
+                        }
+                    } catch (Exception e) {
+                        logger.debug("handleExcel error"+e.getMessage());
+                    }
+                }
+            }
+
+            for(int i = 0 ; i< ASSET_HEADER_FIELD.length ; i++){
+                String mtName = "set"+ASSET_HEADER_FIELD[i].substring(0, 1).toUpperCase() + ASSET_HEADER_FIELD[i].substring(1);
+                if(row.getCell(i+ASSET_BEGIN) != null && StringUtils.isNotBlank(CellType.NUMERIC.equals(row.getCell(i+ASSET_BEGIN).getCellTypeEnum()) ?
+                        new DecimalFormat("##############.#####").format(row.getCell(i+ASSET_BEGIN).getNumericCellValue()) : row.getCell(i+ASSET_BEGIN).getStringCellValue())){
+                    String opt = CellType.NUMERIC.equals(row.getCell(i+ASSET_BEGIN).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(i+ASSET_BEGIN).getNumericCellValue()) : row.getCell(i+ASSET_BEGIN).getStringCellValue();
+                    opt = handIndexBox(ASSET_HEADER_FIELD[i],opt);
+                    try {
+                        if(Arrays.asList(ASSET_HEADER_FIELD_BIGDECIMAL_TYPE).contains(ASSET_HEADER_FIELD[i])){
+                            Method method = BudgetApplicationAsset.class.getMethod(mtName, BigDecimal.class);
+                            method.invoke(budgetApplicationAsset, new BigDecimal(opt));
+                        }else if(Arrays.asList(ASSET_HEADER_FIELD_INTEGER_TYPE).contains(ASSET_HEADER_FIELD[i])){
+                            Method method = BudgetApplicationAsset.class.getMethod(mtName,Integer.class);
+                            method.invoke(budgetApplicationAsset,  Integer.parseInt(opt));
+                        }else if(Arrays.asList(HEADER_FIELD_DATE_TYPE).contains(ASSET_HEADER_FIELD[i])){
+                            Method method = BudgetApplicationAsset.class.getMethod(mtName,Date.class);
+                            if(HSSFDateUtil.isCellDateFormatted(row.getCell(i+ASSET_BEGIN))){
+                                Date optDate = row.getCell(i+ASSET_BEGIN).getDateCellValue();
+                                method.invoke(budgetApplicationAsset,  optDate);
+                            }
+                        } else{
+                            Method method = BudgetApplicationAsset.class.getMethod(mtName,String.class);
+                            method.invoke(budgetApplicationAsset, opt);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.debug("handleExcel error"+e.getMessage());
+                    }
+                }
+            }
+            errorInfo = checkRequiredAndDataVerification(budgetApplication,selectOrgInfo,errorInfo);
+            budgetApplication.setExcelIdex(j + 2);
+            if (StringUtils.isNotBlank(errorInfo)) {
+                budgetApplication.setErrorInfo(errorInfo);
+                tempBudgetList.add(budgetApplication);
+                continue;
+            }
+            budgetApplicationAsset.setApplicationNum(budgetApplication.getApplicationNum());
+            BudgetApplicationAsset budgetApplicationAssetCur = budgetApplication.getBudgetAssets().iterator().next();
+            if(budgetApplicationAssetCur.getApplicationPrice()!= null && budgetApplicationAssetCur.getApplicationQuantity()!= null){
+                budgetApplicationAssetCur.setApplicationAmount(budgetApplicationAssetCur.getApplicationPrice()
+                        .multiply(new BigDecimal(budgetApplicationAssetCur.getApplicationQuantity()))
+                        .setScale(2, RoundingMode.HALF_UP));
+            }
+            if(budgetApplicationAssetCur.getOfflineApplicationPrice()!= null && budgetApplicationAssetCur.getOfflineApplicationQuantity()!= null){
+                budgetApplicationAssetCur.setOfflineApplicationAmount(budgetApplicationAssetCur.getOfflineApplicationPrice()
+                        .multiply(new BigDecimal(budgetApplicationAssetCur.getOfflineApplicationQuantity()))
+                        .setScale(2, RoundingMode.HALF_UP));
+                //budgetApplicationAssetCur.setConfirmPrice(budgetApplicationAssetCur.getOfflineApplicationPrice());
+                //budgetApplicationAssetCur.setConfirmQuantity(budgetApplicationAssetCur.getOfflineApplicationQuantity());
+            }
+            budgetApplicationDao.save(budgetApplication);
+        }
+        return tempBudgetList;
+    }
+
+    public BudgetApplication initCreateBudget(UserAccount user,OrgInfo selectOrgInfo,String orderType){
+        BudgetApplication budgetApplication = new BudgetApplication();
+        Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
+        BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
+        budgetApplicationAssetSet.add(budgetApplicationAsset);
+        budgetApplication.setBudgetAssets(budgetApplicationAssetSet);
+        budgetApplication.setApplicationStep(BudgetApplication.APPLICATIONSTEP.Complete.toString());
+        budgetApplication.setApplicationDate(new Date());
+        budgetApplication.setApplicationStatus(6);
+        budgetApplication.setBudgetApprovals(new HashSet<>());
+        budgetApplication.setCreatedBy(user.getLoginName());
+        budgetApplication.setCreatedDate(new Date());
+        budgetApplication.setLastModifiedBy(user.getLoginName());
+        budgetApplication.setLastModifiedDate(new Date());
+        budgetApplication.setOrderType(orderType);
+        budgetApplication.setCourtyardArea(selectOrgInfo.getName());
+        budgetApplication.setCourtyardAreaId(selectOrgInfo.getId());
+        budgetApplication.setTenantUID(selectOrgInfo.getTenantUID());
+        budgetApplication.setInstitutionUID(selectOrgInfo.getInstitutionUID());
+        budgetApplication.setHospitalUID(selectOrgInfo.getHospitalUID());
+        budgetApplication.setSiteUID(selectOrgInfo.getSiteUID());
+        budgetApplication.setDataSource("EXCEL_IMPORT");
+        budgetApplicationAsset.setCreatedDate(new Date());
+        budgetApplicationAsset.setCreatedBy(user.getLoginName());
+        budgetApplicationAsset.setLastModifiedBy(user.getLoginName());
+        budgetApplicationAsset.setLastModifiedDate(new Date());
+        budgetApplicationAsset.setTenantUID(selectOrgInfo.getTenantUID());
+        budgetApplicationAsset.setInstitutionUID(selectOrgInfo.getInstitutionUID());
+        budgetApplicationAsset.setHospitalUID(selectOrgInfo.getHospitalUID());
+        budgetApplicationAsset.setSiteUID(selectOrgInfo.getSiteUID());
+        return budgetApplication;
+    }
+
+
+
+    public String checkRequiredAndDataVerification(BudgetApplication budgetApplication,OrgInfo selectOrgInfo,String errorInfo) throws NoSuchFieldException, IllegalAccessException {
+        BudgetApplication budgetApplicationExist = budgetApplicationDao.findByApplicationNum(budgetApplication.getApplicationNum());
+        if(budgetApplicationExist != null ){
+            //为空  只有这个是等于
+            errorInfo = "[数据已存在，请检查后重试]";
+        }else{
+            for (int i = 0; i < BUDGET_FIELD_REQUIRE[0].length; i++) {
+                String fieldName = BUDGET_FIELD_REQUIRE[0][i];
+                Field field = budgetApplication.getClass().getDeclaredField(fieldName);
+                if (isFieldEmpty(field, budgetApplication)) {
+                    System.out.println("字段 " + fieldName + " 为空");
+                    errorInfo += "[请输入"+BUDGET_FIELD_REQUIRE[1][i]+"]";
+                }
+            }
+            BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
+            for (int i = 0; i < ASSET_FIELD_REQUIRE[0].length; i++) {
+                String fieldName = ASSET_FIELD_REQUIRE[0][i];
+                Field field = budgetApplicationAsset.getClass().getDeclaredField(fieldName);
+                if (isFieldEmpty(field, budgetApplicationAsset)) {
+                    errorInfo += "[请输入"+ASSET_FIELD_REQUIRE[1][i]+"]";
+                }
+            }
+            //手术室设备必填项校验
+            if(StringUtils.isNotBlank(budgetApplicationAsset.getUsedOperatingRoom()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())) {
+                if (StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse()) || "F".equals(budgetApplicationAsset.getSignatureNurse())) {
+                    errorInfo += "[手术室使用的设备，护士长是否已签名需为是！]";
+                }
+            }
+            //申请人
+            if(StringUtils.isNotBlank(budgetApplication.getApplicantLoginName())){
+                UserAccount userAccount = userAccountRepository.getByLoginName(budgetApplication.getApplicantLoginName());
+                if(userAccount==null){
+                    errorInfo += "[申请人登录账号有误，请检查后重试！]";
+                }else{
+                    budgetApplication.setApplicant(userAccount);
+                    budgetApplication.setApplicantId(userAccount.getId());
+                }
+            }
+            //审核人
+            if(StringUtils.isNotBlank(budgetApplication.getApprovalLoginName())) {
+                UserAccount userAccountApproval = userAccountRepository.getByLoginName(budgetApplication.getApprovalLoginName());
+                if(userAccountApproval==null){
+                    errorInfo += "[审核人登录账号有误，请检查后重试！]";
+                }else{
+                    budgetApplication.setApprover(userAccountApproval);
+                    budgetApplication.setApproverId(userAccountApproval.getId());
+                }
+            }
+            OrgInfo orgInfoDept = orgDao.getDepartmentByName(budgetApplication.getApplicationDeptName(),selectOrgInfo.getUid());
+            if(orgInfoDept==null){
+                errorInfo += "[申请科室有误，请检查后重试！]";
+            }else{
+                budgetApplication.setApplicationDeptName(orgInfoDept.getName());
+                budgetApplication.setApplicationDeptId(orgInfoDept.getId());
+                budgetApplication.setApplicationDept(orgInfoDept);
+                budgetApplicationAsset.setApplicationDeptId(orgInfoDept.getId());
+            }
+        }
+        return errorInfo;
+    }
+
+    private static boolean isFieldEmpty(Field field, Object obj) throws IllegalAccessException {
+        field.setAccessible(true); // 允许访问私有字段
+        Object value = field.get(obj);
+        return value == null; // 如果值为null，则字段为空
+    }
+
+    public String handIndexBox(String strFiled,String value){
+        if(Arrays.asList(ASSET_HEADER_FIELD_DROP_INDEX).contains(strFiled)){
+            if(StringUtils.isNotBlank(value)){
+                if("是".equals(value)){
+                    value = "T";
+
+                }else if("否".equals(value)){
+                    value = "F";
+
+                }else if("横向专项经费(科研))".equals(value)){
+                    value = "HorizontalSpecial";
+
+                }else if("拨款资金".equals(value)){
+                    value = "Appropriation";
+
+                }else if("自筹资金".equals(value)){
+                    value = "SelfRaised";
+                }
+            }
+        }
+        return value;
+    }
+
+
+    public Workbook createExcel(UploadedFile file) throws IOException {
+        Workbook workbook = null;
+        if (ExcelDocument.ExcelType.XLS.equals(ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+            workbook = new HSSFWorkbook(file.getInputstream());
+        } else if (ExcelDocument.ExcelType.XLSX.equals(ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+            workbook = new XSSFWorkbook(file.getInputstream());
+        }
+        return workbook;
+    }
+
+   /* public void exportAssetExcelTemplate() throws IOException {
+
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //field name using english
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        //field name using chinese
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
+
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        template.exportSampleAsset(orgList, exportFields);
+        template.exportSampleAsset(orgList, exportFields,tcm);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isLocale()){
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        }else{
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
+        }
+        logger.info(" export asset excel template successful. ");
+    }*/
 }

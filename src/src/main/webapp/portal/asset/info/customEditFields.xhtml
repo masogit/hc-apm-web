@@ -11,7 +11,9 @@
         <h:panelGroup>
             <label class="label">#{msg.serialNum}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['serialNum'].required? '*':''}</span></label>
             <p:inputText id="serialNum" value="#{assetInfoEditController.selected.serialNum}" required="#{assetInfoEditController.customConfig.assetFields['serialNum'].required}"
-                         requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('serialNum')}"/>
+                         requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('serialNum')}">
+                <p:ajax event="blur" listener="#{assetInfoEditController.checkSerialNumExists}"/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
 
@@ -191,7 +193,32 @@
 
         </h:panelGroup>
     </c:if>
+    <!--保养巡检负责人-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'patrolInspectionOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerName'].required? '*':''}</span></label>
+            <p:autoComplete id="patrolInspectionOwnerName" value="#{assetInfoEditController.selectedObjectMap['patrolInspectionOwnerName']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('patrolInspectionOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerName'].required}" requiredMessage="#{msg.patrolInspectionOwnerName} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
 
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'patrolInspectionOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerTel'].required? '*':''}</span></label>
+            <p:inputText id="patrolInspectionOwnerTel" value="#{assetInfoEditController.selected.patrolInspectionOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerTel'].required}"
+                         requiredMessage="#{msg.patrolInspectionOwnerTel} #{msg.ValidationRequire}" readonly="true" class="patrolInspectionOwnerName"/>
+        </h:panelGroup>
+    </c:if>
     <!--负责人-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'measuringOwnerName')}" >
         <h:panelGroup >
@@ -987,7 +1014,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'createdBy')}" >
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
-            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selectCreatedBy(assetInfoEditController.selected.createdBy)}"  readonly="true"/>
+            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selected.createdBy}"  readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->

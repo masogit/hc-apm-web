@@ -1,14 +1,12 @@
 package com.ge.apm.domain.budget;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Formula;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -18,7 +16,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
-import java.util.List;
+
 import java.util.Set;
 
 /**
@@ -122,6 +120,10 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "approver_id")
     private Integer approverId;
 
+    // 审批人id
+    @Transient
+    private String approvalLoginName;
+
     // 审批人
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
@@ -157,6 +159,18 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     // 院区
     @Column(name = "courtyard_area")
     private String courtyardArea;
+
+    // 院区id
+    @Column(name = "courtyard_area_id")
+    private Integer courtyardAreaId;
+
+    public Integer getCourtyardAreaId() {
+        return courtyardAreaId;
+    }
+
+    public void setCourtyardAreaId(Integer courtyardAreaId) {
+        this.courtyardAreaId = courtyardAreaId;
+    }
 
     // 审批流
     @JsonBackReference
@@ -206,14 +220,33 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     private String applicantName ;//申请人
 
     @Transient
-    private String applicantDeptName ;//申请科室
+    private String applicantLoginName ;//申请人登录账号
 
-    public String getApplicantDeptName() {
-        return applicantDeptName;
+    @Column(name = "confirm_status")
+    private String confirmStatus;
+
+    public String getApprovalLoginName() {
+        return approvalLoginName;
     }
 
-    public void setApplicantDeptName(String applicantDeptName) {
-        this.applicantDeptName = applicantDeptName;
+    public void setApprovalLoginName(String approvalLoginName) {
+        this.approvalLoginName = approvalLoginName;
+    }
+
+    public String getApplicantLoginName() {
+        return applicantLoginName;
+    }
+
+    public void setApplicantLoginName(String applicantLoginName) {
+        this.applicantLoginName = applicantLoginName;
+    }
+
+    public String getConfirmStatus() {
+        return confirmStatus;
+    }
+
+    public void setConfirmStatus(String confirmStatus) {
+        this.confirmStatus = confirmStatus;
     }
 
     public String getProcureStatus() {
@@ -261,6 +294,62 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     // 申请科室
     @Transient
     private String applicationDeptName;
+
+    @Transient
+    private Integer excelIdex;
+
+    @Transient
+    private String errorInfo;
+
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    public enum OrderType {
+        BAY, BAP
+    }
+    /**
+     * 订单类型
+     * BAY临时采购  BAP年度采购
+     */
+    @Column(name = "order_type")
+    private String orderType;
+
+    /**
+     * 申请编号索引
+     */
+    @Column(name = "application_num_index")
+    private Integer applicationNumIndex;
+
+    /**
+     * 数据来源   excel导入   system
+     */
+    @Column(name = "data_source")
+    private String dataSource;
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public Integer getExcelIdex() {
+        return excelIdex;
+    }
+
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
+    }
 
     public String getApplicationDeptName() {
         return applicationDeptName;
@@ -318,19 +407,6 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
         this.applicantName = applicantName;
     }
 
-    /**
-     * 订单类型
-     * BAY临时采购  BAP年度采购
-     */
-    public enum OrderType {
-        BAY, BAP
-    }
-    /**
-     * 订单类型
-     * BAY临时采购  BAP年度采购
-     */
-    @Column(name = "order_type")
-    private String orderType;
 
     public String getApplicationStep() {
         return applicationStep;
@@ -348,11 +424,7 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
         this.orderType = orderType;
     }
 
-    /**
-     * 申请编号索引
-     */
-    @Column(name = "application_num_index")
-    private Integer applicationNumIndex;
+
 
     public Integer getApplicationNumIndex() {
         return applicationNumIndex;

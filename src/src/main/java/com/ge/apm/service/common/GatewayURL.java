@@ -130,6 +130,9 @@ public enum GatewayURL {
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
     PURCHASE_BUDGET_CONFIG_SEND_WX_MESSAGE("/hcapmassetservice/api/apm/budget/config/sendWeChatMessages"),
 
+    PURCHASE_SEND_WX_MESSAGE("/hcapmassetservice/api/apm/budget/config/sendWeChatMessagesPurchase"),
+    RESULT_PURCHASE_SEND_WX_MESSAGE("/hcapmassetservice/api/apm/budget/config/sendWeChatMessagesPurchaseRes"),
+
     SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/sendWeChat"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
