@@ -67,6 +67,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     private UaaService uaaService;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private UserOrgInfoRepository userOrgInfoRepository;
     private boolean selectClinicalDept;
     @Override
     protected void init() {
@@ -83,6 +84,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
         assetTypeGroupMapper = WebUtil.getBean(AssetTypeGroupMapper.class);
+        userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         buildApproveUserList();
     }
 
@@ -142,6 +144,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selected.setHierOrgUid(selectedOrg.getUid());
         selected.setTenantUID(selectedOrg.getTenantUID());
         getClinicalDepList(selectedOrg.getUid());
+        if(CollectionUtils.isNotEmpty(deptInfoList)){
+            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+        }
     }
 
     public void preEdit() {
@@ -611,11 +616,23 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if(StringUtils.isBlank(uid)){
             uid=selectedUserOrg.getSiteUID();
         }
-           deptInfoList = uaaService.getClinicalDeptListBySiteUID(uid);
+        deptInfoList = userOrgInfoMapper.findAccessUidByUserUidsAndOrgInfoUid(UserContextService.getCurrentUserAccount().getUid(), uid);
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(uid);
+        List<String> accessUidByUserUid = userOrgInfoRepository.findAccessUidByUserUid(UserContextService.getCurrentUserAccount().getUid());
+        List<OrgInfo>  visibleOrgInfo=new ArrayList<>();
 
-        if(CollectionUtils.isNotEmpty(deptInfoList)){
-            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+        if(CollectionUtils.isNotEmpty(deptInfoList) && CollectionUtils.isNotEmpty(accessUidByUserUid)){
 
+            for (OrgInfo orgInfo : deptInfoList) {
+                accessUidByUserUid.stream().forEach(item->{
+                   if(item.equals(orgInfo.getUid())){
+                       visibleOrgInfo.add(orgInfo);
+                   }
+                });
+            }
+            deptInfoList=visibleOrgInfo;
+        }else{
+            deptInfoList=new ArrayList<>();
         }
         return deptInfoList;
     }
@@ -700,7 +717,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     private void loadAssetTypeGroup() {
-        assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
+        assetTypeGroupTree = assetTypeGroupService.buildUserAccessibleAssetTypeGroupInTree();
 
         List<String> userAssetGroups = selected.getSelectAssetTypes();
 
