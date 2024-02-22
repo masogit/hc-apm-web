@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
-import com.ge.apm.dao.mapper.UserAssetTypeGroupMapper;
 import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetTypeGroupDto;
@@ -13,6 +12,7 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,6 +67,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     private UaaService uaaService;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private boolean selectClinicalDept;
     @Override
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -162,7 +163,14 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             //默认启用
             selected.setEnable(true);
             nodesList.clear();
+
+            List<AssetTypeGroup> resultList = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(UserContextService.getCurrentUserAccount().getTenantUID());
+            if(CollectionUtils.isNotEmpty(resultList)){
+                selected.setSelectAssetTypes(resultList.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList()));
+            }
             loadAssetTypeGroup();
+            List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup");
+            selected.setSelectAssetGroups(assetGroup.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList()));
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -262,6 +270,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存配置
     public void save() {
+        if(CollectionUtils.isEmpty(selected.getSelectAssetClinicalDeptUids())  || CollectionUtils.isEmpty(selected.getSelectAssetGroups())  || (isEnableAssetType()  && CollectionUtils.isEmpty(selected.getSelectAssetTypes())  )  ){
+            WebUtil.addWarnMessage("当前配置下配置信息多选条件不能为空");
+            return;
+        }
         //判断是否已经存在审批流
         Integer minAmountNew = selected.getMinAmount() != null ?selected.getMinAmount() : 0;
         Integer maxAmountNew = selected.getMaxAmount() != null ?selected.getMaxAmount() : 0;
@@ -600,6 +612,11 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             uid=selectedUserOrg.getSiteUID();
         }
            deptInfoList = uaaService.getClinicalDeptListBySiteUID(uid);
+
+        if(CollectionUtils.isNotEmpty(deptInfoList)){
+            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+
+        }
         return deptInfoList;
     }
 
@@ -746,5 +763,21 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     public void setSelectedAssetTypeGroupNodes(TreeNode[] selectedAssetTypeGroupNodes) {
         this.selectedAssetTypeGroupNodes = selectedAssetTypeGroupNodes;
+    }
+
+    public boolean getSelectClinicalDept() {
+        return selectClinicalDept;
+    }
+
+    public void setSelectClinicalDept(boolean selectClinicalDept) {
+        this.selectClinicalDept = selectClinicalDept;
+    }
+
+    public void selectClinicalDeptUids(){
+        if(selectClinicalDept && CollectionUtils.isNotEmpty(deptInfoList)){
+            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+        }else{
+           selected.setSelectAssetClinicalDeptUids(new ArrayList<>());
+        }
     }
 }
