@@ -21,6 +21,7 @@ import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -195,12 +196,12 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public void batchDeleteSupplier() {
-//        selectedMap.forEach((k,v) -> {
-//            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
-//            if (selected != null) {
-//                deleteSupplier();
-//            }
-//        });
+        selectedMap.forEach((k,v) -> {
+            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
+            if (selected != null) {
+                deleteSupplier();
+            }
+        });
         selectedMap.clear();
     }
 
