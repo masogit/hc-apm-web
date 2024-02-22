@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
@@ -116,6 +118,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     @Autowired
     private WxMessageService wxMessageService;
+
+    @Autowired
+    private AssetTypeGroupMapper assetTypeGroupMapper;
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
@@ -499,7 +504,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                     List<String> assetType = (List<String>) map.get("selectAssetTypes");
                     List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
                     List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
-
+                    if(CollectionUtils.isNotEmpty(assetType)){
+                        List<AssetTypeGroup> assetTypeByUids = assetTypeGroupMapper.getAssetTypeByUids(assetType);
+                        assetType=assetTypeByUids.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+                    }
                     int matchCount = getMatchCount(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType);
 
                     // 返回包含原始对象和匹配数量的SimpleEntry

@@ -81,9 +81,9 @@
             </p:fieldset>
 
             <p:fieldset id="config" legend="配置信息"
-                        rendered="#{multiLevelApprovalConfigController.configEnable}">
+                        >
 
-                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{multiLevelApprovalConfigController.configEnable}">
                     <h:panelGroup >
                         <label class="label">金额区间(不包含左边)</label>
                         <p:inputNumber id="minPrice" decimalPlaces="0" minValue="0" maxValue="999999999"
@@ -125,16 +125,24 @@
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
                             <p:outputPanel id="checkboxPanel">
                             <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection">
-                                <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}" var="item" itemLabel="#{item.name }" itemValue="#{item.uid}"/>
+                                <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <p:ajax listener="#{multiLevelApprovalConfigController.selectAssetClinicalDeptChange}"/>
                             </p:selectManyCheckbox>
                             </p:outputPanel>
                         </p:scrollPanel>
                     </p:fieldset>
-                    <p:fieldset legend="设备分类" rendered="#{multiLevelApprovalConfigController.enableAssetType}">
+                    <p:fieldset legend="资产分类" rendered="#{multiLevelApprovalConfigController.enableAssetType}">
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
-                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetTypes}" layout="pageDirection">
-                                <f:selectItems  value="#{multiLevelApprovalConfigController.assetTypeList}"  var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
-                            </p:selectManyCheckbox>
+<!--                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetTypes}" layout="pageDirection">-->
+<!--                                <f:selectItems  value="#{multiLevelApprovalConfigController.assetTypeList}"  var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>-->
+<!--                            </p:selectManyCheckbox>-->
+                                <p:tree id="authGroupTree" class="tree" style="border:0;height:200px" value="#{multiLevelApprovalConfigController.assetTypeGroupTree}" selection="#{multiLevelApprovalConfigController.selectedAssetTypeGroupNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                    <p:ajax event="select" listener="#{multiLevelApprovalConfigController.onSelectAssetTypeGroupTreeNode}" />
+                                    <p:ajax event="unselect" listener="#{multiLevelApprovalConfigController.onUnselectAssetTypeGroupTreeNode}" />
+                                    <p:treeNode type="assetTypeGroup">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
                         </p:scrollPanel>
                     </p:fieldset>
                 </p:panelGrid>

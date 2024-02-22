@@ -72,4 +72,9 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
             ") select * from cte_org)", nativeQuery = true)
     void deleteByUserUids46(String userUid,List<String> orgUids);
 
+    @Query(value = "select o.* from user_org o, org_info oi where o.user_uid in (?1) " +
+            "and o.org_uid in (oi.tenant_uid,oi.institution_uid,oi.hospital_uid,oi.site_uid,oi.uid) ",nativeQuery = true)
+    List<UserOrgInfo> findAccessUidByUserUids(List<String> userUid);
+
+
 }

@@ -3,9 +3,15 @@ package com.ge.apm.view.approval;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
+import com.ge.apm.dao.mapper.UserAssetTypeGroupMapper;
+import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetTypeGroupDto;
+import com.ge.apm.domain.dto.UserOrgInfoDto;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -13,6 +19,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,12 +45,17 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private SysRoleRepository roleDao;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
 
+    private UserOrgInfoMapper userOrgInfoMapper;
+
+    private AssetTypeGroupMapper assetTypeGroupMapper;
+
     @Setter@Getter
     private ApprovalNode approvalNode;
     private RoleApproveCondition roleApproveCondition=new RoleApproveCondition();
     @Setter
     private List<ApprovalNode> nodesList;
     private List<UserAccount> approveUserList;
+    private List<UserAccount> approveUserListInit;
     @Getter
     private String operateType;
     @Getter
@@ -67,6 +79,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         orgTree= WebUtil.getBean(UaaService.class).buildOrgTree(UserContextService.getCurrentUserAccount().getTenantUID(), "", -1, -1);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
+        assetTypeGroupMapper = WebUtil.getBean(AssetTypeGroupMapper.class);
         buildApproveUserList();
     }
 
@@ -80,6 +95,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         } else {
             approveUserList = new ArrayList<>();
         }
+        approveUserListInit=approveUserList;
     }
 
     public void onSelectTreeNode(NodeSelectEvent event){
@@ -93,6 +109,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public List<UserAccount> getUsers4Approval(){
+        selectAssetClinicalDeptChange();
         if(selectedUserOrg != null){
             return approveUserList.stream().filter(user -> user.getOrgInfoUID().equals(selectedUserOrg.getUid())).collect(Collectors.toList());
         }
@@ -131,6 +148,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         setConfigEnable();
         switchJsontoVo();
         getClinicalDepList(selected.getHierOrgUid());
+        loadAssetTypeGroup();
     }
 
     public void preCreate() {
@@ -144,6 +162,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             //默认启用
             selected.setEnable(true);
             nodesList.clear();
+            loadAssetTypeGroup();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -256,6 +275,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 return;
             }
         }
+//        userAssetTypeUpdate();
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
             Integer minAmount = (Integer) map.get("minAmount");
@@ -299,6 +319,33 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         super.save();
     }
 
+
+    private void userAssetTypeUpdate() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = gatherUserAuthGroup();
+        selected.setSelectAssetTypes(selectedSysAuthGroups.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList()));
+
+    }
+
+    public Set<AssetTypeGroup> gatherUserAuthGroup() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
+        readSelectedNodesInAssetTypeGroupTree(assetTypeGroupTree, selectedSysAuthGroups);
+
+        return selectedSysAuthGroups;
+    }
+
+    private void readSelectedNodesInAssetTypeGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
+        if (node.isSelected()) {
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            } else {
+                selectedTreeNodeList.add((AssetTypeGroup)node.getData());
+            }
+        } else {
+            for (TreeNode item : node.getChildren()) {
+                readSelectedNodesInAssetTypeGroupTree(item, selectedTreeNodeList);
+            }
+        }
+    }
     public Boolean check(Integer minAmountNew,Integer maxAmountNew,boolean enable){
         List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = configDao.findByHierOrgUidAndBusinessTypeAndEnable(selected.getHierOrgUid(),selected.getBusinessType(),true);
         if(!multiLevelApprovalConfigs.isEmpty() && multiLevelApprovalConfigs != null){
@@ -570,5 +617,134 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     public void setDeptInfoList(List<OrgInfo> deptInfoList) {
         this.deptInfoList = deptInfoList;
     }
+    public void selectAssetTypeChange(){
+        userAssetTypeUpdate();
 
+        selectAssetClinicalDeptChange();
+
+    }
+    public void selectAssetClinicalDeptChange(){
+//        buildApproveUserList();
+        approveUserList=approveUserListInit;
+        if(selected==null){
+            return;
+        }
+        List<String> selectAssetClinicalDeptUids = selected.getSelectAssetClinicalDeptUids();
+        List<String> uids = approveUserList.stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+        if(CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && CollectionUtils.isNotEmpty(approveUserList)){
+            List<UserOrgInfoDto> userOrgInfos=  userOrgInfoMapper.findAccessUidByUserUids(uids);
+            Map<String, List<UserOrgInfoDto>> userOrgListMap = userOrgInfos.stream().collect(Collectors.groupingBy(UserOrgInfoDto::getUserUid));
+            List<String> validUser=new ArrayList<>();
+            userOrgListMap.forEach((k, list) -> {
+                List<String> collect = list.stream().map(UserOrgInfoDto::getOrgInfoUid).collect(Collectors.toList());
+                if(collect.containsAll(selectAssetClinicalDeptUids)){
+                    validUser.add(k);
+                }
+            });
+            if(CollectionUtils.isNotEmpty(validUser)){
+                approveUserList=approveUserList.stream().filter(item->validUser.contains(item.getUid())).collect(Collectors.toList());
+            }else{
+                approveUserList=new ArrayList<>();
+            }
+        }
+
+        List<String> selectAssetTypes = selected.getSelectAssetTypes();
+        if(CollectionUtils.isNotEmpty(selectAssetTypes) && CollectionUtils.isNotEmpty(approveUserList) && isEnableAssetType()) {
+            Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
+            getSelectAssetType(assetTypeGroupTree,selectedSysAuthGroups);
+            List<String> assetTypeUids = selectedSysAuthGroups.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList());
+            List<AssetTypeGroupDto> assetTypeByUids = assetTypeGroupMapper.getAssetTypeByUserUids(uids);
+            Map<String, List<AssetTypeGroupDto>> assetTypeListMap = assetTypeByUids.stream().collect(Collectors.groupingBy(AssetTypeGroupDto::getUserUid));
+            List<String> validUser=new ArrayList<>();
+            assetTypeListMap.forEach((k, list) -> {
+                List<String> collect = list.stream().map(AssetTypeGroupDto::getUid).collect(Collectors.toList());
+                if(collect.containsAll(assetTypeUids)){
+                    validUser.add(k);
+                }
+            });
+            if(CollectionUtils.isNotEmpty(validUser)){
+                approveUserList=approveUserList.stream().filter(item->validUser.contains(item.getUid())).collect(Collectors.toList());
+            }else{
+                approveUserList=new ArrayList<>();
+            }
+
+        }
+    }
+    private TreeNode assetTypeGroupTree;
+    private TreeNode[] selectedAssetTypeGroupNodes;
+
+    private AssetTypeGroupService assetTypeGroupService;
+
+
+
+    public TreeNode getAssetTypeGroupTree() {
+        return assetTypeGroupTree;
+    }
+
+    private void loadAssetTypeGroup() {
+        assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
+
+        List<String> userAssetGroups = selected.getSelectAssetTypes();
+
+        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
+
+    }
+
+    private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {
+        if (node.getData() instanceof AssetTypeGroup) {
+            AssetTypeGroup assetTypeGroup = (AssetTypeGroup) node.getData();
+            if (userAuthGroupUids.contains(assetTypeGroup.getUid())) {
+                node.setSelected(true);
+            } else if (node.getParent() != null && node.getParent().isSelected()) {
+                node.setSelected(true);
+            }
+        }
+
+        for (TreeNode item : node.getChildren()) {
+            setSelectedSysAuthGroupTree(item, userAuthGroupUids);
+        }
+    }
+
+    private void getSelectAssetType(TreeNode node, Set<AssetTypeGroup> selectedSysAuthGroups) {
+            if (node.getChildren()==null) {
+                selectedSysAuthGroups.add((AssetTypeGroup)node.getData());
+            }else{
+                for (TreeNode item : node.getChildren()) {
+                    readSelectedNodesInAssetTypeGroupTree(item, selectedSysAuthGroups);
+                }
+            }
+
+
+    }
+
+    public void onSelectAssetTypeGroupTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+        selectAssetTypeChange();
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    public void onUnselectAssetTypeGroupTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+        selectAssetTypeChange();
+    }
+
+    public TreeNode[] getSelectedAssetTypeGroupNodes() {
+        return selectedAssetTypeGroupNodes;
+    }
+
+    public void setSelectedAssetTypeGroupNodes(TreeNode[] selectedAssetTypeGroupNodes) {
+        this.selectedAssetTypeGroupNodes = selectedAssetTypeGroupNodes;
+    }
 }
