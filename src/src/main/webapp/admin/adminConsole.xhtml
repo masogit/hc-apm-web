@@ -84,6 +84,11 @@
 				<p:fieldset legend="批量更激活有所有医院的数字医工">
 					<p:commandButton actionListener="#{adminConsoleController.batchActiveDigitalAssetStaff()}" disabled="false" value="批量更激活有所有医院的数字医工" update=":growl"></p:commandButton>
 				</p:fieldset>
+
+
+				<p:fieldset legend="批量更新多级审批配置信息选择条件">
+					<p:commandButton actionListener="#{adminConsoleController.batchMultiLevelApprovalConfig()}" disabled="false" value="批量更新多级审批配置信息选择条件" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

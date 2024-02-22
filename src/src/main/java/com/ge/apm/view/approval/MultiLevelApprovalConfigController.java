@@ -720,9 +720,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         assetTypeGroupTree = assetTypeGroupService.buildUserAccessibleAssetTypeGroupInTree();
 
         List<String> userAssetGroups = selected.getSelectAssetTypes();
-
-        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
-
+        if(CollectionUtils.isNotEmpty(userAssetGroups)){
+            setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
+        }
     }
 
     private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {

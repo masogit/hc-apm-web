@@ -315,4 +315,10 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
+	public void batchMultiLevelApprovalConfig() {
+		new Thread(() -> adminConsoleService.batchMultiLevelApprovalConfig()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+
 }
