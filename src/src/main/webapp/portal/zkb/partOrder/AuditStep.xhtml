@@ -620,7 +620,7 @@
                             <label class="label">区域经理审批时间*</label>
                             <p:calendar timeZone="GMT+8"  id="manageAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.manageAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.haveTrainCourseFlag}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.haveTrainCourseFlag}">
                             <label class="label">是否上过培训课*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.haveTrainCourseFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -773,9 +773,6 @@
                                 <h:panelGroup rendered="#{!userContextService.zkbUser and empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <label class="label">价格*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" required="false" requiredMessage="价格 #{msg.ValidationRequire}" > <p:ajax /> </p:inputText>
-                                    <!--<p:inputNumber value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" required="true" requiredMessage="价格 #{msg.ValidationRequire}"> </p:inputNumber>-->
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" required="false" requiredMessage="价格 #{msg.ValidationRequire}"  > <p:ajax /> </p:inputText>
-                                    <!--<p:inputNumber value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" required="true" requiredMessage="价格 #{msg.ValidationRequire}"> </p:inputNumber>-->
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType eq 'HighValue') and !(userContextService.zkbUser) and empty zkbPartOrderAuditController.selected.notGeAsset}">
                                     <label class="label">是否全新探头</label>
