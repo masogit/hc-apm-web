@@ -124,8 +124,15 @@
                     <p:fieldset legend="所属科室">
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
                             <p:outputPanel id="checkboxPanel">
-                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection">
+                                <p:selectBooleanCheckbox
+                                        value="#{multiLevelApprovalConfigController.selectClinicalDept}"
+                                        itemLabel="全选">
+                                    <p:ajax update="selectClinicalDeptUids"
+                                            listener="#{multiLevelApprovalConfigController.selectClinicalDeptUids}"/>
+                                </p:selectBooleanCheckbox>
+                            <p:selectManyCheckbox id="selectClinicalDeptUids" value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection">
                                 <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <p:ajax listener="#{multiLevelApprovalConfigController.selectAssetClinicalDeptChange}"/>
                                 <p:ajax listener="#{multiLevelApprovalConfigController.selectAssetClinicalDeptChange}"/>
                             </p:selectManyCheckbox>
                             </p:outputPanel>
