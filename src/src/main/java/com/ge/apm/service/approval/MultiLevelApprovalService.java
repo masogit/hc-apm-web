@@ -771,7 +771,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
                         }
-                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
+                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
                     } else {
                         com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel);
                         if (node != null) {
