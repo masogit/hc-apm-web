@@ -69,6 +69,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserOrgInfoRepository userOrgInfoRepository;
     private boolean selectClinicalDept;
+    private boolean selectAssetGroup;
     @Override
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -146,6 +147,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         getClinicalDepList(selectedOrg.getUid());
         if(CollectionUtils.isNotEmpty(deptInfoList)){
             selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+            selectClinicalDept=true;
         }
     }
 
@@ -155,6 +157,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         switchJsontoVo();
         getClinicalDepList(selected.getHierOrgUid());
         loadAssetTypeGroup();
+        selectClinicalDeptCheck();
+        setSelectAssetGroupCheck();
     }
 
     public void preCreate() {
@@ -163,6 +167,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         operateType = ApprovalConstant.OPERATE_TYPE_CREATE;
         configEnable = true;
+        selectAssetGroup=true;
+        selectClinicalDept=true;
         try {
             super.prepareCreate();
             //默认启用
@@ -641,6 +647,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selectAssetClinicalDeptChange();
 
     }
+
     public void selectAssetClinicalDeptChange(){
 //        buildApproveUserList();
         approveUserList=approveUserListInit;
@@ -791,11 +798,34 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         this.selectClinicalDept = selectClinicalDept;
     }
 
+    public boolean getSelectAssetGroup() {
+        return selectAssetGroup;
+    }
+
+    public void setSelectAssetGroup(boolean selectAssetGroup) {
+        this.selectAssetGroup = selectAssetGroup;
+    }
+
     public void selectClinicalDeptUids(){
         if(selectClinicalDept && CollectionUtils.isNotEmpty(deptInfoList)){
             selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
         }else{
            selected.setSelectAssetClinicalDeptUids(new ArrayList<>());
         }
+    }
+    List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup");
+
+    public void selectAssetGroupUids(){
+        if(selectAssetGroup && CollectionUtils.isNotEmpty(assetGroup)){
+            selected.setSelectAssetGroups(assetGroup.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList()));
+        }else{
+            selected.setSelectAssetGroups(new ArrayList<>());
+        }
+    }
+    public void selectClinicalDeptCheck(){
+        selectClinicalDept = deptInfoList.size() == selected.getSelectAssetClinicalDeptUids().size();
+    }
+    public void setSelectAssetGroupCheck(){
+        selectAssetGroup = assetGroup.size() == selected.getSelectAssetGroups().size();
     }
 }
