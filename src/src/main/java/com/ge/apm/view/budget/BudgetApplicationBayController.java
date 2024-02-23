@@ -1,5 +1,9 @@
 package com.ge.apm.view.budget;
-import com.ge.apm.dao.*;
+
+import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.BudgetApplicationRepository;
+import com.ge.apm.dao.BudgetAssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
@@ -8,6 +12,7 @@ import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
+import com.ge.apm.service.budget.BudgetFileDynamicTemplate;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -70,7 +75,6 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     @Getter @Setter
     private Integer tabIndexList = 0;
 
-
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
 
@@ -93,6 +97,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private List<BudgetAssetInfo> optionalBudgetAssets = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
+
+    private OrgInfoRepository orgDao;
 
     private BudgetApplicationRepository dao;
     private BudgetAssetInfoRepository budgetAssetDao;
@@ -127,10 +133,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
-
-        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
@@ -534,7 +538,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     @Override
     public void prepareEdit() {
         crudActionName = "Edit";
-        buildCurDetail(this.editId); }
+        buildCurDetail(this.editId);
+    }
 
     @Override
     public void prepareView() {
@@ -677,13 +682,15 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private UploadedFile file;
     @Getter  @Setter
     private List<BudgetApplication> errorImportList;
+    @Getter  @Setter
+    private StreamedContent budgetTemplateFile;
 
     public void handleFileUploadImport(FileUploadEvent event) throws IOException, ParseException, NoSuchFieldException, IllegalAccessException {
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
         if(this.selectedImportOrg==null){
-            OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
-            selectedImportOrg = orgDao.findByUid(account.getSiteUID());
+            WebUtil.addErrorMessage("请先选择所属院区！",null);
+            return;
         }
         errorImportList = persistService.handleExcel(file, account,selectedImportOrg,BudgetApplication.OrderType.BAY.toString());
         //有错误数据 warning 没有错误数据  info
@@ -693,29 +700,19 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
-    public void exportAssetExcelTemplate() throws IOException {
-
-       /* CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-        //field name using english
-        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        //field name using chinese
-//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-
-        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
-        List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
-
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
-        template.exportSampleAsset(orgList, exportFields);
-        template.exportSampleAsset(orgList, exportFields,tcm);
+    public void exportBudgetExcelTemplate() throws IOException {
+        List<OrgInfo> orgList = new ArrayList<OrgInfo>();
+        if(this.selectedImportOrg != null){
+            orgList = orgDao.findBySiteUIDAndOrgType(this.selectedImportOrg.getUid(), 4);
+        }
+        BudgetFileDynamicTemplate template = new BudgetFileDynamicTemplate();
+        template.exportSampleAsset(orgList);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(userContextService.isLocale()){
-            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
-        }else{
-            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
-        }*/
-        logger.info(" export asset excel template successful. ");
+        budgetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "Budget_Import_Template.xlsx");
+        logger.info(" export budget excel template successful. ");
     }
+
+
 
     public List<BudgetApplication> getErrorImportList() {
         return errorImportList;
@@ -745,6 +742,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         return args;
     }
+
     /**  **************************批量导入**************************           **/
 
 

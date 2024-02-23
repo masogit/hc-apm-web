@@ -43,7 +43,13 @@
                         </p:panelGrid>
                         <h:panelGroup>
                             <p>说明</p>
-                            <p>1. <a href="excel/Budget_Import_Template.xlsx" title="download">下载模板</a> </p>
+                            <p>
+                                1.
+                                <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm" actionListener="#{budgetController.exportBudgetExcelTemplate}" update=":growl"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"  style="background-color: #5180ce;">
+                                    <p:fileDownload value="#{budgetController.budgetTemplateFile}" />
+                                </p:commandButton>
+                            </p>
                             <p>2. 文件中填入要导入的申购信息数据<br/>
                             其中：申请编号，申请科室，病区代码，申请人登录账号，申请日期，审核人登录账号，审核日期，设备名称，设备品类，推荐品牌，规格，型号，数量，
                                 单位，预算单价，是否在手术室使用，审批时间，审批意见，审批结论，记录人，审批数量，审批单价，备注为必填字段</p>
