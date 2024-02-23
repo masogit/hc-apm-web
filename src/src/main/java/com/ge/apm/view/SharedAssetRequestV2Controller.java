@@ -612,6 +612,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                              for (int i = 0; i < data.size(); i++) {
                                  Map<String, Object>list1 = data.get(i);
                                  SharedAssetReqDetail request2 = JSON.parseObject(JSON.toJSONString(list1), SharedAssetReqDetail.class);
+                                 if(list1.containsKey("shared_asset_type")){
+                                     String sharedAssetType =(String) list1.get("shared_asset_type");
+                                     request2.setSharedAssetTypeId(sharedAssetType);
+                                 }
                                  detail_list.add(request2);
                              }
                              if (detail_list.size() == 1) {
@@ -1489,7 +1493,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 selected.setState(state);
                 dao.save(selected);
                 asiDao.save(selected.getInfoList());
-               sharedAssetRequestService.sendMq(selected.getInfoList());
+//               sharedAssetRequestService.sendMq(selected.getInfoList());
 
                apdDao.save(selected.getSartList());
 

@@ -51,4 +51,17 @@ public interface UserOrgInfoMapper {
 
 
 
+	@Select("with recursive cte_org as (\n" +
+			"    select oi.*\n" +
+			"    from user_org o, org_info oi \n" +
+			"    where oi.uid = #{orgInfoUid}   and o.user_uid=#{userUid}   \n" +
+			"\n" +
+			"    union\n" +
+			"\n" +
+			"    select oi.*\n" +
+			"    from org_info oi\n" +
+			"    join cte_org cte on oi.parent_uid = cte.uid\n" +
+			") select * from cte_org")
+	List<OrgInfo> findAccessUidByUserUidsAndOrgInfoUid(@Param("userUid") String userUid, @Param("orgInfoUid") String orgInfoUid);
+
 }

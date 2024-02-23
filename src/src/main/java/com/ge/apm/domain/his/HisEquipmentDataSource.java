@@ -99,6 +99,14 @@ public class HisEquipmentDataSource implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns({
+            @JoinColumn(name = "device_dept_code", referencedColumnName = "sfxm_id", insertable = false,updatable = false),
+            @JoinColumn(name = "org_code", referencedColumnName = "hos_id", insertable = false,updatable = false)
+    })
+    private HisEquipmentSfxm hisEquipmentSfxm;
+
     //excel行数
     @Transient
     private int lineNum;

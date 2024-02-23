@@ -67,6 +67,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     private UaaService uaaService;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private UserOrgInfoRepository userOrgInfoRepository;
     private boolean selectClinicalDept;
     @Override
     protected void init() {
@@ -83,6 +84,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
         assetTypeGroupMapper = WebUtil.getBean(AssetTypeGroupMapper.class);
+        userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         buildApproveUserList();
     }
 
@@ -142,6 +144,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selected.setHierOrgUid(selectedOrg.getUid());
         selected.setTenantUID(selectedOrg.getTenantUID());
         getClinicalDepList(selectedOrg.getUid());
+        if(CollectionUtils.isNotEmpty(deptInfoList)){
+            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+        }
     }
 
     public void preEdit() {
@@ -270,6 +275,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存配置
     public void save() {
+        userAssetTypeUpdate();
         if(CollectionUtils.isEmpty(selected.getSelectAssetClinicalDeptUids())  || CollectionUtils.isEmpty(selected.getSelectAssetGroups())  || (isEnableAssetType()  && CollectionUtils.isEmpty(selected.getSelectAssetTypes())  )  ){
             WebUtil.addWarnMessage("当前配置下配置信息多选条件不能为空");
             return;
@@ -611,12 +617,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if(StringUtils.isBlank(uid)){
             uid=selectedUserOrg.getSiteUID();
         }
-           deptInfoList = uaaService.getClinicalDeptListBySiteUID(uid);
-
-        if(CollectionUtils.isNotEmpty(deptInfoList)){
-            selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
-
-        }
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(uid);
         return deptInfoList;
     }
 
@@ -703,9 +704,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
 
         List<String> userAssetGroups = selected.getSelectAssetTypes();
-
-        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
-
+        if(CollectionUtils.isNotEmpty(userAssetGroups)){
+            setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
+        }
     }
 
     private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {
