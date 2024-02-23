@@ -31,6 +31,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -313,11 +314,17 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
 
         List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
+        AtomicBoolean nodeApprovalUserIsNull= new AtomicBoolean(false);
         collect.stream().forEach(item -> {
             if (item.getUsingRole()) {
                 item.setRoleUids(item.getApproveRoles().stream().map(a -> a.getId()).collect(Collectors.toList()));
                 item.setUserUids(null);
             } else {
+                if(CollectionUtils.isEmpty(item.getApproveUsers())){
+                    nodeApprovalUserIsNull.set(true);
+                    WebUtil.addWarnMessage("当前配置下审批节点中审核人为空,不允许保存！");
+                    return;
+                }
                 item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //
@@ -329,6 +336,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setRoleUids(null);
             }
         });
+        if(nodeApprovalUserIsNull.get()){
+            return;
+        }
         String nodes = JSON.toJSONString(collect);
         selected.setApprovalItem(nodes);
 
