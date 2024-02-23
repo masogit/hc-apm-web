@@ -207,7 +207,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public void deleteSupplier() {
 
-        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(selected.getId(), selected.getId(), selected.getId());
+        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(selected.getId(), selected.getId() + "", selected.getId() + "");
         List<ArrivalList> arrivalListList = arrivalListDao.findBySupplierId(selected.getId());
 
         if(assetInfoList.isEmpty() && arrivalListList.isEmpty()){
