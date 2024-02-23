@@ -19,6 +19,7 @@ import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
@@ -183,6 +184,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private BudgetApplicationRepository budgetApplicationRepository;
+
+	@Autowired
+	private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
+
+	@Autowired
+	private UaaService uaaService;
+
+	@Autowired
+	AssetTypeGroupRepository assetTypeGroupDao;
 
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
 	private String baseURL;
@@ -1482,5 +1492,53 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				nurseSiteMaintainConfigRepository.save(v);
 			}
 		});
+	}
+
+    public void batchMultiLevelApprovalConfig() {
+
+		Iterable<MultiLevelApprovalConfig> configs = multiLevelApprovalConfigRepository.findAll();
+		List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup");
+
+		configs.forEach(config->{
+
+			String configration = config.getConfigration();
+			if (null != configration) {
+				Map map = JSON.parseObject(configration, Map.class);
+				config.setMinAmount((Integer) map.get("minAmount"));
+				config.setMaxAmount((Integer) map.get("maxAmount"));
+				config.setSelectAssetTypes((List<String>) map.get("selectAssetTypes"));
+				config.setSelectAssetGroups((List<String>) map.get("selectAssetGroups"));
+				config.setSelectAssetClinicalDeptUids((List<String>) map.get("selectAssetClinicalDeptUids"));
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetGroups())){
+					config.setSelectAssetGroups(assetGroup.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList()));
+				}
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetClinicalDeptUids())){
+				  List<OrgInfo>	deptInfoList = uaaService.getClinicalDeptListBySiteUID(config.getHierOrgUid());
+				  if(!CollectionUtils.isEmpty(deptInfoList)){
+				  	config.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+				  }
+				}
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetTypes())){
+					List<AssetTypeGroup> resultList = assetTypeGroupDao.getTopAuthGroupAndTenantUid(config.getTenantUID());
+					if(!CollectionUtils.isEmpty(resultList)){
+						config.setSelectAssetTypes(resultList.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList()));
+					}
+				}
+			}
+			Map<String, Object> map = new HashMap();
+			map.put("minAmount", config.getMinAmount());
+			map.put("maxAmount", config.getMaxAmount());
+			map.put("selectAssetClinicalDeptUids", config.getSelectAssetClinicalDeptUids());
+			map.put("selectAssetGroups", config.getSelectAssetGroups());
+			map.put("selectAssetTypes", config.getSelectAssetTypes());
+			String newConfigration = JSON.toJSONString(map);
+			config.setConfigration(newConfigration);
+			multiLevelApprovalConfigRepository.save(config);
+
+		});
+
 	}
 }

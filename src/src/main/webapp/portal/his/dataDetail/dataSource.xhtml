@@ -99,6 +99,11 @@
                                             <h:outputText value="#{item.deviceDeptCode}"/>
                                         </p:column>
 
+                                        <p:column headerText="收费项目名称" sortBy="#{item.hisEquipmentSfxm.sfxmName}"
+                                                  filterBy="#{item.hisEquipmentSfxm.sfxmName}" filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.hisEquipmentSfxm.sfxmName}"/>
+                                        </p:column>
+
 
                                         <p:column headerText="数量" sortBy="#{item.receiptNum}"
                                                   filterBy="#{item.receiptNum}"
