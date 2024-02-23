@@ -243,7 +243,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select uid from asset_info where tenant_uid = ?1 and (status in ?2 or is_deleted = true or is_valid = false)",nativeQuery = true)
     List<String> getInvalidAssets(String tenantUID,List<Integer> status);
 
-    List<AssetInfo> findBySupplierIdOrMaitananceIdOrManufactureId(Integer supplierId, String maitananceId, String manufactureId);
+    List<AssetInfo> findBySupplierIdOrMaitananceIdOrManufactureId(Integer supplierId, Integer maitananceId, Integer manufactureId);
 
     AssetInfo findFirstByQrCode(String qrCode);
 
