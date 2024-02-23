@@ -275,6 +275,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存配置
     public void save() {
+        userAssetTypeUpdate();
         if(CollectionUtils.isEmpty(selected.getSelectAssetClinicalDeptUids())  || CollectionUtils.isEmpty(selected.getSelectAssetGroups())  || (isEnableAssetType()  && CollectionUtils.isEmpty(selected.getSelectAssetTypes())  )  ){
             WebUtil.addWarnMessage("当前配置下配置信息多选条件不能为空");
             return;
