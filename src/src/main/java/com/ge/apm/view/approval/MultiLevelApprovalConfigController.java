@@ -686,8 +686,25 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             }else{
                 approveUserList=new ArrayList<>();
             }
-
         }
+
+        //筛选条件变更校验审批节点中审核人是否存在权限移除
+        List<String> approveUserListUids = approveUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+
+        nodesList.stream().forEach(item->{
+//            List<String> approvalUids = item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(item.getApproveUsers())){
+                List<String> invalidUserUid=new ArrayList<>();
+                for (UserAccount userAccount : item.getApproveUsers()) {
+                    if(!approveUserListUids.contains(userAccount.getUid())){
+                        invalidUserUid.add(userAccount.getUid());
+                    }
+                }
+//                approvalUids.removeAll(invalidUserUid);
+                List<UserAccount> validUser = item.getApproveUsers().stream().filter(user -> !invalidUserUid.contains(user.getUid())).collect(Collectors.toList());
+                item.setApproveUsers(validUser);
+            }
+        });
     }
     private TreeNode assetTypeGroupTree;
     private TreeNode[] selectedAssetTypeGroupNodes;
