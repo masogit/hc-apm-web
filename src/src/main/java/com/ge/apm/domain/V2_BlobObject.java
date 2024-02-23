@@ -181,6 +181,9 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "compress_object_id")
     private String compressObjectId;
 
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
     public String getId() {
         return id;
     }
@@ -339,6 +342,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setCompressObjectId(String compressObjectId) {
         this.compressObjectId = compressObjectId;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 
     @Override
