@@ -121,6 +121,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     @Autowired
     private AssetTypeGroupMapper assetTypeGroupMapper;
+    @Autowired
+    private AssetTypeGroupRepository assetTypeGroupRepository;
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
@@ -1062,6 +1064,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
             //设备科长(可见范围内包含该设备的所有医学工程处主任)
             List<UserAccount> userAccounts=userAccountRepository.findUserByClinicalDeptUID(assetInfo.getClinicalDeptUID(),"AssetHead");
+            if (userAccount.isEnableAssetTypeGroup()) {
+                // 已开启资产分类，需要过滤掉没有资产分类权限的人
+                if(StringUtils.isNotBlank(assetInfo.getAssetType())){
+                    List<String> userUidList = assetTypeGroupRepository.getUserUidListByEncoded(assetInfo.getAssetType());
+                    userAccounts = userAccounts.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+                }else{
+                    userAccounts=new ArrayList<>();
+                }
+
+            }
             //推送消息到临床(该工单的报修人)
             UserAccount user = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
             userAccounts.add(user);
