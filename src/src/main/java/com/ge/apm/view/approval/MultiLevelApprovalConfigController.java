@@ -407,7 +407,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //                                selectAssetClinicalDeptUids=(List<String>) mapNew.get("selectAssetClinicalDeptUids");
 //                            }
 //                        }
-                        if( minAmountNew > minAmount && minAmountNew < maxAmount ) {
+                        if( minAmountNew >= minAmount && minAmountNew < maxAmount) {
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
                                 return true;
                         }
@@ -417,10 +417,14 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //                            WebUtil.addWarnMessage(approvalMsg);
 //                            return true;
                         }
-                        if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount){
+                        if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount  && maxAmount != 0){
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
 //                            WebUtil.addWarnMessage(approvalMsg);
                             return true;
+                        }
+                        if(  (minAmountNew <= minAmount ||  minAmountNew >= minAmount ) && maxAmountNew == maxAmount  ){
+                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
+                                return true;
                         }
                     }
 
