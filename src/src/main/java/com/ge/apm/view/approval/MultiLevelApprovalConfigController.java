@@ -407,11 +407,15 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //                                selectAssetClinicalDeptUids=(List<String>) mapNew.get("selectAssetClinicalDeptUids");
 //                            }
 //                        }
+                        if( (minAmountNew==0 && maxAmountNew==0 ) || (minAmount==0 && maxAmount==0)   ){
+                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
+                                return true;
+                        }
                         if( minAmountNew >= minAmount && minAmountNew < maxAmount) {
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
                                 return true;
                         }
-                        if( maxAmountNew > minAmount && maxAmountNew <= maxAmount){
+                        if(( maxAmountNew > minAmount && maxAmountNew <= maxAmount)){
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
                                 return true;
 //                            WebUtil.addWarnMessage(approvalMsg);
