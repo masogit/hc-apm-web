@@ -112,28 +112,36 @@
 <!--                        </p:autoComplete>-->
 <!--                    </h:panelGroup>-->
                 </p:panelGrid>
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 900px" >
 
                     <p:fieldset legend="设备分类">
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
-                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetGroups}" layout="pageDirection">
+                            <p:selectBooleanCheckbox  id="selectAssetGroupAll"
+                                                      value="#{multiLevelApprovalConfigController.selectAssetGroup}"
+                                                      itemLabel="全选">
+                                <p:ajax update="selectAssetGrouoUids"
+                                        listener="#{multiLevelApprovalConfigController.selectAssetGroupUids}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectManyCheckbox  id="selectAssetGrouoUids" value="#{multiLevelApprovalConfigController.selected.selectAssetGroups}" layout="pageDirection">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <p:ajax update="@parent:selectAssetGroupAll" listener="#{multiLevelApprovalConfigController.setSelectAssetGroupCheck}"/>
+
                             </p:selectManyCheckbox>
                         </p:scrollPanel>
                     </p:fieldset>
                     <p:fieldset legend="所属科室">
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
                             <p:outputPanel id="checkboxPanel">
-                                <p:selectBooleanCheckbox
-                                        value="#{multiLevelApprovalConfigController.selectClinicalDept}"
+                                <p:selectBooleanCheckbox  id="selectAll"
+                                                          value="#{multiLevelApprovalConfigController.selectClinicalDept}"
                                         itemLabel="全选">
                                     <p:ajax update="selectClinicalDeptUids"
                                             listener="#{multiLevelApprovalConfigController.selectClinicalDeptUids}"/>
                                 </p:selectBooleanCheckbox>
-                            <p:selectManyCheckbox id="selectClinicalDeptUids" value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection">
-                                <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            <p:selectManyCheckbox id="selectClinicalDeptUids" value="#{multiLevelApprovalConfigController.selected.selectAssetClinicalDeptUids}" layout="pageDirection" filterMatchMode="contains">
+                                <f:selectItems value="#{multiLevelApprovalConfigController.deptInfoList}"  var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 <p:ajax listener="#{multiLevelApprovalConfigController.selectAssetClinicalDeptChange}"/>
-                                <p:ajax listener="#{multiLevelApprovalConfigController.selectAssetClinicalDeptChange}"/>
+                                <p:ajax update="@parent:selectAll" listener="#{multiLevelApprovalConfigController.selectClinicalDeptCheck}"/>
                             </p:selectManyCheckbox>
                             </p:outputPanel>
                         </p:scrollPanel>
