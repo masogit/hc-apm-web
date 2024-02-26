@@ -3641,6 +3641,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','Cleaned','已取消','Cleaned',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','CommercialAccept','Commercial审批通过','Commercial Support Accept',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','CommercialReject','Commercial审批拒绝','Commercial Support Reject',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','ReturnCompleted','归还审核完成','ReturnCompleted',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','CloseCommited','关单已提交','CloseCommited',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','CloseApproved','关单审核通过','CloseApproved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','CloseFailed','关单审核不通过','closeFailed',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnDataStatus','Pending','待审批','Pending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnDataStatus','Accept','审批通过','Accept',NULL,-1);
@@ -3703,6 +3707,61 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','cancel','cancel','cancel',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','useNoReturn','已使用申请不归还','已使用申请不归还',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','damagedShipment','Damaged in shipment','Damaged in shipment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','singlePurchase','ZKB转单独采购','ZKB转单独采购',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','esdBagDamaged','ESD Bag Damaged(防静电袋破损)','ESD Bag Damaged',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','esdBagMissing','ESD Bag missing(防静电袋丢失)','ESD Bag missing',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','Good','Good(完好)','Good',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','inadequateToProtectPart','Inadequate to protect part(内部缓冲保护不足)','Inadequate to protect part',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','packagingInadequate','Packaging and ESD inadequate(包装和防静电不完整)','Packaging and ESD inadequate',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealType','greenFEReseal','Green FE Reseal(绿色标签FE重新密封)','Green FE Reseal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealType','greenSupplierSeal','Green Supplier Seal(绿色标签供应商密封)','Green Supplier Seal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealType','greenWarehouseSeal','Green Warehouse Seal(绿色标签仓库密封)','Green Warehouse Seal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealType','noSeal','No seal(没有密封标签)','No seal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealType','redOrPurple','Red or Purple(红色或紫色标签)','Red or Purple',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealStatus','Broken','Cut/Broken(破损的)','Cut/Broken',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealStatus','notSealBox','Intact But Did not Seal Box(完好无损但未封箱)','Intact But Did not Seal Box',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealStatus','good','Intact/Good(完好的)','Intact/Good',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnQualitySealStatus','noQualitySeal','No Quality Seal(没有密封标签)','No Quality Seal',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQuality','Damaged','Bad/Damaged(坏的)','Bad/Damaged',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQuality','IntermittentFailure','Intermittent Failure(间隙性坏的)','Intermittent Failure',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQuality','Unknown','Unknown(不知道)','Unknown',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Potential','Potential(该故障会导致潜在伤害)','Potential',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Actual','Actual(该故障已导致实际伤害)','Actual',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','No','No(该故障不会导致潜在或实际伤害)','No',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','Yes','Yes(故障发生时，有病人在使用这台机器)','Yes',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','No','No(故障发生时，没有病人使用这台机器)','No',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','NotReported','Not reported(客户没有告知，不清楚故障发生时有没有病人在使用这台机器)','Not reported',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Diagnosis','Diagnosis(诊断)','Diagnosis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Treatment','Treatment(治疗)','Treatment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Monitoring','Monitoring(监控)','Monitoring',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Declined','Declined(用户拒绝透露)','Declined',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Boot Up Issue','Boot Up Issue(启动故障)','Boot Up Issue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Cosmetic Issue','Cosmetic Issue(外观目视差(生锈、磨损严重等))','Cosmetic Issue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Disassembled','Disassembled(部件结构分离)','Disassembled',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Function Does Not Work','Function Does Not Work(功能失常)','Function Does Not Work',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Image Quality Issue','Image Quality Issue(影像质量功能)','Image Quality Issue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Missing/Swapped Component','Missing/Swapped Component(丢失/非常规组件)','Missing/Swapped Component',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Other','Other(其他)','Other',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Physical Damage','Physical Damage(备件实体破损)','Physical Damage',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPartQualityIssue','Used/Dirty','Used/Dirty(被用过/污迹)','Used/Dirty',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Travel','Travel(差旅时间)','Travel',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite(现场维修时间)','onsite',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support(远程支持时间)','Phone Support',NULL,-1);
+
 
 -- 归还类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_zkbPoReturnType','badReturn','坏还','Bad Return',NULL,-1);
