@@ -165,15 +165,18 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
     public void activeDigital() {
         AdminFeatureActiveRepository dao = WebUtil.getBean(AdminFeatureActiveRepository.class);
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
-        adminFeatureActive.setHospitalUID(userAccount.getHospitalUID());
-        adminFeatureActive.setTenantUID(userAccount.getTenantUID());
-        adminFeatureActive.setActiveUser(userAccount.getUid());
-        adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
-        adminFeatureActive.setCreateDate(new Date());
-        adminFeatureActive.setActiveDate(new Date());
-        adminFeatureActive.setFeatureKey(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name());
-        dao.save(adminFeatureActive);
+        AdminFeatureActive adminFeatureActive = dao.findByHospitalUIDAndFeatureKey(userAccount.getHospitalUID(), ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name());
+        if (ObjectUtils.isEmpty(adminFeatureActive)) {
+            adminFeatureActive = new AdminFeatureActive();
+            adminFeatureActive.setHospitalUID(userAccount.getHospitalUID());
+            adminFeatureActive.setTenantUID(userAccount.getTenantUID());
+            adminFeatureActive.setActiveUser(userAccount.getUid());
+            adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+            adminFeatureActive.setCreateDate(new Date());
+            adminFeatureActive.setActiveDate(new Date());
+            adminFeatureActive.setFeatureKey(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name());
+            dao.save(adminFeatureActive);
+        }
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.afterActiveDigital();
         MessageUtil.outPutReturnFacesMessage("激活成功", FacesMessage.SEVERITY_INFO);
