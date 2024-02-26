@@ -933,6 +933,10 @@ public class UserContextService implements Serializable {
 
     public String isActiveNew(){
         UserAccount currentUser = getLoginUser();
+        // 忽略智康宝
+        if (isZkbAccount()) {
+            return "0";
+        }
         if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2 && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
             return "1";//need active DIGITAL_MEDICAL_ENGINEERING
         } else {
