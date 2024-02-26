@@ -31,6 +31,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -69,6 +70,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserOrgInfoRepository userOrgInfoRepository;
     private boolean selectClinicalDept;
+    private boolean selectAssetGroup;
     @Override
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -146,6 +148,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         getClinicalDepList(selectedOrg.getUid());
         if(CollectionUtils.isNotEmpty(deptInfoList)){
             selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+            selectClinicalDept=true;
         }
     }
 
@@ -155,6 +158,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         switchJsontoVo();
         getClinicalDepList(selected.getHierOrgUid());
         loadAssetTypeGroup();
+        selectClinicalDeptCheck();
+        setSelectAssetGroupCheck();
     }
 
     public void preCreate() {
@@ -163,6 +168,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         operateType = ApprovalConstant.OPERATE_TYPE_CREATE;
         configEnable = true;
+        selectAssetGroup=true;
+        selectClinicalDept=true;
         try {
             super.prepareCreate();
             //默认启用
@@ -307,11 +314,17 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
 
         List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
+        AtomicBoolean nodeApprovalUserIsNull= new AtomicBoolean(false);
         collect.stream().forEach(item -> {
             if (item.getUsingRole()) {
                 item.setRoleUids(item.getApproveRoles().stream().map(a -> a.getId()).collect(Collectors.toList()));
                 item.setUserUids(null);
             } else {
+                if(CollectionUtils.isEmpty(item.getApproveUsers())){
+                    nodeApprovalUserIsNull.set(true);
+                    WebUtil.addWarnMessage("当前配置下审批节点中审核人为空,不允许保存！");
+                    return;
+                }
                 item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //
@@ -323,6 +336,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setRoleUids(null);
             }
         });
+        if(nodeApprovalUserIsNull.get()){
+            return;
+        }
         String nodes = JSON.toJSONString(collect);
         selected.setApprovalItem(nodes);
 
@@ -391,20 +407,28 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //                                selectAssetClinicalDeptUids=(List<String>) mapNew.get("selectAssetClinicalDeptUids");
 //                            }
 //                        }
-                        if( minAmountNew > minAmount && minAmountNew < maxAmount ) {
+                        if( (minAmountNew==0 && maxAmountNew==0 ) || (minAmount==0 && maxAmount==0)   ){
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
                                 return true;
                         }
-                        if( maxAmountNew > minAmount && maxAmountNew <= maxAmount){
+                        if( minAmountNew >= minAmount && minAmountNew < maxAmount) {
+                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
+                                return true;
+                        }
+                        if(( maxAmountNew > minAmount && maxAmountNew <= maxAmount)){
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
                                 return true;
 //                            WebUtil.addWarnMessage(approvalMsg);
 //                            return true;
                         }
-                        if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount){
+                        if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount  && maxAmount != 0){
                             if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
 //                            WebUtil.addWarnMessage(approvalMsg);
                             return true;
+                        }
+                        if(  (minAmountNew <= minAmount ||  minAmountNew >= minAmount ) && maxAmountNew == maxAmount  ){
+                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids))
+                                return true;
                         }
                     }
 
@@ -641,6 +665,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selectAssetClinicalDeptChange();
 
     }
+
     public void selectAssetClinicalDeptChange(){
 //        buildApproveUserList();
         approveUserList=approveUserListInit;
@@ -686,8 +711,25 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             }else{
                 approveUserList=new ArrayList<>();
             }
-
         }
+
+        //筛选条件变更校验审批节点中审核人是否存在权限移除
+        List<String> approveUserListUids = approveUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+
+        nodesList.stream().forEach(item->{
+//            List<String> approvalUids = item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(item.getApproveUsers())){
+                List<String> invalidUserUid=new ArrayList<>();
+                for (UserAccount userAccount : item.getApproveUsers()) {
+                    if(!approveUserListUids.contains(userAccount.getUid())){
+                        invalidUserUid.add(userAccount.getUid());
+                    }
+                }
+//                approvalUids.removeAll(invalidUserUid);
+                List<UserAccount> validUser = item.getApproveUsers().stream().filter(user -> !invalidUserUid.contains(user.getUid())).collect(Collectors.toList());
+                item.setApproveUsers(validUser);
+            }
+        });
     }
     private TreeNode assetTypeGroupTree;
     private TreeNode[] selectedAssetTypeGroupNodes;
@@ -774,11 +816,34 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         this.selectClinicalDept = selectClinicalDept;
     }
 
+    public boolean getSelectAssetGroup() {
+        return selectAssetGroup;
+    }
+
+    public void setSelectAssetGroup(boolean selectAssetGroup) {
+        this.selectAssetGroup = selectAssetGroup;
+    }
+
     public void selectClinicalDeptUids(){
         if(selectClinicalDept && CollectionUtils.isNotEmpty(deptInfoList)){
             selected.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
         }else{
            selected.setSelectAssetClinicalDeptUids(new ArrayList<>());
         }
+    }
+    List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup");
+
+    public void selectAssetGroupUids(){
+        if(selectAssetGroup && CollectionUtils.isNotEmpty(assetGroup)){
+            selected.setSelectAssetGroups(assetGroup.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList()));
+        }else{
+            selected.setSelectAssetGroups(new ArrayList<>());
+        }
+    }
+    public void selectClinicalDeptCheck(){
+        selectClinicalDept = deptInfoList.size() == selected.getSelectAssetClinicalDeptUids().size();
+    }
+    public void setSelectAssetGroupCheck(){
+        selectAssetGroup = assetGroup.size() == selected.getSelectAssetGroups().size();
     }
 }
