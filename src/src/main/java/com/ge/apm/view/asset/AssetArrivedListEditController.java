@@ -23,7 +23,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -1133,30 +1132,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.newSupplier.setSiteUID(loginUser.getSiteUID());
         this.newSupplier.setCreatedDate(new Date());
         this.newSupplier.setCreatedBy(loginUser.getName());
-        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
-        Boolean isHas = false;
-        if (!ObjectUtils.isEmpty(supplier)) {
-            isHas = true;
-        }
-        if(newSupplier.getManufacturerT()){
-            manueList.add(newSupplier);
-            if (isHas) {
-                supplier.setManufacturerT(true);
-            }
-        }
-        if(newSupplier.getSupplierT()){
-            suppliersList.add(newSupplier);
-            if (isHas) {
-                supplier.setSupplierT(true);
-            }
-        }
-        if(newSupplier.getMaintainerT()){
-            maintainerList.add(newSupplier);
-            if (isHas) {
-                supplier.setMaintainerT(true);
-            }
-        }
-        this.newSupplier = supplier;
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
 
@@ -1167,6 +1142,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }else if("maintainer".equals(newSupplierType)){
             maintainerList.add(newSupplier);
         }*/
+        if(newSupplier.getManufacturerT()){
+            manueList.add(newSupplier);
+        }
+        if(newSupplier.getSupplierT()){
+            suppliersList.add(newSupplier);
+        }
+        if(newSupplier.getMaintainerT()){
+            maintainerList.add(newSupplier);
+        }
 //        supplierList.add(newSupplier);
 //        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
 //            supplierList.add(newSupplier);
