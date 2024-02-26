@@ -1158,18 +1158,23 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //        changeSelect(createTpye);
 
     }
-
+    @Getter
+    @Setter
+    public String createTpyeName=null;
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
         newSupplierType = type;
         if("manufacturer".equals(type)){
             newSupplier.setManufacturerT(true);
+            createTpyeName="制造商信息";
         }
         if("supplier".equals(type)){
             newSupplier.setSupplierT(true);
+            createTpyeName="供应商信息";
         }
         if("maintainer".equals(type)){
             newSupplier.setMaintainerT(true);
+            createTpyeName="维修商信息";
         }
 
     }
