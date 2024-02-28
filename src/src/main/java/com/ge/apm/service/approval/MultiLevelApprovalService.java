@@ -1030,7 +1030,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                                 PurchaseOrderInfo.PURCHASESTEPSTATUS.Complete.toString(),null,null);
                                     }
                                     String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                                    this.sendWxMsg(paramList, message,"待审批",linkUrl);
+                                    this.sendWxMsg(paramList, message,"待审批","");
                                     break;
 
                             }
