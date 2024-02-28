@@ -1029,12 +1029,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                                 PurchaseOrderInfo.PURCHASESTEP.Complete.toString(),
                                                 PurchaseOrderInfo.PURCHASESTEPSTATUS.Complete.toString(),null,null);
                                     }
-                                    break;
-                                default:
-                                    //审批同意时 给审批人发送微信
                                     String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
                                     this.sendWxMsg(paramList, message,"待审批",linkUrl);
                                     break;
+
                             }
                         }
                     }
