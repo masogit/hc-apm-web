@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import static com.ge.apm.service.constant.ApprovalConstant.APPROVAL_SEPARATOR;
 
@@ -164,6 +165,8 @@ public class MultiLevelApproval implements Serializable {
     @Column(name = "digest")
     private String digest;
 
+    @Transient
+    private List<V2_BlobObject> attachments;
 
     public String getSignatureNurse() {
         return signatureNurse;
