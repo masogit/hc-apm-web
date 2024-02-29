@@ -120,6 +120,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     }
 
     public void promptApproval(MultiLevelApproval multiLevelApproval) {
+        display=false;
         multiLevelApprovalController.onServerEvent(null, multiLevelApproval);
     }
 

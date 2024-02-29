@@ -135,6 +135,8 @@
                         <!-- 预算审核页面-->
                         <ui:include src="budget/BudgetDetail.xhtml"/>
 
+                        <ui:include src="content/MultiLevelApprovalAttachmentxhtml.xhtml"/>
+
                         <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
                             <label class="label" style="font-size: medium; font-weight: bold">审核结果</label>
                             <p:selectOneRadio id="enable" value="#{multiLevelApprovalController.approvalResult}">
