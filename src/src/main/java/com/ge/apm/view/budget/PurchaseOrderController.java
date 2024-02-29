@@ -381,10 +381,17 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
         int applicationQuantitySumResult = 0;
         for(BudgetApplicationAsset curApplicationBudget:curApplicationBudgetAssets){
-            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
-                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
-            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
-                    0:curApplicationBudget.getConfirmQuantity();
+            if(curApplicationBudget.getConfirmAmount()==null && curApplicationBudget.getConfirmQuantity()==null){
+                totalAmount.set(totalAmount.get().add(curApplicationBudget.getOfflineApplicationAmount()==null?
+                        new BigDecimal(0):curApplicationBudget.getOfflineApplicationAmount()));
+                applicationQuantitySumResult += curApplicationBudget.getOfflineApplicationQuantity()==null?
+                        0:curApplicationBudget.getOfflineApplicationQuantity();
+            }else{
+                totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                        new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
+                applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                        0:curApplicationBudget.getConfirmQuantity();
+            }
         }
         selected.setTotalPrice(totalAmount.get());
         selected.setPurchaseQuantity(applicationQuantitySumResult);
