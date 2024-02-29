@@ -38,6 +38,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -1734,7 +1735,27 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.newSupplier.setSiteUID(loginUser.getSiteUID());
         this.newSupplier.setCreatedDate(new Date());
         this.newSupplier.setCreatedBy(loginUser.getName());
-
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
+        Boolean isHas = false;
+        if (!ObjectUtils.isEmpty(supplier)) {
+            isHas = true;
+        }
+        if(newSupplier.getManufacturerT()){
+            if (isHas) {
+                supplier.setManufacturerT(true);
+            }
+        }
+        if(newSupplier.getSupplierT()){
+            if (isHas) {
+                supplier.setSupplierT(true);
+            }
+        }
+        if(newSupplier.getMaintainerT()){
+            if (isHas) {
+                supplier.setMaintainerT(true);
+            }
+        }
+        this.newSupplier = supplier;
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
         supplierList.add(newSupplier);
