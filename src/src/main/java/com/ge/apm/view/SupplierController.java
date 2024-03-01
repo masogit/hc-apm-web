@@ -216,7 +216,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             List<V2_BlobObject> tempBlobObject = blobService.findBlobObjectsByBoUid(selected.getUid());
             blobService.deleteBlobFile(tempBlobObject);
         } else {
-            WebUtil.addErrorMessage("供应商删除失败！原因:存在已绑定的设备或到货安装的设备！");
+            WebUtil.addErrorMessage("供应商已绑定资产/责任人，无法删除");
         }
 
     }
