@@ -44,6 +44,9 @@ public class HisEquipmentConnect implements Serializable {
 
 
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 

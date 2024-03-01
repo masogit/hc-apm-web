@@ -120,20 +120,19 @@ public class HisEquipmentDataSourceImportService {
 
     public void importData(List<Map<String, Object>> importMapList) {
 
-//        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-//        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
-//        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
-//        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
-//        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
-
-        List<String> orgCodeList =null;
-        List<HisEquipmentDataSource>  hisEquipmentDataSource=hisEquipmentDataSourceMapper.selectByOrgCodeAndExecTime();
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
+        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
+        Map<String,OrgInfo> map =  orgInfoList.stream().collect(Collectors.toMap(OrgInfo::getOrgCode,each->each,(value1, value2) -> value1));
+        List<HisEquipmentDataSource>  hisEquipmentDataSource=hisEquipmentDataSourceMapper.selectByTenantUidGroup(UserContextService.getCurrentUserAccount().getTenantUID());
         Map<String, List<HisEquipmentDataSource>> collect = hisEquipmentDataSource.stream().collect(Collectors.groupingBy(HisEquipmentDataSource::getOrgCode));
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList,orgCodeList,collect)) {
+                if(checkData(item, importMapList,orgCodeList,collect,map)) {
                     importOneHisEquipment(item);
                 }
 
@@ -149,7 +148,7 @@ public class HisEquipmentDataSourceImportService {
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList , Map<String, List<HisEquipmentDataSource>> collect) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList , Map<String, List<HisEquipmentDataSource>> collect, Map<String,OrgInfo> map) {
 
 
         boolean isValidateData = true;
@@ -228,6 +227,17 @@ public class HisEquipmentDataSourceImportService {
                 item.put("status", ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "已经导入此时间段数据");
                 isValidateData = false;
+            }
+        }
+        if(StringUtils.isNotBlank(hisEquipmentDataSource.getOrgCode())){
+            if(!orgCodeList.contains(hisEquipmentDataSource.getOrgCode())){
+                item.put("status", HisEquipmentImportService.ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "租户下面不存在该医院机构代码");
+                isValidateData = false;
+            }else{
+                OrgInfo orgInfo = map.get(hisEquipmentDataSource.getOrgCode());
+                hisEquipmentDataSource.setSiteUid(orgInfo.getSiteUID());
+                hisEquipmentDataSource.setTenantUid(orgInfo.getTenantUID());
             }
         }
         return isValidateData;

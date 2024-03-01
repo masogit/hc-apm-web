@@ -143,11 +143,13 @@ public class HisEquipmentImportService {
         orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
         List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
         List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
+        Map<String,OrgInfo> map =  orgInfoList.stream().collect(Collectors.toMap(OrgInfo::getOrgCode,each->each,(value1, value2) -> value1));
+
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList,orgCodeList)) {
+                if(checkData(item, importMapList,orgCodeList,map)) {
                     importOneHisEquipment(item);
                 }
 
@@ -163,7 +165,7 @@ public class HisEquipmentImportService {
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList ) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList,Map<String,OrgInfo> map ) {
 
 
         boolean isValidateData = true;
@@ -204,7 +206,10 @@ public class HisEquipmentImportService {
         }
 
         if(isValidateData && StringUtils.isNotBlank(hisEquipmentConnect.getEqId()) && StringUtils.isNotBlank(hisEquipmentConnect.getEqHosid())){
-            HisEquipmentConnect byEqId = hisEquipmentConnectRepository.findByEqIdAndEqHosid(hisEquipmentConnect.getEqId(),hisEquipmentConnect.getEqHosid());
+            OrgInfo orgInfo = map.get(hisEquipmentConnect.getEqHosid());
+            hisEquipmentConnect.setSiteUid(orgInfo.getSiteUID());
+            hisEquipmentConnect.setTenantUid(orgInfo.getTenantUID());
+            HisEquipmentConnect byEqId = hisEquipmentConnectRepository.findByEqIdAndEqHosidAndSiteUid(hisEquipmentConnect.getEqId(),hisEquipmentConnect.getEqHosid(),orgInfo.getSiteUID());
             if(byEqId != null){
                 item.put("status", ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "设备编号已存在,不允许导入");

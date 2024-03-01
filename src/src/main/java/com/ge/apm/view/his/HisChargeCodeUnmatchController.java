@@ -77,6 +77,7 @@ public class HisChargeCodeUnmatchController extends GenericCRUDUUIDController<Hi
         }
         if(orgComponentController.getSelectedOrg() != null){
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
         Page<HisEquipmentSfxmMatch> page = sfxmMatchRepository.findBySearchFilter(this.searchFilters, pageRequest);
         currentPages = page.getContent();
@@ -95,7 +96,7 @@ public class HisChargeCodeUnmatchController extends GenericCRUDUUIDController<Hi
 
     @Transactional
     public void onSelectCurrent(String sfxmId) {
-        List<HisEquipmentSfxmMatch>  sfxmMatches =sfxmMatchRepository.findBySfxmId(sfxmId);
+        List<HisEquipmentSfxmMatch>  sfxmMatches =sfxmMatchRepository.findBySfxmIdAAndTenantUid(sfxmId,UserContextService.getCurrentUserAccount().getTenantUID());
         if(sfxmMatches !=null && !sfxmMatches.isEmpty()) {
             if(hisAdjustBusinessJob.getDataStartDate() == null || hisAdjustBusinessJob.getDataEndDate() == null || hisAdjustBusinessJob.getDataEndDate().compareTo(hisAdjustBusinessJob.getDataStartDate()) <= 0){
                 WebUtil.addSuccessMessage("取消收费项目匹配填写开始时间或结束时间错误");
@@ -108,6 +109,8 @@ public class HisChargeCodeUnmatchController extends GenericCRUDUUIDController<Hi
             hisAdjustBusinessJob.setTaskStatus(0);
             hisAdjustBusinessJob.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
             hisAdjustBusinessJob.setCreatedDate(new Date());
+            hisAdjustBusinessJob.setTenantUid(sfxmMatches.get(0).getTenantUid());
+            hisAdjustBusinessJob.setSiteUid(sfxmMatches.get(0).getSiteUid());
             hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
 
             sfxmMatchRepository.delete(sfxmMatches);

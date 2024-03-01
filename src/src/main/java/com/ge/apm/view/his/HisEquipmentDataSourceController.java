@@ -123,10 +123,12 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
             searchFilters = new ArrayList<SearchFilter>();
         }
         removeFilterOnField("orgCode");
+        removeFilterOnField("siteUid");
 
         OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
         if (selectedOrg != null) {
             searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
         }
         if (hisRequestParamsDto.getStartDate() != null) {
             searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
