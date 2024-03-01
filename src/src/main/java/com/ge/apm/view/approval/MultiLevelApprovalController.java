@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -184,7 +185,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
         primaryApprovalData = null;
         secondaryApprovalData = null;
-
+        multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
+        if(true){
+            return;
+        }
         if (null == multiLevelApproval) {
             multiLevelApprovals = null;
             return;
@@ -295,6 +299,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      */
     public void getMultiLevelApprovalPersonByAgree() throws Exception {
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
@@ -332,6 +337,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApproval.setAttachments(attachList);
         multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -463,6 +469,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      */
     public void getMultiLevelApprovalPersionAndSubmitByDisagree() {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
@@ -473,6 +480,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApproval.setAttachments(attachList);
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -512,13 +520,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
             return;
         }
+        multiLevelApproval.setAttachments(attachList);
         String token = UserContextService.getAccessToken();
         AdverseEvents events = new AdverseEvents();
         events.setUid(multiLevelApproval.getBusinessUid());
         events.setStatus(6);
         events.setApprovalOpinion(approvalOpinion);
         events.setApprovalResult(approvalResult);
-        multiLevelApprovalService.approveAdverseEvents(token, events);
+        multiLevelApprovalService.approveAdverseEvents(token, events,multiLevelApproval);
         selected = null;
     }
 
@@ -533,13 +542,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
             return;
         }
+        multiLevelApproval.setAttachments(attachList);
         String token = UserContextService.getAccessToken();
         AdverseEvents events = new AdverseEvents();
         events.setUid(multiLevelApproval.getBusinessUid());
         events.setStatus(4);
         events.setApprovalOpinion(approvalOpinion);
         events.setApprovalResult(approvalResult);
-        multiLevelApprovalService.approveAdverseEvents(token, events);
+        multiLevelApprovalService.approveAdverseEvents(token, events,multiLevelApproval);
         selected = null;
     }
 
@@ -615,7 +625,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public void returnApprove() throws Exception {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
-
+        multiLevelApproval.setAttachments(attachList);
         int level = 0;
         for (int i=1;i<=nodes.size();i++){
             if(nodes.get(i-1).getNodeName().equals(nodeName)){
@@ -646,7 +656,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     }
     public void directDelivery() throws Exception {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
-
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
@@ -873,5 +883,36 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public Integer approvaLevelPurchase() {
         return this.selected.getApprovalLevel();
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        if(CollectionUtils.isEmpty(attachList)){
+            attachList= new ArrayList<>();
+        }
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getFile().getContentType().startsWith("image")?"Image":"File";
+            blobObject.setBoType(V2_BlobObject.AttachmentType.getKeyByValue("多级审批"));
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getId());
+            blobObject.setTenantUid(selected.getTenantUID());
+//            blobService.saveBlobObject(blobObject);
+            attachList.add(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public List<V2_BlobObject> getFileByBoSubType(String type){
+        if(CollectionUtils.isEmpty(attachList)){
+            attachList= new ArrayList<>();
+        }
+        return attachList.stream().filter(item->type.equals(item.getBoSubType())).collect(Collectors.toList());
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 }

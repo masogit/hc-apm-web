@@ -122,11 +122,13 @@ public class HisEquipmentSfxmImportService {
         orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
         List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
         List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
+        Map<String,OrgInfo> map =  orgInfoList.stream().collect(Collectors.toMap(OrgInfo::getOrgCode,each->each,(value1, value2) -> value1));
+
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList,orgCodeList)) {
+                if(checkData(item, importMapList,orgCodeList,map)) {
                     importOneHisEquipmentSfxm(item);
                 }
 
@@ -152,44 +154,47 @@ public class HisEquipmentSfxmImportService {
         hisEquipmentSfxmRepository.save(hisEquipmentSfxm);
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList, List<String> orgCodeList) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList, List<String> orgCodeList,  Map<String,OrgInfo> map) {
 
         boolean isValidateData = true;
-        HisEquipmentSfxm HisEquipmentSfxm = (HisEquipmentSfxm)item.get("hisEquipmentSfxm");
+        HisEquipmentSfxm hisEquipmentSfxm = (HisEquipmentSfxm)item.get("hisEquipmentSfxm");
         ContractRow.clearErrMessage(item);
 
-        if(HisEquipmentSfxm.getHosId() == null){
+        if(hisEquipmentSfxm.getHosId() == null){
             item.put("status", HisEquipmentImportService.ImportStatus.Failure);
             ContractRow.addErrMessage(item, "医院机构代码不能为空");
             isValidateData = false;
         }
-        if(HisEquipmentSfxm.getSfxmId() == null){
+        if(hisEquipmentSfxm.getSfxmId() == null){
             item.put("status", HisEquipmentImportService.ImportStatus.Failure);
             ContractRow.addErrMessage(item, "收费项目不能为空");
             isValidateData = false;
         }
-        if(HisEquipmentSfxm.getSfxmName() == null){
+        if(hisEquipmentSfxm.getSfxmName() == null){
             item.put("status", HisEquipmentImportService.ImportStatus.Failure);
             ContractRow.addErrMessage(item, "收费项目名称不能为空");
             isValidateData = false;
         }
-        if(HisEquipmentSfxm.getSfxmLb() == null){
+        if(hisEquipmentSfxm.getSfxmLb() == null){
             item.put("status", HisEquipmentImportService.ImportStatus.Failure);
             ContractRow.addErrMessage(item, "收费项目分类不能为空");
             isValidateData = false;
         }
 
-        if(StringUtils.isNotBlank(HisEquipmentSfxm.getHosId())){
-            if(!orgCodeList.contains(HisEquipmentSfxm.getHosId())){
+        if(StringUtils.isNotBlank(hisEquipmentSfxm.getHosId())){
+            if(!orgCodeList.contains(hisEquipmentSfxm.getHosId())){
                 item.put("status", HisEquipmentImportService.ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "租户下面不存在该医院机构代码");
                 isValidateData = false;
             }
         }
 
-        if(isValidateData && StringUtils.isNotBlank(HisEquipmentSfxm.getSfxmId()) && StringUtils.isNotBlank(HisEquipmentSfxm.getHosId())){
-            HisEquipmentSfxm hisEquipmentSfxm = hisEquipmentSfxmRepository.findBySfxmIdAndHosId(HisEquipmentSfxm.getSfxmId(),HisEquipmentSfxm.getHosId());
-            if(hisEquipmentSfxm != null){
+        if(isValidateData && StringUtils.isNotBlank(hisEquipmentSfxm.getSfxmId()) && StringUtils.isNotBlank(hisEquipmentSfxm.getHosId())){
+            OrgInfo orgInfo = map.get(hisEquipmentSfxm.getHosId());
+            hisEquipmentSfxm.setSiteUid(orgInfo.getSiteUID());
+            hisEquipmentSfxm.setTenantUid(orgInfo.getTenantUID());
+            HisEquipmentSfxm hisEquipmentSfxm1 = hisEquipmentSfxmRepository.findBySfxmIdAndHosIdAndSiteUid(hisEquipmentSfxm.getSfxmId(),hisEquipmentSfxm.getHosId(),orgInfo.getSiteUID());
+            if(hisEquipmentSfxm1 != null){
                 item.put("status", HisEquipmentImportService.ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "收费项目代码已存在,不允许导入");
                 isValidateData = false;

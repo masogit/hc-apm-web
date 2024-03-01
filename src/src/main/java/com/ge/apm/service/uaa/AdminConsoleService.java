@@ -15,7 +15,6 @@ import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
@@ -49,7 +48,6 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.DbMessageSource;
 
-import javax.faces.application.FacesMessage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -1540,5 +1538,48 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 		});
 
+	}
+
+	public void batchUpdatePmRuleBlob() {
+		List<PmOrderRule> pmRuleReports = pmOrderRuleRepository.findPmRuleReports();
+		Set<String> objectIds = pmRuleReports.stream().map(PmOrderRule::getReportStorageId).collect(Collectors.toSet());
+		List<V2_BlobObject> blobObjects = blobObjectRepository.findByObjectStorageIdIn(objectIds);
+		Map<String, List<V2_BlobObject>> blobMap = blobObjects.stream().collect(Collectors.groupingBy(V2_BlobObject::getObjectStorageId));
+		List<V2_BlobObject> saveList = ListUtil.newArrayList();
+		for (PmOrderRule pmRuleReport : pmRuleReports) {
+			List<V2_BlobObject> objects = blobMap.get(pmRuleReport.getReportStorageId());
+			if (ObjectUtil.isNotEmpty(objects)) {
+				V2_BlobObject blobObject = objects.get(0);
+				if (ObjectUtil.isNotEmpty(blobObject.getBoUuid())) {
+					V2_BlobObject newBlobObject = new V2_BlobObject();
+					BeanUtils.copyProperties(blobObject, newBlobObject);
+					newBlobObject.setId(null);
+					newBlobObject.setBoId(pmRuleReport.getId());
+					newBlobObject.setBoUuid(pmRuleReport.getUid());
+					newBlobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+					newBlobObject.setTenantUid(pmRuleReport.getTenantUID());
+					saveList.add(newBlobObject);
+				} else {
+					blobObject.setBoId(pmRuleReport.getId());
+					blobObject.setBoUuid(pmRuleReport.getUid());
+					blobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+					blobObject.setTenantUid(pmRuleReport.getTenantUID());
+					saveList.add(blobObject);
+				}
+			} else {
+				V2_BlobObject blobObject = new V2_BlobObject();
+				blobObject.setBoId(pmRuleReport.getId());
+				blobObject.setBoUuid(pmRuleReport.getUid());
+				blobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+				blobObject.setTenantUid(pmRuleReport.getTenantUID());
+				blobObject.setObjectStorageId(pmRuleReport.getReportStorageId());
+				blobObject.setCreatedBy("anonymousUser");
+				blobObject.setCreatedDate(new Date());
+				blobObject.setLastModifiedBy("anonymousUser");
+				blobObject.setLastModifiedDate(new Date());
+				saveList.add(blobObject);
+			}
+		}
+		blobObjectRepository.save(saveList);
 	}
 }

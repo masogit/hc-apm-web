@@ -10,12 +10,12 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
-import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
 import com.ge.apm.service.asset.AssetLifecyleService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
@@ -32,10 +32,8 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.cons.ApmServiceName;
 import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.mq.MqContext;
-import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -123,6 +121,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private AssetTypeGroupMapper assetTypeGroupMapper;
     @Autowired
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    @Autowired
+    private BlobFileService blobService;
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
@@ -310,6 +310,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         multiLevelApproval.setApprovalIng(true);
         //更新审批数据
         multiLevelApprovalRepository.save(multiLevelApproval);
+        saveBlobFile(multiLevelApproval);
         //更新审批状态为不通过 业务状态为审批不通过
         List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
         //发起人UID
@@ -587,6 +588,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     public List<MultiLevelApproval> getMultiLevelApproval(MultiLevelApproval multiLevelApproval) {
         String approvalNumber = multiLevelApproval.getApprovalNumber();
         List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.getByApprovalNumberList(approvalNumber);
+        if(CollectionUtils.isNotEmpty(multiLevelApprovals)){
+            Set<String> collect = multiLevelApprovals.stream().map(MultiLevelApproval::getId).collect(Collectors.toSet());
+            List<V2_BlobObject> blobObjectsByBoUids = blobService.findBlobObjectsByBoUids(collect);
+            multiLevelApprovals.forEach(item->{
+                List<V2_BlobObject> blobList = blobObjectsByBoUids.stream().filter(blob -> blob.getBoUuid().equals(item.getId())).collect(Collectors.toList());
+                item.setAttachments(blobList);
+            });
+        }
         return multiLevelApprovals;
     }
 
@@ -638,6 +647,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(level);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
             if (level > 2) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
@@ -859,6 +869,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                     }
                 }
             }
+        }
+    }
+    private void saveBlobFile(MultiLevelApproval multiLevelApproval){
+        List<V2_BlobObject> blobObjects=null;
+        if(multiLevelApproval != null && CollectionUtils.isEmpty(blobObjects = multiLevelApproval.getAttachments())){
+            blobService.saveBlobObject(blobObjects);
         }
     }
 
@@ -1229,7 +1245,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    public void approveAdverseEvents(String token, AdverseEvents adverseEvents) {
+    public void approveAdverseEvents(String token, AdverseEvents adverseEvents, MultiLevelApproval multiLevelApproval) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
         HttpEntity<AdverseEvents> requestEntity = new HttpEntity<>(adverseEvents, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.APPROVE_ADVERSE_EVENTS);
@@ -1238,6 +1254,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             String message = responseMap.get("message").toString();
             throw new RuntimeException(message);
+        }else{
+            saveBlobFile(multiLevelApproval);
         }
     }
 
@@ -1313,6 +1331,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(returnLevel);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
             if (level > 0) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
@@ -1445,6 +1464,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(level);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
 
                 if (null != list) {

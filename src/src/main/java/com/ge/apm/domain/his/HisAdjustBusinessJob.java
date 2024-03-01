@@ -130,6 +130,13 @@ public class HisAdjustBusinessJob implements Serializable {
     @Column(name = "created_by", columnDefinition = "VARCHAR(60)")
     private String createdBy;
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
+
     @Override
     public int hashCode() {
         int hash = 0;

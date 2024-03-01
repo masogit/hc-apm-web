@@ -118,8 +118,10 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
         OrgInfo selectedOrg = getCurrentOrg();
         if (selectedOrg != null) {
             searchFiltersAsset.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
+            searchFiltersAsset.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
         } else {
             searchFiltersAsset.add(new SearchFilter("hosId", SearchFilter.Operator.IsNull, null));
+            searchFiltersAsset.add(new SearchFilter("siteUid", SearchFilter.Operator.IsNull, null));
         }
 
         if (null == connTargetOffices) {

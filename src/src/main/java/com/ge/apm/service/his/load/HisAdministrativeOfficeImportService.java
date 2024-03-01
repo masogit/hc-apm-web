@@ -112,11 +112,14 @@ public class HisAdministrativeOfficeImportService {
         orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
         List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
         List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
+
+        Map<String,OrgInfo> map =  orgInfoList.stream().collect(Collectors.toMap(OrgInfo::getOrgCode,each->each,(value1, value2) -> value1));
+
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList,orgCodeList)) {
+                if(checkData(item, importMapList,orgCodeList,map)) {
                     importOneHisClinical(item);
                 }
 
@@ -143,7 +146,7 @@ public class HisAdministrativeOfficeImportService {
         hisAdministrativeOfficesRepository.save(hisAdministrativeOffices);
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList , List<String> orgCodeList) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList , List<String> orgCodeList, Map<String,OrgInfo> map) {
 
         boolean isValidateData = true;
         HisAdministrativeOffices hisAdministrativeOffices = (HisAdministrativeOffices)item.get("hisClinical");
@@ -184,7 +187,10 @@ public class HisAdministrativeOfficeImportService {
         }
 
         if(isValidateData && StringUtils.isNotBlank(hisAdministrativeOffices.getHisKsid()) && StringUtils.isNotBlank(hisAdministrativeOffices.getHosId())) {
-            HisAdministrativeOffices hisKsid = hisAdministrativeOfficesRepository.findByHisKsidAndHosId(hisAdministrativeOffices.getHisKsid(),hisAdministrativeOffices.getHosId());
+            OrgInfo orgInfo = map.get(hisAdministrativeOffices.getHosId());
+            hisAdministrativeOffices.setSiteUid(orgInfo.getSiteUID());
+            hisAdministrativeOffices.setTenantUid(orgInfo.getTenantUID());
+            HisAdministrativeOffices hisKsid = hisAdministrativeOfficesRepository.findByHisKsidAndHosIdAndSiteUid(hisAdministrativeOffices.getHisKsid(),hisAdministrativeOffices.getHosId(),orgInfo.getSiteUID());
             if(hisKsid != null){
                 item.put("status", ContractImportService.ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "科室编号已存在,不允许导入");

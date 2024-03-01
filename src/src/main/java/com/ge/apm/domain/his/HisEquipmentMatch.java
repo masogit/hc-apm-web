@@ -72,6 +72,9 @@ public class HisEquipmentMatch implements Serializable {
     private Date modifyDate;//修改日期
 
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 

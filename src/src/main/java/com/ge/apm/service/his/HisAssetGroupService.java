@@ -171,6 +171,8 @@ public class HisAssetGroupService {
                 hisAdjustBusinessJob.setTaskStatus(0);
                 hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
                 hisAdjustBusinessJob.setCreatedDate(new Date());
+                hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
+                hisAdjustBusinessJob.setSiteUid(listSfxmMatch.get(0).getSiteUid());
                 hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
             }
 

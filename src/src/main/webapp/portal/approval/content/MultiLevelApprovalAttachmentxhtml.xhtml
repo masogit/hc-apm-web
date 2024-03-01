@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <h:outputStylesheet>
+        .ui-accordion-header{
+            background-color: #cacaca!important;
+        }
+        .ui-state-active{
+            background-color: #5180ce!important;
+        }
+    </h:outputStylesheet>
+<h:panelGroup>
+     <label class="label">附件</label>
+        <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{multiLevelApprovalController.multiLevelApprovals}">
+            <p:tab title="#{o.approvalLevel}级审批" >
+                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="名称" >
+                                <h:outputText value="#{fileitem.objectName}"/>
+                            </p:column>
+                            <p:column headerText="类型"  >
+                                <h:outputText value="#{fileitem.boSubType}"/>
+                            </p:column>
+                            <p:column headerText="预览"  >
+                                <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
+                            </p:column>
+                            <p:column headerText="操作"  >
+                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            </p:column>
+                        </p:dataTable>
+            </p:tab>
+        </p:accordionPanel>
+    </h:panelGroup>
+    <h:panelGroup rendered="#{!multiLevelApprovalListController.display}">
+                <p:dataList id="contractList" value="#{multiLevelApprovalController.getAttachList()}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                    <f:facet name="header">#{msg.Attachment}</f:facet>
+                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    <p:commandButton actionListener="#{multiLevelApprovalController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                    </p:commandButton>
+                </p:dataList>
+                <p:fileUpload id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                              mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{multiLevelApprovalController.handleFileUpload}"
+                              multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+
+    </h:panelGroup>
+</ui:composition>
+</html>
