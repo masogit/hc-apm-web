@@ -10,6 +10,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,6 +46,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private PmOrderRuleItemRepository pmOrderRuleItemRepository;
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     private PmOrderReportTemplateService pmOrderReportTemplateService;
+    private BlobObjectRepository blobObjectRepository;
     private List<Integer> ids = new ArrayList<>();
     private String filterPmRuleStatus;
     private String filterPmRuleLevel;
@@ -103,6 +105,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
+        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
@@ -384,6 +387,14 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             selected.setSiteUID(selectedUserOrg.getSiteUID());
         }
         dao.save(selected);
+        // add blob
+        if (ObjectUtil.isNotEmpty(uploadedFileObject)) {
+            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+            uploadedFileObject.setBoId(selected.getId());
+            uploadedFileObject.setBoUuid(selected.getUid());
+            uploadedFileObject.setTenantUid(selected.getTenantUID());
+            blobObjectRepository.save(uploadedFileObject);
+        }
         if (CollectionUtils.isNotEmpty(checkItemLists)) {
             checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
             for (PmOrderRuleCheckList item : checkItemLists) {
