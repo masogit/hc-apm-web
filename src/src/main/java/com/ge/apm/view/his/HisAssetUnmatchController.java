@@ -57,9 +57,11 @@ public class HisAssetUnmatchController extends GenericCRUDUUIDController<HisEqui
         }
 
         removeFilterOnField("eqHosid");
+        removeFilterOnField("siteUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             searchFilters.add(new SearchFilter("eqHosid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);

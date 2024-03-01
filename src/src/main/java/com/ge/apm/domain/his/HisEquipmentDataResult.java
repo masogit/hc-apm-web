@@ -93,4 +93,7 @@ public class HisEquipmentDataResult implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
 }
