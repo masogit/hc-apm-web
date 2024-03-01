@@ -873,7 +873,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
     private void saveBlobFile(MultiLevelApproval multiLevelApproval){
         List<V2_BlobObject> blobObjects=null;
-        if(multiLevelApproval != null && CollectionUtils.isEmpty(blobObjects = multiLevelApproval.getAttachments())){
+        if(multiLevelApproval != null && !CollectionUtils.isEmpty(blobObjects = multiLevelApproval.getAttachments())){
             blobService.saveBlobObject(blobObjects);
         }
     }
