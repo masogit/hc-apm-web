@@ -464,7 +464,7 @@
                                 <h:panelGroup >
                                     <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired? '*':''}</span></label>
                                     <apm:selectAssetTypeGroup readonly="true" required="#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired}"
-                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange"/>
+                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''}"/>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>

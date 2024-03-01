@@ -67,6 +67,7 @@ public class UserContextService implements Serializable {
     private Boolean flagIsUltraSoundTenant = null;
     private Boolean flagIsAgentTenant = null;
     private Boolean flagIsHospitalUser = null;
+    private Boolean enableAssetGroupAssetTypeGroupAssociation = null;// 开启资产分类是否关联设备分类
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
@@ -1382,6 +1383,20 @@ public class UserContextService implements Serializable {
         return enableMaterialsInterfaceFlag;
     }
 
+    /**
+     *  资产分类是否关联设备分类
+     * @return
+     */
+    public boolean enableAssetGroupAssetTypeGroupAssociation(){
+        if(enableAssetGroupAssetTypeGroupAssociation == null){
+            enableAssetGroupAssetTypeGroupAssociation = Boolean.FALSE;
+            UserAccount user = getCurrentUserAccount();
+            String enableAssetGroup = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableAssetGroupAssetTypeGroupAssociation");
+            enableAssetGroupAssetTypeGroupAssociation=Boolean.TRUE.toString().equalsIgnoreCase(enableAssetGroup);
+        }
+
+        return enableAssetGroupAssetTypeGroupAssociation;
+    }
     public boolean activeSupplier(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
