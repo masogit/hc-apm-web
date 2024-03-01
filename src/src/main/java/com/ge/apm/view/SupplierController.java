@@ -212,8 +212,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
         if(assetInfoList.isEmpty() && arrivalListList.isEmpty()){
             dao.delete(selected);
+            WebUtil.addSuccessMessage("供应商删除成功！");
             List<V2_BlobObject> tempBlobObject = blobService.findBlobObjectsByBoUid(selected.getUid());
             blobService.deleteBlobFile(tempBlobObject);
+        } else {
+            WebUtil.addErrorMessage("供应商删除失败！原因:存在已绑定的设备或到货安装的设备！");
         }
 
     }
