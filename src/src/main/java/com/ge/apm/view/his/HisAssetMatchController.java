@@ -53,6 +53,7 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
 
     private UploadedFile file;
     public static final String FIELD_NAME_EQ_HOSID = "eqHosid";
+    public static final String FIELD_NAME_SITE_UID = "siteUid";
     private OrgInfoRepository orgInfoDao;
     private HisEquipmentMatchRepository dao;
     private HisEquipmentConnectRepository connDao;
@@ -160,8 +161,10 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
         OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
         if (selectedOrg != null) {
             searchFiltersAsset.add(new SearchFilter(FIELD_NAME_EQ_HOSID, SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
+            searchFiltersAsset.add(new SearchFilter(FIELD_NAME_SITE_UID, SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
         } else {
             searchFiltersAsset.add(new SearchFilter(FIELD_NAME_EQ_HOSID, SearchFilter.Operator.IsNull, null));
+            searchFiltersAsset.add(new SearchFilter(FIELD_NAME_SITE_UID, SearchFilter.Operator.IsNull, null));
         }
 
         List<HisEquipmentConnect> conns = connDao.findBySearchFilter(searchFiltersAsset,pageRequest).getContent();

@@ -116,6 +116,12 @@ public class HisEquipmentDataSourceSplit implements Serializable {
     @Column(name = "is_sum")
     private Boolean isSum;//是否被统计 默认为false
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
     public String getId() {
         return id;
     }

@@ -37,6 +37,9 @@ public class HisEquipmentSfxm implements Serializable {
     private Boolean isMatched;
 
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 

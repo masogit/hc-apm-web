@@ -33,6 +33,8 @@ public class HisClinicalService {
         match.setOrgName(source.getName());
         match.setNamePyCode(source.getNamePyCode());
         match.setCreateDate(new Date());
+        match.setTenantUid(target.getTenantUid());
+        match.setSiteUid(target.getSiteUid());
         matchDao.save(match);
 
         target.setIsMatched(true);

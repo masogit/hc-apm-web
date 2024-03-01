@@ -320,5 +320,10 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
+	public void batchUpdatePmRuleBlob() {
+		new Thread(() -> adminConsoleService.batchUpdatePmRuleBlob()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
 
 }
