@@ -1879,6 +1879,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
                 AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
                 selectedObjectMap.put("selectedAssetTypeGroup", assetTypeGroup);
+                if (userContextService.enableAssetGroupAssetTypeGroupAssociation()) {
+                    selected.setAssetGroup(assetTypeGroup.getAssetGroup());
+                }
                 break;
             default:
                 break;

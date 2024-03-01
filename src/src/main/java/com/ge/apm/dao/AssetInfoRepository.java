@@ -363,4 +363,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     List<AssetInfo> findByLocationCode(String namePyCode);
 
     List<AssetInfo> findByLocationCodeIn(List<String> collect);
+
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info  set asset_group=?1 where tenant_uid=?2 and asset_type=?3 and site_uid in (?4)",nativeQuery = true)
+    void batchUpdateAssetInfoAssetGroup(Integer newAssetGroup,String tenantUid, String encoded,List<String> siteUids);
 }

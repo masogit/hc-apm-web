@@ -85,7 +85,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private MqUtils mqUtils;
-
+    private UserContextService userContextService;
     private QrCodeLib createRequest;
     //******* filter start
 
@@ -214,7 +214,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         supplierController = WebUtil.getBean(SupplierController.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
-
+        userContextService = WebUtil.getBean(UserContextService.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         assetTypeGroupTreeComponentController.registerController(this);
 
@@ -1623,6 +1623,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
                 AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
                 selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+                if (userContextService.enableAssetGroupAssetTypeGroupAssociation()) {
+                    selected.setAssetGroup(selectedAssetTypeGroup.getAssetGroup());
+                }
                 break;
             default:
                 break;

@@ -34,7 +34,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
-            <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}">
+            <p:selectOneMenu  id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}"  disabled="#{!assetInfoEditController.needEdit('assetGroup') || userContextService.enableAssetGroupAssetTypeGroupAssociation()}">
                 <p:ajax  listener="#{assetInfoEditController.onAssetGroupChange()}" update="@(.assetGroupChange)" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -75,7 +75,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
             <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required}"
-                                 updateAfterClinicalDeptChange="clinicalDeptNameChange"
+                                 updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation?'@parent:assetGroup':''}"
                                  disabled="#{!assetInfoEditController.needEdit('assetTypeGroup')}"/>
 
         </h:panelGroup>

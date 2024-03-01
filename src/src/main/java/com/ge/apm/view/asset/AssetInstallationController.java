@@ -76,6 +76,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private ConfigItemRepository configItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private UserContextService userContextService;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -190,6 +191,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        userContextService=WebUtil.getBean(UserContextService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -1050,6 +1052,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
             selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
             assetTypeGroup = selectedAssetTypeGroup.getEncoded();
+            if(userContextService.enableAssetGroupAssetTypeGroupAssociation()){
+                selected.setAssetGroup(selectedAssetTypeGroup.getAssetGroup());
+            }
         }
     }
 

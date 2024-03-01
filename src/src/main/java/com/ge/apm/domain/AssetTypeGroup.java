@@ -67,6 +67,8 @@ public class AssetTypeGroup implements Serializable {
     @JsonBackReference
     private AssetTypeGroup parentAuthGroup;
 
+    @Column(name = "asset_group")
+    private Integer assetGroup;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
