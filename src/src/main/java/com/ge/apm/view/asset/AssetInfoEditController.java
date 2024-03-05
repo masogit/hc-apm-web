@@ -1724,46 +1724,53 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
 
-
+    public void onBlur() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            this.newSupplier = supplier;
+        } else {
+            String name = newSupplier.getName();
+            boolean ManufacturerT = newSupplier.getManufacturerT();
+            boolean SupplierT = newSupplier.getSupplierT();
+            boolean MaintainerT = newSupplier.getMaintainerT();
+            prepareCreateSupplier("manufacturer");
+            newSupplier.setName(name);
+            newSupplier.setSupplierT(SupplierT);
+            newSupplier.setMaintainerT(MaintainerT);
+            newSupplier.setManufacturerT(ManufacturerT);
+        }
+    }
 
     public void saveNewSupplier() {
-        this.newSupplier.setSiteId(loginUser.getSiteId());
-        this.newSupplier.setHospitalId(loginUser.getHospitalId());
-        this.newSupplier.setTenantUID(loginUser.getTenantUID());
-        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
-        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
-        this.newSupplier.setSiteUID(loginUser.getSiteUID());
-        this.newSupplier.setCreatedDate(new Date());
-        this.newSupplier.setCreatedBy(loginUser.getName());
-        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
-        Boolean isHas = false;
-        if (!ObjectUtils.isEmpty(supplier)) {
-            isHas = true;
+        if (null == newSupplier.getId()) {
+            this.newSupplier.setSiteId(loginUser.getSiteId());
+            this.newSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newSupplier.setCreatedDate(new Date());
+            this.newSupplier.setCreatedBy(loginUser.getName());
         }
-        if(newSupplier.getManufacturerT()){
-            if (isHas) {
-                supplier.setManufacturerT(true);
-            }
-        }
-        if(newSupplier.getSupplierT()){
-            if (isHas) {
-                supplier.setSupplierT(true);
-            }
-        }
-        if(newSupplier.getMaintainerT()){
-            if (isHas) {
-                supplier.setMaintainerT(true);
-            }
-        }
-        this.newSupplier = supplier;
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
-        supplierList.add(newSupplier);
-        if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
-            supplierList.add(newSupplier);
+        if (newSupplier.getManufacturerT()) {
+            if (manuList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                manuList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getSupplierT()) {
+            if (supplierList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                supplierList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getMaintainerT()) {
+            if (mantainList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                mantainList.add(newSupplier);
+            }
         }
         changeSelect(createTpye);
-
     }
 
     public List<String> autoCompleteTags(String query) {

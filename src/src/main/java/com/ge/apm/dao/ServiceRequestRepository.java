@@ -43,4 +43,6 @@ public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_Servi
     List<Integer> getAssetInfoByClinicalDeptName(String clinicalDeptName, Integer hospitalId, Integer siteId);
 
     Page<ServiceRequestProjection> findProjectionByAssetId(Integer assetId, Pageable pr);
+
+    public V2_ServiceRequest findBySrNum(String srNum);
 }
