@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -1213,7 +1214,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     private Date factoryWarrantyDate;
 
-    public void installDateChange() {
+    public void installDateChange(ValueChangeEvent event) {
+        if (ObjectUtil.isNotEmpty(event)) {
+            Date installDate = (Date) event.getNewValue();
+            arrivalListItem.setInstallDate(installDate);
+        }
         if (ObjectUtil.isAllNotEmpty(arrivalListItem.getWarrantyYear(), arrivalListItem.getInstallDate())) {
             Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
             Calendar calender = Calendar.getInstance();
@@ -1229,7 +1234,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             return factoryWarrantyDate;
         }
         if (ObjectUtil.isEmpty(arrivalListItem.getFactoryWarrantyDate())) {
-            installDateChange();
+            installDateChange(null);
         }
         return arrivalListItem.getFactoryWarrantyDate();
     }
