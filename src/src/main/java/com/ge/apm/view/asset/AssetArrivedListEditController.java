@@ -30,6 +30,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.tools.FileObject;
 import java.util.*;
 import java.util.logging.Level;
@@ -1123,56 +1124,53 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao.updateIsEdit(selected.getIsEdit(),selected.getId());
     }
 
-    public void saveNewSupplier() {
+    public void onBlur() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-        this.newSupplier.setSiteId(loginUser.getSiteId());
-        this.newSupplier.setHospitalId(loginUser.getHospitalId());
-        this.newSupplier.setTenantUID(loginUser.getTenantUID());
-        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
-        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
-        this.newSupplier.setSiteUID(loginUser.getSiteUID());
-        this.newSupplier.setCreatedDate(new Date());
-        this.newSupplier.setCreatedBy(loginUser.getName());
         Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
-        Boolean isHas = false;
         if (!ObjectUtils.isEmpty(supplier)) {
-            isHas = true;
+            this.newSupplier = supplier;
+        } else {
+            String name = newSupplier.getName();
+            boolean ManufacturerT = newSupplier.getManufacturerT();
+            boolean SupplierT = newSupplier.getSupplierT();
+            boolean MaintainerT = newSupplier.getMaintainerT();
+            prepareCreateSupplier("manufacturer");
+            newSupplier.setName(name);
+            newSupplier.setSupplierT(SupplierT);
+            newSupplier.setMaintainerT(MaintainerT);
+            newSupplier.setManufacturerT(ManufacturerT);
         }
-        if(newSupplier.getManufacturerT()){
-            manueList.add(newSupplier);
-            if (isHas) {
-                supplier.setManufacturerT(true);
+    }
+
+    public void saveNewSupplier() {
+        if (null == newSupplier.getId()) {
+            UserAccount loginUser = UserContextService.getCurrentUserAccount();
+            this.newSupplier.setSiteId(loginUser.getSiteId());
+            this.newSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newSupplier.setCreatedDate(new Date());
+            this.newSupplier.setCreatedBy(loginUser.getName());
+        }
+        if (newSupplier.getManufacturerT()) {
+            if (manueList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                manueList.add(newSupplier);
             }
         }
-        if(newSupplier.getSupplierT()){
-            suppliersList.add(newSupplier);
-            if (isHas) {
-                supplier.setSupplierT(true);
+        if (newSupplier.getSupplierT()) {
+            if (suppliersList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                suppliersList.add(newSupplier);
             }
         }
-        if(newSupplier.getMaintainerT()){
-            maintainerList.add(newSupplier);
-            if (isHas) {
-                supplier.setMaintainerT(true);
+        if (newSupplier.getMaintainerT()) {
+            if (maintainerList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                maintainerList.add(newSupplier);
             }
         }
-        this.newSupplier = supplier;
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
-
-/*        if("manufacturer".equals(newSupplierType)){
-            manueList.add(newSupplier);
-        }else if("supplier".equals(newSupplierType)){
-            suppliersList.add(newSupplier);
-        }else if("maintainer".equals(newSupplierType)){
-            maintainerList.add(newSupplier);
-        }*/
-//        supplierList.add(newSupplier);
-//        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
-//            supplierList.add(newSupplier);
-//        }
-//        changeSelect(createTpye);
-
     }
     @Getter
     @Setter

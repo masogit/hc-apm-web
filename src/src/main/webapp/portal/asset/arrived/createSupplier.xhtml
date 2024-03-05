@@ -13,7 +13,9 @@
                     <h:panelGroup>
                         <label class="label">#{msg.name}*</label>
                         <p:inputText id="name" value="#{assetArrivedListEditController.newSupplier.name}"
-                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                            <p:ajax event="blur" listener="#{assetArrivedListEditController.onBlur}" update=":SupplierEditForm"/>
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.city}</label>

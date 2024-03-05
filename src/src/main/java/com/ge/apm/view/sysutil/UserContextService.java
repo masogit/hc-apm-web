@@ -10,6 +10,7 @@ import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -1573,6 +1574,11 @@ public class UserContextService implements Serializable {
         Set<ApmFunction> apmFunctions = new HashSet<>();
         getInitFeature().forEach(f -> apmFunctions.addAll(f.getFunctionList()));
         return apmFunctions;
+    }
+
+    public boolean isEnableBtnByKey(String key) {
+        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+        return BooleanUtils.isFalse(configItemService.getConfigItemByKey(key, getLoginUser()));
     }
 
     public OrgInfo getSelectSiteSchedule() {

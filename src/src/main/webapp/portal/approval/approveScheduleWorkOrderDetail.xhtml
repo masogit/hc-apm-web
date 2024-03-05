@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <h:form id="ItemWorkOrderDetailViewForm">
+            <p:fieldset legend="工单详情" rendered="#{not empty approveScheduleController.workOrder}">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetName}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.assetName}" />
+                    </h:panelGroup>
+
+
+                    <h:panelGroup rendered="#{approveScheduleController.workOrder.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                        <label class="label">#{msg.MVSContractStartDate}</label>
+                        <p:outputLabel value="#{workOrderMgrController.getMvsContract(approveScheduleController.workOrder.assetInfo.id).contractStartDate}" />
+
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{approveScheduleController.workOrder.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                        <label class="label">#{msg.MVSContractEndDate}</label>
+                        <p:outputLabel value="#{workOrderMgrController.getMvsContract(approveScheduleController.workOrder.assetInfo.id).contractEndDate}" />
+                    </h:panelGroup>
+
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.departNum}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.assetInfo.departNum}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.srNum}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.srNum}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestorName}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.requestorName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestTime}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.requestTime}" >
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetLocation}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.assetLocation}" />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{userContextService.countyArea}">
+                        <label class="label">院区名称</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.hospitalName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestReason}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.requestReason}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+                    <h:panelGroup id="assetstatus" class="updateDownTime">
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{workOrderMgrController.currentStatus ne 3}">
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{approveScheduleController.workOrder.serviceRequest.status ne 1}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{approveScheduleController.workOrder.serviceRequest.status ne 1 or !assetInfoEditController.hasScrappedAuthority()}"/>
+                        </p:selectOneRadio>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
+                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup id="showDownTime">
+                        <label class="label">#{msg.confirmedDownTime}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.confirmedDownTime}" >
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.UpTimeExcel}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.confirmedUpTime}" >
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.equipmentTaker}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.equipmentTaker}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.PickUpTime}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.takeTime}" >
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{approveScheduleController.workOrder.serviceRequest.status eq 3}">
+                        <label class="label">#{msg.Cancelor}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.cancelPerson}" />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{approveScheduleController.workOrder.serviceRequest.status eq 3}">
+                        <label class="label">#{msg.cancelWorkOrderReason}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.cancelReason}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">医院客户姓名</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.customerName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">医院客户电话</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.customerTel}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">医院客户职务</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.serviceRequest.customerPosition}" />
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.status}</label>
+                        <p:outputLabel value="#{fieldMsg.fieldValue('woSteps', approveScheduleController.workOrder.currentStepId)}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.totalManHour}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.totalManHour}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.totalPrice}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.totalPrice}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.CheckInTime}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.checkinTime}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.intExtType}</label>
+                        <p:outputLabel value="#{fieldMsg.fieldValue('intExtType', approveScheduleController.workOrder.intExtType)}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.caseType}</label>
+                        <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(approveScheduleController.workOrder.caseType)}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.patProblems}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.patProblems}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.patActions}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.patActions}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.patTests}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.patTests}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.entryType}</label>
+                        <p:outputLabel value="#{fieldMsg.fieldValue('hoursEntryType', approveScheduleController.workOrder.entryType == null ? 0 : approveScheduleController.workOrder.entryType)}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.manHours}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.manHours}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.otherExpense}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.otherExpense}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ExternalExpenses}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.externalExpense}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.currentPersonName}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.currentStepId ==5 ? approveScheduleController.workOrder.ackName:approveScheduleController.workOrder.currentPersonName}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.feedbackRating}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.feedbackRating}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.feedbackComment}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.feedbackComment}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.endTime}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.closeTime}">
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.MaintenanceSubStatus}</label>
+                        <p:outputLabel value="#{fieldMsg.fieldValue('subStatus',approveScheduleController.workOrder.subStatus)}" style="word-wrap: break-word;"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.maintenanceValue}</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.maintenanceValue}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">外部报价</label>
+                        <p:outputLabel value="#{approveScheduleController.workOrder.externalQuotation}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+        </h:form>
+    </ui:composition>
+</html>

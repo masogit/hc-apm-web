@@ -681,4 +681,8 @@ public class V2_WorkOrderService {
         return srApi.addUserSignature(signatureId);
     }
 
+    public List<V2_WorkOrder> findBySrNum(String srNum) {
+        V2_ServiceRequest request = srDao.findBySrNum(srNum);
+        return woDao.findBySrId(request.getId());
     }
+}

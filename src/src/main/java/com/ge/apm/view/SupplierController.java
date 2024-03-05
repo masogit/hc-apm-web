@@ -9,6 +9,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -211,7 +212,12 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         List<ArrivalList> arrivalListList = arrivalListDao.findBySupplierId(selected.getId());
 
         if(assetInfoList.isEmpty() && arrivalListList.isEmpty()){
-            dao.delete(selected);
+            try {
+                dao.delete(selected);
+            } catch (Exception e) {
+                WebUtil.addErrorMessage("供应商已绑定资产/责任人，无法删除");
+                return;
+            }
             WebUtil.addSuccessMessage("供应商删除成功！");
             List<V2_BlobObject> tempBlobObject = blobService.findBlobObjectsByBoUid(selected.getUid());
             blobService.deleteBlobFile(tempBlobObject);
