@@ -123,6 +123,12 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @Column(name = "asset_status")
     private Integer assetStatus; //报废之前asset_info status
 
+    @Column(name = "equipment_disposal_method")
+    private String equipmentDisposalMethod;
+
+    @Column(name = "custom_disposal_method")
+    private String customDisposalMethod;
+
     public AssetScrap() {
     }
 
@@ -396,5 +402,21 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setAssetStatus(Integer assetStatus) {
         this.assetStatus = assetStatus;
+    }
+
+    public String getEquipmentDisposalMethod() {
+        return equipmentDisposalMethod;
+    }
+
+    public void setEquipmentDisposalMethod(String equipmentDisposalMethod) {
+        this.equipmentDisposalMethod = equipmentDisposalMethod;
+    }
+
+    public String getCustomDisposalMethod() {
+        return customDisposalMethod;
+    }
+
+    public void setCustomDisposalMethod(String customDisposalMethod) {
+        this.customDisposalMethod = customDisposalMethod;
     }
 }
