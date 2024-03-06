@@ -11,6 +11,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface SharedAssetRequestRepository extends GenericRepositoryUUID<SharedAssetRequest> {
     @Modifying
@@ -57,4 +58,8 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
 
     public List<SharedAssetRequest> findByTenantUID(String tenantUID);
 
+    @Modifying
+    @Transactional
+    @Query(value = "update shared_asset_request sar set state =(case when sar.state=3 then 6 when sar.state = 9 then 12 else sar.state end) from shared_asset_req_detail sard where  sar.id in (sard.borrow_id,sard.return_id) and sard.asset_info_id in ?1 and sar.state in(3,9)",nativeQuery = true)
+    void updateStateCompletedByAssetUid(Set<String> collect);
 }
