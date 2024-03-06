@@ -38,7 +38,6 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -49,6 +48,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -1261,7 +1261,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<ServiceRequestMsg> getServiceRequestMessageList(String woId) {
         return selected == null ? null : woService.getServiceRequestMessageList(woId);
     }
-
+    public void prepareActSetting(String woid){
+        prepareAct(woid);
+        V2_WorkOrder temp=new V2_WorkOrder();
+        BeanUtils.copyProperties(selectedWorkOrder,temp);
+        setSelectedWorkOrder(temp);
+        String  repairTypeValue= userContextService.getConfigItemValue("repairTypeDefaultValueConfiguration");
+        if(StringUtils.isNumeric(repairTypeValue)){
+            selectedWorkOrder.setRepairType(Integer.valueOf(repairTypeValue));
+        }
+    }
     public void prepareAct(String woid) {
         selectedWorkOrder = dao.findById(woid);
         currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
