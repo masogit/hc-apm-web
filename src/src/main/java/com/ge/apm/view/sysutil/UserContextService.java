@@ -1398,6 +1398,17 @@ public class UserContextService implements Serializable {
 
         return enableAssetGroupAssetTypeGroupAssociation;
     }
+
+    /**
+     *  通过key获取指定的配置
+     * @param key
+     * @return
+     */
+    public String getConfigItemValue(String key){
+            UserAccount user = getCurrentUserAccount();
+            String value = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), key);
+            return value;
+    }
     public boolean activeSupplier(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
