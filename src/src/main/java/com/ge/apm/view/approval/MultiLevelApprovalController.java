@@ -11,6 +11,7 @@ import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -86,6 +87,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
 
     private AssetInfoRepository assetInfoRepository;
+
+    private I18nMessageService i18nMessageService;
 
 
     @Setter
@@ -174,6 +177,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
@@ -186,9 +190,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         primaryApprovalData = null;
         secondaryApprovalData = null;
         multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
-        if(true){
-            return;
-        }
+//        if(true){
+//            return;
+//        }
         if (null == multiLevelApproval) {
             multiLevelApprovals = null;
             return;
@@ -273,6 +277,17 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                if(StringUtils.isNotBlank(assetScrap.getEquipmentDisposalMethod())){
+                    I18nMessage equipmentDisposalMethod = i18nMessageService.getByMsgTypeAndMsgKey("equipmentDisposalMethod", assetScrap.getEquipmentDisposalMethod());
+                    if(equipmentDisposalMethod!=null){
+                        if(equipmentDisposalMethod.getMsgKey().equals("0")){
+                            String method=equipmentDisposalMethod.getValueZh()+"("+assetScrap.getCustomDisposalMethod()+")";
+                            assetScrap.setCustomDisposalMethod(method);
+                        }else{
+                            assetScrap.setCustomDisposalMethod(equipmentDisposalMethod.getValueZh());
+                        }
+                    }
+                }
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
