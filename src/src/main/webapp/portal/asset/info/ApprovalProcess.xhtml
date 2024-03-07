@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+<ui:composition>
+    <!--    <ui:define name="content">-->
+    <!--            <div class="ui-g-12 card">-->
+    <p:dataTable id="approvalList" value="#{assetApprovalController.lazyModel}"
+                 var="item"
+                 widgetVar="approvalList"
+                 lazy="true" paginator="true" paginatorPosition="bottom"
+                 paginatorAlwaysVisible="true"
+                 selectionMode="single" selection="#{multiLevelApprovalListController.selected}"
+                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                 sortBy="#{item.createdDate}"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                 rowsPerPageTemplate="20,50,100,500">
+
+        <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}"
+                update="assetDetail:itemDetailViewForm3"/>
+
+        <p:column headerText="审批单号">
+            <h:outputText value="#{item.approvalNumber}"/>
+        </p:column>
+        <p:column headerText="业务单号">
+            <h:outputText value="#{item.businessNumber}"/>
+        </p:column>
+        <p:column headerText="业务类型">
+            <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
+        </p:column>
+        <p:column headerText="总审批进度">
+            <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
+        </p:column>
+        <p:column headerText="审批时间" sortBy="#{item.actualApproverDate}"
+                  rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
+            <h:outputText value="#{item.actualApproverDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+            </h:outputText>
+        </p:column>
+        <!--                    <p:column headerText="#{msg.Actions}" rendered="#{multiLevelApprovalListController.pendingApprovalByMe}">-->
+        <!--                        &lt;!&ndash;17 为采购&ndash;&gt;-->
+        <!--                                <p:commandButton value="审批" rendered="#{item.businessType eq 17}"-->
+        <!--                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"-->
+        <!--                                                 update="MultiLevelApprovalClaimPurDialog"-->
+        <!--                                                 oncomplete="PF('MultiLevelApprovalClaimPurDialog').show()"  />-->
+
+        <!--                        &lt;!&ndash;17 为采购&ndash;&gt;-->
+        <!--                                <p:commandButton value="审批" rendered="#{item.businessType ne 17}"-->
+        <!--                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"-->
+        <!--                                                 update="MultiLevelApprovalClaimDialog"-->
+        <!--                                                 oncomplete="PF('MultiLevelApprovalClaimDialog').show()"  />-->
+
+        <!--                    </p:column>-->
+
+        <!--                    <f:facet name="{Toolbar}">-->
+        <!--                    </f:facet>-->
+    </p:dataTable>
+    <ui:include src="MultiLeveApprovalDetail.xhtml"/>
+
+
+    <!--            </div>-->
+
+    <!--采购使用-->
+    <!--            <div class="ui-g-12 card">-->
+    <!--                <ui:include src="/portal/approval/MultiLevelApprovalPurchase.xhtml"/>-->
+    <!--            </div>-->
+    <!--采购使用-->
+
+
+    <!--    </ui:define>-->
+
+</ui:composition>
+</html>
