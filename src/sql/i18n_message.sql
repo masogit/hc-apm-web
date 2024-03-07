@@ -5256,3 +5256,8 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','1','捐赠','1',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','2','上交国家','2',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','3','放置库房','3',NULL,	-1	);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'equipmentDisposalMethod', '设备处置方式', 'equipmentDisposalMethod', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'customDisposalMethod', '自定义处置方式', 'customDisposalMethod', NULL, '-1');
