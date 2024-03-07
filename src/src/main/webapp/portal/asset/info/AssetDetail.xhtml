@@ -27,7 +27,7 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <p:tabView dynamic="true">
+            <p:tabView dynamic="true" id="assetDetail">
                 <p:tab title="#{msg.BasicInfo}">
                     <p:accordionPanel id="accordion" multiple="false" >
                         <p:tab title="#{msg.BasicInfo}">
@@ -460,6 +460,14 @@
                             </c:choose>
                         </p:panelGrid>
                     </h:form>
+                    <p:panel  id="approvale"
+                             header="设备流程记录"
+                             toggleable="true"
+                             toggleSpeed="500"  widgetVar="approvale"
+                             style="margin-bottom:20px;">
+                            <ui:include src="ApprovalProcess.xhtml"/>
+                    </p:panel>
+
 
                     <p:panel id="modifyRecordList"
                              header="#{msg.ModifyRecord}"

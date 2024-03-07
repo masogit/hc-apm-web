@@ -1,12 +1,14 @@
 package com.ge.apm.view.approval;
 
 import com.ge.apm.dao.MultiLevelApprovalRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static com.ge.apm.service.constant.ApprovalConstant.APPROVAL_SEPARATOR;
 
