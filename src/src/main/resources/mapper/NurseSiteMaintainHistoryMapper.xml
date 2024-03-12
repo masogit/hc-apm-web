@@ -30,4 +30,107 @@
         <where>${ew.sqlSegment}</where>
     </select>
 
+    <select id="searchMaintainHistory" resultType="com.ge.apm.domain.NurseSiteMaintainHistory">
+        select nsm.* from nurse_site_maintain_history nsm
+        <where>
+            <choose>
+                <when test="assetTypes != null and assetTypes.size > 0">
+                    <include refid="queryConfigIds"/>
+                </when>
+                <otherwise>
+                    <if test="scheduleDateStart != null">
+                        and nsm.schedule_date >= #{scheduleDateStart}
+                    </if>
+                    <if test="scheduleDateEnd != null">
+                        and nsm.schedule_date &lt; #{scheduleDateEnd}
+                    </if>
+                    <if test="tenantUid != null">
+                        and nsm.tenant_uid = #{tenantUid}
+                    </if>
+                    <if test="siteUid != null">
+                        and nsm.site_uid = #{siteUid}
+                    </if>
+                    <if test="deptUid != null">
+                        and nsm.clinical_dept_uid = #{deptUid}
+                    </if>
+                    <if test="configId != null">
+                        and nsm.config_id = #{configId}
+                    </if>
+                    <if test="status != null">
+                        and nsm.status in ${status}
+                    </if>
+                    <if test="orgUidList != null and orgUidList.size > 0">
+                        and (
+                        nsm.site_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsm.institution_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsm.hospital_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        or nsm.clinical_dept_uid in
+                        <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                            #{item}
+                        </foreach>
+                        )
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <sql id="queryConfigIds">
+        and nsm.id in (
+        select nsmi.parent_id from nurse_site_maintain_item_history nsmi join asset_info ai on nsmi.asset_uid = ai.uid
+        <where>
+            <if test="scheduleDateStart != null">
+                and nsmi.schedule_date >= #{scheduleDateStart}
+            </if>
+            <if test="scheduleDateEnd != null">
+                and nsmi.schedule_date &lt; #{scheduleDateEnd}
+            </if>
+            <if test="tenantUid != null">
+                and ai.tenant_uid = #{tenantUid}
+            </if>
+            <if test="siteUid != null">
+                and ai.site_uid = #{siteUid}
+            </if>
+            <if test="deptUid != null">
+                and ai.clinical_dept_uid = #{deptUid}
+            </if>
+            <if test="orgUidList != null and orgUidList.size > 0">
+                and (
+                ai.site_uid in
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                or ai.institution_uid in
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                or ai.hospital_uid in
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                or ai.clinical_dept_uid in
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="assetTypes != null and assetTypes.size > 0">
+                and ai.asset_type in
+                <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        )
+    </sql>
+
 </mapper>

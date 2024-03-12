@@ -139,10 +139,8 @@ public class MaintainExportController {
         if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
             param.put("orgUidList", orgUidList);
         } else {
-            List<String> listUidTemp = new ArrayList<>();
-
             if(this.selectedOrg != null){
-                listUidTemp.add(this.selectedOrg.getUid());
+                List<String> listUidTemp = ListUtil.newArrayList(this.selectedOrg.getUid());
                 // 如果只选择了医院/院区，就获取到下属科室列表，查询下属科室的所有数据
                 if(this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1){
                     if(CollectionUtils.isNotEmpty(listOrgDept)){
@@ -151,11 +149,11 @@ public class MaintainExportController {
                         }
                     }
                 }
+                param.put("orgUidList", listUidTemp);
             }
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
-                listUidTemp.add(this.selectedOrgDepart.getUid());
+                param.put("deptUid", this.selectedOrgDepart.getUid());
             }
-            param.put("orgUidList", listUidTemp);
         }
 
         listMaintainData = nurseSiteMaintainService.searchMaintain(param);
