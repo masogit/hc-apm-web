@@ -8,3 +8,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-21203 维修类型默认值配置
 insert into public.config_item (uid, category,  description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 4,  '维修类型默认值配置', 'repairTypeDefaultValueConfiguration', '维修类型默认值配置', 'f', 't', 7,(select concat('[',string_agg(concat('{"key":"',value_zh,'"',',','"value":"',msg_key,'"','}'),','),']') from  i18n_message  where msg_type='repairType') where not exists (select * from config_item where key = 'repairTypeDefaultValueConfiguration');
+
+-- YHAAO-21232 维修工单添加签到时间必填项
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '签到时间是否必填', 'enableCheckInTime', '签到时间是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckInTime');

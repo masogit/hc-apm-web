@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -135,6 +136,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private ConfigItemMapper configItemMapper;
     private String locationName;
     private String assigneeId;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -322,6 +324,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
             externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+            configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1639,6 +1642,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void repairWorkOrder() {
         boolean valid = true;
+        ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", loginUser.getSiteUID());
+        if (ObjectUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue.getValue()) && ObjectUtil.isEmpty(selectedWorkOrder.getCheckinTime())) {
+            WebUtil.addErrorMessage("签到时间不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("checkin_time", true);
+            valid = false;
+        }
         if (confirmedUpDate ==
                 null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
