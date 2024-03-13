@@ -1642,7 +1642,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void repairWorkOrder() {
         boolean valid = true;
-        ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", loginUser.getSiteUID());
+        ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", selectedWorkOrder.getSiteUID());
         if (ObjectUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue.getValue()) && ObjectUtil.isEmpty(selectedWorkOrder.getCheckinTime())) {
             WebUtil.addErrorMessage("签到时间不能为空！");
             RequestContext.getCurrentInstance().addCallbackParam("checkin_time", true);
