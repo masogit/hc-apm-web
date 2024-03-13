@@ -279,13 +279,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
             List<TenantInfo> tenantInfos = tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
             setTenantUid(tenantInfos.get(0).getUid());
-        } else if(isITAdmin){
+        } else{
+            setTenantUid(loginUser.getTenantUID());
             setITAdminOrgTree();
             updateRoleList();
-        }else {
-            setTenantUid(loginUser.getTenantUID());
         }
-
         //判断是否是理想用户
         if (LX_USER_TYPE.equals(loginUser.getType())) {
             this.isShowButton = Boolean.FALSE;
@@ -311,8 +309,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getRequestURI();
         if("/geapm/portal/uaa/userAccount/ListMain.xhtml".equals(encodeStr)){
-            String roleName="ITAdmin";
-            isITAdmin= loginUser.getRoleNames().stream().anyMatch(item->roleName.equals(item));
+            isITAdmin= Boolean.TRUE;
         }
     }
     public boolean isLocale() {
@@ -443,6 +440,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             Set<String> child=new HashSet<>();
             getSubOrgInfo(uid,child);
             searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, child));
+        }
+        if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
+            List<String> customRolesUser = customRoleRepository.findCustomRolesUser(loginUser.getTenantUID());
+            if(CollectionUtils.isEmpty(customRolesUser)){
+                customRolesUser.add("-1");
+            }
+            searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,customRolesUser));
         }
     }
     private void getSubOrgInfo(String uid,Set<String> result){
