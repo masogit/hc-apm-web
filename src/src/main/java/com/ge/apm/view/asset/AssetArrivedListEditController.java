@@ -1315,6 +1315,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
+    public List<QrCodeTemplate> getQrCodeTemplates() {
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
+    }
     public void exportQrCode() throws Exception {
 //        Map<String, String> orgNamesMap = orgDao.findByUids(arrivalItemList.stream().filter(item->item.getSiteUid()!=null).map(ArrivalListItem::getSiteUid).distinct().collect(Collectors.toSet()))
 //                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
