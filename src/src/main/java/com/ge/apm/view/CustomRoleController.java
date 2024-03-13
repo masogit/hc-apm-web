@@ -100,7 +100,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		Set<String> apmFunctions = uaaService.getFunctionListByTenantUid(user.getTenantUID());
 		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name())
 				&& !f.name().startsWith("PLATFORM_")
-				&& !f.name().startsWith("CONFIG_")
+//				&& !f.name().startsWith("CONFIG_")
 				&& !f.name().equals("REPAIR_ORDER_DISPATCH")
 				&& !f.name().startsWith("REPAIR_ORDER_TAKE")
 				&& !f.name().startsWith("REPAIR_ORDER_ACCEPT")

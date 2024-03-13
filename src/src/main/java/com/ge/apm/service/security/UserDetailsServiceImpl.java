@@ -4,8 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.GrantedAuthorityDiyImpl;
@@ -13,6 +16,7 @@ import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +51,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private TenantInfoRepository tenantInfoRepository;
+
+
+    @Autowired
+    private CustomRoleRepository customRoleRepository;
 
     /**
      * Retrieve an account depending on its login this method is not case sensitive.<br>
@@ -101,7 +109,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(account.getTenantUID());
             grantedAuthorities = toGrantedAuthorities(account.getRoleNames(), tenantInfo);
         }
-
+        getCustomRole(account,grantedAuthorities);
         String password = obtainPassword(login);
 
         if (password == null) {
@@ -159,5 +167,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         return result;
+    }
+
+    public void getCustomRole(UserAccount userAccount,Collection<GrantedAuthority> grantedAuthorities){
+        if(CollectionUtils.isNotEmpty(grantedAuthorities)){
+            List<CustomRole> customRolesList = customRoleRepository.findCustomRolesByUserId(userAccount.getId());
+            if(CollectionUtils.isNotEmpty(customRolesList)){
+                customRolesList.forEach(item->{
+                    Set<String> strings = JSON.parseObject(item.getFunctionList(), new TypeReference<Set<String>>() {
+                    });
+                    grantedAuthorities.add(new GrantedAuthorityDiyImpl(item.getRoleDesc(), strings));
+                });
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.PermissionGroupMapper;
@@ -217,6 +218,9 @@ public class UaaService {
                 if(srVO.getName().equals("ReviewSystemAdministrator")||srVO.getName().equals("PMAdministrator")){
                     continue;
                 }
+            }
+            if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
+                continue;
             }
             sysRoleList.add(srVO);
         }
