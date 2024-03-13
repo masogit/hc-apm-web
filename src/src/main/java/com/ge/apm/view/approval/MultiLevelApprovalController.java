@@ -760,6 +760,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.signatureContent = null;
         this.signatureContentStream = null;
         this.newSignature = true;
+        this.attachList = null;
     }
 
 

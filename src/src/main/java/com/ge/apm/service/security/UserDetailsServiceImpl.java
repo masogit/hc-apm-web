@@ -176,7 +176,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 customRolesList.forEach(item->{
                     Set<String> strings = JSON.parseObject(item.getFunctionList(), new TypeReference<Set<String>>() {
                     });
-                    grantedAuthorities.add(new GrantedAuthorityDiyImpl(item.getRoleDesc(), strings));
+                    grantedAuthorities.add(new GrantedAuthorityDiyImpl(item.getName(), strings));
                 });
             }
         }
