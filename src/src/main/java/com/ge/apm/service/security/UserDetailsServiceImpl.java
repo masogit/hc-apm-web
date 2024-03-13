@@ -108,8 +108,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (grantedAuthorities == null) {
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(account.getTenantUID());
             grantedAuthorities = toGrantedAuthorities(account.getRoleNames(), tenantInfo);
+            getCustomRole(account,grantedAuthorities);
         }
-        //getCustomRole(account,grantedAuthorities);
         String password = obtainPassword(login);
 
         if (password == null) {
