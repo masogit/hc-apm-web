@@ -281,6 +281,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ExternalTempUser externalTempUser;
     @Getter @Setter
     private List<Map<String,String>> maintenancePersonInformation;
+
+    private ConfigItemValueRepository configItemValueRepository;
     @Override
     protected void init() {
         try {
@@ -325,6 +327,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
+            configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1269,7 +1272,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         V2_WorkOrder temp=new V2_WorkOrder();
         BeanUtils.copyProperties(selectedWorkOrder,temp);
         setSelectedWorkOrder(temp);
-        String  repairTypeValue= userContextService.getConfigItemValue("repairTypeDefaultValueConfiguration");
+        String  key= "repairTypeDefaultValueConfiguration";
+        String repairTypeValue = configItemValueRepository.findByKeyAndSiteForUseParent(temp.getSiteUID(), temp.getHospitalUID(), temp.getInstitutionUID(), temp.getTenantUID(), key);
         if(StringUtils.isNumeric(repairTypeValue)){
             selectedWorkOrder.setRepairType(Integer.valueOf(repairTypeValue));
         }
