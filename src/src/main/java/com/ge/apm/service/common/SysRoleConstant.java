@@ -6,6 +6,10 @@ package com.ge.apm.service.common;
  */
 public interface SysRoleConstant {
     String ROLE_ASSET_HEAD = "AssetHead";
+    String ROLE_ASSET_STAFF = "AssetStaff";
     String ROLE_DEPT_HEAD = "DeptHead";
     String ROLE_CLINICAL_STAFF = "ClinicalStaff";
+
+
+
 }
