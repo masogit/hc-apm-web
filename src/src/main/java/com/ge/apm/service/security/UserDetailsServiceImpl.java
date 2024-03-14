@@ -170,7 +170,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void getCustomRole(UserAccount userAccount,Collection<GrantedAuthority> grantedAuthorities){
-        if(CollectionUtils.isNotEmpty(grantedAuthorities)){
+        if(grantedAuthorities != null){
             List<CustomRole> customRolesList = customRoleRepository.findCustomRolesByUserId(userAccount.getId());
             if(CollectionUtils.isNotEmpty(customRolesList)){
                 customRolesList.forEach(item->{
