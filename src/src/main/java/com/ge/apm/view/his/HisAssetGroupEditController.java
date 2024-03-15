@@ -187,11 +187,11 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
                 return;
             }
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate,selectedOrg);
 
             WebUtil.addSuccessMessage("修改成功");
         } else {
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null,selectedOrg);
             WebUtil.addSuccessMessage("创建成功");
         }
 
