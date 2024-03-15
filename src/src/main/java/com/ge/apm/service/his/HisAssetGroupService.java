@@ -84,7 +84,7 @@ public class HisAssetGroupService {
     }
 
     @Transactional
-    public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate){
+    public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg){
         String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
 
@@ -94,14 +94,14 @@ public class HisAssetGroupService {
 
             //修改前先移除该分组下所有资产
             hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
-            insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept);
+            insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         } else {
-            saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment);
-            insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept);
+            saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment,selectOrg);
+            insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         }
     }
 
-    public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment){
+    public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment,OrgInfo selectOrg){
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = new HisAssetGroupAssetMatch();
         hisAssetGroupAssetMatch.setOrgInfoUid(clinicalDept.getSiteUID());
         hisAssetGroupAssetMatch.setClinicalDeptUid(clinicalDept.getUid());
@@ -109,10 +109,12 @@ public class HisAssetGroupService {
         hisAssetGroupAssetMatch.setAssetGroupUid(hisAssetGroup.getUuid());
         hisAssetGroupAssetMatch.setAssetGroupName(hisAssetGroup.getName());
         hisAssetGroupAssetMatch.setIsSubEquipment(subEquipment);
+        hisAssetGroupAssetMatch.setSiteUid(selectOrg.getSiteUID());
+        hisAssetGroupAssetMatch.setTenantUid(selectOrg.getTenantUID());
         hisAssetGroupAssetMatchRepository.save(hisAssetGroupAssetMatch);
     }
 
-    private void insertAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept) {
+    private void insertAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept,OrgInfo selectOrg) {
         String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
 
         targetAssets.stream().forEach(item -> {
@@ -122,6 +124,8 @@ public class HisAssetGroupService {
             hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
             hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
             hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
+            hisAssetGroupClinicalMatch.setSiteUid(selectOrg.getSiteUID());
+            hisAssetGroupClinicalMatch.setTenantUid(selectOrg.getTenantUID());
             hisAssetGroupClinicalMatchRepository.save(hisAssetGroupClinicalMatch);
         });
 
