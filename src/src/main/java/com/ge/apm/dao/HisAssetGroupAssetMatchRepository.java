@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -21,4 +23,9 @@ public interface HisAssetGroupAssetMatchRepository extends GenericRepositoryUUID
     public List<HisAssetGroupAssetMatch> findByIds(List<String> ids);
 
     HisAssetGroupAssetMatch findByAssetGroupUidAndClinicalDeptUid(String assetGroupUid, String clinicalDeptUid);
+
+    @Transactional
+    @Modifying
+    @Query(value="update  his_asset_group_asset_match set asset_group_name=?1 where asset_group_uid=?2",nativeQuery = true)
+    void updateAssetGroupNameByGroupUid(String name, String uuid);
 }
