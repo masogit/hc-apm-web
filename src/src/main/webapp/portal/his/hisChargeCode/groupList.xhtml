@@ -56,9 +56,9 @@
                               filterMatchMode="LIKE" >
                         <h:outputText value="#{item.sfxmName}"/>
                     </p:column>
-                    <p:column headerText="自定义分组名称" sortBy="#{item.assetGroupName}"
+                    <p:column headerText="自定义分组名称" sortBy="#{item.hisAssetGroup.name}"
                               filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetGroupName}"/>
+                        <h:outputText value="#{item.hisAssetGroup.name}"/>
                     </p:column>
                     <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"
                               filterMatchMode="LIKE">
