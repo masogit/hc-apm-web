@@ -1353,6 +1353,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 assetInfo.setName(selected.getAssetName());
                 assetInfo.setClinicalDeptName(selected.getClinicalDeptName());
                 assetInfo.setClinicalDeptUID(selected.getClinicalDeptUID());
+                assetInfo.setAssetGroup(selected.getAssetGroup());
             }
             assetInfos.add(assetInfo);
         }
