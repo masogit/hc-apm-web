@@ -305,7 +305,7 @@ public class QrCodeService {
                         itemObject.put("TextShowValue", textValue.concat(asset.getName() == null ? "" : asset.getName()));
                         break;
                     case "assetGroup":
-                        itemObject.put("TextShowValue", textValue.concat(FieldValueMessageController.fieldValue("assetGroup", asset.getAssetGroup().toString())));
+                        itemObject.put("TextShowValue", textValue.concat( asset.getAssetGroup()==null? "": FieldValueMessageController.fieldValue("assetGroup", asset.getAssetGroup().toString())));
                         break;
                     case "hospital":
                         if (qrCodeObject.getString("HospitalName") != null) {
