@@ -19,6 +19,7 @@ import com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.StringUtil;
@@ -41,6 +42,9 @@ import java.util.zip.ZipOutputStream;
  */
 @Component
 public class QrCodeService {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(QrCodeService.class);
+
 
     @Autowired
     QrCodeLibRepository qrCodeLibDao;
@@ -484,6 +488,7 @@ public class QrCodeService {
                 ImageIO.write(image, "JPG", out);
                 out.closeEntry();
             } catch (Exception e) {
+                logger.error("e:",e);
                 WebUtil.addErrorMessage("export fail;");
             }
         });

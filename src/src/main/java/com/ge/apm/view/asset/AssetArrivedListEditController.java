@@ -23,6 +23,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -1333,7 +1334,29 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
 
         List<QrCodeLib> bySearchFilter = qrCodeLibRepository.findBySearchFilter(filterFilter);
-        QrCodeExportStream exportStream = new QrCodeExportStream(bySearchFilter.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        if(CollectionUtils.isEmpty(bySearchFilter)){
+            return;
+        }
+        List<AssetInfo> assetInfos = new ArrayList<AssetInfo>(bySearchFilter.size());
+        Map<String, List<ArrivalListItem>> listMap = arrivalItemList.stream().filter(item -> item.getQrCode() != null).collect(Collectors.groupingBy(ArrivalListItem::getQrCode));
+
+        for (QrCodeLib qrCodeLib : bySearchFilter) {
+            AssetInfo assetInfo = new AssetInfo();
+            assetInfo.setSiteUID(qrCodeLib.getSiteUID());
+            assetInfo.setQrCode(qrCodeLib.getQrCode());
+            List<ArrivalListItem> arrivalListItems = listMap.get(qrCodeLib.getQrCode());
+            if(!CollectionUtils.isEmpty(arrivalListItems)){
+                ArrivalListItem arrivalListItem = arrivalListItems.get(0);
+                assetInfo.setSerialNum(arrivalListItem.getSerialNum());
+                assetInfo.setFinancingNum(arrivalListItem.getFinancingNum());
+                assetInfo.setDepartNum(arrivalListItem.getDepartNum());
+                assetInfo.setName(selected.getAssetName());
+                assetInfo.setClinicalDeptName(selected.getClinicalDeptName());
+                assetInfo.setClinicalDeptUID(selected.getClinicalDeptUID());
+            }
+            assetInfos.add(assetInfo);
+        }
+        QrCodeExportStream exportStream = new QrCodeExportStream(assetInfos.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
         zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 
