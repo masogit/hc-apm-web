@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -251,6 +252,7 @@ public class QrCodeService {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
             img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
         } catch (Exception ex) {
+            logger.error("getQrCodeImage createQrCodeTag  qrCodeObjectL:{},siteUid:{},    error :{}", JSON.toJSONString(qrCodeObject),siteUid,ex);
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return img;
