@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="采购管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <!--<p:fieldset legend="#{msg.AdvancedSearch}">
+                        <p:panelGrid id="searchPanel" columns="4" layout="grid"
+                                     styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="采购单编号"/>
+                                <p:inputText value="#{demandAnalysisController.searchForm.purchaseNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="操作人"/>
+                                <p:inputText value="#{demandAnalysisController.searchForm.applicantName}"/>
+                            </h:panelGroup>
+                           &lt;!&ndash; <h:panelGroup>
+                                <p:outputLabel class="label" value="操作日期(#{msg.From})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{demandAnalysisController.searchForm.dateStart}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="操作日期(#{msg.To})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{demandAnalysisController.searchForm.dateEnd}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>&ndash;&gt;
+                         <h:panelGroup style="display: flex;">
+                                <p:commandButton value="#{msg.Search}"
+                                                 actionListener="#{demandAnalysisController.search}"
+                                                 update="datalist"/>
+                                <p:commandButton value="#{msg.Reset}"
+                                                 actionListener="#{demandAnalysisController.resetSearch}"
+                                                 update="searchForm datalist"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>-->
+
+                </h:form>
+                <p:tabView class="ui-g-12" id="purchaseTabView" dynamic="true" cache="false"
+                           activeIndex="#{demandAnalysisController.tabIndex}">
+                    <p:ajax event="tabChange" listener="#{demandAnalysisController.onTabChange}"/>
+                    <p:tab id="s0" title="待转信息确认">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s1" title="待信息确认">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s2" title="待过会确认">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <!--<p:tab id="s3" title="待招标完成" >
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s4" title="招标完成">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>-->
+                    <p:tab id="s5" title="#{msg.All}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+            function copyText() {
+                let pwd = document.getElementById("purchseUrl").innerText;
+                let input = document.createElement("input");
+                input.setAttribute('id', 'copyInput');
+                input.setAttribute('value', pwd);
+                document.getElementsByTagName('body')[0].appendChild(input);
+                document.getElementById('copyInput').select();
+                document.execCommand("copy");
+                document.getElementById('copyInput').remove();
+            }
+        </script>
+        <div class="ui-g-12 card">
+            <ui:include src="ViewUrl.xhtml"/>
+        </div>
+    </ui:define>
+</ui:composition>

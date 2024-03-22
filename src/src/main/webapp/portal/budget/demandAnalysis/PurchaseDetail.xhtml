@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:fieldset  legend="采购审核详情: #{demandAnalysisController.selected.approvalConfig.approvalName}" rendered="#{(demandAnalysisController.approvaLevelPurchase() ge 1 ) }">
+        <p:dataTable id="budgetApprovallist" value="#{demandAnalysisController.selected.purchaseApprovals}"
+                     var="item" widgetVar="varPurchaseApprovalDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="审批单号">
+                <h:outputText value="#{item.approvalNumber}"/>
+            </p:column>
+            <p:column headerText="实际审批人">
+                <h:outputText value="#{item.actualApproverName}"/>
+            </p:column>
+            <p:column headerText="审批级别">
+                <h:outputText value="#{item.approvalLevel}级审批人"/>
+            </p:column><!--
+                            <p:column headerText="审批意见">
+                                <h:outputText value="#{item.approvalOpinion}"/>
+                            </p:column>-->
+            <p:column headerText="审批节点状态">
+                <h:outputText
+                        value="#{multiLevelApprovalGlobalController.getApprovalNodeStatus(item.approvalNodeStatus)}"/>
+            </p:column>
+            <p:column headerText="审批时间">
+                <h:outputText value="#{item.actualApproverDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat14()}"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+    </p:fieldset>
+
+    <!--<p:fieldset legend="申购单信息确认" id="applicationDetailConfirm"  rendered="#{(multiLevelApprovalController.approvaLevelPurchase() eq 1
+    or multiLevelApprovalController.approvaLevelPurchase() eq 2) and userContextService.hasAnyRole('DeptHead,ClinicalStaff')}">-->
+    <p:fieldset legend="申购单信息确认" id="applicationDetailConfirm"  rendered="#{(demandAnalysisController.approvaLevelPurchase() ge 2 )  }">
+         <p:dataTable id="budgetApplicationConfirmlist" value="#{demandAnalysisController.queryBudgetApplicationAsset()}"
+                      var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
+                      selectionMode="single" disabledSelection="true"
+                      paginatorPosition="top" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+                      sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                      rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
+             <p:ajax event="rowSelect" />
+             <p:ajax event="rowDblselect" listener="#{demandAnalysisController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
+             <p:column headerText="申请科室">
+                 <h:outputText value="#{item.budgetApplication.applicationDept.name}"/>
+             </p:column>
+             <p:column headerText="申请编号">
+                 <h:outputText value="#{item.applicationNum}"/>
+             </p:column>
+             <p:column headerText="#{msg.EquipmentName}">
+                 <h:outputText value="#{item.applicationAssetName}"/>
+             </p:column>
+             <p:column headerText="使用科室">
+                 <h:outputText value="#{item.confirmApplicationDeptName}"/>
+             </p:column>
+             <p:column headerText="设备品目">
+                 <h:outputText value="#{item.confirmEquipmentCategory}"/>
+             </p:column>
+             <p:column headerText="国产占比（国家财政部）">
+                 <h:outputText value="#{item.confirmNationalFinance}"/>
+             </p:column>
+             <p:column headerText="国产占比（省财政部）">
+                 <h:outputText value="#{item.confirmProvincialFinance}"/>
+             </p:column>
+             <p:column headerText="科室意见（是否进口）" >
+                 <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationT_F', item.confirmImport)}"/>
+             </p:column>
+             <p:column headerText="公告及信息收集情况">
+                 <h:outputText value="#{item.confirmNotice}"/>
+             </p:column>
+             <p:column headerText="主要功能和配置">
+                 <h:outputText value="#{item.confirmMajorFunction}"/>
+             </p:column>
+             <p:column headerText="主要参数和要求">
+                 <h:outputText value="#{item.confirmParameters}"/>
+             </p:column>
+             <p:column headerText="意向品牌">
+                 <h:outputText value="#{item.confirmBrand}"/>
+             </p:column>
+             <p:column headerText="确认数量（台）">
+                 <h:outputText value="#{item.confirmQuantity}"/>
+             </p:column>
+             <p:column headerText="确认预算价">
+                 <h:outputText value="#{item.confirmPrice}"/>
+             </p:column>
+             <p:column headerText="确认预算总价">
+                 <h:outputText value="#{item.confirmAmount}"/>
+             </p:column>
+             <p:column headerText="拦标价">
+                 <h:outputText value="#{item.confirmMaximumPrice}"/>
+             </p:column>
+             <p:column headerText="备注">
+                 <h:outputText value="#{item.confirmRemark}"/>
+             </p:column>
+             <p:column headerText="#{msg.Operation}" style="width: 150px" exportable="false">
+                 <p:commandButton value="申购信息调整"   oncomplete="PF('BudgetApplicationDialogConfirm').show()" process="@this" update="BudgetApplicationDialogConfirm"
+                                  actionListener="#{demandAnalysisController.prepareConfirm(item.id)}"/>
+             </p:column>
+         </p:dataTable>
+     </p:fieldset>
+     <br/>
+       <!-- <p:fieldset legend="过会信息" id="purchaseInfoMeeting" rendered="#{multiLevelApprovalController.approvaLevelPurchase() eq 2
+        and userContextService.hasAnyRole('AssetStaff,AssetHead')}" >-->
+      <p:fieldset legend="过会信息" id="purchaseInfoMeeting"
+                  rendered="#{demandAnalysisController.approvaLevelPurchase() ge 3}" >
+           <p:fieldset legend="设备科意见" >
+               <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <h:panelGroup>
+                       <label class="label">专业工程师意见<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingEngineerOpinion}"/>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">医院现有品牌<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingExistingBrands}"/>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">收费项目<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingFeeItems}"/>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">耗材或试剂说明<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingConsumableDescription}"/>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">器械科审核意见<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingEquipmentDeptOpin}"/>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">审核时间<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingApproveDate}">
+                           <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                              locale="#{userContextService.getCalendarLocale()}"
+                                              pattern="#{userContextService.timeFormat()}"/>
+                       </h:outputText>
+                   </h:panelGroup>
+                   <h:panelGroup>
+                       <label class="label">备注<span style="color: red">*</span></label>
+                       <h:outputText value="#{demandAnalysisController.selected.meetingRemarks}"/>
+                   </h:panelGroup>
+               </p:panelGrid>
+           </p:fieldset>
+          <p:panelGrid id="meetingPanel" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+              <!-- <h:panelGroup>
+                   <p:outputLabel class="label">拦标价<span style="color: red">*</span></p:outputLabel>
+                   <h:outputText value="#{demandAnalysisController.selected.meetingMaximumPrice}">
+                       <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                   </h:outputText>
+               </h:panelGroup>-->
+               <h:panelGroup>
+                   <label class="label">是否采购进口产品<span style="color: red">*</span></label>
+                   <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationT_F', demandAnalysisController.selected.meetingPurchasingImports)}"/>
+               </h:panelGroup>
+               <h:panelGroup>
+                   <label class="label">过会日期<span style="color: red">*</span></label>
+                   <h:outputText value="#{demandAnalysisController.selected.meetingDate}">
+                       <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                          locale="#{userContextService.getCalendarLocale()}"
+                                          pattern="#{userContextService.timeFormat()}"/>
+                   </h:outputText>
+               </h:panelGroup>
+           </p:panelGrid>
+       </p:fieldset>
+    <br/>
+    <p:fieldset legend="采购办确认信息" id="procurementOffice"
+                rendered="#{demandAnalysisController.approvaLevelPurchase() ge 3 and demandAnalysisController.selected.purchaseType ne null}" >
+        <p:panelGrid id="meetingPanelProcurementOffice" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup >
+                <label class="label">采购类型<span style="color: red">*</span></label>
+                <p:selectOneMenu value="#{demandAnalysisController.selected.purchaseType}"  disabled="true" >
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">合同开始时间</label>
+                <h:outputText value="#{demandAnalysisController.selected.contractStartDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat()}"/>
+                </h:outputText>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">合同结束时间</label>
+                <h:outputText value="#{demandAnalysisController.selected.contractEndDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat()}"/>
+                </h:outputText>
+            </h:panelGroup>
+        </p:panelGrid>
+        <p:fieldset legend="预供应商" id="purchaseVender"  >
+            <p:selectOneRadio id="purchaseVenderConfirm" value="#{demandAnalysisController.venderInfoConfirm}" disabled="true" converter="venderConverter"
+                               layout="responsive" columns="4" styleClass="grid-radio">
+                <f:selectItems value="#{demandAnalysisController.venderInfos}" var="item" itemLabel="#{item.venderName}" itemValue="#{item}"/>
+            </p:selectOneRadio>
+        </p:fieldset>
+        <p:fieldset legend="招标公司" id="purchaseCompany"  >
+            <p:selectOneRadio id="purchaseCompanyConfirm" value="#{demandAnalysisController.companyInfoConfirm}" disabled="true" converter="venderConverter"
+                               layout="responsive" columns="4" styleClass="grid-radio">
+                <f:selectItems value="#{demandAnalysisController.companyInfos}" var="item" itemLabel="#{item.companyName}" itemValue="#{item}"/>
+            </p:selectOneRadio>
+        </p:fieldset>
+    </p:fieldset>
+    <br/>
+</ui:composition>
+</html>
