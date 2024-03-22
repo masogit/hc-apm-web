@@ -143,7 +143,9 @@
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
-                            </h:panelGroup>
+                                <p:link target="_new" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:link>                            </h:panelGroup>
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
