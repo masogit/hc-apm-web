@@ -176,6 +176,7 @@
                            <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/application/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ANNUAL_SUBSCRIPTION_EDIT')}"/>
                            <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPORARY_SUBSCRIPTION_EDIT')}"/>
                            <p:menuitem  value="预算设备管理" outcome="/portal/budget/asset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ASSET_EDIT')}"/>
+                           <p:menuitem  value="需求论证" outcome="/portal/budget/demandAnalysis/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_DEMAND_ANALYSIS_EDIT')}"/>
                            <p:menuitem  value="采购管理" outcome="/portal/budget/purchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_PURCHASE_EDIT')}"/>
                            <p:menuitem  value="模板管理" outcome="/portal/budget/purchaseTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPLATE_EDIT')}"/>
                        </p:submenu>
