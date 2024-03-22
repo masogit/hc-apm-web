@@ -1,13 +1,1 @@
--- YHAAO-20109 需求-资产分类和设备分类的关联关系
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '资产分类是否关联设备分类', 'enableAssetGroupAssetTypeGroupAssociation', '资产分类是否关联设备分类', 'f', 't', 3 where not exists (select * from config_item where key = 'enableAssetGroupAssetTypeGroupAssociation');
-
--- YHAAO-21202 维修工作台按钮显示控制
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待评价按钮(隐藏时确保已关闭流程配置项的必须评价功能,否则将会影响正常流程)', 'enableWorkOrderFeedbackBtn', '是否隐藏待评价按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderFeedbackBtn');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待验收按钮(隐藏时确保已开启配置项管理的自动验收配置,否则将会影响正常流程)', 'enableWorkOrderAckBtn', '是否隐藏待验收按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderAckBtn');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待审批按钮(隐藏时确保工单流程无需备件审批,否则工单流程将无法进行)', 'enableWorkOrderReviewBtn', '是否隐藏待审批按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderReviewBtn');
-
--- YHAAO-21203 维修类型默认值配置
-insert into public.config_item (uid, category,  description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 4,  '维修类型默认值配置', 'repairTypeDefaultValueConfiguration', '维修类型默认值配置', 'f', 't', 7,(select concat('[',string_agg(concat('{"key":"',value_zh,'"',',','"value":"',msg_key,'"','}'),','),']') from  i18n_message  where msg_type='repairType') where not exists (select * from config_item where key = 'repairTypeDefaultValueConfiguration');
-
--- YHAAO-21232 维修工单添加签到时间必填项
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '签到时间是否必填', 'enableCheckInTime', '签到时间是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckInTime');
+INSERT INTO "public"."system_client_info"("uid", "bind_site_uid", "client_key", "client_name", "client_secret", "client_type", "create_time", "last_access_date")  select replace(uuid_generate_v4()::text,'-',''), 'd05f0dc4c64b4e278e874cfb06745a9a', '1dee1cec8d7f440dbf26a2d1f21a8580', '积水潭医院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, '2024-03-20 17:15:16.803';
