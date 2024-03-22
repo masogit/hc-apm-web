@@ -4,7 +4,7 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:form id="inventoryOrderDetailAssetInfoListForm">
-	<p:dataTable id="datalist1" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList1" selectionMode="single"
+	<p:dataTable id="datalist1" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList1" selectionMode="single" class="datalist1"
 		selection="#{inventoryOrderDetailAssetInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -66,6 +66,11 @@
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist1" fileName="InventoryOrderDetailAssetInfo_export" />
+			</p:commandButton>
+		</f:facet>
+		<f:facet name="header">
+			<p:commandButton style="float: left" process="@this" update="@(.datalist1)" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_BATH_INVENTORY')}" actionListener="#{inventoryOrderDetailAssetInfoController.bathInventory()}" value="一键盘点">
+				<p:confirm header="盘点确认" message="您确定要一键盘点么？" icon="ui-icon-warning"/>
 			</p:commandButton>
 		</f:facet>
 	</p:dataTable>
