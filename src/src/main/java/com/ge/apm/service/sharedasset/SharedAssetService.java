@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * @author 212579464
@@ -129,6 +130,15 @@ public class SharedAssetService extends MicroServiceInvoker {
             ResponseEntity<LinkedHashMap> response = template.exchange(url,method, requestEntity, LinkedHashMap.class);
             logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
         });
+    }
+
+    public void asynRemoteCall(GatewayURL gatewayUrl, HttpMethod method, Map<String, Object> requestData, Function<String,String> function){
+        String url = getGatewayURL(gatewayUrl);
+         url =function.apply(url);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity requestEntity = new HttpEntity<>(requestData, header);
+        runAsync(url,method,requestEntity);
     }
 
 }
