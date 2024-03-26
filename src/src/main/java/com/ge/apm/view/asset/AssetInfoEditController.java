@@ -448,31 +448,39 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
 
-        selected.setAssetGroup(assetInfo.getAssetGroup());
-        selected.setClinicalDeptId(assetInfo.getClinicalDeptId());
-        selected.setClinicalDeptUID(assetInfo.getClinicalDeptUID());
-        selected.setAssetDeptId(assetInfo.getAssetDeptId());
-        selected.setAssetDeptUID(assetInfo.getAssetDeptUID());
-        selected.setAssetDeptId(assetInfo.getAssetDeptId());
-        selected.setStatus(assetInfo.getStatus());
-        selected.setName(assetInfo.getName());
-
-        selected.setManufactureId(assetInfo.getManufactureId());
-        selected.setManufacture(assetInfo.getManufacture());
-        selected.setManufactureTel(assetInfo.getManufactureTel());
-        selected.setVendor(assetInfo.getVendor());
-        selected.setSupplierId(assetInfo.getSupplierId());
-        selected.setVendorTel(assetInfo.getVendorTel());
-
-        selected.setMaitanance(assetInfo.getMaitanance());
-        selected.setMaitananceId(assetInfo.getMaitananceId());
-        selected.setMaitananceTel(assetInfo.getMaitananceTel());
-
-        selected.setRegistrationNo(assetInfo.getRegistrationNo());
-
-        selected.setFunctionType(assetInfo.getFunctionType());
-        selected.setMeasureGrade(assetInfo.getMeasureGrade());
-        selected.setMeasuringItemCategory(assetInfo.getMeasuringItemCategory());
+//        selected.setAssetGroup(assetInfo.getAssetGroup());
+//        selected.setClinicalDeptId(assetInfo.getClinicalDeptId());
+//        selected.setClinicalDeptUID(assetInfo.getClinicalDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setAssetDeptUID(assetInfo.getAssetDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setStatus(assetInfo.getStatus());
+//        selected.setName(assetInfo.getName());
+//
+//        selected.setManufactureId(assetInfo.getManufactureId());
+//        selected.setManufacture(assetInfo.getManufacture());
+//        selected.setManufactureTel(assetInfo.getManufactureTel());
+//        selected.setVendor(assetInfo.getVendor());
+//        selected.setSupplierId(assetInfo.getSupplierId());
+//        selected.setVendorTel(assetInfo.getVendorTel());
+//
+//        selected.setMaitanance(assetInfo.getMaitanance());
+//        selected.setMaitananceId(assetInfo.getMaitananceId());
+//        selected.setMaitananceTel(assetInfo.getMaitananceTel());
+//
+//        selected.setRegistrationNo(assetInfo.getRegistrationNo());
+//
+//        selected.setFunctionType(assetInfo.getFunctionType());
+//        selected.setMeasureGrade(assetInfo.getMeasureGrade());
+//        selected.setMeasuringItemCategory(assetInfo.getMeasuringItemCategory());
+        BeanUtils.copyProperties(assetInfo,selected);
+        selected.setSerialNum(null);
+        selected.setFinancingNum(null);
+        selected.setDepartNum(null);
+        selected.setQrCode(null);
+        selected.setQrCode(null);
+        selected.setId(null);
+        selected.setUid(null);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
