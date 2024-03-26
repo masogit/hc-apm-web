@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调剂设备管理"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="secondmentAssetSetting">
+                    <p:dataTable id="datalist" value="#{secondmentAssetSettingController.lazyModel}"
+                                 var="item"
+                                 widgetVar="configEditList"
+                                 lazy="true" paginator="true" paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
+                                 selectionMode="single"  selection="#{secondmentAssetSettingController.selected}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,50,100">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton" />
+                        <p:ajax event="filter" listener="#{secondmentAssetSettingController.onFilter}" update="datalist"/>
+                        <p:column exportable="false" width="100" headerText="操作">
+                            <h:panelGroup >
+                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowedStatus != 0}" process="@this" title="取消调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,-1)}" update="datalist" icon="ui-icon-remove-circle-outline">
+                                    <p:confirm header="取消调剂设备提醒" message="确定取消该设备调剂？" icon="ui-icon-alert"/>
+                                </p:commandButton>
+                                <p:commandButton id="restEnable" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowedStatus == 0}" process="@this" title="启用调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,0)}" update="datalist"  icon="ui-icon-play-circle-outline">
+                                    <p:confirm header="启用调剂设备提醒" message="确定启用该设备调剂？" icon="ui-icon-alert"/>
+                                </p:commandButton>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="#{msg.assetName}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}" />
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}"  filterBy="#{item.functionType}" filterMatchMode="EQ">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('configEditList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup',item.assetGroup)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}" >
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.qrCode}" >
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" >
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="设备调剂状态" >
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('configEditList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>
+                        </p:column>
+                        <p:column headerText="使用计费模式" >
+                            <h:outputText value="#{secondmentAssetSettingController.getBillingModel(item)}"/>
+                        </p:column>
+                        <p:column headerText="累计借出时长" >
+                            <h:outputText value="#{item.billingTime}"/>
+                        </p:column>
+                        <p:column headerText="累计借出费用" >
+                            <h:outputText value="#{item.billingCost}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
+
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="assetSettingEdit.xhtml"/>
+            </div>
+
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

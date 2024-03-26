@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SecondmentOrderManageMapper">
+
+    <resultMap type="com.ge.apm.domain.dto.SecondmentOrderDto" id="secondmentOrderManage" >
+            <id column="id" property="id"/>
+            <result column="asset_name" property="assetName"/>
+            <result column="function_type" property="functionType"/>
+            <result column="asset_group" property="assetGroup"/>
+            <result column="depart_num" property="departNum"/>
+            <result column="qr_code" property="qrCode"/>
+            <result column="secondment_no" property="secondmentNo"/>
+            <result column="asset_uid" property="assetUid"/>
+            <result column="config_id" property="configId"/>
+            <result column="status" property="status"/>
+            <result column="need_spare_parts" property="needSpareParts"/>
+            <result column="spare_parts_remark" property="sparePartsRemark"/>
+            <result column="applicant_uid" property="applicantUid"/>
+            <result column="apply_time" property="applyTime"/>
+            <result column="billing_type" property="billingType"/>
+            <result column="unit_price" property="unitPrice"/>
+            <result column="cost" property="cost"/>
+            <result column="billing_time" property="billingTime"/>
+            <result column="billing_standards" property="billingStandards"/>
+            <result column="billing_begin_time" property="billingBeginTime"/>
+            <result column="billing_end_time" property="billingEndTime"/>
+            <result column="borrow_dept_uid" property="borrowDeptUid"/>
+            <result column="lend_dept_uid" property="lendDeptUid"/>
+            <result column="config_snapshot" property="configSnapshot"/>
+            <result column="remark" property="remark"/>
+            <result column="created_by" property="createdBy"/>
+            <result column="created_date" property="createdDate"/>
+            <result column="modify_by" property="modifyBy"/>
+            <result column="modify_Date" property="modifyDate"/>
+            <result column="tenant_uid" property="tenantUID"/>
+            <result column="institution_uid" property="institutionUID"/>
+            <result column="hospital_uid" property="hospitalUID"/>
+            <result column="site_uid" property="siteUID"/>
+
+    </resultMap>
+
+    <select id="loadSecondmentOrder" resultMap="secondmentOrderManage">
+            select
+            ai.name as asset_name,
+            ai.function_type,
+            ai.asset_group ,
+            ai.depart_num ,
+            ai.qr_code ,
+            so.id ,
+            so.secondment_no,
+            so.asset_uid ,
+            so.config_id,
+            so.status,
+            so.need_spare_parts ,
+            so.spare_parts_remark ,
+            so.applicant_uid ,
+            so.apply_time,
+            so.billing_type,
+            so.unit_price ,
+            so.cost ,
+            so.billing_time ,
+            so.billing_standards ,
+            so.billing_begin_time ,
+            so.billing_end_time ,
+            so.borrow_dept_uid ,
+            so.lend_dept_uid ,
+            so.config_snapshot,
+            so.remark ,
+            so.created_by,
+            so.created_date ,
+            so.modify_by ,
+            so.modify_Date ,
+            so.tenant_uid ,
+            so.institution_uid ,
+            so.hospital_uid ,
+            so.site_uid
+            from secondment_order so left join asset_info ai on so.asset_uid = ai.uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+        <select id="rewriteSelectCount" resultType="java.lang.Integer">
+                select count(so.id)  from secondment_order so left join asset_info ai on so.asset_uid = ai.uid <where>${ew.sqlSegment}</where>
+        </select>
+
+</mapper>
