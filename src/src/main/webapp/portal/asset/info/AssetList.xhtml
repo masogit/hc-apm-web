@@ -145,7 +145,7 @@
                                 </p:commandLink>
                                 <c:if test="#{!userContextService.isEnableBtnByKey('enableDeviceReplication')}">
                                     <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
-                                        <p:graphicImage value="/copy1.png" style="width: 27px; height: 27px;"/>
+                                        <p:graphicImage value="/images/icons/copy1.png" style="width: 27px; height: 27px;"/>
                                     </p:link>
                                 </c:if>
                         </h:panelGroup>
