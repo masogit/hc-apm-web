@@ -55,6 +55,8 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     private ServerEventInterface callingController;
     private String updateViewIDs;
     private SharedAssetService sharedAssetService;
+    private List<OrgInfo> orgInfoList;
+    private List<AssetInfo> selectAssetInfos;
     @Override
     protected void init() {
         dao= WebUtil.getBean(AssetInfoRepository.class);
@@ -189,11 +191,11 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
 
     }
 
-    public void applyBorrowBefore(AssetInfo assetInfo){
+    public void applyBorrowBefore(){
         crudActionName = "Create";
-        selected = assetInfo;
         refreshSecondmentConfig();
         initSecondmentOrder();
+        getOrgInfo();
     }
     private void initSecondmentOrder(){
         Date now = new Date();
@@ -230,14 +232,14 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         secondmentNo = format.format(date);
          return secondmentNo;
     }
-    public List<OrgInfo> getOrgInfo(){
+    public void getOrgInfo(){
         String siteUid = selected.getSiteUID();
         String filterDeptUid = selected.getClinicalDeptUID();
-        return cacheOrgList.stream().filter(item->{
+        orgInfoList = cacheOrgList.stream().filter(item->{
             String uid = item.getUid();
             String siteUID = item.getSiteUID();
-            Integer orgLevel = item.getOrgLevel();
-            return orgLevel != null && orgLevel ==4 && !uid.equals(filterDeptUid) && siteUID.equals(siteUid);
+            Integer orgType = item.getOrgType();
+            return orgType != null && orgType ==4 && !uid.equals(filterDeptUid) && siteUID.equals(siteUid);
         }).collect(Collectors.toList());
     }
     public String getBorrowDeptName(String uid){
@@ -294,7 +296,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
 
     public void confirmSelection(){
         if (callingController != null) {
-            applyBorrowBefore(this.selected);
+            applyBorrowBefore();
             SecondmentOrderDto dto=new SecondmentOrderDto();
             BeanUtils.copyProperties(this.secondmentOrder,dto);
             dto.setAssetName(this.selected.getName());
@@ -312,5 +314,21 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
 
     public void setUpdateViewIDs(String updateViewIDs) {
         this.updateViewIDs = updateViewIDs;
+    }
+
+    public List<OrgInfo> getOrgInfoList() {
+        return orgInfoList;
+    }
+
+    public void setOrgInfoList(List<OrgInfo> orgInfoList) {
+        this.orgInfoList = orgInfoList;
+    }
+
+    public List<AssetInfo> getSelectAssetInfos() {
+        return selectAssetInfos;
+    }
+
+    public void setSelectAssetInfos(List<AssetInfo> selectAssetInfos) {
+        this.selectAssetInfos = selectAssetInfos;
     }
 }

@@ -27,13 +27,13 @@
                                  lazy="true" paginator="true" paginatorPosition="both"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single"  selection="#{secondmentOrderAssetController.selected}"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}" rowKey="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50,100">
 
-                        <p:ajax event="rowSelect" update="" />
+                        <p:ajax event="rowSelect" update="editButton" />
                         <p:ajax event="filter" listener="#{secondmentOrderAssetController.onFilter}" update="datalist"/>
 
                         <p:column headerText="#{msg.assetName}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -61,7 +61,8 @@
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
                         <p:column headerText="设备调剂状态" >
-                            <h:outputText value="#{item.borrowedStatus}"/>
+<!--                            <h:outputText value="#{item.borrowedStatus}"/>-->
+                            <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>
                         </p:column>
                         <p:column headerText="使用计费模式" >
                             <h:outputText value="#{secondmentAssetSettingController.getBillingModel(item)}"/>
@@ -72,19 +73,20 @@
                         <p:column headerText="累计借出费用" >
                             <h:outputText value="#{item.billingCost}"/>
                         </p:column>
-                        <p:column exportable="false" width="100" headerText="操作">
-                            <h:panelGroup >
-                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{item.borrowedStatus != 0}" process="@this" title="申请借用" actionListener="#{secondmentOrderAssetController.applyBorrowBefore(item)}" oncomplete="PF('applyBorrowOrder').show()" update="applyBorrowOrder" icon="ui-icon-create" />
-                            </h:panelGroup>
-                        </p:column>
+<!--                        <p:column exportable="false" width="100" headerText="操作">-->
+<!--                            <h:panelGroup >-->
+<!--                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{item.borrowedStatus != 0}" process="@this" title="申请借用" actionListener="#{secondmentOrderAssetController.applyBorrowBefore(item)}" oncomplete="PF('applyBorrowOrder').show()" update="applyBorrowOrder" icon="ui-icon-create" />-->
+<!--                            </h:panelGroup>-->
+<!--                        </p:column>-->
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
                             </p:commandButton>
-<!--                            <p:commandButton id="createButton" icon="ui-icon-plus" actionListener="#{secondmentConfigController.prepareCreate()}" update="" class="btn btn-sm btn-gray" title="#{msg.Create}" oncomplete="PF('configEditDlg').show()"/>-->
+<!--                            <p:commandButton id="editButton" style="zoom:0.80;" disabled="#{empty secondmentAssetSettingController.selected}" process="@this" title="申请借用" actionListener="#{secondmentOrderAssetController.applyBorrowBefore(item)}" oncomplete="PF('applyBorrowOrder').show()" update="applyBorrowOrder" icon="ui-icon-create" />-->
 <!--                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected || secondmentAssetSettingController.selected.borrowedStatus == 1}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >-->
 <!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
 <!--                            </p:commandButton>-->
+                            <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderAssetController.selected}" actionListener="#{secondmentOrderAssetController.applyBorrowBefore()}" update="applyBorrowOrder" title="#{msg.Edit}"   oncomplete="PF('applyBorrowOrder').show()"/>
 
                         </f:facet>
                     </p:dataTable>

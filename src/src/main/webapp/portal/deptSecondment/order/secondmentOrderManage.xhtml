@@ -30,6 +30,9 @@
 
                                 <p:ajax event="rowSelect"  update="editButton" />
                                 <p:ajax event="filter" listener="#{secondmentOrderManageController.onFilter}" update="datalist"/>
+                                <p:column headerText="序号"  >
+                                    <h:outputText value="#{item.num}" />
+                                </p:column>
                                 <p:column headerText="单号" filterBy="#{item.secondment_no}" >
                                     <h:outputText value="#{item.secondmentNo}" />
                                 </p:column>
@@ -73,7 +76,7 @@
                                     <h:outputText value="#{item.applyTime}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
                                     </h:outputText>
-                                </p:column>>
+                                </p:column>
                                 <p:column headerText="使用计费模式" >
                                     <h:outputText value="#{item.billingStandards}"/>
                                 </p:column>
@@ -94,10 +97,10 @@
                                     <h:outputText value="#{item.cost}"/>
                                 </p:column>
                                 <f:facet name="{Toolbar}">
-                                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                         <p:dataExporter type="xls" target="datalist" fileName="secondmentOrder_export"/>
                                     </p:commandButton>
-                                    <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderManageController.selected}" actionListener="#{secondmentOrderManageController.prepareEdit()}" update="secondmentOrderEdit" title="#{msg.Edit}"   oncomplete="PF('secondmentOrderEdit').show()"/>
+                                    <p:commandButton rendered="#{userContextService.hasAnyRoleByApmRoles('DeptHead')}" id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderManageController.selected}" actionListener="#{secondmentOrderManageController.prepareEdit()}" update="secondmentOrderEdit" title="#{msg.Edit}"   oncomplete="PF('secondmentOrderEdit').show()"/>
 
                                 </f:facet>
                             </p:dataTable>

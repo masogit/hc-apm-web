@@ -91,6 +91,7 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
                             </p:commandButton>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" actionListener="#{secondmentConfigController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}"/>
                             <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
 
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >

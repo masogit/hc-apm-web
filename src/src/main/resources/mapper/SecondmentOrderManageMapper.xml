@@ -5,6 +5,7 @@
     <resultMap type="com.ge.apm.domain.dto.SecondmentOrderDto" id="secondmentOrderManage" >
             <id column="id" property="id"/>
             <result column="asset_name" property="assetName"/>
+            <result column="num" property="num"/>
             <result column="function_type" property="functionType"/>
             <result column="asset_group" property="assetGroup"/>
             <result column="depart_num" property="departNum"/>
@@ -40,7 +41,7 @@
     </resultMap>
 
     <select id="loadSecondmentOrder" resultMap="secondmentOrderManage">
-            select
+            select ROW_NUMBER() OVER (ORDER BY so.created_date DESC ) AS num,
             ai.name as asset_name,
             ai.function_type,
             ai.asset_group ,

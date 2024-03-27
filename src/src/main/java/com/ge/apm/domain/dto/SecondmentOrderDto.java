@@ -17,7 +17,7 @@ public class SecondmentOrderDto implements Serializable {
     private String departNum;
     private String qrCode;
     private String secondmentNo;
-
+    private Integer num;
     private String assetUid;
 
     private String configId;
