@@ -144,8 +144,8 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                                 <c:if test="#{!userContextService.isEnableBtnByKey('enableDeviceReplication')}">
-                                    <p:link  target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
-                                        <p:graphicImage name="icons/copy.png" style="width: 30px; height: 30px;"/>
+                                    <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
+                                        <p:graphicImage value="/copy1.png" style="width: 27px; height: 27px;"/>
                                     </p:link>
                                 </c:if>
                         </h:panelGroup>
