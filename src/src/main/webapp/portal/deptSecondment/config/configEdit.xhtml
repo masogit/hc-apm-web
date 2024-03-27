@@ -18,7 +18,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">单价*</label>
-                            <p:inputNumber  value="#{secondmentConfigController.selected.unitPrice}" required="true"  requiredMessage="单价 #{msg.ValidationRequire}" />
+                            <p:inputNumber  value="#{secondmentConfigController.selected.unitPrice}" decimalPlaces="2" minValue="0" required="true"  requiredMessage="单价 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>计价方式*</label>
@@ -28,6 +28,10 @@
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.createdBy}</label>
+                            <p:inputText value="#{secondmentConfigController.currentUserAccount}"  readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.createdBy}</label>

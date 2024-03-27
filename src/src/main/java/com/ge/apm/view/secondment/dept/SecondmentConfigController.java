@@ -9,6 +9,7 @@ import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -87,23 +88,29 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
 
     @Override
     public void delete() {
-        super.delete();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
         searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.EQ,selected.getId()));
         List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchFilters);
         searchFilters.clear();
-        for (AssetInfo assetInfo : assetInfos) {
-            assetInfo.setBorrowConfigId(null);
+        if(CollectionUtils.isNotEmpty(assetInfos)){
+            for (AssetInfo assetInfo : assetInfos) {
+                assetInfo.setBorrowConfigId(null);
+            }
+            assetInfoRepository.save(assetInfos);
+            for (AssetInfo assetInfo : assetInfos) {
+                saveAssetHistory(assetInfo,"设备解绑科室间借调配置");
+            }
         }
-        assetInfoRepository.save(assetInfos);
-        for (AssetInfo assetInfo : assetInfos) {
-            saveAssetHistory(assetInfo,"设备解绑科室间借调配置");
-        }
-
-
+        dao.delete(selected);
     }
 
-    public void saveAssetHistory(AssetInfo newAsset,String message) {
+    @Override
+    public void save() {
+        dao.save(selected);
+        WebUtil.addSuccessMessage("保存成功");
+    }
+
+    public void saveAssetHistory(AssetInfo newAsset, String message) {
         MqContext mqContext = new MqContext();
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("SecondmentConfigController");

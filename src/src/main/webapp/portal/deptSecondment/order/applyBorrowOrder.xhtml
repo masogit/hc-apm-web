@@ -50,9 +50,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请科室</label>
-                            <p:inputText rendered="#{!secondmentOrderAssetController.chooseDept}" value="#{secondmentOrderAssetController.getBorrowDeptName(secondmentOrderAssetController.secondmentOrder.borrowDeptUid)}" readonly="true" />
-                            <p:autoComplete rendered="#{secondmentOrderAssetController.chooseDept}" id="dd" autoSelection="true" dropdown="true"  value="#{secondmentOrderAssetController.secondmentOrder.borrowDeptUid}"
-                                            completeMethod="#{secondmentOrderAssetController.getOrgInfo()}" scrollHeight="250"/>
+                            <p:selectOneMenu  disabled="#{!secondmentOrderAssetController.chooseDept}" value="#{secondmentOrderAssetController.secondmentOrder.borrowDeptUid}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems  value="#{secondmentOrderAssetController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请人</label>

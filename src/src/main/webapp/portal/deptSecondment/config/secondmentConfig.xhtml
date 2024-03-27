@@ -30,7 +30,7 @@
 
                                     <p:ajax event="rowSelect" update="createButton  editButton deleteButton" />
                                     <p:ajax event="filter" listener="#{secondmentConfigController.onFilter}" update="datalist"/>
-                                    <p:column headerText="名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                                    <p:column headerText="调剂配置名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                                         <h:outputText value="#{item.name}" />
                                     </p:column>
                                     <p:column headerText="单价"  filterBy="#{item.unitPrice}" filterMatchMode="LTE">
@@ -44,6 +44,11 @@
                                             </p:selectOneMenu>
                                         </f:facet>
                                         <h:outputText value="#{fieldMsg.doGetFieldValue('chargingType',item.billingType)}"/>
+                                    </p:column>
+                                    <p:column headerText="创建时间" >
+                                        <h:outputText value="#{item.createdDate}">
+                                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
+                                        </h:outputText>
                                     </p:column>
                                     <p:column headerText="创建人" >
                                         <h:outputText value="#{secondmentConfigController.getCreatedBy(item)}"/>
