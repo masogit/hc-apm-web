@@ -1412,7 +1412,7 @@ public class UserContextService implements Serializable {
     public boolean activeSupplier(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         Set<String> feature = userContextService.getFeatureList();
-        if (feature.contains(ApmFeature.ASSET_SUPPLIER_APPLICATION.getFeatureName())) {
+        if (feature.contains(ApmFeature.ASSET_SUPPLIER_APPLICATION.name())) {
             return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
         }
         return false;
