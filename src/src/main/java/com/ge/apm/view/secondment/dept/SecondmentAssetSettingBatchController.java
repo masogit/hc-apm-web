@@ -121,27 +121,20 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     @Override
     public void save() {
         try {
-            // TODO 校验是否有维修工单
-            String borrowConfigId = selected.getBorrowConfigId();
-            if(StringUtils.isEmpty(borrowConfigId)){
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage("计费配置不允许为空");
-                return;
-            }
+
             if(CollectionUtils.isEmpty(selectAsset)){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage("请选择要绑定的设备");
+                WebUtil.addErrorMessage("请选择添加设备");
                 return;
             }
             for (AssetInfo assetInfo : selectAsset) {
-                assetInfo.setBorrowedStatus(0);
-                assetInfo.setBorrowConfigId(borrowConfigId);
+                assetInfo.setBorrowConfigId("-1");
             }
             dao.save(selectAsset);
             for (AssetInfo assetInfo : selectAsset) {
                 saveAssetHistory(assetInfo,"科室间借调/修改配置");
             }
-            WebUtil.addErrorMessage("绑定调剂计费配置成功");
+            WebUtil.addErrorMessage("添加科室调剂设备成功");
         } catch (Exception e) {
             e.printStackTrace();
         }

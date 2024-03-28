@@ -19,7 +19,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.assetName}</label>
                             <p:inputText value="#{secondmentOrderManageController.selected.assetName}" readonly="true"  />
-                            <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==-2}" class="popupIconButton" actionListener="#{secondmentOrderAssetController.prepareDialogCallback(secondmentOrderManageController, ':secondmentOrderEditFrom')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show();"/>
+                            <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==-2}" class="popupIconButton" actionListener="#{secondmentOrderAssetController.prepareDialogCallback(secondmentOrderManageController, ':secondmentOrderEditFrom')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show();"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.functionType}</label>
@@ -96,6 +96,10 @@
                             <label class="label">备注</label>
                             <p:inputText value="#{secondmentOrderManageController.selected.remark}" readonly="true"  />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty secondmentOrderManageController.selected.denialReason}">
+                            <label class="label">拒绝原因</label>
+                            <p:inputTextarea  id="denialReason" readonly="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset legend="计费配置信息" style="margin-bottom:20px">
@@ -120,21 +124,34 @@
                             <label class="label">#{msg.remark}</label>
                             <p:inputTextarea id="remark"  readonly="true" value="#{secondmentOrderManageController.secondmentConfig.remark}"  />
                         </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
 <!--                // -2已拒绝 -1已取消  0 待同意 ，1 待交付， 2待归还， 3已归还 4、维修中-->
-                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==-2 }" validateClient="true" disabled="#{!secondmentOrderManageController.resubmit()}" actionListener="#{secondmentOrderManageController.statusUpdate(null,0)}" value="提交申请" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,-1)}" value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==-2}" validateClient="true" disabled="#{!secondmentOrderManageController.resubmit()}" actionListener="#{secondmentOrderManageController.statusUpdate(null,0)}" value="提交申请" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,-1)}" value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
 
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,1)}" value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,-2)}" value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.selected.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,5)}" value="提醒归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,1)}" value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varRejectDlg').show();"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,5)}" value="提醒归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.selected.status ne 3 }" immediate="true" value="返回" icon="ui-icon-cancel" onclick="PF('secondmentOrderEdit').hide()"/>
             </h:form>
             <ui:include src="selectAssetDialog.xhtml" />
+            <p:dialog id="rejectDlg"  widgetVar="varRejectDlg" modal="true" resizable="true" draggable="true" header="拒绝申请" appendTo="@(body)" width="50%" height="200">
+                <h:form id="selectAssetForm1" >
+                    <p:panelGrid columns="1" layout="grid">
+                        <h:panelGroup>
+                            <label class="label">拒绝原因<span style="color: red">*</span></label>
+                            <p:inputTextarea required="true" id="denialReason1"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" icon="ui-icon-check" update=":secondmentOrderManage:datalist :growl" actionListener="#{secondmentOrderManageController.statusUpdate(null,-2)}" oncomplete="closeDigital(args);"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varRejectDlg').hide()"/>
+                </h:form>
+            </p:dialog>
         </div>
     </p:dialog>
     <script type="text/javascript">
@@ -144,6 +161,10 @@
             } else {
                 PF(dialog).hide();
             }
+        }
+        function closeDigital(args) {
+            PF('varRejectDlg').hide();
+            PF('secondmentOrderEdit').hide();
         }
     </script>
 </ui:composition>

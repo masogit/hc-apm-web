@@ -108,6 +108,9 @@ public class SecondmentOrder implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "denial_reason", columnDefinition = "text")
+    private String denialReason;
+
     @Override
     public int hashCode() {
         Integer hash = 0;
