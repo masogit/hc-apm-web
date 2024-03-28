@@ -1411,7 +1411,11 @@ public class UserContextService implements Serializable {
     }
     public boolean activeSupplier(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
+        Set<String> feature = userContextService.getFeatureList();
+        if (feature.contains(ApmFeature.ASSET_SUPPLIER_APPLICATION.getFeatureName())) {
+            return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
+        }
+        return false;
     }
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
         RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
