@@ -18,7 +18,7 @@ public class SecondmentOrderManageService {
     @Autowired
     private SecondmentOrderManageMapper manageMapper;
     public Page<SecondmentOrderDto> loadSecondmentOrderList(PageRequest pageRequest, Wrapper<SecondmentOrderDto> wrapper){
-        Pagination page = new Pagination(pageRequest.getPageNumber(),pageRequest.getPageSize());
+        Pagination page = new Pagination(pageRequest.getPageNumber()+1,pageRequest.getPageSize());
         Integer total= manageMapper.rewriteSelectCount(wrapper);
         List<SecondmentOrderDto> secondmentOrderDtos = manageMapper.loadSecondmentOrder(page, wrapper);
         return new PageImpl<SecondmentOrderDto>(secondmentOrderDtos,pageRequest,total);

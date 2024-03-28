@@ -11,11 +11,13 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.dto.SecondmentOrderDto;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.domain.secondment.SecondmentOrder;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.secondment.SecondmentOrderManageService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -59,6 +61,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private List<Field> fields = new ArrayList<>();
     private SecondmentOrderDto secondmentOrderDtoTemp;
     private SharedAssetService sharedAssetService;
+    private MqUtils mqUtils;
 
     @Override
     protected GenericRepositoryUUID<SecondmentOrderDto> getDAO() {
@@ -74,6 +77,8 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         secondmentConfigRepository = WebUtil.getBean(SecondmentConfigRepository.class);
         secondmentOrderRepository = WebUtil.getBean(SecondmentOrderRepository.class);
         sharedAssetService = WebUtil.getBean(SharedAssetService.class);
+        mqUtils = WebUtil.getBean(MqUtils.class);
+
         List<I18nMessage> chargingType = FieldValueMessageController.getFieldValueList("chargingType");
         cacheChargingType = chargingType.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, item -> item));
         if(searchFilters == null){
@@ -169,6 +174,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      BeanUtils.copyProperties(dto,order);
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
+                     saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
                  }else{
                      WebUtil.addSuccessMessage("设备："+assetInfo.getName() +",已被占用或未配置调剂规则,请刷新后重试");
                  }
@@ -193,6 +199,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      BeanUtils.copyProperties(dto,order);
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
+                     saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
                  break;
              case 5:
                  // 提醒归还
@@ -358,9 +365,6 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     public void onServerEvent(String eventName, Object eventObject) {
         SecondmentOrderDto  selectAssetOrder= (SecondmentOrderDto) eventObject;
         if(!secondmentOrderDtoTemp.getAssetUid().equals(selectAssetOrder.getAssetUid())){
-            selectAssetOrder.setId(this.selected.getId());
-            selectAssetOrder.setSecondmentNo(this.selected.getSecondmentNo());
-            selectAssetOrder.setStatus(this.selected.getStatus());
             this.selected = selectAssetOrder;
             serializationConfiguration();
         }else{
@@ -371,5 +375,14 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
 
     public boolean resubmit() {
         return secondmentOrderDtoTemp.getSecondmentNo().equals(selected.getSecondmentNo()) && !secondmentOrderDtoTemp.getAssetUid().equals(selected.getAssetUid());
+    }
+
+    public void saveAssetHistory(AssetInfo newAsset,String message) {
+        MqContext mqContext = new MqContext();
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("SecondmentAssetSettingController");
+        mqContext.setMethodName("statusUpdate");
+        mqContext.setDescribe(message);
+        mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
     }
 }
