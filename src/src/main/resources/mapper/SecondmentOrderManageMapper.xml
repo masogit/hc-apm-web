@@ -37,6 +37,7 @@
             <result column="institution_uid" property="institutionUID"/>
             <result column="hospital_uid" property="hospitalUID"/>
             <result column="site_uid" property="siteUID"/>
+            <result column="denial_reason" property="denialReason"/>
 
     </resultMap>
 
@@ -74,7 +75,8 @@
             so.tenant_uid ,
             so.institution_uid ,
             so.hospital_uid ,
-            so.site_uid
+            so.site_uid,
+            so.denial_reason
             from secondment_order so left join asset_info ai on so.asset_uid = ai.uid
         <where>${ew.sqlSegment}</where>
     </select>

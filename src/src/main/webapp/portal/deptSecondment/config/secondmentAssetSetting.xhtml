@@ -17,7 +17,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="调剂设备信息"/>
+                <p:outputLabel class="pageTitle" value="调剂设备管理"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="secondmentAssetSetting">
@@ -37,10 +37,10 @@
                         <p:ajax event="filter" listener="#{secondmentAssetSettingController.onFilter}" update="datalist"/>
                         <p:column exportable="false" width="100" headerText="操作">
                             <h:panelGroup >
-                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowedStatus != 0}" process="@this" title="取消调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,-1)}" update="datalist" icon="ui-icon-remove-circle-outline">
+                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus != 0}" process="@this" title="取消调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,-1)}" update="datalist" icon="ui-icon-remove-circle-outline">
                                     <p:confirm header="取消调剂设备提醒" message="确定取消该设备调剂？" icon="ui-icon-alert"/>
                                 </p:commandButton>
-                                <p:commandButton id="restEnable" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowedStatus == 0}" process="@this" title="启用调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,0)}" update="datalist"  icon="ui-icon-play-circle-outline">
+                                <p:commandButton id="restEnable" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus == 0}" process="@this" title="启用调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,0)}" update="datalist"  icon="ui-icon-play-circle-outline">
                                     <p:confirm header="启用调剂设备提醒" message="确定启用该设备调剂？" icon="ui-icon-alert"/>
                                 </p:commandButton>
                             </h:panelGroup>
@@ -94,7 +94,7 @@
                             <p:commandButton id="createButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-plus" actionListener="#{secondmentAssetSettingBatchController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}" update="assetSettingEditBatch" oncomplete="PF('assetSettingEditBatch').show()" />
                             <p:commandButton id="editButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-settings" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
 
-                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >
+                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="移除调剂设备"  update="datalist" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
 

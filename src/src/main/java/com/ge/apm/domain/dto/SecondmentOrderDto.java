@@ -75,6 +75,8 @@ public class SecondmentOrderDto implements Serializable {
 
     private String siteUID;
 
+    private String denialReason;
+
     @Override
     public int hashCode() {
         Integer hash = 0;

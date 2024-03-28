@@ -10,44 +10,44 @@
     <p:dialog id="assetSettingEditBatch" width="1000" height="600" widgetVar="assetSettingEditBatch" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentAssetSettingBatchController.getCRUDActionName()}" >
         <div class="ui-g-12 card">
             <h:form id="assetSettingBatchFrom">
-                <p:fieldset legend="调剂设备配置" style="margin-bottom:20px">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <h:panelGroup>
-                            <label class="label">计费配置*</label>
-                            <p:selectOneMenu  id="secondmentConfigId"  value="#{secondmentAssetSettingBatchController.selected.borrowConfigId}" >
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
-                                <f:selectItems value="#{secondmentAssetSettingBatchController.cacheConfigList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                <p:ajax event="valueChange" listener="#{secondmentAssetSettingBatchController.refreshSecondmentConfig}" update="configName1 unitPrice1 billingType1 createdBy1 remark1" />
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+<!--                <p:fieldset legend="调剂设备配置" style="margin-bottom:20px">-->
+<!--                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >-->
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">计费配置*</label>-->
+<!--                            <p:selectOneMenu  id="secondmentConfigId"  value="#{secondmentAssetSettingBatchController.selected.borrowConfigId}" >-->
+<!--                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />-->
+<!--                                <f:selectItems value="#{secondmentAssetSettingBatchController.cacheConfigList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>-->
+<!--                                <p:ajax event="valueChange" listener="#{secondmentAssetSettingBatchController.refreshSecondmentConfig}" update="configName1 unitPrice1 billingType1 createdBy1 remark1" />-->
+<!--                            </p:selectOneMenu>-->
+<!--                        </h:panelGroup>-->
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.name}</label>
-                            <p:inputText id="configName1" value="#{secondmentAssetSettingBatchController.secondmentConfig.name}" readonly="true"  />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">单价</label>
-                            <p:inputNumber id="unitPrice1" value="#{secondmentAssetSettingBatchController.secondmentConfig.unitPrice}" readonly="true"  />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class='label'>计价方式</label>
-                            <p:selectOneMenu id="billingType1" readonly="true" disabled="true"
-                                              value="#{secondmentAssetSettingBatchController.secondmentConfig.billingType}"
-                                              requiredMessage="计价方式 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.createdBy}</label>
-                            <p:inputText id="createdBy1" value="#{secondmentAssetSettingBatchController.getCreatedBy(secondmentAssetSettingBatchController.secondmentConfig)}"  readonly="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.remark}</label>
-                            <p:inputTextarea id="remark1" cols="100" readonly="true" value="#{secondmentAssetSettingBatchController.secondmentConfig.remark}"  />
-                        </h:panelGroup>
-                    </p:panelGrid>
-                </p:fieldset>
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">#{msg.name}</label>-->
+<!--                            <p:inputText id="configName1" value="#{secondmentAssetSettingBatchController.secondmentConfig.name}" readonly="true"  />-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">单价</label>-->
+<!--                            <p:inputNumber id="unitPrice1" value="#{secondmentAssetSettingBatchController.secondmentConfig.unitPrice}" readonly="true"  />-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup>-->
+<!--                            <label class='label'>计价方式</label>-->
+<!--                            <p:selectOneMenu id="billingType1" readonly="true" disabled="true"-->
+<!--                                              value="#{secondmentAssetSettingBatchController.secondmentConfig.billingType}"-->
+<!--                                              requiredMessage="计价方式 #{msg.ValidationRequire}">-->
+<!--                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>-->
+<!--                                <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>-->
+<!--                            </p:selectOneMenu>-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">#{msg.createdBy}</label>-->
+<!--                            <p:inputText id="createdBy1" value="#{secondmentAssetSettingBatchController.getCreatedBy(secondmentAssetSettingBatchController.secondmentConfig)}"  readonly="true"/>-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">#{msg.remark}</label>-->
+<!--                            <p:inputTextarea id="remark1" cols="100" readonly="true" value="#{secondmentAssetSettingBatchController.secondmentConfig.remark}"  />-->
+<!--                        </h:panelGroup>-->
+<!--                    </p:panelGrid>-->
+<!--                </p:fieldset>-->
                 <p:fieldset legend="设备" id="assetList" style="margin-bottom:20px">
                     <p:panelGrid columns="1" layout="grid">
                         <p:dataTable id="datalist" value="#{secondmentAssetSettingBatchController.lazyModel}"

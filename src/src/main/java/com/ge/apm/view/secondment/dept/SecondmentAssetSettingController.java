@@ -135,8 +135,9 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         try {
             // TODO 校验是否有再借未完成工单
             selected.setBorrowConfigId(null);
-            super.save();
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
+            selected.setBorrowedStatus(null);
+            dao.save(selected);
+            WebUtil.addSuccessMessage("调剂设备移除成功");
             saveAssetHistory(selected,"科室间借调/解绑配置");
         } catch (Exception e) {
             e.printStackTrace();
@@ -211,8 +212,9 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         for (SecondmentConfig config : cacheConfigList) {
             if(config.getId().equals(borrowConfigId)){
                 secondmentConfig = config;
-                break;
+                return;
             }
         }
+        secondmentConfig = new SecondmentConfig();
     }
 }

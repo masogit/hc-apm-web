@@ -364,13 +364,15 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         SecondmentOrderDto  selectAssetOrder= (SecondmentOrderDto) eventObject;
-        if(!secondmentOrderDtoTemp.getAssetUid().equals(selectAssetOrder.getAssetUid())){
-            this.selected = selectAssetOrder;
-            serializationConfiguration();
-        }else{
-            this.selected = this.secondmentOrderDtoTemp;
-            WebUtil.addErrorMessage("设备："+selected.getAssetName() +"，申请已拒绝！");
-        }
+        this.selected = selectAssetOrder;
+//        serializationConfiguration();
+//        if(!secondmentOrderDtoTemp.getAssetUid().equals(selectAssetOrder.getAssetUid())){
+//            this.selected = selectAssetOrder;
+//            serializationConfiguration();
+//        }else{
+//            this.selected = this.secondmentOrderDtoTemp;
+//            WebUtil.addErrorMessage("设备："+selected.getAssetName() +"，申请已拒绝！");
+//        }
     }
 
     public boolean resubmit() {
@@ -384,5 +386,13 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         mqContext.setMethodName("statusUpdate");
         mqContext.setDescribe(message);
         mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
+    }
+
+    public SecondmentOrderDto getSecondmentOrderDtoTemp() {
+        return secondmentOrderDtoTemp;
+    }
+
+    public void setSecondmentOrderDtoTemp(SecondmentOrderDto secondmentOrderDtoTemp) {
+        this.secondmentOrderDtoTemp = secondmentOrderDtoTemp;
     }
 }
