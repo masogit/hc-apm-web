@@ -188,7 +188,8 @@ public enum GatewayURL {
     DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),
     // 科室间调剂
     SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
-    SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}")
+    SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),
+    SECONDMENT_GENERATE_NO("/hcapmworkflowservice/api/apm/secondment/getNo"),
     ;
     private final String url;
 

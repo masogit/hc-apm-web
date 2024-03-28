@@ -19,7 +19,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -173,7 +176,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         try {
             List<SearchFilter> searchFilters=new ArrayList<>();
             searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,selected.getUid()));
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE,0));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE,1));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.LT,3));
             List<SecondmentOrder> secondmentOrders = secondmentOrderRepository.findBySearchFilter(searchFilters);
             if(CollectionUtils.isNotEmpty(secondmentOrders)){
@@ -182,6 +185,8 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             }
             SecondmentOrder secondmentOrder = this.secondmentOrder;
             if(secondmentOrder!= null){
+                String secondmentNo = generateSecondmentNo(null);
+                secondmentOrder.setSecondmentNo(secondmentNo);
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
             }
@@ -203,7 +208,6 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         SecondmentConfig config = this.secondmentConfig;
         UserAccount userAccount = this.userAccount;
         secondmentOrder= new SecondmentOrder();
-        secondmentOrder.setSecondmentNo(generateSecondmentNo(now));
         secondmentOrder.setAssetUid(assetInfo.getUid());
         secondmentOrder.setConfigId(config.getId());
         secondmentOrder.setApplyTime(now);
@@ -225,12 +229,13 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         String configJSON = JSON.toJSONString(config);
         secondmentOrder.setConfigSnapshot(configJSON);
     }
-    private String generateSecondmentNo(Date date){
-        String secondmentNo = "";
-        String pattern = "yyyyMMddHHmmssSS";
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        secondmentNo = format.format(date);
-         return secondmentNo;
+    private String generateSecondmentNo(String key){
+        try {
+            return sharedAssetService.getSrNum(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     public void getOrgInfo(){
         String siteUid = selected.getSiteUID();

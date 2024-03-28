@@ -34,8 +34,8 @@
                             <p:inputText value="#{secondmentConfigController.currentUserAccount}"  readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.createdBy}</label>
-                            <p:inputText value="#{secondmentConfigController.currentUserAccount}"  readonly="true"/>
+                            <label class="label">#{msg.createdDate}</label>
+                            <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentConfigController.selected.createdDate}" readonly="true" showOn="false"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.remark}</label>

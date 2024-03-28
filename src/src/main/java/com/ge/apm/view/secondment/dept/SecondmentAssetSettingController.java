@@ -96,6 +96,8 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,scope));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ,true));
+         searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNotNull,null));
+
 
     }
 

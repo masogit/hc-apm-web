@@ -17,7 +17,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="调剂设备管理"/>
+                <p:outputLabel class="pageTitle" value="调剂设备信息"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="secondmentAssetSetting">
@@ -25,7 +25,7 @@
                                  var="item"
                                  widgetVar="configEditList"
                                  lazy="true" paginator="true" paginatorPosition="both"
-                                 paginatorAlwaysVisible="true"
+                                 paginatorAlwaysVisible="true" rowKey="#{item.id}"
                                  selectionMode="single"  selection="#{secondmentAssetSettingController.selected}"
                                  sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
@@ -91,10 +91,10 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
                             </p:commandButton>
-                            <p:commandButton id="createButton" icon="ui-icon-plus" actionListener="#{secondmentConfigController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}"/>
-                            <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
+                            <p:commandButton id="createButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-plus" actionListener="#{secondmentAssetSettingBatchController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}" update="assetSettingEditBatch" oncomplete="PF('assetSettingEditBatch').show()" />
+                            <p:commandButton id="editButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-settings" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
 
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >
+                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="#{msg.Delete}"  update="datalist" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
 
@@ -102,6 +102,7 @@
                     </p:dataTable>
                 </h:form>
                 <ui:include src="assetSettingEdit.xhtml"/>
+                <ui:include src="assetSettingEditBatch.xhtml"/>
             </div>
 
         </div>
