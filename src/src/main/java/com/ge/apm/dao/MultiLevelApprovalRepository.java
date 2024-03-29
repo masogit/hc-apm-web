@@ -39,4 +39,20 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
 
     @Query(value = "select count(m.id) from multi_level_approval m  where m.workflow_config_approve_uid = ?1 and ( m.approval_status = 0 or m.approval_status = 1   ) ",nativeQuery = true)
     int getIncompleteApprovalConfig(String id);
+
+
+    @Query(value = "select   count(ma.*) from multi_level_approval ma left join asset_scrap  scrap on ma.business_number=scrap.business_number \n" +
+            "left join asset_department_convert adc   on ma.business_number=adc.business_number \n" +
+            "left join v2_service_request sr on ma.business_number=sr.sr_num \n" +
+            "left join v2_pm_order po on ma.business_uid=po.id\n" +
+            "where ma.tenant_uid=?1 and ma.initiate_approver_uid is not null and  (scrap.asset_uid=?2 or  adc.asset_uid=?2 or sr.asset_uid=?2  or po.asset_uid= ?2  )\n",nativeQuery = true)
+    int getAssetProcessRecord(String tenantUID, String uid);
+
+
+    @Query(value = "select   ma.* from multi_level_approval ma left join asset_scrap  scrap on ma.business_number=scrap.business_number \n" +
+            "left join asset_department_convert adc   on ma.business_number=adc.business_number \n" +
+            "left join v2_service_request sr on ma.business_number=sr.sr_num \n" +
+            "left join v2_pm_order po on ma.business_uid=po.id\n" +
+            "where ma.tenant_uid=?1 and ma.initiate_approver_uid is not null and  (scrap.asset_uid=?2 or  adc.asset_uid=?2 or sr.asset_uid=?2  or po.asset_uid= ?2 ) limit ?3 offset ?4   \n",nativeQuery = true)
+    List<MultiLevelApproval> getAssetProcessRecordPage(String tenantUID, String uid, Integer pageSize, Integer pageNum);
 }

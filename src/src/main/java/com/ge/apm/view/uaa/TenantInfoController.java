@@ -306,6 +306,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
 			selected.setFeatureList(JSON.toJSONString(features.get().getFeatureList()));
 			selected.setEnablesNewMenu(true);
+			selected.setEnablesMenuOrder(false);
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		log.info("save/updating... TenantInfo , tenantName:{},tenantConfig:{}", this.selected.getName(), this.selected.getTenantConfig());

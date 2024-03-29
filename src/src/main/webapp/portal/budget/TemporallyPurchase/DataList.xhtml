@@ -45,7 +45,7 @@
                 </h:outputText>
             </p:column>
             <p:column headerText="申请科室" >
-                <h:outputText value="#{item.applicantDeptName}"/>
+                <h:outputText value="#{item.applicationDeptName}"/>
             </p:column>
             <p:column headerText="#{msg.Applicant}" >
                 <h:outputText value="#{item.applicantName}"/>
@@ -98,8 +98,10 @@
                     <p:fileDownload value="#{budgetBayController.exportFile}"/>
                 </p:commandButton>-->
                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
-                                 disabled="#{empty budgetBayController.selected or budgetBayController.selected.applicationStatus ne 1}" actionListener="#{budgetBayController.delete}"  rendered="#{budgetBayController.tabIndex eq 0 }">
+                                 disabled="#{budgetBayController.deleteButtonStatus()}" actionListener="#{budgetBayController.delete}" >
                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                </p:commandButton>
+                <p:commandButton id="importButton" ajax="false" title="临时申购信息导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n"  class="btn btn-sm btn-gray">
                 </p:commandButton>
             </f:facet>
         </p:dataTable>

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -76,6 +77,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private ConfigItemRepository configItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private UserContextService userContextService;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -190,6 +192,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        userContextService=WebUtil.getBean(UserContextService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -404,13 +407,13 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             return "";
         }
 
-        if (arrivalListItem.getWarrantyYear() != null) {
+        /*if (arrivalListItem.getWarrantyYear() != null) {
             Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
             Calendar calender = Calendar.getInstance();
             calender.setTime(arrivalListItem.getInstallDate() == null ? new Date() : arrivalListItem.getInstallDate());
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
-        }
+        }*/
         //configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())
         if (isApproved()) {
             //待审核
@@ -598,13 +601,13 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 }
             }
 
-            if (arrivalListItem.getWarrantyYear() != null) {
+            /*if (arrivalListItem.getWarrantyYear() != null) {
                 Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
                 Calendar calender = Calendar.getInstance();
                 calender.setTime(arrivalListItem.getInstallDate() == null ? new Date() : arrivalListItem.getInstallDate());
                 calender.add(Calendar.MONTH, monthLong);
                 arrivalListItem.setFactoryWarrantyDate(calender.getTime());
-            }
+            }*/
 
             if (isApproved()) {
                 //待审核
@@ -1050,6 +1053,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
             selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
             assetTypeGroup = selectedAssetTypeGroup.getEncoded();
+            if(userContextService.enableAssetGroupAssetTypeGroupAssociation()){
+                selected.setAssetGroup(selectedAssetTypeGroup.getAssetGroup());
+            }
         }
     }
 
@@ -1197,5 +1203,44 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             flag=Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
         }
         return flag;
+    }
+
+    public void checkSerialNumExists () {
+        List<AssetInfo> list = assetDao.findBySerialNumAndTenantUID(this.arrivalListItem.getSerialNum(), this.arrivalList.getTenantUID());
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("制造商序列号已存在！");
+        }
+    }
+
+    private Date factoryWarrantyDate;
+
+    public void installDateChange(ValueChangeEvent event) {
+        if (ObjectUtil.isNotEmpty(event)) {
+            Date installDate = (Date) event.getNewValue();
+            arrivalListItem.setInstallDate(installDate);
+        }
+        if (ObjectUtil.isAllNotEmpty(arrivalListItem.getWarrantyYear(), arrivalListItem.getInstallDate())) {
+            Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
+            Calendar calender = Calendar.getInstance();
+            calender.setTime(arrivalListItem.getInstallDate() == null ? new Date() : arrivalListItem.getInstallDate());
+            calender.add(Calendar.MONTH, monthLong);
+            arrivalListItem.setFactoryWarrantyDate(calender.getTime());
+            factoryWarrantyDate = calender.getTime();
+        }
+    }
+
+    public Date getFactoryWarrantyDate() {
+        if (ObjectUtil.isNotEmpty(factoryWarrantyDate)) {
+            return factoryWarrantyDate;
+        }
+        if (ObjectUtil.isEmpty(arrivalListItem.getFactoryWarrantyDate())) {
+            installDateChange(null);
+        }
+        return arrivalListItem.getFactoryWarrantyDate();
+    }
+
+    public void setFactoryWarrantyDate(Date factoryWarrantyDate) {
+        this.factoryWarrantyDate = factoryWarrantyDate;
+        this.arrivalListItem.setFactoryWarrantyDate(factoryWarrantyDate);
     }
 }

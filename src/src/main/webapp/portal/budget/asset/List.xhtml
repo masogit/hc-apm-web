@@ -129,7 +129,7 @@
                                              actionListener="#{budgetAssetController.prepareCreate}"
                                              update=":BudgetAssetEditDlg"
                                              oncomplete="PF('BudgetAssetEditDialog').show()"
-                                             disabled="#{userContextService.hasNotAnyRole('AssetHead,DeptHead,ClinicalStaff')}"/>
+                                             />
                             <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
                                              title="#{msg.View}"
                                              actionListener="#{budgetAssetController.prepareView}"

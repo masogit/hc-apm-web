@@ -30,6 +30,7 @@ public class V2_BlobObject implements Serializable {
         AUDIT_REPORT("AuReport","质控报告"),
         INSPECTION_REPORT ("PIReport","巡检报告"),
         OTHER ("Other","其他"),
+        MULTI_LEVEL_APPROVAL("MultiLevelApproval","多级审批"),
 //        PMBE("PMBE","保养前照片"),
 //        PMAF("PMAF","保养后照片"),
         ;
@@ -64,6 +65,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
     public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
+    public static final String BO_TYPE_MultiLevelApproval = "MultiLevelApproval"; // 多级审批
 
     public static final String BO_TYPE_PrePmOrder = "PrePmOrder"; //保养前照片
     public static final String BO_TYPE_PmOrder = "PmOrder"; //保养后照片
@@ -73,6 +75,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PIReport = "PIReport"; //巡检报告
     public static final String BO_TYPE_Other = "Other"; //其他
 
+    public static final String BO_TYPE_PM_RULE = "PmRule";
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
     public static final String BO_TYPE_WorkOrderDetail = "WorkOrderDetail";
@@ -93,6 +96,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_SUB_TYPE_DOCS = "Docs";
     public static final String BO_SUB_TYPE_IMG = "Image";
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
+    public static final String BO_SUB_FILE = "File";
     public static final String BO_SUB_TYPE_AssetInfo_Measuring = "Measuring";
     public static final String BO_TYPE_ZKB_PART_ORDER = "ZkbPartOrder";
     public static final String BO_TYPE_ZKB_COURSE = "ZkbCourse";
@@ -180,6 +184,9 @@ public class V2_BlobObject implements Serializable {
 
     @Column(name = "compress_object_id")
     private String compressObjectId;
+
+    @Column(name = "tenant_uid")
+    private String tenantUid;
 
     public String getId() {
         return id;
@@ -339,6 +346,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setCompressObjectId(String compressObjectId) {
         this.compressObjectId = compressObjectId;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 
     @Override

@@ -1,16 +1,13 @@
--- https://ge-hc.atlassian.net/browse/YHAAO-20766
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'EquipmentSwap', '设备调配中心', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'EquipmentSwap');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'BatchEquipmentSwap', '设备批量调配', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'BatchEquipmentSwap');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'SwappedEquipmentConfiguration', '调配设备配置', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'SwappedEquipmentConfiguration');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'SwappedEquipmentNameSettings', '调配名称设置', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'SwappedEquipmentNameSettings');
-insert into i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) select 'label', 'AdjustmentEquipmentName', '调配设备名称', 'Equipment Swap', NULL, 808 where not exists(select * from i18n_message where msg_type = 'label' and site_id = 808 and msg_key = 'AdjustmentEquipmentName');
+-- YHAAO-20109 需求-资产分类和设备分类的关联关系
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '资产分类是否关联设备分类', 'enableAssetGroupAssetTypeGroupAssociation', '资产分类是否关联设备分类', 'f', 't', 3 where not exists (select * from config_item where key = 'enableAssetGroupAssetTypeGroupAssociation');
 
---https://ge-hc.atlassian.net/browse/YHAAO-20653 维修工单增加asset_uid字段刷历史数据
-update v2_service_request sr set asset_uid =(select ai.uid from asset_info  ai where ai.id=sr.asset_id);
-update v2_work_order wo set asset_uid =(select uid from asset_info ai where wo.asset_id =ai.id  );
---https://ge-hc.atlassian.net/browse/YHAAO-20655 资产表增加parent_asset_uid字段刷历史数据
-update asset_info ai set parent_asset_uid =(select uid from asset_info ai2 where ai.parent_asset_id=ai2.id) where ai.parent_asset_id is not null;
+-- YHAAO-21202 维修工作台按钮显示控制
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待评价按钮(隐藏时确保已关闭流程配置项的必须评价功能,否则将会影响正常流程)', 'enableWorkOrderFeedbackBtn', '是否隐藏待评价按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderFeedbackBtn');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待验收按钮(隐藏时确保已开启配置项管理的自动验收配置,否则将会影响正常流程)', 'enableWorkOrderAckBtn', '是否隐藏待验收按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderAckBtn');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否隐藏待审批按钮(隐藏时确保工单流程无需备件审批,否则工单流程将无法进行)', 'enableWorkOrderReviewBtn', '是否隐藏待审批按钮', 'f', 't', 3 where not exists (select * from config_item where key = 'enableWorkOrderReviewBtn');
 
---广元his数据上传，新增账号
-INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), '1dee1cec8d7f440dbf26a2d1f21a8580', '1dee1cec8d7f440dbf26a2d1f21a8580', '广元市中心医院本院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='1dee1cec8d7f440dbf26a2d1f21a8580');
-INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date) select replace(uuid_generate_v4()::text,'-',''), '86c1f747f1904e2190f240016412f179', '86c1f747f1904e2190f240016412f179', '广元市中心医院妇儿院区', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='86c1f747f1904e2190f240016412f179')
+-- YHAAO-21203 维修类型默认值配置
+insert into public.config_item (uid, category,  description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 4,  '维修类型默认值配置', 'repairTypeDefaultValueConfiguration', '维修类型默认值配置', 'f', 't', 7,(select concat('[',string_agg(concat('{"key":"',value_zh,'"',',','"value":"',msg_key,'"','}'),','),']') from  i18n_message  where msg_type='repairType') where not exists (select * from config_item where key = 'repairTypeDefaultValueConfiguration');
+
+-- YHAAO-21232 维修工单添加签到时间必填项
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '签到时间是否必填', 'enableCheckInTime', '签到时间是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckInTime');

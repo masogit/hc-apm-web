@@ -104,9 +104,19 @@ public class SupplierService {
         supplierUser.setStatus(SupplierUser.Status.Approved.name());
         supplierUserDao.save(supplierUser);
     }
-
-    public void deleteByID(String id){
-        supplierUserDao.delete(id);
+    @Transactional
+    public void deleteByID(SupplierUser supplierUser){
+        UserAccount user = supplierUser.getUserAccount();
+        if(user != null){
+            user.setIsActive(Boolean.FALSE);
+            user.setIsDeleted(Boolean.TRUE);
+            user.setTelephone(null);
+            user.setWeChatId(null);
+            user.setWxUnionId(null);
+            userAccountDao.save(user);
+        }
+        supplierUserDao.deleteUserWxApp(supplierUser.getUserID());
+        supplierUserDao.delete(supplierUser.getId());
     }
 
     @Transactional

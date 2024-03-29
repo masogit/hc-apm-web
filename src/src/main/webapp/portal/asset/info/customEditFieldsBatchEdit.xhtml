@@ -31,7 +31,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetGroup}</label>
-            <p:selectOneMenu id="assetGroup" value="#{assetInfoBulkEditController.selected.assetGroup}"  disabled="#{!assetInfoBulkEditController.needEdit('assetGroup')}">
+            <p:selectOneMenu id="assetGroup" value="#{assetInfoBulkEditController.selected.assetGroup}"  disabled="#{!assetInfoBulkEditController.needEdit('assetGroup') || userContextService.enableAssetGroupAssetTypeGroupAssociation()}">
                 <p:ajax  listener="#{assetInfoBulkEditController.onAssetGroupChange()}" update="@(.assetGroupChange)" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -150,8 +150,32 @@
 
         </h:panelGroup>
     </c:if>
+<!--    巡检负责人-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'patrolInspectionOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerName}</label>
+            <p:autoComplete id="patrolInspectionOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['patrolInspectionOwnerName']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('patrolInspectionOwnerName')}"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
 
-
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'patrolInspectionOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerTel}</label>
+            <p:inputText id="patrolInspectionOwnerTel" value="#{assetInfoBulkEditController.selected.patrolInspectionOwnerTel}"
+                         readonly="true" class="patrolInspectionOwnerName"/>
+        </h:panelGroup>
+    </c:if>
     <!--计量负责人-->
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measuringOwner')}" >
         <h:panelGroup >
@@ -890,7 +914,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
             <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoBulkEditController.customConfig.assetFields['assetTypeGroup'].required}"
-                                 updateAfterClinicalDeptChange="clinicalDeptNameChange"
+                                 updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''}"
                                  disabled="#{!assetInfoBulkEditController.needEdit('assetTypeGroup')}"/>
 
         </h:panelGroup>

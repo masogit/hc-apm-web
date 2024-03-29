@@ -37,7 +37,8 @@ public class HisAdministrativeOffices implements Serializable {
     @Column(name = "is_matched")//辅助字段，是否匹配过,默认是false
     private Boolean isMatched;
 
-
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;

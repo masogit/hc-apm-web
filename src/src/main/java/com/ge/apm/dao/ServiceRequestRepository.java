@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_ServiceRequest> {
@@ -42,5 +43,7 @@ public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_Servi
     @Query(nativeQuery = true, value = "SELECT id FROM asset_info WHERE clinical_dept_name=?1 and hospital_id=?2 and site_id=?3")
     List<Integer> getAssetInfoByClinicalDeptName(String clinicalDeptName, Integer hospitalId, Integer siteId);
 
-    Page<ServiceRequestProjection> findProjectionByAssetId(Integer assetId, Pageable pr);
+    Page<ServiceRequestProjection> findProjectionByAssetIdIn(Collection<Integer> assetIds, Pageable pr);
+
+    public V2_ServiceRequest findBySrNum(String srNum);
 }

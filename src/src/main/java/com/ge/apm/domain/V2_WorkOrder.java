@@ -393,7 +393,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public int getBusinessType() {
         return  ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT;
     }
+    @Override
+    public String getAssetType() {
+        if (null != assetInfo) {
+            return assetInfo.getAssetType();
+        }
+        return null;
+    }
 
+    @Override
+    public AssetInfo getApprovalAssetInfo() {
+        if (null != assetInfo) {
+            return assetInfo;
+        }
+        return null;
+    }
     public Integer getDispatchMode() {
         return dispatchMode;
     }

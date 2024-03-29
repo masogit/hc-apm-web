@@ -304,9 +304,26 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 
+	@Deprecated
 	public void updateNurseSiteMaintainConfigPyCode() {
 		new Thread(() -> adminConsoleService.updateNurseSiteMaintainConfigPyCode()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void batchActiveDigitalAssetStaff() {
+		new Thread(() -> adminConsoleService.batchActiveDigitalAssetStaff()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void batchMultiLevelApprovalConfig() {
+		new Thread(() -> adminConsoleService.batchMultiLevelApprovalConfig()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void batchUpdatePmRuleBlob() {
+		new Thread(() -> adminConsoleService.batchUpdatePmRuleBlob()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
 
 }

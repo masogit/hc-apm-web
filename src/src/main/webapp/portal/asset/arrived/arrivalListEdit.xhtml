@@ -853,14 +853,14 @@
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display1" >
                     <label class="label">#{msg.SelectExportTemplate}</label>
-                    <p:selectOneMenu  value="#{assetInfoListController.exportQrCodeTemplateId}">
+                    <p:selectOneMenu  value="#{assetArrivedListEditController.exportQrCodeTemplateId}">
                         <p:ajax update="preview" />
                         <f:selectItem itemLabel="#{msg.TemplateUsedbyDefault}" itemValue="#{null}" noSelectionOption="true" />
-                        <f:selectItems value="#{assetInfoListController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                        <f:selectItems value="#{assetArrivedListEditController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">
-                        <h:panelGroup rendered="#{not empty assetInfoListController.exportQrCodeTemplateId}">
-                            <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoListController.exportQrCodeTemplateId,'')}" />
+                        <h:panelGroup rendered="#{not empty assetArrivedListEditController.exportQrCodeTemplateId}">
+                            <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetArrivedListEditController.exportQrCodeTemplateId,'')}" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>

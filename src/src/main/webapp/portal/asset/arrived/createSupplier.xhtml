@@ -6,14 +6,16 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
-              draggable="true" appendTo="@this" header="#{msg.Supplier}">
+              draggable="true" appendTo="@this" header="#{assetArrivedListEditController.createTpyeName}">
         <h:form id="SupplierEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                     <h:panelGroup>
                         <label class="label">#{msg.name}*</label>
                         <p:inputText id="name" value="#{assetArrivedListEditController.newSupplier.name}"
-                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                            <p:ajax event="blur" listener="#{assetArrivedListEditController.onBlur}" update=":SupplierEditForm"/>
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.city}</label>

@@ -15,10 +15,10 @@ import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.view.SparePart.OrderNumberGenerator;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
@@ -30,6 +30,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,7 +48,6 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.DbMessageSource;
 
-import javax.faces.application.FacesMessage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -182,6 +182,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private BudgetApplicationRepository budgetApplicationRepository;
+
+	@Autowired
+	private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
+
+	@Autowired
+	private UaaService uaaService;
+
+	@Autowired
+	AssetTypeGroupRepository assetTypeGroupDao;
 
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
 	private String baseURL;
@@ -1429,6 +1438,33 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		adminFeatureActiveRepository.save(waitSaveActiveHospital);
 	}
 
+	public void batchActiveDigitalAssetStaff() {
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		String featureKey = ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name();
+		tenantInfos.forEach(tenantInfo -> {
+			List<AdminFeatureActive> waitList = new ArrayList<>();
+			if (BooleanUtils.isTrue(tenantInfo.getIsEnabled())) {
+				List<OrgInfo> hospitals = orgInfoRepository.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
+				hospitals.forEach(info -> {
+					if (info.getOrgLevel() == 2) {
+						Set<String> features = adminFeatureActiveRepository.findByHospitalUID(info.getUid()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
+						if (!features.contains(featureKey)) {
+							AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+							adminFeatureActive.setFeatureKey(featureKey);
+							adminFeatureActive.setHospitalUID(info.getUid());
+							adminFeatureActive.setTenantUID(info.getTenantUID());
+							adminFeatureActive.setActiveRole(ApmSystemRole.SuperAdmin.name());
+							adminFeatureActive.setCreateDate(new Date());
+							adminFeatureActive.setActiveDate(new Date());
+							waitList.add(adminFeatureActive);
+						}
+					}
+				});
+				adminFeatureActiveRepository.save(waitList);
+			}
+		});
+	}
+
 	private void buildActiveFeatureByHospitalUid(String uid, List<AdminFeatureActive> waitSave, String featureKey) {
 		OrgInfo info = orgInfoRepository.getByUid(uid);
 		if (info.getOrgLevel() == 2) {
@@ -1454,5 +1490,96 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				nurseSiteMaintainConfigRepository.save(v);
 			}
 		});
+	}
+
+    public void batchMultiLevelApprovalConfig() {
+
+		Iterable<MultiLevelApprovalConfig> configs = multiLevelApprovalConfigRepository.findAll();
+		List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup");
+
+		configs.forEach(config->{
+
+			String configration = config.getConfigration();
+			if (null != configration) {
+				Map map = JSON.parseObject(configration, Map.class);
+				config.setMinAmount((Integer) map.get("minAmount"));
+				config.setMaxAmount((Integer) map.get("maxAmount"));
+				config.setSelectAssetTypes((List<String>) map.get("selectAssetTypes"));
+				config.setSelectAssetGroups((List<String>) map.get("selectAssetGroups"));
+				config.setSelectAssetClinicalDeptUids((List<String>) map.get("selectAssetClinicalDeptUids"));
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetGroups())){
+					config.setSelectAssetGroups(assetGroup.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList()));
+				}
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetClinicalDeptUids())){
+				  List<OrgInfo>	deptInfoList = uaaService.getClinicalDeptListBySiteUID(config.getHierOrgUid());
+				  if(!CollectionUtils.isEmpty(deptInfoList)){
+				  	config.setSelectAssetClinicalDeptUids(deptInfoList.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
+				  }
+				}
+
+				if(CollectionUtils.isEmpty(config.getSelectAssetTypes())){
+					List<AssetTypeGroup> resultList = assetTypeGroupDao.getTopAuthGroupAndTenantUid(config.getTenantUID());
+					if(!CollectionUtils.isEmpty(resultList)){
+						config.setSelectAssetTypes(resultList.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList()));
+					}
+				}
+			}
+			Map<String, Object> map = new HashMap();
+			map.put("minAmount", config.getMinAmount());
+			map.put("maxAmount", config.getMaxAmount());
+			map.put("selectAssetClinicalDeptUids", config.getSelectAssetClinicalDeptUids());
+			map.put("selectAssetGroups", config.getSelectAssetGroups());
+			map.put("selectAssetTypes", config.getSelectAssetTypes());
+			String newConfigration = JSON.toJSONString(map);
+			config.setConfigration(newConfigration);
+			multiLevelApprovalConfigRepository.save(config);
+
+		});
+
+	}
+
+	public void batchUpdatePmRuleBlob() {
+		List<PmOrderRule> pmRuleReports = pmOrderRuleRepository.findPmRuleReports();
+		Set<String> objectIds = pmRuleReports.stream().map(PmOrderRule::getReportStorageId).collect(Collectors.toSet());
+		List<V2_BlobObject> blobObjects = blobObjectRepository.findByObjectStorageIdIn(objectIds);
+		Map<String, List<V2_BlobObject>> blobMap = blobObjects.stream().collect(Collectors.groupingBy(V2_BlobObject::getObjectStorageId));
+		List<V2_BlobObject> saveList = ListUtil.newArrayList();
+		for (PmOrderRule pmRuleReport : pmRuleReports) {
+			List<V2_BlobObject> objects = blobMap.get(pmRuleReport.getReportStorageId());
+			if (ObjectUtil.isNotEmpty(objects)) {
+				V2_BlobObject blobObject = objects.get(0);
+				if (ObjectUtil.isNotEmpty(blobObject.getBoUuid())) {
+					V2_BlobObject newBlobObject = new V2_BlobObject();
+					BeanUtils.copyProperties(blobObject, newBlobObject);
+					newBlobObject.setId(null);
+					newBlobObject.setBoId(pmRuleReport.getId());
+					newBlobObject.setBoUuid(pmRuleReport.getUid());
+					newBlobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+					newBlobObject.setTenantUid(pmRuleReport.getTenantUID());
+					saveList.add(newBlobObject);
+				} else {
+					blobObject.setBoId(pmRuleReport.getId());
+					blobObject.setBoUuid(pmRuleReport.getUid());
+					blobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+					blobObject.setTenantUid(pmRuleReport.getTenantUID());
+					saveList.add(blobObject);
+				}
+			} else {
+				V2_BlobObject blobObject = new V2_BlobObject();
+				blobObject.setBoId(pmRuleReport.getId());
+				blobObject.setBoUuid(pmRuleReport.getUid());
+				blobObject.setBoType(V2_BlobObject.BO_TYPE_PM_RULE);
+				blobObject.setTenantUid(pmRuleReport.getTenantUID());
+				blobObject.setObjectStorageId(pmRuleReport.getReportStorageId());
+				blobObject.setCreatedBy("anonymousUser");
+				blobObject.setCreatedDate(new Date());
+				blobObject.setLastModifiedBy("anonymousUser");
+				blobObject.setLastModifiedDate(new Date());
+				saveList.add(blobObject);
+			}
+		}
+		blobObjectRepository.save(saveList);
 	}
 }

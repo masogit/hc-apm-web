@@ -31,6 +31,9 @@ public interface HisEquipmentSfxmMatchRepository extends GenericRepositoryUUID<H
     @Query("select o from HisEquipmentSfxmMatch o  where o.sfxmId in ?1 ")
     public List<HisEquipmentSfxmMatch> findBySfxmId(String sfxmIds);
 
+    @Query("select o from HisEquipmentSfxmMatch o  where o.sfxmId in ?1  and o.tenantUid=?2")
+    public List<HisEquipmentSfxmMatch> findBySfxmIdAAndTenantUid(String sfxmIds,String tenantUid);
+
     @Query("select o from HisEquipmentSfxmMatch o  where o.sfxmId in ?1 ")
     public List<HisEquipmentSfxmMatch> findHisEquipmentSfxmMatchBySfxmIds(List<String> sfxmIds);
 

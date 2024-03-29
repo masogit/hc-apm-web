@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
@@ -14,6 +15,7 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
 import com.ge.apm.service.asset.AssetLifecyleService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
@@ -115,12 +117,19 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     @Autowired
     private WxMessageService wxMessageService;
 
+    @Autowired
+    private AssetTypeGroupMapper assetTypeGroupMapper;
+    @Autowired
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    @Autowired
+    private BlobFileService blobService;
+
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
         logger.info("approvableTarget" + approvableTarget);
         BigDecimal totalPrice = approvableTarget.getTotalPriceToBigDecimal();
         MultiLevelApprovalConfig multiLevelApprovalConfig =
-                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice, approvalFlag);
+                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice, approvalFlag,approvableTarget);
         return multiLevelApprovalConfig;
     }
 
@@ -252,6 +261,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             this.sendWxMsg(paramList,message,"待审批",linkUrl);
                         }
+                        if(multiLevelApproval.getBusinessType()==ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT){
+                            mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),multiLevelApproval.getApprovalStatus());
+                        }
                         return multiLevel;
                     }
                 }
@@ -298,6 +310,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         multiLevelApproval.setApprovalIng(true);
         //更新审批数据
         multiLevelApprovalRepository.save(multiLevelApproval);
+        saveBlobFile(multiLevelApproval);
         //更新审批状态为不通过 业务状态为审批不通过
         List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
         //发起人UID
@@ -425,16 +438,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * 根据金额查询审批配置信息
      *
      */
-    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag) {
+    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag,ApprovableTarget approvableTarget) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID()));
         for (String orgUid : orgUidList) {
             MultiLevelApprovalConfig approveConfig = null;
             if (approvalFlag) {
-                approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount);
+                approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount,approvableTarget);
             } else {
-                approveConfig = getApproveConfigByOrgUidApprovalFlag(orgUid, busiType, amount);
+                approveConfig = getApproveConfigByOrgUidApprovalFlag(orgUid, busiType, amount,approvableTarget);
             }
             if (null != approveConfig) {
                 return approveConfig;
@@ -443,11 +456,18 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    MultiLevelApprovalConfig getApproveConfigByOrgUid(String orgUid, String busiType, BigDecimal amount) {
+    MultiLevelApprovalConfig getApproveConfigByOrgUid(String orgUid, String busiType, BigDecimal amount,ApprovableTarget approvableTarget) {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        boolean enableAssetType= user.isEnableAssetTypeGroup();
+
+        if(approvableTarget.getApprovalAssetInfo()!=null){
+            configList = filterConfigs(configList, approvableTarget, enableAssetType);
+        }
         if (null != configList && configList.size() > 0) {
             logger.info("多级审核  configList : " + configList.toString());
             if (ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT.equals(busiType)) {
@@ -459,11 +479,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    MultiLevelApprovalConfig getApproveConfigByOrgUidApprovalFlag(String orgUid, String busiType, BigDecimal amount) {
+    MultiLevelApprovalConfig getApproveConfigByOrgUidApprovalFlag(String orgUid, String busiType, BigDecimal amount,ApprovableTarget approvableTarget) {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean enableAssetType= user.isEnableAssetTypeGroup();
+        if(approvableTarget.getApprovalAssetInfo()!=null){
+            configList = filterConfigs(configList, approvableTarget, enableAssetType);
+        }
         if (null != configList && configList.size() > 0) {
             if (ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType)
                     || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType) ) {
@@ -473,6 +498,51 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
         return null;
+    }
+    public List<MultiLevelApprovalConfig> filterConfigs(List<MultiLevelApprovalConfig> configList, ApprovableTarget approvableTarget, boolean enableAssetType) {
+        List<MultiLevelApprovalConfig> collect = configList.stream()
+                .filter(config -> config.getConfigration() != null)
+                .map(config -> {
+                    Map<String, Object> map = JSON.parseObject(config.getConfigration(), Map.class);
+                    List<String> assetType = (List<String>) map.get("selectAssetTypes");
+                    List<String> selectAssetGroups = (List<String>) map.get("selectAssetGroups");
+                    List<String> selectAssetClinicalDeptUids = (List<String>) map.get("selectAssetClinicalDeptUids");
+                    if(CollectionUtils.isNotEmpty(assetType)){
+                        List<AssetTypeGroup> assetTypeByUids = assetTypeGroupMapper.getAssetTypeByUids(assetType);
+                        assetType=assetTypeByUids.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+                    }
+                    int matchCount = getMatchCount(approvableTarget, assetType, selectAssetGroups, selectAssetClinicalDeptUids, enableAssetType);
+
+                    // 返回包含原始对象和匹配数量的SimpleEntry
+                    return new AbstractMap.SimpleEntry<>(config, matchCount);
+                })
+                .filter(entry -> entry.getValue()!=  0) // 过滤掉不满足条件的项
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // 按照匹配数量从大到小排序（升序比较时交换两个参数的位置）
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+    private int getMatchCount(ApprovableTarget approvableTarget, List<String> assetType,
+                              List<String> selectAssetGroups, List<String> selectAssetClinicalDeptUids, boolean enableAssetType) {
+        // 如果至少有一个集合非空并且不包含对应的值，则返回0，表示不匹配
+        if ((CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && !selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()))
+                || (CollectionUtils.isNotEmpty(selectAssetGroups) && !selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())))
+                || (enableAssetType && CollectionUtils.isNotEmpty(assetType) && !assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType()))) {
+            return 0;
+        }
+
+        // 否则计算匹配的数量
+        int count = 0;
+        if (enableAssetType) {
+            count += CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(selectAssetGroups) && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(assetType) && assetType.contains(approvableTarget.getApprovalAssetInfo().getAssetType()) ? 1 : 0;
+        } else {
+            count += CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && selectAssetClinicalDeptUids.contains(approvableTarget.getApprovalAssetInfo().getClinicalDeptUID()) ? 1 : 0;
+            count += CollectionUtils.isNotEmpty(selectAssetGroups) && selectAssetGroups.contains(String.valueOf(approvableTarget.getApprovalAssetInfo().getAssetGroup())) ? 1 : 0;
+        }
+        return count;
     }
 
     //获取备件库存审批流
@@ -518,6 +588,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     public List<MultiLevelApproval> getMultiLevelApproval(MultiLevelApproval multiLevelApproval) {
         String approvalNumber = multiLevelApproval.getApprovalNumber();
         List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.getByApprovalNumberList(approvalNumber);
+        if(CollectionUtils.isNotEmpty(multiLevelApprovals)){
+            Set<String> collect = multiLevelApprovals.stream().map(MultiLevelApproval::getId).collect(Collectors.toSet());
+            List<V2_BlobObject> blobObjectsByBoUids = blobService.findBlobObjectsByBoUids(collect);
+            multiLevelApprovals.forEach(item->{
+                List<V2_BlobObject> blobList = blobObjectsByBoUids.stream().filter(blob -> blob.getBoUuid().equals(item.getId())).collect(Collectors.toList());
+                item.setAttachments(blobList);
+            });
+        }
         return multiLevelApprovals;
     }
 
@@ -569,6 +647,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(level);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
             if (level > 2) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
@@ -712,6 +791,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
                         }
+                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
                     } else {
                         com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel);
                         if (node != null) {
@@ -789,6 +869,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                     }
                 }
             }
+        }
+    }
+    private void saveBlobFile(MultiLevelApproval multiLevelApproval){
+        List<V2_BlobObject> blobObjects=null;
+        if(multiLevelApproval != null && !CollectionUtils.isEmpty(blobObjects = multiLevelApproval.getAttachments())){
+            blobService.saveBlobObject(blobObjects);
         }
     }
 
@@ -959,12 +1045,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                                 PurchaseOrderInfo.PURCHASESTEP.Complete.toString(),
                                                 PurchaseOrderInfo.PURCHASESTEPSTATUS.Complete.toString(),null,null);
                                     }
-                                    break;
-                                default:
-                                    //审批同意时 给审批人发送微信
                                     String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                                    this.sendWxMsg(paramList, message,"待审批",linkUrl);
+                                    try {
+                                        this.sendWxMsg(paramList, message,"待审批","");
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                     break;
+
                             }
                         }
                     }
@@ -994,6 +1082,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
             //设备科长(可见范围内包含该设备的所有医学工程处主任)
             List<UserAccount> userAccounts=userAccountRepository.findUserByClinicalDeptUID(assetInfo.getClinicalDeptUID(),"AssetHead");
+            if (userAccount.isEnableAssetTypeGroup()) {
+                // 已开启资产分类，需要过滤掉没有资产分类权限的人
+                if(StringUtils.isNotBlank(assetInfo.getAssetType())){
+                    List<String> userUidList = assetTypeGroupRepository.getUserUidListByEncoded(assetInfo.getAssetType());
+                    userAccounts = userAccounts.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+                }else{
+                    userAccounts=new ArrayList<>();
+                }
+
+            }
             //推送消息到临床(该工单的报修人)
             UserAccount user = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
             userAccounts.add(user);
@@ -1033,7 +1131,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         assetInfoDao.save(assetInfo);
 
         saveAssetHistoryIfUpdated(assetInfo);
-        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
     }
     public void saveAssetHistoryIfUpdated(AssetInfo newAsset) {
         MqContext mqContext = new MqContext();
@@ -1151,7 +1249,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
-    public void approveAdverseEvents(String token, AdverseEvents adverseEvents) {
+    public void approveAdverseEvents(String token, AdverseEvents adverseEvents, MultiLevelApproval multiLevelApproval) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
         HttpEntity<AdverseEvents> requestEntity = new HttpEntity<>(adverseEvents, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.APPROVE_ADVERSE_EVENTS);
@@ -1160,6 +1258,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             String message = responseMap.get("message").toString();
             throw new RuntimeException(message);
+        }else{
+            saveBlobFile(multiLevelApproval);
         }
     }
 
@@ -1235,6 +1335,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(returnLevel);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
             if (level > 0) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
@@ -1367,6 +1468,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             multiLevelApproval.setApprovalLevelNow(level);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
             //更新审批进度
 
                 if (null != list) {
@@ -1494,10 +1596,17 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(BigDecimal.ZERO);
         int applicationQuantitySumResult = 0;
         for(BudgetApplicationAsset curApplicationBudget:budgetApplicationAssets){
-            totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
-                    new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
-            applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
-                    0:curApplicationBudget.getConfirmQuantity();
+            if(curApplicationBudget.getConfirmAmount()==null && curApplicationBudget.getConfirmQuantity()==null){
+                totalAmount.set(totalAmount.get().add(curApplicationBudget.getOfflineApplicationAmount()==null?
+                        new BigDecimal(0):curApplicationBudget.getOfflineApplicationAmount()));
+                applicationQuantitySumResult += curApplicationBudget.getOfflineApplicationQuantity()==null?
+                        0:curApplicationBudget.getOfflineApplicationQuantity();
+            }else{
+                totalAmount.set(totalAmount.get().add(curApplicationBudget.getConfirmAmount()==null?
+                        new BigDecimal(0):curApplicationBudget.getConfirmAmount()));
+                applicationQuantitySumResult += curApplicationBudget.getConfirmQuantity()==null?
+                        0:curApplicationBudget.getConfirmQuantity();
+            }
         }
         purchaseOrderInfoV.setTotalPrice(totalAmount.get());
         purchaseOrderInfoV.setPurchaseQuantity(applicationQuantitySumResult);

@@ -32,7 +32,7 @@
                 </p:fieldset>
 
                 <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" legend="#{msg.EquipmentSelection}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup  >
                         <!--设备分类-->
                         <label class ="label">#{msg.assetGroup}</label>
@@ -69,6 +69,14 @@
                                 <f:selectItems value="#{assetSubscriberController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.measuringItemCategory}</label>
+                            <p:selectOneMenu id="measuringItemCategory" value="#{assetSubscriberController.queryAsset1.measuringItemCategory}">
+                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                 </p:panelGrid>
                     <!--<h:panelGroup gaolei>-->
                 <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
@@ -86,6 +94,9 @@
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.clinicalDeptName}" />
                     </p:column>
+                    <!--<p:column style="float: left;width:30%;">
+                        <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
+                    </p:column>-->
                     <!--<p:column>
                         <h:outputText value="#{item.functionType}" />
                     </p:column>-->

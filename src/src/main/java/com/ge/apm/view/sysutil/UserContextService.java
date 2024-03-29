@@ -10,16 +10,14 @@ import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.web.cboard.CBoardController;
-import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
-import com.ge.healthcare.cn.common.cons.ApmFeature;
-import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.*;
 import com.google.common.base.Strings;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,11 +63,12 @@ public class UserContextService implements Serializable {
     private Set<ApmSystemRole> apmSystemRoles = null;
     private Set<String> apmFeatures = null;
     private Map<String, Boolean> adminActive = null; //单独激活项
-    private Boolean activeSupplierFlag = null;
+    private Boolean enableMaterialsInterfaceFlag = null;
     private String selectedSiteUid;
     private Boolean flagIsUltraSoundTenant = null;
     private Boolean flagIsAgentTenant = null;
     private Boolean flagIsHospitalUser = null;
+    private Boolean enableAssetGroupAssetTypeGroupAssociation = null;// 开启资产分类是否关联设备分类
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
@@ -260,6 +259,16 @@ public class UserContextService implements Serializable {
 
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
+    }
+
+    public List<String> menuOrder() {
+        List<String> defaultMenuOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
+        if (getTenantInfo().getEnablesMenuOrder()) {
+            defaultMenuOrder = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class)
+                    .stream().filter(defaultMenuOrder::contains)
+                    .collect(Collectors.toList());
+        }
+        return defaultMenuOrder;
     }
 
     public boolean accessContainsFunctionMenu(String functionName) {
@@ -560,6 +569,7 @@ public class UserContextService implements Serializable {
                 }
             } else {
                 Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> apmFeatures.contains(v.name())).forEach(v -> adminActive.put(v.name(), Boolean.TRUE));
+                adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
             }
             CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
@@ -916,11 +926,28 @@ public class UserContextService implements Serializable {
     }
     public String isActive(){
         UserAccount currentUser = getLoginUser();
-        if(!currentUser.getIsActive() && currentUser.getId() != 0){
-            return "1";//need active
-        }else {
+        if((!currentUser.getIsActive() && currentUser.getId() != 0)){
+            return "1";//need active user
+        } else {
             return "0";
         }
+    }
+
+    public String isActiveNew(){
+        UserAccount currentUser = getLoginUser();
+        // 忽略智康宝
+        if (isZkbAccount()) {
+            return "0";
+        }
+        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() >= 2 && !canRender(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name())) {
+            return "1";//need active DIGITAL_MEDICAL_ENGINEERING
+        } else {
+            return "0";
+        }
+    }
+
+    public void afterActiveDigital() {
+        adminActive.put(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING.name(), Boolean.TRUE);
     }
 
     /* 
@@ -1343,22 +1370,49 @@ public class UserContextService implements Serializable {
     }
 
     /**
-     * 判断租户是否已激活供应商
+     * 判断租户是否启用物资接口
      * @return
      */
-    public boolean activeSupplier(){
-        if(activeSupplierFlag == null){
-            activeSupplierFlag = Boolean.FALSE;
+    public boolean enableMaterialsInterface(){
+        if(enableMaterialsInterfaceFlag == null){
+            enableMaterialsInterfaceFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
-            ConfigService configService = WebUtil.getBean(ConfigService.class);
-            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
-            if (BooleanUtils.isTrue(configBySite.getActiveSupplier())) {
-                activeSupplierFlag = Boolean.TRUE;
-            }
+            String enableMaterialsInterface = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableMaterialsInterface");
+            enableMaterialsInterfaceFlag=Boolean.TRUE.toString().equalsIgnoreCase(enableMaterialsInterface);
         }
-        return activeSupplierFlag;
+
+        return enableMaterialsInterfaceFlag;
     }
 
+    /**
+     *  资产分类是否关联设备分类
+     * @return
+     */
+    public boolean enableAssetGroupAssetTypeGroupAssociation(){
+        if(enableAssetGroupAssetTypeGroupAssociation == null){
+            enableAssetGroupAssetTypeGroupAssociation = Boolean.FALSE;
+            UserAccount user = getCurrentUserAccount();
+            String enableAssetGroup = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableAssetGroupAssetTypeGroupAssociation");
+            enableAssetGroupAssetTypeGroupAssociation=Boolean.TRUE.toString().equalsIgnoreCase(enableAssetGroup);
+        }
+
+        return enableAssetGroupAssetTypeGroupAssociation;
+    }
+
+    /**
+     *  通过key获取指定的配置
+     * @param key
+     * @return
+     */
+    public String getConfigItemValue(String key){
+            UserAccount user = getCurrentUserAccount();
+            String value = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), key);
+            return value;
+    }
+    public boolean activeSupplier(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
+    }
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
         RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
         return roleMsgRelRepository.getRoleMsgRels(userId);
@@ -1531,6 +1585,11 @@ public class UserContextService implements Serializable {
         Set<ApmFunction> apmFunctions = new HashSet<>();
         getInitFeature().forEach(f -> apmFunctions.addAll(f.getFunctionList()));
         return apmFunctions;
+    }
+
+    public boolean isEnableBtnByKey(String key) {
+        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+        return BooleanUtils.isFalse(configItemService.getConfigItemByKey(key, getLoginUser()));
     }
 
     public OrgInfo getSelectSiteSchedule() {

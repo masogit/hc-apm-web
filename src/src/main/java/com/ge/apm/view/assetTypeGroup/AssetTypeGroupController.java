@@ -2,17 +2,18 @@ package com.ge.apm.view.assetTypeGroup;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetTypeGroupRepository;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.UserAssetGroupRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.AssetTypeGroup;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.assetTypeGroup.AssetTypeService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Data;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -20,7 +21,9 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -30,6 +33,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
 
     private AssetTypeGroupRepository authGroupDao;
     private AssetTypeGroupService assetTypeGroupService;
+    private ConfigItemValueRepository configItemValueRepository;
 
     private TreeNode assetTypeGroupTree;
     private TreeNode selectedAssetTypeGroupNodes;
@@ -43,6 +47,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
     private String namePath;
     private String encoded;
     private String classificationCode;
+    private Integer oldAssetGroup;
 
     boolean createTopLevelNode=false;
 
@@ -51,6 +56,8 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
     private AssetInfoRepository assetInfoRepository;
 
     private UserAssetGroupRepository userAssetGroupDao;
+
+    List<ConfigItemValue> configItemValueList;
 
     private String  isReadOnly=null;
 
@@ -78,6 +85,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         authGroupDao = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetInfoRepository=WebUtil.getBean(AssetInfoRepository.class);
         userAssetGroupDao=WebUtil.getBean(UserAssetGroupRepository.class);
+        configItemValueRepository=WebUtil.getBean(ConfigItemValueRepository.class);
         buildOrdTree();
     }
 
@@ -100,6 +108,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         classificationCode=selected.getClassificationCode();
         encoded=selected.getEncoded().trim();
         parentUid=selected.getParentUid();
+        oldAssetGroup = selected.getAssetGroup();
         if(selected.getParentUid() != null) {
             namePath=authGroupDao.listAssetTypeGroupNamePathInHierarchy(selected.getParentUid());
         }else {
@@ -149,6 +158,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
                 selected.setClassificationCode(classificationCode);
                 authGroupDao.save(selected);
                 buildOrdTree();
+                syncAssetGroup();
                 return;
             }
         }
@@ -204,7 +214,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         uid=selected.getUid();
         classificationCode=selected.getClassificationCode();
         encoded=selected.getEncoded()==null ? "" : selected.getEncoded().trim();
-        List<AssetInfo> assetInfos=assetInfoRepository.findByAssetType(uid);
+        List<AssetInfo> assetInfos=assetInfoRepository.findByAssetType(encoded);
         if(assetInfos.size()>=1){
             WebUtil.addErrorMessage(name + "已绑定资产");
             return;
@@ -233,6 +243,28 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         classificationCode=null;
     }
 
+    public void syncAssetGroup(){
+        Integer newAssetGroup = selected.getAssetGroup();
+        String tenantUid = selected.getTenantUid();
+        String encoded = selected.getEncoded();
+        if(oldAssetGroup != null && newAssetGroup != null && !oldAssetGroup.equals(newAssetGroup)){
+            List<ConfigItemValue> enableAssetGroupAssetType = getConfigItemValue(tenantUid, "enableAssetGroupAssetTypeGroupAssociation");
+            List<String> siteUids = enableAssetGroupAssetType.stream().map(ConfigItemValue::getSiteUid).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(siteUids)){
+                assetInfoRepository.batchUpdateAssetInfoAssetGroup(newAssetGroup,tenantUid,encoded,siteUids);
+            }
+        }
+    }
 
+    private List<ConfigItemValue> getConfigItemValue(String tenantUid, String key) {
+        if(CollectionUtils.isEmpty(configItemValueList)){
+            List<SearchFilter> searchFilters=new ArrayList<>();
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,tenantUid));
+            searchFilters.add(new SearchFilter("value", SearchFilter.Operator.EQ,"true"));
+            searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ,key));
+            configItemValueList = configItemValueRepository.findBySearchFilter(searchFilters);
+        }
+       return configItemValueList;
+    }
 
 }

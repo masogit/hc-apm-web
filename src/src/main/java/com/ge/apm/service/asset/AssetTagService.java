@@ -102,6 +102,9 @@ public class AssetTagService {
             if (null != queryAsset.getQrCode()) {
                 assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryAsset.getQrCode()));
             }
+            if (null != queryAsset.getMeasuringItemCategory()) {
+                assetFilters.add(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, queryAsset.getMeasuringItemCategory()));
+            }
             //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
             Pageable pageable = new PageRequest(0, 5000);
             Page page = assetDao.findBySearchFilter(assetFilters, pageable);

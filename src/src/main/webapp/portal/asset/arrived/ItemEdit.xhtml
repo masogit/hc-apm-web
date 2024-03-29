@@ -254,7 +254,7 @@
                                     <label class="label">#{msg.serialNum}<span style="color:red">#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired}" 
                                                  requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}">
-                                        <p:ajax process="@this" update="@this"/>
+                                        <p:ajax event="blur" listener="#{assetInstallationController.checkSerialNumExists}" process="@this" update="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
@@ -333,21 +333,32 @@
                                     </p:calendar>
                                 </h:panelGroup>
                             </c:if>
-                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['warrantyDate']}">
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['installDate']}">
                                 <h:panelGroup>
-                                    <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired? '*':''}</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
-                                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                                    <label class="label">#{msg.InstallDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" required="#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired}"
+                                                requiredMessage="#{msg.installDate} #{msg.ValidationRequire}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
+                                                valueChangeListener="#{assetInstallationController.installDateChange}">
+                                        <p:ajax event="dateSelect" process="@this" update="@this ItemEditDlgForm:factoryWarrantyDate"/>
                                         <p:ajax process="@this" update="@this"/>
                                     </p:calendar>
                                 </h:panelGroup>
                             </c:if>
-                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['installDate']}">
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['factoryWarrantyDate']}">
                                 <h:panelGroup>
-                                    <label class="label">#{msg.InstallDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired? '*':''}</span></label>
-                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" required="#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.installDate} #{msg.ValidationRequire}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                    <label class="label">#{msg.factoryWarrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['factoryWarrantyDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.factoryWarrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}"
+                                                requiredMessage="#{msg.factoryWarrantyDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:calendar>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['warrantyDate']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}"
+                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
                                         <p:ajax event="dateSelect" process="@this" update="@this"/>
                                         <p:ajax process="@this" update="@this"/>
                                     </p:calendar>
@@ -464,7 +475,7 @@
                                 <h:panelGroup >
                                     <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired? '*':''}</span></label>
                                     <apm:selectAssetTypeGroup readonly="true" required="#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired}"
-                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange"/>
+                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''}"/>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>

@@ -282,4 +282,10 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value = "WITH recursive t AS( ( SELECT * FROM org_info WHERE uid = ?1) UNION ALL ( SELECT org_info.* FROM org_info JOIN t ON t.parent_uid = org_info.uid ) ) SELECT ua.* FROM t LEFT JOIN user_org uo ON uo.org_uid = t.uid LEFT JOIN user_account ua ON uo.user_uid = ua.uid  where ua.id is not null ", nativeQuery = true)
     List<UserAccount> findByClinicalDeptUID(String clinicalDeptUID);
 
+    UserAccount findByUid(String patrolInspectionOwnerUID);
+
+
+
+    @Query(value = "select * from user_account where tenant_uid=?1 and name=?2 and (is_deleted = false or is_deleted is null) ", nativeQuery = true)
+    List<UserAccount> findByTenantUIDAndNameAndValid(String tenantUID, String assetOwnerName);
 }

@@ -35,6 +35,7 @@ public interface HisEquipmentSfxmRepository extends GenericRepositoryUUID<HisEqu
     public void updateIsMatched(boolean is_matched, String id);
 
     HisEquipmentSfxm findBySfxmIdAndHosId(String sfxmId, String hosId);
+    HisEquipmentSfxm findBySfxmIdAndHosIdAndSiteUid(String sfxmId, String hosId,String siteUid);
 
 //    @Modifying
 //    @Transactional

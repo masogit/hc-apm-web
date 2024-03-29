@@ -1,6 +1,4 @@
-
 package com.ge.apm.view.budget;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
@@ -10,6 +8,7 @@ import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
+import com.ge.apm.service.budget.BudgetFileDynamicTemplate;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -30,10 +29,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -46,6 +42,7 @@ import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -76,6 +73,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
     private BlobFileService blobService;
+
     /**
      * 编辑数据主键
      */
@@ -95,6 +93,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private BudgetApplicationRepository dao;
     private BudgetAssetInfoRepository budgetAssetDao;
     private BlobObjectRepository blobObjectRepository;
+    private OrgInfoRepository orgDao;
 
     private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
 
@@ -111,6 +110,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private OrgInfo org;
     @Getter  @Setter
     private TreeNode orgTree;
+    @Getter  @Setter
+    private TreeNode orgImportTree;
     @Getter  @Setter
     private TreeNode orgTreeEdit;
     @Getter  @Setter
@@ -131,13 +132,15 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
-        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        TreeNode treeNodeImport = uaaService.getOrgTreeByParentIdWithSelectedChildren(account.getSiteUID(), account.getUid());
+        orgImportTree = initOrgTree(treeNodeImport);
         orgTree = initOrgTree(treeNode);
-        orgTreeEdit = initOrgTree(treeNodeEdit);
+        orgTreeEdit = initOrgTree(treeNodeEdit);  //
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
         this.editId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "editId");
         attachList = new ArrayList<>();
@@ -215,6 +218,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_ASSET_STAFF)
                 || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
                 ||userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
             this.searchFilters = this.getSearchFilter(this.tabIndex);
@@ -261,7 +265,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
 
-        // 临床科室主任, 医学工程处主任   // 临床科室人员
+        // 临床科室主任, 医学工程处主任  工程师   // 临床科室人员
         queryByUserRole(org);
         return searchFilters;
     }
@@ -416,6 +420,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             updateSearchFilter(new SearchFilter("applicationAssetName", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
         }
     }
+
     private void queryByUserRole(OrgInfo org){
         if(org == null) return;
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
@@ -443,7 +448,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
                     // 租户
                     searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
             }
-        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+        } else {
             searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
         }
     }
@@ -452,8 +457,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setApplicationAmount(budgetApplicationAsset.getApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getApplicationQuantity());
         }
     }
 
@@ -462,8 +467,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             budgetApplicationAsset.setOfflineApplicationAmount(budgetApplicationAsset.getOfflineApplicationPrice()
                     .multiply(new BigDecimal(budgetApplicationAsset.getOfflineApplicationQuantity()))
                     .setScale(2, RoundingMode.HALF_UP));
-            budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
-            budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
+            //budgetApplicationAsset.setConfirmPrice(budgetApplicationAsset.getOfflineApplicationPrice());
+            //budgetApplicationAsset.setConfirmQuantity(budgetApplicationAsset.getOfflineApplicationQuantity());
         }
     }
 
@@ -659,4 +664,74 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         }
         return render;
     }
+
+    /**  **************************批量导入************************** **/
+    @Getter  @Setter
+    private OrgInfo selectedImportOrg;
+    @Getter  @Setter
+    private String selectedImportOrgName;
+    @Getter  @Setter
+    private UploadedFile file;
+    @Getter  @Setter
+    private List<BudgetApplication> errorImportList;
+    @Getter  @Setter
+    private StreamedContent budgetTemplateFile;
+
+    public void handleFileUploadImport(FileUploadEvent event) throws IOException, ParseException, NoSuchFieldException, IllegalAccessException {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.file = event.getFile();
+        if(this.selectedImportOrg==null){
+            WebUtil.addErrorMessage("请先选择所属院区！",null);
+            return;
+        }
+        errorImportList = persistService.handleExcel(file, account,selectedImportOrg,BudgetApplication.OrderType.BAP.toString());
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void exportBudgetExcelTemplate() throws IOException {
+        List<OrgInfo> orgList = new ArrayList<OrgInfo>();
+        if(this.selectedImportOrg != null){
+            orgList = orgDao.findBySiteUIDAndOrgType(this.selectedImportOrg.getUid(), 4);
+        }
+        BudgetFileDynamicTemplate template = new BudgetFileDynamicTemplate();
+        template.exportSampleAsset(orgList);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        budgetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "Budget_Import_Template.xlsx");
+        logger.info(" export budget excel template successful. ");
+    }
+
+    public List<BudgetApplication> getErrorImportList() {
+        return errorImportList;
+    }
+
+    /**
+     * 编辑区域部门选择
+     * @param event
+     */
+    public void onSelectedImportTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        this.setSelectedImportOrgName(orgInfo.getName());
+        this.setSelectedImportOrg(orgInfo);
+    }
+
+    /**
+     * 删除按钮
+     * @param
+     */
+    public boolean deleteButtonStatus() {
+        boolean args = true;
+        if(this.selected != null &&
+                (this.selected.getApplicationStatus() == 1||
+                        ("EXCEL_IMPORT".equals(this.selected.getDataSource()) && ("Unpurchased".equals(this.selected.getProcureStatus()))))){
+            args = false;
+        }
+        return args;
+    }
+    /**  **************************批量导入**************************           **/
+
 }

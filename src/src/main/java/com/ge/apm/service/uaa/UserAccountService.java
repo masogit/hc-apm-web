@@ -91,6 +91,9 @@ public class UserAccountService {
 	@Autowired
 	UserAssetGroupRepository userAssetGroupDao;
 
+	@Autowired
+	private SiteToSiteAllocationRepository siteToSiteAllocationRepository;
+
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 	public List<UserAccount> getUserAccount() {
@@ -418,8 +421,29 @@ public class UserAccountService {
 		existSubscribeMessages(selected,result);
 		isPersonLiable(selected,result);
 		existWorkflowConfigPersonLiable(selected,result);
+		existSiteToSiteAllocation(selected,result);
 		logger.info("该用户为设备类型负责人,result:{}", JSONObject.toJSONString(result));
 		return result;
+	}
+	private void existSiteToSiteAllocation(UserAccount selected,List<String> result){
+		String uid = selected.getUid();
+		List<SearchFilter> searchFilters=new ArrayList<>();
+		searchFilters.add(new SearchFilter("borrowerUid", SearchFilter.Operator.EQ,uid,"1*2+"));
+		searchFilters.add(new SearchFilter("returnerUid", SearchFilter.Operator.EQ,uid,"1*2+"));
+		List<SiteToSiteAllocation> siteToSiteAllocations = siteToSiteAllocationRepository.findBySearchFilter(searchFilters);
+		if(CollectionUtils.isNotEmpty(siteToSiteAllocations)){
+			boolean exist = siteToSiteAllocations.stream().anyMatch(item -> {
+				if (item.getReturnAt() == null) {
+					return Boolean.TRUE;
+				} else {
+					return (StringUtils.isEmpty(item.getReturnerAck()) || StringUtils.isEmpty(item.getReceiverSignatureStorageId()) || StringUtils.isEmpty(item.getReturnerSignatureStorageId()));
+				}
+			});
+			if(exist){
+				result.add("用户有未完成的院间借调工单，禁止删除！");
+			}
+		}
+
 	}
 	private void  existWorkflowConfigPersonLiable(UserAccount selected,List<String> result){
 		// TODO

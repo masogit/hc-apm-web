@@ -47,6 +47,8 @@ public class HisAssetService {
             match.setKsbm(source.getClinicalDeptUID());
             match.setKsName(source.getClinicalDeptName());
             match.setCreateDate(new Date());
+            match.setTenantUid(connect.getTenantUid());
+            match.setSiteUid(connect.getSiteUid());
             matchs.add(match);
         }
         matchDao.save(matchs);
@@ -62,7 +64,8 @@ public class HisAssetService {
         hisAdjustBusinessJob.setTaskStatus(0);
         hisAdjustBusinessJob.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
         hisAdjustBusinessJob.setCreatedDate(new Date());
-
+        hisAdjustBusinessJob.setTenantUid(equipmentMatch.getTenantUid());
+        hisAdjustBusinessJob.setSiteUid(equipmentMatch.getSiteUid());
 
         hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
 

@@ -32,7 +32,7 @@
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
-                                <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update="orgTree editPanel :growl"/>
+                                <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update=":editForm:orgTree :editPanel :growl"/>
                             </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
@@ -45,7 +45,7 @@
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single" selection="#{orgInfoController.selectedNode}" highlight="true">
-                                    <p:ajax process="@this" event="select" listener="#{orgInfoController.onSelectTreeNode}" update=":editForm:editPanel"/>
+                                    <p:ajax process="@this" event="select" listener="#{orgInfoController.onSelectTreeNode}" update=":editPanel"/>
 
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node.shortName}"/>
@@ -55,15 +55,16 @@
                             </p:scrollPanel>
                         </div>
                     </div>
-
+                </h:form>
+                <h:form id="editPanel">
                     <div class="ui-g-12 ui-lg-8">
                         <div class="card" style="height:400px;">
-                            <h:panelGroup id="editPanel">
+                            <h:panelGroup >
                                 <h:panelGrid columns="8">
-                                    <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Institution}" actionListener="#{orgInfoController.prepareCreateInstitution}" update=":editForm:editPanel"/>
-                                    <p:commandButton id="createHospital" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Hospital}" actionListener="#{orgInfoController.prepareCreateHospital}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateHospitalDisabled}"/>
-                                    <p:commandButton id="createSite" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Site}" actionListener="#{orgInfoController.prepareCreateSite}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateSiteDisabled}"/>
-                                    <p:commandButton id="createDept" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Department}" actionListener="#{orgInfoController.prepareCreateDepartment}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateDepartmentDisabled}"/>
+                                    <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Institution}" actionListener="#{orgInfoController.prepareCreateInstitution}" update=":editPanel"/>
+                                    <p:commandButton id="createHospital" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Hospital}" actionListener="#{orgInfoController.prepareCreateHospital}" update=":editPanel" disabled="#{orgInfoController.isCreateHospitalDisabled}"/>
+                                    <p:commandButton id="createSite" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Site}" actionListener="#{orgInfoController.prepareCreateSite}" update=":editPanel" disabled="#{orgInfoController.isCreateSiteDisabled}"/>
+                                    <p:commandButton id="createDept" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Department}" actionListener="#{orgInfoController.prepareCreateDepartment}" update=":editPanel" disabled="#{orgInfoController.isCreateDepartmentDisabled}"/>
                                     <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update=":editForm" oncomplete="deleteAfter();" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
@@ -142,7 +143,7 @@
                                     </h:panelGroup>
                                     <br/>
                                     <p:spacer></p:spacer>
-                                    <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
+                                    <p:commandButton style="width: 90px;margin-top: -10px;" process=":editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update=":editForm:orgTree :editPanel :growl"/>
                                     <h:inputHidden id="failureType" value="#{orgInfoController.failureType}"/>
                                 </p:panelGrid>
 
