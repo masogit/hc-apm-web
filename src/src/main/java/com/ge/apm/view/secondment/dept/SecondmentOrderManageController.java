@@ -364,6 +364,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         SecondmentOrderDto  selectAssetOrder= (SecondmentOrderDto) eventObject;
+        selectAssetOrder.setBorrowDeptUid(secondmentOrderDtoTemp.getBorrowDeptUid());
         this.selected = selectAssetOrder;
 //        serializationConfiguration();
 //        if(!secondmentOrderDtoTemp.getAssetUid().equals(selectAssetOrder.getAssetUid())){
@@ -394,5 +395,24 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
 
     public void setSecondmentOrderDtoTemp(SecondmentOrderDto secondmentOrderDtoTemp) {
         this.secondmentOrderDtoTemp = secondmentOrderDtoTemp;
+    }
+
+    public String conversionTime(Long billingTime){
+        StringBuilder result=new StringBuilder();
+        if(billingTime != null){
+            long day = 0;
+            long hour = 0;
+            long minute = 0;
+            if((day=billingTime / (24 * 60)) > 0){
+                result.append(day).append("天");
+            }
+            if((hour = billingTime % (24 * 60) / 60) > 0){
+                result.append(hour).append("小时");
+            }
+            if((minute = billingTime % (24 * 60) % 60) > 0){
+                result.append(minute).append("分钟");
+            }
+        }
+        return result.toString();
     }
 }

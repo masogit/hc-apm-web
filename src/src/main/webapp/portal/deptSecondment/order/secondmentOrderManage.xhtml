@@ -60,14 +60,20 @@
                                 <p:column headerText="#{msg.clinicalDeptName}" >
                                     <h:outputText value="#{secondmentOrderManageController.getBorrowDeptName(item.lendDeptUid)}"/>
                                 </p:column>
-                                <p:column headerText="使用科室" >
+                                <p:column headerText="借用科室" >
                                     <h:outputText value="#{secondmentOrderManageController.getBorrowDeptName(item.borrowDeptUid)}"/>
                                 </p:column>
                                 <p:column headerText="设备调剂状态"  filterMatchMode="EQ" filterBy="#{item.so.status}" >
                                     <f:facet name="filter">
                                         <p:selectOneMenu  onchange="PF('secondmentOrderManageList').filter()" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('borrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItem itemLabel="已拒绝"  itemValue="-2" />
+                                            <f:selectItem itemLabel="已取消"  itemValue="-1" />
+                                            <f:selectItem itemLabel="待同意"  itemValue="0" />
+                                            <f:selectItem itemLabel="待交付"  itemValue="1" />
+                                            <f:selectItem itemLabel="待归还"  itemValue="2" />
+                                            <f:selectItem itemLabel="已归还"  itemValue="3" />
+<!--                                            <f:selectItems value="#{fieldMsg.getFieldValueList('borrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status)}"/>

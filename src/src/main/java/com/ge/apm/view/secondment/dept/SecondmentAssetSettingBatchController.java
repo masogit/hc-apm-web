@@ -9,29 +9,36 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.view.nurseSite.AssetSelectController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.LazyDataModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
+import webapp.framework.web.mvc.GenericDataTableModel;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class SecondmentAssetSettingBatchController extends GenericCRUDController<AssetInfo>   {
+
+    private static final Logger log = LoggerFactory.getLogger(SecondmentAssetSettingBatchController.class);
 
     private UserAccountRepository userAccountRepository;
     private SecondmentConfigRepository secondmentConfigRepository;
@@ -45,7 +52,19 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private Map<String,I18nMessage> cacheChargingType;
     private List<UserAccount> userAccountList;
     private SecondmentConfig secondmentConfig ;
-    private List<AssetInfo> selectAsset ;
+    private List<AssetInfo> cacheDataTablePage;
+    private List<AssetInfo> cacheDataTablePage2;
+    private Map<String, Boolean> selectedAssetUidTable1;
+    private Set<AssetInfo> selectedAssetsed1;
+    private Boolean allSelected1 = Boolean.FALSE;
+
+    private Map<String, Boolean> selectedAssetUidTable2;
+    private Set<AssetInfo> selectedAssetsed2;
+    private Boolean allSelected2 = Boolean.FALSE;
+    private List<AssetInfo> selectAsset;
+
+    private LazyDataModel<AssetInfo> lazyModel2;
+
 
     @Override
     protected void init() {
@@ -58,6 +77,31 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
             searchFilters = new ArrayList<SearchFilter>();
         }
         initialization();
+        initLazyModel2();
+
+    }
+
+    private void initLazyModel2() {
+        lazyModel2 = new GenericDataTableModel<AssetInfo>() {
+            @Override
+            protected List<AssetInfo> load(PageRequest pageRequest) {
+                int size = selectAsset.size();
+                List<AssetInfo> result= new ArrayList<>();
+                int pageNumber = pageRequest.getPageNumber();
+                int pageSize = pageRequest.getPageSize();
+                int start = pageNumber * pageSize;
+                int end = (pageNumber+1) * pageSize;
+                for (;start< end;start++){
+                    if(start == size){
+                        break;
+                    }
+                    result.add(selectAsset.get(start));
+                }
+                cacheDataTablePage2 = result;
+                this.setRowCount(size);
+                return result;
+            }
+        };
     }
 
     private void initialization(){
@@ -69,13 +113,26 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         List<I18nMessage> chargingType = FieldValueMessageController.getFieldValueList("chargingType");
         cacheChargingType = chargingType.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, item -> item));
         userAccountList = userAccountRepository.getByTenantUID(userAccount.getTenantUID());
+        selectedAssetUidTable1= new HashMap<>();
+        selectedAssetsed1 = new HashSet<>();
+        allSelected1 = Boolean.FALSE;
+        selectedAssetUidTable2= new HashMap<>();
+        selectedAssetsed2 = new HashSet<>();
+        allSelected2 = Boolean.FALSE;
+
         selectAsset = new ArrayList<>();
         secondmentConfig = new SecondmentConfig();
     }
     @Override
     public void onBeforeNewObject(AssetInfo object) {
-            selectAsset = new ArrayList<>();
-            secondmentConfig = new SecondmentConfig();
+        selectedAssetUidTable1.clear();
+        selectedAssetsed1.clear();
+        allSelected1 = Boolean.FALSE;
+        selectedAssetUidTable2.clear();
+        selectedAssetsed2.clear();
+        allSelected2 = Boolean.FALSE;
+        selectAsset.clear();
+        secondmentConfig = new SecondmentConfig();
 
     }
 
@@ -87,10 +144,15 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         addFilter();
-        return super.loadData(pageRequest);
+        Page<AssetInfo> assetInfos = super.loadData(pageRequest);
+        cacheDataTablePage = assetInfos.getContent();
+        allSelected1 = Boolean.FALSE;
+        searchFilters.clear();
+        return assetInfos;
     }
 
     private void addFilter(){
+
         List<String> scope=new ArrayList<>();
         if(CollectionUtils.isEmpty(visibleScope)){
             scope.add("-1");
@@ -102,22 +164,14 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ,true));
         searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNull,null));
-
-
-    }
-    public void addSelectAsset(AssetInfo info){
-        if(!exist(info)){
-            selectAsset.add(info);
+        if(CollectionUtils.isNotEmpty(selectAsset)){
+            List<String> collect = selectAsset.stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN,collect));
         }
-        WebUtil.addSuccessMessage("设备： "+info.getName() +"已加入队列");
+
+
     }
-    public boolean exist(AssetInfo info){
-        return selectAsset.stream().anyMatch(item -> item.getUid().equals(info.getUid()));
-    }
-    public void unSelectAsset(AssetInfo info){
-        selectAsset = selectAsset.stream().filter(item-> !item.getUid().equals(info.getUid())).collect(Collectors.toList());
-        WebUtil.addSuccessMessage("设备： "+info.getName() +"已移除队列");
-    }
+
     @Override
     public void save() {
         try {
@@ -236,12 +290,142 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
             }
         }
     }
+    public void updateSelctedAssetList1(AjaxBehaviorEvent event) {
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+        if(box.isSelected()) {
+            selectedAssetsed1.add(asset);
+        } else {
+            selectedAssetsed1.remove(asset);
+        }
+        allSelected1=cacheDataTablePage.stream().allMatch(item->selectedAssetUidTable1.get(item.getUid()));
+    }
+    public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+        if(box.isSelected()) {
+            selectedAssetsed2.add(asset);
+        } else {
+            selectedAssetsed2.remove(asset);
+        }
+        allSelected2=cacheDataTablePage2.stream().allMatch(item->selectedAssetUidTable2.get(item.getUid()));
+    }
+    public void addAssetsOfCurrentPage1(AjaxBehaviorEvent event) {
+        log.debug("value of isAllSelected: {}", this.allSelected1);
+        if(allSelected1) {
+            cacheDataTablePage.stream().forEach(t -> {
+                selectedAssetUidTable1.put(t.getUid(), Boolean.TRUE);
+                selectedAssetsed1.add(t);
+            });
+        } else {
+            cacheDataTablePage.stream().forEach(t -> {
+                selectedAssetUidTable1.put(t.getUid(), Boolean.FALSE);
+                selectedAssetsed1.remove(t);
+            });
+        }
+        log.debug("size of selectedAssetUids: {}", selectedAssetUidTable1.size());
+    }
+    public void addAssetsOfCurrentPage2(AjaxBehaviorEvent event) {
+        log.debug("value of allSelected2: {}", this.allSelected2);
+        if(allSelected2) {
+            cacheDataTablePage2.stream().forEach(t -> {
+                selectedAssetUidTable2.put(t.getUid(), Boolean.TRUE);
+                selectedAssetsed2.add(t);
+            });
+        } else {
+            cacheDataTablePage2.stream().forEach(t -> {
+                selectedAssetUidTable2.put(t.getUid(), Boolean.FALSE);
+                selectedAssetsed2.remove(t);
+            });
+        }
+        log.debug("size of selectedAssetsed2: {}", selectedAssetUidTable2.size());
+    }
+    public void addCheckedDevice(){
+        for (AssetInfo assetInfo : selectedAssetsed1) {
+            boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+            if(!b){
+                selectAsset.add(assetInfo);
+            }
+        }
+        allSelected1 = Boolean.FALSE;
+        selectedAssetsed1.clear();
+        selectedAssetUidTable1.clear();
+    }
+    public void deleteCheckedDevice(){
+        for (AssetInfo assetInfo : selectedAssetsed2) {
+            boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+            if(b){
+                selectAsset.remove(assetInfo);
+            }
+        }
+        allSelected2 = Boolean.FALSE;
+        selectedAssetsed2.clear();
+        selectedAssetUidTable2.clear();
+    }
+    public void clearAll(){
+        selectAsset.clear();
+        allSelected1 = Boolean.FALSE;
+        selectedAssetsed1.clear();
+        selectedAssetUidTable1.clear();
+        allSelected2 = Boolean.FALSE;
+        selectedAssetsed2.clear();
+        selectedAssetUidTable2.clear();
 
-    public List<AssetInfo> getSelectAsset() {
-        return selectAsset;
     }
 
-    public void setSelectAsset(List<AssetInfo> selectAsset) {
-        this.selectAsset = selectAsset;
+    public Map<String, Boolean> getSelectedAssetUidTable1() {
+        return selectedAssetUidTable1;
+    }
+
+    public void setSelectedAssetUidTable1(Map<String, Boolean> selectedAssetUidTable1) {
+        this.selectedAssetUidTable1 = selectedAssetUidTable1;
+    }
+
+    public Set<AssetInfo> getSelectedAssetsed1() {
+        return selectedAssetsed1;
+    }
+
+    public void setSelectedAssetsed1(Set<AssetInfo> selectedAssetsed1) {
+        this.selectedAssetsed1 = selectedAssetsed1;
+    }
+
+    public Boolean getAllSelected1() {
+        return allSelected1;
+    }
+
+    public void setAllSelected1(Boolean allSelected1) {
+        this.allSelected1 = allSelected1;
+    }
+
+    public Map<String, Boolean> getSelectedAssetUidTable2() {
+        return selectedAssetUidTable2;
+    }
+
+    public void setSelectedAssetUidTable2(Map<String, Boolean> selectedAssetUidTable2) {
+        this.selectedAssetUidTable2 = selectedAssetUidTable2;
+    }
+
+    public Set<AssetInfo> getSelectedAssetsed2() {
+        return selectedAssetsed2;
+    }
+
+    public void setSelectedAssetsed2(Set<AssetInfo> selectedAssetsed2) {
+        this.selectedAssetsed2 = selectedAssetsed2;
+    }
+
+    public Boolean getAllSelected2() {
+        return allSelected2;
+    }
+
+    public void setAllSelected2(Boolean allSelected2) {
+        this.allSelected2 = allSelected2;
+    }
+
+    public LazyDataModel<AssetInfo> getLazyModel2() {
+        return lazyModel2;
+    }
+
+    public void setLazyModel2(LazyDataModel<AssetInfo> lazyModel2) {
+        this.lazyModel2 = lazyModel2;
     }
 }
