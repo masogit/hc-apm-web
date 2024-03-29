@@ -49,8 +49,8 @@
                             <p:inputText value="#{secondmentOrderAssetController.secondmentOrder.sparePartsRemark}"  />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">申请科室</label>
-                            <p:selectOneMenu  disabled="#{!secondmentOrderAssetController.chooseDept}" value="#{secondmentOrderAssetController.secondmentOrder.borrowDeptUid}">
+                            <label class="label">申请科室<span style="color:red">*</span></label>
+                            <p:selectOneMenu required="true" disabled="#{!secondmentOrderAssetController.chooseDept}" value="#{secondmentOrderAssetController.secondmentOrder.borrowDeptUid}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems  value="#{secondmentOrderAssetController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>

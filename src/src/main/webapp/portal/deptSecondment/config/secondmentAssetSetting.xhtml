@@ -33,14 +33,14 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50,100">
 
-                        <p:ajax event="rowSelect" update="editButton deleteButton" />
+                        <p:ajax event="rowSelect" update="editButton " />
                         <p:ajax event="filter" listener="#{secondmentAssetSettingController.onFilter}" update="datalist"/>
-                        <p:column exportable="false" width="100" headerText="操作">
+                        <p:column  exportable="false" width="100" headerText="操作" rendered="#{userContextService.hasAnyRoleByApmRoles('DeptHead')}">
                             <h:panelGroup >
-                                <p:commandButton id="cancel" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus != 0}" process="@this" title="取消调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,-1)}" update="datalist" icon="ui-icon-remove-circle-outline">
+                                <p:commandButton  id="cancel" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus == -1 || item.borrowedStatus == 1}" process="@this" title="取消调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,-1)}" update="datalist" icon="ui-icon-remove-circle-outline">
                                     <p:confirm header="取消调剂设备提醒" message="确定取消该设备调剂？" icon="ui-icon-alert"/>
                                 </p:commandButton>
-                                <p:commandButton id="restEnable" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus == 0}" process="@this" title="启用调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,0)}" update="datalist"  icon="ui-icon-play-circle-outline">
+                                <p:commandButton id="restEnable" style="zoom:0.80;" disabled="#{empty item.borrowConfigId || item.borrowConfigId eq '-1' || item.borrowedStatus == 0 || item.borrowedStatus == 1}" process="@this" title="启用调剂设备" actionListener="#{secondmentAssetSettingController.changeStatus(item,0)}" update="datalist"  icon="ui-icon-play-circle-outline">
                                     <p:confirm header="启用调剂设备提醒" message="确定启用该设备调剂？" icon="ui-icon-alert"/>
                                 </p:commandButton>
                             </h:panelGroup>
@@ -69,7 +69,7 @@
                         <p:column headerText="#{msg.clinicalDeptName}" >
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
-                        <p:column headerText="设备调剂状态" >
+                        <p:column headerText="设备调剂状态" filterBy="#{item.borrowedStatus}" filterMatchMode="EQ">
                             <f:facet name="filter" >
                                 <p:selectOneMenu onchange="PF('configEditList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
@@ -92,11 +92,11 @@
                                 <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
                             </p:commandButton>
                             <p:commandButton id="createButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-plus" actionListener="#{secondmentAssetSettingBatchController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}" update="assetSettingEditBatch" oncomplete="PF('assetSettingEditBatch').show()" />
-                            <p:commandButton id="editButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-settings" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="#{msg.Edit}"   oncomplete="PF('assetSettingEdit').show()"/>
+                            <p:commandButton id="editButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-settings" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="计费配置"   oncomplete="PF('assetSettingEdit').show()"/>
 
-                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="移除调剂设备"  update="datalist" >
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
+<!--                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="删除配置"  update="datalist" >-->
+<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+<!--                            </p:commandButton>-->
 
                         </f:facet>
                     </p:dataTable>
