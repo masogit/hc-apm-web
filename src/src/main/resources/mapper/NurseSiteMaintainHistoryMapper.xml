@@ -30,7 +30,7 @@
         <where>${ew.sqlSegment}</where>
     </select>
 
-    <select id="searchMaintainHistory" resultType="com.ge.apm.domain.NurseSiteMaintainHistory">
+    <select id="searchMaintainHistory" resultMap="maintainBean">
         select nsm.* from nurse_site_maintain_history nsm
         <where>
             <choose>
