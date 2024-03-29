@@ -33,6 +33,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.asset.AssetFileAttachmentController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.tools.FileObject;
@@ -239,6 +240,11 @@ public class BlobFileService {
 
     public List<V2_BlobObject> findBlobObjectsByBoUid(String uid){
         return blobDao.findByBoUuid(uid);
+    }
+    public List<V2_BlobObject> findBlobObjectsByBoUids(Set<String> uid){
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.IN,uid));
+        return blobDao.findBySearchFilter(searchFilters);
     }
 
     public Boolean deleteBlobFileById(String id){

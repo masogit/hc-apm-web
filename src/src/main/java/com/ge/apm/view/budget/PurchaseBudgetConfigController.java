@@ -3,31 +3,18 @@ package com.ge.apm.view.budget;
 import com.ge.apm.dao.PurchaseBudgetConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
-import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
-import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.service.constant.ApprovalConstant;
-import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -37,7 +24,7 @@ import java.util.*;
 
 /**
  * @author : 503189362
- * @date : 2023/10/12
+ * @date : 2023/10/12 man
  * @description :
  */
 @ViewScoped
@@ -71,6 +58,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
             searchFilters = new ArrayList<>();
         }
         updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
         if(StringUtils.isNotEmpty(searchForm.getYear())){
             updateSearchFilter(new SearchFilter("year", SearchFilter.Operator.LIKE, searchForm.getYear()));
         }
@@ -128,7 +116,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
             return;
         }
         if("Edit".equals(this.actionName)){
-            List<PurchaseBudgetConfig> olds = purchaseBudgetConfigRepository.findByYearAndTenantUIDAndIdIsNot(selected.getYear(), selected.getId(), currentUser.getTenantUID());
+            List<PurchaseBudgetConfig> olds = purchaseBudgetConfigRepository.findByYearAndTenantUIDAndSiteUIDAndIdIsNot(selected.getYear(), selected.getId(), currentUser.getTenantUID(),currentUser.getSiteUID());
             if(olds != null && olds.size() > 0){
                 WebUtil.addErrorMessage("年度申购开启记录已存在，不能重复创建！");
                 return;
@@ -139,7 +127,7 @@ public class PurchaseBudgetConfigController extends GenericCRUDUUIDController<Pu
             selected.setInstitutionUID(currentUser.getInstitutionUID());
             selected.setHospitalUID(currentUser.getHospitalUID());
             selected.setSiteUID(currentUser.getSiteUID());
-            List<PurchaseBudgetConfig> olds = purchaseBudgetConfigRepository.findByYearAndTenantUID(selected.getYear(), currentUser.getTenantUID());
+            List<PurchaseBudgetConfig> olds = purchaseBudgetConfigRepository.findByYearAndTenantUIDAndSiteUID(selected.getYear(), currentUser.getTenantUID(),currentUser.getSiteUID());
             if(olds != null && olds.size() > 0){
                 WebUtil.addErrorMessage("年度申购开启记录已存在，不能重复创建！");
                 return;

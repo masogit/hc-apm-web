@@ -42,6 +42,9 @@ public class HisAssetGroupAssetMatch implements Serializable {
     private Boolean isSubEquipment;
 
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 

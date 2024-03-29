@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -38,7 +39,6 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -49,6 +49,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -135,6 +136,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private ConfigItemMapper configItemMapper;
     private String locationName;
     private String assigneeId;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -279,6 +281,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ExternalTempUser externalTempUser;
     @Getter @Setter
     private List<Map<String,String>> maintenancePersonInformation;
+
+    private ConfigItemValueRepository configItemValueRepository;
     @Override
     protected void init() {
         try {
@@ -322,6 +326,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
             externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+            configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
+            configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1261,7 +1267,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<ServiceRequestMsg> getServiceRequestMessageList(String woId) {
         return selected == null ? null : woService.getServiceRequestMessageList(woId);
     }
-
+    public void prepareActSetting(String woid){
+        prepareAct(woid);
+        V2_WorkOrder temp=new V2_WorkOrder();
+        BeanUtils.copyProperties(selectedWorkOrder,temp);
+        setSelectedWorkOrder(temp);
+        String  key= "repairTypeDefaultValueConfiguration";
+        String repairTypeValue = configItemValueRepository.findByKeyAndSiteForUseParent(temp.getSiteUID(), temp.getHospitalUID(), temp.getInstitutionUID(), temp.getTenantUID(), key);
+        if(StringUtils.isNumeric(repairTypeValue)){
+            selectedWorkOrder.setRepairType(Integer.valueOf(repairTypeValue));
+        }
+    }
     public void prepareAct(String woid) {
         selectedWorkOrder = dao.findById(woid);
         currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
@@ -1630,6 +1646,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void repairWorkOrder() {
         boolean valid = true;
+        ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", selectedWorkOrder.getSiteUID());
+        if (ObjectUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue.getValue()) && ObjectUtil.isEmpty(selectedWorkOrder.getCheckinTime())) {
+            WebUtil.addErrorMessage("签到时间不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("checkin_time", true);
+            valid = false;
+        }
         if (confirmedUpDate ==
                 null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));

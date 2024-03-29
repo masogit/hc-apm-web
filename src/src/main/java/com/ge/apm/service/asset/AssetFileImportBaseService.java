@@ -271,8 +271,8 @@ public class AssetFileImportBaseService {
 
     @Transactional
     protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
-
         AssetInfo newAsset = (AssetInfo) item.get("asset");
+        AssetInfo dbAsset = (AssetInfo) item.get("oldAsset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
 
         AssetRow.clearErrMessage(item);
@@ -333,10 +333,10 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
         } else {
 
-            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName());
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
-                newAsset.setAssetOwnerName(null);
+                newAsset.setAssetOwnerName(dbAsset.getAssetOwnerName());
             } else if (userAccounts.get(0).getIsDisable()) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "此用已停用");
                 newAsset.setAssetOwnerName(null);
@@ -350,10 +350,10 @@ public class AssetFileImportBaseService {
         if (newAsset.getAssetOwnerName2() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName2());
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName2());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
-                newAsset.setAssetOwnerName2(null);
+                newAsset.setAssetOwnerName2(dbAsset.getAssetOwnerName2());
             } else if (userAccounts.get(0).getIsDisable()) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "此用户已停用");
                 newAsset.setAssetOwnerName2(null);
@@ -368,10 +368,10 @@ public class AssetFileImportBaseService {
         if (newAsset.getAssetOwnerName3() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName3());
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName3());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
-                newAsset.setAssetOwnerName3(null);
+                newAsset.setAssetOwnerName3(dbAsset.getAssetOwnerName3());
             } else if (userAccounts.get(0).getIsDisable()) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "此用户已停用");
                 newAsset.setAssetOwnerName3(null);
@@ -386,10 +386,10 @@ public class AssetFileImportBaseService {
         if (newAsset.getClinicalOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getClinicalOwnerName());
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getClinicalOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
-                newAsset.setClinicalOwnerName(null);
+                newAsset.setClinicalOwnerName(dbAsset.getClinicalOwnerName());
             } else if (userAccounts.get(0).getIsDisable()) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "此用户已停用");
                 newAsset.setClinicalOwnerName(null);
@@ -404,10 +404,10 @@ public class AssetFileImportBaseService {
         if (newAsset.getPmOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + "未设置");
         } else {
-            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getPmOwnerName());
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPmOwnerName());
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
-                newAsset.setPmOwnerName(null);
+                newAsset.setPmOwnerName(dbAsset.getPmOwnerName());
             } else if (userAccounts.get(0).getIsDisable()) {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "此用户已停用");
                     newAsset.setPmOwnerName(null);
@@ -417,7 +417,21 @@ public class AssetFileImportBaseService {
             }
 
         }
+        if (newAsset.getPatrolInspectionOwnerName() == null) {
+            AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + "未设置");
+        } else {
+            userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPatrolInspectionOwnerName());
+            if (userAccounts.size() != 1) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "无此用户/无法关联");
+                newAsset.setPatrolInspectionOwnerName(dbAsset.getPatrolInspectionOwnerName());
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "此用户已停用");
+            }else {
+                newAsset.setPatrolInspectionOwnerUID(userAccounts.get(0).getUid());
+                newAsset.setPatrolInspectionOwnerTel(userAccounts.get(0).getTelephone());
+            }
 
+        }
         Supplier supplier;
         //导入供应商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getVendor())) {

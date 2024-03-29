@@ -15,14 +15,16 @@ import javax.faces.context.FacesContext;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.NurseSiteMaintainItemRepository;
+import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -35,11 +37,9 @@ import org.slf4j.LoggerFactory;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
@@ -50,7 +50,6 @@ public class MaintainExportController {
     private List<NurseSiteMaintain> listMaintainData;
     private List<NurseSiteMaintain> selectedListMaintain;
     private OrgInfo selectedParentOrgInfo;
-    private NurseSiteMaintainItemRepository maintainItemRepository;
     //show
     private List<OrgInfo> listOrgInfo;
     private List<String> orgUidList;
@@ -68,25 +67,46 @@ public class MaintainExportController {
     private TreeNode selectedNode;
     List<OrgInfo> listOrgDept;
     OrgInfo selectedOrgDepart;
+    @Getter @Setter
+    private String status;
+    @Getter @Setter
+    private NurseSiteMaintainConfig selectedConfig;
+    @Getter @Setter
+    private List<NurseSiteMaintainConfig> listConfig;
 
 
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+        NurseSiteMaintainConfigMapper nurseSiteMaintainConfigMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
         nurseSiteMaintainService.init();
         currentUser = UserContextService.getCurrentUserAccount();
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
-        maintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
         loadUserParentOrgInfo();
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        Map<String, Object> param = MapUtil.newHashMap();
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("orgUidList", orgUidList);
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            listConfig = ListUtil.empty();
+        } else {
+            if (currentUser.isEnableAssetTypeGroup()) {
+                param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+            }
+            listConfig = nurseSiteMaintainConfigMapper.searchMaintainConfig(param);
+        }
+        NurseSiteMaintainConfig tempConfig = new NurseSiteMaintainConfig();
+        tempConfig.setId("-1");
+        tempConfig.setName("请选择...");
+        listConfig.add(0,tempConfig);
         fetchOrgTree();
     }
 
     private void initValue() {
-        this.selectedListMaintain = new ArrayList<NurseSiteMaintain>();
+        this.selectedListMaintain = new ArrayList<>();
     }
 
     private void searchMaintainData(Date start, Date end) {
@@ -103,20 +123,24 @@ public class MaintainExportController {
             ca.add(Calendar.MONTH, 1);
             end = ca.getTime();
         }
-        Wrapper<NurseSiteMaintain> wrapper = new EntityWrapper<>();
-        if (currentUser.isEnableAssetTypeGroup()) {
-            wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+        Map<String, Object> param = MapUtil.newHashMap();
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("scheduleDateStart", start);
+        param.put("scheduleDateEnd", end);
+        if (ObjectUtil.isNotEmpty(selectedConfig)) {
+            param.put("configId", selectedConfig.getId());
         }
-        wrapper.ge("nsm.schedule_date", start);
-        wrapper.le("nsm.schedule_date", end);
+        if (ObjectUtil.isNotEmpty(status)) {
+            param.put("status", status);
+        }
+        if (currentUser.isEnableAssetTypeGroup()) {
+            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+        }
         if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
-            wrapper.in("nsm.clinical_dept_uid", orgUidList);
-//            listMaintainData = findDefaultMaintain(start, end);
+            param.put("orgUidList", orgUidList);
         } else {
-            List<String> listUidTemp = new ArrayList<>();
-
             if(this.selectedOrg != null){
-                listUidTemp.add(this.selectedOrg.getUid());
+                List<String> listUidTemp = ListUtil.newArrayList(this.selectedOrg.getUid());
                 // 如果只选择了医院/院区，就获取到下属科室列表，查询下属科室的所有数据
                 if(this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1){
                     if(CollectionUtils.isNotEmpty(listOrgDept)){
@@ -125,17 +149,14 @@ public class MaintainExportController {
                         }
                     }
                 }
+                param.put("orgUidList", listUidTemp);
             }
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
-                listUidTemp.add(this.selectedOrgDepart.getUid());
+                param.put("deptUid", this.selectedOrgDepart.getUid());
             }
-            wrapper.in("nsm.clinical_dept_uid", listUidTemp);
-//            listMaintainData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
         }
 
-        wrapper.groupBy("nsm.id");
-        wrapper.orderBy("nsm.schedule_date");
-        listMaintainData = nurseSiteMaintainService.findJoinAssetList(wrapper);
+        listMaintainData = nurseSiteMaintainService.searchMaintain(param);
         if (ObjectUtil.isNotEmpty(listMaintainData)) {
             Set<String> maintainIds = listMaintainData.stream().map(NurseSiteMaintain::getId).collect(Collectors.toSet());
             Wrapper<NurseSiteMaintainItem> itemWrapper = new EntityWrapper<>();
@@ -156,15 +177,14 @@ public class MaintainExportController {
     }
 
     private void loadUserParentOrgInfo() {
-        if (orgUidList.size() > 0) {
+        if (!orgUidList.isEmpty()) {
             checkListParentOrgInfo = nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
-            listOrgInfo = new ArrayList<OrgInfo>();
+            listOrgInfo = new ArrayList<>();
         }
     }
 
     private void loadUserOrgInfo() {
-        if (orgUidList.size() > 0) {
-//			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+        if (!orgUidList.isEmpty()) {
             listOrgInfo = nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
         }
     }
@@ -186,7 +206,7 @@ public class MaintainExportController {
     public void exportAll() {
         clearStream();
 
-        if (listMaintainData == null || listMaintainData.size() == 0) {
+        if (listMaintainData == null || listMaintainData.isEmpty()) {
             addMessage("无数据");
             return;
         }
@@ -197,7 +217,7 @@ public class MaintainExportController {
     public void exportSelected() {
         clearStream();
 
-        if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
+        if (selectedListMaintain == null || selectedListMaintain.isEmpty()) {
             addMessage("未选中需要导出的记录");
             return;
         }

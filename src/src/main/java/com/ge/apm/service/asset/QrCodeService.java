@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -19,6 +20,7 @@ import com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.StringUtil;
@@ -41,6 +43,9 @@ import java.util.zip.ZipOutputStream;
  */
 @Component
 public class QrCodeService {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(QrCodeService.class);
+
 
     @Autowired
     QrCodeLibRepository qrCodeLibDao;
@@ -247,6 +252,7 @@ public class QrCodeService {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
             img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
         } catch (Exception ex) {
+            logger.error("getQrCodeImage createQrCodeTag  qrCodeObjectL:{},siteUid:{},    error :{}", JSON.toJSONString(qrCodeObject),siteUid,ex);
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return img;
@@ -299,7 +305,7 @@ public class QrCodeService {
                         itemObject.put("TextShowValue", textValue.concat(asset.getName() == null ? "" : asset.getName()));
                         break;
                     case "assetGroup":
-                        itemObject.put("TextShowValue", textValue.concat(FieldValueMessageController.fieldValue("assetGroup", asset.getAssetGroup().toString())));
+                        itemObject.put("TextShowValue", textValue.concat( asset.getAssetGroup()==null? "": FieldValueMessageController.fieldValue("assetGroup", asset.getAssetGroup().toString())));
                         break;
                     case "hospital":
                         if (qrCodeObject.getString("HospitalName") != null) {
@@ -484,6 +490,7 @@ public class QrCodeService {
                 ImageIO.write(image, "JPG", out);
                 out.closeEntry();
             } catch (Exception e) {
+                logger.error("e:",e);
                 WebUtil.addErrorMessage("export fail;");
             }
         });

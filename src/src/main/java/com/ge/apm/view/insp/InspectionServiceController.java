@@ -8,12 +8,14 @@ import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ServiceRequestProjection;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
@@ -31,7 +33,8 @@ public class InspectionServiceController {
     V2_PmOrderRepository pmDao = WebUtil.getBean(V2_PmOrderRepository.class);
     UaaService uuaService = WebUtil.getBean(UaaService.class);
     AssetInfoMapper assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
-    
+    ServiceRequestApiService serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
+
     public List<InspectionOrder> getInspectionOrderList(Integer assetId,Integer orderType,Integer limit){
         List<InspectionOrder> res = inspectionDao.getRecentlyInspectionOrder(assetId,orderType);
         return res.subList(0, Math.min(limit, res.size()));
@@ -47,30 +50,38 @@ public class InspectionServiceController {
     }
 
     public List<ServiceRequestProjection> getWorkOrderList(Integer assetId){
+        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
         PageRequest pr =  new PageRequest(0, 5000, sort);
-        return srDao.findProjectionByAssetId(assetId, pr).getContent();
+        return srDao.findProjectionByAssetIdIn(assetIds, pr).getContent();
     }
 
     public List<ServiceRequestProjection> getWorkOrderList(Integer assetId, Integer limit){
+        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
         PageRequest pr =  new PageRequest(0, limit, sort);
-        return srDao.findProjectionByAssetId(assetId, pr).getContent();
+        return srDao.findProjectionByAssetIdIn(assetIds, pr).getContent();
     }
 
-    public List<V2_PmOrder> getPmOrderList(String assetUid){
+    public List<V2_PmOrder> getPmOrderList(Integer assetId){
+        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "startTime");
         PageRequest pr =  new PageRequest(0, 5000, sort);
-        List<SearchFilter> searchFilters = new ArrayList();
-        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, assetUid));
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
         return pmDao.findBySearchFilter(searchFilters, pr).getContent();
     }
 
-    public List<V2_PmOrder> getPmOrderList(String assetUid,Integer limit){
+    public List<V2_PmOrder> getPmOrderList(Integer assetId,Integer limit){
+        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "startTime");
         PageRequest pr =  new PageRequest(0, limit, sort);
-        List<SearchFilter> searchFilters = new ArrayList();
-        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, assetUid));
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
         return pmDao.findBySearchFilter(searchFilters, pr).getContent();
     }
 

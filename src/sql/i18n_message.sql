@@ -5249,3 +5249,15 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('spare01', '14-01-05', '康复训练设备', '康复训练设备',null,'-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('spare01', '14-01-06', '结扎治疗设备', '结扎治疗设备',null,'-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AdjustmentEquipmentName', '调剂设备名称', 'Name of adjustment equipment', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh,value_en,value_tw, site_id) VALUES ('field_name', 'patrolInspectionOwnerName','巡检负责人', 'Patrol inspection owner name', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en,value_tw, site_id) VALUES ('field_name','patrolInspectionOwnerTel','巡检负责人电话','Patrol inspection owner tel',  NULL, '-1');
+
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','0','其他','0',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','1','捐赠','1',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','2','上交国家','2',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('equipmentDisposalMethod','3','放置库房','3',NULL,	-1	);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'equipmentDisposalMethod', '设备处置方式', 'equipmentDisposalMethod', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'customDisposalMethod', '自定义处置方式', 'customDisposalMethod', NULL, '-1');

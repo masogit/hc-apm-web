@@ -90,6 +90,8 @@ public enum CustomConfigFields {
     assetValueCategory(fieldName, "assetValueCategory" ,Text),    //资产价值分类
     pmOwnerName(fieldName, "pmOwnerName" ,Text),   //保养负责人
     pmOwnerTel(fieldName, "pmOwnerTel" ,Text),   //保养负责人电话
+    patrolInspectionOwnerName(fieldName,"patrolInspectionOwnerName",Text), // 保养巡检负责人
+    patrolInspectionOwnerTel(fieldName,"patrolInspectionOwnerTel",Text), // 保养巡检负责人电话
     acceptDate(fieldName, "acceptDate" ,Text),  //验收日期
     warrantyMonth(fieldName, "warrantyMonth" ,Text),   //质保时间（月）
     subjectProject(label, "subjectProject" ,Text),  //所属课题项目

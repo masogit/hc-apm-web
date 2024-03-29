@@ -96,8 +96,20 @@ public class HisEquipmentDataSource implements Serializable {
     private Boolean isMatched;
 
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns({
+            @JoinColumn(name = "device_dept_code", referencedColumnName = "sfxm_id", insertable = false,updatable = false),
+            @JoinColumn(name = "org_code", referencedColumnName = "hos_id", insertable = false,updatable = false),
+            @JoinColumn(name = "tenant_uid", referencedColumnName = "tenant_uid", insertable = false,updatable = false)
+    })
+    private HisEquipmentSfxm hisEquipmentSfxm;
 
     //excel行数
     @Transient

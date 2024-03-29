@@ -95,7 +95,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         if (!isEditMode()) {
             return false;
         }
-        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByName(selected.getAssetGroupName());
+        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
 
         return hisAssetGroupService.needPromptInputDates(this.availableAssets.getTarget(), hisAssetGroup, filterDeptOrg);
     }
@@ -171,7 +171,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
 
-        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByNameAndTenantUid(selected.getAssetGroupName(),loginUser.getTenantUID());
+        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
         for(AssetInfo assetInfo : targetAssets){
             List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatchList = hisAssetGroupClinicalMatchDao.findByAssetUid(assetInfo.getUid());
             List<String> assetGroupUIds = hisAssetGroupClinicalMatchList.stream().map(HisAssetGroupClinicalMatch::getHisAssetGroupUId).collect(Collectors.toList());
@@ -187,11 +187,11 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
                 return;
             }
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate,selectedOrg);
 
             WebUtil.addSuccessMessage("修改成功");
         } else {
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null,selectedOrg);
             WebUtil.addSuccessMessage("创建成功");
         }
 
@@ -228,7 +228,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 selectedOrg = orgInfoDao.findByUid(selected.getOrgInfoUid());
                 filterDeptOrg = orgInfoDao.findByUid(selected.getClinicalDeptUid());
 
-                String ids = hisAssetGroupRepository.findByName(selected.getAssetGroupName()).getUuid() + filterDeptOrg.getUid();
+                String ids = selected.getAssetGroupUid() + filterDeptOrg.getUid();
                 List<String> assetIds = hisAssetGroupClinicalMatchDao.findAssetIds(ids);
                 List<AssetInfo> targetAssets = assetInfoRepository.findAllByUidIn(assetIds);
                 availableAssets.setTarget(targetAssets);

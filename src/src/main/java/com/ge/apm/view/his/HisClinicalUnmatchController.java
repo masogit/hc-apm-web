@@ -41,9 +41,11 @@ public class HisClinicalUnmatchController extends GenericCRUDUUIDController<HisA
         }
 
         removeFilterOnField("hosId");
+        removeFilterOnField("siteUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);

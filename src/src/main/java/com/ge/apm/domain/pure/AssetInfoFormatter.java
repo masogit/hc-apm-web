@@ -1047,6 +1047,8 @@ public class AssetInfoFormatter {
 
         map.put(getMessage("pmOwnerName"), this.getPmOwnerName());
         map.put(getMessage("pmOwnerTel"), assetInfo.getPmOwnerTel());
+        map.put(getMessage("patrolInspectionOwnerName"), assetInfo.getPatrolInspectionOwnerName());
+        map.put(getMessage("patrolInspectionOwnerTel"), assetInfo.getPatrolInspectionOwnerTel());
         map.put(getMessage("measuringOwner"), assetInfo.getMeasuringOwnerName());
 
         if (crossSite) {

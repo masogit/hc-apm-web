@@ -128,6 +128,11 @@
 								   </p:selectOneRadio>
 							  </c:if>
 						   </h:panelGroup>
+					   <h:panelGroup rendered="#{generatePmOrdersController.enableWarrantyDateSearch}">
+						   <label class ="label">#{msg.warrantyDate}</label>
+						   <p:calendar  timeZone="GMT+8" id="warrantyDate" pattern="yyyy/MM/dd" mask="true" value="#{generatePmOrdersController.queryAsset.warrantyDate}" showOn="button" showButtonPanel="true" >
+						   </p:calendar>
+					   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"/>

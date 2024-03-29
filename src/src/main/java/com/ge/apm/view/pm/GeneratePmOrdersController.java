@@ -96,6 +96,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private boolean isYmyg = false;
 	private OrgInfo userOrgInfo;
 
+	private ConfigItemValueRepository configItemValueRepository;
+
 	private List<AssetRuleModel> onlyOneModels = new ArrayList<>();//只存在唯一一个质控绑定规则的记录默认批量创建
 	private List<AssetRuleModel> notOnlyOneModels = new ArrayList<>();//存在多个绑定规则的列表（需用户选择是否批量创建）
 	private List<AssetRuleModel> selectedNotOnlyOneModels = new ArrayList<>();//弹出框存在多个质控规则中选定的记录
@@ -114,7 +116,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
 		supplierService = WebUtil.getBean(SupplierService.class);
         configService = WebUtil.getBean(ConfigService.class);
-		targetAssets = new ArrayList<>();
+		configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);targetAssets = new ArrayList<>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
@@ -303,6 +305,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         }
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+		}
+		if (queryAsset.getWarrantyDate() != null) {
+
+			assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.EQ, queryAsset.getWarrantyDate()));
 		}
 		if(level != null) {
 			List<String> uids = null;
@@ -731,6 +737,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         });
 
     }
+
+	public boolean isEnableWarrantyDateSearch(){
+		String value = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),"enableWarrantyDateSearch");
+		return Boolean.FALSE.toString().equalsIgnoreCase(value)?false:true;
+	}
 
 	public String getName(AssetInfo assetInfo){
 		return StringUtils.isEmpty(assetInfo.getName()) ? "  " : assetInfo.getName();

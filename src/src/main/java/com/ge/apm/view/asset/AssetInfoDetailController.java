@@ -17,6 +17,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.approval.MultiLevelApprovalListController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -29,6 +30,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -95,6 +99,9 @@ public class AssetInfoDetailController {
 
     private ArrivalListItemRepository arrivalListItemRepository;
 
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
+
+
 
     @PostConstruct
     protected void init() {
@@ -129,6 +136,7 @@ public class AssetInfoDetailController {
         userContextService = WebUtil.getBean(UserContextService.class);
         countyArea = userContextService.isCountyArea();
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
+        multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
 
         assetInfoService.setSupplier(ListUtil.newArrayList(selected));
         maintanceType = aimService.getMaintanceType(selected);
@@ -467,4 +475,12 @@ public class AssetInfoDetailController {
         return changeHistoryList.size();
     }
 
+//    @Getter
+//    private List<MultiLevelApproval> assetApprovalProcess=new ArrayList();
+//    public  int getAssetProcessRecordCount(){
+//        if(CollectionUtils.isEmpty(assetApprovalProcess) && null!=selected){
+//            assetApprovalProcess=multiLevelApprovalRepository.getAssetProcessRecord(selected.getTenantUID(),selected.getUid());
+//        }
+//        return assetApprovalProcess.size();
+//    }
 }

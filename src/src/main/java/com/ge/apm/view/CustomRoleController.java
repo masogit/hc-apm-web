@@ -117,9 +117,12 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				&& !f.name().startsWith("ASSET_LOCATION_")
 
 		).collect(Collectors.toList());
+		postprocessing();
 		functions = allFunction;
 	}
-
+	private void postprocessing(){
+		allFunction.add(ApmFunction.CONFIG_USER_EDIT);
+	}
 	@Override
 	protected CustomRoleRepository getDAO() {
 		return dao;

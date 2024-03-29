@@ -11,6 +11,7 @@ import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -21,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -85,6 +87,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
 
     private AssetInfoRepository assetInfoRepository;
+
+    private I18nMessageService i18nMessageService;
 
 
     @Setter
@@ -173,6 +177,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
@@ -184,7 +189,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
         primaryApprovalData = null;
         secondaryApprovalData = null;
-
+        multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
+//        if(true){
+//            return;
+//        }
         if (null == multiLevelApproval) {
             multiLevelApprovals = null;
             return;
@@ -269,6 +277,17 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                if(StringUtils.isNotBlank(assetScrap.getEquipmentDisposalMethod())){
+                    I18nMessage equipmentDisposalMethod = i18nMessageService.getByMsgTypeAndMsgKey("equipmentDisposalMethod", assetScrap.getEquipmentDisposalMethod());
+                    if(equipmentDisposalMethod!=null){
+                        if(equipmentDisposalMethod.getMsgKey().equals("0")){
+                            String method=equipmentDisposalMethod.getValueZh()+"("+assetScrap.getCustomDisposalMethod()+")";
+                            assetScrap.setCustomDisposalMethod(method);
+                        }else{
+                            assetScrap.setCustomDisposalMethod(equipmentDisposalMethod.getValueZh());
+                        }
+                    }
+                }
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
@@ -295,6 +314,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      */
     public void getMultiLevelApprovalPersonByAgree() throws Exception {
         MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
@@ -332,6 +352,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApproval.setAttachments(attachList);
         multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -384,9 +405,18 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     if(StringUtils.isBlank(baa.getConfirmNotice()) || StringUtils.isBlank(baa.getConfirmEquipmentCategory())){
                         throw new RuntimeException();
                     }
+                    if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                        if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null || baa.getConfirmMaximumPrice() == null){
+                            throw new RuntimeException();
+                        }
+                    }
                 });
             } catch(Exception e) {
-                WebUtil.addWarnMessage("产品信息确认未完成，请检查后重试！");
+                if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                    WebUtil.addWarnMessage("申购单数量/价格确认未完成，请检查后重试！");
+                }else {
+                    WebUtil.addWarnMessage("申购单信息确认未完成，请检查后重试！");
+                }
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
@@ -454,6 +484,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      */
     public void getMultiLevelApprovalPersionAndSubmitByDisagree() {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
@@ -464,6 +495,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
+        multiLevelApproval.setAttachments(attachList);
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
         selected = null;
         this.needSignature = false;
@@ -503,13 +535,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
             return;
         }
+        multiLevelApproval.setAttachments(attachList);
         String token = UserContextService.getAccessToken();
         AdverseEvents events = new AdverseEvents();
         events.setUid(multiLevelApproval.getBusinessUid());
         events.setStatus(6);
         events.setApprovalOpinion(approvalOpinion);
         events.setApprovalResult(approvalResult);
-        multiLevelApprovalService.approveAdverseEvents(token, events);
+        multiLevelApprovalService.approveAdverseEvents(token, events,multiLevelApproval);
         selected = null;
     }
 
@@ -524,13 +557,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
             return;
         }
+        multiLevelApproval.setAttachments(attachList);
         String token = UserContextService.getAccessToken();
         AdverseEvents events = new AdverseEvents();
         events.setUid(multiLevelApproval.getBusinessUid());
         events.setStatus(4);
         events.setApprovalOpinion(approvalOpinion);
         events.setApprovalResult(approvalResult);
-        multiLevelApprovalService.approveAdverseEvents(token, events);
+        multiLevelApprovalService.approveAdverseEvents(token, events,multiLevelApproval);
         selected = null;
     }
 
@@ -606,7 +640,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public void returnApprove() throws Exception {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
-
+        multiLevelApproval.setAttachments(attachList);
         int level = 0;
         for (int i=1;i<=nodes.size();i++){
             if(nodes.get(i-1).getNodeName().equals(nodeName)){
@@ -637,7 +671,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     }
     public void directDelivery() throws Exception {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
-
+        multiLevelApproval.setAttachments(attachList);
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
@@ -726,6 +760,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.signatureContent = null;
         this.signatureContentStream = null;
         this.newSignature = true;
+        this.attachList = null;
     }
 
 
@@ -864,5 +899,36 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public Integer approvaLevelPurchase() {
         return this.selected.getApprovalLevel();
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        if(CollectionUtils.isEmpty(attachList)){
+            attachList= new ArrayList<>();
+        }
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getFile().getContentType().startsWith("image")?"Image":"File";
+            blobObject.setBoType(V2_BlobObject.AttachmentType.getKeyByValue("多级审批"));
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getId());
+            blobObject.setTenantUid(selected.getTenantUID());
+//            blobService.saveBlobObject(blobObject);
+            attachList.add(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public List<V2_BlobObject> getFileByBoSubType(String type){
+        if(CollectionUtils.isEmpty(attachList)){
+            attachList= new ArrayList<>();
+        }
+        return attachList.stream().filter(item->type.equals(item.getBoSubType())).collect(Collectors.toList());
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 }

@@ -923,30 +923,23 @@ public class NurseSiteMaintainService {
 	}
 
 	public void supplementMaintainWithoutItem(List<NurseSiteMaintain> listTempMaintain) {
-		Set<String> setModifyByUids = new HashSet<String>();
-		Map<String, UserAccount> mapModifyBy = new HashMap<String, UserAccount>();
+		Set<String> setModifyByUids = new HashSet<>();
+		Map<String, UserAccount> mapModifyBy = new HashMap<>();
 		List<UserAccount> listModify = null;
-		Set<String> nurseSiteMaintainIds = new HashSet<String>();
-		if (listTempMaintain != null && listTempMaintain.size() > 0) {
-			for (int i = 0; i < listTempMaintain.size(); ++i) {
-				NurseSiteMaintain tempMaintain = listTempMaintain.get(i);
-				nurseSiteMaintainIds.add(tempMaintain.getId());
-				setModifyByUids.add(tempMaintain.getCreateByUid());
-				setModifyByUids.add(tempMaintain.getModifyByUid());
-			}
+		if (ObjectUtil.isNotEmpty(listTempMaintain)) {
+			setModifyByUids = listTempMaintain.stream().map(NurseSiteMaintain::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+			setModifyByUids.addAll(listTempMaintain.stream().map(NurseSiteMaintain::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet()));
 		}
-		if (setModifyByUids.size() > 0) {
+		if (ObjectUtil.isNotEmpty(setModifyByUids)) {
 			listModify = userAccountRepository.getSimpleByUids(setModifyByUids);
 		}
 		if (listModify != null) {
-			for (int i = 0; i < listModify.size(); ++i) {
-				UserAccount tempUser = listModify.get(i);
+			for (UserAccount tempUser : listModify) {
 				mapModifyBy.put(tempUser.getUid(), tempUser);
 			}
 		}
-		if (listTempMaintain != null && listTempMaintain.size() > 0) {
-			for (int i = 0; i < listTempMaintain.size(); ++i) {
-				NurseSiteMaintain tempMaintain = listTempMaintain.get(i);
+		if (ObjectUtil.isNotEmpty(listTempMaintain)) {
+			for (NurseSiteMaintain tempMaintain : listTempMaintain) {
 				if (StringUtils.isNotEmpty(tempMaintain.getModifyByUid())) {
 					tempMaintain.setModifyBy(mapModifyBy.get(tempMaintain.getModifyByUid()));
 				}

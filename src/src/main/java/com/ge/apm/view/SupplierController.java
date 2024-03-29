@@ -9,6 +9,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -21,6 +22,7 @@ import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -195,24 +197,32 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public void batchDeleteSupplier() {
-//        selectedMap.forEach((k,v) -> {
-//            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
-//            if (selected != null) {
-//                deleteSupplier();
-//            }
-//        });
+        selectedMap.forEach((k,v) -> {
+            selected = currentPageSuppliers.stream().filter(s -> BooleanUtils.isTrue(v) && s.getId().compareTo(k) == 0 ).findFirst().orElse(null);
+            if (selected != null) {
+                deleteSupplier();
+            }
+        });
         selectedMap.clear();
     }
 
     public void deleteSupplier() {
 
-        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(selected.getId(), selected.getUid(), selected.getUid());
+        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(selected.getId(), selected.getId() + "", selected.getId() + "");
         List<ArrivalList> arrivalListList = arrivalListDao.findBySupplierId(selected.getId());
 
         if(assetInfoList.isEmpty() && arrivalListList.isEmpty()){
-            dao.delete(selected);
+            try {
+                dao.delete(selected);
+            } catch (Exception e) {
+                WebUtil.addErrorMessage("供应商已绑定资产/责任人，无法删除");
+                return;
+            }
+            WebUtil.addSuccessMessage("供应商删除成功！");
             List<V2_BlobObject> tempBlobObject = blobService.findBlobObjectsByBoUid(selected.getUid());
             blobService.deleteBlobFile(tempBlobObject);
+        } else {
+            WebUtil.addErrorMessage("供应商已绑定资产/责任人，无法删除");
         }
 
     }
@@ -339,7 +349,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     //供应商责任人停用
     public void onRefuse(SupplierUser supplierUser){
-        supplierService.deleteByID(supplierUser.getId());
+        try {
+            supplierService.deleteByID(supplierUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         initSupplierUser();
     }
 

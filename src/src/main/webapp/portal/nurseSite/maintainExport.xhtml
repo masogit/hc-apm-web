@@ -23,7 +23,7 @@
                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
         </p:panelGrid>
-        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">所属院区</label>
                 <p:inputText id="idCSSelectedOrgName" value="#{maintainExportController.selectedOrg.name}" readonly="true" required="true"
@@ -52,6 +52,23 @@
                 <p:selectOneMenu id="idCSClinicalOrgInfo" value="#{maintainExportController.selectedOrgDepart}" disabled="false" converter="orgInfoColumnFilterConverter"
                                  style="width:100%;" filter="true" filterMatchMode="contains">
                     <f:selectItems value="#{maintainExportController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">日常检查名称</label>
+                <p:selectOneMenu id="configName" value="#{maintainExportController.selectedConfig}" disabled="false" converter="nurseSiteMaintainConfigConverter"
+                                 style="width:100%;" filter="true" filterMatchMode="contains">
+                    <f:selectItems value="#{maintainExportController.listConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">状态</label>
+                <p:selectOneMenu id="status" value="#{maintainExportController.status}" disabled="false" style="width:100%;">
+                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                    <f:selectItem itemLabel="未检查" itemValue="(0)"/>
+                    <f:selectItem itemLabel="进行中" itemValue="(4)"/>
+                    <f:selectItem itemLabel="已通过" itemValue="(2,5,6,7)"/>
+                    <f:selectItem itemLabel="有问题" itemValue="(3,8)"/>
                 </p:selectOneMenu>
             </h:panelGroup>
         </p:panelGrid>

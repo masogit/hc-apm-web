@@ -62,11 +62,13 @@
                                 </p:inputText>
                             </h:panelGroup>
 
-<!--                            <h:panelGroup rendered="false" >-->
-<!--                                <label class="label">分类层级（BI使用）</label>-->
-<!--                                <p:inputText id="classificationPath" value="#{assetTypeGroupController.selected.classificationPath}" readonly="true">-->
-<!--                                </p:inputText>-->
-<!--                            </h:panelGroup>-->
+                            <h:panelGroup rendered="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()}">
+                                <label class="label">#{msg.assetGroup}*</label>
+                                <p:selectOneMenu id="assetGroup" value="#{assetTypeGroupController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
 
                             <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{assetTypeGroupController.saveSelectedAuthGrouping}" value="#{msg.Save}" update="authGroupTree :growl"/>
                         </p:panelGrid>

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.NurseSiteMaintainItemHistoryRepository;
+import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainHistoryService;
@@ -12,7 +13,10 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -63,9 +67,17 @@ public class MaintainHistoryController {
     List<OrgInfo> listOrgDept;
     OrgInfo selectedOrgDepart;
 
+    @Getter @Setter
+    private String status;
+    @Getter @Setter
+    private NurseSiteMaintainConfig selectedConfig;
+    @Getter @Setter
+    private List<NurseSiteMaintainConfig> listConfig;
+
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainHistoryService.class);
+        NurseSiteMaintainConfigMapper nurseSiteMaintainConfigMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
         nurseSiteMaintainService.init();
         currentUser = UserContextService.getCurrentUserAccount();
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -75,11 +87,26 @@ public class MaintainHistoryController {
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        Map<String, Object> param = MapUtil.newHashMap();
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("orgUidList", orgUidList);
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            listConfig = ListUtil.empty();
+        } else {
+            if (currentUser.isEnableAssetTypeGroup()) {
+                param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+            }
+            listConfig = nurseSiteMaintainConfigMapper.searchMaintainConfig(param);
+        }
+        NurseSiteMaintainConfig tempConfig = new NurseSiteMaintainConfig();
+        tempConfig.setId("-1");
+        tempConfig.setName("请选择...");
+        listConfig.add(0,tempConfig);
         fetchOrgTree();
     }
 
     private void initValue() {
-        this.selectedListMaintain = new ArrayList<NurseSiteMaintainHistory>();
+        this.selectedListMaintain = new ArrayList<>();
     }
 
     public Date getMaxDate() {
@@ -105,20 +132,24 @@ public class MaintainHistoryController {
             ca.add(Calendar.MONTH, 1);
             end = ca.getTime();
         }
-        Wrapper<NurseSiteMaintainHistory> wrapper = new EntityWrapper<>();
-        if (currentUser.isEnableAssetTypeGroup()) {
-            wrapper.in("ai.asset_type", currentUser.getAssetTypeGroupMap().keySet());
+        Map<String, Object> param = MapUtil.newHashMap();
+        param.put("tenantUid", currentUser.getTenantUID());
+        param.put("scheduleDateStart", start);
+        param.put("scheduleDateEnd", end);
+        if (ObjectUtil.isNotEmpty(selectedConfig)) {
+            param.put("configId", selectedConfig.getId());
         }
-        wrapper.ge("nsm.schedule_date", start);
-        wrapper.le("nsm.schedule_date", end);
-        if (this.selectedOrg == null &&  (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
-            wrapper.in("nsm.clinical_dept_uid", orgUidList);
-//            listMaintainData = findDefaultMaintain(start, end);
+        if (ObjectUtil.isNotEmpty(status)) {
+            param.put("status", status);
+        }
+        if (currentUser.isEnableAssetTypeGroup()) {
+            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+        }
+        if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
+            param.put("orgUidList", orgUidList);
         } else {
-            List<String> listUidTemp = new ArrayList<String>();
-
             if(this.selectedOrg != null){
-                listUidTemp.add(this.selectedOrg.getUid());
+                List<String> listUidTemp = ListUtil.newArrayList(this.selectedOrg.getUid());
                 // 如果只选择了医院/院区，就获取到下属科室列表，查询下属科室的所有数据
                 if(this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1){
                     if(CollectionUtils.isNotEmpty(listOrgDept)){
@@ -127,17 +158,14 @@ public class MaintainHistoryController {
                         }
                     }
                 }
+                param.put("orgUidList", listUidTemp);
             }
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
-                listUidTemp.add(this.selectedOrgDepart.getUid());
+                param.put("deptUid", this.selectedOrgDepart.getUid());
             }
-            wrapper.in("nsm.clinical_dept_uid", listUidTemp);
-//            listMaintainData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
         }
 
-        wrapper.groupBy("nsm.id");
-        wrapper.orderBy("nsm.schedule_date");
-        listMaintainData = nurseSiteMaintainService.findJoinAssetList(wrapper);
+        listMaintainData = nurseSiteMaintainService.searchMaintainHistory(param);
         if (ObjectUtil.isNotEmpty(listMaintainData)) {
             Set<String> maintainIds = listMaintainData.stream().map(NurseSiteMaintainHistory::getId).collect(Collectors.toSet());
             Wrapper<NurseSiteMaintainItemHistory> itemWrapper = new EntityWrapper<>();

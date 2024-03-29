@@ -34,7 +34,7 @@
 
 
                         <p:ajax event="filter" listener="#{approveScheduleController.onFilter}" update=":ItemDetailViewForm" />
-                        <p:ajax event="rowSelect" listener="#{approveScheduleController.onRowSelect}" update=":ItemDetailViewForm"/>
+                        <p:ajax event="rowSelect" listener="#{approveScheduleController.onRowSelect}" update=":ItemDetailViewForm :ItemWorkOrderDetailViewForm"/>
 
                         <p:column headerText="工单号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.srNum}"/>
@@ -54,7 +54,7 @@
                     </p:dataTable>
                 </h:form>
                 <ui:include src="approveScheduleDetail.xhtml"/>
-
+                <ui:include src="approveScheduleWorkOrderDetail.xhtml"/>
             </div>
         </div>
     </ui:define>

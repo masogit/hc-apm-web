@@ -70,4 +70,6 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     @Transactional
     void deleteByBoUuid(String boUuid);
 
+    List<V2_BlobObject> findByObjectStorageIdIn(Set<String> objectIds);
+
 }

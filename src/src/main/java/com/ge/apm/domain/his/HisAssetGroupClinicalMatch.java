@@ -41,4 +41,10 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     @Column(name = "clinical_dept_uid")
     private String clinicalDeptUid;
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUid;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUid;
+
 }

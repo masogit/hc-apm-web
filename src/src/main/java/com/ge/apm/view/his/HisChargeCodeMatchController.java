@@ -180,6 +180,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
 
         if(orgComponentController.getSelectedOrg() != null){
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
 
         List<HisEquipmentSfxm> bySearchFilter = sfxDao.findBySearchFilter(this.searchFilters,pageRequest).getContent();
@@ -269,6 +270,8 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
                 hisEquipmentSfxmMatch.setCreateDate(date);
                 hisEquipmentSfxmMatch.setCreateBy(user.getName());
                 hisEquipmentSfxmMatch.setClinicalDeptName(group.getClinicalDeptName());
+                hisEquipmentSfxmMatch.setTenantUid(sfxm.getTenantUid());
+                hisEquipmentSfxmMatch.setSiteUid(sfxm.getSiteUid());
                 matches.add(hisEquipmentSfxmMatch);
             }
             List<String> ids = Lists.newArrayList();

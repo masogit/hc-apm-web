@@ -38,6 +38,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -545,6 +546,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
 
         selectedObjectMap.put("measuringOwner", selected.getMeasuringOwnerId() == null ? null : userDao.findById(selected.getMeasuringOwnerId()));
+        selectedObjectMap.put("patrolInspectionOwnerName", selected.getPatrolInspectionOwnerUID() == null ? null : userDao.findByUid(selected.getPatrolInspectionOwnerUID()));
 
 
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
@@ -717,6 +719,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "patrolInspectionOwnerName":
+                selected.setPatrolInspectionOwnerUID(null == selectedUser ? null : selectedUser.getUid());
+                selected.setPatrolInspectionOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setPatrolInspectionOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
         }
 
 
@@ -977,9 +985,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         // do other stuff after save
         int status = selected.getStatus();
-        if(status != assetLifecyleStatus){
-            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
-        }
+//        if(status != assetLifecyleStatus){
+//            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
+//        }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
@@ -1273,7 +1281,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setStatus(4);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
@@ -1293,7 +1301,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setTerminateDate(null);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
+//        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 
@@ -1692,43 +1700,77 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     public String createTpye=null;
+    @Getter
+    @Setter
+    public String createTpyeName=null;
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
         if("manufacturer".equals(type)){
             createTpye=type;
             newSupplier.setManufacturerT(true);
+            createTpyeName="制造商信息";
         }
         if("supplier".equals(type)){
             createTpye=type;
             newSupplier.setSupplierT(true);
+            createTpyeName="供应商信息";
         }
         if("maintainer".equals(type)){
             createTpye=type;
             newSupplier.setMaintainerT(true);
+            createTpyeName="维修商信息";
+
         }
 
     }
 
-
+    public void onBlur() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            this.newSupplier = supplier;
+        } else {
+            String name = newSupplier.getName();
+            boolean ManufacturerT = newSupplier.getManufacturerT();
+            boolean SupplierT = newSupplier.getSupplierT();
+            boolean MaintainerT = newSupplier.getMaintainerT();
+            prepareCreateSupplier("manufacturer");
+            newSupplier.setName(name);
+            newSupplier.setSupplierT(SupplierT);
+            newSupplier.setMaintainerT(MaintainerT);
+            newSupplier.setManufacturerT(ManufacturerT);
+        }
+    }
 
     public void saveNewSupplier() {
-        this.newSupplier.setSiteId(loginUser.getSiteId());
-        this.newSupplier.setHospitalId(loginUser.getHospitalId());
-        this.newSupplier.setTenantUID(loginUser.getTenantUID());
-        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
-        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
-        this.newSupplier.setSiteUID(loginUser.getSiteUID());
-        this.newSupplier.setCreatedDate(new Date());
-        this.newSupplier.setCreatedBy(loginUser.getName());
-
+        if (null == newSupplier.getId()) {
+            this.newSupplier.setSiteId(loginUser.getSiteId());
+            this.newSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newSupplier.setCreatedDate(new Date());
+            this.newSupplier.setCreatedBy(loginUser.getName());
+        }
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
-        supplierList.add(newSupplier);
-        if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
-            supplierList.add(newSupplier);
+        if (newSupplier.getManufacturerT()) {
+            if (manuList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                manuList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getSupplierT()) {
+            if (supplierList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                supplierList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getMaintainerT()) {
+            if (mantainList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                mantainList.add(newSupplier);
+            }
         }
         changeSelect(createTpye);
-
     }
 
     public List<String> autoCompleteTags(String query) {
@@ -1826,7 +1868,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean getAssetScrapEnable(){
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"assetScrap");
-        return  value.equals("true")?true:false;
+        return  StringUtils.isNotEmpty(value)?value.equals("true"):false;
 
     }
 
@@ -1844,6 +1886,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
                 AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
                 selectedObjectMap.put("selectedAssetTypeGroup", assetTypeGroup);
+                if (userContextService.enableAssetGroupAssetTypeGroupAssociation()) {
+                    selected.setAssetGroup(assetTypeGroup.getAssetGroup());
+                }
                 break;
             default:
                 break;
@@ -1854,6 +1899,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
         return dao.secondment(selected.getUid())>0;
+    }
+
+    public void checkSerialNumExists () {
+        List<AssetInfo> list = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
+        if (CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("制造商序列号已存在！");
+        }
     }
 
     public boolean isApproval() {

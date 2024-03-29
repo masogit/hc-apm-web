@@ -6,6 +6,8 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.ApproveSchedule;
 import com.ge.apm.domain.AuditGroupConfigurationDetail;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -28,6 +30,10 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
     private ApproveScheduleRepository dao;
     private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     private UserAccountRepository userAccountRepository;
+    private V2_WorkOrderService workOrderService;
+
+    @Getter @Setter
+    private V2_WorkOrder workOrder;
 
     @Setter
     @Getter
@@ -38,6 +44,8 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
         dao = WebUtil.getBean(ApproveScheduleRepository.class);
         auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
+
 
     }
 
@@ -67,6 +75,8 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
                 auditGroupConfigurationDetail.setSrNum(approveSchedule.getSrNum());
             }
         }
+        List<V2_WorkOrder> workOrders = workOrderService.findBySrNum(selected.getSrNum());
+        workOrder = workOrders.stream().findFirst().get();
     }
     public String getUserName(String userUid){
         UserAccount userAccount = userAccountRepository.getByUid(userUid);

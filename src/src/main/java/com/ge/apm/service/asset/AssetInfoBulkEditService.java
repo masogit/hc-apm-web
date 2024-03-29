@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,9 +66,15 @@ public class AssetInfoBulkEditService {
         commitPmRule(assets, targetAsset);
         commitAssetTagRule(assets);
         commitNurseSiteConfig(assets);
-
+        commitSharedAssetReq(assets);
         //make sure qrcode site update before asset site update, due to qrcode update depend on asset site
         commitSiteForAssetItself(assets, targetAsset);
+    }
+
+    private void commitSharedAssetReq(List<AssetInfo> assets) {
+        if(CollectionUtils.isEmpty(assets)) return;
+        Set<String> collect = assets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
+        sharedAssetRequestRepository.updateStateCompletedByAssetUid(collect);
     }
 
 

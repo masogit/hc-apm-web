@@ -362,7 +362,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
             return;
         }
-        if (selected.getOrgType() == 2 && checkOrgCode()) {
+//        if (selected.getOrgType() == 2 && checkOrgCode()) {
+//            return;
+//        }
+        if (checkOrgCode()) {
             return;
         }
         boolean isNew = selected.getId() == null;

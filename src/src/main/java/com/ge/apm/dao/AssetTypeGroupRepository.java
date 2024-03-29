@@ -12,24 +12,24 @@ import java.util.List;
 public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGroup> {
 
     @Query(value = "with recursive cte_auth_group as (\n" +
-            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid ,sag.tenant_uid  \n" +
+            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid ,sag.tenant_uid,sag.asset_group  \n" +
             "from asset_type_group sag\n" +
             "where parent_uid is null and tenant_uid =?1\n" +
             "\n" +
             "union all\n" +
             "\n" +
-            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid \n" +
+            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid,sag.asset_group \n" +
             "from asset_type_group sag\n" +
             "inner join cte_auth_group cte on sag.parent_uid = cte.uid\n" +
             ") select  * from cte_auth_group", nativeQuery = true)
     List<AssetTypeGroup> listAssetTypeGroupInHierarchy(String tenantUid);
 
     @Query(value = "with recursive cte_child_auth_group as (\n" +
-            "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid\n" +
+            "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid,sag.asset_group\n" +
             "    from asset_type_group sag join user_asset_group uag on uag.asset_group_uid = sag.uid\n" +
             "    where uag.user_uid = :userUid \n" +
             "    union all\n" +
-            "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid\n" +
+            "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid,sag.asset_group\n" +
             "    from asset_type_group sag\n" +
             "    inner join cte_child_auth_group cte_child\n" +
             "    on sag.parent_uid = cte_child.uid\n" +
@@ -66,11 +66,11 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
 
 
     @Query(value = "with recursive cte_auth_group as (\n" +
-            "select sag.uid,  sag.name, sag.encoded, sag.classification_code, sag.parent_uid,sag.tenant_uid\n" +
+            "select sag.uid,  sag.name, sag.encoded, sag.classification_code, sag.parent_uid,sag.tenant_uid,sag.asset_group\n" +
             "from asset_type_group sag\n" +
             "where parent_uid=?1\n" +
             "union all\n" +
-            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid\n" +
+            "select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid,sag.asset_group\n" +
             "from asset_type_group sag\n" +
             "inner join cte_auth_group cte on sag.parent_uid = cte.uid) select  * from cte_auth_group", nativeQuery = true)
     List<AssetTypeGroup> findChildByParentUid(String uid);
@@ -120,4 +120,7 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
             "        )  \n" +
             "        select uag.user_uid from cte_child_auth_group join user_asset_group uag on cte_child_auth_group.uid = uag.asset_group_uid", nativeQuery = true)
     List<String> getUserUidListByEncoded(@Param("encoded") String encoded);
+
+    @Query(value = "select sag.* from asset_type_group sag where sag.parent_uid is null and tenant_uid=?1", nativeQuery = true)
+    List<AssetTypeGroup> getTopAuthGroupAndTenantUid(String tenantUid);
 }

@@ -23,12 +23,15 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.tools.FileObject;
 import java.util.*;
 import java.util.logging.Level;
@@ -1122,54 +1125,71 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao.updateIsEdit(selected.getIsEdit(),selected.getId());
     }
 
-    public void saveNewSupplier() {
+    public void onBlur() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-        this.newSupplier.setSiteId(loginUser.getSiteId());
-        this.newSupplier.setHospitalId(loginUser.getHospitalId());
-        this.newSupplier.setTenantUID(loginUser.getTenantUID());
-        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
-        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
-        this.newSupplier.setSiteUID(loginUser.getSiteUID());
-        this.newSupplier.setCreatedDate(new Date());
-        this.newSupplier.setCreatedBy(loginUser.getName());
-        supplierController.setSelected(newSupplier);
-        supplierController.saveSubmit();
-
-/*        if("manufacturer".equals(newSupplierType)){
-            manueList.add(newSupplier);
-        }else if("supplier".equals(newSupplierType)){
-            suppliersList.add(newSupplier);
-        }else if("maintainer".equals(newSupplierType)){
-            maintainerList.add(newSupplier);
-        }*/
-        if(newSupplier.getManufacturerT()){
-            manueList.add(newSupplier);
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            this.newSupplier = supplier;
+        } else {
+            String name = newSupplier.getName();
+            boolean ManufacturerT = newSupplier.getManufacturerT();
+            boolean SupplierT = newSupplier.getSupplierT();
+            boolean MaintainerT = newSupplier.getMaintainerT();
+            prepareCreateSupplier("manufacturer");
+            newSupplier.setName(name);
+            newSupplier.setSupplierT(SupplierT);
+            newSupplier.setMaintainerT(MaintainerT);
+            newSupplier.setManufacturerT(ManufacturerT);
         }
-        if(newSupplier.getSupplierT()){
-            suppliersList.add(newSupplier);
-        }
-        if(newSupplier.getMaintainerT()){
-            maintainerList.add(newSupplier);
-        }
-//        supplierList.add(newSupplier);
-//        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
-//            supplierList.add(newSupplier);
-//        }
-//        changeSelect(createTpye);
-
     }
 
+    public void saveNewSupplier() {
+        if (null == newSupplier.getId()) {
+            UserAccount loginUser = UserContextService.getCurrentUserAccount();
+            this.newSupplier.setSiteId(loginUser.getSiteId());
+            this.newSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newSupplier.setCreatedDate(new Date());
+            this.newSupplier.setCreatedBy(loginUser.getName());
+        }
+        if (newSupplier.getManufacturerT()) {
+            if (manueList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                manueList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getSupplierT()) {
+            if (suppliersList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                suppliersList.add(newSupplier);
+            }
+        }
+        if (newSupplier.getMaintainerT()) {
+            if (maintainerList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+                maintainerList.add(newSupplier);
+            }
+        }
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+    }
+    @Getter
+    @Setter
+    public String createTpyeName=null;
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
         newSupplierType = type;
         if("manufacturer".equals(type)){
             newSupplier.setManufacturerT(true);
+            createTpyeName="制造商信息";
         }
         if("supplier".equals(type)){
             newSupplier.setSupplierT(true);
+            createTpyeName="供应商信息";
         }
         if("maintainer".equals(type)){
             newSupplier.setMaintainerT(true);
+            createTpyeName="维修商信息";
         }
 
     }
@@ -1296,6 +1316,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
+    public List<QrCodeTemplate> getQrCodeTemplates() {
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
+    }
     public void exportQrCode() throws Exception {
 //        Map<String, String> orgNamesMap = orgDao.findByUids(arrivalItemList.stream().filter(item->item.getSiteUid()!=null).map(ArrivalListItem::getSiteUid).distinct().collect(Collectors.toSet()))
 //                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
@@ -1310,7 +1334,30 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
 
         List<QrCodeLib> bySearchFilter = qrCodeLibRepository.findBySearchFilter(filterFilter);
-        QrCodeExportStream exportStream = new QrCodeExportStream(bySearchFilter.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        if(CollectionUtils.isEmpty(bySearchFilter)){
+            return;
+        }
+        List<AssetInfo> assetInfos = new ArrayList<AssetInfo>(bySearchFilter.size());
+        Map<String, List<ArrivalListItem>> listMap = arrivalItemList.stream().filter(item -> item.getQrCode() != null).collect(Collectors.groupingBy(ArrivalListItem::getQrCode));
+
+        for (QrCodeLib qrCodeLib : bySearchFilter) {
+            AssetInfo assetInfo = new AssetInfo();
+            assetInfo.setSiteUID(qrCodeLib.getSiteUID());
+            assetInfo.setQrCode(qrCodeLib.getQrCode());
+            List<ArrivalListItem> arrivalListItems = listMap.get(qrCodeLib.getQrCode());
+            if(!CollectionUtils.isEmpty(arrivalListItems)){
+                ArrivalListItem arrivalListItem = arrivalListItems.get(0);
+                assetInfo.setSerialNum(arrivalListItem.getSerialNum());
+                assetInfo.setFinancingNum(arrivalListItem.getFinancingNum());
+                assetInfo.setDepartNum(arrivalListItem.getDepartNum());
+                assetInfo.setName(selected.getAssetName());
+                assetInfo.setClinicalDeptName(selected.getClinicalDeptName());
+                assetInfo.setClinicalDeptUID(selected.getClinicalDeptUID());
+                assetInfo.setAssetGroup(selected.getAssetGroup());
+            }
+            assetInfos.add(assetInfo);
+        }
+        QrCodeExportStream exportStream = new QrCodeExportStream(assetInfos.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
         zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 

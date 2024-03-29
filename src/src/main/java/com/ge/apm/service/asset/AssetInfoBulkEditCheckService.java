@@ -66,28 +66,35 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
             List<SharedAssetReqDetail> sharedAssetReqDetails = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
-            if(sharedAssetReqDetails.size() > 0){
-                List<String> assetUidList = new ArrayList<>();
-                for (int i = 0; i < sharedAssetReqDetails.size(); i++) {
-                    SharedAssetReqDetail sharedAssetReqDetail = sharedAssetReqDetails.get(i);
-                    String assetInfoUid = sharedAssetReqDetail.getAssetInfoId();
-                    if(!assetUidList.contains(assetInfoUid)){
-                        assetUidList.add(assetInfoUid);
-                        String returnId = sharedAssetReqDetail.getReturnId();
-                        if(!"".equals(returnId) && returnId !=null){
-                            SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(returnId);
-                            int state = sharedAssetRequest.getState();
-                            if (state==ReceiveBorrowConstant.STATE_RETURN_CONFIRMED){
-                                return true;
-                            }
-                        }
+            Map<String, List<SharedAssetReqDetail>> sharedAssetReqDetailGroup = sharedAssetReqDetails.stream().collect(Collectors.groupingBy(SharedAssetReqDetail::getAssetInfoId));
+            if(!CollectionUtils.isEmpty(sharedAssetReqDetailGroup)){
+                Set<Map.Entry<String, List<SharedAssetReqDetail>>> sharedAssetReqDetailEntries = sharedAssetReqDetailGroup.entrySet();
+                for (Map.Entry<String, List<SharedAssetReqDetail>> sharedAssetReqDetailEntry : sharedAssetReqDetailEntries) {
+                    List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailEntry.getValue();
+                    if(undone(sharedAssetReqDetailList)){
+                        return false;
                     }
                 }
-                return false;
             }
         }
         return true;
     }
+
+    private boolean undone(List<SharedAssetReqDetail> sharedAssetReqDetailList) {
+        if(CollectionUtils.isEmpty(sharedAssetReqDetailList)) return false;
+        return sharedAssetReqDetailList.stream().anyMatch(item -> {
+            SharedAssetRequest leaseRequest = item.getLeaseRequest();
+            SharedAssetRequest returnRequest = item.getReturnRequest();
+            if (returnRequest != null) {
+                int state = returnRequest.getState();
+                return ((state > ReceiveBorrowConstant.STATE_RENT_EXPIRED && state < ReceiveBorrowConstant.STATE_RETURN_DELIVERED) || state == ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
+            } else {
+                int state = leaseRequest.getState();
+                return (state < ReceiveBorrowConstant.STATE_RENT_DELIVERED || state == ReceiveBorrowConstant.STATE_RENT_SUSPENDED);
+            }
+        });
+    }
+
     public List<String> verifyByBatchEdit(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
            List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());

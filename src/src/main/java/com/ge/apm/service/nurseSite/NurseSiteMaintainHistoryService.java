@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Created by 503035627
  */
@@ -283,30 +285,23 @@ public class NurseSiteMaintainHistoryService {
 	}
 
 	public void supplementMaintainWithoutItem(List<NurseSiteMaintainHistory> listTempMaintain) {
-		Set<String> setModifyByUids = new HashSet<String>();
-		Map<String, UserAccount> mapModifyBy = new HashMap<String, UserAccount>();
+		Set<String> setModifyByUids = new HashSet<>();
+		Map<String, UserAccount> mapModifyBy = new HashMap<>();
 		List<UserAccount> listModify = null;
-		Set<String> nurseSiteMaintainIds = new HashSet<String>();
-		if (listTempMaintain != null && listTempMaintain.size() > 0) {
-			for (int i = 0; i < listTempMaintain.size(); ++i) {
-				NurseSiteMaintainHistory tempMaintain = listTempMaintain.get(i);
-				nurseSiteMaintainIds.add(tempMaintain.getId());
-				setModifyByUids.add(tempMaintain.getCreateByUid());
-				setModifyByUids.add(tempMaintain.getModifyByUid());
-			}
+		if (ObjectUtil.isNotEmpty(listTempMaintain)) {
+			setModifyByUids = listTempMaintain.stream().map(NurseSiteMaintainHistory::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+			setModifyByUids.addAll(listTempMaintain.stream().map(NurseSiteMaintainHistory::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet()));
 		}
-		if (setModifyByUids.size() > 0) {
+		if (ObjectUtil.isNotEmpty(setModifyByUids)) {
 			listModify = userAccountRepository.getSimpleByUids(setModifyByUids);
 		}
 		if (listModify != null) {
-			for (int i = 0; i < listModify.size(); ++i) {
-				UserAccount tempUser = listModify.get(i);
+			for (UserAccount tempUser : listModify) {
 				mapModifyBy.put(tempUser.getUid(), tempUser);
 			}
 		}
-		if (listTempMaintain != null && listTempMaintain.size() > 0) {
-			for (int i = 0; i < listTempMaintain.size(); ++i) {
-				NurseSiteMaintainHistory tempMaintain = listTempMaintain.get(i);
+		if (ObjectUtil.isNotEmpty(listTempMaintain)) {
+			for (NurseSiteMaintainHistory tempMaintain : listTempMaintain) {
 				if (StringUtils.isNotEmpty(tempMaintain.getModifyByUid())) {
 					tempMaintain.setModifyBy(mapModifyBy.get(tempMaintain.getModifyByUid()));
 				}
@@ -669,5 +664,9 @@ public class NurseSiteMaintainHistoryService {
 
 	public List<NurseSiteMaintainItemHistory> findItemJoinAssetList(Pagination pagination, Wrapper<NurseSiteMaintainItemHistory> wrapper) {
 		return nurseSiteMaintainHistoryItemMapper.findJoinAssetList(pagination, wrapper);
+	}
+
+	public List<NurseSiteMaintainHistory> searchMaintainHistory(Map<String, Object> param) {
+		return nurseSiteMaintainHistoryMapper.searchMaintainHistory(param);
 	}
 }

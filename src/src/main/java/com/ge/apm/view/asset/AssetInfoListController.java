@@ -37,6 +37,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -319,24 +320,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         lastPageSort = pageRequest.getSort(); //export excel use
         boolean createdByBoolean = false;
         String value = null;
-        for (SearchFilter searchFilter :searchFilters) {
-            if ("createdBy".equals(searchFilter.fieldName)) {
-                createdByBoolean = true;
-                value = (String)searchFilter.value;
-            }
-        }
-
-        if(createdByBoolean) {
-            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
-            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
-            List<String> loginNamList = new ArrayList<>();
-            if(!userAccountList.isEmpty()){
-                for (UserAccount userAccount:userAccountList) {
-                    loginNamList.add(userAccount.getLoginName());
-                }
-            }
-            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
-        }
+//        for (SearchFilter searchFilter :searchFilters) {
+//            if ("createdBy".equals(searchFilter.fieldName)) {
+//                createdByBoolean = true;
+//                value = (String)searchFilter.value;
+//            }
+//        }
+//
+//        if(createdByBoolean) {
+//            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
+//            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+//            List<String> loginNamList = new ArrayList<>();
+//            if(!userAccountList.isEmpty()){
+//                for (UserAccount userAccount:userAccountList) {
+//                    loginNamList.add(userAccount.getLoginName());
+//                }
+//            }
+//            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
+//        }
         if (this.hasFilterOnField("assetUsedLifecycle")) {
             int assetUsedLifecycle = Integer.parseInt(searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetUsedLifecycle", SearchFilter.Operator.EQ, 0)).value.toString());
             DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
@@ -659,8 +660,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
+        assetHistoryService.deleteAsset(asset);
         logger.info("delete asset successful. assetName: {}", asset.getName());
-        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
+//        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
     public void cancleWarranty(String assetUid) {
@@ -793,7 +795,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(assetInfo);
             assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
-            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+//            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
         this.selectedMap.clear();
     }
