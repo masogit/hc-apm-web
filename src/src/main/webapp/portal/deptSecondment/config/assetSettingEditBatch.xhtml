@@ -16,7 +16,7 @@
                                      var="item"
                                      widgetVar="configEditList1"
                                      lazy="true" paginator="true" paginatorPosition="both"
-                                     paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.createdDate}"
+                                     paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" emptyMessage="#{msg.noRecordFound}"
@@ -76,10 +76,10 @@
                                      var="item"
                                      widgetVar="selectedTable"
                                      lazy="true" paginator="true" paginatorPosition="both"
-                                     paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.createdDate}"
+                                     paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     rows="5" emptyMessage="#{msg.noRecordFound}"
+                                     rows="5" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
                                      rowsPerPageTemplate="5,10,20,50">
                             <p:column width="40" id="checkBoxCol1">
                                 <p:selectBooleanCheckbox value="#{secondmentAssetSettingBatchController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox1">

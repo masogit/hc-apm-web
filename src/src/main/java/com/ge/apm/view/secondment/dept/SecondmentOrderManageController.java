@@ -1,6 +1,7 @@
 package com.ge.apm.view.secondment.dept;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
@@ -62,6 +63,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private SecondmentOrderDto secondmentOrderDtoTemp;
     private SharedAssetService sharedAssetService;
     private MqUtils mqUtils;
+    private List<SecondmentOrder.ProcessRecords> processRecords;
 
     @Override
     protected GenericRepositoryUUID<SecondmentOrderDto> getDAO() {
@@ -135,9 +137,15 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         super.prepareEdit();
         secondmentOrderDtoTemp = this.selected;
         serializationConfiguration();
-
+        serializationProcessRecords();
     }
-
+    private void serializationProcessRecords(){
+        processRecords = new ArrayList<>();
+        String processRecordsStr = selected.getProcessRecords();
+        if(StringUtils.hasText(processRecordsStr)){
+            processRecords = JSON.parseObject(processRecordsStr,new TypeReference<List<SecondmentOrder.ProcessRecords>>(){});
+        }
+    }
     private void serializationConfiguration() {
         secondmentConfig = new SecondmentConfig();
         String configSnapshot = selected.getConfigSnapshot();
@@ -172,6 +180,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      dto.setBillingTime(null);
                      dto.setCost(null);
                      BeanUtils.copyProperties(dto,order);
+                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"同意");
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
@@ -197,25 +206,51 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                          assetInfo.setBillingCost(billingCost + billingCost+dto.getCost());
                      }
                      BeanUtils.copyProperties(dto,order);
+                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还");
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
                  break;
              case 5:
                  // 提醒归还
+                 dto.setBillingTime(null);
+                 dto.setCost(null);
                  sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_REMINDER_TO_RETURN, HttpMethod.POST,new HashMap<>(),(url)-> url.replace("{orderId}",dto.getId()));
                  WebUtil.addSuccessMessage("设备："+assetInfo.getName() +"，已发送归还通知！");
                  break;
              case 4:
-             case 2:
-                dto.setBillingBeginTime(new Date());
-             case -2: // 已拒绝
-             case -1: //已取消
-             default:
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"维修中");
                  secondmentOrderRepository.save(order);
+                 break;
+             case 2:
+                 dto.setBillingBeginTime(new Date());
+                 dto.setBillingTime(null);
+                 dto.setCost(null);
+                 BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付");
+                 secondmentOrderRepository.save(order);
+                break;
+             case -2: // 已拒绝
+                 dto.setBillingTime(null);
+                 dto.setCost(null);
+                 BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝");
+                 secondmentOrderRepository.save(order);
+                 break;
+             case -1: //已取消
+                 BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消");
+                 secondmentOrderRepository.save(order);
+                 break;
+             case 0: //已取消
+                 BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"申请");
+                 secondmentOrderRepository.save(order);
+                 break;
+             default:
                  break;
          }
 
@@ -257,7 +292,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         return name;
     }
 
-    private void calculateTimeCharges(SecondmentOrderDto order){
+    public SecondmentOrderDto calculateTimeCharges(SecondmentOrderDto order){
         LocalDateTime beginLocalDateTime = order.getBillingBeginTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         Date billingEndTime = order.getBillingEndTime();
         if(billingEndTime == null){
@@ -290,9 +325,14 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
             default:
                 break;
         }
-
+        return order;
     }
-
+    public SecondmentOrderDto adDocCalculation(SecondmentOrderDto dto){
+        if(dto.getBillingBeginTime() != null && dto.getBillingTime() == null){
+            return calculateTimeCharges(dto);
+        }
+        return dto;
+    }
 
     public Wrapper<SecondmentOrderDto> buildDefaultFilters(List<SearchFilter> searchFilters) {
         Wrapper<SecondmentOrderDto> ew = new EntityWrapper<SecondmentOrderDto>();
@@ -414,5 +454,13 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
             }
         }
         return result.toString();
+    }
+
+    public List<SecondmentOrder.ProcessRecords> getProcessRecords() {
+        return processRecords;
+    }
+
+    public void setProcessRecords(List<SecondmentOrder.ProcessRecords> processRecords) {
+        this.processRecords = processRecords;
     }
 }
