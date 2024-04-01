@@ -102,11 +102,11 @@
                                 </p:column>
 
                                 <p:column headerText="借出时长" >
-                                    <h:outputText value="#{secondmentOrderManageController.adDocCalculation(item).billingTime}"/>
+                                    <h:outputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.adDocCalculation(item).billingTime)}"/>
                                 </p:column>
 
                                 <p:column headerText="借出费用" >
-                                    <h:outputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.adDocCalculation(item).cost)}"/>
+                                    <h:outputText value="#{secondmentOrderManageController.adDocCalculation(item).cost}"/>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">

@@ -22,6 +22,7 @@
                                      rows="5" emptyMessage="#{msg.noRecordFound}"
                                      rowsPerPageTemplate="5,10,20,50">
                             <p:ajax event="filter" listener="#{secondmentAssetSettingBatchController.onFilter}" update="datalist"/>
+                            <p:ajax event="page"  listener="#{secondmentAssetSettingBatchController.setAllSelected1(false)}" oncomplete="updateSelectAllCheckBox('selectCheckBox','selectCheckBoxHeader');"/>
                             <p:column width="40" id="checkBoxCol">
                                 <p:selectBooleanCheckbox value="#{secondmentAssetSettingBatchController.selectedAssetUidTable1[item.uid]}" class="selectCheckBox">
                                     <p:ajax event="change" listener="#{secondmentAssetSettingBatchController.updateSelctedAssetList1}" update="@(.selectCheckBoxHeader)"/>
@@ -81,6 +82,7 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="5" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
                                      rowsPerPageTemplate="5,10,20,50">
+                            <p:ajax event="page"  listener="#{secondmentAssetSettingBatchController.setAllSelected2(false)}" oncomplete="updateSelectAllCheckBox('selectCheckBox1','selectCheckBoxHeader1');"/>
                             <p:column width="40" id="checkBoxCol1">
                                 <p:selectBooleanCheckbox value="#{secondmentAssetSettingBatchController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox1">
                                     <p:ajax event="change" listener="#{secondmentAssetSettingBatchController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader1)"/>
@@ -145,7 +147,18 @@
                 PF(dialog).hide();
             }
         }
-
+        function updateSelectAllCheckBox(checkBox,checkBoxHeader) {
+            var checkboxlist = $("."+checkBox);
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+            });
+            if (selectAllstatus) {
+                $("."+checkBoxHeader)[0].children[1].classList.add("ui-state-active");
+            } else {
+                $("."+checkBoxHeader)[0].children[1].classList.remove("ui-state-active");
+            }
+        }
     </script>
 </ui:composition>
 </html>

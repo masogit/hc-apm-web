@@ -437,7 +437,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         this.secondmentOrderDtoTemp = secondmentOrderDtoTemp;
     }
 
-    public String conversionTime(Long billingTime){
+    public static String conversionTime(Long billingTime){
         StringBuilder result=new StringBuilder();
         if(billingTime != null){
             long day = 0;
@@ -449,9 +449,11 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
             if((hour = billingTime % (24 * 60) / 60) > 0){
                 result.append(hour).append("小时");
             }
-            if((minute = billingTime % (24 * 60) % 60) > 0){
+            if((minute = billingTime % 60) > 0){
                 result.append(minute).append("分钟");
             }
+        }else{
+            result.append("0");
         }
         return result.toString();
     }
