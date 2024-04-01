@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -73,6 +74,9 @@
                                             <f:selectItem itemLabel="待交付"  itemValue="1" />
                                             <f:selectItem itemLabel="待归还"  itemValue="2" />
                                             <f:selectItem itemLabel="已归还"  itemValue="3" />
+                                            <c:if test="#{!secondmentOrderManageController.borrowFlag}">
+                                                <f:selectItem  itemLabel="维修中"  itemValue="4" />
+                                            </c:if>
 <!--                                            <f:selectItems value="#{fieldMsg.getFieldValueList('borrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                         </p:selectOneMenu>
                                     </f:facet>
@@ -96,12 +100,15 @@
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
                                     </h:outputText>
                                 </p:column>
+
                                 <p:column headerText="借出时长" >
-                                    <h:outputText value="#{item.billingTime}"/>
+                                    <h:outputText value="#{secondmentOrderManageController.adDocCalculation(item).billingTime}"/>
                                 </p:column>
+
                                 <p:column headerText="借出费用" >
-                                    <h:outputText value="#{item.cost}"/>
+                                    <h:outputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.adDocCalculation(item).cost)}"/>
                                 </p:column>
+
                                 <f:facet name="{Toolbar}">
                                     <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                         <p:dataExporter type="xls" target="datalist" fileName="secondmentOrder_export"/>

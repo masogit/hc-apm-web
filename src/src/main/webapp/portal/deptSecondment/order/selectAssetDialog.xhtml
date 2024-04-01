@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="selectAssetDlg"  widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="选择设备" appendTo="@(body)" width="80%" height="500">
+        <p:dialog id="selectAssetDlg"  widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="新增设备" appendTo="@(body)" width="80%" height="500">
             <h:form id="selectAssetForm" >
                 <p:panelGrid columns="1" layout="grid">
                         <p:dataTable id="selectAssetDatalist" filterDelay="" value="#{secondmentOrderAssetController.lazyModel}" var="item" widgetVar="varSelectAssetDatalist"
@@ -45,7 +45,7 @@
                                 <h:outputText value="#{item.clinicalDeptName}"/>
                             </p:column>
                             <p:column headerText="设备调剂状态" >
-                                <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.borrowedStatus)}"/>
+                                <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>
                             </p:column>
                             <p:column headerText="使用计费模式" >
                                 <h:outputText value="#{secondmentAssetSettingController.getBillingModel(item)}"/>

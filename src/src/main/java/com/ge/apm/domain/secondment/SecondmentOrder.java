@@ -1,6 +1,8 @@
 package com.ge.apm.domain.secondment;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -110,6 +112,8 @@ public class SecondmentOrder implements Serializable {
 
     @Column(name = "denial_reason", columnDefinition = "text")
     private String denialReason;
+    @Column(name = "process_records", columnDefinition = "text")
+    private String processRecords;
 
     @Override
     public int hashCode() {
@@ -129,6 +133,17 @@ public class SecondmentOrder implements Serializable {
             return false;
         }
         return true;
+    }
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProcessRecords{
+        private String  uid;
+        private String  name;
+        private Integer status;
+        private String  nodeName;
+        private Date    operateTime;
+
     }
 
 }

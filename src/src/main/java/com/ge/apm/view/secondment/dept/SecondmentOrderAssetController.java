@@ -1,6 +1,8 @@
 package com.ge.apm.view.secondment.dept;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
@@ -186,6 +188,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             SecondmentOrder secondmentOrder = this.secondmentOrder;
             if(secondmentOrder!= null){
                 String secondmentNo = generateSecondmentNo(null);
+                 generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请");
                 secondmentOrder.setSecondmentNo(secondmentNo);
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
@@ -196,6 +199,19 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
 
     }
 
+    public static void generateProcessRecords(SecondmentOrder order,String uid,String name,String nodeName){
+        if(order == null) return;
+        List<SecondmentOrder.ProcessRecords> processRecordsList;
+        String processRecords = order.getProcessRecords();
+        if(StringUtils.hasText(processRecords)){
+            processRecordsList = JSON.parseObject(processRecords, new TypeReference<List<SecondmentOrder.ProcessRecords>>() {
+            });
+        }else{
+            processRecordsList =new ArrayList<>();
+        }
+        processRecordsList.add(new SecondmentOrder.ProcessRecords(uid,name,order.getStatus(),nodeName,new Date()));
+        order.setProcessRecords(JSON.toJSONString(processRecordsList));
+    }
     public void applyBorrowBefore(){
         crudActionName = "Create";
         refreshSecondmentConfig();
