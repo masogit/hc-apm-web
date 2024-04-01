@@ -61,11 +61,11 @@
                             <label class ="label">备注 </label>
                             <p:inputText id="remark" value="#{sparePartController.selected.remark}"  />
                         </h:panelGroup>
-                        <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                        <h:panelGroup>
                             <label class ="label">适用设备 </label>
                             <p:inputText id="adaptingDevices" value="#{sparePartController.selected.adaptingDevices}"  />
                         </h:panelGroup>
-                        <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                        <h:panelGroup>
                             <label class ="label">有效期 </label>
                             <p:calendar id="effectiveDate" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartController.selected.effectiveDate}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
@@ -76,7 +76,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:fieldset legend="备件照片" rendered="${userContextService.hasCurrentTenantName('')}">
+                    <p:fieldset legend="备件照片">
                         <p:dataGrid id="pictureList" var="fileitem" value="#{sparePartController.tempFile}" columns="5" layout="grid">
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
