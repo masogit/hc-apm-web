@@ -108,9 +108,21 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         addFilter();
-        return super.loadData(pageRequest);
+        Page<AssetInfo> assetInfos = super.loadData(pageRequest);
+        generateVirtualSerialNumber(assetInfos);
+        return assetInfos;
     }
-
+    private void generateVirtualSerialNumber(Page<AssetInfo> assetInfos){
+        int number = assetInfos.getNumber();
+        int size = assetInfos.getSize();
+        List<AssetInfo> content = assetInfos.getContent();
+        if(CollectionUtils.isEmpty(content)) return;
+        int num =number * size;
+        for (int i = 0; i < content.size(); i++) {
+            AssetInfo assetInfo = content.get(i);
+            assetInfo.setSharedAssetSwapIndexId(String.valueOf((num + i + 1)));
+        }
+    }
     private void addFilter(){
         String orgInfoUID = userAccount.getOrgInfoUID();
         List<String> scope = cacheOrgList.stream().filter(item -> !item.getUid().equals(orgInfoUID) && item.getOrgType() == 4).map(item -> item.getUid()).collect(Collectors.toList());
@@ -351,5 +363,26 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
 
     public void setSelectAssetInfos(List<AssetInfo> selectAssetInfos) {
         this.selectAssetInfos = selectAssetInfos;
+    }
+
+    public static String conversionTime(Long billingTime){
+        StringBuilder result=new StringBuilder();
+        if(billingTime != null){
+            long day = 0;
+            long hour = 0;
+            long minute = 0;
+            if((day=billingTime / (24 * 60)) > 0){
+                result.append(day).append("天");
+            }
+            if((hour = billingTime % (24 * 60) / 60) > 0){
+                result.append(hour).append("小时");
+            }
+            if((minute = billingTime % 60) > 0){
+                result.append(minute).append("分钟");
+            }
+        }else{
+            result.append("0");
+        }
+        return result.toString();
     }
 }
