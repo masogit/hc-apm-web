@@ -62,7 +62,7 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		
+
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量盘点" process="@this" update="@(.datalist1)" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_BATH_INVENTORY')}" actionListener="#{inventoryOrderDetailAssetInfoController.bathInventory()}">
 				<p:confirm header="盘点确认" message="是否对当前页面所有设备进行盘点？" icon="ui-icon-warning"/>
