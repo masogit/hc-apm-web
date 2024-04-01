@@ -8,8 +8,8 @@
 				<p:outputLabel class="pageTitle" value="#{msg.InventoryDetails}" />
 			</div>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5" rendered="true">
-                <p:commandButton value="工单视图" rendered="#{userContextService.hasCurrentTenantName('')}"  action="#{inventoryOrderDetailAssetInfoAllController.changePage(true)}"/>
-                <p:commandButton value="全院视图" rendered="#{userContextService.hasCurrentTenantName('')}" action="#{inventoryOrderDetailAssetInfoAllController.changePage(false)}" disabled="true"/>
+                <p:commandButton value="工单视图"  action="#{inventoryOrderDetailAssetInfoAllController.changePage(true)}"/>
+                <p:commandButton value="全院视图" action="#{inventoryOrderDetailAssetInfoAllController.changePage(false)}" disabled="true"/>
             </h:panelGrid>
 			<div class="ui-g-12 card ">
 				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0" dynamic="true" cache="true">
