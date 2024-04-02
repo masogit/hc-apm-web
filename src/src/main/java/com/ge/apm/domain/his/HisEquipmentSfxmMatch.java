@@ -1,5 +1,6 @@
 package com.ge.apm.domain.his;
 
+import com.ge.apm.domain.Supplier;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -75,5 +76,10 @@ public class HisEquipmentSfxmMatch implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)
+    private HisAssetGroup hisAssetGroup;
 
 }

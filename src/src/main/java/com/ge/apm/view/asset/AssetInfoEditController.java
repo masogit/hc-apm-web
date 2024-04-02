@@ -365,6 +365,32 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             assetInfoService.setSupplier(ListUtil.newArrayList(selected));
+        }else if ("Copy".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = false;
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            AssetInfo assetInfo=dao.findByUid(selectedId);
+
+            try {
+                prepareCreate();
+                String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
+                terminate = Boolean.parseBoolean(terminateStr);
+                assetInfoCopySelected(assetInfo,selected);
+                OrgInfo orgInfo = orgDao.findByUid(assetInfo.getSiteUID());
+                selectedObjectMap.put("selectedOrg", orgInfo);
+//                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+                selected.setSiteId(orgInfo.getSiteId());
+                selected.setHospitalId(orgInfo.getId());
+
+                selected.setTenantUID(orgInfo.getTenantUID());
+                selected.setHospitalUID(orgInfo.getHospitalUID());
+                selected.setInstitutionUID(orgInfo.getInstitutionUID());
+                selected.setSiteUID(orgInfo.getSiteUID());
+                config = configService.findConfigBySite(selected.getSiteUID());
+                beforeEdit();
+            } catch (Exception e) {
+                logger.error("AssetInfoEditController copy error: "+e);
+            }
+
         }
         if(selected ==null){
             try {
@@ -419,6 +445,42 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
+    }
+    private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
+
+//        selected.setAssetGroup(assetInfo.getAssetGroup());
+//        selected.setClinicalDeptId(assetInfo.getClinicalDeptId());
+//        selected.setClinicalDeptUID(assetInfo.getClinicalDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setAssetDeptUID(assetInfo.getAssetDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setStatus(assetInfo.getStatus());
+//        selected.setName(assetInfo.getName());
+//
+//        selected.setManufactureId(assetInfo.getManufactureId());
+//        selected.setManufacture(assetInfo.getManufacture());
+//        selected.setManufactureTel(assetInfo.getManufactureTel());
+//        selected.setVendor(assetInfo.getVendor());
+//        selected.setSupplierId(assetInfo.getSupplierId());
+//        selected.setVendorTel(assetInfo.getVendorTel());
+//
+//        selected.setMaitanance(assetInfo.getMaitanance());
+//        selected.setMaitananceId(assetInfo.getMaitananceId());
+//        selected.setMaitananceTel(assetInfo.getMaitananceTel());
+//
+//        selected.setRegistrationNo(assetInfo.getRegistrationNo());
+//
+//        selected.setFunctionType(assetInfo.getFunctionType());
+//        selected.setMeasureGrade(assetInfo.getMeasureGrade());
+//        selected.setMeasuringItemCategory(assetInfo.getMeasuringItemCategory());
+        BeanUtils.copyProperties(assetInfo,selected);
+        selected.setSerialNum(null);
+        selected.setFinancingNum(null);
+        selected.setDepartNum(null);
+        selected.setQrCode(null);
+        selected.setQrCode(null);
+        selected.setId(null);
+        selected.setUid(null);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {

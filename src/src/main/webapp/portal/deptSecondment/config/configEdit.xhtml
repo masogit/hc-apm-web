@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="configEditDlg" width="1000" height="600" widgetVar="configEditDlg" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentConfigController.getCRUDActionName()}" >
+        <div class="ui-g-12 card">
+            <h:form id="configEditForm">
+                <p:fieldset legend="调剂设备信息" style="margin-bottom:20px">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{secondmentConfigController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.name}*</label>
+                            <p:inputText value="#{secondmentConfigController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">单价*</label>
+                            <p:inputNumber  value="#{secondmentConfigController.selected.unitPrice}" decimalPlaces="2" minValue="0" required="true"  requiredMessage="单价 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>计价方式*</label>
+                            <p:selectOneMenu id="chargingType" required="true"
+                                              value="#{secondmentConfigController.selected.billingType}"
+                                              requiredMessage="计价方式 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.createdBy}</label>
+                            <p:inputText value="#{secondmentConfigController.currentUserAccount}"  readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.createdDate}</label>
+                            <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentConfigController.selected.createdDate}" readonly="true" showOn="false"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.remark}</label>
+                            <p:inputTextarea cols="100" value="#{secondmentConfigController.selected.remark}"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:commandButton validateClient="true" actionListener="#{secondmentConfigController.save}" value="#{msg.Save}" update=":secondmentConfigForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configEditDlg')"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('configEditDlg').hide()"/>
+            </h:form>
+        </div>
+    </p:dialog>
+</ui:composition>
+</html>

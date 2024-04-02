@@ -193,4 +193,10 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		this.orderId = orderId;
 	}
 
+    public void transferNonInventory(InventoryOrderDetail inventoryOrderDetail) {
+        inventoryOrderDetail.setStatus(0);
+        inventoryOrderDetail.setLastModifiedBy("");
+        dao.save(inventoryOrderDetail);
+    }
+
 }

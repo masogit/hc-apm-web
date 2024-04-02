@@ -185,8 +185,11 @@ public enum GatewayURL {
     ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
 
     // davinci
-    DAVINCI_EXTERNAL("/davinci/externalSharePageLink")
-
+    DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),
+    // 科室间调剂
+    SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
+    SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),
+    SECONDMENT_GENERATE_NO("/hcapmworkflowservice/api/apm/secondment/getNo"),
     ;
     private final String url;
 

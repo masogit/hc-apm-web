@@ -657,6 +657,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return UrlEncryptController.encodeUrlParam(operation);
     }
 
+    public String getCopyPage(String assetUid, String assetName) {
+        String operation = "AssetCreate.xhtml?actionName=Copy&selectedid=" + assetUid
+                + "&asset_name=" + assetName
+                + "&terminate=" + this.terminate;
+        return UrlEncryptController.encodeUrlParam(operation);
+    }
+
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);

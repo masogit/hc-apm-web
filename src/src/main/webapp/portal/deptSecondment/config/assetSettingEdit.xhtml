@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="assetSettingEdit" width="1000" height="600" widgetVar="assetSettingEdit" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentAssetSettingController.getCRUDActionName()}" >
+        <div class="ui-g-12 card">
+            <h:form id="assetSettingFrom">
+                <p:fieldset legend="调剂设备配置" style="margin-bottom:20px">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{secondmentAssetSettingController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetName}</label>
+                            <p:inputText value="#{secondmentAssetSettingController.selected.name}" readonly="true"  />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">计费配置*</label>
+                            <p:selectOneMenu  id="secondmentConfigId"  value="#{secondmentAssetSettingController.selected.borrowConfigId}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{secondmentAssetSettingController.cacheConfigList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <p:ajax event="valueChange" listener="#{secondmentAssetSettingController.refreshSecondmentConfig}" update="configName unitPrice billingType createdBy remark" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.name}</label>
+                            <p:inputText id="configName" value="#{secondmentAssetSettingController.secondmentConfig.name}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">单价</label>
+                            <p:inputNumber id="unitPrice" value="#{secondmentAssetSettingController.secondmentConfig.unitPrice}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>计价方式</label>
+                            <p:selectOneMenu id="billingType" readonly="true" disabled="true"
+                                              value="#{secondmentAssetSettingController.secondmentConfig.billingType}"
+                                              requiredMessage="计价方式 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.createdBy}</label>
+                            <p:inputText id="createdBy" value="#{secondmentAssetSettingController.getCreatedBy(secondmentAssetSettingController.secondmentConfig)}"  readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.remark}</label>
+                            <p:inputTextarea id="remark" cols="100" readonly="true" value="#{secondmentAssetSettingController.secondmentConfig.remark}"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:commandButton  validateClient="true" actionListener="#{secondmentAssetSettingController.save}" value="#{msg.Save}" update=":secondmentAssetSetting:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args, 'assetSettingEdit')"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('assetSettingEdit').hide()"/>
+            </h:form>
+        </div>
+    </p:dialog>
+    <script type="text/javascript">
+        function handleSubmitDigital(args, dialog) {
+            if (args.validationFailed) {
+                PF(dialog).show();
+            } else {
+                PF(dialog).hide();
+            }
+        }
+    </script>
+</ui:composition>
+</html>

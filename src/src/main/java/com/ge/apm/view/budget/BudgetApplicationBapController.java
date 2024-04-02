@@ -218,6 +218,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_ASSET_STAFF)
                 || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
                 ||userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
             this.searchFilters = this.getSearchFilter(this.tabIndex);
@@ -264,7 +265,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
 
-        // 临床科室主任, 医学工程处主任   // 临床科室人员
+        // 临床科室主任, 医学工程处主任  工程师   // 临床科室人员
         queryByUserRole(org);
         return searchFilters;
     }
@@ -447,7 +448,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
                     // 租户
                     searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
             }
-        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+        } else {
             searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
         }
     }

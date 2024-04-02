@@ -82,21 +82,21 @@
                 <p:tabView class="ui-g-12" id="purchaseTabView" dynamic="true" cache="false"
                            activeIndex="#{purchaseOrderController.tabIndex}">
                     <p:ajax event="tabChange" listener="#{purchaseOrderController.onTabChange}"/>
-                    <p:tab id="s0" title="待转信息确认">
+                    <p:tab id="s0" title="待招标完成">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s1" title="待信息确认">
+                    <p:tab id="s1" title="招标完成">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s2" title="待过会确认">
+                <!--    <p:tab id="s2" title="待过会确认">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s3" title="待招标完成">
+                    <p:tab id="s3" title="" >
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
-                    <p:tab id="s4" title="招标完成">
+                    <p:tab id="s4" title="">
                         <ui:include src="DataList.xhtml"/>
-                    </p:tab>
+                    </p:tab>-->
                     <p:tab id="s5" title="#{msg.All}">
                         <ui:include src="DataList.xhtml"/>
                     </p:tab>
