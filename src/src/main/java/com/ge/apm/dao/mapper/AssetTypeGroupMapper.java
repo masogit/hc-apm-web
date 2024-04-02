@@ -10,7 +10,7 @@ import java.util.List;
 public interface AssetTypeGroupMapper {
 
 	@Select(value = "WITH recursive child AS (\n" +
-			"    SELECT atg.*, true as accessible FROM asset_type_group atg JOIN user_asset_group uag ON atg.uid = uag.asset_group_uid WHERE uag.user_uid = #{userUid} \n" +
+			"    SELECT atg.*, true as accessible FROM asset_type_group atg JOIN `user_asset_group` uag ON atg.uid = uag.asset_group_uid WHERE uag.user_uid = #{userUid} \n" +
 			"    union all\n" +
 			"    SELECT atg.*, true as accessible FROM asset_type_group atg JOIN child child ON atg.parent_uid = child.uid\n" +
 			"), parent as (\n" +
@@ -63,5 +63,8 @@ public interface AssetTypeGroupMapper {
 					"select * from child"+
 					"</script>"})
 	List<AssetTypeGroup> getAssetTypeByUids(@Param("uids") List<String> uids);
+
+	@Select("SELECT atg.uid, atg.name, atg.encoded, atg.parent_uid parentUid, uag.user_uid FROM asset_type_group atg left join user_asset_group uag on atg.uid = uag.asset_group_uid where atg.tenant_uid = #{tenantUid}")
+	List<AssetTypeGroupDto> findDtoByTenantUid(@Param("tenantUid") String tenantUid);
 
 }
