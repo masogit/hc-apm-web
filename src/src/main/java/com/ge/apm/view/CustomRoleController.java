@@ -100,7 +100,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		Set<String> apmFunctions = uaaService.getFunctionListByTenantUid(user.getTenantUID());
 		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name())
 				&& !f.name().startsWith("PLATFORM_")
-//				&& !f.name().startsWith("CONFIG_")
+				&& !f.name().startsWith("CONFIG_")
 				&& !f.name().equals("REPAIR_ORDER_DISPATCH")
 				&& !f.name().startsWith("REPAIR_ORDER_TAKE")
 				&& !f.name().startsWith("REPAIR_ORDER_ACCEPT")
@@ -117,9 +117,12 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				&& !f.name().startsWith("ASSET_LOCATION_")
 
 		).collect(Collectors.toList());
+		postprocessing();
 		functions = allFunction;
 	}
-
+	private void postprocessing(){
+		allFunction.add(ApmFunction.CONFIG_USER_EDIT);
+	}
 	@Override
 	protected CustomRoleRepository getDAO() {
 		return dao;

@@ -101,6 +101,17 @@
 					</p:selectOneMenu>
 				</f:facet>
 			</p:column>
+			<p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true" rendered="#{userAccountController.isEnableAssetTypeGroup}">
+				<f:facet name="header">
+					<h:outputText value="#{msg.assetTypeGroup}"/><br/>
+					<p:autoComplete dropdown="true" value="#{userAccountController.filterAssetTypeGroup}" appendTo="@(Body)" onchange="PF('varDataList').filter()"
+									scrollHeight="300"  forceSelection="true" completeMethod="#{userAccountController.autoCompleteAssetTypeGroupName}" size="5">
+						<p:ajax event="itemSelect" listener="#{userAccountController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":userAccountTab:UserAccountListForm:datalist"/>
+						<p:ajax process="@this" listener="#{userAccountController.onAssetTypeGroupNameFilterChange}" update=":userAccountTab:UserAccountListForm:datalist"/>
+					</p:autoComplete>
+				</f:facet>
+				<h:outputText value="#{userAccountController.convertAssetTypeGroupEncodedToName(item.uid)}"/>
+			</p:column>
 			<p:column headerText="UUID" visible="false" exportable="true">
 				<h:outputText value="#{item.uid}" />
 			</p:column>

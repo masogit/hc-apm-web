@@ -302,6 +302,9 @@ public class BudgetApplicationAsset implements Serializable {
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
+    @Column(name = "offline_approval_complete")
+    private String offlineApprovalComplete;
+
     // 申请人
     @Transient
     private String applicantName;
@@ -321,6 +324,14 @@ public class BudgetApplicationAsset implements Serializable {
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action = NotFoundAction.IGNORE)
     private BudgetApplication budgetApplication;
+
+    public String getOfflineApprovalComplete() {
+        return offlineApprovalComplete;
+    }
+
+    public void setOfflineApprovalComplete(String offlineApprovalComplete) {
+        this.offlineApprovalComplete = offlineApprovalComplete;
+    }
 
     public Integer getOfflineApplicationQuantity() {
         return offlineApplicationQuantity;

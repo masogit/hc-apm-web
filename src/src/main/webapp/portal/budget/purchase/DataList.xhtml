@@ -16,9 +16,9 @@
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
-            <p:ajax event="rowSelect" update="createButton editButton viewUrl deleteButton exportZipButton confirmButton"/>
+            <p:ajax event="rowSelect" update=" editButton viewUrl  exportZipButton "/>
             <p:ajax event="rowDblselect" listener="#{purchaseOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
-            <p:ajax event="filter" listener="#{purchaseOrderController.onFilter}" update="createButton editButton deleteButton exportZipButton viewUrl"/>
+            <p:ajax event="filter" listener="#{purchaseOrderController.onFilter}" update=" editButton  exportZipButton viewUrl"/>
             <p:column headerText="采购单号" filterBy="#{item.purchaseNum}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.purchaseNum}" />
             </p:column>
@@ -84,22 +84,22 @@
                 <h:outputText value="#{fieldMsg.fieldValue('purchaseStatus', item.status)}"/>
             </p:column>
             <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false">
-                <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled' || item.status eq ''}" update="datalist deleteButton viewUrl" actionListener="#{purchaseOrderController.updateStatus(item.id,'Enabled')}"  />
-                <p:commandButton value="停用"  rendered="#{item.status eq 'Enabled'}" update="datalist deleteButton viewUrl" actionListener="#{purchaseOrderController.updateStatus(item.id,'NotEnabled')}"  />
+                <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled' || item.status eq ''}" update="datalist  viewUrl" actionListener="#{purchaseOrderController.updateStatus(item.id,'Enabled')}"  />
+                <p:commandButton value="停用"  rendered="#{item.status eq 'Enabled'}" update="datalist  viewUrl" actionListener="#{purchaseOrderController.updateStatus(item.id,'NotEnabled')}"  />
             </p:column>
             <f:facet name="{Toolbar}">
-                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+               <!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
-                                 action="#{purchaseOrderController.intoActionModel('Create')}" rendered="#{purchaseOrderController.tabIndex eq 0}"/>
+                                 action="#{purchaseOrderController.intoActionModel('Create')}" rendered="#{purchaseOrderController.tabIndex eq 0}"/>-->
                 <!--启用和已经在审批流程中的数据不可以删除和编辑-->
                 <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                  title="#{msg.Edit}"
                                  action="#{purchaseOrderController.intoActionModel('Edit')}"
                                  disabled="#{empty purchaseOrderController.selected }"/>
-                <p:commandButton id="confirmButton" icon="ui-icon-arrow-forward"  class="btn btn-sm btn-gray"
-                                 title="转信息确认" update="datalist createButton editButton viewUrl deleteButton exportZipButton "
+             <!--   <p:commandButton id="confirmButton" icon="ui-icon-arrow-forward"  class="btn btn-sm btn-gray"
+                                 title="转信息确认" update="datalist  editButton viewUrl  exportZipButton "
                                  actionListener="#{purchaseOrderController.submitPurchase()}"
-                                 disabled="#{empty purchaseOrderController.selected || purchaseOrderController.selected.orderStep ne null}" />
+                                 disabled="#{empty purchaseOrderController.selected || purchaseOrderController.selected.orderStep ne null}" />-->
                 <p:commandButton id="viewUrl" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray"  title="查看Url"
                                  disabled="#{empty purchaseOrderController.selected || purchaseOrderController.selected.status eq 'NotEnabled'}"
                                  immediate="false" process="@this"  oncomplete="PF('viewUrlDlg').show()" update=":growl :viewUrlDlg" >
@@ -118,12 +118,12 @@
                     <p:fileDownload value="#{purchaseOrderController.exportFile}"/>
                 </p:commandButton>
                 <!--启用和已经在审批流程中的数据不可以删除和编辑 -->
-                <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
+               <!-- <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
                                   actionListener="#{purchaseOrderController.delete}" disabled="#{(empty purchaseOrderController.selected) ||
                                  purchaseOrderController.selected.status eq 'Enabled' ||
                                  purchaseOrderController.selected.orderStep ne null}" >
                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                </p:commandButton>
+                </p:commandButton>-->
             </f:facet>
         </p:dataTable>
     </h:form>

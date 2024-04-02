@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <h:form>
+        <p:dataTable id="datalist" value="#{demandAnalysisController.lazyModel}" var="item" widgetVar="varDataList"
+                     selectionMode="single" selection="#{demandAnalysisController.selected}"
+                     lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                     rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+            <p:ajax event="rowSelect" update="createButton editButton viewUrl deleteButton exportZipButton confirmButton"/>
+            <p:ajax event="rowDblselect" listener="#{demandAnalysisController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
+            <p:ajax event="filter" listener="#{demandAnalysisController.onFilter}" update="createButton editButton deleteButton exportZipButton viewUrl"/>
+            <p:column headerText="采购单号" filterBy="#{item.purchaseNum}" filterMatchMode="LIKE">
+                <h:outputText value="#{item.purchaseNum}" />
+            </p:column>
+            <p:column headerText="设备名称"  filterBy="#{item.applicationAssetName}" filterMatchMode="LIKE" >
+                <h:outputText value="#{item.applicationAssetName}"/>
+            </p:column>
+            <p:column headerText="采购数量" >
+                <h:outputText value="#{item.purchaseQuantity}"/>
+            </p:column>
+            <p:column headerText="采购金额">
+                <h:outputText value="#{item.totalPrice}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="操作人" >
+                <h:outputText value="#{item.operator.name}"/>
+            </p:column>
+            <p:column headerText="采购开始时间"  sortBy="#{item.startDate}" >
+                <f:facet name="filter">
+                    <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>
+                </f:facet>
+                <h:outputText value="#{item.startDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat()}"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="采购截止时间" sortBy="#{item.endDate}" >
+                <f:facet name="filter">
+                    <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
+                </f:facet>
+                <h:outputText value="#{item.endDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat()}"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="步骤" filterBy="#{item.orderStep}" filterMatchMode="EQ">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('varDataList').filter()" rendered="#{demandAnalysisController.tabIndex eq 5}">
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseStep')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{fieldMsg.fieldValue('purchaseStep', item.orderStep)}"/>
+            </p:column>
+            <p:column headerText="采购单状态" filterBy="#{item.stepStatus}" filterMatchMode="EQ">
+                <f:facet name="filter" >
+                    <p:selectOneMenu onchange="PF('varDataList').filter()" rendered="#{demandAnalysisController.tabIndex eq 5}" >
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseStepStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{fieldMsg.fieldValue('purchaseStepStatus', item.stepStatus)}"/>
+            </p:column>
+            <p:column headerText="是否启用" filterBy="#{item.status}" filterMatchMode="EQ">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{fieldMsg.fieldValue('purchaseStatus', item.status)}"/>
+            </p:column>
+            <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false">
+                <p:commandButton value="启用" rendered="#{item.status eq 'NotEnabled' || item.status eq ''}" update="datalist deleteButton viewUrl" actionListener="#{demandAnalysisController.updateStatus(item.id,'Enabled')}"  />
+                <p:commandButton value="停用"  rendered="#{item.status eq 'Enabled'}" update="datalist deleteButton viewUrl" actionListener="#{demandAnalysisController.updateStatus(item.id,'NotEnabled')}"  />
+            </p:column>
+            <f:facet name="{Toolbar}">
+                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                 title="#{msg.Create}"
+                                 action="#{demandAnalysisController.intoActionModel('Create')}" rendered="#{demandAnalysisController.tabIndex eq 0}"/>
+                <!--启用和已经在审批流程中的数据不可以删除和编辑-->
+                <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                 title="#{msg.Edit}"
+                                 action="#{demandAnalysisController.intoActionModel('Edit')}"
+                                 disabled="#{empty demandAnalysisController.selected }"/>
+                <p:commandButton id="confirmButton" icon="ui-icon-arrow-forward"  class="btn btn-sm btn-gray"
+                                 title="转信息确认" update="datalist createButton editButton viewUrl deleteButton exportZipButton "
+                                 actionListener="#{demandAnalysisController.submitPurchase()}"
+                                 disabled="#{empty demandAnalysisController.selected || demandAnalysisController.selected.orderStep ne null}" />
+                <p:commandButton id="viewUrl" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray"  title="查看Url"
+                                 disabled="#{empty demandAnalysisController.selected || demandAnalysisController.selected.status eq 'NotEnabled'}"
+                                 immediate="false" process="@this"  oncomplete="PF('viewUrlDlg').show()" update=":growl :viewUrlDlg" >
+                </p:commandButton>
+                <!-- <p:commandButton id="confirmBid" icon="ui-icon-settings" class="btn btn-sm btn-gray"
+                                  actionListener="#{demandAnalysisController.loadVenderInfo}" update=":confirmBidForm"
+                                  title="确认中标" oncomplete="PF('confirmBidDlg').show()"
+                                  />-->
+                <p:commandButton  title="导出采购单列表" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
+                                  ajax="false">
+                    <p:dataExporter type="xls" target="datalist" fileName="Purchase_Export"/>
+                </p:commandButton>
+                <p:commandButton id="exportZipButton" ajax="false" title="采购单完整信息" actionListener="#{demandAnalysisController.exportAll}"
+                                 disabled="#{empty demandAnalysisController.selected}"
+                                 icon="ui-icon-circle-triangle-s" class="btn btn-sm btn-gray">
+                    <p:fileDownload value="#{demandAnalysisController.exportFile}"/>
+                </p:commandButton>
+                <!--启用和已经在审批流程中的数据不可以删除和编辑 -->
+                <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}"
+                                  actionListener="#{demandAnalysisController.delete}" disabled="#{(empty demandAnalysisController.selected) ||
+                                 demandAnalysisController.selected.status eq 'Enabled' ||
+                                 demandAnalysisController.selected.orderStep ne null}" >
+                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                </p:commandButton>
+            </f:facet>
+        </p:dataTable>
+    </h:form>
+</ui:composition>
+</html>

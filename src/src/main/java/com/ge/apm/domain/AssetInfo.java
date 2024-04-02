@@ -1016,8 +1016,23 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     @Column(name = "spare05")
     private String spare05;
+    @Getter
+    @Setter
+    @Column(name = "billing_time")
+    private Long billingTime; // 累计借用计费时长分钟
 
-
+    @Getter
+    @Setter
+    @Column(name = "billing_cost",columnDefinition = "decimal(11,2)")
+    private Double billingCost;//累计费用
+    @Getter
+    @Setter
+    @Column(name = "borrowed_status")
+    private Integer borrowedStatus;  // 借用状态 -1不可借出，0 可借，1占用
+    @Getter
+    @Setter
+    @Column(name = "borrow_config_id")
+    private String borrowConfigId;
     public void setSupplierPyCode(String supplierPyCode) {
         this.supplierPyCode = supplierPyCode;
     }

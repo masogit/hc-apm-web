@@ -108,8 +108,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (grantedAuthorities == null) {
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(account.getTenantUID());
             grantedAuthorities = toGrantedAuthorities(account.getRoleNames(), tenantInfo);
+            getCustomRole(account,grantedAuthorities);
         }
-        getCustomRole(account,grantedAuthorities);
         String password = obtainPassword(login);
 
         if (password == null) {
@@ -170,13 +170,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void getCustomRole(UserAccount userAccount,Collection<GrantedAuthority> grantedAuthorities){
-        if(CollectionUtils.isNotEmpty(grantedAuthorities)){
+        if(grantedAuthorities != null){
             List<CustomRole> customRolesList = customRoleRepository.findCustomRolesByUserId(userAccount.getId());
             if(CollectionUtils.isNotEmpty(customRolesList)){
                 customRolesList.forEach(item->{
                     Set<String> strings = JSON.parseObject(item.getFunctionList(), new TypeReference<Set<String>>() {
                     });
-                    grantedAuthorities.add(new GrantedAuthorityDiyImpl(item.getRoleDesc(), strings));
+                    grantedAuthorities.add(new GrantedAuthorityDiyImpl(item.getName(), strings));
                 });
             }
         }

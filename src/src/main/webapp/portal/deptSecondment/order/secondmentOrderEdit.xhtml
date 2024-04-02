@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="secondmentOrderEdit" width="1000" height="600" widgetVar="secondmentOrderEdit" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentOrderManageController.getCRUDActionName()}" >
+        <div class="ui-g-12 card">
+            <h:form id="secondmentOrderEditFrom">
+                <p:fieldset legend="调剂设备借用信息" style="margin-bottom:20px">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">单号</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.secondmentNo}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetName}</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.assetName}" readonly="true"  />
+                            <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==-2}" class="popupIconButton" actionListener="#{secondmentOrderAssetController.prepareDialogCallback(secondmentOrderManageController, ':secondmentOrderEditFrom')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show();"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.functionType}</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.functionType}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetGroup}</label>
+                            <p:inputText value="#{fieldMsg.doGetFieldValue('assetGroup',secondmentOrderManageController.selected.assetGroup)}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.departNum}</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.departNum}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.qrCode}</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.qrCode}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <p:inputText value="#{secondmentOrderManageController.getBorrowDeptName(secondmentOrderManageController.selected.lendDeptUid)}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">申请科室</label>
+                            <p:inputText value="#{secondmentOrderManageController.getBorrowDeptName(secondmentOrderManageController.selected.borrowDeptUid)}" readonly="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">调剂状态</label>
+                            <p:selectOneMenu   value="#{secondmentOrderManageController.selected.status}" disabled="true">
+                                <f:selectItems  value="#{fieldMsg.getFieldValueList('borrowedStatus')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
+                            </p:selectOneMenu >
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否需要备件<span style="color:red">*</span></label>
+                            <p:selectOneRadio  disabled="#{empty secondmentOrderManageController.selected or secondmentOrderManageController.selected.status ==-2}" value="#{secondmentOrderManageController.selected.needSpareParts}" >
+                                <f:selectItem itemLabel="是" itemValue="true" />
+                                <f:selectItem itemLabel="否" itemValue="false" />
+                                <p:ajax  event="change" update="secondmentOrderEditFrom" />
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup id="sparePartsRemark" rendered="#{secondmentOrderManageController.selected.needSpareParts}">
+                            <label class="label">备件备注</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.sparePartsRemark}"  />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">申请人</label>
+                            <p:inputText value="#{secondmentOrderManageController.getUserName(secondmentOrderManageController.selected.applicantUid)}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">申请时间</label>
+                            <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.applyTime}" readonly="true" showOn="false"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计费开始时间</label>
+                            <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.billingBeginTime}" readonly="true"  showOn="false" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计费结束时间</label>
+                            <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.billingEndTime}" readonly="true"  showOn="false" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计费标准</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.billingStandards}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计费时长(分钟)</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.billingTime}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计时费用</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">备注</label>
+                            <p:inputText value="#{secondmentOrderManageController.selected.remark}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty secondmentOrderManageController.selected.denialReason}">
+                            <label class="label">拒绝原因</label>
+                            <p:inputTextarea  id="denialReason" readonly="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="计费配置信息" style="margin-bottom:20px">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <label class="label">#{msg.name}</label>
+                        <p:inputText value="#{secondmentOrderManageController.secondmentConfig.name}" readonly="true"  />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">单价</label>
+                        <p:inputNumber id="unitPrice" value="#{secondmentOrderManageController.secondmentConfig.unitPrice}" readonly="true"  />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class='label'>计价方式</label>
+                        <p:selectOneMenu id="billingType" readonly="true" disabled="true"
+                                         value="#{secondmentOrderManageController.secondmentConfig.billingType}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems  value="#{fieldMsg.getFieldValueList('chargingType')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.remark}</label>
+                        <p:inputTextarea id="remark"  readonly="true" value="#{secondmentOrderManageController.secondmentConfig.remark}"  />
+                    </h:panelGroup>
+
+                </p:panelGrid>
+            </p:fieldset>
+            <p:fieldset legend="操作信息" style="margin-bottom:20px" rendered="#{not empty secondmentOrderManageController.processRecords}">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <p:dataTable var="node" value="#{secondmentOrderManageController.processRecords}">
+                        <p:column headerText="名称">
+                            <h:outputText value="#{node.nodeName}" />
+                        </p:column>
+
+                        <p:column headerText="操作人">
+                            <h:outputText value="#{node.name}" />
+                        </p:column>
+
+                        <p:column headerText="时间">
+                            <h:outputText value="#{node.operateTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+                </p:panelGrid>
+            </p:fieldset>
+<!--                // -2已拒绝 -1已取消  0 待同意 ，1 待交付， 2待归还， 3已归还 4、维修中-->
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==-2}" validateClient="true" disabled="#{secondmentOrderManageController.selected.status ==-2}" actionListener="#{secondmentOrderManageController.statusUpdate(null,0)}" value="提交申请" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,-1)}" value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,1)}" value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varRejectDlg').show();"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,5)}" value="提醒归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.selected.status ne 3 }" immediate="true" value="返回" icon="ui-icon-cancel" onclick="PF('secondmentOrderEdit').hide()"/>
+            </h:form>
+            <ui:include src="selectAssetDialog.xhtml" />
+            <p:dialog id="rejectDlg"  widgetVar="varRejectDlg" modal="true" resizable="true" draggable="true" header="拒绝申请" appendTo="@(body)" width="50%" height="200">
+                <h:form id="selectAssetForm1" >
+                    <p:panelGrid columns="1" layout="grid">
+                        <h:panelGroup>
+                            <label class="label">拒绝原因<span style="color: red">*</span></label>
+                            <p:inputTextarea required="true" id="denialReason1"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" icon="ui-icon-check" update=":secondmentOrderManage:datalist :growl" actionListener="#{secondmentOrderManageController.statusUpdate(null,-2)}" oncomplete="closeDigital(args);"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varRejectDlg').hide()"/>
+                </h:form>
+            </p:dialog>
+        </div>
+    </p:dialog>
+    <script type="text/javascript">
+        function handleSubmitDigital(args, dialog) {
+            if (args.validationFailed) {
+                PF(dialog).show();
+            } else {
+                PF(dialog).hide();
+            }
+        }
+        function closeDigital(args) {
+            PF('varRejectDlg').hide();
+            PF('secondmentOrderEdit').hide();
+        }
+    </script>
+</ui:composition>
+</html>

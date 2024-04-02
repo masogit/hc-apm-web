@@ -341,6 +341,9 @@ public class UaaService {
         if(userAccount.getId()!=null){
             userRoleDao.deleteByUserAccount(userAccount.getId());
         }
+        if(isCreated && !UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
+            return ;
+        }
         userRoleDao.save(userRoles);
     }
 

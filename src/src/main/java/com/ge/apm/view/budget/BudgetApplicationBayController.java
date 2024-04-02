@@ -217,6 +217,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     }
     protected Page<BudgetApplication> loadData(PageRequest pageRequest) {
         if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_ASSET_STAFF)
                 || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
                 ||userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
             this.searchFilters = this.getSearchFilter(this.tabIndex);
@@ -435,7 +436,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
                     // 租户
                     searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
             }
-        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+        } else {
             searchFilters.add(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
         }
     }

@@ -3,6 +3,7 @@ package com.ge.apm.view.inventory;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
@@ -22,6 +23,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,15 +70,17 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		return dao;
 	}
 
+	List<SearchFilter> bathFilters;
+
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
 		//before
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+			searchFilters = new ArrayList<>();
 		}
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -99,18 +103,8 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
-//		if(!pageAssetInfo.getContent().isEmpty()){
-//            for (InventoryOrderDetail inventoryOrderDetail :pageAssetInfo.getContent()){
-//                if(inventoryOrderDetail.getClinicalDeptName()==null){
-//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
-//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
-//                }
-//            }
-//        }
-
-		//after
-		return pageAssetInfo;
+		bathFilters = searchFilters;
+		return dao.findBySearchFilter(searchFilters,pageRequest);
 	}
 
 	@Override
@@ -140,6 +134,17 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public void bathInventory() {
+		List<InventoryOrderDetail> nonInventoryOrderDetails = dao.findBySearchFilter(bathFilters);
+		Date date = new Date();
+		nonInventoryOrderDetails.forEach(d -> {
+			d.setStatus(1);
+			d.setLastModifiedDate(date);
+			d.setLastModifiedBy(currentUser.getLoginName());
+		});
+		dao.save(nonInventoryOrderDetails);
 	}
 
 }

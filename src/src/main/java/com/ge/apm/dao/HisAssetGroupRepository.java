@@ -17,4 +17,7 @@ public interface HisAssetGroupRepository extends JpaRepository<HisAssetGroup,Str
     List<HisAssetGroup> findByTenantUid(String tenantUID);
 
     HisAssetGroup findByNameAndTenantUid(String name, String tenantUID);
+
+    @Query(value = "select * from his_asset_group where uuid = ?1", nativeQuery = true)
+    HisAssetGroup findByUuid(String uuid);
 }

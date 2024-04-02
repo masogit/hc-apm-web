@@ -1,8 +1,10 @@
 package com.ge.apm.view.his;
 
+import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
 import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
 import com.ge.apm.dao.HisAssetGroupRepository;
 import com.ge.apm.domain.his.HisAssetGroup;
+import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -20,11 +22,13 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
 
     private HisAssetGroupRepository hisAssetGroupDao;
     private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
+    private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchRepository;
 
     @Override
     protected void init() {
         hisAssetGroupDao = WebUtil.getBean(HisAssetGroupRepository.class);
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
+        hisAssetGroupAssetMatchRepository = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
     }
 
     public HisAssetGroup onSelectHisAssetGroup() {
@@ -53,6 +57,8 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
             return;
         }
         hisAssetGroupDao.save(selected);
+        hisAssetGroupAssetMatchRepository.updateAssetGroupNameByGroupUid(selected.getName(),selected.getUuid());
+
 
         selected = null;
 

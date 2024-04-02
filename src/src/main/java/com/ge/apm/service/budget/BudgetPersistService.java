@@ -53,27 +53,31 @@ public class BudgetPersistService {
 
     private static Logger logger = LoggerFactory.getLogger(BudgetPersistService.class);
     //主表字段
-    private final String[] BUDGET_HEADER_FIELD = {"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate","approvalLoginName","approvalDate"};  //主表字段名
+    private final String[] BUDGET_HEADER_FIELD = {"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate"};  //主表字段名
     //设备明细字段
     private final String[] ASSET_HEADER_FIELD = {"applicationAssetName","applicationAssetCategory","recommendedBrand","standards","model","applicationQuantity","unit",
             "applicationPrice","sourceFunding","similarDevicesNumber","similarDevicesUse","importedOr","majorFunction","deviceConfiguration",
             "technicalParameter","equipmentUtilization","benefitAnalysis","productComparison","serviceLife","chargingStandards","yearIncome","usage",
-            "placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","description","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion",
+            "placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","description","offlineApprovalComplete","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion",
             "offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark"};  //明细字段名
     private final String[] ASSET_HEADER_FIELD_BIGDECIMAL_TYPE = {"applicationPrice","chargingStandards","yearIncome","offlineApplicationPrice"}; //bigdecima数字类型字段
     private final String[] ASSET_HEADER_FIELD_INTEGER_TYPE = {"applicationQuantity","similarDevicesNumber","offlineApplicationQuantity"}; //integer类型字段
     //日期类型
-    private final String[] HEADER_FIELD_DATE_TYPE = {"applicationDate","offlineApprovalDate","approvalDate"}; //日期类型字段
+    private final String[] HEADER_FIELD_DATE_TYPE = {"applicationDate","offlineApprovalDate"}; //日期类型字段
     //下拉字段名  ，需value  和中文转换
-    private final String[] ASSET_HEADER_FIELD_DROP_INDEX = {"sourceFunding","importedOr","placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork"}; //下拉字段
+    private final String[] ASSET_HEADER_FIELD_DROP_INDEX = {"sourceFunding","importedOr","placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","offlineApprovalComplete"}; //下拉字段
     //主表必填字段
-    private final String[][] BUDGET_FIELD_REQUIRE = {{"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate","approvalLoginName","approvalDate"},
-                                                     {"申请编号"       ,"申请科室"             ,"病区代码"  ,"申请人登录账号"      ,"申请日期(YYYY/MM/DD)","审核人登录账号"   ,"审核日期(YYYY/MM/DD)"}}; //主表必填字段名称，和中文名
+    private final String[][] BUDGET_FIELD_REQUIRE = {{"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate"},
+                                                     {"申请编号"       ,"申请科室"             ,"病区代码"  ,"申请人登录账号"      ,"申请日期(YYYY/MM/DD)"}}; //主表必填字段名称，和中文名
     //明细必填字段
-    private final String[][] ASSET_FIELD_REQUIRE = {{"applicationAssetName","applicationAssetCategory","recommendedBrand","standards","model","applicationQuantity","unit","applicationPrice","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion","offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark","usedOperatingRoom"},
-                                                    {"设备名称"              ,"设备品类"                  ,"推荐品牌"         ,"规格"      ,"型号"  ,"数量"                ,"单位" ,"预算单价"         ,"审批时间(YYYY/MM/DD)" ,"审批意见"                ,"审批结论"                  ,"记录人"                   ,"审批数量"                   ,"审批单价"                 ,"备注"                  ,"是否在手术室使用"}}; //明细必填字段
+    private final String[][] ASSET_FIELD_REQUIRE = {{"applicationAssetName","applicationAssetCategory","applicationQuantity","unit","applicationPrice","usedOperatingRoom","offlineApprovalComplete"},
+                                                    {"设备名称"              ,"设备品类"                  ,"数量"                ,"单位" ,"预算单价"         ,"是否在手术室使用"    ,"线下审批是否完成"  }}; //明细必填字段
 
-    private final int ASSET_BEGIN = 7;
+    //过会信息必填字段
+    private final String[][] OFFLINE_APPROVAL_REQUIRE = {{"offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion","offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark"},
+                                                        {"审批时间(YYYY/MM/DD)" ,"审批意见"                ,"审批结论"                  ,"记录人"                   ,"审批数量"                   ,"审批单价"                 ,"备注"                  }}; //明细必填字段
+
+    private final int ASSET_BEGIN = 5;
 
     @Autowired
     private UserAccountRepository userAccountRepository;
@@ -465,7 +469,7 @@ public class BudgetPersistService {
             BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
             budgetApplicationAssetSet.add(budgetApplicationAsset);
             budgetApplication.setBudgetAssets(budgetApplicationAssetSet);
-            budgetApplication = initCreateBudget(user,selectOrgInfo,orderType);
+            budgetApplication = initCreateBudgetForExcel(user,selectOrgInfo,orderType);
             budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
             for(int i = 0 ; i< BUDGET_HEADER_FIELD.length ; i++){
                 String mtName = "set"+BUDGET_HEADER_FIELD[i].substring(0, 1).toUpperCase() + BUDGET_HEADER_FIELD[i].substring(1);
@@ -544,7 +548,7 @@ public class BudgetPersistService {
         return tempBudgetList;
     }
 
-    public BudgetApplication initCreateBudget(UserAccount user,OrgInfo selectOrgInfo,String orderType){
+    public BudgetApplication initCreateBudgetForExcel(UserAccount user,OrgInfo selectOrgInfo,String orderType){
         BudgetApplication budgetApplication = new BudgetApplication();
         Set<BudgetApplicationAsset> budgetApplicationAssetSet = new HashSet<BudgetApplicationAsset>();
         BudgetApplicationAsset budgetApplicationAsset = new BudgetApplicationAsset();
@@ -566,6 +570,9 @@ public class BudgetPersistService {
         budgetApplication.setHospitalUID(selectOrgInfo.getHospitalUID());
         budgetApplication.setSiteUID(selectOrgInfo.getSiteUID());
         budgetApplication.setDataSource("EXCEL_IMPORT");
+        budgetApplication.setApprover(user);
+        budgetApplication.setApproverId(user.getId());
+        budgetApplication.setApprovalDate(new Date());
         budgetApplicationAsset.setCreatedDate(new Date());
         budgetApplicationAsset.setCreatedBy(user.getLoginName());
         budgetApplicationAsset.setLastModifiedBy(user.getLoginName());
@@ -601,6 +608,18 @@ public class BudgetPersistService {
                     errorInfo += "[请输入"+ASSET_FIELD_REQUIRE[1][i]+"]";
                 }
             }
+            if("T".equals(budgetApplicationAsset.getOfflineApprovalComplete())){
+                for (int i = 0; i < OFFLINE_APPROVAL_REQUIRE[0].length; i++) {
+                    String fieldName = OFFLINE_APPROVAL_REQUIRE[0][i];
+                    Field field = budgetApplicationAsset.getClass().getDeclaredField(fieldName);
+                    if (isFieldEmpty(field, budgetApplicationAsset)) {
+                        errorInfo += "[请输入"+OFFLINE_APPROVAL_REQUIRE[1][i]+"]";
+                    }
+                }
+            }else{
+                budgetApplication.setApplicationStep(BudgetApplication.APPLICATIONSTEP.PendingComplete.toString());
+                budgetApplication.setApplicationStatus(3);
+            }
             //手术室设备必填项校验
             if(StringUtils.isNotBlank(budgetApplicationAsset.getUsedOperatingRoom()) && "T".equals(budgetApplicationAsset.getUsedOperatingRoom())) {
                 if (StringUtils.isBlank(budgetApplicationAsset.getSignatureNurse()) || "F".equals(budgetApplicationAsset.getSignatureNurse())) {
@@ -615,16 +634,6 @@ public class BudgetPersistService {
                 }else{
                     budgetApplication.setApplicant(userAccount);
                     budgetApplication.setApplicantId(userAccount.getId());
-                }
-            }
-            //审核人
-            if(StringUtils.isNotBlank(budgetApplication.getApprovalLoginName())) {
-                UserAccount userAccountApproval = userAccountRepository.getByLoginName(budgetApplication.getApprovalLoginName());
-                if(userAccountApproval==null){
-                    errorInfo += "[审核人登录账号有误，请检查后重试！]";
-                }else{
-                    budgetApplication.setApprover(userAccountApproval);
-                    budgetApplication.setApproverId(userAccountApproval.getId());
                 }
             }
             OrgInfo orgInfoDept = orgDao.getDepartmentByName(budgetApplication.getApplicationDeptName(),selectOrgInfo.getUid());
@@ -651,7 +660,6 @@ public class BudgetPersistService {
             if(StringUtils.isNotBlank(value)){
                 if("是".equals(value)){
                     value = "T";
-
                 }else if("否".equals(value)){
                     value = "F";
 
