@@ -109,8 +109,6 @@
 
                     <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-
-
                     <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid">
                         <f:facet name="header">#{msg.AddDocument}</f:facet>
                             <h:panelGrid columns="1" style="width:100%" >
@@ -284,18 +282,24 @@
                                 <f:selectItems value="#{workOrderMgrController.acker}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>-->
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.AcknowledgedBy}*</label>
+                                <p:autoComplete id="ackerName" converter="userAccountConverter" value="#{workOrderMgrController.ua1}" dropdown="true" forceSelection="true" requiredMessage="#{msg.AcknowledgedBy}#{msg.ValidationRequire}"  var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{workOrderMgrController.completeAckList}">
+                                    <!-- <p:ajax event="itemSelect" listener="#{workOrderMgrController.test}" process="@this" />
+                                     <p:ajax listener="#{workOrderMgrController.test}" process="@this" />-->
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.AcknowledgedBy}*</label>
-                            <p:autoComplete id="ackerName" converter="userAccountConverter" value="#{workOrderMgrController.ua1}" dropdown="true" forceSelection="true" requiredMessage="#{msg.AcknowledgedBy}#{msg.ValidationRequire}"  var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{workOrderMgrController.completeAckList}">
-                               <!-- <p:ajax event="itemSelect" listener="#{workOrderMgrController.test}" process="@this" />
-                                <p:ajax listener="#{workOrderMgrController.test}" process="@this" />-->
-                                <p:column>
-                                    <h:outputText value="#{t.name}"/>
-                                </p:column>
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('')}">
+                                <label class="label">备注</label>
+                                <p:inputTextarea value="#{workOrderMgrController.comments}" rows="3"  cols="40"  maxlength="500"  />
+                            </h:panelGroup>
+                        </p:panelGrid>
 
-                            </p:autoComplete>
-                        </h:panelGroup>
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup id="commandButtonId">
