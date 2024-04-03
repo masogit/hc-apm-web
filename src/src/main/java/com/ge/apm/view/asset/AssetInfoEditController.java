@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.approval.WxMessageService;
+import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -45,6 +46,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1028,6 +1030,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         selected.setOfflineUpdateDate(new Date());
         this.save();
+        if(selected.isSpecialAsset()){
+            specialAssetInfo.setAssetId(selected.getId());
+            specialAssetInfo.setAssetUid(selected.getUid());
+            List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getName() != null).collect(Collectors.toList());
+            assetAnnualInspectionReports.forEach(item->item.setSpecialAssetUid(specialAssetInfo.getId()));
+            Set<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getCertificateName() != null).collect(Collectors.toSet());
+            specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+            specialAssetInfo.setPermitInfos(permitInfos);
+            specialAssetInfoService.saveSpecialAsset(specialAssetInfo);
+
+        }
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(selected,assetInfo);
         if(isCreate){
@@ -1058,6 +1071,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         saveOrUpdateAssetTags();
+        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+            return "specialAssetList?faces-redirect=true";
+        }
         if(isStatus){
             return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }

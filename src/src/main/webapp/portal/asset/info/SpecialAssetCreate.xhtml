@@ -1,0 +1,728 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
+        <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
+        <style>
+            div.ui-panelgrid-cell>label+div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+            div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
+                max-width: 200px;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+            .demo-container {
+                border: 1px solid #009BE3;
+                padding:0 20px;
+                font-family: "Myriad Pro Regular","Trebuchet MS";
+            }
+
+            .demo-container a, .demo-container a:link, .demo-container a:visited, .demo-container a:hover, .demo-container a:focus, .demo-container a:active {
+                color: #009BE3;
+            }
+
+            .demo-container ul {
+                list-style-type:none;
+                padding:0;
+                margin:1em 0;
+                width:100%;
+                overflow:hidden;
+            }
+
+            .demo-container ul span {
+                color: #A0A600;
+            }
+
+            .demo-container li {
+                float:left;
+                margin-right:1em;
+            }
+
+            .demo-container p span.track-name {
+                color: #CC0090;
+            }
+
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{assetInfoEditController.CRUDActionName} #{assetInfoEditController.terminate? msg.TerminateAssetInfo :msg.AssetInfo}"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <p:fieldset legend="#{msg.BasicInformation}" id="accordion" rendered="#{assetInfoEditController.isStatus()}">
+                    <div class="ui-g-7">
+                        <div class="container-fluid" style="height: 400px; overflow: auto;">
+                            <div class="row" id="picDiv">
+                                <c:forEach
+                                        items="#{assetInfoEditController.pictureList}"
+                                        var="attach">
+                                    <div>
+                                        <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                             src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                             style="opacity:0; width:1px; height:1px"/>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                            <script>new Viewer(document.getElementById('picDiv'), {inline: true});</script>
+                        </div>
+                    </div>
+                    <div class="ui-g-5">
+                        <p:fieldset legend="#{msg.VoiceDescription}" id="audioComment" >
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                                <div id="jquery_jplayer"></div>
+                                <div id="jp_container" class="demo-container">
+                                    <ul id="audioUl">
+                                        <li><span>#{msg.VoiceList} : </span></li>
+                                    </ul>
+                                    <p>
+                                        <span class="play-state"></span> :
+                                        <span class="track-name">#{msg.None}</span>
+                                        <span class="extra-play-info"></span>
+                                        #{msg.ATotalOf} <span class="jp-duration"></span>, #{msg.PlayTo}
+                                        <span class="jp-current-time"></span>
+                                    </p>
+                                    <ul>
+                                        <li><a class="jp-play" href="#">Play</a></li>
+                                        <li><a class="jp-pause" href="#">Pause</a></li>
+                                        <li><a class="jp-stop" href="#">Stop</a></li>
+                                    </ul>
+                                </div>
+                                <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">
+                                    <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>
+                                </c:forEach>
+                            </p:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="#{msg.TextDescription}" id="textComment" >
+                            <c:forEach items="#{assetInfoEditController.getCommentsList()}" var="item">
+                                <p>#{item}</p>
+                            </c:forEach>
+                        </p:fieldset>
+
+                    </div>
+
+                </p:fieldset>
+            </div>
+            <div class="ui-g-12 card">
+
+                <p:tabView id="tab">
+                    <p:tab title="#{assetInfoEditController.CRUDActionName}">
+                        <h:form id="AssetInfoEditForm">
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增') or assetInfoEditController.CRUDActionName.equals('')}">
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                        <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                            <ui:include src="customEditFields.xhtml"/>
+                                        </c:forEach>
+                                    </p:panelGrid>
+                                </p:fieldset>
+                            </c:if>
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('修改')}">
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                                    <div class="ui-g-8">
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                                <ui:include src="customEditFields.xhtml"/>
+                                            </c:forEach>
+                                        </p:panelGrid>
+                                    </div>
+                                    <div class="ui-g-4">
+
+                                        <h:panelGroup id="pict">
+                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
+                                            <div class="container-fluid" style="height: 400px; overflow: auto;">
+                                                <div class="row" id="assetPagePicDiv">
+                                                    <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
+                                                        <div>
+                                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 style="opacity:0; width:1px; height:1px"/>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                                <script>
+                                                    new Viewer(document.getElementById('assetPagePicDiv'), {inline: true});
+                                                </script>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </p:fieldset>
+                            </c:if>
+
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageStatusFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                    <h:panelGroup rendered="#{userContextService.countyArea}">
+                                        <label class="label">IB合同类别</label>
+                                        <p:inputText id="contractType" value="#{assetInfoEditController.selected.contractType}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                    <c:if test="#{userContextService.zkbAccount}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
+                                            <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
+                                                <p:ajax update="fileSecondDirectory"/>
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <c:forEach items="#{assetInfoEditController.findMainDirectory()}" var="v">
+                                                    <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                </c:forEach>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
+                                            <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <c:forEach items="#{assetInfoEditController.subZkbFileDirectoryList}" var="v">
+                                                    <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                </c:forEach>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
+                                <ui:include src="MvsEditFields.xhtml"/>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" rendered="#{!assetInfoEditController.isStatus()}">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup >
+                                        <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict':'pictureList'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict':'pictureList'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                    <c:forEach items="#{assetInfoEditController.getAttachmentCategories()}" var="attachmentConfig">
+                                        <h:panelGroup>
+                                            <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                                <f:facet name="header">#{attachmentConfig.label}</f:facet>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                </p:commandButton>
+                                            </p:dataList>
+                                            <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                          multiple="true"  sizeLimit="500000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                        </h:panelGroup>
+                                    </c:forEach>
+                                    <h:panelGroup >
+                                        <p:dataList id="acklList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,4)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="acklList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="acklList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.SelectAndSaveTheImageAsAnAttachmentToTheAsset}"  style="margin-bottom:20px" rendered="#{assetInfoEditController.isStatus()}">
+                                <p:selectManyCheckbox id="custom" value="#{assetCreateController.selectedPictures}"  layout="custom">
+                                    <f:selectItems value="#{assetInfoEditController.pictureList}" var="item"  itemValue="#{item.objectStorageId}" />
+                                </p:selectManyCheckbox>
+                                <c:forEach items="#{assetInfoEditController.pictureList}" var="item" varStatus="status">
+                                    <div class="ui-grid-col-2" style="text-align:center">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(item.objectStorageId)}" stream="false" height="60"  width="80" />
+                                        <p:checkbox id="opt#{item.id}" for="custom" itemIndex="#{status.index}" />
+                                    </div>
+                                </c:forEach>
+                            </p:fieldset>
+
+                            <p:panel id="modifyRecordList"
+                                     header="#{assetInfoEditController.assetChangeHistoryCount > 0 ? msg.ModifyRecord : msg.NoRecords}"
+                                     toggleable="true"
+                                     toggleSpeed="500" collapsed="true" widgetVar="panel"
+                                     style="margin-bottom:20px"
+                                     rendered="#{assetInfoEditController.assetChangeHistoryCount > 0}">
+                                <p:dataTable id="modifiedRecordList" var="item"
+                                             value="#{assetInfoEditController.changeHistoryList}"
+                                             emptyMessage="#{msg.noRecordFound}" lazy="true">
+                                    <ui:include src="ImportantFieldsView.xhtml"/>
+                                </p:dataTable>
+                            </p:panel>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup id="buttonGroup">
+                                    <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
+                                    <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval(2)}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and ((assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
+                                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                                    <p:commandButton id="specialAssetInfo"  rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET')}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
+
+                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactiveEnable" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   oncomplete="PF('scrapapply').show()"  immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="#{msg.RefuseToReturnBack}" rendered="#{assetInfoEditController.isStatus()}">
+                        <h:form id="returnback">
+                            <p:fieldset id="returnBackHistory" legend="#{msg.ReturnBackHistory}" rendered="#{not empty assetInfoEditController.rejectTextHistory}">
+                                <c:forEach items="#{assetInfoEditController.rejectTextHistory}" var="item">
+                                    <p>#{item}</p>
+                                </c:forEach>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.ReturnBackReason}">
+                                <p:inputTextarea id ="rejectTextarea" value="#{assetInfoEditController.rejectText}" counter="comentsCounts" counterTemplate="#{msg.remainingCharacters}" maxlength="100"  rows="6" cols="50" required="true" requiredMessage="#{msg.ReasonRequired}"/>
+                                <p><h:outputText id="comentsCounts" /></p>
+                            </p:fieldset>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup >
+                                    <p:commandButton value="#{msg.ReturnBack}" icon="ui-icon-check" action="#{assetInfoEditController.returnBack()}" validateClient="true" update=":growl returnback" style="float:left"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="规则设置" rendered="#{assetInfoEditController.createAction}">
+                        <h:form id="createRule">
+                            <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{'二级'.concat(msg.PmOrderRule)}</label>
+                                    <p:autoComplete id="SelectedPmOrderRuleTwoLevel" value="#{assetInfoEditController.pmOrderRuleTwoLevel}" dropdown="true" scrollHeight="300"
+                                                    forceSelection="true" completeMethod="#{relRuleAssetController.geLevelTwoRuleList}"
+                                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
+                                        <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.setRuleId()}"/>
+                                        <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{'三级'.concat(msg.PmOrderRule)}</label>
+                                    <p:autoComplete id="SelectedPmOrderRuleThreeLevel" value="#{assetInfoEditController.pmOrderRuleThreeLevel}" dropdown="true" scrollHeight="300"
+                                                    forceSelection="true" completeMethod="#{relRuleAssetController.getLevelThreeRuleList}"
+                                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
+                                        <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.setRuleId()}"/>
+                                        <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_VIEW')}">
+                                    <label class="label">日常检查规则(请先选择设备所属科室)</label>
+                                    <p:selectManyMenu id="addMaintainConfig" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="false"
+                                                      filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
+                                        <p:ajax process="@this" listener="#{maintainConfigController.onSelectedCheckItemChange}" update=""></p:ajax>
+                                        <f:selectItems value="#{maintainConfigController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                                        <p:column style="float: left;text-align:left;">
+                                            <h:outputText value="#{t.name}" />
+                                        </p:column>
+                                    </p:selectManyMenu>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT')}">
+                                    <label class="label">使用登记规则(请先选择设备所属科室)</label>
+                                    <p:autoComplete id="addMaintainConfigJN" value="#{assetInfoEditController.selectedNurseSiteMaintainConfigJN}" dropdown="true" scrollHeight="300"
+                                                    forceSelection="true" completeMethod="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}"
+                                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="nurseSiteMaintainConfigJNConverter" >
+                                        <p:ajax process="@this" event="itemSelect" listener="#{maintainConfigJNController.onSelectedCheckItemChange}"/>
+                                        <p:ajax process="@this" listener="#{maintainConfigJNController.onSelectedCheckItemChange}"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="特种设备信息" rendered="#{assetInfoEditController.selected.specialAsset}">
+                        <ui:include src="createSpecialAsset.xhtml" />
+                    </p:tab>
+                </p:tabView>
+
+                <ui:include src="createSupplier.xhtml" />
+            </div>
+        </div>
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
+            <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
+                <span>
+                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                </span>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                    <span class="ui-icon ui-icon-closethick"></span></a>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
+            </div>
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">
+
+                <p style="text-align: center; vertical-align: middle"><image id="shwoPicDialogImg" src="" style="max-width: 1000px; max-height: 700px"></image></p>
+            </div>
+        </div>
+        <script id="shwoPicDialog_s" type="text/javascript">$(function () {
+            PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+        });
+        </script>
+        <script>
+            //<![CDATA[
+
+            function handleComplete(xhr, status, args) {
+                var unCheckedNursesiteMaintainSite = args.unCheckedNursesiteMaintainSite;
+                var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
+                if(unCheckedNursesiteMaintainSite==true && toDeleteNurseMaintainSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                }
+            }
+
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
+                PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i < 10; i++) {
+                    ImageSuofang(true);
+                }
+            }
+
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height && num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
+            })
+
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
+                        return;
+                    }
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+
+            $(document).ready(function () {
+                var $audioUlEle = $("#audioUl");
+                var audioList = $("input[id*='audio']");
+                $.each(audioList, function (index) {
+                    var audioClass = (index == 0 ? "track-default" : "");
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    $audioUlEle.append(templ);
+                });
+
+                // Local copy of jQuery selectors, for performance.
+                var my_jPlayer = $("#jquery_jplayer"),
+                    my_trackName = $("#jp_container .track-name"),
+                    my_playState = $("#jp_container .play-state"),
+                    my_extraPlayInfo = $("#jp_container .extra-play-info");
+
+                // Some options
+                var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
+                    opt_auto_play = true, // If true, when a track is selected, it will auto-play.
+                    opt_text_playing = "播放", // Text when playing
+                    opt_text_selected = "选择"; // Text when not playing
+
+                // A flag to capture the first track
+                var first_track = true;
+
+                // Change the time format
+                $.jPlayer.timeFormat.padMin = false;
+                $.jPlayer.timeFormat.padSec = false;
+                $.jPlayer.timeFormat.sepMin = " 分 ";
+                $.jPlayer.timeFormat.sepSec = " 秒";
+
+                // Initialize the play state text
+                my_playState.text(opt_text_selected);
+
+                // Instance jPlayer
+                my_jPlayer.jPlayer({
+                    ready: function () {
+                        $("#jp_container .track-default").click();
+                    },
+                    timeupdate: function (event) {
+                        my_extraPlayInfo.text(parseInt(event.jPlayer.status.currentPercentAbsolute, 10) + "%");
+                    },
+                    play: function (event) {
+                        my_playState.text(opt_text_playing);
+                    },
+                    pause: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    ended: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    swfPath: "../../dist/jplayer",
+                    cssSelectorAncestor: "#jp_container",
+                    supplied: "mp3",
+                    wmode: "window"
+                });
+
+                // Create click handlers for the different tracks
+                var temp = $("#jp_container .track");
+                $("#jp_container .track").click(function (e) {
+                    my_trackName.text($(this).text());
+                    my_jPlayer.jPlayer("setMedia", {
+                        mp3: $(this).attr("href")
+                    });
+                    if ((opt_play_first && first_track) || (opt_auto_play && !first_track)) {
+                        my_jPlayer.jPlayer("play");
+                    }
+                    first_track = false;
+                    $(this).blur();
+                    return false;
+                });
+
+            });
+            //]]>
+        </script>
+
+        <p:dialog  widgetVar="toDeleteCheckedNurseSite"  modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.toDelete()}" value="是" icon="ui-icon-check"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
+
+
+        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="300" width="500" header="报废申请">
+            <h:form id="nodeForm" >
+                <h:panelGroup>
+                    <label class="label">申请理由</label>
+                    <p:inputTextarea placeholder="报废申请*" value="#{assetInfoEditController.applyReason}" maxlength="256" />
+                    <p:outputLabel value="#{assetInfoEditController.applyReason}" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">鉴定理由</label>
+                    <p:inputTextarea placeholder="申请通过*" value="#{assetInfoEditController.approvalReason}" maxlength="256" />
+                    <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
+                </h:panelGroup>
+                <br/>
+                <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.applyAssetScrap()}" value="确定"  icon="ui-icon-check"  oncomplete="PF('scrapapply').hide()"/>
+                <p:commandButton  validateClient="true" immediate="false"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
+            </h:form>
+
+        </p:dialog>
+
+        <p:dialog id="annualInspectionReportDlg" widgetVar="annualInspectionReportDlg" modal="true" resizable="true" draggable="true"
+                  appendTo="@(body)" header="新增年检报告" width="800" height="400">
+            <h:form id="reportEditForm"><h:panelGroup id="displayy">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">报告名称<span
+                                style="color:red"></span></label>
+                        <p:inputText id="reportName"
+                                     value="#{assetInfoEditController.assetAnnualInspectionReport.name}"
+                                     requiredMessage="#{msg.reportName} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">报告类型<span
+                                style="color:red"></span></label>
+                        <p:inputText id="reportType"
+                                     value="#{assetInfoEditController.assetAnnualInspectionReport.reportType}"
+                                     requiredMessage="#{msg.reportType} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">检测单位<span
+                                style="color:red"></span></label>
+                        <p:inputText id="testingUnit"
+                                     value="#{assetInfoEditController.assetAnnualInspectionReport.testingUnit}"
+                                     requiredMessage="#{msg.testingUnit} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">检测结果<span
+                                style="color:red"></span></label>
+                        <p:inputText id="testResults"
+                                     value="#{assetInfoEditController.assetAnnualInspectionReport.testResults}"
+                                     requiredMessage="#{msg.testResults} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告发证单位<span
+                                style="color:red"></span></label>
+                        <p:inputText id="certificateIssuingUnit"
+                                     value="#{assetInfoEditController.assetAnnualInspectionReport.certificateIssuingUnit}"
+                                     requiredMessage="#{msg.certificateIssuingUnit} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">报告生效时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{assetInfoEditController.assetAnnualInspectionReport.effectiveTime}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.effectiveTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告到期时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{assetInfoEditController.assetAnnualInspectionReport.expiryDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.expiryDate} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.saveReport}"
+                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:reportInfoList" icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'annualInspectionReportDlg');"
+                />
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('annualInspectionReportDlg').hide()"/>
+
+            </h:panelGroup></h:form>
+        </p:dialog>
+        <p:dialog id="permitInfoDlg" widgetVar="permitInfoDlg" modal="true" resizable="true" draggable="true"
+                  appendTo="@(body)" header="新增证照信息" width="800" height="400">
+            <h:form id="permitInfoEditForm"><h:panelGroup id="displayssy">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">证件名称<span
+                                style="color:red"></span></label>
+                        <p:inputText id="certificateName"
+                                     value="#{assetInfoEditController.permitInfo.certificateName}"
+                                     requiredMessage="#{msg.reportName} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">证书类型<span
+                                style="color:red"></span></label>
+                        <p:inputText id="certificateType"
+                                     value="#{assetInfoEditController.permitInfo.certificateType}"
+                                     requiredMessage="#{msg.certificateType} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">持证人<span
+                                style="color:red"></span></label>
+                        <p:inputText id="holder"
+                                     value="#{assetInfoEditController.permitInfo.holder}"
+                                     requiredMessage="#{msg.holder} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告生效时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{assetInfoEditController.permitInfo.effectiveTime}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.effectiveTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告到期时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{assetInfoEditController.permitInfo.expiryDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.expiryDate} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.savePermitInfo}"
+                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:permitInfoList" icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'permitInfoDlg');"
+                />
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('permitInfoDlg').hide()"/>
+
+            </h:panelGroup></h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

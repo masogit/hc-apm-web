@@ -97,6 +97,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private List<BuildManagement>  managementList=new ArrayList<>();
 
+    private List<AssetInfo> assets4Permit;
+
+    private List<AssetInfo> assets5Permit;
+
+
 
     private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
 
@@ -141,6 +146,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
         this.isSelectAll = Boolean.FALSE;
+
+        this.assets4Permit = null;
+        this.assets5Permit=new ArrayList<>();
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
@@ -181,6 +189,50 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain = new ArrayList<>(this.selectedAssets);
     }
 
+
+    public void loadData4Edit(List<AssetInfo> assetInfos,String  siteUid) {
+        this.is4Edit = Boolean.TRUE;
+        this.orgTree = assetSelectService.loadOrgTree();
+        this.selectedOrg = assetSelectService.loadSelectedOrg();
+        // 页面 资产查询列表的复选框用
+        this.selectedAssetUids.clear();
+        // 编辑时，之前编辑的时候已经勾选了的资产
+        this.selectedAssets.clear();
+        // 本次编辑时勾选的资产
+        this.selectedAssetsed.clear();
+
+
+        this.selectedAssets = new HashSet<>(assetInfos);
+        this.selectedAssets.forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
+//        OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
+        this.selectedOrg = assetSelectService.getOrgInfoByUid(siteUid);
+        if (this.listCheckOrgInfo == null) {
+            this.listCheckOrgInfo = new ArrayList<OrgInfo>();
+        }
+        else{
+            this.listCheckOrgInfo.clear();
+        }
+//        listCheckOrgInfo.add(selectedDept);
+        if(!CollectionUtils.isEmpty(assetInfos)){
+            List<OrgInfo> orgInfos= assetSelectService.getOrgInfoByUids(assetInfos.stream().map(item->item.getClinicalDeptUID()).collect(Collectors.toList()));
+            listCheckOrgInfo.addAll(orgInfos);
+        }
+
+        this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
+
+        //sort assets by selected for edit view
+        searchFilters.add(new SearchFilter("isSpecialAsset", SearchFilter.Operator.EQ, true, "1*"));
+
+        List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
+                .filter(t -> !this.selectedAssetUids.getOrDefault(t.getUid(), Boolean.FALSE))
+                .collect(Collectors.toList());
+        this.assets4Permit = new ArrayList<>();
+        this.assets4Permit.addAll(assetsWithoutSelected);
+        this.assets5Permit = new ArrayList<>(this.selectedAssets);
+    }
+
+
+
     public void onSelectOrgFromTree(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedOrg = (OrgInfo) node.getData();
@@ -192,6 +244,30 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         isSelectAll = false;
     }
 
+    public void findAssets2Permit() {
+        //clear selected asset for each search
+        this.selectedAssetUids.clear();
+        this.selectedAssets.clear();
+        this.buildBaseSearchFilters();
+        searchFilters.add(new SearchFilter("isSpecialAsset", SearchFilter.Operator.EQ, true, "1*"));
+
+        int filterCount=this.buildAdvancedSearchFilters();
+        if(filterCount==0){
+        	WebUtil.addErrorMessage("缺少筛选条件！");
+        } else{
+            if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+                assets4Permit = ListUtil.empty();
+            } else {
+                if (currentUser.isEnableAssetTypeGroup()) {
+                    searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+                }
+                assets4Permit = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+            }
+        }
+        this.searchFilters.clear();
+    }
+
+
     public void findAssets2Maintain() {
         //clear selected asset for each search
         this.selectedAssetUids.clear();
@@ -199,7 +275,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.buildBaseSearchFilters();
         int filterCount=this.buildAdvancedSearchFilters();
         if(filterCount==0){
-        	WebUtil.addErrorMessage("缺少筛选条件！");
+            WebUtil.addErrorMessage("缺少筛选条件！");
         } else{
             if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
                 assets4Maintain = ListUtil.empty();
@@ -212,6 +288,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
         this.searchFilters.clear();
     }
+
+
+
     private void  assetInfosFilter(){
         if(CollectionUtils.isEmpty(assets4Maintain) || CollectionUtils.isEmpty(listCheckOrgInfo) )return;
         List<String> collect = listCheckOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
@@ -234,6 +313,19 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     	}
     	this.tiggerEvent();
     }
+
+    public void addAssetInfoPermit(){
+        for(AssetInfo assetInfo: selectedAssetsed){
+            if(!selectedAssets.contains(assetInfo)){
+                selectedAssets.add(assetInfo);
+            }
+        }
+        for(AssetInfo assetInfo: selectedAssets){
+            if(!assets5Permit.contains(assetInfo)){
+                assets5Permit.add(assetInfo);
+            }
+        }
+    }
     
     public void removeAssetInfo(){
         selectedAssets.removeAll(selectedAssets5);
@@ -249,6 +341,22 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5.clear();
         selectedAssetUids5.clear();
     }
+
+    public void removePermitAssetInfo(){
+        selectedAssets.removeAll(selectedAssets5);
+        assets5Permit.removeAll(selectedAssets5);
+        selectedAssets5.clear();
+        selectedAssetUids5.clear();
+//        this.tiggerEvent();
+    }
+
+    public void clearPermitAssetInfo(){
+        this.selectedAssets.clear();
+        assets5Permit.clear();
+        selectedAssets5.clear();
+        selectedAssetUids5.clear();
+    }
+
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
         log.debug("value of isAllSelected: {}", this.isAllSelected);
@@ -266,7 +374,25 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         isAllSelected = !isAllSelected;
         log.debug("size of selectedAssetUids: {}", selectedAssetUids.size());
     }
-    
+
+
+    public void addAssetsPermitOfCurrentPage(AjaxBehaviorEvent event) {
+        log.debug("value of isAllSelected: {}", this.isAllSelected);
+        if(isAllSelected) {
+            assets4Permit.stream().forEach(t -> {
+                selectedAssetUids.put(t.getUid(), Boolean.TRUE);
+                selectedAssetsed.add(t);
+            });
+        } else {
+            assets4Permit.stream().forEach(t -> {
+                selectedAssetUids.put(t.getUid(), Boolean.FALSE);
+                selectedAssetsed.remove(t);
+            });
+        }
+        isAllSelected = !isAllSelected;
+        log.debug("size of selectedAssetUids: {}", selectedAssetUids.size());
+    }
+
     public void addAssetsOfCurrentPage5(AjaxBehaviorEvent event) {
         log.debug("value of isAllSelected5: {}", this.isAllSelected5);
         if(isAllSelected5) {
@@ -276,6 +402,23 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             });
         } else {
             assets5Maintain.stream().forEach(t -> {
+                selectedAssetUids5.put(t.getUid(), Boolean.FALSE);
+                selectedAssets5.remove(t);
+            });
+        }
+        isAllSelected5 = !isAllSelected5;
+        log.debug("size of selectedAssetUids5: {}", selectedAssetUids.size());
+    }
+
+    public void addAssetsPermitOfCurrentPage5(AjaxBehaviorEvent event) {
+        log.debug("value of isAllSelected5: {}", this.isAllSelected5);
+        if(isAllSelected5) {
+            assets5Permit.stream().forEach(t -> {
+                selectedAssetUids5.put(t.getUid(), Boolean.TRUE);
+                selectedAssets5.add(t);
+            });
+        } else {
+            assets5Permit.stream().forEach(t -> {
                 selectedAssetUids5.put(t.getUid(), Boolean.FALSE);
                 selectedAssets5.remove(t);
             });
@@ -466,4 +609,20 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
     }
 
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public List<OrgInfo> getListCheckOrgInfo() {
+        return listCheckOrgInfo;
+    }
+
+    public void setListCheckOrgInfo(List<OrgInfo> listCheckOrgInfo) {
+        this.listCheckOrgInfo = listCheckOrgInfo;
+    }
 }

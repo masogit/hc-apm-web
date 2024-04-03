@@ -1940,7 +1940,7 @@ public class AssetInfo implements ChineseName,Serializable {
         return serialNum;
     }
 
-    public void setSerialNum(String serialNum) {
+    public void setSerialNum(String serialNum)   {
         this.serialNum = serialNum;
     }
 

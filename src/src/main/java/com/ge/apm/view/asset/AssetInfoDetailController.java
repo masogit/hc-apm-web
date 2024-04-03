@@ -100,9 +100,10 @@ public class AssetInfoDetailController {
     private ArrivalListItemRepository arrivalListItemRepository;
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    private SpecialAssetInfoService specialAssetInfoService;
 
 
-
+    private SpecialAssetInfo specialAssetInfo;
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -137,7 +138,7 @@ public class AssetInfoDetailController {
         countyArea = userContextService.isCountyArea();
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
-
+        specialAssetInfoService = WebUtil.getBean(SpecialAssetInfoService.class);
         assetInfoService.setSupplier(ListUtil.newArrayList(selected));
         maintanceType = aimService.getMaintanceType(selected);
         assetEvents  = aimService.getAssetEventsList(selected);
@@ -160,6 +161,10 @@ public class AssetInfoDetailController {
 
         List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
         this.selected.setTags(existingTags);
+
+        if(Boolean.TRUE.equals(selected.isSpecialAsset())){
+            specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+        }
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -475,7 +480,15 @@ public class AssetInfoDetailController {
         return changeHistoryList.size();
     }
 
-//    @Getter
+    public SpecialAssetInfo getSpecialAssetInfo() {
+        return specialAssetInfo;
+    }
+
+    public void setSpecialAssetInfo(SpecialAssetInfo specialAssetInfo) {
+        this.specialAssetInfo = specialAssetInfo;
+    }
+
+    //    @Getter
 //    private List<MultiLevelApproval> assetApprovalProcess=new ArrayList();
 //    public  int getAssetProcessRecordCount(){
 //        if(CollectionUtils.isEmpty(assetApprovalProcess) && null!=selected){
