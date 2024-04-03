@@ -291,11 +291,10 @@
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
-
                                 </p:autoComplete>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('')}">
-                                <label class="label">备注</label>
+                            <h:panelGroup>
+                                <label class="label">#{msg.LatestDevelopments}</label>
                                 <p:inputTextarea value="#{workOrderMgrController.comments}" rows="3"  cols="40"  maxlength="500"  />
                             </h:panelGroup>
                         </p:panelGrid>
