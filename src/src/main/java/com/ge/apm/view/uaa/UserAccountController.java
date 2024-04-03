@@ -2043,7 +2043,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         if (filterAssetTypeGroup != null) {
             List<AssetTypeGroupDto> assetTypeGroupsMatchingByName = this.assetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeGroup)).collect(Collectors.toList());
-            Set<AssetTypeGroupDto> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList1(assetTypeGroupsMatchingByName, assetTypeGroupList);
+            List<AssetTypeGroupDto> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList1(assetTypeGroupsMatchingByName, assetTypeGroupList);
             assetTypeUserUidSet = matchedList.stream().map(AssetTypeGroupDto::getUserUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
             if (ObjectUtil.isEmpty(assetTypeUserUidSet)) {
                 assetTypeUserUidSet = Collections.singleton("-1");
