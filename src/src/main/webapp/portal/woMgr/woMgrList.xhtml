@@ -73,7 +73,7 @@
                             <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                         </c:when>
                         <c:otherwise>
-                            <h:outputText value="#{fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}"></h:outputText>
+                            <h:outputText value="#{fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"></h:outputText>
                         </c:otherwise>
                     </c:choose>
                 </p:column>
