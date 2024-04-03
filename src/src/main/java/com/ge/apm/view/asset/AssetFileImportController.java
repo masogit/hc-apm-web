@@ -154,12 +154,12 @@ public class AssetFileImportController {
         try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
              ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
         {
-            logger.info("check upload asset file version");
+            /*logger.info("check upload asset file version");
 
             if(!streamingService.checkDocVersion(assetDoc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
                 return;
-            }
+            }*/
 
             logger.info("fetch org cache for quick lookup");
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());

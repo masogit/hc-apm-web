@@ -47,11 +47,11 @@ public class AssetFileImportBaseService {
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
     public static final String SHEET_TCM = "TCM List";
-    public static final int EXCEL_ASSET_HEADER_ROW = 6;
-    public static final int EXCEL_ASSET_DATA_ROW = 7;
+    public static final int EXCEL_ASSET_HEADER_ROW = 1;
+    public static final int EXCEL_ASSET_DATA_ROW = 2;
 
-    public static final int EXCEL_ORG_HEADER_ROW = 4;
-    public static final int EXCEL_ORG_DATA_ROW = 5;
+    public static final int EXCEL_ORG_HEADER_ROW = 1;
+    public static final int EXCEL_ORG_DATA_ROW = 2;
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
