@@ -1,13 +1,9 @@
 package com.ge.apm.view.secondment.dept;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.SecondmentOrderDto;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.domain.secondment.SecondmentOrder;
@@ -21,10 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -33,7 +26,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +54,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     private SharedAssetService sharedAssetService;
     private List<OrgInfo> orgInfoList;
     private List<AssetInfo> selectAssetInfos;
+    private V2_WorkOrderRepository v2_workOrderRepository;
     @Override
     protected void init() {
         dao= WebUtil.getBean(AssetInfoRepository.class);
@@ -71,6 +64,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         userAccountRepository= WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         sharedAssetService= WebUtil.getBean(SharedAssetService.class);
+        v2_workOrderRepository= WebUtil.getBean(V2_WorkOrderRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -197,6 +191,18 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
                 WebUtil.addErrorMessage("设备："+selected.getName() +"，占用中！");
                 return ;
             }
+            String clinicalDeptUID = selected.getClinicalDeptUID();
+            String assetDeptUID = selected.getAssetDeptUID();
+            if(StringUtils.hasText(assetDeptUID) && !assetDeptUID.equals(clinicalDeptUID)){
+
+                WebUtil.addErrorMessage("设备："+selected.getName() +"，正在调剂中！");
+                return ;
+            }
+            List<V2_WorkOrder> workOrders = searchRepairAgain(selected.getUid());
+            if(CollectionUtils.isNotEmpty(workOrders)){
+                WebUtil.addErrorMessage("设备："+selected.getName() +" 正在维修中,暂停借出！");
+                return ;
+            }
             SecondmentOrder secondmentOrder = this.secondmentOrder;
             if(secondmentOrder!= null){
                 String secondmentNo = generateSecondmentNo(null);
@@ -209,6 +215,13 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             e.printStackTrace();
         }
 
+    }
+    private List<V2_WorkOrder> searchRepairAgain(String uid){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, uid));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        List<V2_WorkOrder> workOrders = v2_workOrderRepository.findBySearchFilter(searchFilters);
+        return workOrders;
     }
 
     public static void generateProcessRecords(SecondmentOrder order,String uid,String name,String nodeName){

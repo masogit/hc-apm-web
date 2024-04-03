@@ -195,15 +195,15 @@ public class AssetTypeGroupService {
         }
     }
 
-    public Set<AssetTypeGroupDto> collectChildAssetTypeGroupInExstingList1(List<AssetTypeGroupDto> assetTypeGroupsMatchingByName, List<AssetTypeGroupDto> assetTypeGroupList) {
-        Set<AssetTypeGroupDto> assetTypeGroupSet = new HashSet<>();
+    public List<AssetTypeGroupDto> collectChildAssetTypeGroupInExstingList1(List<AssetTypeGroupDto> assetTypeGroupsMatchingByName, List<AssetTypeGroupDto> assetTypeGroupList) {
+        List<AssetTypeGroupDto> assetTypeGroupSet = new ArrayList<>();
         for (AssetTypeGroupDto assetTypeGroup: assetTypeGroupsMatchingByName) {
             collectChildAssetTypeGroupInExstingList1(assetTypeGroup, assetTypeGroupList, assetTypeGroupSet);
         }
         return assetTypeGroupSet;
     }
 
-    public void collectChildAssetTypeGroupInExstingList1(AssetTypeGroupDto parentAssetTypeGroup, List<AssetTypeGroupDto> assetTypeGroupList, Set<AssetTypeGroupDto> assetTypeGroupSet) {
+    public void collectChildAssetTypeGroupInExstingList1(AssetTypeGroupDto parentAssetTypeGroup, List<AssetTypeGroupDto> assetTypeGroupList, List<AssetTypeGroupDto> assetTypeGroupSet) {
         assetTypeGroupSet.add(parentAssetTypeGroup);
         for (AssetTypeGroupDto assetTypeGroup : assetTypeGroupList) {
             if (!parentAssetTypeGroup.getUid().equals(assetTypeGroup.getParentUid())) continue;

@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -174,7 +175,8 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         AssetInfo assetInfo = assetInfoRepository.findByUid(assetUid);
          switch (status){
              case 1:
-                 if(assetInfo.getBorrowedStatus() == 0){
+                 Integer borrowedStatus = assetInfo.getBorrowedStatus();
+                 if(borrowedStatus == null || borrowedStatus == 0){
                      assetInfo.setAssetDeptUID(borrowDeptUid);
                      assetInfo.setBorrowedStatus(1);
                      dto.setBillingTime(null);
@@ -184,6 +186,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
+                     rejectSameDeviceWorkOrder(order);
                  }else{
                      WebUtil.addSuccessMessage("设备："+assetInfo.getName() +",已被占用或未配置调剂规则,请刷新后重试");
                  }
@@ -221,6 +224,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
              case 4:
                  dto.setBillingTime(null);
                  dto.setCost(null);
+                 dto.setIsRepair(true);
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"维修中");
                  secondmentOrderRepository.save(order);
@@ -255,7 +259,22 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
          }
 
     }
-
+    public void rejectSameDeviceWorkOrder(SecondmentOrder order){
+        String assetUid = order.getAssetUid();
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,assetUid));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ,0));
+        List<SecondmentOrder> rejectWorkOrder = secondmentOrderRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isEmpty(rejectWorkOrder)) return;
+        for (SecondmentOrder secondmentOrder : rejectWorkOrder) {
+             secondmentOrder.setDenialReason("该设备其他科室已占用"); // 拒绝原因
+             SecondmentOrderAssetController.generateProcessRecords(secondmentOrder,userAccount.getUid(),userAccount.getName(),"拒绝");
+             secondmentOrder.setModifyBy(userAccount.getUid());
+             secondmentOrder.setModifyDate(new Date());
+             secondmentOrder.setStatus(-2);
+        }
+        secondmentOrderRepository.save(rejectWorkOrder);
+    }
     public SecondmentConfig getSecondmentConfig() {
         return secondmentConfig;
     }
