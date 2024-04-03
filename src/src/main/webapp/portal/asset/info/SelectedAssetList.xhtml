@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <div class="common-search-div">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <label class="label">所属院区</label>
+                <p:inputText id="selectedOrgName" value="#{assetSelectController.selectedOrg.name}" readonly="true" required="true"
+                             requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" disabled="#{assetSelectController.is4Edit}"/>
+                <p:commandButton id="orgBtn" process="@this" disabled="#{assetSelectController.is4Edit}" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
+                <p:overlayPanel id="orgPanel" widgetVar="varOrgPanel" for="orgBtn" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"
+                                style="width:300px;" modal="false">
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}"
+                                var="node" selectionMode="single">
+                            <p:ajax process="@this" event="select"
+                                    update="@parent:selectedOrgName,@parent:deptOrgInfoCreate,@parent:selectAll"
+                                    listener="#{assetSelectController.onSelectOrgFromTree}" oncomplete="PF('varOrgPanel').hide();" />
+                            <p:ajax process="@this" event="expand" />
+                            <p:ajax process="@this" event="collapse" />
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node}" />
+                            </p:treeNode>
+							<p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
+            </h:panelGroup>
+            <h:panelGroup>
+                <!--指代所属科室或使用科室-->
+                <label class="label">科室</label>
+<!--                <p:selectBooleanCheckbox id="selectAll" value="#{assetSelectController.isSelectAll}" itemLabel="全选" rendered="#{!assetSelectController.is4Edit}">-->
+<!--                    <p:ajax update="@parent:deptOrgInfoCreate" listener="#{assetSelectController.updateSelectAll()}"/>-->
+<!--                </p:selectBooleanCheckbox>-->
+                <p:selectBooleanCheckbox id="selectAll" value="#{assetSelectController.isSelectAll}" itemLabel="全选" >
+                    <p:ajax update="@parent:deptOrgInfoCreate" listener="#{assetSelectController.updateSelectAll()}"/>
+                </p:selectBooleanCheckbox>
+<!--				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"-->
+<!--					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">-->
+<!--                    <p:ajax update="@parent:selectAll" listener="#{assetSelectController.updateItem()}"/>-->
+<!--					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />-->
+<!--					<p:column style="float: left;text-align:left;">-->
+<!--						<h:outputText value="#{t.name}" />-->
+<!--					</p:column>-->
+<!--				</p:selectManyMenu>-->
+<!--				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"-->
+<!--					showCheckbox="false" style="width:100%" rendered="#{assetSelectController.is4Edit}" disabled="#{assetSelectController.is4Edit}">-->
+<!--					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />-->
+<!--					<p:column style="float: left;text-align:left;">-->
+<!--						<h:outputText value="#{t.name}" />-->
+<!--					</p:column>-->
+<!--				</p:selectOneMenu>-->
+
+                				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
+                					filterMatchMode="contains" showCheckbox="true" style="width:100%">
+                                    <p:ajax update="@parent:selectAll" listener="#{assetSelectController.updateItem()}"/>
+                					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                					<p:column style="float: left;text-align:left;">
+                						<h:outputText value="#{t.name}" />
+                					</p:column>
+                				</p:selectManyMenu>
+			</h:panelGroup>
+            <h:panelGroup>
+                <label class="label">设备名称</label>
+                <p:inputText value="#{assetSelectController.assetName}"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">设备分类</label>
+                <p:selectOneMenu value="#{assetSelectController.assetGroup}" disabled="false">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">设备型号</label>
+                <p:inputText value="#{assetSelectController.functionType}"/>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{!assetSelectController.is4Edit}">
+                <label class="label">设备编号</label>
+                <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">是否急救类设备</label>
+                <p:selectOneMenu id="emergencyEquipment" value="#{assetSelectController.emergencyEquipment}" disabled="false">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.locationName}</label>
+                <p:inputText value="#{assetSelectController.locationName}"/>
+            </h:panelGroup>
+
+
+			<p:commandButton validateClient="true" value="查询"
+				update=":permitInfoCreateForm:assets4Permit :permitInfoCreateForm:saveButtonId"
+				action="#{assetSelectController.findAssets2Permit}" />
+
+		</p:panelGrid>
+
+        <!--asset search result list-->
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+            <p:dataTable id="assets4Permit" value="#{assetSelectController.assets4Permit}" var="asset"
+                         selectionMode="single"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:column width="40" id="checkBoxCol">
+                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
+                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":permitInfoCreateForm:saveButtonId"/>
+                        <f:attribute name="assetObj" value="#{asset}"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectController.addAssetsPermitOfCurrentPage}" update="@(.selectCheckBox) :permitInfoCreateForm:saveButtonId"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                    <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}">
+                    <h:outputText value="#{asset.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.serialNum}">
+                    <h:outputText value="#{asset.serialNum}"/>
+                </p:column>
+                <p:column headerText="二维码编号">
+                    <h:outputText value="#{asset.qrCode}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panelGrid>
+
+		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+			<p:commandButton validateClient="true" value="添加已勾选设备"
+				update=":permitInfoCreateForm:assets4Permit :permitInfoCreateForm:assets5Permit :permitInfoCreateForm:saveButtonId"
+				action="#{assetSelectController.addAssetInfoPermit}" />
+		</p:panelGrid>
+
+		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+            <p:dataTable id="assets5Permit" value="#{assetSelectController.assets5Permit}" var="asset"
+                         selectionMode="single"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:column width="40" id="checkBoxCol">
+                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids5[asset.uid]}" class="selectCheckBox2">
+                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList5}" update=":permitInfoCreateForm:saveButtonId"/>
+                        <f:attribute name="assetObj" value="#{asset}"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected5}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectController.addAssetsPermitOfCurrentPage5}" update="@(.selectCheckBox2) :permitInfoCreateForm:saveButtonId"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                    <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}">
+                    <h:outputText value="#{asset.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.serialNum}">
+                    <h:outputText value="#{asset.serialNum}"/>
+                </p:column>
+                <p:column headerText="二维码编号">
+                    <h:outputText value="#{asset.qrCode}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panelGrid>
+
+		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+			<p:commandButton validateClient="true" value="删除已勾选设备"
+				update=":permitInfoCreateForm:assets4Permit :permitInfoCreateForm:assets5Permit :permitInfoCreateForm:saveButtonId"
+				action="#{assetSelectController.removePermitAssetInfo}" />
+			<p:commandButton validateClient="true" value="清空"
+				update=":permitInfoCreateForm:assets4Permit :permitInfoCreateForm:assets5Permit :permitInfoCreateForm:saveButtonId"
+				action="#{assetSelectController.clearPermitAssetInfo}" />
+		</p:panelGrid>
+	</div>
+</ui:composition>
+</html>
