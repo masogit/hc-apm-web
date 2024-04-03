@@ -555,6 +555,10 @@ public class AssetInfoFormatter {
         return assetInfo.getLastMeteringDate();
     }
 
+    public Date getLastInventoryDate() {
+        return assetInfo.getLastInventoryDate();
+    }
+
     public Date getLastQaDate() {
         return assetInfo.getLastQaDate();
     }
@@ -964,6 +968,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("terminateDate"), this.getTerminateDate());
         map.put(getMessage("lastPmDate"), this.getLastPmDate());
         map.put(getMessage("lastMeteringDate"), this.getLastMeteringDate());
+        map.put(getMessage("lastInventoryDate"), this.getLastInventoryDate());
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());
@@ -1103,6 +1108,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("terminateDate"), this.getTerminateDate());
         map.put(getMessage("lastPmDate"), this.getLastPmDate());
         map.put(getMessage("lastMeteringDate"), this.getLastMeteringDate());
+        map.put(getMessage("lastInventoryDate"), this.getLastInventoryDate());
         map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
         map.put(getMessage("maitanance"), this.getMaitanance());

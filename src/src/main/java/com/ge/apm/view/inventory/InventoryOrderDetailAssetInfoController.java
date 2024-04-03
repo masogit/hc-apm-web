@@ -1,7 +1,7 @@
 package com.ge.apm.view.inventory;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -22,9 +22,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,11 +34,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
 	private InventoryOrderService service;
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
-	private static final String ORG_NAME = "orgName";
+	private AssetInfoRepository assetInfoRepository;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
@@ -48,10 +45,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -145,6 +142,9 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 			d.setLastModifiedBy(currentUser.getLoginName());
 		});
 		dao.save(nonInventoryOrderDetails);
+		// 更新资产盘点日期
+		Set<Integer> assetIds = nonInventoryOrderDetails.stream().map(t -> t.getAssetInfo().getId()).collect(Collectors.toSet());
+		assetInfoRepository.bathInventory(assetIds);
 	}
 
 }
