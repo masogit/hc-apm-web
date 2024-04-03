@@ -73,7 +73,7 @@ public class CustomConfigConstant {
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
                 "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
-                "lastMeteringDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
+                "lastMeteringDate", "lastInventoryDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
                 "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
@@ -121,7 +121,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline");
+                "lastQaDate", "lastMeteringDate", "lastInventoryDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
@@ -167,7 +167,7 @@ public class CustomConfigConstant {
                 "functionGrade", "functionGroup", "assetCode68","medicalApparatusClassification", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
                 "isPm","isFixed", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
-                "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
+                "lastPmDate", "lastQaDate", "lastMeteringDate", "lastInventoryDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
     }
 
     public static List<String> getAssetsMobilepageHeaderFields() {
