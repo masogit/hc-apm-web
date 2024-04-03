@@ -114,7 +114,12 @@ public class SecondmentOrder implements Serializable {
     private String denialReason;
     @Column(name = "process_records", columnDefinition = "text")
     private String processRecords;
-
+    @Column(name = "is_repair")
+    private Boolean isRepair;
+    @Column(name = "approval_suggestions", columnDefinition = "text")
+    private String approvalSuggestions; // 审批意见
+    @Column(name = "approval_remarks", columnDefinition = "text")
+    private String approvalRemarks; // 审批备注
     @Override
     public int hashCode() {
         Integer hash = 0;

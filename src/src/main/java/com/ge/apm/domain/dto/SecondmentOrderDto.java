@@ -75,10 +75,12 @@ public class SecondmentOrderDto implements Serializable {
 
     private String siteUID;
 
-    private String denialReason;
+    private String denialReason; // 拒绝原因/取消原因
 
     private String processRecords;
-
+    private Boolean isRepair;
+    private String approvalSuggestions; // 审批意见
+    private String approvalRemarks; // 审批备注
     @Override
     public int hashCode() {
         Integer hash = 0;
