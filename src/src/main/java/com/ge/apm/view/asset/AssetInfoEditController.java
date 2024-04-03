@@ -93,7 +93,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private BuildManagementRepository buildManagementRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private AssetScrapRepository assetScrapRepository;
-
+    private SpecialAssetInfoService specialAssetInfoService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -256,6 +256,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String locationName;
     private UserAccount loginUser;
 
+    private SpecialAssetInfo specialAssetInfo;
+
+
+    private String type=null;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -306,6 +311,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
+        specialAssetInfoService = WebUtil.getBean(SpecialAssetInfoService.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -349,6 +355,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            specialAssetInfo=new SpecialAssetInfo();
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -367,6 +374,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             assetInfoService.setSupplier(ListUtil.newArrayList(selected));
+            if(Boolean.TRUE.equals(selected.isSpecialAsset())){
+               specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+            }
         }else if ("Copy".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = false;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -393,6 +403,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 logger.error("AssetInfoEditController copy error: "+e);
             }
 
+        }
+        type = (String) UrlEncryptController.getValueFromMap(encodeStr, "type");
+
+        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+            selected.setSpecialAsset(true);
+            specialAssetInfo.setAssetId(selected.getId());
+            specialAssetInfo.setAssetUid(selected.getUid());
+            specialAssetInfo.setHospitalUID(selected.getHospitalUID());
+            specialAssetInfo.setTenantUID(selected.getTenantUID());
+            specialAssetInfo.setInstitutionUID(selected.getInstitutionUID());
+            specialAssetInfo.setSiteUID(selected.getSiteUID());
+            specialAssetInfo.setCreatedDate(new Date());
+            specialAssetInfo.setCreatedByUid(loginUser.getUid());
+            specialAssetInfo.setLastModifiedByUid(loginUser.getUid());
+            specialAssetInfo.setLastModifiedDate(new Date());
         }
         if(selected ==null){
             try {
@@ -1365,6 +1390,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
+    //转入特种设备
+    public String transforSpecialAsset() {
+        selected.setSpecialAsset(true);
+        specialAssetInfoService.initSpecialAsset(selected);
+        dao.save(selected);
+        return "AssetList?faces-redirect=true";
+    }
+
     public String applyAssetScrap(){
         assetScrapService.apply(selected.getId(),applyReason,approvalReason);
         return "AssetList?faces-redirect=true";
@@ -2017,4 +2050,139 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
+
+    public SpecialAssetInfo getSpecialAssetInfo() {
+        return specialAssetInfo;
+    }
+
+    public void setSpecialAssetInfo(SpecialAssetInfo specialAssetInfo) {
+        this.specialAssetInfo = specialAssetInfo;
+    }
+
+    public void checkAssessmentNoExists () {
+        List<SpecialAssetInfo> list = specialAssetInfoService.findByAssessmentNoAndTenantUID(specialAssetInfo.getAndAssessmentNo(), selected.getTenantUID());
+        if (CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("预评批号已存在！");
+        }
+    }
+
+    private AssetAnnualInspectionReport assetAnnualInspectionReport;
+    private PermitInfo permitInfo;
+    public void onAddReport() {
+        assetAnnualInspectionReport = new AssetAnnualInspectionReport();
+    }
+
+    public void onAddPermitInfo() {
+        permitInfo = new PermitInfo();
+    }
+
+    public void onEditReport(String uid) {
+        for (AssetAnnualInspectionReport report : specialAssetInfo.getAssetAnnualInspectionReports()) {
+            if (null != report.getUid() && uid.equals(report.getUid())) {
+                assetAnnualInspectionReport = report;
+            }
+        }
+    }
+
+    public void onEditPermitInfo(String name) {
+        for (PermitInfo permit : specialAssetInfo.getPermitInfos()) {
+            if (null != permit.getCertificateName() && name.equals(permit.getCertificateName())) {
+                permitInfo = permit;
+            }
+        }
+    }
+
+
+    public void delReport(String name) {
+        List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> !name.equals(item.getName())).collect(Collectors.toList());
+        specialAssetInfo.setAssetAnnualInspectionReports(collect);
+
+    }
+
+
+    public void delPermitInfo(String name) {
+        Set<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> !name.equals(item.getCertificateName())).collect(Collectors.toSet());
+        specialAssetInfo.setPermitInfos(collect);
+
+    }
+
+    public void saveReport() {
+
+        if(assetAnnualInspectionReport!=null &&( assetAnnualInspectionReport.getUid()!=null || assetAnnualInspectionReport.getNodeId()!=null)){
+            return;
+        }
+        List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports();
+        if(assetAnnualInspectionReports==null){
+            assetAnnualInspectionReports=new ArrayList<>();
+        }
+        assetAnnualInspectionReport.setCreatedByName(loginUser.getName());
+        assetAnnualInspectionReport.setCreatedByUid(loginUser.getUid());
+        assetAnnualInspectionReport.setNodeId(assetAnnualInspectionReports.size());
+        assetAnnualInspectionReports.add(assetAnnualInspectionReport);
+    }
+
+    public void savePermitInfo() {
+        if(permitInfo!=null &&( permitInfo.getUid()!=null || permitInfo.getNodeId()!=null)){
+            return;
+        }
+        Set<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos();
+        if(permitInfos==null){
+            permitInfos=new HashSet<>();
+        }
+        permitInfo.setTenantUID(loginUser.getTenantUID());
+        permitInfo.setSiteUID(loginUser.getSiteUID());
+        permitInfo.setHospitalUID(loginUser.getHospitalUID());
+        permitInfo.setInstitutionUID(loginUser.getInstitutionUID());
+        permitInfo.setCreatedByName(loginUser.getName());
+        permitInfo.setCreatedByUid(loginUser.getUid());
+        permitInfo.setNodeId(permitInfos.size());
+
+        permitInfos.add(permitInfo);
+    }
+
+    public AssetAnnualInspectionReport getAssetAnnualInspectionReport() {
+        return assetAnnualInspectionReport;
+    }
+
+    public void setAssetAnnualInspectionReport(AssetAnnualInspectionReport assetAnnualInspectionReport) {
+        this.assetAnnualInspectionReport = assetAnnualInspectionReport;
+    }
+    public PermitInfo getPermitInfo( ) {
+        return permitInfo;
+    }
+
+    public void setPermitInfo(PermitInfo permitInfo) {
+        this.permitInfo = permitInfo;
+    }
+
+    public List<AssetAnnualInspectionReport> getAssetAnnualInspectionReports() {
+        if(specialAssetInfo.getAssetAnnualInspectionReports()==null){
+            List<AssetAnnualInspectionReport> assetAnnualInspectionReports = new ArrayList<>();
+            specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+        }
+        if(!specialAssetInfo.getAssetAnnualInspectionReports().stream().anyMatch(item->item.getUid()==null && item.getName()==null)){
+            specialAssetInfo.getAssetAnnualInspectionReports().add(new AssetAnnualInspectionReport());
+        }
+        return specialAssetInfo.getAssetAnnualInspectionReports();
+    }
+
+    private Set<PermitInfo> permitInfos;
+
+    public Set<PermitInfo> getPermitInfos() {
+        if(specialAssetInfo.getPermitInfos()==null){
+            Set<PermitInfo> permitInfos = new HashSet<>();
+            specialAssetInfo.setPermitInfos(permitInfos);
+        }
+        if(!specialAssetInfo.getPermitInfos().stream().anyMatch(item->item.getUid()==null && item.getCertificateName()==null)){
+            specialAssetInfo.getPermitInfos().add(new PermitInfo());
+        }
+        return specialAssetInfo.getPermitInfos();
+
+    }
+
+    public void processInputChange( ) {
+        System.out.println("processInputChange");
+    }
+
+
 }

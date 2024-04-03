@@ -1037,6 +1037,19 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     @Column(name = "borrow_config_id")
     private String borrowConfigId;
+
+
+    @Column(name = "is_special_asset", columnDefinition = "boolean default false")
+    private boolean isSpecialAsset; //是否特种设备
+
+    public boolean isSpecialAsset() {
+        return isSpecialAsset;
+    }
+
+    public void setSpecialAsset(boolean specialAsset) {
+        isSpecialAsset = specialAsset;
+    }
+
     public void setSupplierPyCode(String supplierPyCode) {
         this.supplierPyCode = supplierPyCode;
     }
