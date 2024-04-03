@@ -56,7 +56,7 @@
                    </c:when>
                    <c:when test="#{item eq 'SPECIAL_ASSET'}">
                        <!-- 特种设备管理 -->
-                       <p:submenu id="um011" label="特种设备管理" icon="fa fa-bars fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_')}">
+                       <p:submenu id="um011" label="特种设备管理" icon="fa fa-bars fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_') and userContextService.hasRole('SpecialEquipmentRole') }">
                            <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}"/>
                            <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_REPAIR_EDIT')}"/>
                            <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_MAINTAIN_EDIT')}"/>
