@@ -133,6 +133,26 @@
                 </if>
             UNION ALL
             SELECT NULL AS assetId, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
+                <if test="orgUidList != null and orgUidList.size > 0">
+                    AND (
+                    iod.institution_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.hospital_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.site_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.clinical_dept_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    )
+                </if>
         ) t
     </sql>
 
