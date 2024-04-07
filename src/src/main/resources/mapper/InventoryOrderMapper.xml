@@ -86,12 +86,12 @@
                 ai.institution_uid institutionUid,
                 ai.hospital_uid hospitalUid,
                 ai.site_uid siteUid,
-                CASE WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
-                CASE WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
-                CASE WHEN ii.id IS NOT NULL THEN (select string_agg(icl.item, ', ') from inventory_check_list icl left join inventory_issue_detail isd on icl.id = isd.inventory_check_list_id where isd.inventory_issue_id = ii.id group by isd.inventory_issue_id) ELSE '' END inventoryCheckListItems,
-                CASE WHEN ii.last_modified_by IS NOT NULL THEN ii.last_modified_by ELSE iod.last_modified_by END lastModifiedBy,
-                CASE WHEN ii.last_modified_date IS NOT NULL THEN ii.last_modified_date ELSE iod.last_modified_date END lastModifiedDate,
-                CASE WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.comment WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.id IS NOT NULL THEN (select string_agg(icl.item, ', ') from inventory_check_list icl left join inventory_issue_detail isd on icl.id = isd.inventory_check_list_id where isd.inventory_issue_id = ii.id group by isd.inventory_issue_id) ELSE '' END inventoryCheckListItems,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.last_modified_by WHEN ii.last_modified_by IS NOT NULL THEN ii.last_modified_by ELSE iod.last_modified_by END lastModifiedBy,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.last_modified_date WHEN ii.last_modified_date IS NOT NULL THEN ii.last_modified_date ELSE iod.last_modified_date END lastModifiedDate,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.status WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
             FROM
                 asset_info ai
                 LEFT JOIN (select t1.* from inventory_issue t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_issue group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) ii ON ai.id = ii.asset_id
