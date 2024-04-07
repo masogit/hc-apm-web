@@ -106,7 +106,9 @@
                                 </p:column>
 
                                 <p:column headerText="借出费用" >
-                                    <h:outputText value="#{secondmentOrderManageController.adDocCalculation(item).cost}"/>
+                                    <h:outputText value="#{secondmentOrderManageController.adDocCalculation(item).cost}">
+                                        <f:convertNumber pattern="0.00" />
+                                    </h:outputText>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">

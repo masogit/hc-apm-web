@@ -86,11 +86,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费时长(分钟)</label>
-                            <p:inputText value="#{secondmentOrderManageController.selected.billingTime}" readonly="true"  />
+                            <p:inputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.selected.billingTime)}" readonly="true"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计时费用</label>
-                            <p:inputText value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
+                            <p:inputNumber value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">备注</label>
