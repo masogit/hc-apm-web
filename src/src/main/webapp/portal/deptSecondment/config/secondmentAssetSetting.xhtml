@@ -82,7 +82,7 @@
                             <h:outputText value="#{secondmentAssetSettingController.getBillingModel(item)}"/>
                         </p:column>
                         <p:column headerText="累计借出时长" >
-                            <h:outputText value="#{item.billingTime}"/>
+                            <h:outputText value="#{secondmentOrderManageController.conversionTime(item.billingTime)}"/>
                         </p:column>
                         <p:column headerText="累计借出费用" >
                             <h:outputText value="#{item.billingCost}"/>

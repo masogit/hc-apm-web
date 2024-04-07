@@ -76,7 +76,11 @@
                         </p:dataTable>
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-                        <p:commandButton  validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" update="assetList assetList2 :growl" icon="ui-icon-check" />
+<!--                        <p:commandButton  validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" update="assetList assetList2 :growl" icon="ui-icon-check"  oncomplete="PF('configEditList1').clearFilters()"/>-->
+                        <p:commandButton validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" icon="fa fa-filter" process="@form" update="assetList assetList2 :growl"
+                                         oncomplete="PF('configEditList1').clearFilters();">
+                            <p:resetInput target="datalist" />
+                        </p:commandButton>
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" id="assetList2" styleClass="ui-panelgrid-blank form-group ">
                         <p:dataTable id="datalist1" value="#{secondmentAssetSettingBatchController.lazyModel2}"
