@@ -183,9 +183,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createFunctionTypeSecondaryLevel();
 
         if (!crossSite) {
-            createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-            createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-            createFormulaForExistingDropdown( WebUtil.getMessage("spare01"), "OFFSET('TCM List'!$A$5,0,0,COUNTA('TCM List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$2,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$2,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown( WebUtil.getMessage("spare01"), "OFFSET('TCM List'!$A$2,0,0,COUNTA('TCM List'!$A:$A) - 2, 1)");
         }
 
     }
@@ -518,7 +518,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         String[] columnTitles = exportFields.toArray(new String[] {});
 
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles,true);
         return writer;
     }
 
@@ -574,7 +574,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         //create asset table
 //        createAssetTable(columnTitles);
 
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles,true);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         writer.writeRowData(startRow, buildSampleAsset(clinicalDeptList));
@@ -676,8 +676,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         String sumFormula = String.format("SUM('Asset List'!$%s$7:$%s$%d)", purchasePriceLetter, purchasePriceLetter, maxRows);
 
-        writer.writeCellFormula(5, 1, countFormula);
-        writer.writeCellFormula(5, 2, sumFormula);
+      /*  writer.writeCellFormula(5, 1, countFormula);
+        writer.writeCellFormula(5, 2, sumFormula);*/
 
     }
 

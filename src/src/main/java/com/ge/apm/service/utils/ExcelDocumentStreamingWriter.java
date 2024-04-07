@@ -5,17 +5,9 @@
  */
 package com.ge.apm.service.utils;
 
-import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.AreaReference;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author Quan Tang
  */
 public class ExcelDocumentStreamingWriter implements Closeable {
@@ -105,26 +96,33 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         }
     }
 
-    public void writeRowData(int row, String[] data) {
+    public void writeRowData(int row, String[] data,boolean... bold) {
 
         for (int index = 0; index < data.length; index++) {
             Object value = data[index];
 
-            writeCellData(row, index + 1, value);
+            writeCellData(row, index + 1, value,bold);
         }
     }
 
-    public void writeCellData(int rowNum, int colNum, Object value) {
+    public void writeCellData(int rowNum, int colNum, Object value, boolean... bold) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
             dataRow = sheet.createRow(rowNum - 1);
         }
 
         Cell cell = dataRow.getCell(colNum - 1);
+
         if (null == cell) {
             cell = dataRow.createCell(colNum - 1);
         }
-
+        if (bold != null && bold.length > 0 && bold[0] == true) {
+            CellStyle cellStyle = workBook.createCellStyle();
+            Font font = workBook.createFont();
+            font.setBold(true);
+            cellStyle.setFont(font);
+            cell.setCellStyle(cellStyle);
+        }
         writeCellData(cell, value);
 
     }
@@ -192,7 +190,7 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     }
 
     @Override
-    public void close()  {
+    public void close() {
         if (workBook != null) {
             try {
                 workBook.close();

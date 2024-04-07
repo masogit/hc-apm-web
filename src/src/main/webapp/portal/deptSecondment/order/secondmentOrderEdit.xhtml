@@ -86,28 +86,28 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费时长(分钟)</label>
-                            <p:inputText value="#{secondmentOrderManageController.selected.billingTime}" readonly="true"  />
+                            <p:inputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.selected.billingTime)}" readonly="true"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计时费用</label>
-                            <p:inputText value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
+                            <p:inputNumber value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">备注</label>
                             <p:inputText value="#{secondmentOrderManageController.selected.remark}" readonly="true"  />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{secondmentOrderManageController.selected.status eq 1}">
-                            <label class="label">审批意见</label>
-                            <p:inputTextarea  id="approvalSuggestions" readonly="true"  rows="3" cols="50" value="#{secondmentOrderManageController.selected.approvalSuggestions}"  />
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{secondmentOrderManageController.selected.status eq 1}">
-                            <label class="label">审批备注</label>
-                            <p:inputTextarea  id="approvalRemarks" readonly="true"  rows="3" cols="50" value="#{secondmentOrderManageController.selected.approvalRemarks}"  />
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{not empty secondmentOrderManageController.selected.denialReason}">
-                            <label class="label">#{secondmentOrderManageController.selected.status eq -1?'取消原因':'拒绝原因'}</label>
-                            <p:inputTextarea  id="denialReason" readonly="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
-                        </h:panelGroup>
+<!--                        <h:panelGroup rendered="#{secondmentOrderManageController.selected.status eq 1}">-->
+<!--                            <label class="label">审批意见</label>-->
+<!--                            <p:inputTextarea  id="approvalSuggestions" readonly="true"  rows="3" cols="50" value="#{secondmentOrderManageController.selected.approvalSuggestions}"  />-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup rendered="#{secondmentOrderManageController.selected.status eq 1}">-->
+<!--                            <label class="label">审批备注</label>-->
+<!--                            <p:inputTextarea  id="approvalRemarks" readonly="true"  rows="3" cols="50" value="#{secondmentOrderManageController.selected.approvalRemarks}"  />-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup rendered="#{not empty secondmentOrderManageController.selected.denialReason}">-->
+<!--                            <label class="label">#{secondmentOrderManageController.selected.status eq -1?'取消原因':'拒绝原因'}</label>-->
+<!--                            <p:inputTextarea  id="denialReason" readonly="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />-->
+<!--                        </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset legend="计费配置信息" style="margin-bottom:20px">
@@ -151,6 +151,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="审批意见">
+                            <h:outputText value="#{node.approvalSuggestions}" />
+                        </p:column>
+                        <p:column headerText="审批备注">
+                            <h:outputText value="#{node.approvalRemarks}" />
+                        </p:column>
                     </p:dataTable>
 
                 </p:panelGrid>
@@ -160,10 +166,10 @@
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varCancelDlg').show();"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
 
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,1)}" value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varApprovalDlg').show();"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varRejectDlg').show();"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and (secondmentOrderManageController.secondmentOrderDtoTemp.status ==2 or secondmentOrderManageController.secondmentOrderDtoTemp.status ==4)}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,5)}" value="提醒归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.selected.status ne 3 }" immediate="true" value="返回" icon="ui-icon-cancel" onclick="PF('secondmentOrderEdit').hide()"/>
             </h:form>
