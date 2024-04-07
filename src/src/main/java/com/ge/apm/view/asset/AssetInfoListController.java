@@ -145,6 +145,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String installDateFormatTime = null;
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
+    private String lastInventoryDateFormatTime = null;
     @Getter @Setter
     private String mvsContractStartDate = null;
     @Getter @Setter
@@ -1626,7 +1627,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
     }
 
-//    public String getOneQrCodeStatus() {
+    public String getLastInventoryDateFormatTime() {
+        return lastInventoryDateFormatTime;
+    }
+
+    public void setLastInventoryDateFormatTime(String lastInventoryDateFormatTime) {
+        this.lastInventoryDateFormatTime = lastInventoryDateFormatTime;
+    }
+
+    //    public String getOneQrCodeStatus() {
 //        return oneQrCodeStatus;
 //    }
 //

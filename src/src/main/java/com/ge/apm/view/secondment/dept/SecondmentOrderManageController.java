@@ -182,7 +182,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      dto.setBillingTime(null);
                      dto.setCost(null);
                      BeanUtils.copyProperties(dto,order);
-                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"同意");
+                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"同意",order.getApprovalSuggestions(),order.getApprovalRemarks());
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
@@ -209,7 +209,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                          assetInfo.setBillingCost(billingCost + billingCost+dto.getCost());
                      }
                      BeanUtils.copyProperties(dto,order);
-                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还");
+                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还",null,null);
                      secondmentOrderRepository.save(order);
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
@@ -226,7 +226,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  dto.setCost(null);
                  dto.setIsRepair(true);
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"维修中");
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"维修中",null,null);
                  secondmentOrderRepository.save(order);
                  break;
              case 2:
@@ -234,24 +234,24 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付");
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付",null,null);
                  secondmentOrderRepository.save(order);
                 break;
              case -2: // 已拒绝
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝");
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
                  break;
              case -1: //已取消
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消");
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
                  break;
              case 0: //已取消
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"申请");
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"申请",null,null);
                  secondmentOrderRepository.save(order);
                  break;
              default:
@@ -268,7 +268,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         if(CollectionUtils.isEmpty(rejectWorkOrder)) return;
         for (SecondmentOrder secondmentOrder : rejectWorkOrder) {
              secondmentOrder.setDenialReason("该设备其他科室已占用"); // 拒绝原因
-             SecondmentOrderAssetController.generateProcessRecords(secondmentOrder,userAccount.getUid(),userAccount.getName(),"拒绝");
+             SecondmentOrderAssetController.generateProcessRecords(secondmentOrder,userAccount.getUid(),userAccount.getName(),"拒绝",secondmentOrder.getDenialReason(),null);
              secondmentOrder.setModifyBy(userAccount.getUid());
              secondmentOrder.setModifyDate(new Date());
              secondmentOrder.setStatus(-2);
@@ -472,7 +472,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 result.append(minute).append("分钟");
             }
         }else{
-            result.append("0");
+            result.append("");
         }
         return result.toString();
     }

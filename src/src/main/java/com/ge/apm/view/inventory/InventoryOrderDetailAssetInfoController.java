@@ -1,13 +1,14 @@
 package com.ge.apm.view.inventory;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,9 +23,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,11 +35,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
 	private InventoryOrderService service;
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
-	private static final String ORG_NAME = "orgName";
+	private AssetInfoRepository assetInfoRepository;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
@@ -48,10 +46,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -93,10 +91,11 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
-            if(!orderIdList.isEmpty()){
-                searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            if(orderIdList.isEmpty()){
+				orderIdList = ListUtil.newArrayList("-1");
             }
-        }else {
+			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+		}else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
 		searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
@@ -145,6 +144,9 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 			d.setLastModifiedBy(currentUser.getLoginName());
 		});
 		dao.save(nonInventoryOrderDetails);
+		// 更新资产盘点日期
+		Set<Integer> assetIds = nonInventoryOrderDetails.stream().map(t -> t.getAssetInfo().getId()).collect(Collectors.toSet());
+		assetInfoRepository.bathInventory(assetIds);
 	}
 
 }

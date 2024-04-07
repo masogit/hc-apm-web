@@ -341,6 +341,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
         assetTypeGroupList = assetTypeGroupMapper.findDtoByTenantUid(tenantUid);
+        assetTypeGroupMap = assetTypeGroupList.stream().distinct().collect(Collectors.toMap(AssetTypeGroupDto::getUid, t -> t));
         if (selectedTenant != null && selectedTenant.getUid().equals(tenantUid)) return;
 
         searchFilters.clear();
@@ -2017,6 +2018,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Getter @Setter
     private List<AssetTypeGroupDto> assetTypeGroupList;
     @Getter @Setter
+    private Map<String, AssetTypeGroupDto> assetTypeGroupMap;
+    @Getter @Setter
     private Set<String> assetTypeUserUidSet;
     @Getter @Setter
     private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
@@ -2027,6 +2030,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         List<AssetTypeGroupDto> res = this.assetTypeGroupList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .filter(item -> ObjectUtil.isEmpty(item.getParentUid()))
                 .collect(Collectors.toList());
         return res.stream().map(AssetTypeGroupDto::getName).distinct().collect(Collectors.toList());
     }
@@ -2054,7 +2058,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public String convertAssetTypeGroupEncodedToName(String uid) {
-        return assetTypeGroupList.stream().filter(t -> uid.equals(t.getUserUid())).map(AssetTypeGroupDto::getName).collect(Collectors.joining(" "));
+        List<AssetTypeGroupDto> userGroups = assetTypeGroupList.stream().filter(t -> uid.equals(t.getUserUid())).collect(Collectors.toList());
+        Set<String> nameList = new HashSet<>();
+        for (AssetTypeGroupDto assetTypeGroupDto : userGroups) {
+            nameList.add(findParent(assetTypeGroupDto).getName());
+        }
+        return nameList.stream().collect(Collectors.joining(" "));
+    }
+
+    private AssetTypeGroupDto findParent(AssetTypeGroupDto assetTypeGroupDto) {
+        if (ObjectUtil.isNotEmpty(assetTypeGroupDto.getParentUid())) {
+            assetTypeGroupDto = findParent(assetTypeGroupMap.get(assetTypeGroupDto.getParentUid()));
+        }
+        return assetTypeGroupDto;
     }
 
 }

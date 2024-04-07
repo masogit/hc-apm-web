@@ -2,10 +2,12 @@ package com.ge.apm.view.secondment.dept;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SecondmentConfigRepository;
+import com.ge.apm.dao.SecondmentOrderRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.secondment.SecondmentConfig;
+import com.ge.apm.domain.secondment.SecondmentOrder;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
@@ -19,8 +21,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -36,6 +40,8 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
 
     private AssetInfoRepository assetInfoRepository;
 
+    private SecondmentOrderRepository secondmentOrderRepository;
+
     private MqUtils mqUtils;
 
     @Override
@@ -44,6 +50,7 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
         userAccountRepository= WebUtil.getBean(UserAccountRepository.class);
         assetInfoRepository= WebUtil.getBean(AssetInfoRepository.class);
         mqUtils= WebUtil.getBean(MqUtils.class);
+        secondmentOrderRepository= WebUtil.getBean(SecondmentOrderRepository.class);
         userAccount = UserContextService.getCurrentUserAccount();
         userAccountList = userAccountRepository.getByTenantUID(userAccount.getTenantUID());
         if (searchFilters == null) {
@@ -93,15 +100,28 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
         List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchFilters);
         searchFilters.clear();
         if(CollectionUtils.isNotEmpty(assetInfos)){
-            for (AssetInfo assetInfo : assetInfos) {
-                assetInfo.setBorrowConfigId(null);
+            List<String> collect = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN,collect));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, Arrays.asList(0,1,2,4)));
+            List<SecondmentOrder> secondmentOrders = secondmentOrderRepository.findBySearchFilter(searchFilters);
+            searchFilters.clear();
+            if(CollectionUtils.isNotEmpty(secondmentOrders)){
+                WebUtil.addErrorMessage("删除失败,关联设备有未完成工单！");
+                return;
             }
-            assetInfoRepository.save(assetInfos);
-            for (AssetInfo assetInfo : assetInfos) {
-                saveAssetHistory(assetInfo,"设备解绑科室间借调配置");
+            if(CollectionUtils.isNotEmpty(assetInfos)){
+                for (AssetInfo assetInfo : assetInfos) {
+                    assetInfo.setBorrowConfigId("-1");
+                    assetInfo.setBorrowedStatus(-1);
+                }
+                assetInfoRepository.save(assetInfos);
+                for (AssetInfo assetInfo : assetInfos) {
+                    saveAssetHistory(assetInfo,"设备解绑科室间借调配置");
+                }
             }
+            dao.delete(selected);
         }
-        dao.delete(selected);
+
     }
 
     @Override

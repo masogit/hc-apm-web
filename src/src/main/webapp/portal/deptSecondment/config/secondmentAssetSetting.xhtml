@@ -33,7 +33,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50,100">
 
-                        <p:ajax event="rowSelect" update="editButton deleteButton" />
+                        <p:ajax event="rowSelect" update="editButton" />
                         <p:ajax event="filter" listener="#{secondmentAssetSettingController.onFilter}" update="datalist"/>
                         <p:column  exportable="false" width="100" headerText="操作" rendered="#{userContextService.hasAnyRoleByApmRoles('DeptHead')}">
                             <h:panelGroup >
@@ -82,7 +82,7 @@
                             <h:outputText value="#{secondmentAssetSettingController.getBillingModel(item)}"/>
                         </p:column>
                         <p:column headerText="累计借出时长" >
-                            <h:outputText value="#{item.billingTime}"/>
+                            <h:outputText value="#{secondmentOrderManageController.conversionTime(item.billingTime)}"/>
                         </p:column>
                         <p:column headerText="累计借出费用" >
                             <h:outputText value="#{item.billingCost}"/>
@@ -94,9 +94,9 @@
                             <p:commandButton id="createButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-plus" actionListener="#{secondmentAssetSettingBatchController.prepareCreate()}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":assetSettingEditBatch :assetSettingBatchFrom" oncomplete="PF('assetSettingEditBatch').show()" />
                             <p:commandButton id="editButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" icon="ui-icon-settings" class="btn btn-sm btn-gray" disabled="#{empty secondmentAssetSettingController.selected}" actionListener="#{secondmentAssetSettingController.prepareEdit()}" update=":assetSettingEdit" title="计费配置"   oncomplete="PF('assetSettingEdit').show()"/>
 
-                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="删除配置"  update="datalist" >
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
+<!--                            <p:commandButton id="deleteButton" rendered="#{userContextService.hasAnyRoleByApmRoles('SharedAssetMgmt')}" process="@this" icon="ui-icon-close" actionListener="#{secondmentAssetSettingController.delete}" disabled="#{empty secondmentAssetSettingController.selected or empty secondmentAssetSettingController.selected.borrowConfigId}" class="btn btn-sm btn-gray" title="删除配置"  update="datalist" >-->
+<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+<!--                            </p:commandButton>-->
 
                         </f:facet>
                     </p:dataTable>

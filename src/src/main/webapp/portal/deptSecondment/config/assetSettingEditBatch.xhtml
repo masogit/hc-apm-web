@@ -49,28 +49,38 @@
                                 </f:facet>
                                 <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup',item.assetGroup)}"/>
                             </p:column>
-                            <p:column headerText="#{msg.departNum}" >
+                            <p:column headerText="#{msg.departNum}" filterBy="#{item.departNum}" filterMatchMode="EQ">
                                 <h:outputText value="#{item.departNum}"/>
                             </p:column>
-                            <p:column headerText="#{msg.qrCode}" >
+                            <p:column headerText="#{msg.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="EQ" >
                                 <h:outputText value="#{item.qrCode}"/>
                             </p:column>
-                            <p:column headerText="#{msg.clinicalDeptName}" >
-                                <h:outputText value="#{item.clinicalDeptName}"/>
-                            </p:column>
-                            <p:column headerText="设备调剂状态" >
+                            <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ" >
                                 <f:facet name="filter" >
                                     <p:selectOneMenu onchange="PF('configEditList1').filter()" >
                                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        <f:selectItems value="#{secondmentAssetSettingBatchController.cacheOrgList}" var="org" itemLabel="#{org.name}" itemValue="#{org.uid}"/>
                                     </p:selectOneMenu>
                                 </f:facet>
-                                <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>
+                                <h:outputText value="#{item.clinicalDeptName}"/>
                             </p:column>
+<!--                            <p:column headerText="设备调剂状态" >-->
+<!--                                <f:facet name="filter" >-->
+<!--                                    <p:selectOneMenu onchange="PF('configEditList1').filter()" >-->
+<!--                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>-->
+<!--                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+<!--                                    </p:selectOneMenu>-->
+<!--                                </f:facet>-->
+<!--                                <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>-->
+<!--                            </p:column>-->
                         </p:dataTable>
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-                        <p:commandButton  validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" update="assetList assetList2 :growl" icon="ui-icon-check" />
+<!--                        <p:commandButton  validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" update="assetList assetList2 :growl" icon="ui-icon-check"  oncomplete="PF('configEditList1').clearFilters()"/>-->
+                        <p:commandButton validateClient="true" actionListener="#{secondmentAssetSettingBatchController.addCheckedDevice}" value="添加已勾选设备" icon="fa fa-filter" process="@form" update="assetList assetList2 :growl"
+                                         oncomplete="PF('configEditList1').clearFilters();">
+                            <p:resetInput target="datalist" />
+                        </p:commandButton>
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" id="assetList2" styleClass="ui-panelgrid-blank form-group ">
                         <p:dataTable id="datalist1" value="#{secondmentAssetSettingBatchController.lazyModel2}"
@@ -118,15 +128,15 @@
                             <p:column headerText="#{msg.clinicalDeptName}" >
                                 <h:outputText value="#{item.clinicalDeptName}"/>
                             </p:column>
-                            <p:column headerText="设备调剂状态" >
+<!--                            <p:column headerText="设备调剂状态" >-->
 <!--                                <f:facet name="filter" >-->
 <!--                                    <p:selectOneMenu onchange="PF('configEditList1').filter()" >-->
 <!--                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>-->
 <!--                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
 <!--                                    </p:selectOneMenu>-->
 <!--                                </f:facet>-->
-                                <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>
-                            </p:column>
+<!--                                <h:outputText value="#{fieldMsg.doGetFieldValue('assetBorrowedStatus',item.borrowedStatus)}"/>-->
+<!--                            </p:column>-->
                         </p:dataTable>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group ">
