@@ -1451,8 +1451,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
         workHoursList = getWorkOrderManHoursDetail(selectedWorkOrder.getId());
-        //加载comments【最新进展】
-        comments = selectedWorkOrder.getComment();
     }
 
     public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
