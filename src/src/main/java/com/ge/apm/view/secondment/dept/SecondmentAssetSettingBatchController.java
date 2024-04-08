@@ -62,7 +62,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private Boolean allSelected2 = Boolean.FALSE;
     private List<AssetInfo> selectAsset;
     private List<OrgInfo> cacheOrgList;
-
+    private boolean chooseDept = Boolean.FALSE;
     private LazyDataModel<AssetInfo> lazyModel2;
 
 
@@ -77,10 +77,15 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
             searchFilters = new ArrayList<SearchFilter>();
         }
         initialization();
+        initChooseDept();
         initLazyModel2();
 
     }
-
+    private  void initChooseDept(){
+        String orgInfoUID = userAccount.getOrgInfoUID();
+        String site = userAccount.getSiteUID();
+        chooseDept =orgInfoUID.equals(site);
+    }
     private void initLazyModel2() {
         lazyModel2 = new GenericDataTableModel<AssetInfo>() {
             @Override
@@ -157,11 +162,16 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private void addFilter(){
 
         List<String> scope=new ArrayList<>();
-        if(CollectionUtils.isEmpty(visibleScope)){
-            scope.add("-1");
+        if(chooseDept){
+            if(CollectionUtils.isEmpty(visibleScope)){
+                scope.add("-1");
+            }else{
+                scope.addAll(visibleScope);
+            }
         }else{
-            scope.addAll(visibleScope);
+            scope.add(userAccount.getOrgInfoUID());
         }
+
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,scope));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false));
