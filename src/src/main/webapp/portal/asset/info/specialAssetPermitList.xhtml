@@ -133,7 +133,7 @@
                             <h:panelGroup>
                                 <p:link target="_new" title="#{msg.Edit}"
                                         outcome="#{specialAssetPermitInfoController.getEditPage(item.uid,item.certificateName)}"
-                                        rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}">
+                                        rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink
@@ -182,6 +182,7 @@
 
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                              title="#{msg.Create}"
+                                             rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}"
                                              actionListener="#{specialAssetPermitInfoController.prepareCreate}"
                                              action="#{urlEncryptController.encodeUrlParam('SpecialAssetPermitCreate.xhtml?actionName=Create')}"
 

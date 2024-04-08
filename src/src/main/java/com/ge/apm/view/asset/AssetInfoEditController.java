@@ -1064,7 +1064,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
             specialAssetInfo.setPermitInfos(permitInfos);
             specialAssetInfoService.saveSpecialAsset(specialAssetInfo);
-
+            if("Create".equals(crudActionName)){
+                onAfterNewObjectPermit();
+            }
         }
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(selected,assetInfo);
@@ -2182,6 +2184,57 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void processInputChange( ) {
         System.out.println("processInputChange");
+    }
+
+
+    public void removePermitAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        Set<V2_BlobObject> blobObjects = permitInfo.getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        permitInfo.setBlobObjects(blobObjects);
+    }
+
+
+    public void handleFileUploadPermit(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            if(permitInfo.getBlobObjects()==null){
+                Set<V2_BlobObject> objects = new HashSet<>();
+                permitInfo.setBlobObjects(objects);
+            }
+            permitInfo.getBlobObjects().add(blobObject);
+//            blobObject.setBoId(permitInfo.getUid());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_SpecialAssetPermitInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(permitInfo.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void onAfterNewObjectPermit() {
+
+        if(specialAssetInfo.getPermitInfos() !=null){
+            specialAssetInfo.getPermitInfos().forEach(item -> {
+                    Set<V2_BlobObject> blobObjects = item.getBlobObjects();
+                    if(blobObjects!=null){
+                        blobObjects.forEach(ite->{
+                            if (ite.getBoUuid() == null) {
+//                                ite.setBoId(object.getId());
+                                ite.setBoUuid(item.getUid());
+                                blobService.saveBlobObject(ite);
+                            }
+                        });
+                    }
+
+                });
+
+        }
+
     }
 
 

@@ -4,12 +4,14 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.PermitInfoRepository;
 import com.ge.apm.dao.SpecialAssetPermitInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.nurseSite.AssetSelectController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -49,7 +51,7 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
 
     private SpecialAssetPermitInfoRepository specialAssetPermitInfoRepository;
     private AssetInfoRepository assetInfoRepository;
-
+    private BlobFileService blobService;
     private List<PermitInfo> permitInfos;
 
 //    private List<OrgInfo> deptList;
@@ -78,7 +80,7 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
 
         assetSelectService = WebUtil.getBean(AssetSelectService.class);
         specialAssetPermitInfoRepository = WebUtil.getBean(SpecialAssetPermitInfoRepository.class);
-
+        blobService = WebUtil.getBean(BlobFileService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -112,7 +114,7 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
         List<PermitInfo> permitInfoList = permitInfos.stream().filter(item -> item.getCertificateName() != null ).collect(Collectors.toList());
         permitInfoRepository.save(permitInfoList);
         Set<AssetInfo> selectedAssets = assetSelectController.getSelectedAssets();
-        if(crudActionName.equals("Edit")){
+        if("Edit".equals(crudActionName)){
             specialAssetPermitInfoRepository.deleteByPermitUidIn(permitInfoList.stream().map(item->item.getUid()).collect(Collectors.toList()));
         }
         ArrayList<SpecialAssetPermitInfo> specialAssetPermitInfos = new ArrayList<>(selectedAssets.size());
@@ -125,10 +127,11 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
             }
         }
         specialAssetPermitInfoRepository.save(specialAssetPermitInfos);
+        if("Create".equals(crudActionName)){
+            onAfterNewObjectPermit();
+        }
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
-
-
         return "specialAssetPermitList?faces-redirect=true";
 
     }
@@ -212,6 +215,60 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
 
         permitInfos.add(permitInfo);
     }
+
+
+    public void removePermitAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        Set<V2_BlobObject> blobObjects = permitInfo.getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        permitInfo.setBlobObjects(blobObjects);
+    }
+
+    public void handleFileUploadPermit(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            if(permitInfo.getBlobObjects()==null){
+                Set<V2_BlobObject> objects = new HashSet<>();
+                permitInfo.setBlobObjects(objects);
+            }
+            permitInfo.getBlobObjects().add(blobObject);
+//            blobObject.setBoId(permitInfo.getUid());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_SpecialAssetPermitInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(permitInfo.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+
+    public void onAfterNewObjectPermit() {
+
+        if(permitInfos !=null){
+            permitInfos.forEach(item -> {
+                Set<V2_BlobObject> blobObjects = item.getBlobObjects();
+                if(blobObjects!=null){
+                    blobObjects.forEach(ite->{
+                        if (ite.getBoUuid() == null) {
+//                                ite.setBoId(object.getId());
+                            ite.setBoUuid(item.getUid());
+                            blobService.saveBlobObject(ite);
+                        }
+                    });
+                }
+
+            });
+
+        }
+
+    }
+
+
+
 
     public PermitInfo getPermitInfo() {
         return permitInfo;

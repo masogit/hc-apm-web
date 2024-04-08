@@ -326,6 +326,7 @@
 <!--                                             rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>-->
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                              title="#{msg.Create}"
+                                             rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}"
                                              actionListener="#{specialAssetController.prepareCreate}"
                                              action="#{urlEncryptController.encodeUrlParam('SpecialAssetCreate.xhtml?actionName=Create&amp;type=SpecialAsset')}"
                             />
