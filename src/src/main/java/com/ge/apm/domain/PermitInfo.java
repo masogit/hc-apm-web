@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "permit_info")
@@ -73,8 +74,9 @@ public class PermitInfo implements Serializable {
 //    private List<SpecialAssetPermitInfo> specialAssetPermitInfos = new ArrayList<>();
 
 
-
-//    private List<V2_BlobObject> blobObjects;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private Set<V2_BlobObject> blobObjects;
 
     @Transient
     private Integer nodeId;
@@ -189,5 +191,13 @@ public class PermitInfo implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public Set<V2_BlobObject> getBlobObjects() {
+        return blobObjects;
+    }
+
+    public void setBlobObjects(Set<V2_BlobObject> blobObjects) {
+        this.blobObjects = blobObjects;
     }
 }

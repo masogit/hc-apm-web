@@ -213,8 +213,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             this.listCheckOrgInfo.clear();
         }
 //        listCheckOrgInfo.add(selectedDept);
-        if(!CollectionUtils.isEmpty(assetInfos)){
-            List<OrgInfo> orgInfos= assetSelectService.getOrgInfoByUids(assetInfos.stream().map(item->item.getClinicalDeptUID()).collect(Collectors.toList()));
+        if(!CollectionUtils.isEmpty(assetInfos)  && !CollectionUtils.isEmpty(assetInfos.stream().filter(ite->StringUtils.isNotBlank(ite.getClinicalDeptUID()) ).collect(Collectors.toList())) ){
+            List<OrgInfo> orgInfos= assetSelectService.getOrgInfoByUids(assetInfos.stream().filter(ite->StringUtils.isNotBlank(ite.getClinicalDeptUID())).map(item->item.getClinicalDeptUID()).collect(Collectors.toList()));
             listCheckOrgInfo.addAll(orgInfos);
         }
 
