@@ -104,6 +104,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         addFilter();
         Page<AssetInfo> assetInfos = super.loadData(pageRequest);
         generateVirtualSerialNumber(assetInfos);
+        searchFilters.clear();
         return assetInfos;
     }
     private void generateVirtualSerialNumber(Page<AssetInfo> assetInfos){
