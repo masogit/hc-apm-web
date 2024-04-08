@@ -6,10 +6,10 @@ import com.ge.apm.dao.SecondmentConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
-import com.ge.apm.view.nurseSite.AssetSelectController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
@@ -20,7 +20,6 @@ import org.primefaces.model.LazyDataModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
@@ -62,6 +61,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private Set<AssetInfo> selectedAssetsed2;
     private Boolean allSelected2 = Boolean.FALSE;
     private List<AssetInfo> selectAsset;
+    private List<OrgInfo> cacheOrgList;
 
     private LazyDataModel<AssetInfo> lazyModel2;
 
@@ -107,6 +107,9 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private void initialization(){
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
+        if(CollectionUtils.isNotEmpty(visibleScope)){
+            cacheOrgList = orgInfoRepository.findByUids(new HashSet<>(visibleScope));
+        }
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,userAccount.getSiteUID()));
         cacheConfigList = secondmentConfigRepository.findBySearchFilter(searchFilters);
         searchFilters.clear();
@@ -427,5 +430,13 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
 
     public void setLazyModel2(LazyDataModel<AssetInfo> lazyModel2) {
         this.lazyModel2 = lazyModel2;
+    }
+
+    public List<OrgInfo> getCacheOrgList() {
+        return cacheOrgList;
+    }
+
+    public void setCacheOrgList(List<OrgInfo> cacheOrgList) {
+        this.cacheOrgList = cacheOrgList;
     }
 }
