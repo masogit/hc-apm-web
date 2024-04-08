@@ -394,7 +394,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
                 result.append(minute).append("分钟");
             }
         }else{
-            result.append("0");
+            result.append("");
         }
         return result.toString();
     }
