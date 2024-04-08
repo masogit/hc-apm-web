@@ -148,6 +148,8 @@ public class SecondmentOrder implements Serializable {
         private Integer status;
         private String  nodeName;
         private Date    operateTime;
+        private String  approvalSuggestions;
+        private String  approvalRemarks;
 
     }
 

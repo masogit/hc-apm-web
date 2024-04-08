@@ -104,6 +104,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         addFilter();
         Page<AssetInfo> assetInfos = super.loadData(pageRequest);
         generateVirtualSerialNumber(assetInfos);
+        searchFilters.clear();
         return assetInfos;
     }
     private void generateVirtualSerialNumber(Page<AssetInfo> assetInfos){
@@ -206,7 +207,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             SecondmentOrder secondmentOrder = this.secondmentOrder;
             if(secondmentOrder!= null){
                 String secondmentNo = generateSecondmentNo(null);
-                 generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请");
+                 generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请",secondmentOrder.getApprovalSuggestions(),secondmentOrder.getApprovalRemarks());
                 secondmentOrder.setSecondmentNo(secondmentNo);
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
@@ -224,7 +225,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         return workOrders;
     }
 
-    public static void generateProcessRecords(SecondmentOrder order,String uid,String name,String nodeName){
+    public static void generateProcessRecords(SecondmentOrder order,String uid,String name,String nodeName,String approvalSuggestions,String approvalRemarks){
         if(order == null) return;
         List<SecondmentOrder.ProcessRecords> processRecordsList;
         String processRecords = order.getProcessRecords();
@@ -234,7 +235,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         }else{
             processRecordsList =new ArrayList<>();
         }
-        processRecordsList.add(new SecondmentOrder.ProcessRecords(uid,name,order.getStatus(),nodeName,new Date()));
+        processRecordsList.add(new SecondmentOrder.ProcessRecords(uid,name,order.getStatus(),nodeName,new Date(),approvalSuggestions,approvalRemarks));
         order.setProcessRecords(JSON.toJSONString(processRecordsList));
     }
     public void applyBorrowBefore(){
@@ -394,7 +395,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
                 result.append(minute).append("分钟");
             }
         }else{
-            result.append("0");
+            result.append("");
         }
         return result.toString();
     }

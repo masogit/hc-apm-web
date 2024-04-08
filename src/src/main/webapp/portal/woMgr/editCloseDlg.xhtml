@@ -39,6 +39,10 @@
                             <label class="label">#{msg.patTests}</label>
                             <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="false"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.LatestDevelopments}</label>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.comment}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="false"/>
+                        </h:panelGroup>
                         <h:panelGroup  id="equipmentTaker" >
                             <label class="label">#{msg.equipmentTaker}</label>
                             <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="false"/>
