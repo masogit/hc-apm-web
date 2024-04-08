@@ -82,7 +82,9 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         addFilter();
-        return super.loadData(pageRequest);
+        Page<AssetInfo> assetInfos = super.loadData(pageRequest);
+        searchFilters.clear();
+        return assetInfos;
     }
 
     private void addFilter(){
@@ -96,7 +98,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,scope));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ,true));
-         searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNotNull,null));
+        searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNotNull,null));
 
 
     }
