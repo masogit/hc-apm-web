@@ -171,8 +171,8 @@
                 </p:column>
                 <!-- 云南阜外 全部、已完成维修人 -->
                 <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{(workOrderMgrController.queryIndex==8 or workOrderMgrController.queryIndex==11) and userContextService.hasCurrentTenantName('')}">
-                    <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
+                    <!--维修人是从WorkOrderStep表中获取【维修中】步骤数据owner_name，维修中状态==4-->
+                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,4)}"/>
                 </p:column>
                 <!--当前处理步骤 for 待办-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
