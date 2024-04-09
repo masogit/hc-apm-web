@@ -15,6 +15,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryIssue;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -192,6 +193,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	}
 
     public void transferNonInventory(InventoryOrderDetail inventoryOrderDetail) {
+        InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(inventoryOrderDetail.getAssetInfo().getId(), inventoryOrderDetail.getInventoryOrderId());
+        if (ObjectUtil.isNotEmpty(inventoryIssue)) {
+            WebUtil.addErrorMessage("当前资产有问题未解决，请检查！");
+            return;
+        }
         inventoryOrderDetail.setStatus(0);
         dao.save(inventoryOrderDetail);
         Integer assetId = inventoryOrderDetail.getAssetInfo().getId();
