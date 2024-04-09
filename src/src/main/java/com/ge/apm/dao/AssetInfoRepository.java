@@ -375,4 +375,10 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Query(value= "update asset_info set last_inventory_date = ?2 where id = ?1",nativeQuery = true)
     void updateLastInventoryDate(Integer assetId, Date lastInventoryDate);
+
+
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info  set is_special_asset=?2 where id=?1",nativeQuery = true)
+    void updateSpecialAsset(Integer assetId, boolean b);
 }

@@ -44,6 +44,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private List<SecondmentConfig> cacheConfigList;
     private Map<String,I18nMessage> cacheChargingType;
     private List<UserAccount> userAccountList;
+    private boolean chooseDept = Boolean.FALSE;
     private SecondmentConfig secondmentConfig = new SecondmentConfig();
 
     @Override
@@ -57,8 +58,13 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
             searchFilters = new ArrayList<SearchFilter>();
         }
         initialization();
+        initChooseDept();
     }
-
+    private  void initChooseDept(){
+        String orgInfoUID = userAccount.getOrgInfoUID();
+        String site = userAccount.getSiteUID();
+        chooseDept =orgInfoUID.equals(site);
+    }
     private void initialization(){
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
@@ -82,21 +88,27 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         addFilter();
-        return super.loadData(pageRequest);
+        Page<AssetInfo> assetInfos = super.loadData(pageRequest);
+        searchFilters.clear();
+        return assetInfos;
     }
 
     private void addFilter(){
         List<String> scope=new ArrayList<>();
-        if(CollectionUtils.isEmpty(visibleScope)){
-            scope.add("-1");
+        if(chooseDept){
+            if(CollectionUtils.isEmpty(visibleScope)){
+                scope.add("-1");
+            }else{
+                scope.addAll(visibleScope);
+            }
         }else{
-            scope.addAll(visibleScope);
+            scope.add(userAccount.getOrgInfoUID());
         }
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,scope));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ,true));
-         searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNotNull,null));
+        searchFilters.add(new SearchFilter("borrowConfigId", SearchFilter.Operator.IsNotNull,null));
 
 
     }
