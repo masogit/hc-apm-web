@@ -2232,11 +2232,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     }
 
                 });
-
         }
 
     }
-
-
 
 }
