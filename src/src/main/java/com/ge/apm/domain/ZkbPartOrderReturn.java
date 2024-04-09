@@ -117,6 +117,61 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "seven_returned_flag")
     private String sevenReturnedFlag;
 
+    @Column(name = "udi")
+    private String udi;
+
+    @Column(name = "internal_packaging")
+    private String internalPackaging;
+
+    @Column(name = "quality_seal_type")
+    private String qualitySealType;
+
+    @Column(name = "quality_seal_status")
+    private String qualitySealStatus;
+
+    @Column(name = "part_quality")
+    private String partQuality;
+
+    public String getUdi() {
+        return udi;
+    }
+
+    public void setUdi(String udi) {
+        this.udi = udi;
+    }
+
+    public String getInternalPackaging() {
+        return internalPackaging;
+    }
+
+    public void setInternalPackaging(String internalPackaging) {
+        this.internalPackaging = internalPackaging;
+    }
+
+    public String getQualitySealType() {
+        return qualitySealType;
+    }
+
+    public void setQualitySealType(String qualitySealType) {
+        this.qualitySealType = qualitySealType;
+    }
+
+    public String getQualitySealStatus() {
+        return qualitySealStatus;
+    }
+
+    public void setQualitySealStatus(String qualitySealStatus) {
+        this.qualitySealStatus = qualitySealStatus;
+    }
+
+    public String getPartQuality() {
+        return partQuality;
+    }
+
+    public void setPartQuality(String partQuality) {
+        this.partQuality = partQuality;
+    }
+
     public String getSevenReturnedFlag() {
         return sevenReturnedFlag;
     }

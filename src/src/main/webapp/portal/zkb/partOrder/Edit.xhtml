@@ -536,7 +536,7 @@
                     <p:dataTable id="zkbDetailDatalist" value="#{zkbPartOrderEditController.selected.zkbPartOrderItems}" var="item"
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbPartOrderEditController.zkbPartOrderItem}"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
-                                 paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" >
+                                 paginatorTemplate="{Toolbar}" rows="200" emptyMessage="#{msg.noRecordFound}" >
 
                         <p:ajax event="rowSelect" update=":zkbPartOrderEditForm:zkbDetailDatalist:editDetailButton :zkbPartOrderEditForm:zkbDetailDatalist:deleteDetailButton"/>
                         <c:choose>

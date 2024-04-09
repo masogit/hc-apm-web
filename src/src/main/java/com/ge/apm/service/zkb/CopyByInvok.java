@@ -12,19 +12,21 @@ import java.util.*;
  */
 public class CopyByInvok {
 
-    public static String EMAIL_URL_TYPE_LASTDAY = "lastDay";
-    public static String EMAIL_URL_TYPE_UNORDER = "unOrder";
+    public static final String EMAIL_URL_TYPE_LASTDAY = "lastDay";
+    public static final String EMAIL_URL_TYPE_UNORDER = "unOrder";
 
-    public static String T = "t";
-    public static String F = "f";
-    public static String NORMAL_Y = "Y";
-    public static String NORMAL_N = "N";
-    public static String FOUR_TO_ONE = "FourInOne";
-    public static String NORMAL_ONE = "1";
-    public static String NORMAL_ZERO = "0";
-    public static String NORMAL_TWO = "2";
-    public static String NORMAL_THREE = "3";
-    public static String NORMAL_DEPOT = "depot";
+    public static final String T = "t";
+    public static final String F = "f";
+    public static final String NORMAL_Y = "Y";
+    public static final String NORMAL_N = "N";
+    public static final String FOUR_TO_ONE = "FourInOne";
+    public static final String NORMAL_ONE = "1";
+    public static final String NORMAL_ZERO = "0";
+    public static final String NORMAL_TWO = "2";
+    public static final String NORMAL_THREE = "3";
+    public static final String NORMAL_DEPOT = "depot";
+
+    public static final String NORMAL_NO = "No";
 
     public static <T> T translateField(Object souce, Class<T> target) throws Exception {
         T tarObj = target.newInstance();
