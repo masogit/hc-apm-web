@@ -41,6 +41,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     Logger logger = LoggerFactory.getLogger(ZkbPartOrderService.class);
 
+    private boolean completeOpenFlag = true;
+
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
@@ -1206,10 +1208,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setClosedAuditer(userAccount.getName());
                 zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
                 //如果srNo之前存在了完成信息，那么直接结束，否则进行完成信息的填写
-                ZkbPartOrderCloseInfo ci = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
-                if(ci == null || StringUtils.isEmpty(ci.getId())){
-                    zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
-                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
+                if(completeOpenFlag){
+                    ZkbPartOrderCloseInfo ci = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
+                    if(ci == null || StringUtils.isEmpty(ci.getId())){
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
+                    }else{
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+                    }
                 }else{
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
@@ -2971,7 +2978,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setClosedDate(new Date());
             zkbPartOrder.setClosedAuditer(userAccount.getName());
             zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
-            if(StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
+            if(false && StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
                 ZkbPartOrderCloseInfo zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
                 if(zkbPartOrderCloseInfo == null){
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
