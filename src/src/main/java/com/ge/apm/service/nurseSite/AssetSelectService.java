@@ -1,6 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -121,4 +122,7 @@ public class AssetSelectService {
         return clinicalDeptsWithAsset.stream().distinct().collect(Collectors.toList());
     }
 
+    public List<OrgInfo> getOrgInfoByUids(List<String> collect) {
+        return orgInfoRepository.findByUids(new HashSet<>(collect));
+    }
 }

@@ -480,6 +480,13 @@
                         </p:dataTable>
                     </p:panel>
                 </p:tab>
+
+
+                <p:tab title="#{msg.specialAsset}" rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET')  and assetInfoDetailController.selected.specialAsset }">
+                    <ui:include src="SpecialAssetInfoDetail.xhtml"/>
+
+                </p:tab>
+
                 <p:tab title="#{msg.AssetArrivalListItemMgmt}" rendered="#{assetInfoDetailController.show(assetInfoDetailController.selected.uid)}">
                     <ui:include src="ItemView.xhtml"/>
                     <ui:include src="ItemDetailView.xhtml"/>

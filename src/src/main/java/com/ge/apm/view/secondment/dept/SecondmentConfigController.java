@@ -75,9 +75,18 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
 
     @Override
     protected Page<SecondmentConfig> loadData(PageRequest pageRequest) {
-        return super.loadData(pageRequest);
+        addFilter();
+        Page<SecondmentConfig> secondmentConfigs = super.loadData(pageRequest);
+        searchFilters.clear();
+        return secondmentConfigs;
     }
-
+    private void addFilter(){
+        String siteUID = userAccount.getSiteUID();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+    }
     public String getCurrentUserAccount(){
        return userAccount.getName();
     }
