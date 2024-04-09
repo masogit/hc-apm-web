@@ -44,6 +44,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private List<SecondmentConfig> cacheConfigList;
     private Map<String,I18nMessage> cacheChargingType;
     private List<UserAccount> userAccountList;
+    private boolean chooseDept = Boolean.FALSE;
     private SecondmentConfig secondmentConfig = new SecondmentConfig();
 
     @Override
@@ -57,8 +58,13 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
             searchFilters = new ArrayList<SearchFilter>();
         }
         initialization();
+        initChooseDept();
     }
-
+    private  void initChooseDept(){
+        String orgInfoUID = userAccount.getOrgInfoUID();
+        String site = userAccount.getSiteUID();
+        chooseDept =orgInfoUID.equals(site);
+    }
     private void initialization(){
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
@@ -89,10 +95,14 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
 
     private void addFilter(){
         List<String> scope=new ArrayList<>();
-        if(CollectionUtils.isEmpty(visibleScope)){
-            scope.add("-1");
+        if(chooseDept){
+            if(CollectionUtils.isEmpty(visibleScope)){
+                scope.add("-1");
+            }else{
+                scope.addAll(visibleScope);
+            }
         }else{
-            scope.addAll(visibleScope);
+            scope.add(userAccount.getOrgInfoUID());
         }
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,scope));
