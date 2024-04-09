@@ -1,7 +1,10 @@
 package com.ge.apm.domain;
 
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import org.hibernate.annotations.GenericGenerator;
+import org.joda.time.DateTime;
+import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -80,6 +83,28 @@ public class PermitInfo implements Serializable {
 
     @Transient
     private Integer nodeId;
+
+
+    @Transient
+    @TableField(exist = false)
+    private String warrantyAlertStatus = null;
+
+    public String getWarrantyAlertStatus(){
+        return warrantyAlertStatus;
+    }
+
+    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays){
+        if(warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
+
+        if(expiryDate!=null){
+            // first check Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(expiryDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
+    }
 
     public Integer getNodeId() {
         return nodeId;

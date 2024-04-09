@@ -92,6 +92,9 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
         }
 
         Page<PermitInfo> page = permitInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        List<PermitInfo> content = page.getContent();
+
+        content.forEach(item -> item.setWarrantyExpireAlertDays(30));
         return page;
     }
 

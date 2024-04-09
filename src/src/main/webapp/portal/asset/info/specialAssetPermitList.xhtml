@@ -61,6 +61,16 @@
 
                 <h:form id="searchForm">
 
+                    <h:panelGrid id="filterType" columns="4" style="float: right">
+                        <h:panelGroup style="float: right" >
+                            <span >#{msg.Legend}：</span>
+                            <span class="warrantyExpireSoon">证件照即将到期</span>
+                            <span></span>
+                            <span class="warrantyExpired">证件照已到期</span>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
                             <p:commandButton id="btnOrg"
@@ -101,7 +111,7 @@
                                  selectionMode="single" scrollable="false"
                                  selection="#{specialAssetPermitInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
                                  rowKey="#{item.uid}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
