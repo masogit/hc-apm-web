@@ -65,6 +65,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private SharedAssetService sharedAssetService;
     private MqUtils mqUtils;
     private List<SecondmentOrder.ProcessRecords> processRecords;
+    private AssetInfo assetInfo;
 
     @Override
     protected GenericRepositoryUUID<SecondmentOrderDto> getDAO() {
@@ -116,6 +117,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         initDeptScope();
         Wrapper<SecondmentOrderDto> entityWrapper = buildDefaultFilters(searchFilters);
         searchFilters.clear();
+        selected = null;
         return service.loadSecondmentOrderList(pageRequest, entityWrapper);
     }
     private void initDeptScope(){
@@ -139,6 +141,10 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         secondmentOrderDtoTemp = this.selected;
         serializationConfiguration();
         serializationProcessRecords();
+        serializationAssetInfo();
+    }
+    public void serializationAssetInfo(){
+        assetInfo = assetInfoRepository.findByUid(selected.getAssetUid());
     }
     private void serializationProcessRecords(){
         processRecords = new ArrayList<>();
@@ -327,18 +333,27 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 order.setCost(unitPrice);
                 break;
             case 2:  //小时(半点)
-                Double halfHour = minutes / 30.0;
+                long halfHour = minutes / 30;
+                if((minutes % 30) > 0){
+                    halfHour+=1;
+                }
                 order.setCost(halfHour * unitPrice);
                 break;
             case 3:  //天
-                long days = ChronoUnit.DAYS.between(beginLocalDateTime, endLocalDateTime);
+                long days = minutes / 1440;
+                if((days % 1440) > 0){
+                    days+=1;
+                }
                 order.setCost(days * unitPrice);
                 break;
             case 4:  // 自然时间
                 order.setCost(minutes * unitPrice);
                 break;
             case 5:   //小时(整点)
-                long hours = ChronoUnit.HOURS.between(beginLocalDateTime, endLocalDateTime);
+                long hours = minutes / 60;
+                if((minutes % 60) > 0){
+                    hours+=1;
+                }
                 order.setCost(hours * unitPrice);
                 break;
             default:
@@ -483,5 +498,13 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
 
     public void setProcessRecords(List<SecondmentOrder.ProcessRecords> processRecords) {
         this.processRecords = processRecords;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
     }
 }
