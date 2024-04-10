@@ -285,17 +285,20 @@
                                     value="#{item.assetInfo.lifecycle == null ? null : item.assetInfo.lifecycle / 12}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.assetTypeGroup}"/><br/>
-                                <p:autoComplete dropdown="true" value="#{specialAssetController.filterAssetTypeGroup}" appendTo="@(Body)"
-                                                scrollHeight="300"  forceSelection="true" completeMethod="#{specialAssetController.autoCompleteAssetTypeGroupName}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{specialAssetController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":SpecialAssetInfoListForm:datalist"/>
-                                    <p:ajax process="@this" listener="#{specialAssetController.onAssetTypeGroupNameFilterChange}" update=":SpecialAssetInfoListForm:datalist" />
-                                </p:autoComplete>
-                            </f:facet>
-                            <h:outputText value="#{specialAssetController.convertAssetTypeGroupEncodedToName(item.assetInfo.assetType)}"/>
-                        </p:column>
+                        <c:if test="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}">
+                            <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.assetTypeGroup}"/><br/>
+                                    <p:autoComplete dropdown="true" value="#{specialAssetController.filterAssetTypeGroup}" appendTo="@(Body)"
+                                                    scrollHeight="300"  forceSelection="true" completeMethod="#{specialAssetController.autoCompleteAssetTypeGroupName}" size="5">
+                                        <p:ajax event="itemSelect" listener="#{specialAssetController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":SpecialAssetInfoListForm:datalist"/>
+                                        <p:ajax process="@this" listener="#{specialAssetController.onAssetTypeGroupNameFilterChange}" update=":SpecialAssetInfoListForm:datalist" />
+                                    </p:autoComplete>
+                                </f:facet>
+                                <h:outputText value="#{specialAssetController.convertAssetTypeGroupEncodedToName(item.assetInfo.assetType)}"/>
+                            </p:column>
+                        </c:if>
+
 
                         <p:column headerText="放射诊疗许可证目录内是否登记" sortBy="#{item.radiotherapyIsRegistration}" filterBy="#{item.radiotherapyIsRegistration}" filterMatchMode="EQ" >
                             <f:facet name="filter">
