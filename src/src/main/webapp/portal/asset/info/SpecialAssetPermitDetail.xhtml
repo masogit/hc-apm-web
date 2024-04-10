@@ -114,7 +114,29 @@
 <!--                                </p:commandButton>-->
 <!--                            </p:column>-->
                         </p:dataTable>
+                        <p:dataList id="permitattachmentList" value="#{specialAssetPermitEditController.permitInfos}" var="permit"
+                                    type="definition" emptyMessage="#{msg.noRecordFound}">
 
+                            <p:dataGrid id="permitattachmentList1" var="fileitem" rendered="#{not empty permit.blobObjects}"
+                                        value="#{permit.blobObjects}" columns="5" layout="grid">
+                                <f:facet name="header">#{permit.certificateName}</f:facet>
+                                <p:panel style="text-align:center">
+
+
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false"
+                                                   actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
+                                                   styleClass="p-mr-2"/>
+<!--                                    <p:commandButton-->
+<!--                                            actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"-->
+<!--                                            update="permitInfoCreateForm:permitattachmentList" icon="ui-icon-clear"-->
+<!--                                            title="#{msg.Delete}" class="popupIconButton" process="@this">-->
+<!--                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"-->
+<!--                                                   icon="ui-icon-warning"/>-->
+<!--                                    </p:commandButton>-->
+
+                                </p:panel>
+                            </p:dataGrid>
+                        </p:dataList>
 
                     </p:fieldset>
 
