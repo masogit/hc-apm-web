@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -21,7 +22,7 @@ public class SpecialAssetPermitInfoService {
     private  SpecialAssetPermitInfoRepository specialAssetPermitInfoRepository;
 
 
-    public void savePermitInfo(Set<PermitInfo> permitInfos, String id) {
+    public void savePermitInfo(List<PermitInfo> permitInfos, String id) {
         if(id!=null){
             specialAssetPermitInfoRepository.deleteBySpecialAssetId(id);
 
@@ -30,7 +31,7 @@ public class SpecialAssetPermitInfoService {
 
     }
 
-    public void saveSpecialAssetPermitInfo(Set<PermitInfo> permitInfos, String id) {
+    public void saveSpecialAssetPermitInfo(List<PermitInfo> permitInfos, String id) {
         ArrayList<SpecialAssetPermitInfo> specialAssetPermitInfos = new ArrayList<>(permitInfos.size());
         for (PermitInfo permitInfo : permitInfos) {
             SpecialAssetPermitInfo specialAssetPermitInfo = new SpecialAssetPermitInfo();

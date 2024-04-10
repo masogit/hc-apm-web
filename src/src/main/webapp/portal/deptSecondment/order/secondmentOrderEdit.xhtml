@@ -7,9 +7,11 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="secondmentOrderEdit" width="1000" height="600" widgetVar="secondmentOrderEdit" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentOrderManageController.getCRUDActionName()}" >
+    <p:dialog id="secondmentOrderEdit" width="1000" height="600" widgetVar="secondmentOrderEdit" modal="true" draggable="true" appendTo="@(body)" header="#{secondmentOrderManageController.CRUDActionName}" >
+
         <div class="ui-g-12 card">
             <h:form id="secondmentOrderEditFrom">
+                <p:outputPanel rendered="#{secondmentOrderManageController.secondmentOrderDtoTemp.status eq 0 and secondmentOrderManageController.assetInfo.borrowedStatus eq -1 }" style="color: red;position: fixed;margin: -52px 23px 0px 71px;font-size:18px">*当前设备调剂状态为:暂停借出</p:outputPanel>
                 <p:fieldset legend="调剂设备借用信息" style="margin-bottom:20px">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -72,29 +74,29 @@
                             <label class="label">申请时间</label>
                             <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.applyTime}" readonly="true" showOn="false"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{secondmentOrderManageController.secondmentOrderDtoTemp.id eq secondmentOrderManageController.selected.id}">
                             <label class="label">计费开始时间</label>
                             <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.billingBeginTime}" readonly="true"  showOn="false" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{secondmentOrderManageController.secondmentOrderDtoTemp.id eq secondmentOrderManageController.selected.id}">
                             <label class="label">计费结束时间</label>
                             <p:calendar pattern="yyyy-MM-dd HH:mm:ss" value="#{secondmentOrderManageController.selected.billingEndTime}" readonly="true"  showOn="false" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup >
                             <label class="label">计费标准</label>
                             <p:inputText value="#{secondmentOrderManageController.selected.billingStandards}" readonly="true"  />
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">计费时长(分钟)</label>
+                        <h:panelGroup rendered="#{secondmentOrderManageController.secondmentOrderDtoTemp.id eq secondmentOrderManageController.selected.id}">
+                            <label class="label">计费时长</label>
                             <p:inputText value="#{secondmentOrderManageController.conversionTime(secondmentOrderManageController.selected.billingTime)}" readonly="true"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{secondmentOrderManageController.secondmentOrderDtoTemp.id eq secondmentOrderManageController.selected.id}">
                             <label class="label">计时费用</label>
                             <p:inputNumber value="#{secondmentOrderManageController.selected.cost}" readonly="true"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">备注</label>
-                            <p:inputText value="#{secondmentOrderManageController.selected.remark}" readonly="true"  />
+                            <p:inputText value="#{secondmentOrderManageController.selected.remark}" readonly="#{secondmentOrderManageController.selected.status ne 0}"  />
                         </h:panelGroup>
 <!--                        <h:panelGroup rendered="#{secondmentOrderManageController.selected.status eq 1}">-->
 <!--                            <label class="label">审批意见</label>-->
@@ -166,7 +168,9 @@
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varCancelDlg').show();"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
 
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varApprovalDlg').show();"/>
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varApprovalDlg').show();">
+                    <p:confirm disabled="#{!(secondmentOrderManageController.assetInfo.borrowedStatus eq -1)}" header="注意" message="当前设备调剂状态为:暂停借出" icon="ui-icon-alert"/>
+                </p:commandButton>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varRejectDlg').show();"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and (secondmentOrderManageController.secondmentOrderDtoTemp.status ==2 or secondmentOrderManageController.secondmentOrderDtoTemp.status ==4)}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>

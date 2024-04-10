@@ -1060,13 +1060,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             specialAssetInfo.setAssetUid(selected.getUid());
             List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getName() != null).collect(Collectors.toList());
             assetAnnualInspectionReports.forEach(item->item.setSpecialAssetUid(specialAssetInfo.getId()));
-            Set<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getCertificateName() != null).collect(Collectors.toSet());
+            List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getCertificateName() != null).collect(Collectors.toList());
             specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
             specialAssetInfo.setPermitInfos(permitInfos);
             specialAssetInfoService.saveSpecialAsset(specialAssetInfo);
-            if("Create".equals(crudActionName)){
-                onAfterNewObjectPermit();
-            }
+            onAfterNewObjectPermit();
+
         }
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(selected,assetInfo);
@@ -1264,6 +1263,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
+    public String getSpecialListPageLink() {
+
+        return "specialAssetList?faces-redirect=true";
+    }
+
     //三码合一设置
     public String getAssetCodeConfig() {
         return config == null ? null : config.getAssetCodeConfig();
@@ -1397,6 +1401,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setSpecialAsset(true);
         specialAssetInfoService.initSpecialAsset(selected);
         dao.save(selected);
+        WebUtil.addSuccessMessage("特种设备转入成功");
+
         return "AssetList?faces-redirect=true";
     }
 
@@ -2078,18 +2084,37 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         permitInfo = new PermitInfo();
     }
 
-    public void onEditReport(String uid) {
+    public void onEditReport(String uid,Integer nodId,String name) {
         for (AssetAnnualInspectionReport report : specialAssetInfo.getAssetAnnualInspectionReports()) {
-            if (null != report.getUid() && uid.equals(report.getUid())) {
+            if (StringUtils.isNotBlank(uid) && uid.equals(report.getUid())) {
                 assetAnnualInspectionReport = report;
+                return;
             }
+            if (StringUtils.isNotBlank(name) && name.equals(report.getName())) {
+                assetAnnualInspectionReport = report;
+                return;
+            }
+            if (null != nodId && nodId==report.getNodeId()) {
+                assetAnnualInspectionReport = report;
+                return;
+            }
+
         }
     }
 
-    public void onEditPermitInfo(String name) {
+    public void onEditPermitInfo(String uid,Integer nodId,String name) {
         for (PermitInfo permit : specialAssetInfo.getPermitInfos()) {
-            if (null != permit.getCertificateName() && name.equals(permit.getCertificateName())) {
+            if (StringUtils.isNotBlank(uid) && uid.equals(permit.getUid())) {
                 permitInfo = permit;
+                return;
+            }
+            if (StringUtils.isNotBlank(name) && name.equals(permit.getCertificateName())) {
+                permitInfo = permit;
+                return;
+            }
+            if (null != nodId && nodId==permit.getNodeId()) {
+                permitInfo = permit;
+                return;
             }
         }
     }
@@ -2103,7 +2128,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     public void delPermitInfo(String name) {
-        Set<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> !name.equals(item.getCertificateName())).collect(Collectors.toSet());
+        List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> !name.equals(item.getCertificateName())).collect(Collectors.toList());
         specialAssetInfo.setPermitInfos(collect);
 
     }
@@ -2127,9 +2152,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(permitInfo!=null &&( permitInfo.getUid()!=null || permitInfo.getNodeId()!=null)){
             return;
         }
-        Set<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos();
+        List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos();
         if(permitInfos==null){
-            permitInfos=new HashSet<>();
+            permitInfos=new ArrayList<>();
         }
         permitInfo.setTenantUID(loginUser.getTenantUID());
         permitInfo.setSiteUID(loginUser.getSiteUID());
@@ -2157,28 +2182,49 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.permitInfo = permitInfo;
     }
 
+
     public List<AssetAnnualInspectionReport> getAssetAnnualInspectionReports() {
+        AssetAnnualInspectionReport assetAnnualInspectionReport = new AssetAnnualInspectionReport();
+        assetAnnualInspectionReport.setNodeId(0);
+        List<AssetAnnualInspectionReport> assetAnnualInspectionReports=null;
         if(specialAssetInfo.getAssetAnnualInspectionReports()==null){
-            List<AssetAnnualInspectionReport> assetAnnualInspectionReports = new ArrayList<>();
-            specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+            assetAnnualInspectionReports = new ArrayList<>();
+        }else{
+            List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+            for (int i = 0; i < collect.size(); i++) {
+                AssetAnnualInspectionReport assetAnnualInspectionReport1 = collect.get(i);
+                assetAnnualInspectionReport1.setNodeId(i+1);
+            }
+            assetAnnualInspectionReports=collect;
+
         }
-        if(!specialAssetInfo.getAssetAnnualInspectionReports().stream().anyMatch(item->item.getUid()==null && item.getName()==null)){
-            specialAssetInfo.getAssetAnnualInspectionReports().add(new AssetAnnualInspectionReport());
-        }
-        return specialAssetInfo.getAssetAnnualInspectionReports();
+        specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+        assetAnnualInspectionReports.add(assetAnnualInspectionReport);
+        return assetAnnualInspectionReports;
     }
 
     private Set<PermitInfo> permitInfos;
 
-    public Set<PermitInfo> getPermitInfos() {
+    public List<PermitInfo> getPermitInfos() {
+        PermitInfo permitInfo=new PermitInfo();
+        permitInfo.setNodeId(0);
+        List<PermitInfo> permitInfos = null;
         if(specialAssetInfo.getPermitInfos()==null){
-            Set<PermitInfo> permitInfos = new HashSet<>();
-            specialAssetInfo.setPermitInfos(permitInfos);
+            permitInfos= new ArrayList<>();
+
+        }else{
+            List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+            for (int i = 0; i < collect.size(); i++) {
+                PermitInfo permitInfo1 = collect.get(i);
+                permitInfo1.setNodeId(i+1);
+            }
+            permitInfos=collect;
+
         }
-        if(!specialAssetInfo.getPermitInfos().stream().anyMatch(item->item.getUid()==null && item.getCertificateName()==null)){
-            specialAssetInfo.getPermitInfos().add(new PermitInfo());
-        }
-        return specialAssetInfo.getPermitInfos();
+        specialAssetInfo.setPermitInfos(permitInfos);
+        permitInfos.add(permitInfo);
+
+        return permitInfos;
 
     }
 
@@ -2192,6 +2238,38 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         Set<V2_BlobObject> blobObjects = permitInfo.getBlobObjects();
         blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
         permitInfo.setBlobObjects(blobObjects);
+    }
+    public void removeReportAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        Set<V2_BlobObject> blobObjects = assetAnnualInspectionReport.getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        permitInfo.setBlobObjects(blobObjects);
+    }
+
+    public void removeReportAttachmentById(String blobId,Integer nodeId) {
+        blobService.deleteBlobFileById(blobId);
+
+        List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
+        Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        for (AssetAnnualInspectionReport annualInspectionReport : specialAssetInfo.getAssetAnnualInspectionReports()) {
+            if(annualInspectionReport.getNodeId()==nodeId){
+                annualInspectionReport.setBlobObjects(blobObjects);
+            }
+        }
+    }
+
+    public void removePermitAttachmentById(String blobId,Integer nodeId) {
+        blobService.deleteBlobFileById(blobId);
+
+        List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
+        Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        for (PermitInfo permitInfo : specialAssetInfo.getPermitInfos()) {
+            if(permitInfo.getNodeId()==nodeId){
+                permitInfo.setBlobObjects(blobObjects);
+            }
+        }
     }
 
 
@@ -2216,6 +2294,27 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void handleFileUploadReport(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            if(assetAnnualInspectionReport.getBlobObjects()==null){
+                Set<V2_BlobObject> objects = new HashSet<>();
+                assetAnnualInspectionReport.setBlobObjects(objects);
+            }
+            assetAnnualInspectionReport.getBlobObjects().add(blobObject);
+//            blobObject.setBoId(permitInfo.getUid());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_SpecialAssetReportInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(assetAnnualInspectionReport.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
     public void onAfterNewObjectPermit() {
 
         if(specialAssetInfo.getPermitInfos() !=null){
@@ -2232,6 +2331,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     }
 
                 });
+        }
+
+        if(specialAssetInfo.getAssetAnnualInspectionReports() !=null){
+            specialAssetInfo.getAssetAnnualInspectionReports().forEach(item -> {
+                Set<V2_BlobObject> blobObjects = item.getBlobObjects();
+                if(blobObjects!=null){
+                    blobObjects.forEach(ite->{
+//                                ite.setBoId(object.getId());
+                            ite.setBoUuid(item.getUid());
+                            blobService.saveBlobObject(ite);
+
+                    });
+                }
+
+            });
         }
 
     }
