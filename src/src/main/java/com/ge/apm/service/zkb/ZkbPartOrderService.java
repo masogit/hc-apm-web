@@ -2978,7 +2978,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setClosedDate(new Date());
             zkbPartOrder.setClosedAuditer(userAccount.getName());
             zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
-            if(false && StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
+            if(completeOpenFlag && StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
                 ZkbPartOrderCloseInfo zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
                 if(zkbPartOrderCloseInfo == null){
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
