@@ -18,6 +18,10 @@ public class WorkOrderExportPojo {
     private Integer assetId;
     //设备编号
     private String assetDepartNum;
+
+    private String registrationNo;
+    private Date warrantyDate;
+    private Date factoryWarrantyDate;
     //工单状态
     private Integer status;
     //工单状态名称
@@ -814,5 +818,29 @@ public class WorkOrderExportPojo {
 
     public void setWorkHourDetail(String workHourDetail) {
         this.workHourDetail = workHourDetail;
+    }
+
+    public String getRegistrationNo() {
+        return registrationNo;
+    }
+
+    public void setRegistrationNo(String registrationNo) {
+        this.registrationNo = registrationNo;
+    }
+
+    public Date getWarrantyDate() {
+        return warrantyDate;
+    }
+
+    public void setWarrantyDate(Date warrantyDate) {
+        this.warrantyDate = warrantyDate;
+    }
+
+    public Date getFactoryWarrantyDate() {
+        return factoryWarrantyDate;
+    }
+
+    public void setFactoryWarrantyDate(Date factoryWarrantyDate) {
+        this.factoryWarrantyDate = factoryWarrantyDate;
     }
 }
