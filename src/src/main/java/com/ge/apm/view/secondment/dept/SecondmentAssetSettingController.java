@@ -1,12 +1,10 @@
 package com.ge.apm.view.secondment.dept;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SecondmentConfigRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -46,6 +44,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private List<UserAccount> userAccountList;
     private boolean chooseDept = Boolean.FALSE;
     private SecondmentConfig secondmentConfig = new SecondmentConfig();
+    private WorkflowConfigRepository workflowConfigRepository;
 
     @Override
     protected void init() {
@@ -53,6 +52,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         mqUtils= WebUtil.getBean(MqUtils.class);
         secondmentConfigRepository= WebUtil.getBean(SecondmentConfigRepository.class);
         userAccountRepository= WebUtil.getBean(UserAccountRepository.class);
+        workflowConfigRepository= WebUtil.getBean(WorkflowConfigRepository.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -68,12 +68,29 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private void initialization(){
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,userAccount.getSiteUID()));
+        if(CollectionUtils.isNotEmpty(visibleScope)){
+            filterAdjustmentCenter();
+        }
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getSiteUID(),"1*2+"));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,userAccount.getSiteUID(),"1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,userAccount.getSiteUID(),"1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,userAccount.getSiteUID(),"1*2+"));
         cacheConfigList = secondmentConfigRepository.findBySearchFilter(searchFilters);
         searchFilters.clear();
         List<I18nMessage> chargingType = FieldValueMessageController.getFieldValueList("chargingType");
         cacheChargingType = chargingType.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, item -> item));
         userAccountList = userAccountRepository.getByTenantUID(userAccount.getTenantUID());
+    }
+    private void filterAdjustmentCenter(){
+        String tenantUID = userAccount.getTenantUID();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUID));
+        searchFilters.add(new SearchFilter("deptForSharedAsset", SearchFilter.Operator.IsNotNull,tenantUID));
+        List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isNotEmpty(workflowConfigs)){
+            List<String> deptForSharedAsset = workflowConfigs.stream().map(WorkflowConfig::getDeptForSharedAsset).collect(Collectors.toList());
+            visibleScope = visibleScope.stream().filter(item -> !deptForSharedAsset.contains(item)).collect(Collectors.toList());
+        }
     }
     @Override
     public void onBeforeNewObject(AssetInfo object) {

@@ -1,13 +1,7 @@
 package com.ge.apm.view.secondment.dept;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SecondmentConfigRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -64,6 +58,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private List<OrgInfo> cacheOrgList;
     private boolean chooseDept = Boolean.FALSE;
     private LazyDataModel<AssetInfo> lazyModel2;
+    private WorkflowConfigRepository workflowConfigRepository;
 
 
     @Override
@@ -73,6 +68,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         secondmentConfigRepository= WebUtil.getBean(SecondmentConfigRepository.class);
         userAccountRepository= WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
+        workflowConfigRepository= WebUtil.getBean(WorkflowConfigRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -113,7 +109,12 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
         if(CollectionUtils.isNotEmpty(visibleScope)){
-            cacheOrgList = orgInfoRepository.findByUids(new HashSet<>(visibleScope));
+            filterAdjustmentCenter();
+            if(CollectionUtils.isNotEmpty(visibleScope)){
+                cacheOrgList = orgInfoRepository.findByUids(new HashSet<>(visibleScope));
+            }else{
+                cacheOrgList = new ArrayList<>();
+            }
         }
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,userAccount.getSiteUID()));
         cacheConfigList = secondmentConfigRepository.findBySearchFilter(searchFilters);
@@ -130,6 +131,17 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
 
         selectAsset = new ArrayList<>();
         secondmentConfig = new SecondmentConfig();
+    }
+    private void filterAdjustmentCenter(){
+        String tenantUID = userAccount.getTenantUID();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUID));
+        searchFilters.add(new SearchFilter("deptForSharedAsset", SearchFilter.Operator.IsNotNull,tenantUID));
+        List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isNotEmpty(workflowConfigs)){
+            List<String> deptForSharedAsset = workflowConfigs.stream().map(WorkflowConfig::getDeptForSharedAsset).collect(Collectors.toList());
+            visibleScope = visibleScope.stream().filter(item -> !deptForSharedAsset.contains(item)).collect(Collectors.toList());
+        }
     }
     @Override
     public void onBeforeNewObject(AssetInfo object) {
@@ -155,7 +167,6 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         Page<AssetInfo> assetInfos = super.loadData(pageRequest);
         cacheDataTablePage = assetInfos.getContent();
         allSelected1 = Boolean.FALSE;
-        searchFilters.clear();
         return assetInfos;
     }
 

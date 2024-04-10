@@ -55,6 +55,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     private List<OrgInfo> orgInfoList;
     private List<AssetInfo> selectAssetInfos;
     private V2_WorkOrderRepository v2_workOrderRepository;
+    private WorkflowConfigRepository workflowConfigRepository;
     @Override
     protected void init() {
         dao= WebUtil.getBean(AssetInfoRepository.class);
@@ -65,6 +66,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         sharedAssetService= WebUtil.getBean(SharedAssetService.class);
         v2_workOrderRepository= WebUtil.getBean(V2_WorkOrderRepository.class);
+        workflowConfigRepository= WebUtil.getBean(WorkflowConfigRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -82,12 +84,27 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         cacheChargingType = chargingType.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, item -> item));
         userAccountList = userAccountRepository.getByTenantUID(userAccount.getTenantUID());
         cacheOrgList = orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(userAccount.getSiteUID()));
+        if(CollectionUtils.isNotEmpty(cacheOrgList)){
+            filterAdjustmentCenter();
+        }
+
         initChooseDept();
     }
     private  void initChooseDept(){
         String orgInfoUID = userAccount.getOrgInfoUID();
         String site = userAccount.getSiteUID();
         chooseDept =orgInfoUID.equals(site);
+    }
+    private void filterAdjustmentCenter(){
+        String tenantUID = userAccount.getTenantUID();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUID));
+        searchFilters.add(new SearchFilter("deptForSharedAsset", SearchFilter.Operator.IsNotNull,tenantUID));
+        List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isNotEmpty(workflowConfigs)){
+            List<String> deptForSharedAsset = workflowConfigs.stream().map(WorkflowConfig::getDeptForSharedAsset).collect(Collectors.toList());
+            cacheOrgList = cacheOrgList.stream().filter(item -> !deptForSharedAsset.contains(item.getUid())).collect(Collectors.toList());
+        }
     }
     @Override
     public void onBeforeNewObject(AssetInfo object) {

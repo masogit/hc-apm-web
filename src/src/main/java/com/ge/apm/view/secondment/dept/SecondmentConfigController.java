@@ -12,6 +12,7 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -20,10 +21,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import javax.faces.component.UIComponent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -43,6 +44,7 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
     private SecondmentOrderRepository secondmentOrderRepository;
 
     private MqUtils mqUtils;
+
 
     @Override
     protected void init() {
@@ -146,5 +148,40 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
         mqContext.setMethodName("delete");
         mqContext.setDescribe(message);
         mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        Map<String, Object> filters = event.getFilters();
+        Set<String> collect = new HashSet<>();
+        if (filters.containsKey("createdBy")) {
+            Set<Map.Entry<String, Object>> entries = filters.entrySet();
+            for (Map.Entry<String, Object> filter: entries) {
+                String key = filter.getKey();
+                if("createdBy".equals(key)){
+                    String value = (String)filter.getValue();
+                     collect = userAccountList.stream().filter(item -> item.getName().contains(value)).map(UserAccount::getUid).collect(Collectors.toSet());
+                    if(CollectionUtils.isEmpty(collect)){
+                        collect.add("-1");
+                    }
+                    break;
+                }
+            }
+        }
+        super.onFilter(event);
+        if(CollectionUtils.isNotEmpty(collect)){
+            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, collect));
+        }
+    }
+
+    @Override
+    protected void processTimeFiled(String filterVal, String fieldName) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+            Date parse = dateFormat.parse(filterVal);
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, parse));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
