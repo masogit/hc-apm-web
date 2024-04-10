@@ -325,6 +325,10 @@ public class AssetInfoDetailController {
         return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
     }
 
+    public String getSpecialListPageLink() {
+        return "specialAssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+    }
+
     public String getParentAssetName() {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.assetDao.getById(this.selected.getParentAssetId());

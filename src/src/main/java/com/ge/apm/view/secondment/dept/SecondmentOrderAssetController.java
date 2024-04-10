@@ -206,9 +206,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             }
             SecondmentOrder secondmentOrder = this.secondmentOrder;
             if(secondmentOrder!= null){
-                String secondmentNo = generateSecondmentNo(null);
                  generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请",secondmentOrder.getApprovalSuggestions(),secondmentOrder.getApprovalRemarks());
-                secondmentOrder.setSecondmentNo(secondmentNo);
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
             }
@@ -250,6 +248,8 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         SecondmentConfig config = this.secondmentConfig;
         UserAccount userAccount = this.userAccount;
         secondmentOrder= new SecondmentOrder();
+        String secondmentNo = generateSecondmentNo(null);
+        secondmentOrder.setSecondmentNo(secondmentNo);
         secondmentOrder.setAssetUid(assetInfo.getUid());
         secondmentOrder.setConfigId(config.getId());
         secondmentOrder.setApplyTime(now);
