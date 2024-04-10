@@ -154,7 +154,7 @@ public class SpecialAssetInfo implements Serializable {
 //            @JoinColumn(name = "permit_info_uid", referencedColumnName = "uid",insertable = false,updatable = false)})
 
     @Transient
-    private Set<PermitInfo> permitInfos;
+    private List<PermitInfo> permitInfos;
 
     @Transient
     @TableField(exist = false)
@@ -397,11 +397,11 @@ public class SpecialAssetInfo implements Serializable {
 //    }
 
 
-    public Set<PermitInfo> getPermitInfos() {
+    public List<PermitInfo> getPermitInfos() {
         return permitInfos;
     }
 
-    public void setPermitInfos(Set<PermitInfo> permitInfos) {
+    public void setPermitInfos(List<PermitInfo> permitInfos) {
         this.permitInfos = permitInfos;
     }
 

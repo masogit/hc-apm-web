@@ -108,7 +108,7 @@
                                 <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                  actionListener="#{specialAssetPermitEditController.delPermitInfo(item.certificateName)}"
                                                  update="permitInfoCreateForm:permitInfoList"
-                                                 rendered="#{not empty item.certificateName}">
+                                                 rendered="#{not empty item.certificateName and  specialAssetPermitEditController.createAction   }">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                icon="ui-icon-alert"/>
                                 </p:commandButton>
@@ -121,6 +121,7 @@
                     <p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:permitInfoCreateForm" icon="ui-icon-check"
                                      oncomplete="PF('permitInfoDlg').hide();handleSubmit(args, 'permitInfoDlg')" action="#{specialAssetPermitEditController.savePermit}"
                                      timeout="180000" />
+                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"  action="specialAssetPermitList?faces-redirect=true" />
 
                 </h:form>
 

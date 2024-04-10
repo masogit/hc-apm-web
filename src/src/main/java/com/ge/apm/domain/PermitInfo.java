@@ -1,16 +1,13 @@
 package com.ge.apm.domain;
 
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.DateTime;
 import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -86,7 +83,6 @@ public class PermitInfo implements Serializable {
 
 
     @Transient
-    @TableField(exist = false)
     private String warrantyAlertStatus = null;
 
     public String getWarrantyAlertStatus(){
@@ -225,4 +221,22 @@ public class PermitInfo implements Serializable {
     public void setBlobObjects(Set<V2_BlobObject> blobObjects) {
         this.blobObjects = blobObjects;
     }
+
+    @Override
+    public int hashCode() {
+        Integer hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof SpecialAssetInfo)) {
+            return false;
+        }
+        PermitInfo other = (PermitInfo) object;
+        return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
+    }
+
 }

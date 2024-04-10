@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "asset_annual_inspection_report")
@@ -51,6 +52,11 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private Set<V2_BlobObject> blobObjects;
+
 
     @Transient
     private Integer nodeId;
@@ -182,5 +188,13 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public Set<V2_BlobObject> getBlobObjects() {
+        return blobObjects;
+    }
+
+    public void setBlobObjects(Set<V2_BlobObject> blobObjects) {
+        this.blobObjects = blobObjects;
     }
 }
