@@ -141,6 +141,9 @@ public class WorkOrderReportProvider {
                 "ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
                 "wo.status as status, ai.id as assetId , " +
                 "wo.sub_status as subStatus, " +
+                "ai.registration_no as registrationNo, "+
+                "ai.warranty_date as warrantyDate, "+
+                "ai.factory_warranty_date as factoryWarrantyDate, "+
                 "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
                 "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
                 "oi.short_name as assetClinicalDeptName, " +
