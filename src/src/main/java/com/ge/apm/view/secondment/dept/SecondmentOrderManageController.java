@@ -117,7 +117,6 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         initDeptScope();
         Wrapper<SecondmentOrderDto> entityWrapper = buildDefaultFilters(searchFilters);
         searchFilters.clear();
-        selected = null;
         return service.loadSecondmentOrderList(pageRequest, entityWrapper);
     }
     private void initDeptScope(){
@@ -182,20 +181,16 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
          switch (status){
              case 1:
                  Integer borrowedStatus = assetInfo.getBorrowedStatus();
-                 if(borrowedStatus == null || borrowedStatus == 0){
-                     assetInfo.setAssetDeptUID(borrowDeptUid);
-                     assetInfo.setBorrowedStatus(1);
-                     dto.setBillingTime(null);
-                     dto.setCost(null);
-                     BeanUtils.copyProperties(dto,order);
-                     SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"同意",order.getApprovalSuggestions(),order.getApprovalRemarks());
-                     secondmentOrderRepository.save(order);
-                     assetInfoRepository.save(assetInfo);
-                     saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
-                     rejectSameDeviceWorkOrder(order);
-                 }else{
-                     WebUtil.addSuccessMessage("设备："+assetInfo.getName() +",已被占用或未配置调剂规则,请刷新后重试");
-                 }
+                 assetInfo.setAssetDeptUID(borrowDeptUid);
+                 assetInfo.setBorrowedStatus(1);
+                 dto.setBillingTime(null);
+                 dto.setCost(null);
+                 BeanUtils.copyProperties(dto,order);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"同意",order.getApprovalSuggestions(),order.getApprovalRemarks());
+                 secondmentOrderRepository.save(order);
+                 assetInfoRepository.save(assetInfo);
+                 saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
+                 rejectSameDeviceWorkOrder(order);
                  break;
              case 3:
                      dto.setBillingEndTime(new Date());
@@ -334,10 +329,11 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 break;
             case 2:  //小时(半点)
                 long halfHour = minutes / 30;
+                double cost = halfHour * (unitPrice / 2);
                 if((minutes % 30) > 0){
-                    halfHour+=1;
+                    cost += unitPrice / 2;
                 }
-                order.setCost(halfHour * unitPrice);
+                order.setCost(cost);
                 break;
             case 3:  //天
                 long days = minutes / 1440;
@@ -347,7 +343,9 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 order.setCost(days * unitPrice);
                 break;
             case 4:  // 自然时间
-                order.setCost(minutes * unitPrice);
+                long hour = minutes / 60;
+                long remainder = minutes % 60;
+                order.setCost(hour * unitPrice + remainder * (unitPrice / 60));
                 break;
             case 5:   //小时(整点)
                 long hours = minutes / 60;

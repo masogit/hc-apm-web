@@ -17,8 +17,8 @@
                     <p:panelGrid columns="1" layout="grid">
                         <h:panelGroup>
                             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                                <p:commandButton value="借出工单"  process="@this" actionListener="#{secondmentOrderManageController.setBorrowFlag(true)}" update="secondmentOrderManage" disabled="#{secondmentOrderManageController.borrowFlag}"  />
-                                <p:commandButton value="借入工单"  process="@this" actionListener="#{secondmentOrderManageController.setBorrowFlag(false)}" update="secondmentOrderManage" disabled="#{!secondmentOrderManageController.borrowFlag}" />
+                                <p:commandButton value="借出工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(true)}" update="secondmentOrderManage" disabled="#{secondmentOrderManageController.borrowFlag}"  />
+                                <p:commandButton value="借入工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(false)}" update="secondmentOrderManage" disabled="#{!secondmentOrderManageController.borrowFlag}" />
                             </h:panelGrid>
                             <p:dataTable id="datalist" value="#{secondmentOrderManageController.lazyModel}" var="item" widgetVar="secondmentOrderManageList"
                                          selectionMode="single"  selection="#{secondmentOrderManageController.selected}"
@@ -64,7 +64,7 @@
                                 <p:column headerText="借用科室" >
                                     <h:outputText value="#{secondmentOrderManageController.getBorrowDeptName(item.borrowDeptUid)}"/>
                                 </p:column>
-                                <p:column headerText="设备调剂状态"  filterMatchMode="EQ" filterBy="#{item.so.status}" >
+                                <p:column headerText="调剂状态"  filterMatchMode="EQ" filterBy="#{item.so.status}" >
                                     <f:facet name="filter">
                                         <p:selectOneMenu  onchange="PF('secondmentOrderManageList').filter()" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
@@ -80,7 +80,12 @@
 <!--                                            <f:selectItems value="#{fieldMsg.getFieldValueList('borrowedStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                         </p:selectOneMenu>
                                     </f:facet>
-                                    <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status)}"/>
+                                    <c:if test="#{secondmentOrderManageController.borrowFlag}">
+                                        <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status == 4?2:tem.status)}"/>
+                                    </c:if>
+                                    <c:if test="#{!secondmentOrderManageController.borrowFlag}">
+                                        <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status)}"/>
+                                    </c:if>
                                 </p:column>
                                 <p:column headerText="申请时间" >
                                     <h:outputText value="#{item.applyTime}">

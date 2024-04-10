@@ -45,15 +45,18 @@
                                         </f:facet>
                                         <h:outputText value="#{fieldMsg.doGetFieldValue('chargingType',item.billingType)}"/>
                                     </p:column>
-                                    <p:column headerText="创建时间" >
+                                    <p:column headerText="创建时间" filterBy="#{item.createdDate}" filterMatchMode="LTE">
+                                        <f:facet name="filter">
+                                            <p:calendar id="cal12" effect="fold"  onchange="PF('configEditList').filter()"  pattern="yyyy/MM/dd HH:mm:ss" showButtonPanel="true" navigator="true"/>
+                                        </f:facet>
                                         <h:outputText value="#{item.createdDate}">
                                             <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="创建人" >
+                                    <p:column headerText="创建人" filterBy="#{item.createdBy}" filterMatchMode="IN">
                                         <h:outputText value="#{secondmentConfigController.getCreatedBy(item)}"/>
                                     </p:column>
-                                    <p:column headerText="备注" >
+                                    <p:column headerText="备注" filterBy="#{item.remark}" filterMatchMode="LIKE">
                                         <h:outputText value="#{item.remark}"/>
                                     </p:column>
                                     <f:facet name="{Toolbar}">
