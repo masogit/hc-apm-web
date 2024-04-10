@@ -58,11 +58,11 @@
                        <!-- 特种设备管理 -->
                        <p:submenu id="um011" label="特种设备管理" icon="fa fa-bars fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_') and userContextService.hasRole('SpecialEquipmentRole') }">
                            <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}"/>
-                           <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_REPAIR_EDIT')}"/>
-                           <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_MAINTAIN_EDIT')}"/>
-                           <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_CHECK_EDIT')}"/>
-                           <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_DOCUMENT_EDIT')}"/>
-                           <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_RISK_EDIT')}"/>
+<!--                           <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_REPAIR_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_MAINTAIN_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_CHECK_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_DOCUMENT_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_RISK_EDIT')}"/>-->
                            <p:menuitem id="um0117" value="证照管理" outcome="/portal/asset/info/specialAssetPermitList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}"/>
                        </p:submenu>
                    </c:when>

@@ -10,105 +10,103 @@
     <h:form id="CreateSpecialAssetForm">
         <p:fieldset legend="特种设备状态" style="margin-bottom:20px">
 
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                    <h:panelGroup>
-                        <label class="label">放射诊疗许可证目录内是否登记</label>
-                        <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.radiotherapyIsRegistration}"
-                                          requiredMessage="#{msg.radiotherapyIsRegistration} #{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                            <p:ajax event="change"></p:ajax>
-                        </p:selectOneRadio>
-                    </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">放射诊疗许可证目录内是否登记</label>
+                    <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.radiotherapyIsRegistration}"
+                                      requiredMessage="#{msg.radiotherapyIsRegistration} #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        <p:ajax event="change"></p:ajax>
+                    </p:selectOneRadio>
+                </h:panelGroup>
 
-                    <h:panelGroup>
-                        <label class="label">预评/控评情况<span
-                                style="color:red"></span></label>
-                        <p:inputText id="assessmentSituation"
-                                     value="#{assetInfoEditController.specialAssetInfo.assessmentSituation}"
-                                     requiredMessage="#{msg.assessmentSituation} #{msg.ValidationRequire}"
-                        >
-                            <p:ajax event="change"></p:ajax>
-                        </p:inputText>
-                    </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">预评/控评情况<span
+                            style="color:red"></span></label>
+                    <p:inputText id="assessmentSituation"
+                                 value="#{assetInfoEditController.specialAssetInfo.assessmentSituation}"
+                                 requiredMessage="#{msg.assessmentSituation} #{msg.ValidationRequire}"
+                    >
+                        <p:ajax event="change"></p:ajax>
+                    </p:inputText>
+                </h:panelGroup>
 
-                    <h:panelGroup>
-                        <label class="label">预评批号<span
-                                style="color:red"></span></label>
-                        <p:inputText id="assessmentNo" value="#{assetInfoEditController.specialAssetInfo.assessmentNo}"
-                                     requiredMessage="#{msg.assessmentNo} #{msg.ValidationRequire}"
-                        >                           <p:ajax event="change"></p:ajax>
+                <h:panelGroup>
+                    <label class="label">预评批号<span
+                            style="color:red"></span></label>
+                    <p:inputText id="assessmentNo" value="#{assetInfoEditController.specialAssetInfo.assessmentNo}"
+                                 requiredMessage="#{msg.assessmentNo} #{msg.ValidationRequire}"
+                    > <p:ajax event="change"></p:ajax>
 
-                        </p:inputText>
-                    </h:panelGroup>
-
-
-                    <h:panelGroup>
-                        <label class="label">预评文件时间<span style="color:red"></span></label>
-                        <p:calendar  timeZone="#{userContextService.getTimeZone()}"
-                                    locale="#{userContextService.getCalendarLocale()}"
-                                    pattern="#{userContextService.timeFormat()}"
-                                    value="#{assetInfoEditController.specialAssetInfo.assessmentFileDate}"
-                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" requiredMessage="#{msg.assessmentFileDate} #{msg.ValidationRequire}">
-                            <p:ajax event="dateSelect"  ></p:ajax>
-
-                        </p:calendar>
-                    </h:panelGroup>
+                    </p:inputText>
+                </h:panelGroup>
 
 
-                    <h:panelGroup>
-                        <label class="label">预评批号<span
-                                style="color:red"></span></label>
-                        <p:inputText id="andAssessmentNo"
-                                     value="#{assetInfoEditController.specialAssetInfo.andAssessmentNo}"
-                                     requiredMessage="#{msg.andAssessmentNo} #{msg.ValidationRequire}"
-                        >
-                            <p:ajax event="change"></p:ajax>
-                        </p:inputText>
-                    </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">预评文件时间<span style="color:red"></span></label>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                locale="#{userContextService.getCalendarLocale()}"
+                                pattern="#{userContextService.timeFormat()}"
+                                value="#{assetInfoEditController.specialAssetInfo.assessmentFileDate}"
+                                showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                mask="true" requiredMessage="#{msg.assessmentFileDate} #{msg.ValidationRequire}">
+                        <p:ajax event="dateSelect"></p:ajax>
 
-                    <h:panelGroup>
-                        <label class="label">控评批复时间 <span style="color:red"></span></label>
-                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
-                                    locale="#{userContextService.getCalendarLocale()}"
-                                    pattern="#{userContextService.timeFormat()}"
-                                    value="#{assetInfoEditController.specialAssetInfo.andAssessmentApprovalDate}"
-                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" requiredMessage="#{msg.assessmentFileDate} #{msg.ValidationRequire}" >
-                            <p:ajax event="dateSelect"  ></p:ajax>
+                    </p:calendar>
+                </h:panelGroup>
 
 
-                        </p:calendar>
-                    </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">预评批号<span
+                            style="color:red"></span></label>
+                    <p:inputText id="andAssessmentNo"
+                                 value="#{assetInfoEditController.specialAssetInfo.andAssessmentNo}"
+                                 requiredMessage="#{msg.andAssessmentNo} #{msg.ValidationRequire}"
+                    >
+                        <p:ajax event="change"></p:ajax>
+                    </p:inputText>
+                </h:panelGroup>
 
-                    <h:panelGroup>
-                        <label class="label">辐射安全许可证目录内是否登记</label>
-                        <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.radiationSafetyIsRegistration}"
-                                          requiredMessage="#{msg.radiationSafetyIsRegistration} #{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                            <p:ajax event="change"></p:ajax>
-
-                        </p:selectOneRadio>
-                    </h:panelGroup>
-
-                    <h:panelGroup>
-                        <label class="label">院内公示、核技术网公示是否完成</label>
-                        <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.coreTechnologyFinish}"
-                                          requiredMessage="#{msg.coreTechnologyFinish} #{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                            <p:ajax event="change"></p:ajax>
-
-                        </p:selectOneRadio>
-                    </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">控评批复时间 <span style="color:red"></span></label>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                locale="#{userContextService.getCalendarLocale()}"
+                                pattern="#{userContextService.timeFormat()}"
+                                value="#{assetInfoEditController.specialAssetInfo.andAssessmentApprovalDate}"
+                                showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                mask="true" requiredMessage="#{msg.assessmentFileDate} #{msg.ValidationRequire}">
+                        <p:ajax event="dateSelect"></p:ajax>
 
 
-                </p:panelGrid>
+                    </p:calendar>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">辐射安全许可证目录内是否登记</label>
+                    <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.radiationSafetyIsRegistration}"
+                                      requiredMessage="#{msg.radiationSafetyIsRegistration} #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        <p:ajax event="change"></p:ajax>
+
+                    </p:selectOneRadio>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">院内公示、核技术网公示是否完成</label>
+                    <p:selectOneRadio value="#{assetInfoEditController.specialAssetInfo.coreTechnologyFinish}"
+                                      requiredMessage="#{msg.coreTechnologyFinish} #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        <p:ajax event="change"></p:ajax>
+
+                    </p:selectOneRadio>
+                </h:panelGroup>
 
 
+            </p:panelGrid>
 
 
         </p:fieldset>
@@ -152,7 +150,7 @@
                     <p:inputText id="assetTypePurpose"
                                  value="#{assetInfoEditController.specialAssetInfo.assetTypePurpose}"
                                  requiredMessage="#{msg.assetTypePurpose} #{msg.ValidationRequire}"
-                    >                           <p:ajax event="change"></p:ajax>
+                    > <p:ajax event="change"></p:ajax>
 
                     </p:inputText>
                 </h:panelGroup>
@@ -164,7 +162,7 @@
                     <p:inputText id="registrationSituation"
                                  value="#{assetInfoEditController.specialAssetInfo.registrationSituation}"
                                  requiredMessage="#{msg.registrationSituation} #{msg.ValidationRequire}"
-                    >                            <p:ajax event="change"></p:ajax>
+                    > <p:ajax event="change"></p:ajax>
 
                     </p:inputText>
                 </h:panelGroup>
@@ -176,7 +174,7 @@
                     <p:inputText id="leadApronEquipment"
                                  value="#{assetInfoEditController.specialAssetInfo.leadApronEquipment}"
                                  requiredMessage="#{msg.leadApronEquipment} #{msg.ValidationRequire}"
-                    >                            <p:ajax event="change"></p:ajax>
+                    > <p:ajax event="change"></p:ajax>
 
                     </p:inputText>
                 </h:panelGroup>
@@ -187,7 +185,7 @@
                     <p:inputText id="leadApronPosition"
                                  value="#{assetInfoEditController.specialAssetInfo.leadApronPosition}"
                                  requiredMessage="#{msg.LeadApronPosition} #{msg.ValidationRequire}"
-                    >                            <p:ajax event="change"></p:ajax>
+                    > <p:ajax event="change"></p:ajax>
 
                     </p:inputText>
                 </h:panelGroup>
@@ -197,7 +195,7 @@
                             style="color:red"></span></label>
                     <p:inputText id="remarks" value="#{assetInfoEditController.specialAssetInfo.remarks}"
                                  requiredMessage="#{msg.remarks} #{msg.ValidationRequire}"
-                    >                            <p:ajax event="change"></p:ajax>
+                    > <p:ajax event="change"></p:ajax>
 
                     </p:inputText>
                 </h:panelGroup>
@@ -206,10 +204,10 @@
             </p:panelGrid>
 
         </p:fieldset>
-<!--        <p:fieldset>-->
-<!--        <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{assetInfoEditController.processInputChange}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" />-->
+        <!--        <p:fieldset>-->
+        <!--        <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{assetInfoEditController.processInputChange}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" />-->
 
-<!--        </p:fieldset>-->
+        <!--        </p:fieldset>-->
         <p:fieldset legend="年检报告管理" style="margin-bottom:20px">
             <p:dataTable id="reportInfoList"
                          value="#{assetInfoEditController.assetAnnualInspectionReports}" var="item"
@@ -233,12 +231,16 @@
                 </p:column>
                 <p:column headerText="报告生效时间">
                     <h:outputText value="#{item.effectiveTime}">
-                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                           locale="#{userContextService.getCalendarLocale()}"
+                                           pattern="#{userContextService.timeFormat()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="报告到期时间">
                     <h:outputText value="#{item.expiryDate}">
-                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                           locale="#{userContextService.getCalendarLocale()}"
+                                           pattern="#{userContextService.timeFormat()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="上传人">
@@ -267,30 +269,55 @@
             </p:dataTable>
 
 
-            <p:dataList id="reportattachmentList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="report" type="definition" emptyMessage="#{msg.noRecordFound}">
+            <!--            <p:dataList id="reportattachmentList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="report" type="definition" emptyMessage="#{msg.noRecordFound}">-->
 
-                <h:panelGroup style="width: 500px"  >
-                <p:dataList id="pictureList2" value="#{report.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+            <!--                <h:panelGroup style="width: 500px"  >-->
+            <!--                <p:dataList id="pictureList2" value="#{report.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
+            <!--                    <f:facet name="header">#{report.name}</f:facet>-->
+
+            <!--                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+            <!--                    <p:commandButton actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"   update="tab:CreateSpecialAssetForm:reportattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
+            <!--                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
+            <!--                    </p:commandButton>-->
+            <!--                </p:dataList>-->
+            <!--                </h:panelGroup>-->
+
+            <!--            </p:dataList>-->
+
+            <p:dataList id="reportattachmentList" value="#{assetInfoEditController.assetAnnualInspectionReports}"
+                        var="report" type="definition" emptyMessage="#{msg.noRecordFound}">
+
+                <p:dataGrid id="reportattachmentList1" var="fileitem" rendered="#{not empty report.blobObjects}"
+                            value="#{report.blobObjects}" columns="5" layout="grid">
                     <f:facet name="header">#{report.name}</f:facet>
+                    <p:panel style="text-align:center">
+                        <h:panelGrid columns="1" style="width:100%">
 
-                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                    <p:commandButton actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"   update="tab:CreateSpecialAssetForm:reportattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                    </p:commandButton>
-                </p:dataList>
-                </h:panelGroup>
+                            <!--                        <h:panelGroup rendered="#{v2PmOrderController.verifyFileSuffixName(fileitem.objectType,'image')}">-->
+                            <!--                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>-->
+                            <!--                        </h:panelGroup>-->
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false"
+                                           actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
+                                           styleClass="p-mr-2"/>
 
+                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
+                            <p:commandButton
+                                    actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"
+                                    update="tab:CreateSpecialAssetForm:reportattachmentList" icon="ui-icon-clear"
+                                    title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"
+                                           icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:dataGrid>
             </p:dataList>
+            <!--            <p:dataList id="pictureList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
+
+            <!--                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>-->
 
 
-<!--            <p:dataList id="pictureList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-
-<!--                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>-->
-
-
-<!--            </p:dataList>-->
-
-
+            <!--            </p:dataList>-->
 
 
         </p:fieldset>
@@ -312,12 +339,16 @@
                 </p:column>
                 <p:column headerText="证书生效时间">
                     <h:outputText value="#{item.effectiveTime}">
-                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                           locale="#{userContextService.getCalendarLocale()}"
+                                           pattern="#{userContextService.timeFormat()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="证书到期时间">
                     <h:outputText value="#{item.expiryDate}">
-                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                           locale="#{userContextService.getCalendarLocale()}"
+                                           pattern="#{userContextService.timeFormat()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="上传人">
@@ -344,19 +375,43 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:dataList id="permitattachmentList" value="#{assetInfoEditController.permitInfos}" var="permit" type="definition" emptyMessage="#{msg.noRecordFound}">
+            <!--            <p:dataList id="permitattachmentList" value="#{assetInfoEditController.permitInfos}" var="permit" type="definition" emptyMessage="#{msg.noRecordFound}">-->
 
-                <h:panelGroup style="width: 500px"  >
-                    <p:dataList id="permitattachmentList2" value="#{permit.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                        <f:facet name="header">#{permit.certificateName}</f:facet>
+            <!--                <h:panelGroup style="width: 500px"  >-->
+            <!--                    <p:dataList id="permitattachmentList2" value="#{permit.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
+            <!--                        <f:facet name="header">#{permit.certificateName}</f:facet>-->
 
-                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                        <p:commandButton actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"   update="tab:CreateSpecialAssetForm:permitattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+            <!--                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+            <!--                        <p:commandButton actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"   update="tab:CreateSpecialAssetForm:permitattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
+            <!--                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
+            <!--                        </p:commandButton>-->
+            <!--                    </p:dataList>-->
+            <!--                </h:panelGroup>-->
+
+            <!--            </p:dataList>-->
+
+            <p:dataList id="permitattachmentList" value="#{assetInfoEditController.permitInfos}" var="permit"
+                        type="definition" emptyMessage="#{msg.noRecordFound}">
+
+                <p:dataGrid id="permitattachmentList1" var="fileitem" rendered="#{not empty permit.blobObjects}"
+                            value="#{permit.blobObjects}" columns="5" layout="grid">
+                    <f:facet name="header">#{permit.certificateName}</f:facet>
+                    <p:panel style="text-align:center">
+
+
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false"
+                                       actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
+                                       styleClass="p-mr-2"/>
+                        <p:commandButton
+                                actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"
+                                update="tab:CreateSpecialAssetForm:permitattachmentList" icon="ui-icon-clear"
+                                title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"
+                                       icon="ui-icon-warning"/>
                         </p:commandButton>
-                    </p:dataList>
-                </h:panelGroup>
 
+                    </p:panel>
+                </p:dataGrid>
             </p:dataList>
 
         </p:fieldset>
@@ -364,6 +419,5 @@
     </h:form>
 
 
-
 </ui:composition>
-<!--</html>-->
+        <!--</html>-->
