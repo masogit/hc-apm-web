@@ -309,7 +309,7 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
                 + selected.getAssetInfo().getUid()
                 + "&asset_name=" + selected.getAssetInfo().getName()
                 + "&terminate=" + this.terminate;
-        url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        url = "SpecialAssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);

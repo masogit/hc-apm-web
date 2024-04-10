@@ -94,7 +94,7 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
         Page<PermitInfo> page = permitInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
         List<PermitInfo> content = page.getContent();
 
-        content.forEach(item -> item.setWarrantyExpireAlertDays(30));
+        content.forEach(item -> item.setWarrantyExpireAlertDays(90));
         return page;
     }
 
@@ -126,14 +126,13 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
             return;
         }
 
-//        String url = "actionName=View&selectedid="
-//                + selected.getAssetInfo().getUid()
-//                + "&asset_name=" + selected.getAssetInfo().getName()
-//                + "&terminate=" + this.terminate;
-//        url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-//
-//        RequestContext requestContext = RequestContext.getCurrentInstance();
-//        requestContext.addCallbackParam("url", url);
+        String url = "actionName=Edit&selectedid="
+                + selected.getUid()
+                + "&name=" + selected.getCertificateName();
+        url = "SpecialAssetPermitDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
 

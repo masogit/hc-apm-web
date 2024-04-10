@@ -64,7 +64,7 @@ public class SpecialAssetInfoService {
         SpecialAssetInfo specialAssetInfo= specialAssetInfoRepository.findByAssetId(id);
         if(specialAssetInfo!=null){
            List<PermitInfo>  permitInfos= permitInfoRepository.findBySpecialAssetId(specialAssetInfo.getAssetUid());
-           specialAssetInfo.setPermitInfos(new HashSet<>(permitInfos));
+           specialAssetInfo.setPermitInfos(permitInfos);
         }
         return specialAssetInfo;
     }
@@ -76,7 +76,7 @@ public class SpecialAssetInfoService {
 
     @Transactional
     public void saveSpecialAsset(SpecialAssetInfo specialAssetInfo) {
-        specialAssetPermitInfoService.savePermitInfo(specialAssetInfo.getPermitInfos(),specialAssetInfo.getId());
+        specialAssetPermitInfoService.savePermitInfo(specialAssetInfo.getPermitInfos(),specialAssetInfo.getAssetUid());
         specialAssetInfoRepository.save(specialAssetInfo);
         specialAssetPermitInfoService.saveSpecialAssetPermitInfo(specialAssetInfo.getPermitInfos(),specialAssetInfo.getAssetUid());
         assetAnnualInspectionReportService.saveAssetReport(specialAssetInfo.getAssetAnnualInspectionReports(),specialAssetInfo.getId());
