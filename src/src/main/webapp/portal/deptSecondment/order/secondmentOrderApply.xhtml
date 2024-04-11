@@ -27,7 +27,7 @@
                                  lazy="true" paginator="true" paginatorPosition="both"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single"  selection="#{secondmentOrderAssetController.selected}"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}" rowKey="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.name}" rowKey="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"

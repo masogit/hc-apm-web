@@ -190,6 +190,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  secondmentOrderRepository.save(order);
                  assetInfoRepository.save(assetInfo);
                  saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  rejectSameDeviceWorkOrder(order);
                  break;
              case 3:
@@ -237,23 +238,26 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付",null,null);
                  secondmentOrderRepository.save(order);
-                break;
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
+                 break;
              case -2: // 已拒绝
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
              case -1: //已取消
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
                  break;
-             case 0: //已取消
+             case 0: //申请
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"申请",null,null);
                  secondmentOrderRepository.save(order);
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
              default:
                  break;
@@ -273,8 +277,9 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
              secondmentOrder.setModifyBy(userAccount.getUid());
              secondmentOrder.setModifyDate(new Date());
              secondmentOrder.setStatus(-2);
+            secondmentOrderRepository.save(rejectWorkOrder);
+            sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
         }
-        secondmentOrderRepository.save(rejectWorkOrder);
     }
     public SecondmentConfig getSecondmentConfig() {
         return secondmentConfig;
