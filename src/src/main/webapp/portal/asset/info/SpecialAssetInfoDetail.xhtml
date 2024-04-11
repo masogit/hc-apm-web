@@ -8,29 +8,6 @@
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-
-<!--    <h:form id="ASD">-->
-<!--        <p:accordionPanel id="accordion" multiple="false">-->
-<!--            <p:tab title="特种设备状态">-->
-
-<!--                特种设备状态-->
-<!--            </p:tab>-->
-<!--        </p:accordionPanel>-->
-<!--        <p:accordionPanel id="accordion2" multiple="false">-->
-<!--            <p:tab title="其他信息">-->
-<!--                其他信息-->
-
-<!--            </p:tab>-->
-<!--        </p:accordionPanel>-->
-<!--        <p:accordionPanel id="accordion3" multiple="false">-->
-<!--            <p:tab title="年检报告管理">-->
-
-<!--                年检报告管理-->
-<!--            </p:tab>-->
-<!--        </p:accordionPanel>-->
-
-<!--    </h:form>-->
-
     <h:form id="CreateSpecialAssetForm">
         <p:fieldset legend="特种设备状态" style="margin-bottom:20px">
            
@@ -243,41 +220,7 @@
                 <p:column headerText="上传人">
                     <h:outputText value="#{item.createdByName}"/>
                 </p:column>
-
-
-<!--                <p:column headerText="操作">-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"-->
-<!--                                     oncomplete="PF('annualInspectionReportDlg').show()"-->
-<!--                                     rendered="#{empty item.name}"-->
-<!--                                     actionListener="#{assetInfoDetailController.onAddReport()}"-->
-<!--                                     update="annualInspectionReportDlg"/>-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"-->
-<!--                                     actionListener="#{assetInfoDetailController.onEditReport(item.uid)}"-->
-<!--                                     oncomplete="PF('annualInspectionReportDlg').show()"-->
-<!--                                     update="annualInspectionReportDlg" rendered="#{not empty item.name}"/>-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"-->
-<!--                                     actionListener="#{assetInfoDetailController.delReport(item.name)}"-->
-<!--                                     update="tab:CreateSpecialAssetForm:reportInfoList"-->
-<!--                                     rendered="#{not empty item.name}">-->
-<!--                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"-->
-<!--                                   icon="ui-icon-alert"/>-->
-<!--                    </p:commandButton>-->
-<!--                </p:column>-->
             </p:dataTable>
-<!--            <p:dataList id="reportattachmentList" value="#{assetInfoDetailController.specialAssetInfo.assetAnnualInspectionReports}" var="report" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-
-<!--                <h:panelGroup style="width: 500px"  >-->
-<!--                    <p:dataList id="pictureList2" value="#{report.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-<!--                        <f:facet name="header">#{report.name}</f:facet>-->
-
-<!--                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
-<!--&lt;!&ndash;                        <p:commandButton actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"   update="tab:CreateSpecialAssetForm:reportattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">&ndash;&gt;-->
-<!--&lt;!&ndash;                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </p:commandButton>&ndash;&gt;-->
-<!--                    </p:dataList>-->
-<!--                </h:panelGroup>-->
-
-<!--            </p:dataList>-->
 
             <p:dataList id="reportattachmentList" value="#{assetInfoDetailController.specialAssetInfo.assetAnnualInspectionReports}"
                         var="report" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -288,21 +231,12 @@
                     <p:panel style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%">
 
-                            <!--                        <h:panelGroup rendered="#{v2PmOrderController.verifyFileSuffixName(fileitem.objectType,'image')}">-->
-                            <!--                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>-->
-                            <!--                        </h:panelGroup>-->
+                            <h:panelGroup rendered="#{assetInfoDetailController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                            </h:panelGroup>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false"
                                            actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
                                            styleClass="p-mr-2"/>
-
-                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
-<!--                            <p:commandButton-->
-<!--                                    actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"-->
-<!--                                    update="tab:CreateSpecialAssetForm:reportattachmentList" icon="ui-icon-clear"-->
-<!--                                    title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"-->
-<!--                                           icon="ui-icon-warning"/>-->
-<!--                            </p:commandButton>-->
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
@@ -337,41 +271,8 @@
                 <p:column headerText="上传人">
                     <h:outputText value="#{item.createdByName}"/>
                 </p:column>
-
-
-<!--                <p:column headerText="操作">-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"-->
-<!--                                     oncomplete="PF('permitInfoDlg').show()"-->
-<!--                                     rendered="#{empty item.certificateName}"-->
-<!--                                     actionListener="#{assetInfoDetailController.onAddPermitInfo()}"-->
-<!--                                     update="permitInfoDlg"/>-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"-->
-<!--                                     actionListener="#{assetInfoDetailController.onEditPermitInfo(item.certificateName)}"-->
-<!--                                     oncomplete="PF('permitInfoDlg').show()"-->
-<!--                                     update="permitInfoDlg" rendered="#{not empty item.certificateName}"/>-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"-->
-<!--                                     actionListener="#{assetInfoDetailController.delPermitInfo(item.certificateName)}"-->
-<!--                                     update="tab:CreateSpecialAssetForm:permitInfoList"-->
-<!--                                     rendered="#{not empty item.certificateName}">-->
-<!--                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"-->
-<!--                                   icon="ui-icon-alert"/>-->
-<!--                    </p:commandButton>-->
-<!--                </p:column>-->
             </p:dataTable>
-<!--            <p:dataList id="permitattachmentList" value="#{assetInfoDetailController.specialAssetInfo.permitInfos}" var="permit" type="definition" emptyMessage="#{msg.noRecordFound}">-->
 
-<!--                <h:panelGroup style="width: 500px"  >-->
-<!--                    <p:dataList id="permitattachmentList2" value="#{permit.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-<!--                        <f:facet name="header">#{permit.certificateName}</f:facet>-->
-
-<!--                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
-<!--&lt;!&ndash;                        <p:commandButton actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"   update="tab:CreateSpecialAssetForm:permitattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">&ndash;&gt;-->
-<!--&lt;!&ndash;                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </p:commandButton>&ndash;&gt;-->
-<!--                    </p:dataList>-->
-<!--                </h:panelGroup>-->
-
-<!--            </p:dataList>-->
 
             <p:dataList id="permitattachmentList" value="#{assetInfoDetailController.specialAssetInfo.permitInfos}" var="permit"
                         type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -381,17 +282,12 @@
                     <f:facet name="header">#{permit.certificateName}</f:facet>
                     <p:panel style="text-align:center">
 
-
+                        <h:panelGroup rendered="#{assetInfoDetailController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
                         <p:commandLink value="#{fileitem.objectName}" ajax="false"
                                        actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
                                        styleClass="p-mr-2"/>
-<!--                        <p:commandButton-->
-<!--                                actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"-->
-<!--                                update="tab:CreateSpecialAssetForm:permitattachmentList" icon="ui-icon-clear"-->
-<!--                                title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-<!--                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"-->
-<!--                                       icon="ui-icon-warning"/>-->
-<!--                        </p:commandButton>-->
 
                     </p:panel>
                 </p:dataGrid>

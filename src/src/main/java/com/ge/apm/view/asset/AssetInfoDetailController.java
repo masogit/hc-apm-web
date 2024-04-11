@@ -500,4 +500,11 @@ public class AssetInfoDetailController {
 //        }
 //        return assetApprovalProcess.size();
 //    }
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
 }
