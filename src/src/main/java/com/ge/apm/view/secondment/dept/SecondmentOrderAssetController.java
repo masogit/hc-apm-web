@@ -226,6 +226,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
                  generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请",secondmentOrder.getApprovalSuggestions(),secondmentOrder.getApprovalRemarks());
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
+                WebUtil.addSuccessMessage("调剂设备："+selected.getName() +" 申请成功");
             }
         } catch (Exception e) {
             e.printStackTrace();
