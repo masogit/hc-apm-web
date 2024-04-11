@@ -34,7 +34,7 @@
                                 <p:column headerText="序号"  >
                                     <h:outputText value="#{item.num}" />
                                 </p:column>
-                                <p:column headerText="单号" filterBy="#{item.secondment_no}" filterMatchMode="EQ">
+                                <p:column headerText="单号" filterBy="#{item.secondment_no}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.secondmentNo}" />
                                 </p:column>
                                 <p:column headerText="#{msg.assetName}" filterBy="#{item.name}" filterMatchMode="LIKE">
