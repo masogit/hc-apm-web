@@ -1,10 +1,7 @@
 package com.ge.apm.view.secondment.dept;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -45,7 +42,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private boolean chooseDept = Boolean.FALSE;
     private SecondmentConfig secondmentConfig = new SecondmentConfig();
     private WorkflowConfigRepository workflowConfigRepository;
-
+    private V2_WorkOrderRepository v2_workOrderRepository;
     @Override
     protected void init() {
         dao= WebUtil.getBean(AssetInfoRepository.class);
@@ -54,6 +51,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         userAccountRepository= WebUtil.getBean(UserAccountRepository.class);
         workflowConfigRepository= WebUtil.getBean(WorkflowConfigRepository.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
+        v2_workOrderRepository= WebUtil.getBean(V2_WorkOrderRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -140,14 +138,25 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
                 WebUtil.addErrorMessage("计费配置不允许为空");
                 return;
             }
-            selected.setBorrowedStatus(0);
+            List<V2_WorkOrder> workOrders = searchRepairAgain(selected.getUid());
+            if(CollectionUtils.isNotEmpty(workOrders)){
+                selected.setBorrowedStatus(-1);
+            }else{
+                selected.setBorrowedStatus(0);
+            }
             super.save();
             saveAssetHistory(selected,"科室间借调/修改配置");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    private List<V2_WorkOrder> searchRepairAgain(String uid){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, uid));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        List<V2_WorkOrder> workOrders = v2_workOrderRepository.findBySearchFilter(searchFilters);
+        return workOrders;
+    }
     public void  changeStatus(AssetInfo assetInfo, Integer status){
         try {
             // TODO 校验是否有再借未完成工单

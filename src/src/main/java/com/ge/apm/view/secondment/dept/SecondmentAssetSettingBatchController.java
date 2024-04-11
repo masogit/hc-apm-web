@@ -59,6 +59,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
     private boolean chooseDept = Boolean.FALSE;
     private LazyDataModel<AssetInfo> lazyModel2;
     private WorkflowConfigRepository workflowConfigRepository;
+    private boolean whetherUserOrgDispatchCenter = false;
 
 
     @Override
@@ -141,6 +142,7 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
         if(CollectionUtils.isNotEmpty(workflowConfigs)){
             List<String> deptForSharedAsset = workflowConfigs.stream().map(WorkflowConfig::getDeptForSharedAsset).collect(Collectors.toList());
             visibleScope = visibleScope.stream().filter(item -> !deptForSharedAsset.contains(item)).collect(Collectors.toList());
+            whetherUserOrgDispatchCenter = deptForSharedAsset.contains(userAccount.getOrgInfoUID());
         }
     }
     @Override
@@ -180,7 +182,12 @@ public class SecondmentAssetSettingBatchController extends GenericCRUDController
                 scope.addAll(visibleScope);
             }
         }else{
-            scope.add(userAccount.getOrgInfoUID());
+            if(whetherUserOrgDispatchCenter){  // 当前用户所属科室时调剂中心科室
+                scope.add("-1");
+            }else{
+                scope.add(userAccount.getOrgInfoUID());
+            }
+
         }
 
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
