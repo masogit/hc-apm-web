@@ -2350,4 +2350,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
+
 }

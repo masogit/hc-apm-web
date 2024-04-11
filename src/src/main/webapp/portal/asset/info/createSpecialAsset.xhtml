@@ -268,22 +268,6 @@
                 </p:column>
             </p:dataTable>
 
-
-            <!--            <p:dataList id="reportattachmentList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="report" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-
-            <!--                <h:panelGroup style="width: 500px"  >-->
-            <!--                <p:dataList id="pictureList2" value="#{report.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-            <!--                    <f:facet name="header">#{report.name}</f:facet>-->
-
-            <!--                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
-            <!--                    <p:commandButton actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"   update="tab:CreateSpecialAssetForm:reportattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-            <!--                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
-            <!--                    </p:commandButton>-->
-            <!--                </p:dataList>-->
-            <!--                </h:panelGroup>-->
-
-            <!--            </p:dataList>-->
-
             <p:dataList id="reportattachmentList" value="#{assetInfoEditController.assetAnnualInspectionReports}"
                         var="report" type="definition" emptyMessage="#{msg.noRecordFound}">
 
@@ -293,14 +277,12 @@
                     <p:panel style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%">
 
-                            <!--                        <h:panelGroup rendered="#{v2PmOrderController.verifyFileSuffixName(fileitem.objectType,'image')}">-->
-                            <!--                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>-->
-                            <!--                        </h:panelGroup>-->
+                            <h:panelGroup rendered="#{assetInfoEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                            </h:panelGroup>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false"
                                            actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
                                            styleClass="p-mr-2"/>
-
-                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                             <p:commandButton
                                     actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id,report.nodeId)}"
                                     update="tab:CreateSpecialAssetForm:reportattachmentList" icon="ui-icon-clear"
@@ -312,14 +294,6 @@
                     </p:panel>
                 </p:dataGrid>
             </p:dataList>
-            <!--            <p:dataList id="pictureList" value="#{assetInfoEditController.assetAnnualInspectionReports}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-
-            <!--                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>-->
-
-
-            <!--            </p:dataList>-->
-
-
         </p:fieldset>
 
         <p:fieldset legend="证件信息" style="margin-bottom:20px">
@@ -375,20 +349,6 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <!--            <p:dataList id="permitattachmentList" value="#{assetInfoEditController.permitInfos}" var="permit" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-
-            <!--                <h:panelGroup style="width: 500px"  >-->
-            <!--                    <p:dataList id="permitattachmentList2" value="#{permit.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-            <!--                        <f:facet name="header">#{permit.certificateName}</f:facet>-->
-
-            <!--                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
-            <!--                        <p:commandButton actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"   update="tab:CreateSpecialAssetForm:permitattachmentList"    icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-            <!--                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
-            <!--                        </p:commandButton>-->
-            <!--                    </p:dataList>-->
-            <!--                </h:panelGroup>-->
-
-            <!--            </p:dataList>-->
 
             <p:dataList id="permitattachmentList" value="#{assetInfoEditController.permitInfos}" var="permit"
                         type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -398,7 +358,9 @@
                     <f:facet name="header">#{permit.certificateName}</f:facet>
                     <p:panel style="text-align:center">
 
-
+                        <h:panelGroup rendered="#{assetInfoEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
                         <p:commandLink value="#{fileitem.objectName}" ajax="false"
                                        actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
                                        styleClass="p-mr-2"/>

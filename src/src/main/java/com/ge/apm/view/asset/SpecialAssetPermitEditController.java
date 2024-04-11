@@ -267,7 +267,13 @@ public class SpecialAssetPermitEditController extends JpaCRUDController<PermitIn
 
     }
 
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
 
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
 
 
     public PermitInfo getPermitInfo() {
