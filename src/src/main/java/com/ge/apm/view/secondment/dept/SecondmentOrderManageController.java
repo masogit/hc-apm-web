@@ -207,7 +207,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      if(billingCost == null){
                          assetInfo.setBillingCost(dto.getCost());
                      }else{
-                         assetInfo.setBillingCost(billingCost + billingCost+dto.getCost());
+                         assetInfo.setBillingCost(billingCost+dto.getCost());
                      }
                      BeanUtils.copyProperties(dto,order);
                      SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还",null,null);
@@ -337,7 +337,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 break;
             case 3:  //天
                 long days = minutes / 1440;
-                if((days % 1440) > 0){
+                if((minutes % 1440) > 0){
                     days+=1;
                 }
                 order.setCost(days * unitPrice);

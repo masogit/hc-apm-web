@@ -81,7 +81,7 @@
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <c:if test="#{secondmentOrderManageController.borrowFlag}">
-                                        <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status == 4?2:tem.status)}"/>
+                                        <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status == 4?2:item.status)}"/>
                                     </c:if>
                                     <c:if test="#{!secondmentOrderManageController.borrowFlag}">
                                         <h:outputText value="#{fieldMsg.doGetFieldValue('borrowedStatus',item.status)}"/>

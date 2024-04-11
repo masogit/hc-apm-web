@@ -12,6 +12,7 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -131,14 +132,40 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
                 }
             }
             dao.delete(selected);
+        }else{
+            dao.delete(selected);
         }
 
     }
 
     @Override
     public void save() {
+        if (validateData()) {
+            return;
+        }
         dao.save(selected);
         WebUtil.addSuccessMessage("保存成功");
+    }
+
+    private boolean validateData() {
+        boolean flag=false;
+        String name = selected.getName();
+        if(name == null){
+            flag=true;
+            WebUtil.addErrorMessage("名称 输入不可为空！");
+        }
+        Double unitPrice = selected.getUnitPrice();
+        if(unitPrice == null){
+            flag=true;
+            WebUtil.addErrorMessage("单价 输入不可为空！");
+        }
+        Integer billingType = selected.getBillingType();
+        if(billingType == null){
+            flag=true;
+            WebUtil.addErrorMessage("计价方式 输入不可为空！");
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", flag);
+        return flag;
     }
 
     public void saveAssetHistory(AssetInfo newAsset, String message) {

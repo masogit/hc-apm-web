@@ -14,15 +14,15 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{secondmentConfigController.selected != null}">
                         <h:panelGroup>
                             <label class="label">#{msg.name}*</label>
-                            <p:inputText value="#{secondmentConfigController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
+                            <p:inputText value="#{secondmentConfigController.selected.name}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">单价*</label>
-                            <p:inputNumber  value="#{secondmentConfigController.selected.unitPrice}" decimalPlaces="2" minValue="0" required="true"  requiredMessage="单价 #{msg.ValidationRequire}" />
+                            <p:inputNumber  value="#{secondmentConfigController.selected.unitPrice}"  decimalPlaces="2"   emptyValue="empty" requiredMessage="单价 #{msg.ValidationRequire}"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>计价方式*</label>
-                            <p:selectOneMenu id="chargingType" required="true"
+                            <p:selectOneMenu id="chargingType"
                                               value="#{secondmentConfigController.selected.billingType}"
                                               requiredMessage="计价方式 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
@@ -43,10 +43,19 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:commandButton validateClient="true" actionListener="#{secondmentConfigController.save}" value="#{msg.Save}" update=":secondmentConfigForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configEditDlg')"/>
+                <p:commandButton validateClient="true" actionListener="#{secondmentConfigController.save}" value="#{msg.Save}" update=":secondmentConfigForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args, 'configEditDlg')"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('configEditDlg').hide()"/>
             </h:form>
         </div>
+        <script type="text/javascript">
+            function handleSubmitDigital(args, dialog) {
+                if (args.validationFailed) {
+                    //
+                } else {
+                    PF(dialog).hide();
+                }
+            }
+        </script>
     </p:dialog>
 </ui:composition>
 </html>
