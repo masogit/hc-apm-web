@@ -251,6 +251,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
+                 updateDeviceStatus(assetInfo);
                  break;
              case 0: //申请
                  BeanUtils.copyProperties(dto,order);
@@ -261,6 +262,25 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
              default:
                  break;
          }
+
+    }
+    private void updateDeviceStatus(AssetInfo assetInfo){
+        boolean flag=false;
+        String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+        String assetDeptUID = assetInfo.getAssetDeptUID();
+        if(StringUtils.hasText(assetDeptUID) && !clinicalDeptUID.equals(assetDeptUID)){
+            assetInfo.setAssetDeptUID(clinicalDeptUID);
+            flag=true;
+        }
+        Integer borrowedStatusCurrent = assetInfo.getBorrowedStatus();
+        if(borrowedStatusCurrent != null && borrowedStatusCurrent == 1){
+            assetInfo.setBorrowedStatus(0);
+            flag=true;
+        }
+        if(flag){
+            assetInfoRepository.save(assetInfo);
+            saveAssetHistory(assetInfo,"科室调剂取消借用更新设备使用科室");
+        }
 
     }
     public void rejectSameDeviceWorkOrder(SecondmentOrder order){
@@ -411,6 +431,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     public void switchQuery(boolean borrowFlag){
         setBorrowFlag(borrowFlag);
         this.selected = null;
+        searchFilters = new ArrayList<>();
     }
     public Boolean getBorrowFlag() {
         return borrowFlag;
