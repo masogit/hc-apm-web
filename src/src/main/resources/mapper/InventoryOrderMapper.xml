@@ -94,8 +94,8 @@
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.status WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
             FROM
                 asset_info ai
-                LEFT JOIN (select t1.* from inventory_issue t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_issue group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) ii ON ai.id = ii.asset_id
-                LEFT JOIN (select t1.* from inventory_order_detail t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_order_detail group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) iod ON ai.id = iod.asset_id
+                LEFT JOIN (select t1.* from inventory_issue t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_issue where tenant_uid = #{tenantUid} group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) ii ON ai.id = ii.asset_id
+                LEFT JOIN (select t1.* from inventory_order_detail t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_order_detail where tenant_uid = #{tenantUid} group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) iod ON ai.id = iod.asset_id
             WHERE
                 ai.is_checked = TRUE
                 AND ai.is_deleted = FALSE
