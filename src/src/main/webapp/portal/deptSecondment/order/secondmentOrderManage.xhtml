@@ -17,8 +17,12 @@
                     <p:panelGrid columns="1" layout="grid">
                         <h:panelGroup>
                             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                                <p:commandButton value="借出工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(true)}" update="secondmentOrderManage" disabled="#{secondmentOrderManageController.borrowFlag}"  />
-                                <p:commandButton value="借入工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(false)}" update="secondmentOrderManage" disabled="#{!secondmentOrderManageController.borrowFlag}" />
+                                <p:commandButton value="借出工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(true)}" update="secondmentOrderManage" disabled="#{secondmentOrderManageController.borrowFlag}" oncomplete="PF('secondmentOrderManageList').clearFilters();" >
+                                    <p:resetInput target="datalist" />
+                                </p:commandButton>
+                                <p:commandButton value="借入工单"  process="@this" actionListener="#{secondmentOrderManageController.switchQuery(false)}" update="secondmentOrderManage" disabled="#{!secondmentOrderManageController.borrowFlag}" oncomplete="PF('secondmentOrderManageList').clearFilters();">
+                                    <p:resetInput target="datalist" />
+                                </p:commandButton>
                             </h:panelGrid>
                             <p:dataTable id="datalist" value="#{secondmentOrderManageController.lazyModel}" var="item" widgetVar="secondmentOrderManageList"
                                          selectionMode="single"  selection="#{secondmentOrderManageController.selected}"
