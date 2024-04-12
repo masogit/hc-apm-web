@@ -80,7 +80,6 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
     protected Page<SecondmentConfig> loadData(PageRequest pageRequest) {
         addFilter();
         Page<SecondmentConfig> secondmentConfigs = super.loadData(pageRequest);
-        searchFilters.clear();
         return secondmentConfigs;
     }
     private void addFilter(){
