@@ -122,8 +122,8 @@
                                 onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"
                                 update="createButton  deleteButton "/>
                         <p:ajax event="filter" listener="#{specialAssetPermitInfoController.onFilter}"
-                                oncomplete="updateSelectAllCheckBox();"/>
-                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+                               />
+                        <p:ajax event="page" />
 <!--                        <p:column width="36" id="checkBoxColumn">-->
 <!--                            <p:selectBooleanCheckbox value="#{specialAssetPermitInfoController.selectedMap[item.id]}"-->
 <!--                                                     class="selectCheckBox">-->
