@@ -89,7 +89,7 @@ public class AssetInfoDetailController {
     private List<AssetLifecycleEvent> assetEvents;
     private Boolean termOptions = Boolean.TRUE;//期限选项
     @Getter
-    private List<JSONObject> changeHistoryList = Collections.emptyList();
+    private List<JSONObject> changeHistoryList = null;
     private SysAuthGroup selectedAuthGroup;
     private AssetTypeGroup selectedAssetTypeGroup;
     @Getter
@@ -478,7 +478,7 @@ public class AssetInfoDetailController {
     }
 
     public int getAssetChangeHistoryCount() {
-        if(CollectionUtils.isEmpty(changeHistoryList) && null!=selected){
+        if(null==changeHistoryList  && null!=selected){
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
         }
         return changeHistoryList.size();
