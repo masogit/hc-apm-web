@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.constant.SimplePartsConstant;
@@ -2209,7 +2210,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         PermitInfo permitInfo=new PermitInfo();
         permitInfo.setNodeId(0);
         List<PermitInfo> permitInfos = null;
-        if(specialAssetInfo.getPermitInfos()==null){
+        if(CollectionUtils.isEmpty(specialAssetInfo.getPermitInfos())){
             permitInfos= new ArrayList<>();
 
         }else{
