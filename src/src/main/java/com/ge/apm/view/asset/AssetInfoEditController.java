@@ -2209,6 +2209,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         PermitInfo permitInfo=new PermitInfo();
         permitInfo.setNodeId(0);
         List<PermitInfo> permitInfos = null;
+        logger.info("specialAssetInfo.getPermitInfos():{}"+specialAssetInfo.getPermitInfos().toString());
         if(CollectionUtils.isEmpty(specialAssetInfo.getPermitInfos())){
             permitInfos= new ArrayList<>();
 
