@@ -120,7 +120,7 @@
                                     <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                         <p:dataExporter type="xls" target="datalist" fileName="secondmentOrder_export"/>
                                     </p:commandButton>
-                                    <p:commandButton rendered="#{userContextService.hasAnyRoleByApmRoles('DeptHead')}" id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderManageController.selected}" actionListener="#{secondmentOrderManageController.prepareEdit()}" update="secondmentOrderEdit" title="#{msg.Edit}"   oncomplete="PF('secondmentOrderEdit').show()"/>
+                                    <p:commandButton rendered="#{userContextService.hasAnyRoleByApmRoles('DeptHead')}" id="editButton"  icon="#{secondmentOrderManageController.borrowFlag?'fa fa-sign-out':'fa fa-sign-in'}" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderManageController.selected}" actionListener="#{secondmentOrderManageController.prepareEdit()}" update="secondmentOrderEdit" title="#{msg.Edit}"   oncomplete="PF('secondmentOrderEdit').show()"/>
 
                                 </f:facet>
                             </p:dataTable>
