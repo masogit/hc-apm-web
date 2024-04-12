@@ -116,7 +116,6 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     protected Page<SecondmentOrderDto> loadData(PageRequest pageRequest) {
         initDeptScope();
         Wrapper<SecondmentOrderDto> entityWrapper = buildDefaultFilters(searchFilters);
-        searchFilters.clear();
         return service.loadSecondmentOrderList(pageRequest, entityWrapper);
     }
     private void initDeptScope(){

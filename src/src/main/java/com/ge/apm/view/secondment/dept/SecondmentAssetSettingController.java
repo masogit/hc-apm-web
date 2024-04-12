@@ -104,7 +104,6 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         addFilter();
         Page<AssetInfo> assetInfos = super.loadData(pageRequest);
-        searchFilters.clear();
         return assetInfos;
     }
 
