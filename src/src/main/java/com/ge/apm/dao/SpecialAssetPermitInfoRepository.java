@@ -18,6 +18,12 @@ public interface SpecialAssetPermitInfoRepository extends GenericRepositoryUUID<
     @Modifying
     @Transactional
     @Query(value = "delete from special_asset_permit_info where permit_info_uid =?1  ", nativeQuery = true)
+    int  deleteByPermitUid(String id);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from special_asset_permit_info where permit_info_uid =?1  ", nativeQuery = true)
     int  deleteByPermitUidIn(List<String> id);
 
 
