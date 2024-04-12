@@ -305,7 +305,7 @@
                    </c:when>
                     <!--      科室间借调             -->
                    <c:when test="#{item eq 'SECONDMENT_BETWEEN_DEPARTMENTS'}">
-                       <p:submenu id="um5000" icon="fa fa-refresh fa-fw" label="科室调剂" rendered="#{userContextService.accessContainsApmFeature('SECONDMENT_')}">
+                       <p:submenu id="um5000" icon="fa fa-refresh fa-fw" label="科室调剂" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_') and userContextService.canRender('SECONDMENT_BETWEEN_DEPARTMENTS')}">
                            <p:menuitem id="um5100" value="调剂计费配置" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_ADJUST_CONFIGURATION')}" outcome="/portal/deptSecondment/config/secondmentConfig.xhtml"/>
                            <p:menuitem id="um5200" value="调剂设备管理" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_DISPATCH_EQUIPMENT_MANAGEMENT')}" outcome="/portal/deptSecondment/config/secondmentAssetSetting.xhtml"/>
                            <p:menuitem id="um5300" value="调剂设备信息" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_BORROWING_APPLICATION')}" outcome="/portal/deptSecondment/order/secondmentOrderApply.xhtml"/>
