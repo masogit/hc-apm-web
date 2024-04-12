@@ -4,6 +4,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SpecialAssetInfoService;
+import com.ge.apm.service.asset.SpecialAssetPermitInfoService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
@@ -48,6 +49,7 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
 
     private AssetSelectController assetSelectController;
 
+    private  SpecialAssetPermitInfoRepository specialAssetPermitInfoRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -58,6 +60,7 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetSelectController = WebUtil.getBean(AssetSelectController.class);
+        specialAssetPermitInfoRepository = WebUtil.getBean(SpecialAssetPermitInfoRepository.class);
         assetSelectController.setCallingController(this);
     }
 
@@ -152,6 +155,7 @@ public class SpecialAssetPermitInfoController  extends GenericCRUDUUIDController
 
     public void deleteAssetPermit(PermitInfo permitInfo) {
         permitInfoRepository.delete(permitInfo);
+        specialAssetPermitInfoRepository.deleteByPermitUid(permitInfo.getUid());
     }
 
     public OrgInfo getSelectSite() {
