@@ -27,7 +27,7 @@
                                  lazy="true" paginator="true" paginatorPosition="both"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single"  selection="#{secondmentOrderAssetController.selected}"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}" rowKey="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.name}" rowKey="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -80,7 +80,7 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="secondmentConfig_export"/>
                             </p:commandButton>
-                            <p:commandButton id="editButton"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderAssetController.selected}" actionListener="#{secondmentOrderAssetController.applyBorrowBefore()}" update="applyBorrowOrder" title="#{msg.Edit}"   oncomplete="PF('applyBorrowOrder').show()"/>
+                            <p:commandButton id="editButton"  icon="ui-icon-plus" class="btn btn-sm btn-gray" disabled="#{empty secondmentOrderAssetController.selected}" actionListener="#{secondmentOrderAssetController.applyBorrowBefore()}" update="applyBorrowOrder" title="#{msg.Edit}"   oncomplete="PF('applyBorrowOrder').show()"/>
 
                         </f:facet>
                     </p:dataTable>

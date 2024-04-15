@@ -13,26 +13,20 @@ import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.approval.MultiLevelApprovalListController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.map.MapUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -57,7 +51,7 @@ public class AssetInfoDetailController {
     private AssetInfoRepository assetDao;
     private MvsAssetInfoRepository mvsAssetInfoDao;
     private MvsUtil mvsUtil;
-    private OrgInfoRepository orgDao;
+    private ConfigCacheService configCacheService;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
     private SupplierRepository supplierDao;
@@ -89,7 +83,7 @@ public class AssetInfoDetailController {
     private List<AssetLifecycleEvent> assetEvents;
     private Boolean termOptions = Boolean.TRUE;//期限选项
     @Getter
-    private List<JSONObject> changeHistoryList = Collections.emptyList();
+    private List<JSONObject> changeHistoryList = null;
     private SysAuthGroup selectedAuthGroup;
     private AssetTypeGroup selectedAssetTypeGroup;
     @Getter
@@ -112,7 +106,7 @@ public class AssetInfoDetailController {
         mvsUtil = WebUtil.getBean(MvsUtil.class);
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         configService = WebUtil.getBean(ConfigService.class);
@@ -171,7 +165,7 @@ public class AssetInfoDetailController {
         if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
-        return orgDao.getByUid(uid);
+        return configCacheService.findOrgByUid(uid);
     }
 
     public void getPerformanceByDay(){
@@ -478,7 +472,7 @@ public class AssetInfoDetailController {
     }
 
     public int getAssetChangeHistoryCount() {
-        if(CollectionUtils.isEmpty(changeHistoryList) && null!=selected){
+        if(null==changeHistoryList  && null!=selected){
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
         }
         return changeHistoryList.size();
@@ -500,4 +494,11 @@ public class AssetInfoDetailController {
 //        }
 //        return assetApprovalProcess.size();
 //    }
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
 }

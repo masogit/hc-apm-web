@@ -116,7 +116,6 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     protected Page<SecondmentOrderDto> loadData(PageRequest pageRequest) {
         initDeptScope();
         Wrapper<SecondmentOrderDto> entityWrapper = buildDefaultFilters(searchFilters);
-        searchFilters.clear();
         return service.loadSecondmentOrderList(pageRequest, entityWrapper);
     }
     private void initDeptScope(){
@@ -190,6 +189,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  secondmentOrderRepository.save(order);
                  assetInfoRepository.save(assetInfo);
                  saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  rejectSameDeviceWorkOrder(order);
                  break;
              case 3:
@@ -207,7 +207,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      if(billingCost == null){
                          assetInfo.setBillingCost(dto.getCost());
                      }else{
-                         assetInfo.setBillingCost(billingCost + billingCost+dto.getCost());
+                         assetInfo.setBillingCost(billingCost+dto.getCost());
                      }
                      BeanUtils.copyProperties(dto,order);
                      SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还",null,null);
@@ -237,27 +237,50 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付",null,null);
                  secondmentOrderRepository.save(order);
-                break;
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
+                 break;
              case -2: // 已拒绝
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
              case -1: //已取消
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),null);
                  secondmentOrderRepository.save(order);
+                 updateDeviceStatus(assetInfo);
                  break;
-             case 0: //已取消
+             case 0: //申请
                  BeanUtils.copyProperties(dto,order);
                  SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"申请",null,null);
                  secondmentOrderRepository.save(order);
+                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
              default:
                  break;
          }
+
+    }
+    private void updateDeviceStatus(AssetInfo assetInfo){
+        boolean flag=false;
+        String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+        String assetDeptUID = assetInfo.getAssetDeptUID();
+        if(StringUtils.hasText(assetDeptUID) && !clinicalDeptUID.equals(assetDeptUID)){
+            assetInfo.setAssetDeptUID(clinicalDeptUID);
+            flag=true;
+        }
+        Integer borrowedStatusCurrent = assetInfo.getBorrowedStatus();
+        if(borrowedStatusCurrent != null && borrowedStatusCurrent == 1){
+            assetInfo.setBorrowedStatus(0);
+            flag=true;
+        }
+        if(flag){
+            assetInfoRepository.save(assetInfo);
+            saveAssetHistory(assetInfo,"科室调剂取消借用更新设备使用科室");
+        }
 
     }
     public void rejectSameDeviceWorkOrder(SecondmentOrder order){
@@ -273,8 +296,9 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
              secondmentOrder.setModifyBy(userAccount.getUid());
              secondmentOrder.setModifyDate(new Date());
              secondmentOrder.setStatus(-2);
+            secondmentOrderRepository.save(rejectWorkOrder);
+            sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
         }
-        secondmentOrderRepository.save(rejectWorkOrder);
     }
     public SecondmentConfig getSecondmentConfig() {
         return secondmentConfig;
@@ -337,7 +361,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                 break;
             case 3:  //天
                 long days = minutes / 1440;
-                if((days % 1440) > 0){
+                if((minutes % 1440) > 0){
                     days+=1;
                 }
                 order.setCost(days * unitPrice);
@@ -407,6 +431,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     public void switchQuery(boolean borrowFlag){
         setBorrowFlag(borrowFlag);
         this.selected = null;
+        searchFilters = new ArrayList<>();
     }
     public Boolean getBorrowFlag() {
         return borrowFlag;

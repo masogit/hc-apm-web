@@ -125,7 +125,9 @@
                                 <f:facet name="header">#{permit.certificateName}</f:facet>
                                 <p:panel style="text-align:center">
 
-
+                                    <h:panelGroup rendered="#{specialAssetPermitEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    </h:panelGroup>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false"
                                                    actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
                                                    styleClass="p-mr-2"/>
@@ -213,6 +215,10 @@
                 <h:panelGroup >
                     <p:dataList id="permitAttachList" value="#{specialAssetPermitEditController.permitInfo.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+
+                        <h:panelGroup rendered="#{specialAssetPermitEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         <!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         <p:commandButton actionListener="#{specialAssetPermitEditController.removePermitAttachmentById(fileitem.id)}" update="permitAttachList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
