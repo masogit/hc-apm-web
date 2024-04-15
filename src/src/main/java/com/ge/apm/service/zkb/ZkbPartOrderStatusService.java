@@ -1039,13 +1039,6 @@ public class ZkbPartOrderStatusService {
             if(removeI18.size() > 0){
                 returnTypeList.removeAll(removeI18);
             }
-        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-            for(I18nMessage i18nMessage : returnTypeList){
-                if("singlePurchase".equals(i18nMessage.getMsgKey())){
-                    returnTypeList.remove(i18nMessage);
-                    break;
-                }
-            }
         }
         return returnTypeList;
     }
