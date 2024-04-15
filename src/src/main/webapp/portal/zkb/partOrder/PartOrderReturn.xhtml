@@ -28,6 +28,7 @@
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
                     <label class="label">备件UDI*</label>
                     <p:inputText id="udi" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.udi}" required="true" requiredMessage="udi #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" />
+                    <p:outputLabel style="color: red" value="如果该备件没有UDI，请填写“无UDI“"/><br/>
                 </h:panelGroup>
                 <c:choose>
                     <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">

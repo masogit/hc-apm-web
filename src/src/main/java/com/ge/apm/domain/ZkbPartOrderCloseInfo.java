@@ -40,6 +40,13 @@ public class ZkbPartOrderCloseInfo implements Serializable {
     private String srNo;
 
     /**
+     * 设备UDI
+     */
+    @Getter@Setter
+    @Column(name = "udi")
+    private String udi;
+
+    /**
      * Safety Concern该故障是否会导致实际/潜在伤害
      */
     @Getter@Setter
@@ -108,7 +115,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * Problem服务原因
      */
     @Getter@Setter
-    @Size(max = 2000)
+    @Size(max = 4000)
     @Column(name = "problem_reason")
     private String problemReason;
 
@@ -116,7 +123,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      * 服务内容
      */
     @Getter@Setter
-    @Size(max = 2000)
+    @Size(max = 4000)
     @Column(name = "action_content")
     private String actionContent;
 
@@ -125,7 +132,7 @@ public class ZkbPartOrderCloseInfo implements Serializable {
      */
     @Getter@Setter
     @Column(name = "test_result")
-    @Size(max = 2000)
+    @Size(max = 4000)
     private String testResult;
 
 
@@ -157,5 +164,6 @@ public class ZkbPartOrderCloseInfo implements Serializable {
     @Getter@Setter
     @Column(name = "complete_auditer_uid")
     private String completeAuditerUid;
+
 
 }

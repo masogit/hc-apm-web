@@ -995,17 +995,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String getPartSerialNumberTips(){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
             if("DOA".equals(zkbPartOrderReturn.getReturnType())){
-                return "发生DOA的序列号";
+                return "发生DOA的序列号，若没有序列号，填“无”";
             }else if("damagedShipment".equals(zkbPartOrderReturn.getReturnType())){
-                return " 发生Damaged in shipment的序列号";
+                return " 发生Damaged in shipment的序列号，若没有序列号，填“无”";
             }else{
                 return "";
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if("DOA".equals(selected.getReturnType())){
-                return "发生DOA的序列号";
+                return "发生DOA的序列号，若没有序列号，填“无”";
             }else if("damagedShipment".equals(selected.getReturnType())){
-                return " 发生Damaged in shipment的序列号";
+                return " 发生Damaged in shipment的序列号，若没有序列号，填“无”";
             }else{
                 return "";
             }
