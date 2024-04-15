@@ -1296,8 +1296,7 @@
                     </p:panelGrid>
                 </p:fieldset>
 
-                <p:fieldset id="completeFieldset" class="fs" legend="关单信息" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showComplete}">
-                    <h3><p:outputLabel style="color: red!important" value="红色文字为关单信息填写提示"/></h3>
+                <p:fieldset id="completeFieldset" class="fs" legend="关单信息(红色文字为关单信息填写提示)" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showComplete}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">设备UDI*</label>
@@ -1369,7 +1368,7 @@
                         <h:panelGroup>
                             <label class="label">工程师服务原因*</label>
                             <p:outputLabel style="color: red" >事件发生在什么时候（客户在做什么或试图做什么）</p:outputLabel><br/>
-                            <p:outputLabel style="color: red" >事件发生在什么时候（客户在做什么或试图做什么）</p:outputLabel><br/>
+                            <p:outputLabel style="color: red" >发生了什么事情（客户看到/听到/观察到什么）</p:outputLabel><br/>
                             <p:outputLabel style="color: red" >造成了什么影响，客户是否/如何消除影响的</p:outputLabel><br/>
                             <p:outputLabel style="color: red" >应写清楚具体的医疗器械问题，提供清晰而准确的故障信息</p:outputLabel><br/>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.problemReason}" rows="4" cols="120" required="true" requiredMessage="服务原因不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
