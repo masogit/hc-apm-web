@@ -77,7 +77,11 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     private void initialization(){
         userAccount = UserContextService.getCurrentUserAccount();
         visibleScope = orgInfoRepository.getUserDeptScope(userAccount.getUid());
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,userAccount.getSiteUID()));
+        String siteUID = userAccount.getSiteUID();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
         cacheConfigList = secondmentConfigRepository.findBySearchFilter(searchFilters);
         searchFilters.clear();
         List<I18nMessage> chargingType = FieldValueMessageController.getFieldValueList("chargingType");
@@ -121,7 +125,6 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         addFilter();
         Page<AssetInfo> assetInfos = super.loadData(pageRequest);
         generateVirtualSerialNumber(assetInfos);
-        searchFilters.clear();
         return assetInfos;
     }
     private void generateVirtualSerialNumber(Page<AssetInfo> assetInfos){
@@ -226,6 +229,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
                  generateProcessRecords(secondmentOrder,userAccount.getUid(), userAccount.getName(), "申请",secondmentOrder.getApprovalSuggestions(),secondmentOrder.getApprovalRemarks());
                 SecondmentOrder order = secondmentOrderRepository.save(secondmentOrder);
                 sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
+                WebUtil.addSuccessMessage("调剂设备："+selected.getName() +" 申请成功");
             }
         } catch (Exception e) {
             e.printStackTrace();
