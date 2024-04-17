@@ -475,7 +475,7 @@
                                 <h:panelGroup >
                                     <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired? '*':''}</span></label>
                                     <apm:selectAssetTypeGroup readonly="true" required="#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired}"
-                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''}"/>
+                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''} ItemEditDlgForm"/>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>
@@ -789,6 +789,9 @@
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                             <p:menuitem style="padding: 0px;" immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}">
+                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                            </p:menuitem>
+                            <p:menuitem style="padding: 0px;" immediate="true" value="验收资料详单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('detail')}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                             <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">
