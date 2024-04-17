@@ -91,6 +91,9 @@ public class InventoryOrderDetail implements Serializable {
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;
 
+    @Column(name = "asset_type", length = 50)
+    private String assetType;
+
     @Transient
     private String inventoryCheckListItems;
 
@@ -344,4 +347,11 @@ public class InventoryOrderDetail implements Serializable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
 }

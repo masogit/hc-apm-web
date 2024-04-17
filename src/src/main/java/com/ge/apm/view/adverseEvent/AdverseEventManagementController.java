@@ -349,7 +349,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setModel(assetSelected.getFunctionType());
         //设备截止日期
         if(assetType == 1){
-            this.selected.setValidUntil(DateUtil.parse(assetSelected.getAssetLifecycleDeadline()));
+            this.selected.setValidUntil(assetSelected.getAssetLifecycleDeadline());
         }
 
     }
