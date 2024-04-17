@@ -841,8 +841,13 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetLifecycleDeadline'}">
-                                <p:column headerText="#{msg.assetLifecycleDeadline}" filterBy="#{item.assetLifecycleDeadline}" filterMatchMode="LTE">
-                                    <h:outputText value="#{item.assetLifecycleDeadline}"/>
+                                <p:column headerText="#{msg.assetLifecycleDeadline}" sortBy="#{item.assetLifecycleDeadline}" filterBy="#{item.assetLifecycleDeadline}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterFactoryAssetLifecycleDeadline" widgetVar="varFilterAssetLifecycleDeadline" value="#{assetInfoListController.factoryAssetLifecycleDeadlineFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.assetLifecycleDeadline}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetQuantity'}">
@@ -1010,6 +1015,17 @@
                         </h:panelGrid>
                         <p:commandButton onclick="setDateFilter('varDataList', 'varFilterLastInventoryDate', 'varLastInventoryDateFrom', 'varLastInventoryDateTo'); PF('panelFilterLastInventoryDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                         <p:commandButton onclick="PF('panelFilterLastInventoryDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterAssetLifecycleDeadline" widgetVar="panelFilterAssetLifecycleDeadline" for=":AssetInfoListForm:datalist:filterFactoryAssetLifecycleDeadline" dismissable="false" rendered="#{assetInfoListController.isShowColumn('assetLifecycleDeadline')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varAssetLifecycleDeadlineFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varAssetLifecycleDeadlineTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterAssetLifecycleDeadline', 'varAssetLifecycleDeadlineFrom', 'varAssetLifecycleDeadlineTo'); PF('panelFilterAssetLifecycleDeadline').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterAssetLifecycleDeadline').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
                     </p:overlayPanel>
 
                     <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('createdDate')}">
