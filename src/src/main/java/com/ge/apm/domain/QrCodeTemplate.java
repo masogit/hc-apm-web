@@ -5,12 +5,7 @@ package com.ge.apm.domain;
 import com.alibaba.fastjson.JSONObject;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.logging.log4j.util.Strings;
@@ -67,7 +62,18 @@ public class QrCodeTemplate  implements Serializable {
     @Column(name = "json_text")
     @Type(type = "text")
     private String jsonText;
-    
+
+    @Transient
+    private V2_BlobObject v2BlobObject;
+
+    public V2_BlobObject getV2BlobObject() {
+        return v2BlobObject;
+    }
+
+    public void setV2BlobObject(V2_BlobObject v2BlobObject) {
+        this.v2BlobObject = v2BlobObject;
+    }
+
     public JSONObject getJSONObject(){
         return Strings.isEmpty(jsonText)? null: JSONObject.parseObject(jsonText);
     }

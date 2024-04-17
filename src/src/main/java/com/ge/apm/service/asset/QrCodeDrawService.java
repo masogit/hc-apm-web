@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -70,9 +71,9 @@ public class QrCodeDrawService {
         return res;
     }
 
-    public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate, String siteUid) throws Exception {
+    public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate, String siteUid, InputStream inputStream) throws Exception {
         String url = buildQrCodeUrl( qrcodeTemplate.getJSONObject("QrCodeElements"),siteUid);
-        return QrCodeSupportUtil.createQrCodeTag(qrcodeTemplate,siteUid,url);
+        return QrCodeSupportUtil.createQrCodeTag(qrcodeTemplate,siteUid,url, inputStream);
     }
 
     private String buildQrCodeUrl(JSONObject qrcodeElement, String siteUid) {

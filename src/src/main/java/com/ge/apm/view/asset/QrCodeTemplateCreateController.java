@@ -7,6 +7,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.common.QrcodeConfigConstant;
@@ -14,9 +15,15 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +53,13 @@ public class QrCodeTemplateCreateController {
     private List<OrgInfo> siteList;
 
     private I18nMessageRepository i18nMessageRepository;
+
+    private BlobFileService blobService;
+
+    @Setter@Getter
+    private V2_BlobObject backgroundBlob = null;
+
+    String actionName ;
     @PostConstruct
     protected void init() {
         templateDao = WebUtil.getBean(QrCodeTemplateRepository.class);
@@ -55,10 +69,11 @@ public class QrCodeTemplateCreateController {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
 
         initSiteList();
         
-        String actionName = WebUtil.getRequestParameter("action");
+        actionName = WebUtil.getRequestParameter("action");
         if (actionName.equals("Create")) {
             String copyFrom = WebUtil.getRequestParameter("copyFrom");
             thisTemplate = templateService.getDefaultTemplate(getInitialSite());
@@ -68,11 +83,19 @@ public class QrCodeTemplateCreateController {
                     thisTemplate.setHeight(copyFromTemplate.getHeight());
                     thisTemplate.setWidth(copyFromTemplate.getWidth());
                     thisTemplate.setJSONObject(null == copyFromTemplate.getJSONObject() ? templateService.getJSONObjectByTemplate(copyFromTemplate) : copyFromTemplate.getJSONObject());
+                    List<V2_BlobObject> backgroundList = blobService.findBlobObjectsByBoUid(copyFromTemplate.getId());
+                    if(!backgroundList.isEmpty()){
+                        backgroundBlob = backgroundList.get(0);
+                    }
                 }
             }
         } else if (actionName.equals("Edit")) {
             String templateId = WebUtil.getRequestParameter("templateId");
             thisTemplate = templateDao.findById(templateId);
+            List<V2_BlobObject> backgroundList = blobService.findBlobObjectsByBoUid(templateId);
+            if(!backgroundList.isEmpty()){
+                backgroundBlob = backgroundList.get(0);
+            }
         }
 
         //数据迁移后移除
@@ -80,6 +103,7 @@ public class QrCodeTemplateCreateController {
             thisTemplate.setJSONObject(templateService.getJSONObjectByTemplate(thisTemplate));
         }
         templateJsonObject = thisTemplate.getJSONObject();
+
     }
     
     public void createNewElement() {
@@ -98,6 +122,8 @@ public class QrCodeTemplateCreateController {
         thisTemplate.setJSONObject(templateJsonObject);
         thisTemplate.setHeight(templateJsonObject.getIntValue("Height"));
         thisTemplate.setWidth(templateJsonObject.getIntValue("Width"));
+
+        thisTemplate.setV2BlobObject(backgroundBlob);
         return qrCodeService.getPreViewBase64(thisTemplate);
     }
     
@@ -131,6 +157,21 @@ public class QrCodeTemplateCreateController {
             item.setSiteUID(thisTemplate.getSiteUID());
         });
         elementDao.save(thisTemplateElementList);
+        if(backgroundBlob == null){//可能图片被删除了
+            List<V2_BlobObject> list = blobService.findBlobObjectsByBoUid(thisTemplate.getId());
+            if(!list.isEmpty()){
+                blobService.deleteBlobFile(list);
+            }
+        }else if (StrUtil.isEmpty(backgroundBlob.getBoUuid())) {//图片重新上传了
+            //现将老的背景图片删除
+            List<V2_BlobObject> list = blobService.findBlobObjectsByBoUid(thisTemplate.getId());
+            if(!list.isEmpty()){
+                blobService.deleteBlobFile(list);
+            }
+            backgroundBlob.setBoUuid(thisTemplate.getId());
+            blobService.saveBlobObject(backgroundBlob);
+        }
+
         WebUtil.addSuccessMessage(WebUtil.getMessage("ModificationSaved"));
     }
     
@@ -193,6 +234,28 @@ public class QrCodeTemplateCreateController {
             RequestContext.getCurrentInstance().addCallbackParam("JsonValid", false);
         }
     }
+
+    //背景图片上传
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_QRCODE_BACKGROUND);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            //blobObject.setBoUuid(thisTemplate.getId());
+            blobService.saveBlobObject(blobObject);
+            backgroundBlob = blobObject;
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+
+    }
+
+    public void removeAttachmentById(String blobId){
+        //blobService.deleteBlobFileById(blobId);
+        backgroundBlob = null;
+    }
+
 
     //getter and setter
     public void setThisTemplate(QrCodeTemplate thisTemplate) {
