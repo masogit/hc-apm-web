@@ -2,9 +2,11 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -30,7 +32,9 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -100,6 +104,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
+
+    @Getter @Setter
+    private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
 
     public List<BuildManagement> getManagementList() {
         return managementList;
@@ -473,6 +480,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
+        //基础信息编辑时必填字段根据资产分类调整
+        if (loginUser.isEnableAssetTypeGroup()) {
+            String assetType = this.selected.getAssetType();
+            if (StringUtils.isNotEmpty(assetType)) {
+                customConfig.getAssetFields().forEach((k, v) -> {
+                    requiredInput(assetType, v);
+                });
+            }
+        }
+
     }
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
 
@@ -2009,6 +2026,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 if (userContextService.enableAssetGroupAssetTypeGroupAssociation()) {
                     selected.setAssetGroup(assetTypeGroup.getAssetGroup());
                 }
+                customConfig.getAssetFields().forEach((k, v) -> {
+                    requiredInput(assetTypeGroup.getEncoded(), v);
+                });
                 break;
             default:
                 break;
@@ -2026,6 +2046,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (CollectionUtils.isNotEmpty(list)) {
             WebUtil.addWarnMessage("制造商序列号已存在！");
         }
+    }
+
+    public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {
+        if (customConfigAssetField.isRequired() && BooleanUtils.isTrue(assetInfoRequireField.get(customConfigAssetField.getKey()))) {
+            return;
+        }
+        if (StringUtils.isEmpty(encoded) || MapUtils.isEmpty(customConfigAssetField.getAssetTypeRequired())) {
+            return;
+        }
+        if (assetInfoRequireField.get(customConfigAssetField.getKey()) == null) {
+            assetInfoRequireField.put(customConfigAssetField.getKey(), customConfigAssetField.isArrivalRequired());
+        }
+        customConfigAssetField.setRequired(BooleanUtils.isTrue(customConfigAssetField.getAssetTypeRequired().get(encoded)));
     }
 
     public boolean isApproval() {

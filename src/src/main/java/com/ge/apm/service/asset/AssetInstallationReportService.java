@@ -35,6 +35,7 @@ public class AssetInstallationReportService {
     public static final String REPORT_TECHNOLOGY_TEMPLATE = "/portal/asset/arrived/reportTemplate/TechnologyReportTemplate.docx";
     public static final String REPORT_BUSINESS_TEMPLATE = "/portal/asset/arrived/reportTemplate/BusinessReportTemplate.docx";
     public static final String REPORT_CLINICAL_TEMPLATE = "/portal/asset/arrived/reportTemplate/ClinicalReportTemplate.docx";
+    public static final String REPORT_DETAIL_TEMPLATE = "/portal/asset/arrived/reportTemplate/DetailReportTemplate.docx";
     public static final String REPORT_ASSET_TEMPLATE = "/portal/asset/arrived/reportTemplate/AssetReportTemplate.docx";
     public static final String REPORT_ASSET_TEMPLATE_BATCH = "/portal/asset/arrived/reportTemplate/AssetReportTemplateBatch.docx";
     public static final String REPORT_ASSET_TEMPLATE_BATCH_BOTTOM = "/portal/asset/arrived/reportTemplate/AssetReportTemplateBatchBottom.docx";
@@ -42,6 +43,7 @@ public class AssetInstallationReportService {
     public static final String REPORT_TECHNOLOGY_TITLE = "技术验收报告";
     public static final String REPORT_BUSINESS_TITLE = "商务验收报告";
     public static final String REPORT_CLINICAL_TITLE = "临床验收报告";
+    public static final String REPORT_DETAIL_TITLE = "验收资料详单";
     public static final String REPORT_ASSET_TITLE = "固定资产验收单";
     public static final String REPORT_ASSET_TITLE_BATCH = "固定资产验收单(面单)";
     public static final String REPORT_ASSET_TITLE_BATCH_BOTTOM = "固定资产验收单(底单)";
@@ -49,6 +51,7 @@ public class AssetInstallationReportService {
     public static final String REPORT_TYPE_TECHNOLOGY = "technology";
     public static final String REPORT_TYPE_BUSINESS = "business";
     public static final String REPORT_TYPE_CLINICAL = "clinical";
+    public static final String REPORT_TYPE_DETAIL = "detail";
     public static final String REPORT_TYPE_ASSET = "fixasset";
     public static final String REPORT_TYPE_ASSET_BATCH = "fixassetBatch";
     public static final String REPORT_TYPE_ASSET_BATCH_BOTTOM = "fixassetBatchBottom";
@@ -279,6 +282,8 @@ public class AssetInstallationReportService {
             templatePath = REPORT_ASSET_TEMPLATE_BATCH;
         }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
+        }else if(REPORT_TYPE_DETAIL.equals(reportType)){
+            templatePath = REPORT_DETAIL_TEMPLATE;
         }
 
         if(templatePath != null){
@@ -370,6 +375,8 @@ public class AssetInstallationReportService {
             reportTypeTitle = REPORT_ASSET_TITLE;
         }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
             reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
+        }else if(REPORT_TYPE_DETAIL.equals(reportType)){
+            reportTypeTitle = REPORT_DETAIL_TITLE;
         }
 
         if(isEncoding){

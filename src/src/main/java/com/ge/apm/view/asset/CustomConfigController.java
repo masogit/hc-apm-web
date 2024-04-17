@@ -8,6 +8,7 @@ package com.ge.apm.view.asset;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
@@ -54,6 +55,7 @@ public class CustomConfigController {
     private UserContextService userContextService;
     private I18nMessageService i18nMessageService;
     private ConfigItemValueRepository configItemValueRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -66,6 +68,7 @@ public class CustomConfigController {
     private Map<String, String> configInfo = new HashMap();
     private PinYinComparator pinYinComparator;
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
+    private List<AssetTypeGroup> assetTypeGroups = new ArrayList<>();
 
     @Setter
     @Getter
@@ -85,6 +88,7 @@ public class CustomConfigController {
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
@@ -99,7 +103,7 @@ public class CustomConfigController {
         loadConfigForSite(selectSite.getUid());
 
         assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
-
+        assetTypeGroups = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(UserContextService.getCurrentUserAccount().getTenantUID());
         initImportantFieldsChecked();
     }
 
@@ -775,6 +779,10 @@ public class CustomConfigController {
 
     public void setImportantFieldsCheckedStatus(Map<String, Boolean> importantFieldsCheckedStatus) {
         this.importantFieldsCheckedStatus = importantFieldsCheckedStatus;
+    }
+
+    public List<AssetTypeGroup> getAssetTypeGroups() {
+        return assetTypeGroups;
     }
 
     public void removeAssetsImportantFields(String key) {

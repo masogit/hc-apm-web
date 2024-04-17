@@ -443,6 +443,18 @@
                                 </h:panelGroup>
 
                             </p:panelGrid>
+                            <p:fieldset id="assetTypeCheck" legend="资产分类必填" rendered="#{userContextService.currentUserAccount.enableAssetTypeGroup}">
+                                <c:forEach items="#{customConfigController.assetTypeGroups}" var="assetTypeItem" >
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                        <p:selectBooleanCheckbox
+                                                value="#{customConfigController.currentEditField.assetTypeRequired[assetTypeItem.encoded]}"
+                                                itemLabel="#{assetTypeItem.name}">
+                                            <p:ajax update="assetTypeCheck"/>
+                                        </p:selectBooleanCheckbox>
+                                        <p:outputLabel>#{assetTypeItem.name}</p:outputLabel>
+                                    </p:panelGrid>
+                                </c:forEach>
+                            </p:fieldset>
                             <br/>
                             <h:panelGroup>
                                 <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}" update=" :customConfigForm:tabView:assetFieldsTable :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetFieldsEditDialog');"/>
