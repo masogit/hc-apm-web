@@ -43,6 +43,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
     private List<String> listAccessClinical;
+	private String encodeAssetStr;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -133,6 +134,14 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public String getEncodeAssetStr() {
+		return encodeAssetStr;
+	}
+
+	public void setEncodeAssetStr(String encodeAssetStr) {
+		this.encodeAssetStr = encodeAssetStr;
 	}
 
 	public void bathInventory() {
