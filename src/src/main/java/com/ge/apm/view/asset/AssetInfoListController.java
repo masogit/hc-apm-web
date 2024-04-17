@@ -146,6 +146,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
     private String lastInventoryDateFormatTime = null;
+    private String factoryAssetLifecycleDeadlineFormatTime = null;
     @Getter @Setter
     private String mvsContractStartDate = null;
     @Getter @Setter
@@ -319,26 +320,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             pageRequest =addRequiredSortById(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
-        boolean createdByBoolean = false;
-        String value = null;
-//        for (SearchFilter searchFilter :searchFilters) {
-//            if ("createdBy".equals(searchFilter.fieldName)) {
-//                createdByBoolean = true;
-//                value = (String)searchFilter.value;
-//            }
-//        }
-//
-//        if(createdByBoolean) {
-//            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
-//            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
-//            List<String> loginNamList = new ArrayList<>();
-//            if(!userAccountList.isEmpty()){
-//                for (UserAccount userAccount:userAccountList) {
-//                    loginNamList.add(userAccount.getLoginName());
-//                }
-//            }
-//            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
-//        }
         if (this.hasFilterOnField("assetUsedLifecycle")) {
             int assetUsedLifecycle = Integer.parseInt(searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetUsedLifecycle", SearchFilter.Operator.EQ, 0)).value.toString());
             DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
@@ -1635,13 +1616,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.lastInventoryDateFormatTime = lastInventoryDateFormatTime;
     }
 
-    //    public String getOneQrCodeStatus() {
-//        return oneQrCodeStatus;
-//    }
-//
-//    public void setOneQrCodeStatus(String oneQrCodeStatus) {
-//        this.oneQrCodeStatus = oneQrCodeStatus;
-//    }
+    public String getFactoryAssetLifecycleDeadlineFormatTime() {
+        return factoryAssetLifecycleDeadlineFormatTime;
+    }
+
+    public void setFactoryAssetLifecycleDeadlineFormatTime(String factoryAssetLifecycleDeadlineFormatTime) {
+        this.factoryAssetLifecycleDeadlineFormatTime = factoryAssetLifecycleDeadlineFormatTime;
+    }
 
     public boolean getCountyArea() {
         return countyArea;
