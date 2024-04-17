@@ -243,9 +243,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public void assetList() {
-        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+        /*if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
             MessageUtil.outPutReturnFacesMessage("AdverseSearchRequire", FacesMessage.SEVERITY_INFO);
-        }
+        }*/
         searchFilters = new ArrayList<>();
         setUserSearchFilters();
         Page<AssetInfo> page = assetInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
