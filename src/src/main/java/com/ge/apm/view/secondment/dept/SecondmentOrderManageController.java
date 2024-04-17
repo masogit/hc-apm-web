@@ -5,10 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.SecondmentOrderDto;
 import com.ge.apm.domain.secondment.SecondmentConfig;
 import com.ge.apm.domain.secondment.SecondmentOrder;
@@ -66,6 +63,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private MqUtils mqUtils;
     private List<SecondmentOrder.ProcessRecords> processRecords;
     private AssetInfo assetInfo;
+    private V2_WorkOrderRepository v2_workOrderRepository;
 
     @Override
     protected GenericRepositoryUUID<SecondmentOrderDto> getDAO() {
@@ -81,6 +79,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         secondmentConfigRepository = WebUtil.getBean(SecondmentConfigRepository.class);
         secondmentOrderRepository = WebUtil.getBean(SecondmentOrderRepository.class);
         sharedAssetService = WebUtil.getBean(SharedAssetService.class);
+        v2_workOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
         mqUtils = WebUtil.getBean(MqUtils.class);
 
         List<I18nMessage> chargingType = FieldValueMessageController.getFieldValueList("chargingType");
@@ -196,7 +195,12 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      dto.setBillingEndTime(new Date());
                      calculateTimeCharges(dto);
                      assetInfo.setAssetDeptUID(null);
-                     assetInfo.setBorrowedStatus(0);
+                     List<V2_WorkOrder> workOrders = searchRepairAgain(assetUid);
+                     if(CollectionUtils.isEmpty(workOrders)){
+                         assetInfo.setBorrowedStatus(0);
+                     }else{
+                         assetInfo.setBorrowedStatus(-1);
+                     }
                      Long billingTime = assetInfo.getBillingTime();
                      if(billingTime == null){
                          assetInfo.setBillingTime(dto.getBillingTime());
@@ -263,6 +267,13 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  break;
          }
 
+    }
+    private List<V2_WorkOrder> searchRepairAgain(String uid){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, uid));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        List<V2_WorkOrder> workOrders = v2_workOrderRepository.findBySearchFilter(searchFilters);
+        return workOrders;
     }
     private void updateDeviceStatus(AssetInfo assetInfo){
         boolean flag=false;
