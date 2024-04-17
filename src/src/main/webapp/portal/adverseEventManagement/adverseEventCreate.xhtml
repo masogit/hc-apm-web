@@ -475,10 +475,10 @@
                                         <p:radioButton for="usePlace" itemIndex="2"/>
                                         <h:outputLabel value="其他" styleClass="radiolabelPF"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventManagementController.selected.usePlace == 3}">
-                                        <label class="label">场所名称</label>
-                                        <p:inputText id="placeName" maxlength="100" value="#{adverseEventManagementController.selected.placeName}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
-                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">场所名称</label>
+                                    <p:inputText id="placeName" maxlength="100" value="#{adverseEventManagementController.selected.placeName}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">使用过程<span style="color:red">*</span></label>
