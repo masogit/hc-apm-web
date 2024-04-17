@@ -95,6 +95,9 @@ public class InventoryOrder implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "asset_type", length = 50)
+    private String assetType;
+
     public String getId() {
         return id;
     }
@@ -238,5 +241,13 @@ public class InventoryOrder implements Serializable {
 
     public void setClinicalDeptLabel(String clinicalDeptLabel) {
         this.clinicalDeptLabel = clinicalDeptLabel;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 }
