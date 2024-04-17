@@ -8,8 +8,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
-import com.ge.healthcare.cn.common.utils.date.DateField;
-import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +21,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import webapp.framework.util.TimeUtil;
+import webapp.framework.web.WebUtil;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -740,6 +740,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter@Setter
     @Column(name = "mvs_contract_end_date")
     private Date mvsContractEndDate;//续签合同end date
+    @Getter@Setter
+    @Column(name = "asset_lifecycle_deadline")
+    private Date assetLifecycleDeadline;
 
 
     @Transient
@@ -843,6 +846,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     @TableField(exist = false)
     private List<String> tags = new ArrayList<>();
+    @Transient
+    @TableField(exist = false)
+    private String encodeAssetDetailStr;
 
     @Transient
     @TableField(exist = false)
@@ -860,11 +866,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @TableField(exist = false)
     @Setter
     private String assetUsedLifecycle;
-
-    @Transient
-    @TableField(exist = false)
-    @Setter
-    private String assetLifecycleDeadline;
 
     @Getter
     @Setter
@@ -3219,11 +3220,16 @@ public class AssetInfo implements ChineseName,Serializable {
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 
-    public String getAssetLifecycleDeadline() {
-        if (ObjectUtil.isEmpty(manufactDate) || ObjectUtil.isEmpty(lifecycle)) {
-            return null;
-        }
-        com.ge.healthcare.cn.common.utils.date.DateTime dateTime = DateUtil.offset(manufactDate, DateField.MONTH, lifecycle);
-        return DateUtil.formatDate(dateTime);
+    public String getEncodeAssetDetailStr() {
+        String url = "actionName=View&selectedid="
+                + getUid()
+                + "&asset_name=" + getName()
+                + "&terminate=" + Boolean.parseBoolean(WebUtil.getRequestParameter("terminate"));
+        url = UrlParamUtil.encodeUrlQueryString(url);
+        return url;
+    }
+
+    public void setEncodeAssetDetailStr(String encodeAssetDetailStr) {
+        this.encodeAssetDetailStr = encodeAssetDetailStr;
     }
 }
