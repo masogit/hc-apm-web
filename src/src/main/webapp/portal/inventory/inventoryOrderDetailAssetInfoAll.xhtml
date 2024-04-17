@@ -31,7 +31,7 @@
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoAllController.onFilter}" />
         <p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController2.onFilter}" />
 		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.name}" filterMatchMode="LIKE" exportable="false">
-			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetId}" target="_Blank"><h:outputText value="#{item.name}" /></a>
+			<a href="../asset/info/AssetDetail.xhtml?str=#{item.assetInfo.encodeAssetDetailStr}" target="_Blank"><h:outputText value="#{item.name}" /></a>
 		</p:column>
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.name}" />
