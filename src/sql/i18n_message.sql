@@ -4971,7 +4971,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- YHAAO-17126 资产字段添加已使用年限
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetUsedLifecycle','设备已使用年限','Asset used lifecycle',NULL,-1);
 -- YHAAO-20085 资产字段添加使用年限截止日期
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetLifecycleDeadline','设备使用年限截止日期','Asset lifecycle deadline',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetLifecycleDeadline','有效期至','Asset lifecycle deadline',NULL,-1);
 -- YHAAO-17161 数据字典自定义设置页面
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','i18nConfig','数据字典自定义配置','Data dictionary configuration',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','addI18nConfig','添加数据字典','Add data dictionary',NULL,-1);
