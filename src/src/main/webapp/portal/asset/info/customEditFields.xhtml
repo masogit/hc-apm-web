@@ -75,7 +75,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
             <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required}"
-                                 updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''}"
+                                 updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''} :tab:AssetInfoEditForm"
                                  disabled="#{!assetInfoEditController.needEdit('assetTypeGroup')}"/>
 
         </h:panelGroup>

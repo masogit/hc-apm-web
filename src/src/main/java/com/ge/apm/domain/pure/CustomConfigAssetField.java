@@ -7,7 +7,9 @@ package com.ge.apm.domain.pure;
 
 import com.ge.apm.service.common.CustomConfigConstant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -22,6 +24,7 @@ public class CustomConfigAssetField {
     List<String> editRoles = Collections.EMPTY_LIST;
     boolean required = false;
     boolean arrivalRequired = false;
+    Map<String, Boolean> assetTypeRequired = new HashMap<>();
 
     public CustomConfigAssetField(String key, List<String> readRoles,List<String> editRoles) {
         this.key = key;
@@ -89,6 +92,14 @@ public class CustomConfigAssetField {
 
     public void setArrivalRequired(boolean arrivalRequired) {
         this.arrivalRequired = arrivalRequired;
+    }
+
+    public Map<String, Boolean> getAssetTypeRequired() {
+        return assetTypeRequired;
+    }
+
+    public void setAssetTypeRequired(Map<String, Boolean> assetTypeRequired) {
+        this.assetTypeRequired = assetTypeRequired;
     }
 
     @Override
