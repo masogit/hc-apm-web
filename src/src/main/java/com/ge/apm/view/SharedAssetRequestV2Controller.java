@@ -1592,6 +1592,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             WebUtil.addWarnMessage("申请数必须大于0！");
             return;
         }
+        if("-1".equals(selectedSart.getSharedAssetTypeId())){
+            String message = "wrong" ;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("message", message);
+            WebUtil.addWarnMessage("调剂设备名称不能为空！");
+            return;
+        }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())) {
             Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
@@ -2087,6 +2094,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     public void queryStock(){
         String sharedAssetTypeId = this.getSelectedSart().getSharedAssetTypeId();
+        if("-1".equals(sharedAssetTypeId)){
+            SharedAssetReqType selectedSart = this.getSelectedSart();
+            selectedSart.setId(null);
+            selectedSart.setSwapName(null);
+            this.setStock(0);
+            return;
+        }
+
+        SharedAssetType sharedAssetType = swapDao.findById(sharedAssetTypeId);
+        if(sharedAssetType != null){
+            this.getSelectedSart().setSwapName(sharedAssetType.getSwapName());
+        }
         if(Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())){
             this.setStock(selectStock(sharedAssetTypeId));
         }else{
