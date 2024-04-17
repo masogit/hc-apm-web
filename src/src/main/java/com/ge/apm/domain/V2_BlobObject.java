@@ -122,6 +122,8 @@ public class V2_BlobObject implements Serializable {
      */
     public static final String BO_TYPE_ZKB_ENGINEER="ZkbEngineer";
 
+    public static final String BO_TYPE_QRCODE_BACKGROUND = "qrCodeBackground";
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")

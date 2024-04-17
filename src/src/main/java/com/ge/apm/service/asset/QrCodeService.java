@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -226,6 +227,12 @@ public class QrCodeService {
 
             if (template == null) {
                 template = templateService.getDefaultTemplate();
+            }else {
+                //获取背景图片
+                List<V2_BlobObject> v2BlobObjects = blobObjectService.findBlobObjectsByBoUid(template.getId());
+                if(!v2BlobObjects.isEmpty()){
+                    template.setV2BlobObject(v2BlobObjects.get(0));
+                }
             }
         }
 
@@ -248,9 +255,16 @@ public class QrCodeService {
             qrCodeObject = templateService.getJSONObjectByTemplate(template);
         }
 
+        //拿出背景图片
+        InputStream inputStream = null;
+        if(template.getV2BlobObject() != null){
+            V2_BlobObject v2BlobObject = template.getV2BlobObject();
+            StreamedContent content = blobObjectService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId());
+            inputStream = content == null ? null : content.getStream();
+        }
         try {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
-            img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
+            img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid, inputStream);
         } catch (Exception ex) {
             logger.error("getQrCodeImage createQrCodeTag  qrCodeObjectL:{},siteUid:{},    error :{}", JSON.toJSONString(qrCodeObject),siteUid,ex);
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);

@@ -4,17 +4,15 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.*;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.QrCodeTemplateElement;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.uaa.UaaService;
@@ -50,6 +48,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     String selectedTenantUid;
     List<String> accessibleOrgInfoList;
 
+    private BlobFileService blobService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(QrCodeTemplateRepository.class);
@@ -62,6 +61,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         userContextService = WebUtil.getBean(UserContextService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         accessibleOrgInfoList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        blobService = WebUtil.getBean(BlobFileService.class);
     }
 
     @Override
@@ -104,7 +104,14 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
 
     public String getPreViewBase64() {
-        return selected == null ? "" : qrCodeService.getPreViewBase64(selected);
+        if (selected != null){
+            List<V2_BlobObject> objects= blobService.findBlobObjectsByBoUid(selected.getId());
+            if(!objects.isEmpty()){
+                selected.setV2BlobObject(objects.get(0));
+            }
+            return qrCodeService.getPreViewBase64(selected);
+        }
+        return "";
     }
 
     @Transactional

@@ -17,8 +17,6 @@
                 <h:form id="qrCodeEditForm">
                     <p:fieldset legend="#{msg.preview}"  id="preView">
                         <img  style="border: 1px;border-color: grey;border-style: solid" src="#{qrCodeTemplateCreateController.getPreViewBase64()}"  width="#{qrCodeTemplateCreateController.thisTemplate.width}px" height="#{qrCodeTemplateCreateController.thisTemplate.height}px"/>
-
-
                     </p:fieldset>
                     <p:fieldset legend="#{msg.modify}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -166,13 +164,24 @@
                             <p:column headerText="#{msg.Color}">
                                 <p:colorPicker value="#{element.ColorStr}" />   
                                 <h:outputText value="#{element.ColorStr}"/>
-
                             </p:column>
                             <p:column style="width:32px">
                                 <p:rowEditor editTitle="#{msg.Edit}" />
                                 <p:commandLink process="@this" actionListener="#{qrCodeTemplateCreateController.removeElement(element)}" title="#{msg.Delete}" update="qrCodeEditForm:preView elementTable"><span class="ui-icon ui-icon-trash" /></p:commandLink>
                             </p:column>
                         </p:dataTable>
+
+                        <p:fieldset legend="背景图片" >
+                            <h:panelGroup id="backgroundImg">
+                                <p:graphicImage value="#{fileDownloadService.getFile(qrCodeTemplateCreateController.backgroundBlob.objectStorageId)}" height="80" width="100" stream="false" rendered="#{not empty qrCodeTemplateCreateController.backgroundBlob}"/>
+                                <p:commandButton actionListener="#{qrCodeTemplateCreateController.removeAttachmentById(qrCodeTemplateCreateController.backgroundBlob.id)}" update="backgroundImg preView" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{not empty qrCodeTemplateCreateController.backgroundBlob}" style="bottom: 30px">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGroup>
+                            <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{qrCodeTemplateCreateController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="false"  sizeLimit="10000000"  update="backgroundImg type1 preView" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"
+                            />
+                        </p:fieldset>
                     </p:fieldset>
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{qrCodeTemplateCreateController.saveChange()}" validateClient="true" update="preView :growl" style="float:left"/>
