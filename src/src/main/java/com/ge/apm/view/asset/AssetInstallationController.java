@@ -18,13 +18,16 @@ import javax.faces.event.ValueChangeEvent;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -164,6 +167,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     private UserAccount loginUser;
 
+    @Getter @Setter
+    private Map<String, Boolean> arrivalRequireField = new HashMap<>();
+
 
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
@@ -223,6 +229,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(arrivalListItem.getArrivalList().getSiteUID());
+        if (StringUtils.isNotEmpty(assetTypeGroup)) {
+            customConfig.getAssetFields().forEach((k, v) -> requiredInput(assetTypeGroup, v));
+        }
         initOwner();
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
@@ -256,6 +265,19 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         getParentAssetList();
         selectedObjectMap.put("selectedOrg", orgInfoRepository.findByUid(arrivalList.getSiteUID()));
+    }
+
+    public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {
+        if (customConfigAssetField.isArrivalRequired() && BooleanUtils.isTrue(arrivalRequireField.get(customConfigAssetField.getKey()))) {
+            return;
+        }
+        if (StringUtils.isEmpty(encoded) || MapUtils.isEmpty(customConfigAssetField.getAssetTypeRequired())) {
+            return;
+        }
+        if (arrivalRequireField.get(customConfigAssetField.getKey()) == null) {
+            arrivalRequireField.put(customConfigAssetField.getKey(), customConfigAssetField.isArrivalRequired());
+        }
+        customConfigAssetField.setArrivalRequired(BooleanUtils.isTrue(customConfigAssetField.getAssetTypeRequired().get(encoded)));
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -1057,6 +1079,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 selected.setAssetGroup(selectedAssetTypeGroup.getAssetGroup());
             }
         }
+        customConfig.getAssetFields().forEach((k, v) -> {
+            requiredInput(assetTypeGroup, v);
+        });
     }
 
     public List<UserAccount> completeOwnerList(String query) {
