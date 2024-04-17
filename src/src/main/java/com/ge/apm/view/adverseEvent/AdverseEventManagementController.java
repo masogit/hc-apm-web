@@ -14,7 +14,10 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TempFileUtil;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -155,6 +158,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setReporterName(UserContextService.getCurrentUserAccount().getName());
             this.selected.setReportDate(new Date());
             this.selected.setDepartment(selectSite.getUid());
+            //发生地默认【境内】
+            this.selected.setOccurredPlace("境内");
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
@@ -342,6 +347,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setPreviouslyRegistrationReport(false);
         this.selected.setProductionDate(assetSelected.getManufactDate());
         this.selected.setModel(assetSelected.getFunctionType());
+        //设备截止日期
+        if(assetType == 1){
+            this.selected.setValidUntil(DateUtil.parse(assetSelected.getAssetLifecycleDeadline()));
+        }
 
     }
 
@@ -362,7 +371,28 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         return adverseEventsRepository;
     }
 
+
+    /**
+     * 增加保存前检验
+     * @return
+     */
+    public String checkSave(){
+        StringBuilder sb = new StringBuilder();
+        if(selected.getEventDiscoverDate().getTime() < selected.getEventOccurredDate().getTime()){
+            sb.append("发现或获知日期不能大于事件发生日期！");
+        }
+        if(selected.getDeviceUsedDate().getTime() < selected.getEventOccurredDate().getTime()){
+            sb.append("器械使用日期不能大于事件发生日期！");
+        }
+        return sb.toString();
+    }
+
     public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
+        String r = checkSave();
+        if(StrUtil.isNotEmpty(r)){
+            WebUtil.addErrorMessage(r);
+            return;
+        }
         if (status == 0) {
             selected.setStatus(0);
             readOnlyCreateForm = false;
