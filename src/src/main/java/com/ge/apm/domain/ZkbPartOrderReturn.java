@@ -120,6 +120,9 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "udi")
     private String udi;
 
+    @Column(name = "external_packaging")
+    private String externalPackaging;
+
     @Column(name = "internal_packaging")
     private String internalPackaging;
 
@@ -131,6 +134,14 @@ public class ZkbPartOrderReturn implements Serializable {
 
     @Column(name = "part_quality")
     private String partQuality;
+
+    public String getExternalPackaging() {
+        return externalPackaging;
+    }
+
+    public void setExternalPackaging(String externalPackaging) {
+        this.externalPackaging = externalPackaging;
+    }
 
     public String getUdi() {
         return udi;
