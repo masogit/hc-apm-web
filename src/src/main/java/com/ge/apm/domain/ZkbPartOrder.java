@@ -734,6 +734,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "provide_new_contract_second")
     private String provideNewContractSecond;
 
+    @Column(name = "external_packaging")
+    private String externalPackaging;
+
+    public String getExternalPackaging() {
+        return externalPackaging;
+    }
+
+    public void setExternalPackaging(String externalPackaging) {
+        this.externalPackaging = externalPackaging;
+    }
+
     public String getUdi() {
         return udi;
     }

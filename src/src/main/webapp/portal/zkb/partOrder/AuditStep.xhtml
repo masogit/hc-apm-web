@@ -1052,6 +1052,13 @@
                             <p:outputLabel  style="color: red" value="#{zkbPartOrderAuditController.getPartSerialNumberTips()}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
+                            <label class="label">外部包装*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.externalPackaging}" required="true" requiredMessage="外部包装不能为空" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"  >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnExternalPackaging')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
                             <label class="label">内部包装*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.internalPackaging}" required="true" requiredMessage="内部包装不能为空" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"  >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -1089,8 +1096,6 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPartQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                    </p:panelGrid>
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                         <h:panelGroup>
                             <label class="label">归还日期*</label>
                             <p:calendar timeZone="GMT+8"  id="returnDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" />
