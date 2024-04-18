@@ -593,6 +593,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setAttachmentsTwo(attachment);
         formData.setAttachments(picAfterList);
         formData.setPrePmAttachments(picBeforeList);
+        formData.setComments(selectedPmOrder.getComments());//工作备注
         String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
@@ -672,6 +673,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setAttachmentsTwo(attachment);
         formData.setAttachments(picAfterList);
         formData.setPrePmAttachments(picBeforeList);
+        formData.setComments(selectedPmOrder.getComments());
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
@@ -808,7 +810,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setComments(remarks);
+        formData.setRemarks(remarks);
         String res = null;
         if(pass) {
             formData.setActionType("acceptancePass");

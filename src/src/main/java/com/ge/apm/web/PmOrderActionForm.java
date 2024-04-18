@@ -1,6 +1,8 @@
 package com.ge.apm.web;
 
 import com.ge.apm.domain.V2_BlobObject;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,9 @@ public class PmOrderActionForm {
     Integer pmType;
     String applyTime;
     String pmRuleUid;
+
+    @Getter@Setter
+    String remarks;
 
     //附件
     private List<V2_BlobObject> attachmentsTwo = new ArrayList<>();
