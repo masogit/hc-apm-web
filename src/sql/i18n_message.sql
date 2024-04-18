@@ -3711,6 +3711,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','damagedShipment','Damaged in shipment','Damaged in shipment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','singlePurchase','ZKB转单独采购','ZKB转单独采购',NULL,-1);
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnExternalPackaging','Damaged','Damaged(破损)','Damaged',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnExternalPackaging','Good','Good(完好)','Good',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnExternalPackaging','Tripped','Tilt/Shock indicator Tripped(倾斜/震动标签异常)','Tilt/Shock indicator Tripped',NULL,-1);
+
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','esdBagDamaged','ESD Bag Damaged(防静电袋破损)','ESD Bag Damaged',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','esdBagMissing','ESD Bag missing(防静电袋丢失)','ESD Bag missing',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnInternalPackaging','Good','Good(完好)','Good',NULL,-1);

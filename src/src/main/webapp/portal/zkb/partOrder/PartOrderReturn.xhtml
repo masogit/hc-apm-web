@@ -90,6 +90,14 @@
                 </h:panelGroup>
 
                 <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA' or zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'damagedShipment')}">
+                    <label class="label">外部包装*</label>
+                    <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.externalPackaging}" required="true" requiredMessage="外部包装不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnExternalPackaging')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA' or zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'damagedShipment')}">
                     <label class="label">内部包装*</label>
                     <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.internalPackaging}" required="true" requiredMessage="内部包装不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -128,9 +136,6 @@
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPartQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-
-            </p:panelGrid>
-            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"  >
                 <h:panelGroup>
                     <label class="label">归还数量*</label>
                     <p:spinner id="courseCount" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="1000" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" />
