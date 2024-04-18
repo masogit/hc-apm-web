@@ -3,6 +3,7 @@ package com.ge.apm.view.secondment.dept;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.secondment.SecondmentConfig;
+import com.ge.apm.domain.secondment.SecondmentOrder;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -18,10 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -43,6 +41,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     private SecondmentConfig secondmentConfig = new SecondmentConfig();
     private WorkflowConfigRepository workflowConfigRepository;
     private V2_WorkOrderRepository v2_workOrderRepository;
+    private SecondmentOrderRepository secondmentOrderRepository;
     @Override
     protected void init() {
         dao= WebUtil.getBean(AssetInfoRepository.class);
@@ -52,6 +51,7 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
         workflowConfigRepository= WebUtil.getBean(WorkflowConfigRepository.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         v2_workOrderRepository= WebUtil.getBean(V2_WorkOrderRepository.class);
+        secondmentOrderRepository= WebUtil.getBean(SecondmentOrderRepository.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -158,10 +158,28 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
     }
     public void  changeStatus(AssetInfo assetInfo, Integer status){
         try {
-            // TODO 校验是否有再借未完成工单
-            assetInfo.setBorrowedStatus(status);
+            Integer tempStatus = null;
+            String uid = assetInfo.getUid();
+            String name = assetInfo.getName();
+            List<V2_WorkOrder> workOrders = searchRepairAgain(uid);
+            if(CollectionUtils.isNotEmpty(workOrders)){
+                tempStatus = -1; // 暂停借出
+                WebUtil.addSuccessMessage("设备： "+ name + "有未完成维修工单,调剂状态更改为暂停借出!");
+            }else{
+                List<SearchFilter> searchFilters = new ArrayList<>();
+                searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,uid));
+                searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, Arrays.asList(2,4)));
+                List<SecondmentOrder> secondmentOrders = secondmentOrderRepository.findBySearchFilter(searchFilters);
+                if(CollectionUtils.isNotEmpty(secondmentOrders)){
+                    tempStatus = 1;       // 占用
+                    WebUtil.addSuccessMessage("设备： "+ name + "有未完成调剂工单,调剂状态更改为占用!");
+                }else{
+                    tempStatus = status;  //  0 or -1
+                    WebUtil.addSuccessMessage(WebUtil.getMessage("Updated"));
+                }
+            }
+            assetInfo.setBorrowedStatus(tempStatus);
             dao.save(assetInfo);
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Updated"));
             saveAssetHistory(assetInfo,"科室间借调/借用状态变更");
         } catch (Exception e) {
             e.printStackTrace();
