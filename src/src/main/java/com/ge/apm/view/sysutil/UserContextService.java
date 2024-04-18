@@ -73,6 +73,7 @@ public class UserContextService implements Serializable {
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
     private List<OrgInfo> child = new ArrayList<>();
+    private Map<String, Boolean> enableBtnByKey = new HashMap<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -1592,8 +1593,13 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isEnableBtnByKey(String key) {
-        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
-        return BooleanUtils.isFalse(configItemService.getConfigItemByKey(key, getLoginUser()));
+        Boolean result = enableBtnByKey.get(key);
+        if (enableBtnByKey.get(key) == null) {
+            ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+            result = BooleanUtils.isFalse(configItemService.getConfigItemByKey(key, getLoginUser()));
+            enableBtnByKey.put(key, result);
+        }
+        return result;
     }
 
     public OrgInfo getSelectSiteSchedule() {

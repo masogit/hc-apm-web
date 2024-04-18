@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 public class ConfigItemService {
 
     @Autowired
-    private ConfigItemRepository configItemRepository;
-    @Autowired
     private ConfigItemValueRepository configItemValueRepository;
 
     /**
@@ -29,28 +27,8 @@ public class ConfigItemService {
      * */
     public Boolean getConfigItemByKey(String key, UserAccount loginUser) {
         Boolean flag = null;
-        ConfigItem byDefaultValueForKey = configItemRepository.findByDefaultValueForKey(key);
-        if (byDefaultValueForKey == null) return Boolean.FALSE;
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("key", SearchFilter.Operator.EQ, key));
-        String siteUID = loginUser.getSiteUID();
-        String hospitalUID = loginUser.getHospitalUID();
-        String institutionUID = loginUser.getInstitutionUID();
-        String tenantUID = loginUser.getTenantUID();
-        List<String> value = Arrays.asList(siteUID, hospitalUID, institutionUID, tenantUID);
-        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, value));
-        List<ConfigItemValue> configItemValues = configItemValueRepository.findBySearchFilter(searchFilters);
-        if (!CollectionUtils.isEmpty(configItemValues)) {
-            Map<String, Boolean> collect = configItemValues.stream().collect(Collectors.toMap(ConfigItemValue::getSiteUid, item -> Boolean.valueOf(item.getValue())));
-            if ((flag = collect.get(siteUID)) == null
-                    && (flag = collect.get(hospitalUID)) == null
-                    && (flag = collect.get(institutionUID)) == null
-                    && (flag = collect.get(tenantUID)) == null) {
-                flag = Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
-            }
-        } else {
-            flag = Boolean.valueOf(byDefaultValueForKey.getDefaultValue());
-        }
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+        flag = Boolean.valueOf(value);
         return flag;
     }
 }

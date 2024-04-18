@@ -87,6 +87,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private boolean isReturn=false;
     private ConfigService configService;
     private ConfigItemValueRepository configItemValueRepository;
+    private UserAccountRepository userAccountRepository;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -204,6 +205,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
@@ -1177,6 +1179,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
        if(sta == 9){//借用待确认状态
            dao.updateState(uid, state);
+           clearOwner(uid);
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1189,7 +1192,23 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
        
     }
-    
+    private void clearOwner(String uid){
+        String modifyingTheDeviceOwner ="enableModifyingTheDeviceOwner";
+        String configItemValue = userContextService.getConfigItemValue(modifyingTheDeviceOwner);
+        if(Boolean.TRUE.toString().equals(configItemValue)){
+            List<SharedAssetReqDetail> details = asdDao.selectBySharedId(uid);
+            if(CollectionUtils.isEmpty(details)) return;
+            Set<String> assetUid = details.stream().map(SharedAssetReqDetail::getAssetInfoId).collect(Collectors.toSet());
+            List<AssetInfo> assetInfos = asiDao.fetchListByUid(assetUid);
+            if(CollectionUtils.isEmpty(assetInfos)) return;
+            for (AssetInfo assetInfo : assetInfos) {
+                assetInfo.setClinicalOwnerId(null);
+                assetInfo.setClinicalOwnerName(null);
+                assetInfo.setClinicalOwnerTel(null);
+            }
+            asiDao.save(assetInfos);
+        }
+    }
     public void Accept() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1719,7 +1738,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
        if(sta == 3){//借用待确认状态
            dao.updateState(uid, state);
-
+           modifyingTheDeviceOwner(uid);
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1732,7 +1751,40 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
        
     }
-    
+
+    private void modifyingTheDeviceOwner(String uid) {
+        String modifyingTheDeviceOwner ="enableModifyingTheDeviceOwner";
+        String configItemValue = userContextService.getConfigItemValue(modifyingTheDeviceOwner);
+        if(Boolean.TRUE.toString().equals(configItemValue)){
+            List<SharedAssetReqDetail> details = asdDao.selectBySharedId(uid);
+            if(CollectionUtils.isEmpty(details)) return;
+            Set<String> assetUid = details.stream().map(SharedAssetReqDetail::getAssetInfoId).collect(Collectors.toSet());
+            List<AssetInfo> assetInfos = asiDao.fetchListByUid(assetUid);
+            if(CollectionUtils.isEmpty(assetInfos)) return;
+            String applicant = selected.getApplicant();
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ,applicant,"1*2+"));
+            searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.EQ,applicant,"1*2+"));
+            List<UserAccount> userAccounts = userAccountRepository.findBySearchFilter(searchFilters);
+            UserAccount owner=null;
+            if(CollectionUtils.isEmpty(userAccounts)){
+                owner = UserContextService.getCurrentUserAccount();
+            }else{
+                Optional<UserAccount> first = userAccounts.stream().findFirst();
+                if (first.isPresent()) {
+                    owner = first.get();
+                }
+            }
+            if(owner == null) return;
+            for (AssetInfo assetInfo : assetInfos) {
+                assetInfo.setClinicalOwnerId(owner.getId());
+                assetInfo.setClinicalOwnerName(owner.getName());
+                assetInfo.setClinicalOwnerTel(owner.getTelephone());
+            }
+            asiDao.save(assetInfos);
+        }
+    }
+
     public void submmit1() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
