@@ -135,7 +135,7 @@ public class InventoryOrderDetail implements Serializable {
 
     @Transient
     @Getter @Setter
-    private Integer assetUid;
+    private String assetUid;
 
     @Transient
     @TableField(exist = false)
