@@ -705,7 +705,9 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetLifecycleDeadline')}">
         <h:panelGroup >
             <label class="label">#{msg.assetLifecycleDeadline}</label>
-            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoDetailController.selected.assetLifecycleDeadline}" readonly="true"/>
+            <p:inputText id="assetLifecycleDeadline" value="#{assetInfoDetailController.selected.assetLifecycleDeadline}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetQuantity')}">
