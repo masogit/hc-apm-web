@@ -376,21 +376,19 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
      * 增加保存前检验
      * @return
      */
-    public String checkSave(){
-        StringBuilder sb = new StringBuilder();
+    public boolean checkSave(){
+        boolean isValid = true;
         if(selected.getEventDiscoverDate().getTime() < selected.getEventOccurredDate().getTime()){
-            sb.append("发现或获知日期不能大于事件发生日期！");
+            WebUtil.addErrorMessage("发现或获知日期不能大于事件发生日期！");
         }
-        if(selected.getDeviceUsedDate().getTime() < selected.getEventOccurredDate().getTime()){
-            sb.append("器械使用日期不能大于事件发生日期！");
+        if(selected.getDeviceUsedDate().getTime() > selected.getEventOccurredDate().getTime()){
+            WebUtil.addErrorMessage("器械使用日期不能大于事件发生日期！");
         }
-        return sb.toString();
+        return isValid;
     }
 
     public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
-        String r = checkSave();
-        if(StrUtil.isNotEmpty(r)){
-            WebUtil.addErrorMessage(r);
+        if(!checkSave()){
             return;
         }
         if (status == 0) {
