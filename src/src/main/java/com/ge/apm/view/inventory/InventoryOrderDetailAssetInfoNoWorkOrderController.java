@@ -10,6 +10,7 @@ import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,9 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         Map<String, Object> param = MapUtil.newHashMap();
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
@@ -85,6 +89,9 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         }
         if (ObjectUtil.isNotEmpty(orgUidList)) {
             param.put("orgUidList", orgUidList);
+        }
+        if (currentUser.isEnableAssetTypeGroup()) {
+            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
         }
         Long count = inventoryOrderMapper.findNoneOrderCount(param);
         Sort sort = pageRequest.getSort();

@@ -17,6 +17,7 @@ import com.ge.apm.domain.InventoryIssue;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -79,6 +80,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
 		//before
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
@@ -95,6 +99,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+        if (user.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+        }
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
