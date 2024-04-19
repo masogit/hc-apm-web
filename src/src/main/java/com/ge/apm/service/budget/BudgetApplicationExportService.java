@@ -285,9 +285,8 @@ public class BudgetApplicationExportService {
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
         byte[] bytes;
         XWPFTemplate template = null;
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes);
+        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             //template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
             template.render(data);
@@ -356,12 +355,13 @@ public class BudgetApplicationExportService {
                 zout.putNextEntry(new ZipEntry(preFileName + "/" + newFileName));
             }
             byte[] bys = new byte[1024 * 5];
-            BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream());
-            int rd = 0;
-            while ((rd = bufferStream.read(bys)) != -1) {
-                zout.write(bys, 0, rd);
+            try( BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream())){
+                int rd = 0;
+                while ((rd = bufferStream.read(bys)) != -1) {
+                    zout.write(bys, 0, rd);
+                }
+                zout.closeEntry();
             }
-            zout.closeEntry();
         }
     }
 
