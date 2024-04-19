@@ -380,11 +380,11 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         boolean isValid = true;
         if(selected.getEventDiscoverDate().getTime() < selected.getEventOccurredDate().getTime()){
             isValid = false;
-            WebUtil.addErrorMessage("发现或获知日期不能大于事件发生日期！");
+            WebUtil.addErrorMessage("发现或获知日期不得早于事件发生日期！");
         }
         if(selected.getDeviceUsedDate().getTime() > selected.getEventOccurredDate().getTime()){
             isValid = false;
-            WebUtil.addErrorMessage("器械使用日期不能大于事件发生日期！");
+            WebUtil.addErrorMessage("器械使用日期不得晚于事件发生日期！");
         }
         return isValid;
     }
