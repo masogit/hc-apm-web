@@ -785,6 +785,10 @@ public class CustomConfigController {
         return assetTypeGroups;
     }
 
+    public boolean enableAssetTypeGroup() {
+        return userContextService.getLoginUser().isEnableAssetTypeGroup();
+    }
+
     public void removeAssetsImportantFields(String key) {
         if (customConfigObject.getAssetsImportantFields().contains(key)) {
             customConfigObject.setAssetsImportantFields(customConfigObject.getAssetsImportantFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
