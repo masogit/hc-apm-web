@@ -1,12 +1,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+>
 
     <ui:define name="content">
+        <div>
+            <p:progressBar style="display:none" id="exportProgress" widgetVar="pbAjaxLong" ajax="true" value="#{workOrderReportExportController.progress.value}"
+                           labelTemplate="{value}%" global="false" interval="500">
+                <p:ajax event="complete" listener="#{workOrderReportExportController.exportComplete}" update="growl"
+                        oncomplete=""/>
+            </p:progressBar>
+        </div>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.ExportRepairWorkorderReports}"/>
@@ -15,13 +20,16 @@
             <div class="ui-g-12 card ">
                 <p:tabView id="woTab">
                     <p:ajax event="tabChange"/>
-                    <p:tab title="#{msg.ExportWorkorderReports}" id="export" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
+                    <p:tab title="#{msg.ExportWorkorderReports}" id="export"
+                           rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="export.xhtml"/>
                     </p:tab>
-                    <p:tab title="#{msg.ExportWorkorderPartReports}" id="woDetailExport" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
+                    <p:tab title="#{msg.ExportWorkorderPartReports}" id="woDetailExport"
+                           rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="woDetailExport.xhtml"/>
                     </p:tab>
-                    <p:tab title="#{msg.WorkorderReportStatistics}" id="statistics" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
+                    <p:tab title="#{msg.WorkorderReportStatistics}" id="statistics"
+                           rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="statistics.xhtml"/>
                     </p:tab>
                 </p:tabView>
@@ -29,3 +37,4 @@
         </div>
     </ui:define>
 </ui:composition>
+

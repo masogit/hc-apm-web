@@ -41,6 +41,8 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
     AssetTypeGroup findByEncodedAndTenantUid(String encoded,String tenantUid);
     List<AssetTypeGroup> findByEncodedInAndTenantUid(Collection<String> codedList, String tenantUid);
 
+    List<AssetTypeGroup> findByEncodedIn(Collection<String> encodeds);
+
     AssetTypeGroup findFirstByName(String name);
 
     AssetTypeGroup findAuthGroupByNameAndParentUid(String name, String parentUid);

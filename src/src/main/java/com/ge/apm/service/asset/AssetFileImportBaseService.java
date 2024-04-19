@@ -19,6 +19,7 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -212,13 +213,13 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    public void importAssetData(List<Map<String, Object>> importAssetMap,
+    public List<AssetInfo> importAssetData(List<Map<String, Object>> importAssetMap,
                                 Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         int row = 0;
-
+        List<AssetInfo> saveList = ListUtil.newArrayList();
         try {
             if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
 
@@ -229,7 +230,10 @@ public class AssetFileImportBaseService {
                 for (Map<String, Object> item : importAssetMap) {
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
-                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                        AssetInfo newAsset = importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                        if (ObjectUtil.isNotEmpty(newAsset)) {
+                            saveList.add(newAsset);
+                        }
                     }
                 }
 
@@ -239,12 +243,13 @@ public class AssetFileImportBaseService {
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
                         continue;
                     }
-
                     if(supportingService.isChildAssetForIBTenant(assetInfo, parentAssetsMap)) {
                         supportingService.setParentAsset(assetInfo, parentAssetsMap);
                     }
-
-                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    AssetInfo newAsset = importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    if (ObjectUtil.isNotEmpty(newAsset)) {
+                        saveList.add(newAsset);
+                    }
                 }
 
             } else {
@@ -252,9 +257,11 @@ public class AssetFileImportBaseService {
                     if (row % 100 == 0) {
                         logger.info("imported {} rows", row);
                     }
-
                     ++row;
-                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    AssetInfo newAsset = importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    if (ObjectUtil.isNotEmpty(newAsset)) {
+                        saveList.add(newAsset);
+                    }
                 }
             }
 
@@ -266,11 +273,11 @@ public class AssetFileImportBaseService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
-
+        return saveList;
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
+    protected AssetInfo importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         AssetInfo dbAsset = (AssetInfo) item.get("oldAsset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
@@ -289,7 +296,7 @@ public class AssetFileImportBaseService {
         if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
-            return;
+            return null;
         }
 
         String clinicalDeptName = newAsset.getClinicalDeptName();
@@ -297,7 +304,7 @@ public class AssetFileImportBaseService {
             if (StringUtils.isEmpty(newAsset.getUid())) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 科室为空");
-                return;
+                return null;
             }
 
         } else {
@@ -475,12 +482,12 @@ public class AssetFileImportBaseService {
             if (financingNum == null) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "取资产编码失败！请检查相应微服务");
-                return;
+                return null;
             }
             else if (financingNum.startsWith("error:")) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, financingNum);
-                return;
+                return null;
             } else {
                 newAsset.setFinancingNum(financingNum);
             }
@@ -512,7 +519,7 @@ public class AssetFileImportBaseService {
                     } else {
                         item.put("status", ImportStatus.Failure);
                         AssetRow.addErrMessage(item, "错误: 该二维码已使用！");
-                        return;
+                        return null;
                     }
 
                 }
@@ -537,7 +544,7 @@ public class AssetFileImportBaseService {
             if (assetTypeGroupList.isEmpty()) {
                 item.put("assetType", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 资产分类为空！");
-                return;
+                return null;
             }
             newAsset.setAssetType(assetTypeGroupList.get(0).getEncoded());
         }
@@ -548,7 +555,7 @@ public class AssetFileImportBaseService {
         if(isCreate){
             assetInfo.setId(null);
         }
-        this.saveAssetHistory(assetInfo);
+//        this.saveAssetHistory(assetInfo);
 
         assetDepreciationService.saveAssetDerpeciation(newAsset);
 
@@ -563,9 +570,9 @@ public class AssetFileImportBaseService {
             mvsUtil.copyToMvsTableIfMvsEquip(newAsset);
 
         }
-
+        return assetInfo;
     }
-    private void saveAssetHistory(AssetInfo newAsset) {
+    public void saveAssetHistory(AssetInfo newAsset) {
         MqContext mqContext = new MqContext();
         mqContext.setDescribe("资产导入添加");
         mqContext.setMethodName("importOneAsset");
