@@ -8,6 +8,7 @@ import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -76,9 +77,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     @Override
     protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
-        /*if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-        }*/
+        }
         Map<String, Object> param = MapUtil.newHashMap();
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
@@ -86,9 +87,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
         List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-        /*if (currentUser.isEnableAssetTypeGroup()) {
+        if (currentUser.isEnableAssetTypeGroup()) {
             param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
-        }*/
+        }
         param.put("tenantUid", currentUser.getTenantUID());
         param.put("page", pageRequest.getPageSize());
         param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
