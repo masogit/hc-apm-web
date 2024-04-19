@@ -66,11 +66,12 @@ public class QrCodeExportStream extends InputStream {
 
     @Override
     public int read(byte[] b) throws IOException {
-
         int available = biStream.available();
-
         int i = biStream.read(b);
         if (available <= b.length && exportPos < qrCodeLibList.size()) {
+            if(biStream!=null){
+                biStream.close();
+            }
             exportBatchQrCode();
         }
         return i;

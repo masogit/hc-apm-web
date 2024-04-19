@@ -75,6 +75,7 @@
 
             SELECT
                 ai.id assetId,
+                ai.uid assetUid,
                 ai.name,
                 ai.clinical_dept_name clinicalDeptName,
                 ai.qr_code qrCode,
@@ -132,7 +133,7 @@
                     )
                 </if>
             UNION ALL
-            SELECT NULL AS assetId, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
+            SELECT NULL AS assetId, NULL AS assetUid, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
                 <if test="orgUidList != null and orgUidList.size > 0">
                     AND (
                     iod.institution_uid IN
@@ -263,6 +264,12 @@
             </foreach>
         </if>
         <include refid="assetCondition"/>
+        <if test="assetTypes != null and assetTypes.size > 0">
+            AND ai.asset_type IN
+            <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
         AND iod.asset_id IS NULL
         <if test="orderBy != null">
             ORDER BY ${orderBy}

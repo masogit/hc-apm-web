@@ -109,7 +109,7 @@ public class WorkOrderDocxRenderService {
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             template.registerPolicy("part_table", new PartTableRenderPolicy());
-            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
+            template.registerPolicy  ("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
             template.render(datas);
@@ -121,7 +121,7 @@ public class WorkOrderDocxRenderService {
                     template.close();
                 }
             } catch (Exception ignore) {
-
+                log.error("render docx error:{}",ignore.getMessage());
             }
         }
         return bytes;

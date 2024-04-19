@@ -11,10 +11,8 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.wo.WorkOrderExportService;
-import com.ge.apm.service.wo.WorkOrderExportTemplateService;
-import com.ge.apm.service.wo.WorkOrderPublishRenderService;
-import com.ge.apm.service.wo.WorkflowService;
+import com.ge.apm.service.wo.*;
+import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -107,6 +105,9 @@ public class WorkOrderReportExportController implements Serializable {
     private UserAccount filterCurrentOwner;
     private List<UserAccount> currentOwnerList;
 
+    @Getter
+    private Progress progress;
+
     private List<Map<String, Object>> selectedItems;
 
     private Boolean isInsulate;
@@ -120,6 +121,8 @@ public class WorkOrderReportExportController implements Serializable {
     private UserContextService userContextService;
     @Getter @Setter
     private String srNumStr;
+
+    private WorkOrderDocxRenderService renderService;
     @PostConstruct
     protected void init() {
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -134,6 +137,7 @@ public class WorkOrderReportExportController implements Serializable {
         ucService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        renderService=WebUtil.getBean(WorkOrderDocxRenderService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         currentInstitutionUID = currentUser.getInstitutionUID();
@@ -267,13 +271,19 @@ public class WorkOrderReportExportController implements Serializable {
         }
         data = workOrderExportService.supplementWorkOrder(data);
         try {
+            progress=new Progress();
             byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
-            WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
-            exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
+            //WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
+            WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(workOrderList,templateBytes,renderService,progress);
+            exportDocx = new DefaultStreamedContent(workOrderExportStream, workOrderExportStream.getContentType(), workOrderExportStream.getFileName());
         } catch (IOException e) {
             logger.error("Fail to export work orders", e);
             WebUtil.addErrorMessage(WebUtil.getMessage("ExportFailed"));
         }
+    }
+
+    public void exportComplete(){
+        WebUtil.addSuccessMessage("导出完成");
     }
 
     public void reflashData() {
