@@ -443,7 +443,7 @@
                                 </h:panelGroup>
 
                             </p:panelGrid>
-                            <p:fieldset id="assetTypeCheck" legend="资产分类必填" rendered="#{userContextService.currentUserAccount.enableAssetTypeGroup}">
+                            <p:fieldset id="assetTypeCheck" legend="资产分类必填" rendered="#{customConfigController.enableAssetTypeGroup()}">
                                 <c:forEach items="#{customConfigController.assetTypeGroups}" var="assetTypeItem" >
                                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                         <p:selectBooleanCheckbox
