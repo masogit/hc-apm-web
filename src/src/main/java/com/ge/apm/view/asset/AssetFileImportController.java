@@ -219,7 +219,10 @@ public class AssetFileImportController {
             //AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
             //AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
 
-            streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            List<AssetInfo> saveList = streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            for (AssetInfo assetInfo : saveList) {
+                streamingService.saveAssetHistory(assetInfo);
+            }
             if(toDeleteCheckedNurseSite) {
                 streamingService.deleteNursiteMaintain(unCheckNurseSiteMaintainList);
                 toDeleteCheckedNurseSite = false;
