@@ -14,7 +14,9 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -75,12 +77,14 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 
 	@Override
 	protected Page<InventoryIssue> loadData(PageRequest pageRequest) {
+		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+			return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+		}
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		covSearchFilters(searchFilters, orgUidList);
        	boolean hasLastModifiedBy = false; String lastModifiedByFilter = null;
        	for (SearchFilter searchFilter :searchFilters) {
@@ -91,7 +95,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		}
        	if(hasLastModifiedBy) {
 			searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
-			List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), lastModifiedByFilter);
+			List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(currentUser.getTenantUID(), lastModifiedByFilter);
 			List<String> loginNamList = new ArrayList<>();
 			if(!userAccountList.isEmpty()){
 				for (UserAccount userAccount:userAccountList) {
@@ -113,8 +117,10 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-        Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
-		return pageAssetInfo;
+		if (currentUser.isEnableAssetTypeGroup()) {
+			searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+		}
+		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
 	@Override
