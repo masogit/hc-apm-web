@@ -5,12 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +15,7 @@ import javax.persistence.criteria.Root;
 
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.ge.apm.dao.*;
+import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -54,18 +50,14 @@ public class InventoryOrderService {
 	private InventoryOrderRepository inventoryOrderDao;
 	@Autowired
 	private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailDao;
-	// @Autowired
-	// private InventoryOrderIssueRepository inventoryOrderIssueRepository;
-	// @Autowired
-	// private InventoryChecklistRepository inventoryChecklistRepository;
 	@Autowired
 	private AssetInfoRepository assetInfoDao;
 	@Autowired
 	private OrgInfoRepository orgInfoDao;
 	@Autowired
-	private I18nMessageRepository i18nMessageDao;
-	@Autowired
 	private UserAccountRepository userAccountRepository;
+	@Autowired
+	private AssetTypeGroupRepository assetTypeGroupRepository;
 
 	private final Integer INVENTORY_NOT_FINISHED = 0; // 未盘点
 	private final Integer INVENTORY_FINISHED = 1; // 已盘点色弱
@@ -281,34 +273,28 @@ public class InventoryOrderService {
     public List<String> getInventoryOrderData(String tenantUid, List<String> listAccessClinical,Boolean isFinished) {
         List<String> orderIdList = new ArrayList<>();
         List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUIDAndIsFinished(tenantUid,isFinished);
-        if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
-            for (int i = 0; i < listInventoryOrder.size(); ++i) {
-                InventoryOrder tempOrder = listInventoryOrder.get(i);
-                for (String clinicalUid : listAccessClinical) {
-                    if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
-                        orderIdList.add(tempOrder.getId());
-                        break;
-                    }
-                }
-            }
+        if (listInventoryOrder != null && !listInventoryOrder.isEmpty()) {
+			for (InventoryOrder tempOrder : listInventoryOrder) {
+				for (String clinicalUid : listAccessClinical) {
+					if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
+						orderIdList.add(tempOrder.getId());
+						break;
+					}
+				}
+			}
         }
         return orderIdList;
     }
-	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<SearchFilter> listSearchFilter, List<String> listAccessClinical) {
+	public Page<InventoryOrder> getPageData(PageRequest pageRequest, UserAccount currentUser, List<SearchFilter> listSearchFilter, List<String> listAccessClinical) {
 		Page<InventoryOrder> pageRe = null;
 		listUserInventoryOrder.clear();
 		int page = pageRequest.getPageNumber();
 		int pageSize = pageRequest.getPageSize();
-		List<InventoryOrder> listFilterInventoryOrder = new ArrayList<InventoryOrder>();
-		List<InventoryOrder> listSmallRe = new ArrayList<InventoryOrder>();
-		/*if (listUserInventoryOrder.size() > 0) {
-		} else {
-
-		}*/
-		List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(tenantUid);
-		if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
-			for (int i = 0; i < listInventoryOrder.size(); ++i) {
-				InventoryOrder tempOrder = listInventoryOrder.get(i);
+		List<InventoryOrder> listFilterInventoryOrder = new ArrayList<>();
+		List<InventoryOrder> listSmallRe = new ArrayList<>();
+		List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(currentUser.getTenantUID());
+		if (listInventoryOrder != null && !listInventoryOrder.isEmpty()) {
+			for (InventoryOrder tempOrder : listInventoryOrder) {
 				for (String clinicalUid : listAccessClinical) {
 					if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
 						listUserInventoryOrder.add(tempOrder);
@@ -318,9 +304,8 @@ public class InventoryOrderService {
 			}
 		}
 		try {
-			if (listSearchFilter.size() > 0 && listUserInventoryOrder.size() > 0) {
-				for (int i = 0; i < listUserInventoryOrder.size(); ++i) {
-					InventoryOrder tempOrder = listUserInventoryOrder.get(i);
+			if (!listSearchFilter.isEmpty() && !listUserInventoryOrder.isEmpty()) {
+				for (InventoryOrder tempOrder : listUserInventoryOrder) {
 					boolean match = true;
 					for (SearchFilter filter : listSearchFilter) {
 						String fieldName = filter.fieldName;
@@ -367,13 +352,39 @@ public class InventoryOrderService {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		if (currentUser.isEnableAssetTypeGroup()) {
+			if (currentUser.getAssetTypeGroupList().isEmpty()) {
+				return new PageImpl<>(listSmallRe, pageRequest, 0);
+			}
+			Set<String> encodeds = currentUser.getAssetTypeGroupMap().keySet();
+			listFilterInventoryOrder = listFilterInventoryOrder.stream().filter(t -> ObjectUtil.isNotEmpty(t.getAssetType())).filter(t ->  {
+				for (String encoded : encodeds) {
+					if (encoded.startsWith(t.getAssetType())) {
+						return true;
+					}
+				}
+				return false;
+			}).collect(Collectors.toList());
+			Set<String> assetTypes = listFilterInventoryOrder.stream().map(InventoryOrder::getAssetType).collect(Collectors.toSet());
+			List<AssetTypeGroup> assetTypeGroups = assetTypeGroupRepository.findByEncodedIn(assetTypes);
+			Map<String, String> assetTypeMap = assetTypeGroups.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
+			for (InventoryOrder order : listFilterInventoryOrder) {
+				List<Map> clinicalDeptList = JSON.parseArray(order.getAssigneeOrg(), Map.class);
+				StringBuilder clinicalDeptNames = new StringBuilder(assetTypeMap.get(order.getAssetType()));
+				for (Map map : clinicalDeptList) {
+					clinicalDeptNames.append(" / ");
+					clinicalDeptNames.append(map.get("orgName").toString().split(" / ")[1]);
+				}
+				order.setClinicalDeptLabel(clinicalDeptNames.toString());
+			}
+		}
 		int size = listFilterInventoryOrder.size();
 		int pre = page * pageSize;
 		int last = (page + 1) * pageSize;
 		for (int i = pre; i < size && i < last; ++i) {
 			listSmallRe.add(listFilterInventoryOrder.get(i));
 		}
-		pageRe = new PageImpl<InventoryOrder>(listSmallRe, pageRequest, size);
+		pageRe = new PageImpl<>(listSmallRe, pageRequest, size);
 		return pageRe;
 	}
 
