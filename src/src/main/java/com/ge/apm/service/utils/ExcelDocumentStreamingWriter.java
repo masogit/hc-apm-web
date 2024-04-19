@@ -96,12 +96,12 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         }
     }
 
-    public void writeRowData(int row, String[] data,boolean... bold) {
+    public void writeRowData(int row, String[] data, boolean... bold) {
 
         for (int index = 0; index < data.length; index++) {
             Object value = data[index];
 
-            writeCellData(row, index + 1, value,bold);
+            writeCellData(row, index + 1, value, bold);
         }
     }
 
@@ -179,14 +179,13 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    public void writeToFile(File file) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        this.workBook.write(out);
-
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(out.toByteArray());
-        fos.close();
-
+    public void writeToFile(File file){
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); FileOutputStream fos = new FileOutputStream(file);) {
+            this.workBook.write(out);
+            fos.write(out.toByteArray());
+        } catch (Exception e) {
+            logger.error("excelDocumentStreamWrite error:{}",e.getMessage());
+        }
     }
 
     @Override
