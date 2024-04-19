@@ -8,11 +8,14 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.ge.apm.service.utils.UrlParamUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
+import webapp.framework.web.WebUtil;
 
 /**
  * Created by 212605082 on 2017/6/19.
@@ -129,6 +132,14 @@ public class InventoryOrderDetail implements Serializable {
     @Transient
     @Getter @Setter
     private String name;
+
+    @Transient
+    @Getter @Setter
+    private Integer assetUid;
+
+    @Transient
+    @TableField(exist = false)
+    private String encodeAssetDetailStr;
 
 
     public String getClinicalDeptUID() {
@@ -353,5 +364,18 @@ public class InventoryOrderDetail implements Serializable {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public String getEncodeAssetDetailStr() {
+        String url = "actionName=View&selectedid="
+                + getAssetUid()
+                + "&asset_name=" + getName()
+                + "&terminate=" + Boolean.parseBoolean(WebUtil.getRequestParameter("terminate"));
+        url = UrlParamUtil.encodeUrlQueryString(url);
+        return url;
+    }
+
+    public void setEncodeAssetDetailStr(String encodeAssetDetailStr) {
+        this.encodeAssetDetailStr = encodeAssetDetailStr;
     }
 }
