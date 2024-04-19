@@ -1,317 +1,366 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:p="http://primefaces.org/ui">
 
-    <h:form id="exportDataForm">
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">*#{msg.hospitalId}</label>
-                    <p:inputText id="selectedOrgName"
-                                 value="#{workOrderReportExportController.selectedOrg==null ? '': workOrderReportExportController.selectedOrg.name}"
-                                 readonly="true" required="true" requiredMessage="#{msg.siteCannotEmpty}"/>
-                    <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
-                                     class="btn btn-sm popupIconButton"/>
-                    <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
-                                    style="width:300px" modal="false">
-                        <p:scrollPanel style="height:300px;border: 0" mode="native">
-                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
-                                    value="#{workOrderReportExportController.orgTree}"
-                                    selection="#{workOrderReportExportController.selectedNode}" var="node"
-                                    selectionMode="single">
-                                <p:ajax process="@this" event="select" update=":woTab:exportDataForm:selectedOrgName :woTab:exportDataForm:clinicalDeptName"
-                                        listener="#{workOrderReportExportController.onSelectTreeNode}"
-                                        oncomplete="PF('varPanelOrg').hide();"/>
-                                <p:ajax process="@this" event="expand"/>
-                                <p:ajax process="@this" event="collapse"/>
-
-                                <p:treeNode type="org">
-                                    <h:outputText value="#{node}"/>
-                                </p:treeNode>
-								<p:treeNode type="hidden" rendered="false"/>
-                            </p:tree>
-                        </p:scrollPanel>
-                    </p:overlayPanel>
-                </h:panelGroup>
-
-                <h:panelGroup>
-                    <label class="label">#{msg.clinicalDeptName}</label>
-                    <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{workOrderReportExportController.filterDeptOrg}"
-                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderReportExportController.autoCompleteDept}"
-                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                        <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onClinicalDeptChange}" />
-                        <p:ajax listener="#{workOrderReportExportController.onClinicalDeptChange}" />
-                    </p:autoComplete>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.CurrentOwner}</label>
-                    <p:autoComplete id="currentOwner" dropdown="true" value="#{workOrderReportExportController.filterCurrentOwner}"
-                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderReportExportController.completeOwnerList}"
-                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
-                        <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onCurrentOwnerChange}" />
-                        <p:ajax listener="#{workOrderReportExportController.onCurrentOwnerChange}" />
-                    </p:autoComplete>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{workOrderReportExportController.enableAssetTypeGroup}">
-                    <label class="label">#{msg.assetTypeGroup}</label>
-                    <p:autoComplete dropdown="true" value="#{workOrderReportExportController.filterAssetTypeName}"
-                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderReportExportController.completeAssetTypeGroupList}">
-                        <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onAssetTypeGroupChange}" />
-                        <p:ajax listener="#{workOrderReportExportController.onAssetTypeGroupChange}" />
-                    </p:autoComplete>
-                </h:panelGroup>
-
-            </p:panelGrid>
-        </p:fieldset>
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup id="statusOpen">
-                    <p:selectBooleanCheckbox itemLabel="#{msg.UnderRepair}" value="#{workOrderReportExportController.statusOpen}">
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-                <h:panelGroup id="statusClose">
-                    <p:selectBooleanCheckbox itemLabel="#{msg.Finish}" value="#{workOrderReportExportController.statusClose}">
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-                <h:panelGroup id="statusCancel">
-                    <p:selectBooleanCheckbox itemLabel="#{msg.Cancel}" value="#{workOrderReportExportController.statusCancel}">
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.IsPartExist}</label>
-                    <p:selectOneMenu id="filterParts" value="#{workOrderReportExportController.filterParts}">
-                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                        <f:selectItem itemLabel="#{msg.ExistPart}" itemValue="Exist" />
-                        <f:selectItem itemLabel="#{msg.UnexistPart}" itemValue="UnExist" />
-                    </p:selectOneMenu>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.IsMaintenanceAmountExist}</label>
-                    <p:selectOneMenu id="filterTotalPrice" value="#{workOrderReportExportController.filterTotalPrice}">
-                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                        <f:selectItem itemLabel="#{msg.ExistMaintenanceAmount}" itemValue="Exist" />
-                        <f:selectItem itemLabel="#{msg.UnExistMaintenanceAmount}" itemValue="UnExist" />
-                    </p:selectOneMenu>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">当前步骤</label>
-                    <p:selectOneMenu id="currentStepId" value="#{workOrderReportExportController.currentStepId}" >
-                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                        <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,7,8,9,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6,7,8,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                    </p:selectOneMenu>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">#{msg.EarliestApplyTime}</label>
-                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startTime" value="#{workOrderReportExportController.startTime}"
-                                 required="false" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"
-                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.LatestApplyTime}</label>
-                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endTime" value="#{workOrderReportExportController.endTime}"
-                                 required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
-                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.EarliestCloseTime}</label>
-                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="closedStartTime"
-                                value="#{workOrderReportExportController.closedStartTime}"
-                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.LatestCloseTime}</label>
-                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}"
-                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+<h:form id="exportDataForm">
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
-                <p:commandButton value="#{msg.previewResult}" actionListener="#{workOrderReportExportController.previewData}"
-                                 icon="ui-icon-arrowthick-1-s" validateClient="true"
-                                 update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
-                </p:commandButton>
+                <label class="label">*#{msg.hospitalId}</label>
+                <p:inputText id="selectedOrgName"
+                             value="#{workOrderReportExportController.selectedOrg==null ? '': workOrderReportExportController.selectedOrg.name}"
+                             readonly="true" required="true" requiredMessage="#{msg.siteCannotEmpty}"/>
+                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
+                                 class="btn btn-sm popupIconButton"/>
+                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                                style="width:300px" modal="false">
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
+                                value="#{workOrderReportExportController.orgTree}"
+                                selection="#{workOrderReportExportController.selectedNode}" var="node"
+                                selectionMode="single">
+                            <p:ajax process="@this" event="select"
+                                    update=":woTab:exportDataForm:selectedOrgName :woTab:exportDataForm:clinicalDeptName"
+                                    listener="#{workOrderReportExportController.onSelectTreeNode}"
+                                    oncomplete="PF('varPanelOrg').hide();"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.clinicalDeptName}</label>
+                <p:autoComplete id="clinicalDeptName" dropdown="true"
+                                value="#{workOrderReportExportController.filterDeptOrg}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{workOrderReportExportController.autoCompleteDept}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"
+                                class="SiteUIDChange">
+                    <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onClinicalDeptChange}"/>
+                    <p:ajax listener="#{workOrderReportExportController.onClinicalDeptChange}"/>
+                </p:autoComplete>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.CurrentOwner}</label>
+                <p:autoComplete id="currentOwner" dropdown="true"
+                                value="#{workOrderReportExportController.filterCurrentOwner}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{workOrderReportExportController.completeOwnerList}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter"
+                                class="SiteUIDChange">
+                    <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onCurrentOwnerChange}"/>
+                    <p:ajax listener="#{workOrderReportExportController.onCurrentOwnerChange}"/>
+                </p:autoComplete>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{workOrderReportExportController.enableAssetTypeGroup}">
+                <label class="label">#{msg.assetTypeGroup}</label>
+                <p:autoComplete dropdown="true" value="#{workOrderReportExportController.filterAssetTypeName}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{workOrderReportExportController.completeAssetTypeGroupList}">
+                    <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onAssetTypeGroupChange}"/>
+                    <p:ajax listener="#{workOrderReportExportController.onAssetTypeGroupChange}"/>
+                </p:autoComplete>
+            </h:panelGroup>
+
+        </p:panelGrid>
+    </p:fieldset>
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup id="statusOpen">
+                <p:selectBooleanCheckbox itemLabel="#{msg.UnderRepair}"
+                                         value="#{workOrderReportExportController.statusOpen}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="statusClose">
+                <p:selectBooleanCheckbox itemLabel="#{msg.Finish}"
+                                         value="#{workOrderReportExportController.statusClose}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="statusCancel">
+                <p:selectBooleanCheckbox itemLabel="#{msg.Cancel}"
+                                         value="#{workOrderReportExportController.statusCancel}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.IsPartExist}</label>
+                <p:selectOneMenu id="filterParts" value="#{workOrderReportExportController.filterParts}">
+                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                    <f:selectItem itemLabel="#{msg.ExistPart}" itemValue="Exist"/>
+                    <f:selectItem itemLabel="#{msg.UnexistPart}" itemValue="UnExist"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.IsMaintenanceAmountExist}</label>
+                <p:selectOneMenu id="filterTotalPrice" value="#{workOrderReportExportController.filterTotalPrice}">
+                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                    <f:selectItem itemLabel="#{msg.ExistMaintenanceAmount}" itemValue="Exist"/>
+                    <f:selectItem itemLabel="#{msg.UnExistMaintenanceAmount}" itemValue="UnExist"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">当前步骤</label>
+                <p:selectOneMenu id="currentStepId" value="#{workOrderReportExportController.currentStepId}">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems
+                            value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,7,8,9,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6,7,8,9')}"
+                            var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                </p:selectOneMenu>
             </h:panelGroup>
         </p:panelGrid>
-    </h:form>
-    <h:form id="searchBySrNum">
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">工单号*</label>
-                    <p:inputText value="#{workOrderReportExportController.srNumStr}" required="true" requiredMessage="工单号不得为空"/>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+    </p:fieldset>
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
-                <p:commandButton value="工单号检索" actionListener="#{workOrderReportExportController.previewDataBySrNum}"
-                                 icon="ui-icon-arrowthick-1-s" validateClient="true"
-                                 update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
-                </p:commandButton>
+                <label class="label">#{msg.EarliestApplyTime}</label>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}" id="startTime"
+                            value="#{workOrderReportExportController.startTime}"
+                            required="false" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.LatestApplyTime}</label>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}" id="endTime"
+                            value="#{workOrderReportExportController.endTime}"
+                            required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.EarliestCloseTime}</label>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}" id="closedStartTime"
+                            value="#{workOrderReportExportController.closedStartTime}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.LatestCloseTime}</label>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}" id="closedEndTime"
+                            value="#{workOrderReportExportController.closedEndTime}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
         </p:panelGrid>
-    </h:form>
+    </p:fieldset>
 
-    <h:form id="dataListForm">
-        <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item" widgetVar="varDataList"
-                     selection="#{workOrderReportExportController.selectedItems}"
-                     rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="both"
-                     paginatorAlwaysVisible="true"
-                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
-                     emptyMessage="#{msg.noRecordFound}"
-                     rowsPerPageTemplate="20,50,100,500">
-            <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
-            <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>
-            <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}" filterValue="#{workOrderReportExportController.filterMap.srNum}">
-                <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
-                    <c:if test="#{userContextService.isLocale()}">
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup>
+            <p:commandButton value="#{msg.previewResult}"
+                             actionListener="#{workOrderReportExportController.previewData}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true"
+                             update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
+            </p:commandButton>
+        </h:panelGroup>
+    </p:panelGrid>
+</h:form>
+<h:form id="searchBySrNum">
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <label class="label">工单号*</label>
+                <p:inputText value="#{workOrderReportExportController.srNumStr}" required="true"
+                             requiredMessage="工单号不得为空"/>
+            </h:panelGroup>
+        </p:panelGrid>
+    </p:fieldset>
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup>
+            <p:commandButton value="工单号检索" actionListener="#{workOrderReportExportController.previewDataBySrNum}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true"
+                             update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
+            </p:commandButton>
+        </h:panelGroup>
+    </p:panelGrid>
+</h:form>
+
+<h:form id="dataListForm">
+    <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item"
+                 widgetVar="varDataList"
+                 selection="#{workOrderReportExportController.selectedItems}"
+                 rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="both"
+                 paginatorAlwaysVisible="true"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
+                 emptyMessage="#{msg.noRecordFound}"
+                 rowsPerPageTemplate="20,50,100,500">
+        <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
+        <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>
+        <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}"
+                  filterValue="#{workOrderReportExportController.filterMap.srNum}">
+            <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
+                <c:if test="#{userContextService.isLocale()}">
                     <h:outputText value="#{item.报修单号}"/>
-                    </c:if>
-                    <c:if test="#{!userContextService.isLocale()}">
-                        <h:outputText value="#{item.RequestWorkorderNumber}"/>
-                    </c:if>
-                </a>
-            </p:column>
-            <p:column headerText="#{msg.EquipmentID}" filterBy="#{item.设备编号}" filterValue="#{workOrderReportExportController.filterMap.assetDepartNum}">
-                <c:if test="#{userContextService.isLocale()}">
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.RequestWorkorderNumber}"/>
+                </c:if>
+            </a>
+        </p:column>
+        <p:column headerText="#{msg.EquipmentID}" filterBy="#{item.设备编号}"
+                  filterValue="#{workOrderReportExportController.filterMap.assetDepartNum}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备编号}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.EquipmentID}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}" filterValue="#{workOrderReportExportController.filterMap.assetName}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.EquipmentID}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}"
+                  filterValue="#{workOrderReportExportController.filterMap.assetName}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备名称}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.EquipmentName}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}" filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.EquipmentName}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}"
+                  filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备型号}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.EquipmentModel}"/>
-                </c:if>
-            </p:column>
-            <!--<p:column headerText="资产编号">
-                <h:outputText value="#{item.资产编号}"/>
-            </p:column><p:column headerText="资产编号">
-                <h:outputText value="#{item.资产编号}"/>
-            </p:column>-->
-            <p:column headerText="所属院区" sortBy="#{item.院区}" filterBy="#{item.院区}" filterValue="#{workOrderReportExportController.filterMap.hospitalName}" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
-                <h:outputText value="#{item.院区}"/>
-            </p:column>
-            <p:column headerText="#{msg.Department}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.EquipmentModel}"/>
+            </c:if>
+        </p:column>
+        <!--<p:column headerText="资产编号">
+            <h:outputText value="#{item.资产编号}"/>
+        </p:column><p:column headerText="资产编号">
+            <h:outputText value="#{item.资产编号}"/>
+        </p:column>-->
+        <p:column headerText="所属院区" sortBy="#{item.院区}" filterBy="#{item.院区}"
+                  filterValue="#{workOrderReportExportController.filterMap.hospitalName}"
+                  rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+            <h:outputText value="#{item.院区}"/>
+        </p:column>
+        <p:column headerText="#{msg.Department}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.科室}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.Department}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.requestorId}" filterBy="#{item.报修人}" filterValue="#{workOrderReportExportController.filterMap.requestorName}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.Department}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.requestorId}" filterBy="#{item.报修人}"
+                  filterValue="#{workOrderReportExportController.filterMap.requestorName}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修人}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.Requestor}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.requestTime}" >
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.Requestor}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.requestTime}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修时间}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.RequestTime}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.CurrentOwner}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.RequestTime}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.CurrentOwner}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.当前责任人}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.CurrentOwner}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.FaultDescription}" filterBy="#{item.故障描述}" filterValue="#{workOrderReportExportController.filterMap.requestReason}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.CurrentOwner}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.FaultDescription}" filterBy="#{item.故障描述}"
+                  filterValue="#{workOrderReportExportController.filterMap.requestReason}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.故障描述}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.FaultDescription}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.CurrentStep}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.FaultDescription}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.CurrentStep}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.当前步骤}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.CurrentStep}"/>
-                </c:if>
-            </p:column>
-            <p:column headerText="#{msg.WorkorderStatus}">
-                <c:if test="#{userContextService.isLocale()}">
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.CurrentStep}"/>
+            </c:if>
+        </p:column>
+        <p:column headerText="#{msg.WorkorderStatus}">
+            <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.工单状态}"/>
-                </c:if>
-                <c:if test="#{!userContextService.isLocale()}">
-                    <h:outputText value="#{item.WorkorderStatus}"/>
-                </c:if>
-            </p:column>
+            </c:if>
+            <c:if test="#{!userContextService.isLocale()}">
+                <h:outputText value="#{item.WorkorderStatus}"/>
+            </c:if>
+        </p:column>
 
-            <f:facet name="{Toolbar}">
-                <c:choose>
-                    <c:when test="${userContextService.hasCurrentTenantName('')}">
-                        <p:commandButton ajax="false" value="#{msg.ExportWorkorderReports}" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportWo()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
-                        </p:commandButton>
-                        <p:commandButton ajax="false" value="详情导出" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportWoDocx()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                        </p:commandButton>
-                    </c:when>
-                    <c:otherwise>
-                        <p:commandButton ajax="false" value="#{msg.ExportAllReports}" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportAllWo()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
-                        </p:commandButton>
-                        <p:commandButton ajax="false" value="#{msg.SelectAndExportReports}" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportSelectedWo()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
-                        </p:commandButton>
-                        <p:commandButton ajax="false" value="#{msg.ExportAllDetails}" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportAllWoDocx()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                        </p:commandButton>
-                        <p:commandButton ajax="false" value="#{msg.SelectAndExportDetails}" rendered="#{not empty workOrderReportExportController.workOrderList}"
-                                         actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
-                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                            <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                        </p:commandButton>
-                    </c:otherwise>
-                </c:choose>
-            </f:facet>
-        </p:dataTable>
-    </h:form>
+        <f:facet name="{Toolbar}">
+            <c:choose>
+                <c:when test="${userContextService.hasCurrentTenantName('')}">
+                    <p:commandButton ajax="false" value="#{msg.ExportWorkorderReports}"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportWo()}"
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                        <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="详情导出"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportWoDocx()}"
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                        <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+                    </p:commandButton>
+                </c:when>
+                <c:otherwise>
+                    <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportAllWo()}"
+
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                        <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="#{msg.SelectAndExportReports}"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportSelectedWo()}"
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                        <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="#{msg.ExportAllDetails}"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportAllWoDocx()}"
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl"   onclick="startProgress();">
+                        <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="#{msg.SelectAndExportDetails}"
+                                     rendered="#{not empty workOrderReportExportController.workOrderList}"
+                                     actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                        <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+                    </p:commandButton>
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+    </p:dataTable>
+</h:form>
+<script type="text/javascript">
+
+    function startProgress() {
+        $("#exportProgress").show();
+        PF('pbAjaxLong').start();
+        PF('pbAjaxLong').setValue(0);
+    }
+</script>
 </html>
