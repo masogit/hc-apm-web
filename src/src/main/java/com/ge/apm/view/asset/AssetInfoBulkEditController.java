@@ -506,11 +506,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             copyPropertiesExclude(selected, assetInfo);
         }
 
-        this.saveAssetHistory(assetInfoList,newList);
         for (AssetInfo assetInfo: newList) {
             dao.save(assetInfo);
             onAfterNewObject(assetInfo);
         }
+        this.saveAssetHistory(assetInfoList,newList);
         AssetInfoListController.resultAssetMap.clear();
         if(assetInfos != null && !assetInfos.isEmpty()){
             return "";
