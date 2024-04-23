@@ -274,7 +274,7 @@ public class WorkOrderReportExportController implements Serializable {
             progress=new Progress();
             byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             //WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
-            WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(workOrderList,templateBytes,renderService,progress);
+            WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(data,templateBytes,renderService,progress);
             exportDocx = new DefaultStreamedContent(workOrderExportStream, workOrderExportStream.getContentType(), workOrderExportStream.getFileName());
         } catch (IOException e) {
             logger.error("Fail to export work orders", e);
