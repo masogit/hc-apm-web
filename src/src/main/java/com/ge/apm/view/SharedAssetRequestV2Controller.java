@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
@@ -88,6 +89,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private ConfigService configService;
     private ConfigItemValueRepository configItemValueRepository;
     private UserAccountRepository userAccountRepository;
+    private MultiLevelApprovalService multiLevelApprovalService;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -140,7 +142,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.applyTimeFormatTime = applyTimeFormatTime;
     }
     
-    private SharedAssetReqType selectedSart;//借用申请优化机制
+    private SharedAssetReqType selectedSart = new SharedAssetReqType();//借用申请优化机制
 
     public SharedAssetReqType getSelectedSart() {
         return selectedSart;
@@ -206,6 +208,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
@@ -385,7 +388,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
         object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         object.setState(1);
-                
+        object.setApprovalStatus(-1);
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/Edit.xhtml")){
             //借用待受理
             object.setState(1);
@@ -425,6 +428,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        object.setInvalidTime(today);
         
         
+    }
+    private String generateOrderNumber(){
+        StringBuilder sb = new StringBuilder("SAR");
+        SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
+        String dateStr = format.format(new Date());
+        sb.append(dateStr);
+        long count = dao.count();
+        if(count < 1){
+            sb.append(StringUtils.leftPad(String.valueOf(count),7,"0"));
+        }else{
+            sb.append(StringUtils.leftPad(String.valueOf(count),7,"0"));
+        }
+        return sb.toString();
     }
 
     //根据登录人信息配置权限
@@ -1097,15 +1113,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             cal.add(Calendar.DAY_OF_MONTH, 1);
             selected.setInvalidTime(cal.getTime());
             setDataType();
+            selected.setRequestNum(generateOrderNumber());
+            submmitApproval();
             dao.save(selected);
             apdDao.save(selected.getSartList());
-
-            //调用微服务
-            try {
-                sharedAssetService.pushWxMsg(selected.getId());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
             String url = "List.xhtml?faces-redirect=true";
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
@@ -1113,8 +1124,30 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
        
     }
-    
-   public void submmitR0() throws Exception {
+
+    private void submmitApproval() {
+        if(selected.getBehavior().equals(1)){
+            MultiLevelApproval multiLevelApproval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selected, null, false);
+            if (multiLevelApproval == null) {
+                try {
+                    sharedAssetService.pushWxMsg(selected.getId());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }else{
+                selected.setApprovalStatus(0);
+                WebUtil.addSuccessMessage("审批流发起成功,请尽快审批!");
+            }
+        }else{
+            try {
+                sharedAssetService.pushWxMsg(selected.getId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void submmitR0() throws Exception {
        this.save();
        String uid = selected.getId();
        int sta = selected.getState();
@@ -1159,6 +1192,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
              asdDao.delete(ListAll);//删除借用设备信息
+
 
            //调用微服务
            try {
@@ -2246,6 +2280,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 InstitutionUID,
                 tenantUID, key);
         return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
+    }
+
+    public void updateAssetReqType(){
+        SharedAssetReqType selectedSard = this.selectedSart;
+        String sharedAssetTypeId = selectedSard.getSharedAssetTypeId();
+        if("-1".equals(sharedAssetTypeId)){
+            selectedSard.setId(null);
+            selectedSard.setSwapName(null);
+            return;
+        }else{
+            SharedAssetType sharedAssetType = swapDao.findById(sharedAssetTypeId);
+            selectedSard.setSwapName(sharedAssetType.getSwapName());
+        }
     }
 }
     
