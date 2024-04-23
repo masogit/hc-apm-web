@@ -85,6 +85,11 @@
                             <p:ajax update=":IouEditForm:confirmBtn"/>
                         </p:inputNumber>
                     </p:column>
+                    <p:column headerText="预计归还时间" sortBy="#{item.estimatedBorrowTime}" >
+                        <h:outputText value="#{item.estimatedBorrowTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                    </p:column>
                     <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
                         <h:outputText value="#{item.patientNum}"/>
                     </p:column>

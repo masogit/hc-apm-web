@@ -43,7 +43,9 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -1481,7 +1483,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
-    
+
     public void deliverR() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1651,6 +1653,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             requestContext.addCallbackParam("message", message);
             WebUtil.addWarnMessage("调剂设备名称不能为空！");
             return;
+        }
+        Date estimatedBorrowTime = selectedSart.getEstimatedBorrowTime();
+        if(!isReturn && estimatedBorrowTime != null){
+             LocalDate localDate = estimatedBorrowTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+             long between = ChronoUnit.DAYS.between(LocalDate.now(), localDate);
+             if(between < 0){
+                 String message = "wrong" ;
+                 RequestContext requestContext = RequestContext.getCurrentInstance();
+                 requestContext.addCallbackParam("message", message);
+                 WebUtil.addWarnMessage("预计归还时间不能小于当前时间！");
+                 return;
+             }
         }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())) {
