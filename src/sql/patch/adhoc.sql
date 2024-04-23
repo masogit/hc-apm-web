@@ -1,5 +1,5 @@
 -- 批量更新设备使用年限截止日期字段
-update asset_info set asset_lifecycle_deadline = date_trunc('month', manufact_date + INTERVAL '1 month' * lifecycle) where manufact_date is not null and lifecycle is not null
+update asset_info set asset_lifecycle_deadline = date_trunc('month', manufact_date + INTERVAL '1 month' * lifecycle) where manufact_date is not null and lifecycle is not null;
 -- YHAAO-21538 调剂中心借用确认后，设备使用责任人修改
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '是否修改设备责任人', 'enableModifyingTheDeviceOwner', '是否修改设备责任人', 'f', 't', 3 where not exists (select * from config_item where key = 'enableModifyingTheDeviceOwner');
 -- YHAAO-21497 需求-科室间借调，跨院区借调做成可配置项

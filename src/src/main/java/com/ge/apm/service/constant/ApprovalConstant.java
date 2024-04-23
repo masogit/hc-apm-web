@@ -111,6 +111,7 @@ public interface ApprovalConstant {
     String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
     String APPROVAL_ASSET_SCRAP_CHI = "设备报废"; // 设备报废
     String APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI = "设备转科"; // 设备转科
+    String APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT  = "equipmentAdjustment"; // 设备调剂
 
     int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
     int BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT = 2;//备件申购单
@@ -129,6 +130,7 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_ASSET_SCRAP = 15; // 设备报废流程
     int BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT = 16; // 资产转科
     int BUSINESS_TYPE_PURCHASE_MANAGEMENT = 17; // 采购管理
+    int BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT = 18; // 设备调剂
 
     String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "申购管理"; // 预算管理
     String BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME = "采购管理"; // 预算管理
@@ -138,6 +140,7 @@ public interface ApprovalConstant {
     String BUSINESS_TYPE_ASSET_SCRAP_NAME = "设备报废"; // 资产报废
 
     String BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME = "设备转科"; // 资产转科
+    String BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME = "设备调剂"; // 设备调剂
 
     /**
      * 档案信息修改 是否需要审批标识

@@ -8,6 +8,7 @@ package com.ge.apm.domain;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import org.hibernate.annotations.Formula;
 import webapp.framework.web.WebUtil;
 
@@ -30,7 +33,7 @@ import webapp.framework.web.WebUtil;
  */
 @Entity
 @Table(name = "shared_asset_request")//借还申请
-public class SharedAssetRequest implements Serializable{
+public class SharedAssetRequest implements Serializable, ApprovableTarget {
     
     private static final long serialVersionUID = 1L;
     @Id
@@ -141,6 +144,11 @@ public class SharedAssetRequest implements Serializable{
     private String rejectShelveRemark; // 拒绝申请/搁置申请备注
     @Column(name = "data_type")
     private Integer dataType; // 1：调剂，2：无人值守
+    @Column(name = "approval_status")
+    private Integer approvalStatus;  // 多级审批状态 0 审批中 1 审批通过，2 审批不通过
+    @Column(name = "request_num")
+    private String requestNum;
+
     public String getId() {
         return id;
     }
@@ -541,5 +549,41 @@ public class SharedAssetRequest implements Serializable{
 
     public void setDataType(Integer dataType) {
         this.dataType = dataType;
+    }
+
+    public Integer getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(Integer approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getRequestNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT;
+    }
+
+    public String getRequestNum() {
+        return requestNum;
+    }
+
+    public void setRequestNum(String requestNum) {
+        this.requestNum = requestNum;
     }
 }
