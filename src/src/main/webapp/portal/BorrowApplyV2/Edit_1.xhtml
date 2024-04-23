@@ -75,6 +75,11 @@
                             <f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>
                             </p:cellEditor>
                     </p:column>
+                    <p:column headerText="预计归还时间" sortBy="#{item.estimatedBorrowTime}" >
+                        <h:outputText value="#{item.estimatedBorrowTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                    </p:column>
                     <p:column headerText="实际借用数" sortBy="#{item.actualQty}" >
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>
