@@ -15,9 +15,9 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.AdjustmentEquipmentName}*</label>
-                            <p:selectOneMenu id="swapTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}"  required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}">
-                                <p:ajax  update="broQty applyQty" />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <p:selectOneMenu id="swapTypeId" title="#{sharedAssetRequestV2Controller.selectedSart.swapName}" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}" style="width: 200px;" requiredMessage="调剂设备 #{msg.ValidationRequire}">
+                                <p:ajax listener="#{sharedAssetRequestV2Controller.updateAssetReqType()}" update="@this broQty applyQty" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{-1}" noSelectionOption="false"/>
                                 <f:selectItems value="#{sharedAssetTypeController.getSwapNameReturnList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>

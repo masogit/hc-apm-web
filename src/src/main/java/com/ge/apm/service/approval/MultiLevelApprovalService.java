@@ -24,6 +24,7 @@ import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
@@ -123,7 +124,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private AssetTypeGroupRepository assetTypeGroupRepository;
     @Autowired
     private BlobFileService blobService;
-
+    @Autowired
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
+    @Autowired
+    private SharedAssetService sharedAssetService;
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
         logger.info("approvableTarget" + approvableTarget);
@@ -168,6 +172,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT;
             case ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT:
                 return ApprovalConstant.APPROVAL_PURCHASE_MANAGEMENT;
+            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                return ApprovalConstant.APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT;
             default:
                 return null;
         }
@@ -357,7 +363,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 byId.setApprovalReason(approvalOpinion);
                 assetDepartmentConvertRepository.save(byId);
                 break;
-            //备件审批
+             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
+                 sharedAssetRequest.setApprovalStatus(2);
+                 sharedAssetRequest.setState(0);
+                 sharedAssetRequestRepository.save(sharedAssetRequest);
+                 sharedAssetService.pushWxMsg(sharedAssetRequest.getId());
+                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
         }
@@ -787,6 +799,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 }
                                 userAccounts1= userAccounts1.stream().distinct().collect(Collectors.toList());
                                 wxMessageService.sendMessage(assetInfoByUid,"审批通过",byId,userAccounts1,"",userAccount,byId.getApplyReason());
+                                break;
+                            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                                SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
+                                sharedAssetRequest.setApprovalStatus(1); // 多级审批状态 0 审批中 1 审批通过，2 审批不通过
+                                sharedAssetRequestRepository.save(sharedAssetRequest);
+                                sharedAssetService.pushWxMsg(sharedAssetRequest.getId());
                                 break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
@@ -1222,6 +1240,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP_NAME;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME;
+            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME;
         }
         return null;
     }
