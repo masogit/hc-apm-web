@@ -32,6 +32,11 @@
                             <label class="label">库存</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.stock}" id="stock"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预计借用时长（天）</label>
+                            <p:inputNumber id="estimatedBorrowTime" value="#{sharedAssetRequestV2Controller.selectedSart.estimatedBorrowTime}"
+                                           decimalPlaces="0" minValue="0"/>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
                             <label class="label">病人号*</label>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
