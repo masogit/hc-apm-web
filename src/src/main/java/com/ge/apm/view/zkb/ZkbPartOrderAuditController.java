@@ -706,6 +706,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 return "";
             }
             zkbPartOrderService.normalNextComplete(zkbPartOrderCloseInfo,selected,zkbPartOrderCloseWorkTimeList, closeBlobObjectList,currentUser);
+            //发送邮件给关单审核人
+            zkbPartOrderService.sendEmail(selected, "", UserContextService.getAccessToken());
         } else {
             zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
         }
