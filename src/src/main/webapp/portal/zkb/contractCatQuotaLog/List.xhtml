@@ -57,7 +57,7 @@
                            <h:outputText value="#{item.qty}"/>
                        </p:column>
                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="LIKE">
-                           <h:outputText value="#{zkbContractCatQuotaHistoryController.getFieldNameByType('status', item.status)}"/>
+                           <h:outputText value="#{item.status}"/>
                            <f:facet name="filter">
                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
