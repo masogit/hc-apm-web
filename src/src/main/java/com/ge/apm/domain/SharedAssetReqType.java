@@ -76,6 +76,8 @@ public class SharedAssetReqType implements Serializable{
 
     @Column(name = "patient_bed_num")
     private String patientBedNum;
+    @Column(name = "estimated_borrow_time")
+    private Long estimatedBorrowTime;
 
     public String getId() {
         return id;
@@ -234,5 +236,13 @@ public class SharedAssetReqType implements Serializable{
 
     public void setPatientBedNum(String patientBedNum) {
         this.patientBedNum = patientBedNum;
+    }
+
+    public Long getEstimatedBorrowTime() {
+        return estimatedBorrowTime;
+    }
+
+    public void setEstimatedBorrowTime(Long estimatedBorrowTime) {
+        this.estimatedBorrowTime = estimatedBorrowTime;
     }
 }

@@ -123,7 +123,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         //if(userContextService.isZkbUser()) {
             if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType())){
                 if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
-                    ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
                 ){

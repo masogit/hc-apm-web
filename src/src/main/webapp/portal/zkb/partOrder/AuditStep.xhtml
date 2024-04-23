@@ -818,8 +818,8 @@
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </c:when>
-                            <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
-                                <h:panelGroup ><!--工具-->
+                            <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}"><!--工具-->
+                                <h:panelGroup >
                                     <label class="label">SR#</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                                 </h:panelGroup>
