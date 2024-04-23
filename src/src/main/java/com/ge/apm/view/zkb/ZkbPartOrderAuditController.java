@@ -706,6 +706,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 return "";
             }
             zkbPartOrderService.normalNextComplete(zkbPartOrderCloseInfo,selected,zkbPartOrderCloseWorkTimeList, closeBlobObjectList,currentUser);
+            //发送邮件给关单审核人
+            zkbPartOrderService.sendEmail(selected, "", UserContextService.getAccessToken());
         } else {
             zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
         }
@@ -940,7 +942,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void trainCourseRender(){
         if(StrUtil.isEmpty(selected.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
             if(zkbContract != null ){
-                if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                     zkbPartOrderStatusVo.setHaveTrainCourseFlag(true);
                 }
             }
