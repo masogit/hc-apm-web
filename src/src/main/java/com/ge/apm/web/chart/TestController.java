@@ -5,7 +5,6 @@ import com.ge.apm.domain.pure.AssetFinacingNum;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.ConfigUtils;
-import com.ge.apm.service.wechat.CoreService;
 import com.ge.apm.service.wo.WorkflowService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -46,8 +45,6 @@ public class TestController {
 	@Autowired
 	WorkflowService workflowService;
 
-	@Autowired
-	CoreService coreService;
 	
 	@Autowired
 	private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
@@ -68,44 +65,8 @@ public class TestController {
 //        return userAccountService.getUserAccount();
     }
 
-    @RequestMapping(value = "/timeout", method = RequestMethod.GET )
-    @ResponseBody
-    public String calTimeout() {
-         workflowService.execute();
-         return "success";
-    }
 
-    @RequestMapping(value = "/push_wx", method = RequestMethod.GET )
-    @ResponseBody
-    public String pushWX() {
-    		String _openId = "otf1us5X8vbPlgpSK2C7aXKPxu6Q";
-    		System.out.println("env is "+env);
-    		String _templateId = configUtils.fetchProperties("timeout_template_id");
-    		Map<String ,Object> map = new HashMap<String,Object>();
-    		map.put("first", "领工超时");
-    		map.put("_assetName", "CT MR");
-    		map.put("_status", "维修中");
-    		map.put("_currentPerson", "科员");
-    		map.put("_requestTime", "2017-03-28");
-    		map.put("_urgency", "重要");
-    		map.put("_linkUrl", "/web/menu/35");
-    		map.put("remark", "备注信息");
-    		coreService.sendWxTemplateMessage(_openId, _templateId,map);
-         return "success";
-    }
-    public void datecompare() throws Exception{
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    Date d1 =df.parse("2016-05-09");//2001-01-09 for var
-        Date d2 =df.parse("2016-07-12");
-    if(d1.compareTo(d2) ==0){ /**/  }
-    /*is before or after*/
-    DateTime dtFrom = TimeUtil.toJodaDate(d1);
-        DateTime dtTo = TimeUtil.toJodaDate(d2).plusDays(1);
-        while(dtFrom.isBefore(dtTo)){
-            dtFrom = dtFrom.plusDays(1);
-        }
-     }
-    
+
     @RequestMapping(value = "/isExists", method = RequestMethod.GET )
     public String isExists() {
     		String _openId = "otf1us5X8vbPlgpSK2C7aXKPxu6Q111";
