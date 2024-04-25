@@ -46,6 +46,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
+	private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
 
@@ -61,6 +62,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		inventoryOrderDetailDao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
+		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
 		if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
@@ -179,5 +181,13 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
 		searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
 		searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+	}
+
+	public Boolean getFinished() {
+		return isFinished;
+	}
+
+	public void setFinished(Boolean finished) {
+		isFinished = finished;
 	}
 }

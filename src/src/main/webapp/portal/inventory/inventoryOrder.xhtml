@@ -21,7 +21,7 @@
 
 						<p:column headerText="#{msg.InventoryDepartment}" filterBy="#{item.assigneeOrg}"
 											filterMatchMode="LIKE" exportable="false">
-							<a href="inventoryOrderDetailAssetInfoMain.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
+							<a href="inventoryOrderDetailAssetInfoMain.xhtml?orderId=#{item.id}&amp;isFinished=#{item.isFinished}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
 						</p:column>
 						<p:column headerText="#{msg.InventoryDepartment}" visible="false" exportable="true">
 							<h:outputText value="#{item.clinicalDeptLabel}" />
