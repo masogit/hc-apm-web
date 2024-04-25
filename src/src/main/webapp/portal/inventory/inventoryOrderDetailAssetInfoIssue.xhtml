@@ -90,7 +90,7 @@
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 			</h:outputText>
 		</p:column>
-		<p:column headerText="#{msg.Actions}" style="width: 130px">
+		<p:column headerText="#{msg.Actions}" style="width: 130px" rendered="#{!inventoryOrderDetailAssetInfoController.finished}">
 			<p:commandButton id="updateButton" value="转入已盘点" actionListener="#{inventoryOrderDetailAssetInfoIssueController.transferInventorized(item)}"
 							 update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm"
 							 process="@this" disabled="#{item.isSolved eq false}">
@@ -98,7 +98,7 @@
 			</p:commandButton>
 		</p:column>
 		<f:facet name="{Toolbar}">
-			<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{inventoryOrderDetailAssetInfoIssueController.prepareEdit}" update=":inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg" process="@this" oncomplete="PF('OrderIssueEditDlg').show()" disabled="#{empty inventoryOrderDetailAssetInfoIssueController.selected}"/>
+			<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" rendered="#{!inventoryOrderDetailAssetInfoController.finished}" actionListener="#{inventoryOrderDetailAssetInfoIssueController.prepareEdit}" update=":inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg" process="@this" oncomplete="PF('OrderIssueEditDlg').show()" disabled="#{empty inventoryOrderDetailAssetInfoIssueController.selected}"/>
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist4" fileName="InventoryOrderDetailAssetInfoIssue_export" />
 			</p:commandButton>
