@@ -26,10 +26,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -385,8 +382,20 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             }
 
             if(csearchFilters != null){
+                Join join = root.join("assetInfo", JoinType.LEFT);
                 for(SearchFilter searchFilter : csearchFilters){
-                    predicates.add(builder.equal(root.get(searchFilter.fieldName), searchFilter.value));
+                    if(searchFilter.fieldName.toString().indexOf("assetInfo.") > -1){
+                        if(searchFilter.fieldName.toString().equals("assetInfo.name")){
+                            predicates.add(builder.like(join.get("name"), "%" +searchFilter.value.toString() + "%"));
+                        }else if(searchFilter.fieldName.toString().equals("assetInfo.systemId")){
+                            predicates.add(builder.like(join.get("systemId"), "%" +searchFilter.value.toString() + "%"));
+                        }else if(searchFilter.fieldName.toString().equals("assetInfo.assetGroup")){
+                            predicates.add(builder.equal(join.get("assetGroup"), searchFilter.value));
+                        }
+                    }else{
+                        predicates.add(builder.equal(root.get(searchFilter.fieldName), searchFilter.value));
+                    }
+                    //
                 }
             }
 
