@@ -42,6 +42,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
     private InventoryOrderService inventoryOrderService;
 	private AssetInfoRepository assetInfoRepository;
 	private String orderId;
+	private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
     private List<String> listAccessClinical;
@@ -57,6 +58,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
+		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
         if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
@@ -141,6 +143,14 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public Boolean getFinished() {
+		return isFinished;
+	}
+
+	public void setFinished(Boolean finished) {
+		isFinished = finished;
 	}
 
 	public String getEncodeAssetStr() {
