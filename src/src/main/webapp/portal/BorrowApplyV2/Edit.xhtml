@@ -88,8 +88,8 @@
 <!--                    <p:column headerText="借用数" sortBy="#{item.actualQty}" filterBy="#{item.actualQty}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>-->
-                    <p:column headerText="预计归还时间" sortBy="#{item.estimatedBorrowTime}" >
-                        <h:outputText value="#{item.estimatedBorrowTime}">
+                    <p:column headerText="预计归还时间" sortBy="#{item.expectDate}" >
+                        <h:outputText value="#{item.expectDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                         </h:outputText>
                     </p:column>

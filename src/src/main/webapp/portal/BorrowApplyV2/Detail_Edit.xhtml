@@ -34,7 +34,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">预计归还时间</label>
-                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="estimatedBorrowTime" pattern="#{userContextService.timeFormat()}" value="#{sharedAssetRequestV2Controller.selectedSart.estimatedBorrowTime}"
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="expectDate" pattern="#{userContextService.timeFormat()}" value="#{sharedAssetRequestV2Controller.selectedSart.expectDate}"
                                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
