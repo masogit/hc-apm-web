@@ -74,7 +74,7 @@
                                 </p:selectOneRadio>
                                 <h:panelGroup>
                                     <p:radioButton for="assetType" itemIndex="0"/>
-                                    <h:outputLabel value="医疗器械" styleClass="radiolabelPF"/>
+                                    <h:outputLabel value="设备" styleClass="radiolabelPF"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:radioButton for="assetType" itemIndex="1"/>
@@ -89,11 +89,11 @@
                                         <label class="label">注册证编号<span style="color:red">*</span></label>
                                         <p:inputText id="registrationNum" value="#{adverseEventApproveController.selected.registrationNum}" required="true"  requiredMessage="注册证编号不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
+                                    <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号</label>
                                         <p:inputText id="previouslyRegistrationNum" value="#{adverseEventApproveController.selected.previouslyRegistrationNum}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
+                                    <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号是否上报</label>
                                         <p:selectOneRadio value="#{adverseEventApproveController.selected.previouslyRegistrationReport}" id="previouslyRegistrationReport" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}">
                                             <p:ajax event="change" update="@this"/>
@@ -109,27 +109,35 @@
                                             <h:outputLabel value="否" styleClass="radiolabelPF"/>
                                         </h:panelGroup>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
+                                    <h:panelGroup rendered="false">
                                         <label class="label">产品类别</label>
                                         <p:inputText id="productCategory" value="#{adverseEventApproveController.selected.productCategory}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
-                                        <label class="label">型号<span style="color:red">*</span></label>
+                                    <h:panelGroup rendered="true">
+                                        <label class="label">型号<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
                                         <p:inputText id="model" value="#{adverseEventApproveController.selected.model}" required="true" requiredMessage="型号不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
-                                        <label class="label">规格<span style="color:red">*</span></label>
+                                    <h:panelGroup rendered="true">
+                                        <label class="label">规格<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
                                         <p:inputText id="standard" value="#{adverseEventApproveController.selected.standard}" required="true" requiredMessage="规格不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">产地<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
                                         <p:inputText id="originPlace" value="#{adverseEventApproveController.selected.originPlace}" required="#{adverseEventApproveController.assetType == 2 ? 'true':'false'}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
+                                        <label class="label">产品批号</label>
+                                        <p:inputText maxlength="100" value="#{adverseEventApproveController.selected.productLotNum}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
+                                        <label class="label">产品编号</label>
+                                        <p:inputText maxlength="100" value="#{adverseEventApproveController.selected.productNum}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">批号<span style="color:red">*</span></label>
                                         <p:inputText id="productLotNum" maxlength="100" value="#{adverseEventApproveController.selected.productLotNum}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">编号</label>
                                         <p:inputText id="productNum" maxlength="100" value="#{adverseEventApproveController.selected.productNum}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
@@ -141,11 +149,11 @@
                                         <label class="label">生产日期<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
                                         <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{adverseEventApproveController.assetType == 2 ? 'true':'false'}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
-                                        <label class="label">有效期至<span style="color:red">*</span></label>
+                                    <h:panelGroup rendered="true">
+                                        <label class="label">有效期至<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
                                         <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="有效期至不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">停用日期</label>
                                         <p:calendar timeZone="GMT+8"  id="retirementDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.retirementDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
@@ -155,7 +163,7 @@
                                     </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
-                            <p:fieldset legend="操作人">
+                            <p:fieldset legend="操作人" rendered="false">
                                 <p:selectOneRadio value="#{adverseEventApproveController.selected.operator}" id="operator" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}">
                                     <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:operatorDescHi" />
                                     <f:selectItem itemValue="1" />
@@ -194,7 +202,7 @@
                                     <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="事件发生日期不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">事件发现或获知日期<span style="color:red">*</span></label>
+                                    <label class="label">发现或获知日期<span style="color:red">*</span></label>
                                     <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="事件发现或获知日期不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
@@ -283,31 +291,11 @@
                                     <p:inputText id="patientName" maxlength="50" value="#{adverseEventApproveController.selected.patientName}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">性别</label>
-                                    <p:selectOneRadio value="#{adverseEventApproveController.selected.patientSex}" id="patientSex" layout="custom"  disabled="#{adverseEventApproveController.readOnlyCreateForm}">
-                                        <f:selectItem itemValue="1" />
-                                        <f:selectItem itemValue="2" />
-                                        <f:selectItem itemValue="3" />
-                                    </p:selectOneRadio>
-                                    <h:panelGroup>
-                                        <p:radioButton for="patientSex" itemIndex="0"/>
-                                        <h:outputLabel value="男" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="patientSex" itemIndex="1"/>
-                                        <h:outputLabel value="女" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="patientSex" itemIndex="2"/>
-                                        <h:outputLabel value="未知" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                </h:panelGroup>
-                                <h:panelGroup>
                                     <label class="label">出生日期</label>
                                     <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">年龄</label>
+                                    <label class="label">年龄类型</label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.patientAgeType}" id="patientAgeType" layout="custom"  disabled="#{adverseEventApproveController.readOnlyCreateForm}">
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />
@@ -331,7 +319,22 @@
                                     </h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">病例号</label>
+                                    <label class="label">性别</label>
+                                    <p:selectOneRadio value="#{adverseEventApproveController.selected.patientSex}" id="patientSex" layout="custom"  disabled="#{adverseEventApproveController.readOnlyCreateForm}">
+                                        <f:selectItem itemValue="1" />
+                                        <f:selectItem itemValue="2" />
+                                    </p:selectOneRadio>
+                                    <h:panelGroup>
+                                        <p:radioButton for="patientSex" itemIndex="0"/>
+                                        <h:outputLabel value="男" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:radioButton for="patientSex" itemIndex="1"/>
+                                        <h:outputLabel value="女" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">病历号</label>
                                     <p:inputText id="medicalCaseNum" maxlength="100" value="#{adverseEventApproveController.selected.medicalCaseNum}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -370,10 +373,10 @@
                                         <p:radioButton for="usePlace" itemIndex="2"/>
                                         <h:outputLabel value="其他" styleClass="radiolabelPF"/>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{adverseEventApproveController.selected.usePlace == 3}">
-                                        <label class="label">场所名称</label>
-                                        <p:inputText id="placeName" maxlength="100" value="#{adverseEventApproveController.selected.placeName}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
-                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">场所名称</label>
+                                    <p:inputText id="placeName" maxlength="100" value="#{adverseEventApproveController.selected.placeName}"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">使用过程<span style="color:red">*</span></label>
@@ -416,7 +419,7 @@
                                 <p:inputTextarea id="eventCauseDesc" maxlength="500" value="#{adverseEventApproveController.selected.eventCauseDesc}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">初步处置情况</label>
+                                <label class="label">初步处置情况<span style="color:red">*</span></label>
                                 <p:inputTextarea id="initDisposeSitu" maxlength="500" value="#{adverseEventApproveController.selected.initDisposeSitu}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                             </h:panelGroup>
                         </p:tab>

@@ -120,6 +120,8 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
             } else {
                 readOnlyEditForm = true;
             }
+            //设备类型赋值
+            assetType = selected.getDevicesClass() == null ? 1 : selected.getDevicesClass();
         }
     }
 
