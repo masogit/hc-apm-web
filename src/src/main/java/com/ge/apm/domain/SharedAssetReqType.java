@@ -76,9 +76,6 @@ public class SharedAssetReqType implements Serializable{
 
     @Column(name = "patient_bed_num")
     private String patientBedNum;
-    @Column(name = "estimated_borrow_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date estimatedBorrowTime;
 
     public String getId() {
         return id;
@@ -239,11 +236,4 @@ public class SharedAssetReqType implements Serializable{
         this.patientBedNum = patientBedNum;
     }
 
-    public Date getEstimatedBorrowTime() {
-        return estimatedBorrowTime;
-    }
-
-    public void setEstimatedBorrowTime(Date estimatedBorrowTime) {
-        this.estimatedBorrowTime = estimatedBorrowTime;
-    }
 }
