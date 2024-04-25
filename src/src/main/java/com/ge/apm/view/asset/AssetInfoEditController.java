@@ -2056,7 +2056,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return;
         }
         if (assetInfoRequireField.get(customConfigAssetField.getKey()) == null) {
-            assetInfoRequireField.put(customConfigAssetField.getKey(), customConfigAssetField.isArrivalRequired());
+            assetInfoRequireField.put(customConfigAssetField.getKey(), customConfigAssetField.isRequired());
+            if (customConfigAssetField.isRequired()) {
+                return;
+            }
         }
         customConfigAssetField.setRequired(BooleanUtils.isTrue(customConfigAssetField.getAssetTypeRequired().get(encoded)));
     }
