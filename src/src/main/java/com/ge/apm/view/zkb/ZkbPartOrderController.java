@@ -393,9 +393,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             predicates.add(builder.equal(join.get("assetGroup"), searchFilter.value));
                         }
                     }else{
-                        predicates.add(builder.equal(root.get(searchFilter.fieldName), searchFilter.value));
+                        if(searchFilter.operator.equals(SearchFilter.Operator.EQ)){
+                            predicates.add(builder.equal(root.get(searchFilter.fieldName), searchFilter.value));
+                        }else if(searchFilter.operator.equals(SearchFilter.Operator.LIKE)){
+                            predicates.add(builder.like(root.get(searchFilter.fieldName), "%" + searchFilter.value.toString() + "%"));
+                        }
                     }
-                    //
                 }
             }
 
