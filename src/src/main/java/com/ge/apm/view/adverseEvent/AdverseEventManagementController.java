@@ -169,6 +169,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
                 renderedSearchForm = false;
                 readOnlyCreateForm = true;
             }
+            //设备类型赋值
+            assetType = selected.getDevicesClass() == null ? 1 : selected.getDevicesClass();
         }
     }
 
@@ -402,6 +404,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         Integer oldStatus = selected.getStatus();
         processFile();
         selected.setStatus(status);
+        selected.setDevicesClass(assetType);
         try {
             AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
             if (!ObjectUtils.isEmpty(result)) {
