@@ -125,7 +125,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="true" requiredMessage="报告日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd mm:HH" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="true" requiredMessage="报告日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">科室<span style="color:red">*</span></label>
