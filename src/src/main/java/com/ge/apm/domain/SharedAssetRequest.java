@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
@@ -148,6 +149,10 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
     private Integer approvalStatus;  // 多级审批状态 0 审批中 1 审批通过，2 审批不通过
     @Column(name = "request_num")
     private String requestNum;
+
+    @Transient
+    @JsonProperty
+    private List<V2_BlobObject> attachments;
 
     public String getId() {
         return id;
@@ -585,5 +590,13 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
 
     public void setRequestNum(String requestNum) {
         this.requestNum = requestNum;
+    }
+
+    public List<V2_BlobObject> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<V2_BlobObject> attachments) {
+        this.attachments = attachments;
     }
 }

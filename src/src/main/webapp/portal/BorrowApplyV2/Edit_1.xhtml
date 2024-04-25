@@ -75,6 +75,11 @@
                             <f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>
                             </p:cellEditor>
                     </p:column>
+                    <p:column headerText="预计归还时间" sortBy="#{item.estimatedBorrowTime}" >
+                        <h:outputText value="#{item.estimatedBorrowTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                    </p:column>
                     <p:column headerText="实际借用数" sortBy="#{item.actualQty}" >
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>
@@ -136,7 +141,21 @@
                     
                     </p:dataTable>
                 </p:fieldset>
+                <p:fieldset legend="附件上传" style="margin-bottom:20px">
+                    <h:panelGroup >
+                        <p:dataList id="contractList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.Attachment}</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            <p:commandButton  update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                                      mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{sharedAssetRequestV2Controller.handleFileUpload}"
+                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
 
+                    </h:panelGroup>
+                </p:fieldset>
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" disabled="#{sharedAssetRequestV2Controller.selected.approvalStatus eq 0}" actionListener="#{sharedAssetRequestV2Controller.submmit}" action="List?faces-redirect=true" value="确认借用" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 3}"/>

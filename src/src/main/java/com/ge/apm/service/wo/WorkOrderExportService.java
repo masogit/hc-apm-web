@@ -1,18 +1,18 @@
 package com.ge.apm.service.wo;
 
-import com.ge.apm.domain.dto.V2WorkOrderReportDto;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -81,18 +82,18 @@ public class WorkOrderExportService {
     @Autowired
     private BlobObjectRepository blobObjectRepository;
 
-    public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
+    public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
-        if(clinicalDepte!=null) {
-            return serviceRequestApiService.getVisableMvsAssetSystemIdByClinaicalDept(token,clinicalDepte.getUid());
-        } else if(siteOrg!=null) {
-            return serviceRequestApiService.getVisableMvsAssetSystemIdBySite(token,siteOrg.getUid());
+        if (clinicalDepte != null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdByClinaicalDept(token, clinicalDepte.getUid());
+        } else if (siteOrg != null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdBySite(token, siteOrg.getUid());
         } else {
             return serviceRequestApiService.getVisableMvsAssetSystemId(token);
         }
     }
 
-    public List<Map<String, Object>> createPreviewWorkOrderData(V2WorkOrderReportDto v2WorkOrderReportDto){
+    public List<Map<String, Object>> createPreviewWorkOrderData(V2WorkOrderReportDto v2WorkOrderReportDto) {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -119,14 +120,14 @@ public class WorkOrderExportService {
             searchFilters.add(siteFilter);
         }
 
-        if(v2WorkOrderReportDto.getClinicalDept() !=null){
+        if (v2WorkOrderReportDto.getClinicalDept() != null) {
             List<OrgInfo> orgSearchList = new ArrayList<>();
             orgSearchList.add(v2WorkOrderReportDto.getClinicalDept());
             Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, v2WorkOrderReportDto.getClinicalDeptList());
             List<String> clinicalDeptUIDList = tempOrgSearchSet.stream().map(OrgInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
-        if(v2WorkOrderReportDto.getCurrentOwner() !=null) {
+        if (v2WorkOrderReportDto.getCurrentOwner() != null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getCurrentOwner().getId()));
         }
 
@@ -149,13 +150,13 @@ public class WorkOrderExportService {
         if (ObjectUtil.isNotEmpty(v2WorkOrderReportDto.getStatusList())) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, v2WorkOrderReportDto.getStatusList()));
         }
-        if(v2WorkOrderReportDto.getFilterParts() != null){
+        if (v2WorkOrderReportDto.getFilterParts() != null) {
             searchFilters.add(new SearchFilter("filterParts", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getFilterParts()));
         }
-        if(v2WorkOrderReportDto.getFilterTotalPrice() != null){
+        if (v2WorkOrderReportDto.getFilterTotalPrice() != null) {
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getFilterTotalPrice()));
         }
-        if(v2WorkOrderReportDto.getAssetInfoId() != null){
+        if (v2WorkOrderReportDto.getAssetInfoId() != null) {
             searchFilters.add(new SearchFilter("assetInfoId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getAssetInfoId()));
         }
         if (ObjectUtil.isNotEmpty(v2WorkOrderReportDto.getAssetTypeGroupEncodedSet())) {
@@ -164,9 +165,9 @@ public class WorkOrderExportService {
         if (StringUtils.isNotEmpty(v2WorkOrderReportDto.getSrNum())) {
             searchFilters.add(new SearchFilter("srNum", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSrNum()));
         }
-        List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(),v2WorkOrderReportDto.getClinicalDept());
+        List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(), v2WorkOrderReportDto.getClinicalDept());
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
-        if(!assetIds.isEmpty()) {
+        if (!assetIds.isEmpty()) {
             List<Integer> orderAssetIds = workOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
             List<Integer> mvsAssetIds = assetIds.stream().filter(assetId -> !orderAssetIds.contains(assetId)).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
@@ -175,57 +176,57 @@ public class WorkOrderExportService {
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
             boolean isReturn = true;
-            if(v2WorkOrderReportDto.getFilterMap().get("srNum") != null && v2WorkOrderReportDto.getFilterMap().get("srNum").length() > 0) {   //报修单号
-                if(workOrderExportPojo.getSrNum()!=null) {
+            if (v2WorkOrderReportDto.getFilterMap().get("srNum") != null && v2WorkOrderReportDto.getFilterMap().get("srNum").length() > 0) {   //报修单号
+                if (workOrderExportPojo.getSrNum() != null) {
                     isReturn = workOrderExportPojo.getSrNum().contains(v2WorkOrderReportDto.getFilterMap().get("srNum").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum")!=null && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum").length()>0) {  //设备编号
-                if(workOrderExportPojo.getAssetDepartNum()!=null) {
+            if (isReturn && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum") != null && v2WorkOrderReportDto.getFilterMap().get("assetDepartNum").length() > 0) {  //设备编号
+                if (workOrderExportPojo.getAssetDepartNum() != null) {
                     isReturn = workOrderExportPojo.getAssetDepartNum().contains(v2WorkOrderReportDto.getFilterMap().get("assetDepartNum").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn  && v2WorkOrderReportDto.getFilterMap().get("assetName")!=null && v2WorkOrderReportDto.getFilterMap().get("assetName").length()>0) {    //设备名称
-                if(workOrderExportPojo.getAssetName()!=null) {
+            if (isReturn && v2WorkOrderReportDto.getFilterMap().get("assetName") != null && v2WorkOrderReportDto.getFilterMap().get("assetName").length() > 0) {    //设备名称
+                if (workOrderExportPojo.getAssetName() != null) {
                     isReturn = workOrderExportPojo.getAssetName().contains(v2WorkOrderReportDto.getFilterMap().get("assetName").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType")!=null && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType").length()>0) {  //设备型号
-                if(workOrderExportPojo.getAssetFunctionType()!=null) {
+            if (isReturn && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType") != null && v2WorkOrderReportDto.getFilterMap().get("assetFunctionType").length() > 0) {  //设备型号
+                if (workOrderExportPojo.getAssetFunctionType() != null) {
                     isReturn = workOrderExportPojo.getAssetFunctionType().contains(v2WorkOrderReportDto.getFilterMap().get("assetFunctionType").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn  && v2WorkOrderReportDto.getFilterMap().get("requestorName")!=null && v2WorkOrderReportDto.getFilterMap().get("requestorName").length()>0) {  //报修人
-                if(workOrderExportPojo.getRequestorName()!=null && v2WorkOrderReportDto.getFilterMap().get("requestorName")!=null) {
+            if (isReturn && v2WorkOrderReportDto.getFilterMap().get("requestorName") != null && v2WorkOrderReportDto.getFilterMap().get("requestorName").length() > 0) {  //报修人
+                if (workOrderExportPojo.getRequestorName() != null && v2WorkOrderReportDto.getFilterMap().get("requestorName") != null) {
                     isReturn = workOrderExportPojo.getRequestorName().contains(v2WorkOrderReportDto.getFilterMap().get("requestorName").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && v2WorkOrderReportDto.getFilterMap().get("requestReason")!=null && v2WorkOrderReportDto.getFilterMap().get("requestReason").length()>0) {  //故障描述
-                if(workOrderExportPojo.getRequestReason()!=null) {
+            if (isReturn && v2WorkOrderReportDto.getFilterMap().get("requestReason") != null && v2WorkOrderReportDto.getFilterMap().get("requestReason").length() > 0) {  //故障描述
+                if (workOrderExportPojo.getRequestReason() != null) {
                     isReturn = workOrderExportPojo.getRequestReason().contains(v2WorkOrderReportDto.getFilterMap().get("requestReason").trim());
                 } else {
                     isReturn = false;
                 }
             }
-            if(isReturn && v2WorkOrderReportDto.getCurrentStepId()!=null) {  //当前步骤
-                if(workOrderExportPojo.getCurrentStepId()!=null) {
-                    isReturn = Integer.parseInt(v2WorkOrderReportDto.getCurrentStepId())==workOrderExportPojo.getCurrentStepId();
+            if (isReturn && v2WorkOrderReportDto.getCurrentStepId() != null) {  //当前步骤
+                if (workOrderExportPojo.getCurrentStepId() != null) {
+                    isReturn = Integer.parseInt(v2WorkOrderReportDto.getCurrentStepId()) == workOrderExportPojo.getCurrentStepId();
                 } else {
                     isReturn = false;
                 }
             }
-            if(v2WorkOrderReportDto.getFilterMap().get("hospitalName") != null && v2WorkOrderReportDto.getFilterMap().get("hospitalName").length() > 0) {   //所属院区
-                if(workOrderExportPojo.getSrNum()!=null) {
+            if (v2WorkOrderReportDto.getFilterMap().get("hospitalName") != null && v2WorkOrderReportDto.getFilterMap().get("hospitalName").length() > 0) {   //所属院区
+                if (workOrderExportPojo.getSrNum() != null) {
                     isReturn = workOrderExportPojo.getHospitalName().contains(v2WorkOrderReportDto.getFilterMap().get("hospitalName").trim());
                 } else {
                     isReturn = false;
@@ -234,7 +235,7 @@ public class WorkOrderExportService {
             return isReturn;
         }).collect(Collectors.toList());
 
-        for(WorkOrderExportPojo workOrderExportPojo : workOrderList){
+        for (WorkOrderExportPojo workOrderExportPojo : workOrderList) {
             Map<String, Object> workOrderMap = new HashedMap();
 
             workOrderMap.put("woId", workOrderExportPojo.getId());
@@ -251,24 +252,27 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));
             workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
+            workOrderMap.put(WebUtil.getMessage("registrationNo"), workOrderExportPojo.getRegistrationNo());
+            workOrderMap.put(WebUtil.getMessage("warrantyDate"), formatDate2(workOrderExportPojo.getWarrantyDate()));
+            workOrderMap.put(WebUtil.getMessage("factoryWarrantyDate"), formatDate2(workOrderExportPojo.getFactoryWarrantyDate()));
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
-            if(UserContextService.hasCurrentTenantName("")){
+            if (UserContextService.hasCurrentTenantName("")) {
                 if (currentStepId == null) {
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), "");
-                }else if(currentStepId == 7 || currentStepId == 9){//云阜用户 已关单
+                } else if (currentStepId == 7 || currentStepId == 9) {//云阜用户 已关单
                     currentStepId = 9;
-                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
-                }else if(currentStepId == 2 || currentStepId == 3){//云阜用户 待接单
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                } else if (currentStepId == 2 || currentStepId == 3) {//云阜用户 待接单
                     currentStepId = 3;
-                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
-                }else{
-                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                } else {
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
                 }
-            }else {
+            } else {
                 workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), currentStepId != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()) : "");
             }
 
-            workOrderMap.put("是否MVS工单",workOrderExportPojo.getMVSWorkOrder()? "是" : "否");
+            workOrderMap.put("是否MVS工单", workOrderExportPojo.getMVSWorkOrder() ? "是" : "否");
             workOrderMap.put(WebUtil.getMessage("requestorId"), workOrderExportPojo.getRequestorName());
             workOrderMap.put(WebUtil.getMessage("RequestTime_xlsx"), formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put(WebUtil.getMessage("FaultDescription_xlsx"), workOrderExportPojo.getRequestReason());
@@ -318,7 +322,7 @@ public class WorkOrderExportService {
             //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
             workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
 
-            workOrderMap.put("assetId",workOrderExportPojo.getAssetId());
+            workOrderMap.put("assetId", workOrderExportPojo.getAssetId());
 
             if (workOrderExportPojo.getAssetFunctionGroup() != null) {
                 workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
@@ -335,9 +339,9 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("workHourDetail"), workOrderExportPojo.getWorkHourDetail());
 
             String attributesStr = "";
-            if(!StringUtils.isEmpty(workOrderExportPojo.getAttributes())){
+            if (!StringUtils.isEmpty(workOrderExportPojo.getAttributes())) {
                 JSONArray attributesJSONArray = JSONObject.parseArray(workOrderExportPojo.getAttributes());
-                for(int i = 0 ; i < attributesJSONArray.size() ; i++){
+                for (int i = 0; i < attributesJSONArray.size(); i++) {
                     JSONObject attributesObject = attributesJSONArray.getJSONObject(i);
                     Object label = attributesObject.get("label").toString();
                     Object value = attributesObject.get("value").toString();
@@ -346,14 +350,14 @@ public class WorkOrderExportService {
             }
             workOrderMap.put(WebUtil.getMessage("Attribute"), attributesStr);
 
-            if(workOrderExportPojo.getSignature() != null){
+            if (workOrderExportPojo.getSignature() != null) {
                 workOrderMap.put("signature", workOrderExportPojo.getSignature());
             }
-            if(workOrderExportPojo.getAckSignature() != null){
+            if (workOrderExportPojo.getAckSignature() != null) {
                 workOrderMap.put("ack_signature", workOrderExportPojo.getAckSignature());
             }
-            if(workOrderExportPojo.getSrId()!=null) {
-                workOrderMap.put("srId",workOrderExportPojo.getSrId());
+            if (workOrderExportPojo.getSrId() != null) {
+                workOrderMap.put("srId", workOrderExportPojo.getSrId());
             }
             resultList.add(workOrderMap);
         }
@@ -377,71 +381,71 @@ public class WorkOrderExportService {
         String tenantUID = userAccount.getTenantUID();
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
 
-        Map<String,  List<V2_WorkOrder_Detail>> workOrderDetails= new HashMap<>();
+        Map<String, List<V2_WorkOrder_Detail>> workOrderDetails = new HashMap<>();
 
-        Map<String,String> partsSignatureMap = new HashMap<>();
-        Map<String,String> medicalWorkerApproverSignatureMap = new HashMap<>();
+        Map<String, String> partsSignatureMap = new HashMap<>();
+        Map<String, String> medicalWorkerApproverSignatureMap = new HashMap<>();
 //        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
-            List<V2_WorkOrder_Detail> v2_workOrder_details = workOrderDetailDao.findByWoIdIn(woId);
-            v2_workOrder_details.stream().forEach(i->{
-                workOrderDetails.putIfAbsent(i.getWoId(), new ArrayList<>());
-                workOrderDetails.get(i.getWoId()).add(i);
+        List<V2_WorkOrder_Detail> v2_workOrder_details = workOrderDetailDao.findByWoIdIn(woId);
+        v2_workOrder_details.stream().forEach(i -> {
+            workOrderDetails.putIfAbsent(i.getWoId(), new ArrayList<>());
+            workOrderDetails.get(i.getWoId()).add(i);
 
-                if(!Strings.isNullOrEmpty(i.getPartsSignature())) {
-                    partsSignatureMap.putIfAbsent(i.getWoId(), i.getPartsSignature());
-                }
-                if(!Strings.isNullOrEmpty(i.getMedicalWorkerApproverSignature())) {
-                    medicalWorkerApproverSignatureMap.putIfAbsent(i.getWoId(), i.getMedicalWorkerApproverSignature());
-                }
-            });
+            if (!Strings.isNullOrEmpty(i.getPartsSignature())) {
+                partsSignatureMap.putIfAbsent(i.getWoId(), i.getPartsSignature());
+            }
+            if (!Strings.isNullOrEmpty(i.getMedicalWorkerApproverSignature())) {
+                medicalWorkerApproverSignatureMap.putIfAbsent(i.getWoId(), i.getMedicalWorkerApproverSignature());
+            }
+        });
 //        }
 
         final List<AuditGroupConfigurationDetail> approverSignatureList = auditGroupConfigurationDetailRepository.findByBusinessUidInOrderByApproveNumDesc(woId);
         Map<String, List<AuditGroupConfigurationDetail>> approverSignatureObjMap = new HashMap<>();
-        approverSignatureList.stream().forEach(i->{
+        approverSignatureList.stream().forEach(i -> {
             i.setApproveNum(Optional.ofNullable(i.getApproveNum()).orElse(0));
             approverSignatureObjMap.putIfAbsent(i.getBusinessUid(), new ArrayList<>());
-            if(CollectionUtils.isEmpty(approverSignatureObjMap.get(i.getBusinessUid())) ||
-                    approverSignatureObjMap.get(i.getBusinessUid()).stream().anyMatch(sign-> Objects.equals(sign.getApproveNum(), i.getApproveNum()))){
+            if (CollectionUtils.isEmpty(approverSignatureObjMap.get(i.getBusinessUid())) ||
+                    approverSignatureObjMap.get(i.getBusinessUid()).stream().anyMatch(sign -> Objects.equals(sign.getApproveNum(), i.getApproveNum()))) {
                 approverSignatureObjMap.get(i.getBusinessUid()).add(i);
-            }else if(approverSignatureObjMap.get(i.getBusinessUid()).stream().anyMatch(sign-> sign.getApproveNum() < i.getApproveNum())){
+            } else if (approverSignatureObjMap.get(i.getBusinessUid()).stream().anyMatch(sign -> sign.getApproveNum() < i.getApproveNum())) {
                 approverSignatureObjMap.get(i.getBusinessUid()).clear();
                 approverSignatureObjMap.get(i.getBusinessUid()).add(i);
             }
         });
 
         Map<String, List<MultiLevelApproval>> approvalsMap = new HashMap<>();
-        multiLevelApprovals.stream().forEach(i->{
+        multiLevelApprovals.stream().forEach(i -> {
             approvalsMap.putIfAbsent(i.getBusinessUid(), new ArrayList<>());
             approvalsMap.get(i.getBusinessUid()).add(i);
         });
 
-        workOrderdata.stream().forEach(m->{
+        workOrderdata.stream().forEach(m -> {
             String woid = (String) m.get("woId");
-            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a-> a.getPurchasePrice()==null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
-            m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
-                    .map(a->a.getPurchaseDate()).orElse(null));
-            m.put("auditSignatureList",Optional.ofNullable(approvalsMap.get(woid))
-                    .map(o-> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
+            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a -> a.getPurchasePrice() == null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
+            m.put("采购日期", Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
+                    .map(a -> a.getPurchaseDate()).orElse(null));
+            m.put("auditSignatureList", Optional.ofNullable(approvalsMap.get(woid))
+                    .map(o -> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
 
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+            if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                 m.put("partsSignature", partsSignatureMap.get(woid));
-                m.put("medicalWorkerApproverSignature",medicalWorkerApproverSignatureMap.get(woid));
-                m.put("approverSignatureList",Optional.ofNullable(approverSignatureObjMap.get(woid))
-                        .map(o-> o.stream().map(AuditGroupConfigurationDetail::getApproverSignature).collect(Collectors.toList()))
+                m.put("medicalWorkerApproverSignature", medicalWorkerApproverSignatureMap.get(woid));
+                m.put("approverSignatureList", Optional.ofNullable(approverSignatureObjMap.get(woid))
+                        .map(o -> o.stream().map(AuditGroupConfigurationDetail::getApproverSignature).collect(Collectors.toList()))
                         .orElse(Collections.emptyList()));
-            }else if(tenantInfo.getType() != null && tenantInfo.getType() == 6){//县域新增
+            } else if (tenantInfo.getType() != null && tenantInfo.getType() == 6) {//县域新增
                 m.put(WebUtil.getMessage("siebleNumber"), m.get("siebleNumber"));
                 m.put(WebUtil.getMessage("callCenterNumber"), m.get("callCenterNumber"));
             }
             m.put("PartInformation", getPartsDetailMap(Optional.ofNullable(workOrderDetails.get(woid)).orElse(Collections.emptyList()),
                     (String) m.get(WebUtil.getMessage("srNum_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
-                    (String) m.get(WebUtil.getMessage("EquipmentID_xlsx")) ));
+                    (String) m.get(WebUtil.getMessage("EquipmentID_xlsx"))));
 
             List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), null); //微信端之前上传的图片没有 boSubType区分
-            if(pictureList!=null) {
+            if (pictureList != null) {
                 List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
                 List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
                 List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
@@ -449,10 +453,10 @@ public class WorkOrderExportService {
                 pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
                 Set<String> ids = workOrderDetailDao.findByWoId(woid).stream().map(p -> p.getId()).collect(Collectors.toSet());
-                if(!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
-                m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
-                m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
-                m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                if (!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
+                m.put("serviceRequestPicture", serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("workOrderPicture", workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("partsPicture", partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
             }
         });
 
@@ -847,22 +851,22 @@ public class WorkOrderExportService {
     }
     */
 
-    public List<Map<String, Object>> createPartsData(List<Map<String, Object>> workOrderList){
+    public List<Map<String, Object>> createPartsData(List<Map<String, Object>> workOrderList) {
 
         List<Map<String, Object>> partList = new ArrayList<>();
         for (Map<String, Object> workOrderMap : workOrderList) {
-            if(workOrderMap.containsKey("PartInformation")){
-                partList.addAll((List<Map<String, Object>>)workOrderMap.get("PartInformation"));
+            if (workOrderMap.containsKey("PartInformation")) {
+                partList.addAll((List<Map<String, Object>>) workOrderMap.get("PartInformation"));
             }
         }
         return partList;
     }
 
-    private List<Map<String, Object>> getPartsDetailMap(List<V2_WorkOrder_Detail> partsDetails, String srnum, String AssetName,String AssetNum ){
+    private List<Map<String, Object>> getPartsDetailMap(List<V2_WorkOrder_Detail> partsDetails, String srnum, String AssetName, String AssetNum) {
         List<Map<String, Object>> parts = new ArrayList<>();
         for (V2_WorkOrder_Detail workOrderDetail : partsDetails) {
             Map<String, Object> part = new HashedMap();
-            part.put(WebUtil.getMessage("srNum_xlsx"),srnum);
+            part.put(WebUtil.getMessage("srNum_xlsx"), srnum);
             part.put(WebUtil.getMessage("AssetName_xlsx"), AssetName);
             part.put(WebUtil.getMessage("EquipmentID_xlsx"), AssetNum);
             part.put(WebUtil.getMessage("PartName_xlsx"), workOrderDetail.getParts());
@@ -1193,6 +1197,11 @@ public class WorkOrderExportService {
 
     private String formatDate(Date date) {
         return date != null ? sdf.format(date) : "";
+    }
+
+    public String formatDate2(Date date) {
+        return date != null ? new SimpleDateFormat("yyyy-MM-dd").format(date) : "";
+
     }
 
     private String getPartType(String type) {

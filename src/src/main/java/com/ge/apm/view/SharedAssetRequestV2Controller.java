@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
@@ -22,6 +23,7 @@ import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
@@ -43,7 +45,9 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -90,6 +94,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private ConfigItemValueRepository configItemValueRepository;
     private UserAccountRepository userAccountRepository;
     private MultiLevelApprovalService multiLevelApprovalService;
+    private BlobFileService blobService;
+    private List<SharedAssetRequest> sharedAssetRequests;
+    private String viewImageStr;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -209,7 +216,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         userContextService = WebUtil.getBean(UserContextService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
+        sharedAssetRequests = new ArrayList<>();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
@@ -226,6 +235,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         else if ("Edit".equalsIgnoreCase(actionName)) {
             setSelected(dao.findById((String)UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
+            selected.setAttachments(initAttachments(selected.getId()));
+            if(selected.getBehavior() == 2){
+                List<SharedAssetReqDetail> sharedAssetReqDetails = asdDao.findByReturnId(selected.getId());
+                for (SharedAssetReqDetail sharedAssetReqDetail : sharedAssetReqDetails) {
+                    addSharedAssetRequests(sharedAssetReqDetail);
+                }
+            }
             prepareEdit();
         }
         else if ("Delete".equalsIgnoreCase(actionName)) {
@@ -712,6 +728,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                              if (selected.getSardList() != null) {
                                  selectedSard = sard;
                                  selected.getSardList().add(sard);
+                                 addSharedAssetRequests(sard);
                              }
                              preSelectReqDetail = null;
                              //更改使用科室
@@ -741,6 +758,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
              WebUtil.addWarnMessage("录入信息不符，请核对后录入！");
              return;
          }
+    }
+    private void addSharedAssetRequests(SharedAssetReqDetail sard){
+        if(sard == null)return;
+        String borrowId = sard.getBorrowId();
+        SharedAssetRequest request = dao.findById(borrowId);
+        List<V2_BlobObject> blobObjects = initAttachments(borrowId);
+        List<SharedAssetReqDetail> sardList = new ArrayList<>();
+        sardList.add(sard);
+        request.setSardList(sardList);
+        request.setAttachments(blobObjects);
+        sharedAssetRequests.add(request);
     }
     
     public void setCost(SharedAssetReqDetail sard){
@@ -1117,6 +1145,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             submmitApproval();
             dao.save(selected);
             apdDao.save(selected.getSartList());
+            saveAttachments(selected.getAttachments());
             String url = "List.xhtml?faces-redirect=true";
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
@@ -1192,7 +1221,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
              asdDao.delete(ListAll);//删除借用设备信息
-
+            saveAttachments(selected.getAttachments());
 
            //调用微服务
            try {
@@ -1214,6 +1243,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        if(sta == 9){//借用待确认状态
            dao.updateState(uid, state);
            clearOwner(uid);
+           saveAttachments(selected.getAttachments());
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1230,7 +1260,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         String modifyingTheDeviceOwner ="enableModifyingTheDeviceOwner";
         String configItemValue = userContextService.getConfigItemValue(modifyingTheDeviceOwner);
         if(Boolean.TRUE.toString().equals(configItemValue)){
-            List<SharedAssetReqDetail> details = asdDao.selectBySharedId(uid);
+            List<SharedAssetReqDetail> details = asdDao.findByReturnId(uid);
             if(CollectionUtils.isEmpty(details)) return;
             Set<String> assetUid = details.stream().map(SharedAssetReqDetail::getAssetInfoId).collect(Collectors.toSet());
             List<AssetInfo> assetInfos = asiDao.fetchListByUid(assetUid);
@@ -1272,6 +1302,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }catch (Exception e){
                 e.printStackTrace();
             }
+            saveAttachments(selected.getAttachments());
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
             return;
@@ -1290,6 +1321,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         ResponseEntity<LinkedHashMap> result = null;
         try {
             result = sharedAssetService.rejectApply(GatewayURL.REJECT_APPLY, params);
+            saveAttachments(selected.getAttachments());
             logger.info("拒绝借用申请：id="+id);
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
@@ -1309,6 +1341,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         ResponseEntity<LinkedHashMap> result = null;
         try {
             result = sharedAssetService.rejectApply(GatewayURL.REJECT_RETURN, params);
+            saveAttachments(selected.getAttachments());
             logger.info("拒绝归还申请：id="+id);
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
@@ -1328,6 +1361,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sta == 7) {
             String useUid = UserContextService.getCurrentUserAccount().getUid();
             dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
+            saveAttachments(selected.getAttachments());
         }
         if(sta == 11) {
         	dao.updateState(uid, state);
@@ -1360,6 +1394,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            realSAR.setState(state);
            realSAR.setRejectShelveRemark(selected.getRejectShelveRemark());
             dao.save(realSAR);
+            saveAttachments(selected.getAttachments());
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1464,6 +1499,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                selected.setState(state);
                selected.setModifyDate(new Date());
                sharedAssetRequestService.save(selected);
+               saveAttachments(selected.getAttachments());
                //调用微服务
                try {
                    sharedAssetService.pushWxMsg(selected.getId());
@@ -1481,7 +1517,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
-    
+
     public void deliverR() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1551,7 +1587,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                apdDao.save(selected.getSartList());
 
                 asdDao.save(selected.getSardList());
-
+                saveAttachments(selected.getAttachments());
                //调用微服务
                try {
                    sharedAssetService.pushWxMsg(selected.getId());
@@ -1651,6 +1687,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             requestContext.addCallbackParam("message", message);
             WebUtil.addWarnMessage("调剂设备名称不能为空！");
             return;
+        }
+        Date estimatedBorrowTime = selectedSart.getEstimatedBorrowTime();
+        if(!isReturn && estimatedBorrowTime != null){
+             LocalDate localDate = estimatedBorrowTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+             long between = ChronoUnit.DAYS.between(LocalDate.now(), localDate);
+             if(between < 0){
+                 String message = "wrong" ;
+                 RequestContext requestContext = RequestContext.getCurrentInstance();
+                 requestContext.addCallbackParam("message", message);
+                 WebUtil.addWarnMessage("预计归还时间不能小于当前时间！");
+                 return;
+             }
         }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())) {
@@ -1773,6 +1821,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        if(sta == 3){//借用待确认状态
            dao.updateState(uid, state);
            modifyingTheDeviceOwner(uid);
+           saveAttachments(selected.getAttachments());
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -2293,6 +2342,55 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             SharedAssetType sharedAssetType = swapDao.findById(sharedAssetTypeId);
             selectedSard.setSwapName(sharedAssetType.getSwapName());
         }
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+         List<V2_BlobObject> attachments = selected.getAttachments();
+        if(CollectionUtils.isEmpty(attachments)){
+            attachments= new ArrayList<>();
+            selected.setAttachments(attachments);
+        }
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getFile().getContentType().startsWith("image")?"Image":"File";
+            blobObject.setBoType(V2_BlobObject.AttachmentType.getKeyByValue("多级审批"));
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getId());
+            blobObject.setTenantUid(selected.getTenantUID());
+//            blobService.saveBlobObject(blobObject);
+            attachments.add(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    private void saveAttachments(List<V2_BlobObject> Attachments){
+        if(CollectionUtils.isEmpty(Attachments)){
+            return;
+        }
+        blobService.saveBlobObject(Attachments);
+    }
+
+    private List<V2_BlobObject> initAttachments(String id){
+        if(StringUtils.isEmpty(id)) return null;
+        return blobService.findBlobObjectsByBoUid(id);
+    }
+
+    public List<SharedAssetRequest> getSharedAssetRequests() {
+        return sharedAssetRequests;
+    }
+
+    public void setSharedAssetRequests(List<SharedAssetRequest> sharedAssetRequests) {
+        this.sharedAssetRequests = sharedAssetRequests;
+    }
+
+    public String getViewImageStr() {
+        return viewImageStr;
+    }
+
+    public void setViewImageStr(String viewImageStr) {
+        this.viewImageStr = viewImageStr;
     }
 }
     

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <h:outputStylesheet>
+        .ui-accordion-header{
+            background-color: #cacaca!important;
+        }
+        .ui-state-active{
+            background-color: #5180ce!important;
+        }
+    </h:outputStylesheet>
+    <p:fieldset id="sharedAssetRequests" legend="申请附件" style="margin-bottom:20px" rendered="#{sharedAssetRequestV2Controller.selected.behavior eq 2}">
+        <h:panelGroup>
+                <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{sharedAssetRequestV2Controller.sharedAssetRequests}">
+                    <p:tab title="#{o.sardList.get(0).assetName}" >
+                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="名称" >
+                                <h:outputText value="#{fileitem.objectName}"/>
+                            </p:column>
+                            <p:column headerText="类型"  >
+                                <h:outputText value="#{fileitem.boSubType}"/>
+                            </p:column>
+                            <p:column headerText="图片"  >
+                                <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
+                            </p:column>
+                            <p:column headerText="操作"  >
+                                <p:commandButton value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:commandLink  value="预览" ajax="false" actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" oncomplete="PF('viewImageDialog').show()" styleClass="p-mr-2"/>-->
+                                <p:commandButton  actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" value="放大" update="IouEditForm:viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:accordionPanel>
+            </h:panelGroup>
+            <p:dialog  id="viewImage" widgetVar="viewImageDialog" modal="true" height="500" width="500"  resizable="true" draggable="true" appendTo="@(body)" >
+                 <p:graphicImage  url="#{fileDownloadService.getImgUrl(sharedAssetRequestV2Controller.getViewImageStr())}" alt="不支持预览" style="width: 100%" />
+            </p:dialog>
+    </p:fieldset>
+</ui:composition>
+</html>
