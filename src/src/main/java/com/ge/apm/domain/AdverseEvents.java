@@ -544,6 +544,15 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
     @Size(min = 1, max = 100)
     private String reportMergeCode;
 
+    /**
+     * 器械分类
+     * 1-医疗器械 2-耗材
+     * 2024-04-25 add
+     */
+    @Column(name = "devices_class")
+    private Integer devicesClass;
+
+
     @Column(name = "created_by", nullable = true, length = 50, updatable = false)
     @JsonIgnore
     private String createdBy;
