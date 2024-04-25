@@ -85,6 +85,11 @@
                             <p:ajax update=":IouEditForm:confirmBtn"/>
                         </p:inputNumber>
                     </p:column>
+                    <p:column headerText="预计归还时间" sortBy="#{item.estimatedBorrowTime}" >
+                        <h:outputText value="#{item.estimatedBorrowTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                    </p:column>
                     <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
                         <h:outputText value="#{item.patientNum}"/>
                     </p:column>
@@ -131,14 +136,28 @@
                     </f:facet>
                     </p:dataTable>
                 </p:fieldset>
+                <p:fieldset legend="附件上传" style="margin-bottom:20px">
+                    <h:panelGroup >
+                        <p:dataList id="contractList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.Attachment}</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            <p:commandButton  update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                                      mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{sharedAssetRequestV2Controller.handleFileUpload}"
+                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
 
+                    </h:panelGroup>
+                </p:fieldset>
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton id="confirmBtn" validateClient="true" disabled="#{sharedAssetRequestV2Controller.validateAllExpectedQty()}" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
-                    <p:commandButton id="refuseBtn" validateClient="true" action="#{sharedAssetRequestV2Controller.editDialogTitle(1)}"  update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="拒绝申请" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
-                    <p:commandButton validateClient="true" action="#{sharedAssetRequestV2Controller.editDialogTitle(2)}" update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
-                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
-                    <p:commandButton value="#{msg.transfer}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
+                    <p:commandButton id="confirmBtn"  validateClient="true" disabled="#{sharedAssetRequestV2Controller.validateAllExpectedQty() or sharedAssetRequestV2Controller.selected.approvalStatus eq 0}" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
+                    <p:commandButton id="refuseBtn" validateClient="true" disabled="#{sharedAssetRequestV2Controller.selected.approvalStatus eq 0}" action="#{sharedAssetRequestV2Controller.editDialogTitle(1)}"  update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="拒绝申请" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
+                    <p:commandButton validateClient="true" disabled="#{sharedAssetRequestV2Controller.selected.approvalStatus eq 0}" action="#{sharedAssetRequestV2Controller.editDialogTitle(2)}" update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
+                    <p:commandButton value="#{msg.Return}"  action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
+                    <p:commandButton value="#{msg.transfer}" disabled="#{sharedAssetRequestV2Controller.selected.approvalStatus eq 0}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
                     <script>
                         function openSwapTypeViewWindow3(xhr, status, args) {
                         	if(args.validationFailed) {

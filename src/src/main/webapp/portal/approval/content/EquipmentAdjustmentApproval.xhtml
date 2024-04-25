@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 18}">
+        <label class="label">设备调剂审核内容</label>
+        <p:dataTable id="EquipmentAdjustmentList" value="#{multiLevelApprovalController.primaryApprovalData}"
+                     var="item"
+                     widgetVar="varDataList"
+                     lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+
+            <p:column headerText="科室名称" >
+                <h:outputText value="#{item.clinicalDeptName}"/>
+            </p:column>
+            <p:column headerText="申请人" >
+                <h:outputText value="#{item.applicantName}"/>
+            </p:column>
+            <p:column headerText="虚拟网电话" >
+                <h:outputText value="#{item.applicantPhone}"/>
+            </p:column>
+            <p:column headerText="借用状态" >
+                <h:outputText value="#{fieldMsg.fieldValue('assetBorrowStatus',item.state)}"/>
+            </p:column>
+
+            <p:column headerText="申请日期" >
+                <h:outputText value="#{item.applyTime}">
+                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="备注">
+                <h:outputText value="#{item.remark}"/>
+            </p:column>
+
+        </p:dataTable>
+    </h:panelGroup>
+
+</ui:composition>
+</html>

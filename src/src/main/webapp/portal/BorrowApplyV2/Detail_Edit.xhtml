@@ -32,6 +32,11 @@
                             <label class="label">库存</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.stock}" id="stock"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预计归还时间</label>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="estimatedBorrowTime" pattern="#{userContextService.timeFormat()}" value="#{sharedAssetRequestV2Controller.selectedSart.estimatedBorrowTime}"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   />
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
                             <label class="label">病人号*</label>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
