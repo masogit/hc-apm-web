@@ -65,6 +65,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private OrgInfoRepository orgDao;
     private VenderInfoRepository venderInfoRepository;
     private UaaService uaaService;
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
 
 
     private WorkflowService workflowService;
@@ -178,6 +179,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        sharedAssetRequestRepository = WebUtil.getBean(SharedAssetRequestRepository.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
@@ -302,6 +304,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 assetDepartmentConverts.add(assetDepartmentConvert);
                 primaryApprovalData = assetDepartmentConvert;
                 secondaryApprovalData =assetDepartmentConvert;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                  SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
+                primaryApprovalData = sharedAssetRequest;
+                secondaryApprovalData =sharedAssetRequest;
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -599,6 +606,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
             AssetInfo byUid = assetInfoRepository.findByUid(assetDepartmentConvert.getAssetUid());
             siteUid=byUid.getSiteUID();
+        }else if(this.businessTypeFlag == 18){
+            SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
+            siteUid=sharedAssetRequest.getSiteUID();
         }
 
         if(StringUtils.isNotEmpty(siteUid)){

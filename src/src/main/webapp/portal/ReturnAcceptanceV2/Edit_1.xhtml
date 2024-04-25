@@ -150,7 +150,7 @@
                              
                             <p:inputText id="applyAssetInfo" maxlength="100" style="width: 200px" placeholder="资产编号/设备编号/二维码"  value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
                             <p:commandButton icon="ui-icon-search" class="btn btn-sm btn-gray"
-                                             update="datalistDetail datalistOperation , messages returnAssetValidator"
+                                             update="datalistDetail datalistOperation , messages returnAssetValidator sharedAssetRequests"
                                              action="#{sharedAssetRequestV2Controller.getAssetInfoR(sharedAssetRequestV2Controller.selected.msgEndTime,sharedAssetRequestV2Controller.selected.msgAccepter)}"
                                              oncomplete="openReturnAssetValidator(xhr, status, args)"
                                              actionListener="hideGrowl()"/>
@@ -227,7 +227,22 @@
                     </f:facet>  
                     </p:dataTable>
                 </p:fieldset>
-                
+                <p:fieldset legend="附件上传" style="margin-bottom:20px">
+                    <h:panelGroup >
+                        <p:dataList id="contractList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.Attachment}</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            <p:commandButton  update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                                      mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{sharedAssetRequestV2Controller.handleFileUpload}"
+                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+
+                    </h:panelGroup>
+                </p:fieldset>
+                <ui:include src="ReturnAttachmentxhtml.xhtml"/>
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.deliverR}" oncomplete="openSwapTypeViewWindow(xhr, status, args)" 

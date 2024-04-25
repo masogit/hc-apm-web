@@ -5346,3 +5346,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','lastInventoryDate','上次盘点日期','Last Inventory Date',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'specialAsset', '特种设备', 'specialAsset', NULL, '-1');
+-- 	 YHAAO-21537 调剂中心借用申请增加多级审批
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'equipmentAdjustment', '设备调剂', 'equipment adjustment', NULL, -1);
