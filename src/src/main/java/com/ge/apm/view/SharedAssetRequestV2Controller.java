@@ -235,11 +235,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         else if ("Edit".equalsIgnoreCase(actionName)) {
             setSelected(dao.findById((String)UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
-            selected.setAttachments(initAttachments(selected.getId()));
-            if(selected.getBehavior() == 2){
-                List<SharedAssetReqDetail> sharedAssetReqDetails = asdDao.findByReturnId(selected.getId());
-                for (SharedAssetReqDetail sharedAssetReqDetail : sharedAssetReqDetails) {
-                    addSharedAssetRequests(sharedAssetReqDetail);
+            if(selected != null){
+                selected.setAttachments(initAttachments(selected.getId()));
+                if(selected.getBehavior() == 2){
+                    List<SharedAssetReqDetail> sharedAssetReqDetails = asdDao.findByReturnId(selected.getId());
+                    for (SharedAssetReqDetail sharedAssetReqDetail : sharedAssetReqDetails) {
+                        addSharedAssetRequests(sharedAssetReqDetail);
+                    }
                 }
             }
             prepareEdit();
