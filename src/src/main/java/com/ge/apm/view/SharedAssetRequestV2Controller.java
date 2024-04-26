@@ -1690,9 +1690,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             WebUtil.addWarnMessage("调剂设备名称不能为空！");
             return;
         }
-        Date estimatedBorrowTime = selectedSart.getEstimatedBorrowTime();
-        if(!isReturn && estimatedBorrowTime != null){
-             LocalDate localDate = estimatedBorrowTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Date expectDate = selectedSart.getExpectDate();
+        if(!isReturn && expectDate != null){
+             LocalDate localDate = expectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
              long between = ChronoUnit.DAYS.between(LocalDate.now(), localDate);
              if(between < 0){
                  String message = "wrong" ;
