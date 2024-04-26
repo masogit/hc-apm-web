@@ -233,7 +233,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     //保存审批节点
     public void saveNode() {
 //        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
-        if(CollectionUtils.isEmpty(approvalNode.getApproveUsers()) &&( StringUtils.isBlank(roleApproveCondition.getApproveRole())  ||  roleApproveCondition.getCondition()==null )){
+        if(CollectionUtils.isEmpty(approvalNode.getApproveUsers()) &&( StringUtils.isBlank(approvalNode.getRoleApproveCondition().getApproveRole())  ||  approvalNode.getRoleApproveCondition().getCondition()==null )){
             WebUtil.addErrorMessage("请选择审核人");
             return;
         }
@@ -320,7 +320,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setRoleUids(item.getApproveRoles().stream().map(a -> a.getId()).collect(Collectors.toList()));
                 item.setUserUids(null);
             } else {
-                if(CollectionUtils.isEmpty(item.getApproveUsers())){
+                if(CollectionUtils.isEmpty(item.getApproveUsers())  &&( StringUtils.isBlank(item.getRoleApproveCondition().getApproveRole())  ||  item.getRoleApproveCondition().getCondition()==null )){
                     nodeApprovalUserIsNull.set(true);
                     WebUtil.addWarnMessage("当前配置下审批节点中审核人为空,不允许保存！");
                     return;
