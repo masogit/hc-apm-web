@@ -224,10 +224,16 @@
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{'equipmentAdjustment'.equals(multiLevelApprovalConfigController.selected.businessType)}">
+                        <label class="label">上级审批</label>
+                            <p:selectBooleanCheckbox id="approvalRoleAssetHead" value="#{multiLevelApprovalConfigController.approvalRoleAssetHead}">
+                                <p:ajax process="@this" listener="#{multiLevelApprovalConfigController.changeApprovalStrategy}" update="approverInfoEditForm" />
+                            </p:selectBooleanCheckbox>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label" style="font-size: medium">是否通过组织机构筛选</label>
-                        <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.selectByOrg}"
-                                                 disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}">
+                        <p:selectBooleanCheckbox id="selectByOrg" value="#{multiLevelApprovalConfigController.approvalNode.selectByOrg}"
+                                                 disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType) or multiLevelApprovalConfigController.approvalRoleAssetHead}">
                             <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
@@ -235,10 +241,10 @@
                         <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalNode.selectByOrg}">
                             <label class="label">组织机构选择</label>
                             <p:inputText id="selectedOrgName" value="#{multiLevelApprovalConfigController.selectedUserOrg==null ? '': multiLevelApprovalConfigController.selectedUserOrg.name}" readonly="true"/>
-                            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
-                            <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:400px;" modal="false">
+                            <p:commandButton disabled="#{multiLevelApprovalConfigController.approvalRoleAssetHead}" id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel  id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:400px;" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:400px;height: 150px;border:0;" value="#{multiLevelApprovalConfigController.orgTree}" var="node" selectionMode="single">
+                                    <p:tree disabled="#{multiLevelApprovalConfigController.approvalRoleAssetHead}" id="orgTree" class="tree" style="width:400px;height: 150px;border:0;" value="#{multiLevelApprovalConfigController.orgTree}" var="node" selectionMode="single">
                                         <p:ajax process="@this" event="select"  update="approverInfoEditForm:selectedOrgName approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
@@ -259,7 +265,7 @@
 
                         <h:panelGroup rendered="#{multiLevelApprovalConfigController.approvalConditionEnable}">
                             <p:fieldset legend="审批节点-角色">
-                                <p:selectOneMenu  value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                <p:selectOneMenu disabled="#{multiLevelApprovalConfigController.approvalRoleAssetHead}" value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.approveRole}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}审批角色" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItem itemLabel="临床科室主任" itemValue="DeptHead" />
                                     <f:selectItem itemLabel="工程师" itemValue="AssetStaff"  />
@@ -267,7 +273,7 @@
                             </p:fieldset>
 
                             <p:fieldset legend="审批节点-条件">
-                                <p:selectOneMenu   value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                <p:selectOneMenu disabled="#{multiLevelApprovalConfigController.approvalRoleAssetHead}"  value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItem itemLabel="工单设备所属科室" itemValue="1" />
                                 </p:selectOneMenu>
@@ -279,7 +285,7 @@
                                 panelStyle="width:280px" style="width:100%"
                                 converter="userAccountConverter" multiple="true" filter="true"
                                 filterMatchMode="contains"
-                                disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}">
+                                disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType) or multiLevelApprovalConfigController.approvalRoleAssetHead}">
                             <f:selectItems value="#{multiLevelApprovalConfigController.users4Approval}" var="item"
                                            itemLabel="#{multiLevelApprovalConfigController.getNameWithOrgName(item)}" itemValue="#{item}"/>
                             <p:ajax process="@this"/>
