@@ -79,6 +79,10 @@ public class CustomConfigService {
 
     }
 
+    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
+    public void  cleanCurrentCustomConfigCache (String siteUid){
+    }
+
     private CustomConfigObject getDefalutCustomConfigObject() {
         CustomConfigObject   defaultConfig = new CustomConfigObject();
         return defaultConfig;
