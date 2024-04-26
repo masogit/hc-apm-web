@@ -71,6 +71,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private UserOrgInfoRepository userOrgInfoRepository;
     private boolean selectClinicalDept;
     private boolean selectAssetGroup;
+    private boolean approvalRoleAssetHead;
     @Override
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -505,6 +506,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         for (ApprovalNode node : nodesList) {
             if (null != node.getNodeId() && nodeId == node.getNodeId()) {
                 approvalNode = node;
+                setApprovalRoleAssetHead(StringUtils.isNotEmpty(approvalNode.getApprovalStrategy()));
                 if(node.getRoleApproveCondition()==null){
                     approvalNode.setRoleApproveCondition(new RoleApproveCondition());
                 }
@@ -845,5 +847,22 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
     public void setSelectAssetGroupCheck(){
         selectAssetGroup = assetGroup.size() == selected.getSelectAssetGroups().size();
+    }
+
+    public boolean getApprovalRoleAssetHead() {
+        return approvalRoleAssetHead;
+    }
+
+    public void setApprovalRoleAssetHead(boolean approvalRoleAssetHead) {
+        this.approvalRoleAssetHead = approvalRoleAssetHead;
+    }
+
+    public void changeApprovalStrategy(){
+        if(this.approvalRoleAssetHead){
+            // Approval by the superior  上级科室主任审批
+            this.approvalNode.setApprovalStrategy("ApprovalSuperior");
+        }else{
+            this.approvalNode.setApprovalStrategy("");
+        }
     }
 }
