@@ -5,9 +5,11 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.excel.EasyExcel;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.dto.AssetImport;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
@@ -19,14 +21,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import webapp.framework.web.WebUtil;
 
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import webapp.framework.web.WebUtil;
 
 /**
- *
  * @author 212579464
  */
 @Service
@@ -86,7 +88,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
         Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator = doc.iterator();
         while (iterator.hasNext()) {
             Map<String, ExcelDocument.ValueWrapper> rowMap = iterator.next();
-            try{
+            try {
                 Map<String, Object> map = new LinkedHashMap();
 
                 AssetInfo asset;
@@ -96,8 +98,9 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
                     dbAsset = new AssetInfo();
-                    BeanUtils.copyProperties(asset,dbAsset);
-                    if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
+                    BeanUtils.copyProperties(asset, dbAsset);
+                    if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID()))
+                        throw new Exception(WebUtil.getMessage("InvalidUUID"));
 
                     //save old data to compare later
                     map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
@@ -122,7 +125,6 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold");
 
 
-
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentID")), "setDepartNum", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("AssetID")), "setFinancingNum", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentAlias")), "setAliasName", true);
@@ -142,7 +144,6 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("geDeviceType")), "setGeDeviceType");
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("medicalApparatusClassification") + "编码"), "setMedicalApparatusClassification", true);
-
 
 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("medicalInstrumentClassification")), "setFunctionGroup", assetFunctionTypes, map, null);
@@ -206,7 +207,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("secondDirectory")), "setSecondDirectory", true);
 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("UsageClassification")), "setAssetUsage", assetUsageList, map, null);
-                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CapitalSource")), "setCapitalSource", capitalSourceList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CapitalSource")), "" +
+                        "setCapitalSource", capitalSourceList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("riskGrade")), "setRiskGrade", riskGradeList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measureGrade")), "setMeasureGrade", measureGradeList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measuringItemCategory")), "setMeasuringItemCategory", measuringItemCategoryList, map, null);
@@ -262,10 +264,10 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 result.add(map);
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e.getMessage(), e);
-                throw new Exception(WebUtil.getMessage("RowStart")+dataRow+WebUtil.getMessage("DataError") + e.getMessage());
+                throw new Exception(WebUtil.getMessage("RowStart") + dataRow + WebUtil.getMessage("DataError") + e.getMessage());
             }
 
 
@@ -278,11 +280,10 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
         return result;
     }
-    
-    public String trimMsgKey(String msgKey){
+
+    public String trimMsgKey(String msgKey) {
         return msgKey == null ? "" : msgKey.trim();
     }
-
 
 
     public boolean checkDocVersion(ExcelDocumentStreamingReader doc) {

@@ -5,9 +5,11 @@
  */
 package com.ge.apm.view.asset;
 
+import com.alibaba.excel.EasyExcel;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetImport;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
@@ -33,14 +35,14 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author 212579464
  */
 @ManagedBean
@@ -54,6 +56,7 @@ public class AssetFileImportController {
     private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportStreamingService streamingService;
+    private AssetImportDataCheckService assetImportDataCheckService;
     private AssetFileImportUseCacheService importUseCacheService;
 
     private OrgInfoLocalCacheService orgInfoLocalCacheService;
@@ -67,7 +70,7 @@ public class AssetFileImportController {
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
-    
+
     private Boolean canbeImported = false;
     private Boolean unCheckedNurseSite = false;
     private Boolean toDeleteCheckedNurseSite = false;
@@ -91,7 +94,13 @@ public class AssetFileImportController {
 
     private boolean crossSite;
 
+    private Progress uploadProgress;
+
     private String treeNodeNameFilter;
+
+    private List<AssetImport> assetImportList;
+    private Boolean importProgressRender = false;
+
 
     @PostConstruct
     protected void init() {
@@ -107,6 +116,7 @@ public class AssetFileImportController {
         ccService = WebUtil.getBean(CustomConfigService.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         importUseCacheService = WebUtil.getBean(AssetFileImportUseCacheService.class);
+        assetImportDataCheckService = WebUtil.getBean(AssetImportDataCheckService.class);
 
         initOrgTree();
 
@@ -122,7 +132,7 @@ public class AssetFileImportController {
         this.file = event.getFile();
 
         crossSite = false;
-
+        this.setImportProgressRender(true);
         uploadAssetFile(selectedOrg, false);
     }
 
@@ -149,46 +159,54 @@ public class AssetFileImportController {
 
     public void uploadAssetFile(OrgInfo siteOrg, boolean crossSite) {
 
+        assetImportDataCheckService.setSelectedOrgToImport(siteOrg, crossSite);
         streamingService.setSelectedOrgToImport(siteOrg, crossSite);
-
-        try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
-             ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
-        {
+        try (
+                ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null)) {
             /*logger.info("check upload asset file version");
 
             if(!streamingService.checkDocVersion(assetDoc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
                 return;
             }*/
-
+            logger.info("fetch org info in list");
+            importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
             logger.info("fetch org cache for quick lookup");
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
-            importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc, orgNamesUriCache);
+            displayAssetsNew = new ArrayList<>();
+            uploadProgress = new Progress();
+            LocalDateTime startTime = LocalDateTime.now();
+            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).autoCloseStream(true).sheet(0).registerConverter(new ApmI18nConverter(selectedOrg.getSiteId())).doRead();
+            logger.info("found asset record count: {}", displayAssetsNew.size());
+            LocalDateTime endTime = LocalDateTime.now();
+            Duration duration = Duration.between(startTime, endTime);
+            logger.info("easyExcel read  file: {} seconds", duration.getSeconds());
+
+          /*  importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc, orgNamesUriCache);
 
             logger.info("found asset record count: {}", importAssetMap.size());
-
-            if(importAssetMap.size() > 15000){
+*/
+            if (displayAssetsNew.size() > 15000) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
-
-            logger.info("fetch org info in list");
-            importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
-
             logger.info("start to check data");
-            Map checkresult = streamingService.checkData(importOrgMap, importAssetMap,unCheckNurseSiteMaintainList);
-            canbeImported = (Boolean) checkresult.get("canBeImport");
-            unCheckedNurseSite = (Boolean) checkresult.get("unCheckedNurseSite");
-
+            LocalDateTime checkStartime = LocalDateTime.now();
+            Map<String, Boolean> checkresult = assetImportDataCheckService.checkData(displayAssetsNew, importOrgMap, unCheckNurseSiteMaintainList, uploadProgress);
+            LocalDateTime checkEndTime = LocalDateTime.now();
+            Duration checkDuration = Duration.between(checkStartime, checkEndTime);
+            logger.info("check import data : {} seconds", checkDuration.getSeconds());
+            canbeImported = checkresult.get("canBeImport");
+            unCheckedNurseSite = checkresult.get("unCheckedNurseSite");
             filterErrorRecords();
 
         } catch (IOException e) {
             WebUtil.addErrorMessage("File can not be read!", null);
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
 
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage(), null);
-            logger.error(e.getMessage(),e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--" + e.getMessage(), null);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -197,7 +215,7 @@ public class AssetFileImportController {
     }
 
     public void checkIfRequireBeforeImportData() {
-        if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintainList) && !toDeleteCheckedNurseSite) {
+        if (CollectionUtils.isNotEmpty(unCheckNurseSiteMaintainList) && !toDeleteCheckedNurseSite) {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
             requestContext.addCallbackParam("toDeleteCheckedNurseSite", toDeleteCheckedNurseSite);
@@ -218,12 +236,15 @@ public class AssetFileImportController {
 
             //AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
             //AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
-
-            List<AssetInfo> saveList = streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            LocalDateTime saveStartTime = LocalDateTime.now();
+            List<AssetInfo> saveList = streamingService.importAssetDataNew(displayAssetsNew, autoGenerateQrcode, orgNamesUriCache);
+            LocalDateTime saveEndTime = LocalDateTime.now();
+            Duration saveDuration = Duration.between(saveStartTime, saveEndTime);
+            logger.info("save data : {} seconds", saveDuration.getSeconds());
             for (AssetInfo assetInfo : saveList) {
                 streamingService.saveAssetHistory(assetInfo);
             }
-            if(toDeleteCheckedNurseSite) {
+            if (toDeleteCheckedNurseSite) {
                 streamingService.deleteNursiteMaintain(unCheckNurseSiteMaintainList);
                 toDeleteCheckedNurseSite = false;
             }
@@ -257,11 +278,11 @@ public class AssetFileImportController {
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         template.exportSampleAsset(orgList, exportFields);
-        template.exportSampleAsset(orgList, exportFields,tcm);
+        template.exportSampleAsset(orgList, exportFields, tcm);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(userContextService.isLocale()){
+        if (userContextService.isLocale()) {
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
-        }else{
+        } else {
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
         }
         logger.info(" export asset excel template successful. ");
@@ -279,9 +300,9 @@ public class AssetFileImportController {
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(true);
         template.exportSampleAsset(orgList, exportFields);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(userContextService.isLocale()){
+        if (userContextService.isLocale()) {
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
-        }else{
+        } else {
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
         }
         logger.info(" export cross site asset excel template successful. ");
@@ -302,24 +323,24 @@ public class AssetFileImportController {
         this.file = null;
 
     }
-    
-    public Integer getAssetErrorCounts(){
-        if(null!=importAssetMap && !importAssetMap.isEmpty()){
-           return Integer.parseInt(String.valueOf(importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
-        }else{
+
+    public Integer getAssetErrorCounts() {
+        if (null != importAssetMap && !importAssetMap.isEmpty()) {
+            return Integer.parseInt(String.valueOf(importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+        } else {
             return 0;
         }
     }
-    
-    public List<String> getAssetErrorList(){
-        if(null == importAssetMap) {
+
+    public List<String> getAssetErrorList() {
+        if (null == importAssetMap) {
             return null;
         }
         List<String> errors = importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
                 .map(item -> item.get("errmsg").toString()).collect(Collectors.toList());
         return errors;
     }
-    
+
 //    public Integer getOrgErrorCounts(){
 //        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
 //           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
@@ -329,7 +350,7 @@ public class AssetFileImportController {
 //    }
 
     public void initOrgTree() {
-        if(getIsSelect46Account()){
+        if (getIsSelect46Account()) {
             return;
         }
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -373,7 +394,7 @@ public class AssetFileImportController {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        for (Map<String, Object> map: importAssetMap) {
+        for (Map<String, Object> map : importAssetMap) {
 
             AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
             if (importStatus == null) continue;
@@ -390,7 +411,7 @@ public class AssetFileImportController {
 
         List<Map<String, Object>> resultMap = new ArrayList<>();
 
-        for (Map<String, Object> map: importOrgMap) {
+        for (Map<String, Object> map : importOrgMap) {
 
             AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
             if (importStatus == null) continue;
@@ -405,6 +426,8 @@ public class AssetFileImportController {
     }
 
     List<Map<String, Object>> displayAssets;
+
+    List<AssetImport> displayAssetsNew;
 
     public List<Map<String, Object>> getDisplayAssets() {
 
@@ -463,9 +486,13 @@ public class AssetFileImportController {
         return canbeImported;
     }
 
-    public Boolean getUnCheckedNurseSite() { return unCheckedNurseSite; }
+    public Boolean getUnCheckedNurseSite() {
+        return unCheckedNurseSite;
+    }
 
-    public Boolean getToDeleteCheckedNurseSite() { return toDeleteCheckedNurseSite; }
+    public Boolean getToDeleteCheckedNurseSite() {
+        return toDeleteCheckedNurseSite;
+    }
 
     public Boolean getAutoGenerateQrcode() {
         return autoGenerateQrcode;
@@ -516,7 +543,7 @@ public class AssetFileImportController {
     }
 
     public boolean isEmpty() {
-        return (importAssetMap == null || importAssetMap.isEmpty());
+        return (displayAssetsNew == null || displayAssetsNew.isEmpty());
     }
 
     public String getSelectedOrgName() {
@@ -544,7 +571,7 @@ public class AssetFileImportController {
     }
 
     public boolean getIsSelect46Account() {
-        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+        if (UserContextService.getCurrentUserAccount().getSiteId() == 46 && UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
             return true;
         }
         return false;
@@ -558,7 +585,15 @@ public class AssetFileImportController {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
-    private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
+    public List<AssetImport> getAssetImportList() {
+        return assetImportList;
+    }
+
+    public void setAssetImportList(List<AssetImport> assetImportList) {
+        this.assetImportList = assetImportList;
+    }
+
+    private TreeNode buildTree(List<OrgInfo> orgList, int siteId) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -568,7 +603,7 @@ public class AssetFileImportController {
         Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
         for (OrgInfo org : orgList) {
             rootNode.setSelectable(true);
-            rootNode.setRowKey("org_"+org.getId());
+            rootNode.setRowKey("org_" + org.getId());
             if (treeMap.containsKey(org.getParentUID())) {
                 treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
             } else {
@@ -579,9 +614,38 @@ public class AssetFileImportController {
         rootNode.setExpanded(true);
         return rootNode;
     }
-    public void filterTreeNode(){
+
+    public void filterTreeNode() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
-        buildTree(orgList,loginUser.getSiteId());
+        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
+        buildTree(orgList, loginUser.getSiteId());
+    }
+
+    public List<AssetImport> getDisplayAssetsNew() {
+        return displayAssetsNew;
+    }
+
+    public void setDisplayAssetsNew(List<AssetImport> displayAssetsNew) {
+        this.displayAssetsNew = displayAssetsNew;
+    }
+
+    public Progress getUploadProgress() {
+        return uploadProgress;
+    }
+
+    public void setUploadProgress(Progress uploadProgress) {
+        this.uploadProgress = uploadProgress;
+    }
+
+    public Boolean getImportProgressRender() {
+        return importProgressRender;
+    }
+
+    public void setImportProgressRender(Boolean importProgressRender) {
+        this.importProgressRender = importProgressRender;
+    }
+
+    public void start() {
+        this.importProgressRender = true;
     }
 }
