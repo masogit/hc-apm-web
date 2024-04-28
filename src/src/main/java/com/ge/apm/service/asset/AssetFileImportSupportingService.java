@@ -156,6 +156,26 @@ public class AssetFileImportSupportingService {
 
         return supplier;
 
+    }  @Transactional
+    public synchronized Supplier importSupplierIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel,UserAccount userAccount) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setSupplierT(true);
+
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel,userAccount);
+            supplierDao.save(supplier);
+        }
+
+        //existing records, update type
+        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
+            supplier.setSupplierT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
     }
 
     @Transactional
@@ -167,6 +187,26 @@ public class AssetFileImportSupportingService {
             supplier.setMaintainerT(true);
 
             setDefaultValueForSupplier(supplier, selectedOrgToImport, name, tel);
+            supplierDao.save(supplier);
+        }
+
+        //existing records, update type
+        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
+            supplier.setMaintainerT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }@Transactional
+    public synchronized Supplier importMaintainancerIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel, UserAccount userAccount) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setMaintainerT(true);
+
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel,userAccount);
             supplierDao.save(supplier);
         }
 
@@ -201,12 +241,53 @@ public class AssetFileImportSupportingService {
         return supplier;
 
     }
+    @Transactional
+    public synchronized Supplier importManufacturerIfNeededSync(OrgInfo selectedOrgToImport, String name, UserAccount userAccount) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setManufacturerT(true);
+
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, null,userAccount);
+            supplierDao.save(supplier);
+        }
+
+        //existing records, update type
+        if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
+            supplier.setManufacturerT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
 
     private void setDefaultValueForSupplier(Supplier supplier, OrgInfo selectedOrgToImport, String name, String tel) {
 
         Date now = new Date();
 
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        supplier.setSiteId(selectedOrgToImport.getSiteId());
+        supplier.setHospitalId(selectedOrgToImport.getId());
+        supplier.setName(name);
+        supplier.setTel(tel);
+
+        supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+        supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+        supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+        supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+
+        supplier.setCreatedBy(userAccount.getLoginName());
+        supplier.setCreatedDate(now);
+        supplier.setLastModifiedBy(userAccount.getLoginName());
+        supplier.setLastModifiedDate(now);
+
+    }    private void setDefaultValueForSupplierAsync(Supplier supplier, OrgInfo selectedOrgToImport, String name, String tel,UserAccount userAccount) {
+
+        Date now = new Date();
+
 
         supplier.setSiteId(selectedOrgToImport.getSiteId());
         supplier.setHospitalId(selectedOrgToImport.getId());
