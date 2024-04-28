@@ -372,8 +372,7 @@ public class InventoryOrderService {
 				List<Map> clinicalDeptList = JSON.parseArray(order.getAssigneeOrg(), Map.class);
 				StringBuilder clinicalDeptNames = new StringBuilder(assetTypeMap.get(order.getAssetType()));
 				for (Map map : clinicalDeptList) {
-					clinicalDeptNames.append(" / ");
-					clinicalDeptNames.append(map.get("orgName").toString().split(" / ")[1]);
+					clinicalDeptNames.append(map.get("orgName").toString().replace(assetTypeMap.get(order.getAssetType()) + " / ", " "));
 				}
 				order.setClinicalDeptLabel(clinicalDeptNames.toString());
 			}

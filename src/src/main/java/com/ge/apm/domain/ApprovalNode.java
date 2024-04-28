@@ -37,6 +37,8 @@ public class  ApprovalNode implements Serializable {
     private boolean clinicalDepartmentDirector; //是否启用临床科室主任
 
     private List<RoleApproveCondition> roleApproveConditions;
+
+    private String approvalStrategy;
 //
 //    @JSONField(serialize = false)
 //    private List<UserAccount> multiLevelApprovalUsers; //多级审核人
@@ -86,5 +88,13 @@ public class  ApprovalNode implements Serializable {
 
     public void setRoleApproveCondition(RoleApproveCondition roleApproveCondition) {
         this.roleApproveCondition = roleApproveCondition;
+    }
+
+    public String getApprovalStrategy() {
+        return approvalStrategy;
+    }
+
+    public void setApprovalStrategy(String approvalStrategy) {
+        this.approvalStrategy = approvalStrategy;
     }
 }

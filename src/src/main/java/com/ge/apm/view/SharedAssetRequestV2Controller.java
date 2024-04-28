@@ -96,6 +96,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private MultiLevelApprovalService multiLevelApprovalService;
     private BlobFileService blobService;
     private List<SharedAssetRequest> sharedAssetRequests;
+    private List<V2_BlobObject> deleteAttachments;
     private String viewImageStr;
     @Getter
     @Setter
@@ -1144,10 +1145,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setInvalidTime(cal.getTime());
             setDataType();
             selected.setRequestNum(generateOrderNumber());
-            submmitApproval();
             dao.save(selected);
             apdDao.save(selected.getSartList());
             saveAttachments(selected.getAttachments());
+            submmitApproval();
             String url = "List.xhtml?faces-redirect=true";
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
@@ -1167,6 +1168,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }else{
                 selected.setApprovalStatus(0);
+                dao.save(selected);
                 WebUtil.addSuccessMessage("审批流发起成功,请尽快审批!");
             }
         }else{
@@ -2368,17 +2370,33 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
     private void saveAttachments(List<V2_BlobObject> Attachments){
-        if(CollectionUtils.isEmpty(Attachments)){
-            return;
+        if(!CollectionUtils.isEmpty(Attachments)){
+            blobService.saveBlobObject(Attachments);
         }
-        blobService.saveBlobObject(Attachments);
+        if(!CollectionUtils.isEmpty(deleteAttachments)){
+            blobService.deleteBlobFile(deleteAttachments);
+            deleteAttachments = new ArrayList<>();
+        }
+
     }
 
     private List<V2_BlobObject> initAttachments(String id){
         if(StringUtils.isEmpty(id)) return null;
         return blobService.findBlobObjectsByBoUid(id);
     }
-
+    public void removeAttachmentById(String blobId) {
+        if(CollectionUtils.isEmpty(deleteAttachments)){
+            deleteAttachments = new ArrayList<>();
+        }
+         List<V2_BlobObject> attachments = selected.getAttachments();
+        attachments.forEach(item->{
+            if (item.getId().equals(blobId)) {
+                deleteAttachments.add(item);
+            }
+        });
+        attachments = attachments.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+        selected.setAttachments(attachments);
+    }
     public List<SharedAssetRequest> getSharedAssetRequests() {
         return sharedAssetRequests;
     }
