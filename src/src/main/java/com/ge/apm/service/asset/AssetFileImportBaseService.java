@@ -38,6 +38,7 @@ import java.beans.PropertyDescriptor;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -347,7 +348,7 @@ public class AssetFileImportBaseService {
         LocalDateTime startTime = LocalDateTime.now();
         Map<String, OrgInfo> orgCache = new HashMap<>();
         Map<String, UserAccount> userCache = new HashMap<>();
-        Map<String, Supplier> supplierCache = new HashMap<>();
+        Map<String, Supplier> supplierCache = new ConcurrentHashMap<>();
 
         int row = 0;
         List<AssetInfo> saveList = ListUtil.newArrayList();
@@ -913,7 +914,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
             supplier = supplierCache.get(newAsset.getVendor());
             if (Objects.isNull(supplier)) {
-                supplier = supportingService.importSupplierIfNeeded(siteOrg, newAsset.getVendor(), newAsset.getVendorTel());
+                supplier = supportingService.importSupplierIfNeededSync(siteOrg, newAsset.getVendor(), newAsset.getVendorTel(),userAccount);
                 supplierCache.put(newAsset.getVendor(), supplier);
             }
             newAsset.setSupplierId(supplier.getId());
@@ -925,7 +926,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
            Supplier maitananceSupplier = supplierCache.get(newAsset.getMaitanance());
             if (Objects.isNull(maitananceSupplier)) {
-                maitananceSupplier = supportingService.importMaintainancerIfNeeded(siteOrg, newAsset.getMaitanance(), newAsset.getMaitananceTel());
+                maitananceSupplier = supportingService.importMaintainancerIfNeededSync(siteOrg, newAsset.getMaitanance(), newAsset.getMaitananceTel(),userAccount);
             }
             newAsset.setMaitananceId(maitananceSupplier.getId().toString());
             supplierCache.put(newAsset.getMaitanance(),maitananceSupplier);
@@ -937,7 +938,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getManufacture())) {
            Supplier manufacturSupplier=supplierCache.get(newAsset.getManufacture());
             if(Objects.isNull(manufacturSupplier)){
-                manufacturSupplier = supportingService.importManufacturerIfNeeded(siteOrg, newAsset.getManufacture());
+                manufacturSupplier = supportingService.importManufacturerIfNeededSync(siteOrg, newAsset.getManufacture(),userAccount);
             }
             newAsset.setManufactureId(manufacturSupplier.getId().toString());
             supplierCache.put(newAsset.getManufacture(),manufacturSupplier);
