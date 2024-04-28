@@ -77,6 +77,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     @Override
     protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
+        long start = System.currentTimeMillis();
         if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
@@ -106,9 +107,13 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             param.put("queryAssetUid", queryAssetUid);
         }
         inventoryOrderService.covQueryCondition(searchFilters, param);
+        logger.info("InventoryOrderDetail loadData select start : " + (System.currentTimeMillis() - start));
         List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+        logger.info("InventoryOrderDetail loadData select end : " + (System.currentTimeMillis() - start));
         Long count = inventoryOrderMapper.findJoinAssetCount(param);
+        logger.info("InventoryOrderDetail loadData count end : " + (System.currentTimeMillis() - start));
         List<InventoryOrderDetail> resultList = joinAssetList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+        logger.info("InventoryOrderDetail loadData return : " + (System.currentTimeMillis() - start));
         return new PageImpl<>(resultList, pageRequest, count);
     }
 
