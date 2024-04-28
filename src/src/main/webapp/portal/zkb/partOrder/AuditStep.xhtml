@@ -282,7 +282,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.artificialType eq '1' and zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                        <h:panelGroup rendered="false">
                             <label class="label">是否工作站*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.workStationFlag}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
