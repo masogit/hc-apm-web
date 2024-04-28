@@ -33,6 +33,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -231,7 +232,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 userUids.addAll(uids);
                                 userUids = userUids.stream().distinct().collect(Collectors.toList());
                             }
-
+                             List<String> strings = generationAdjustment(approvalNodes, approvalNode,approvableTarget.getBusinessUid(),approvableTarget.getBusinessType());
+                            if(CollectionUtils.isNotEmpty(strings)){
+                                userUids.clear();
+                                userUids.addAll(strings);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
                             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
                                 if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
@@ -276,6 +282,29 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
         return null;
+    }
+
+    private List<String> generationAdjustment(List<ApprovalNode> approvalNodes,ApprovalNode approvalNode,String businessUid,int businessType) {
+        List<String> uids = new ArrayList<>();
+        if(ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT != businessType) return uids;
+        if(StringUtils.isNotEmpty(approvalNode.getApprovalStrategy())){
+            SharedAssetRequest request = sharedAssetRequestRepository.findById(businessUid);
+            String clinicalDeptUid = request.getClinicalDeptUid();
+            int roleId = roleDao.getIdByName(ApmSystemRole.DeptHead.name());
+            List<String> orgUidByRoleId = userRoleDao.findOrgUidByRoleId(clinicalDeptUid, roleId);
+            if(CollectionUtils.isNotEmpty(orgUidByRoleId)){
+                uids.addAll(orgUidByRoleId);
+            }else{
+                int nextIndex = approvalNodes.indexOf(approvalNode) + 1;
+                if(nextIndex < approvalNodes.size()){
+                    ApprovalNode nextApprovalNode = approvalNodes.get(nextIndex);
+                   return generationAdjustment(approvalNodes,nextApprovalNode,businessUid,businessType);
+                }
+            }
+        }else{
+            uids = approvalNode.getUserUids();
+        }
+        return uids;
     }
 
     private List<String> getRoleApproveCondition(ApprovalNode approvalNode,String  businessUid) {
@@ -834,6 +863,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
                                 if(CollectionUtils.isNotEmpty(uids)){
                                     userUids.addAll(uids);
+                                    userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                }
+                                List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
+                                if(CollectionUtils.isNotEmpty(strings)){
+                                    userUids.clear();
+                                    userUids.addAll(strings);
                                     userUids = userUids.stream().distinct().collect(Collectors.toList());
                                 }
                                 userAccounts = userAccountRepository.findByUidIn(userUids);
@@ -1406,6 +1441,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 userUids.addAll(uids);
                                 userUids = userUids.stream().distinct().collect(Collectors.toList());
                             }
+                            List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
+                            if(CollectionUtils.isNotEmpty(strings)){
+                                userUids.clear();
+                                userUids.addAll(strings);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
                             userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
                                 if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
@@ -1536,6 +1577,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
                             if(CollectionUtils.isNotEmpty(uids)){
                                 userUids.addAll(uids);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
+                            List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
+                            if(CollectionUtils.isNotEmpty(strings)){
+                                userUids.clear();
+                                userUids.addAll(strings);
                                 userUids = userUids.stream().distinct().collect(Collectors.toList());
                             }
                             userAccounts = userAccountRepository.findByUidIn(userUids);
