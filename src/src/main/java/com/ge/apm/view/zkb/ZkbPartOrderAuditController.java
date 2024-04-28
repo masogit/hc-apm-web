@@ -942,7 +942,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void trainCourseRender(){
         if(StrUtil.isEmpty(selected.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
             if(zkbContract != null ){
-                if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType()) || !ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
                     zkbPartOrderStatusVo.setHaveTrainCourseFlag(true);
                 }
             }
