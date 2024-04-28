@@ -3,7 +3,9 @@ package com.ge.apm.service.asset;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.dto.AssetImport;
 import com.ge.apm.service.utils.ExcelDocument;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -294,10 +296,26 @@ public class AssetRow {
         }
     }
 
+    public static void addErrMessage(AssetImport item, String comments) {
+        if (!CollectionUtils.isEmpty(item.getErrMsg())) {
+            item.getErrMsg().add(comments);
+        } else {
+            List<String> c = new ArrayList();
+            c.add(comments);
+            item.setErrMsg(c);
+        }
+    }
+
     public static void clearErrMessage(Map<String, Object> item) {
         if (item.containsKey("errmsg")) {
             List<String> errMsgs = ((List<String>) item.get("errmsg"));
             errMsgs.clear();
+        }
+    }
+
+    public static void clearErrMessage(AssetImport item) {
+        if (!CollectionUtils.isEmpty(item.getErrMsg())) {
+            item.getErrMsg().clear();
         }
     }
 
@@ -310,7 +328,7 @@ public class AssetRow {
             String selectedOption = null;
             if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
                 String[] length = fieldValueOfString.split("/");
-                selectedOption = getI18nMsgKeyAsString(msgList, length[length.length-1], map, fieldName);
+                selectedOption = getI18nMsgKeyAsString(msgList, length[length.length - 1], map, fieldName);
             }
 
             if (selectedOption == null) {
@@ -347,8 +365,8 @@ public class AssetRow {
 //                    fieldValueOfString = null;
 //                }
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
-                    fieldValueOfString=fieldValueOfString.split(" ")[0];
-                }else{
+                    fieldValueOfString = fieldValueOfString.split(" ")[0];
+                } else {
                     fieldValueOfString = null;
                 }
                 method.invoke(assetInfo, fieldValueOfString);
@@ -362,7 +380,7 @@ public class AssetRow {
                         }
 
                     } else {
-                        fieldValueOfString=fieldValueOfString.split(" ")[0];
+                        fieldValueOfString = fieldValueOfString.split(" ")[0];
                         method.invoke(assetInfo, fieldValueOfString);
                     }
                 }
