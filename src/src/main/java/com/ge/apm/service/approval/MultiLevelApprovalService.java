@@ -292,7 +292,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             String clinicalDeptUid = request.getClinicalDeptUid();
             int roleId = roleDao.getIdByName(ApmSystemRole.DeptHead.name());
             List<String> orgUidByRoleId = userRoleDao.findOrgUidByRoleId(clinicalDeptUid, roleId);
-            if(CollectionUtils.isEmpty(orgUidByRoleId)){
+            if(CollectionUtils.isNotEmpty(orgUidByRoleId)){
                 uids.addAll(orgUidByRoleId);
             }else{
                 int nextIndex = approvalNodes.indexOf(approvalNode) + 1;

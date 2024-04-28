@@ -1168,6 +1168,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }else{
                 selected.setApprovalStatus(0);
+                dao.save(selected);
                 WebUtil.addSuccessMessage("审批流发起成功,请尽快审批!");
             }
         }else{
