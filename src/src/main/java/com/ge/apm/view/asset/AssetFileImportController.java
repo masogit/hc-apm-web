@@ -657,14 +657,18 @@ public class AssetFileImportController {
 
     public List<AssetInfo> importAssetDataAsync(List<AssetImport> assetData, Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
         int mid = assetData.size() / 2;
-        UserAccount currentAccount=UserContextService.getCurrentUserAccount();
-        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache,currentAccount))
-                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid + 1, assetData.size() - 1), autoGenerateQrcode, orgNamesUriCache,currentAccount)), (a, b) -> {
-            List<AssetInfo> result = new ArrayList<>();
-            result.addAll(a);
-            result.addAll(b);
-            return result;
-        });
+        UserAccount currentAccount = UserContextService.getCurrentUserAccount();
+        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache, currentAccount))
+                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid, assetData.size()), autoGenerateQrcode, orgNamesUriCache, currentAccount)), (a, b) -> {
+                    List<AssetInfo> result = new ArrayList<>();
+                    if (CollectionUtils.isNotEmpty(a)) {
+                        result.addAll(a);
+                    }
+                    if (CollectionUtils.isNotEmpty(b)) {
+                        result.addAll(b);
+                    }
+                    return result;
+                });
         return t.join();
     }
 }
