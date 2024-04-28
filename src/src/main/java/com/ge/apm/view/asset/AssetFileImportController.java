@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -237,7 +238,12 @@ public class AssetFileImportController {
             //AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
             //AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
             LocalDateTime saveStartTime = LocalDateTime.now();
-            List<AssetInfo> saveList = streamingService.importAssetDataNew(displayAssetsNew, autoGenerateQrcode, orgNamesUriCache);
+            List<AssetInfo> saveList = null;
+            if (displayAssetsNew.size() >= 100) {
+                saveList = importAssetDataAsync(displayAssetsNew, autoGenerateQrcode, orgNamesUriCache);
+            } else {
+                saveList = streamingService.importAssetDataNew(displayAssetsNew, autoGenerateQrcode, orgNamesUriCache);
+            }
             LocalDateTime saveEndTime = LocalDateTime.now();
             Duration saveDuration = Duration.between(saveStartTime, saveEndTime);
             logger.info("save data : {} seconds", saveDuration.getSeconds());
@@ -647,5 +653,18 @@ public class AssetFileImportController {
 
     public void start() {
         this.importProgressRender = true;
+    }
+
+    public List<AssetInfo> importAssetDataAsync(List<AssetImport> assetData, Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
+        int mid = assetData.size() / 2;
+        UserAccount currentAccount=UserContextService.getCurrentUserAccount();
+        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache,currentAccount))
+                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid + 1, assetData.size() - 1), autoGenerateQrcode, orgNamesUriCache,currentAccount)), (a, b) -> {
+            List<AssetInfo> result = new ArrayList<>();
+            result.addAll(a);
+            result.addAll(b);
+            return result;
+        });
+        return t.join();
     }
 }

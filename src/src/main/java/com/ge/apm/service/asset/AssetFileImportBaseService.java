@@ -298,7 +298,7 @@ public class AssetFileImportBaseService {
                 //first iteration: import parent asset
                 for (AssetImport item : importDataList) {
                     if (supportingService.isParentAssetForIBTenant(item)) {
-                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache);
+                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,UserContextService.getCurrentUserAccount());
                         if (ObjectUtil.isNotEmpty(newAsset)) {
                             saveList.add(newAsset);
                         }
@@ -311,7 +311,7 @@ public class AssetFileImportBaseService {
                         continue;
                     }
                     supportingService.parentAssetSetting(item, parentAssetsMap);
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache);
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,UserContextService.getCurrentUserAccount());
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -323,7 +323,7 @@ public class AssetFileImportBaseService {
                         logger.info("imported {} rows", row);
                     }
                     ++row;
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache);
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,UserContextService.getCurrentUserAccount());
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -341,6 +341,67 @@ public class AssetFileImportBaseService {
         return saveList;
     }
 
+    public List<AssetInfo> importAssetDataAsync(List<AssetImport> importDataList,
+                                              Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache,UserAccount currentAccount) {
+
+        LocalDateTime startTime = LocalDateTime.now();
+        Map<String, OrgInfo> orgCache = new HashMap<>();
+        Map<String, UserAccount> userCache = new HashMap<>();
+        Map<String, Supplier> supplierCache = new HashMap<>();
+
+        int row = 0;
+        List<AssetInfo> saveList = ListUtil.newArrayList();
+        try {
+            if (currentAccount.getSiteId() == ApmConstant.IB_TENANT_ID) {
+
+                //locate parent assets first for later use
+                parentAssetsMap = supportingService.getParentAssetsNew(importDataList);
+
+                //first iteration: import parent asset
+                for (AssetImport item : importDataList) {
+                    if (supportingService.isParentAssetForIBTenant(item)) {
+                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,currentAccount);
+                        if (ObjectUtil.isNotEmpty(newAsset)) {
+                            saveList.add(newAsset);
+                        }
+                    }
+                }
+
+                //second iteration: import child asset and other asset
+                for (AssetImport item : importDataList) {
+                    if (supportingService.isParentAssetForIBTenant(item)) {
+                        continue;
+                    }
+                    supportingService.parentAssetSetting(item, parentAssetsMap);
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,currentAccount);
+                    if (ObjectUtil.isNotEmpty(newAsset)) {
+                        saveList.add(newAsset);
+                    }
+                }
+
+            } else {
+                for (AssetImport item : importDataList) {
+                    if (row % 100 == 0) {
+                        logger.info("imported {} rows", row);
+                    }
+                    ++row;
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache,currentAccount);
+                    if (ObjectUtil.isNotEmpty(newAsset)) {
+                        saveList.add(newAsset);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for importData: {} seconds", duration.getSeconds());
+        return saveList;
+    }
     @Transactional
     protected AssetInfo importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
         AssetInfo newAsset = (AssetInfo) item.get("asset");
@@ -638,7 +699,7 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache) {
+    protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache,UserAccount userAccount) {
         AssetInfo newAsset = new AssetInfo();
         BeanUtils.copyProperties(importData, newAsset);
         AssetInfo dbAsset = null;
@@ -975,7 +1036,7 @@ public class AssetFileImportBaseService {
 
         supportingService.saveOrUpdateAssetTags(newAsset, importData);
 
-        if (UserContextService.isMVSRole()) {
+        if (isMvs(userAccount)) {
             if (newAsset.getMvsEquip() == null) {
                 newAsset.setMvsEquip(1);
                 assetDao.save(newAsset);
@@ -1365,5 +1426,11 @@ public class AssetFileImportBaseService {
         }
         String[] result = new String[nullField.size()];
         return nullField.toArray(result);
+    }
+
+    public boolean isMvs(UserAccount userAccount){
+            Integer mvsRoleType = userAccount.getMvsRoleType();
+            return mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2);
+
     }
 }
