@@ -346,11 +346,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     //工作站条件：人工申请且机型为放射类设备时才显示
     public boolean workStationRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+        /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType())){
                 return true;
             }
-        }
+        }*/
         return false;
     }
 
