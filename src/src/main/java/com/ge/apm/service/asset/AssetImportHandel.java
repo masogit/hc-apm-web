@@ -12,7 +12,6 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Progress;
 import com.ge.apm.domain.dto.AssetImport;
-import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.web.WebUtil;
 
