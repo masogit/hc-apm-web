@@ -302,7 +302,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 }
             }
         }else{
-            uids = approvalNode.getUserUids();
+            uids.addAll(approvalNode.getUserUids());
         }
         return uids;
     }
