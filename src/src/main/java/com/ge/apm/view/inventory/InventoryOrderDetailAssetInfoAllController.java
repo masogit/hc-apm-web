@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -28,7 +27,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -47,7 +45,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     private String queryAssetUid;
     //选定的院区
     private OrgInfo selectSite;
-    private PageUtil pageUtil = new PageUtil<>();
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -101,28 +98,18 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         if (ObjectUtil.isNotEmpty(selectSite)) {
             param.put("selectedOrgUid", selectSite.getUid());
-            searchFilters.add(new SearchFilter("selectedOrgUid", SearchFilter.Operator.EQ, selectSite.getUid()));
         }
         if (ObjectUtil.isNotEmpty(orgUidList)) {
             param.put("orgUidList", orgUidList);
         }
         if (ObjectUtil.isNotEmpty(queryAssetUid)) {
             param.put("queryAssetUid", queryAssetUid);
-            searchFilters.add(new SearchFilter("queryAssetUid", SearchFilter.Operator.EQ, queryAssetUid));
         }
+        inventoryOrderService.covQueryCondition(searchFilters, param);
         List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-        joinAssetList = inventoryOrderService.covQueryCondition(searchFilters, joinAssetList);
-        Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
-        List<Map<String, Object>> mapList = ListUtil.newArrayList();
-        Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
-        Page<Map<String, Object>> page = pageUtil.pageNum(mapList, pageRequest);
-//        Long count = inventoryOrderMapper.findJoinAssetCount(param);
-        List<InventoryOrderDetail> resultList = page.getContent().stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-        return new PageImpl<>(resultList, pageRequest, mapList.size());
+        Long count = inventoryOrderMapper.findJoinAssetCount(param);
+        List<InventoryOrderDetail> resultList = joinAssetList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+        return new PageImpl<>(resultList, pageRequest, count);
     }
 
     public String  getUserName(String loginName){
