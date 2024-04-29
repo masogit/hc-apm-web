@@ -31,7 +31,7 @@ public class Progress {
 
     public void setComplete() {
         ++this.complete;
-        if (Objects.nonNull(total)) {
+        if (Objects.nonNull(total)&&total!=0) {
             value = 100*complete / total;
         }
     }

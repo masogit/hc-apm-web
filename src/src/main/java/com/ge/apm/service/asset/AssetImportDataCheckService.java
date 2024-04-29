@@ -10,7 +10,6 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
@@ -20,12 +19,16 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
+import java.beans.PropertyDescriptor;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -177,25 +180,29 @@ public class AssetImportDataCheckService {
         result.put("canBeImport", Boolean.TRUE);
         result.put("unCheckedNurseSite", Boolean.FALSE);
         Map<String, OrgInfo> orgNamesUriCache = null;
-        if(crossSite){
+        if (crossSite) {
             orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
         }
-
         for (AssetImport assetImport : assetImportList) {
-            //对默认值和组织机构进行处理
-            if(crossSite){
-                SiteOrgWithDeptOrg siteOrgInAsset = findSiteOrgInAssetExcelRow(assetImport, orgNamesUriCache);
-                markDefautValue(assetImport,siteOrgInAsset.getSiteOrg(),false);
-            }else{
-                markDefautValue(assetImport, selectedOrgToImport, isNeedAudit);
-            }
+
             if (!StringUtils.isEmpty(assetImport.getUid())) {
+                AssetInfo existAsset = assetDao.findByUid(assetImport.getUid());
+                assetImport.setOldQrCode(existAsset.getQrCode());
+                BeanUtils.copyProperties(assetImport, existAsset, beanNullProperty(assetImport));
+                BeanUtils.copyProperties(existAsset, assetImport);
                 //检查是否输入非法UUID
                 if (!tenantUID.equals(assetImport.getTenantUID())) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);
                     assetImport.addErrMsg(String.format("第%d行错误: 非法UUID！"));
                 }
+            }
+            //对默认值和组织机构进行处理
+            if (crossSite) {
+                SiteOrgWithDeptOrg siteOrgInAsset = findSiteOrgInAssetExcelRow(assetImport, orgNamesUriCache);
+                markDefautValue(assetImport, siteOrgInAsset.getSiteOrg(), false);
+            } else {
+                markDefautValue(assetImport, selectedOrgToImport, isNeedAudit);
             }
 
             if (null == assetImport.getAssetGroup()) {
@@ -436,25 +443,26 @@ public class AssetImportDataCheckService {
 
             //check QrCode
             if (!StringUtils.isEmpty(assetImport.getQrCode())) {
-                if (supportingService.isQrCodeNewOrChanged(assetImport)) {
-                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
-                        //三码合一情况下，可以创建新的二维码或者二维码已发行
-                        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(assetImport.getQrCode(), assetImport.getSiteUID());
-                        if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
-                            assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
-                            result.put("canBeImport", Boolean.FALSE);
-                            assetImport.addErrMsg("错误:" + WebUtil.getMessage("InvalidQRCode") + assetImport.getQrCode());
-                        }
-                    } else {
-                        //非三码合一情况下，二维码需要已发行
-                        boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(assetImport.getQrCode(), assetImport.getSiteUID(), 1);
-                        if (!isAvailable) {
-                            assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
-                            result.put("canBeImport", Boolean.FALSE);
-                            assetImport.addErrMsg("错误:" + WebUtil.getMessage("InvalidQRCode") + assetImport.getQrCode());
+                if(!Objects.equals(assetImport.getQrCode(),assetImport.getOldQrCode())){
+                    if (supportingService.isQrCodeNewOrChanged(assetImport)) {
+                        if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                            //三码合一情况下，可以创建新的二维码或者二维码已发行
+                            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(assetImport.getQrCode(), assetImport.getSiteUID());
+                            if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
+                                assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                                result.put("canBeImport", Boolean.FALSE);
+                                assetImport.addErrMsg("错误:" + WebUtil.getMessage("InvalidQRCode") + assetImport.getQrCode());
+                            }
+                        } else {
+                            //非三码合一情况下，二维码需要已发行
+                            boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(assetImport.getQrCode(), assetImport.getSiteUID(), 1);
+                            if (!isAvailable) {
+                                assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                                result.put("canBeImport", Boolean.FALSE);
+                                assetImport.addErrMsg("错误:" + WebUtil.getMessage("InvalidQRCode") + assetImport.getQrCode());
+                            }
                         }
                     }
-
                 }
             }
 
@@ -783,4 +791,19 @@ public class AssetImportDataCheckService {
 
         return siteOrgWithDeptOrg;
     }
+
+    public static String[] beanNullProperty(Object assetImport) {
+        final BeanWrapper src = new BeanWrapperImpl(assetImport);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> nullProperty = new HashSet<>();
+        for (PropertyDescriptor item : pds) {
+            Object value = src.getPropertyValue(item.getName());
+            if (value == null) {
+                nullProperty.add(item.getName());
+            }
+        }
+        String[] properties = new String[nullProperty.size()];
+        return nullProperty.toArray(properties);
+    }
+
 }
