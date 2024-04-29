@@ -39,7 +39,8 @@
                            <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CREATE_VIEW')}"/>
                            <p:menuitem value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_AUDIT_APPROVE')}"/>
                            <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_BATCH_IMPORT')}"/>
-                           <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="#{userContextService.hasCurrentTenantName('') ? '/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml':'/portal/inventory/inventoryOrder.xhtml'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>
+                           <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>
+<!--                           <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="#{userContextService.hasCurrentTenantName('') ? '/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml':'/portal/inventory/inventoryOrder.xhtml'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>-->
                            <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>
                            <p:menuitem id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_HISTORY_VIEW')}"/>
                            <p:menuitem id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"/>
@@ -55,13 +56,14 @@
                    </c:when>
                    <c:when test="#{item eq 'SPECIAL_ASSET'}">
                        <!-- 特种设备管理 -->
-                       <p:submenu id="um011" label="特种设备管理" icon="fa fa-bars fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_')}">
+                       <p:submenu id="um011" label="特种设备管理" icon="fa fa-bars fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_') and userContextService.hasRole('SpecialEquipmentRole') }">
                            <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}"/>
-                           <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_REPAIR_EDIT')}"/>
-                           <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_MAINTAIN_EDIT')}"/>
-                           <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_CHECK_EDIT')}"/>
-                           <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_DOCUMENT_EDIT')}"/>
-                           <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_RISK_EDIT')}"/>
+<!--                           <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_REPAIR_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_MAINTAIN_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_CHECK_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_DOCUMENT_EDIT')}"/>-->
+<!--                           <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_RISK_EDIT')}"/>-->
+                           <p:menuitem id="um0117" value="证照管理" outcome="/portal/asset/info/specialAssetPermitList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'MULTILEVEL_APPROVE'}">
@@ -176,6 +178,7 @@
                            <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/application/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ANNUAL_SUBSCRIPTION_EDIT')}"/>
                            <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPORARY_SUBSCRIPTION_EDIT')}"/>
                            <p:menuitem  value="预算设备管理" outcome="/portal/budget/asset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ASSET_EDIT')}"/>
+                           <p:menuitem  value="需求论证" outcome="/portal/budget/demandAnalysis/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_DEMAND_ANALYSIS_EDIT')}"/>
                            <p:menuitem  value="采购管理" outcome="/portal/budget/purchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_PURCHASE_EDIT')}"/>
                            <p:menuitem  value="模板管理" outcome="/portal/budget/purchaseTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPLATE_EDIT')}"/>
                        </p:submenu>
@@ -298,6 +301,15 @@
                        <!-- 供应商维修工作台 -->
                        <p:submenu id="um25_supplier" label="供应商#{msg.WorkOrderMgmt}" icon="fa fa-wrench fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}">
                            <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}"/>
+                       </p:submenu>
+                   </c:when>
+                    <!--      科室间借调             -->
+                   <c:when test="#{item eq 'SECONDMENT_BETWEEN_DEPARTMENTS'}">
+                       <p:submenu id="um5000" icon="fa fa-refresh fa-fw" label="科室调剂" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_') and userContextService.canRender('SECONDMENT_BETWEEN_DEPARTMENTS')}">
+                           <p:menuitem id="um5100" value="调剂计费配置" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_ADJUST_CONFIGURATION')}" outcome="/portal/deptSecondment/config/secondmentConfig.xhtml"/>
+                           <p:menuitem id="um5200" value="调剂设备管理" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_DISPATCH_EQUIPMENT_MANAGEMENT')}" outcome="/portal/deptSecondment/config/secondmentAssetSetting.xhtml"/>
+                           <p:menuitem id="um5300" value="调剂设备信息" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_BORROWING_APPLICATION')}" outcome="/portal/deptSecondment/order/secondmentOrderApply.xhtml"/>
+                           <p:menuitem id="um5400" value="调剂工作台" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_BORROW_LEND_RECORDS')}" outcome="/portal/deptSecondment/order/secondmentOrderManage.xhtml"/>
                        </p:submenu>
                    </c:when>
                </c:choose>

@@ -22,6 +22,9 @@
 
     <sql id="queryCondition">
         <where>
+            <if test="selectedOrgUid != null">
+                AND ( t.institutionUid = #{selectedOrgUid} OR t.hospitalUid = #{selectedOrgUid} OR t.siteUid = #{selectedOrgUid} )
+            </if>
             <if test="queryAssetUid != null">
                 AND t.assetId = #{queryAssetUid}
             </if>
@@ -69,6 +72,7 @@
 
     <sql id="joinAssetCondition">
         (
+
             SELECT
                 ai.id assetId,
                 ai.name,
@@ -79,33 +83,30 @@
                 ai.financing_num financingNum,
                 ai.status assetStatus,
                 ai.location_name locationName,
-                CASE WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
-                CASE WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
-                CASE WHEN ii.id IS NOT NULL THEN (select string_agg(icl.item, ', ') from inventory_check_list icl left join inventory_issue_detail isd on icl.id = isd.inventory_check_list_id where isd.inventory_issue_id = ii.id group by isd.inventory_issue_id) ELSE '' END inventoryCheckListItems,
-                CASE WHEN ii.last_modified_by IS NOT NULL THEN ii.last_modified_by ELSE iod.last_modified_by END lastModifiedBy,
-                CASE WHEN ii.last_modified_date IS NOT NULL THEN ii.last_modified_date ELSE iod.last_modified_date END lastModifiedDate,
-                CASE WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
+                ai.institution_uid institutionUid,
+                ai.hospital_uid hospitalUid,
+                ai.site_uid siteUid,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.comment WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.id IS NOT NULL THEN (select string_agg(icl.item, ', ') from inventory_check_list icl left join inventory_issue_detail isd on icl.id = isd.inventory_check_list_id where isd.inventory_issue_id = ii.id group by isd.inventory_issue_id) ELSE '' END inventoryCheckListItems,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.last_modified_by WHEN ii.last_modified_by IS NOT NULL THEN ii.last_modified_by ELSE iod.last_modified_by END lastModifiedBy,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.last_modified_date WHEN ii.last_modified_date IS NOT NULL THEN ii.last_modified_date ELSE iod.last_modified_date END lastModifiedDate,
+                CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.status WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
             FROM
                 asset_info ai
-                LEFT JOIN inventory_issue ii ON ai.id = ii.asset_id
-                <if test="orderIdList != null and orderIdList.size > 0">
-                    AND ii.inventory_order_id IN
-                    <foreach item="item" collection="orderIdList" separator="," open="(" close=")" index="">
-                        #{item}
-                    </foreach>
-                </if>
-                LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id
-                <if test="orderIdList != null and orderIdList.size > 0">
-                    AND iod.inventory_order_id IN
-                    <foreach item="item" collection="orderIdList" separator="," open="(" close=")" index="">
-                        #{item}
-                    </foreach>
-                </if>
+                LEFT JOIN (select t1.* from inventory_issue t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_issue where tenant_uid = #{tenantUid} group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) ii ON ai.id = ii.asset_id
+                LEFT JOIN (select t1.* from inventory_order_detail t1 inner join (select asset_id,max(last_modified_date) last_modified_date from inventory_order_detail where tenant_uid = #{tenantUid} group by asset_id) t2 on t1.last_modified_date = t2.last_modified_date and t1.asset_id = t2.asset_id) iod ON ai.id = iod.asset_id
             WHERE
                 ai.is_checked = TRUE
                 AND ai.is_deleted = FALSE
                 AND ai.is_valid = TRUE
                 AND ai.tenant_uid = #{tenantUid}
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND ai.asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
                 <if test="orgUidList != null and orgUidList.size > 0">
                     AND (
                     ai.institution_uid IN
@@ -131,13 +132,27 @@
                     )
                 </if>
             UNION ALL
-            SELECT NULL AS assetId, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
-            <if test="orderIdList != null and orderIdList.size > 0">
-                AND iod.inventory_order_id IN
-                <foreach item="item" collection="orderIdList" separator="," open="(" close=")" index="">
-                    #{item}
-                </foreach>
-            </if>
+            SELECT NULL AS assetId, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
+                <if test="orgUidList != null and orgUidList.size > 0">
+                    AND (
+                    iod.institution_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.hospital_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.site_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR iod.clinical_dept_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    )
+                </if>
         ) t
     </sql>
 

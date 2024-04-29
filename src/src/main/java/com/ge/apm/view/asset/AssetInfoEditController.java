@@ -1,7 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.approval.WxMessageService;
+import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -45,6 +47,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,7 +94,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private BuildManagementRepository buildManagementRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private AssetScrapRepository assetScrapRepository;
-
+    private SpecialAssetInfoService specialAssetInfoService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -254,6 +257,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String locationName;
     private UserAccount loginUser;
 
+    private SpecialAssetInfo specialAssetInfo;
+
+
+    private String type=null;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -304,6 +312,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
+        specialAssetInfoService = WebUtil.getBean(SpecialAssetInfoService.class);
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
@@ -347,6 +356,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            specialAssetInfo=new SpecialAssetInfo();
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -365,6 +375,50 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             assetInfoService.setSupplier(ListUtil.newArrayList(selected));
+            if(Boolean.TRUE.equals(selected.isSpecialAsset())){
+               specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+            }
+        }else if ("Copy".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = false;
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            AssetInfo assetInfo=dao.findByUid(selectedId);
+
+            try {
+                prepareCreate();
+                String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
+                terminate = Boolean.parseBoolean(terminateStr);
+                assetInfoCopySelected(assetInfo,selected);
+                OrgInfo orgInfo = orgDao.findByUid(assetInfo.getSiteUID());
+                selectedObjectMap.put("selectedOrg", orgInfo);
+//                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+                selected.setSiteId(orgInfo.getSiteId());
+                selected.setHospitalId(orgInfo.getId());
+
+                selected.setTenantUID(orgInfo.getTenantUID());
+                selected.setHospitalUID(orgInfo.getHospitalUID());
+                selected.setInstitutionUID(orgInfo.getInstitutionUID());
+                selected.setSiteUID(orgInfo.getSiteUID());
+                config = configService.findConfigBySite(selected.getSiteUID());
+                beforeEdit();
+            } catch (Exception e) {
+                logger.error("AssetInfoEditController copy error: "+e);
+            }
+
+        }
+        type = (String) UrlEncryptController.getValueFromMap(encodeStr, "type");
+
+        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+            selected.setSpecialAsset(true);
+            specialAssetInfo.setAssetId(selected.getId());
+            specialAssetInfo.setAssetUid(selected.getUid());
+            specialAssetInfo.setHospitalUID(selected.getHospitalUID());
+            specialAssetInfo.setTenantUID(selected.getTenantUID());
+            specialAssetInfo.setInstitutionUID(selected.getInstitutionUID());
+            specialAssetInfo.setSiteUID(selected.getSiteUID());
+            specialAssetInfo.setCreatedDate(new Date());
+            specialAssetInfo.setCreatedByUid(loginUser.getUid());
+            specialAssetInfo.setLastModifiedByUid(loginUser.getUid());
+            specialAssetInfo.setLastModifiedDate(new Date());
         }
         if(selected ==null){
             try {
@@ -419,6 +473,42 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
+    }
+    private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
+
+//        selected.setAssetGroup(assetInfo.getAssetGroup());
+//        selected.setClinicalDeptId(assetInfo.getClinicalDeptId());
+//        selected.setClinicalDeptUID(assetInfo.getClinicalDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setAssetDeptUID(assetInfo.getAssetDeptUID());
+//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
+//        selected.setStatus(assetInfo.getStatus());
+//        selected.setName(assetInfo.getName());
+//
+//        selected.setManufactureId(assetInfo.getManufactureId());
+//        selected.setManufacture(assetInfo.getManufacture());
+//        selected.setManufactureTel(assetInfo.getManufactureTel());
+//        selected.setVendor(assetInfo.getVendor());
+//        selected.setSupplierId(assetInfo.getSupplierId());
+//        selected.setVendorTel(assetInfo.getVendorTel());
+//
+//        selected.setMaitanance(assetInfo.getMaitanance());
+//        selected.setMaitananceId(assetInfo.getMaitananceId());
+//        selected.setMaitananceTel(assetInfo.getMaitananceTel());
+//
+//        selected.setRegistrationNo(assetInfo.getRegistrationNo());
+//
+//        selected.setFunctionType(assetInfo.getFunctionType());
+//        selected.setMeasureGrade(assetInfo.getMeasureGrade());
+//        selected.setMeasuringItemCategory(assetInfo.getMeasuringItemCategory());
+        BeanUtils.copyProperties(assetInfo,selected);
+        selected.setSerialNum(null);
+        selected.setFinancingNum(null);
+        selected.setDepartNum(null);
+        selected.setQrCode(null);
+        selected.setQrCode(null);
+        selected.setId(null);
+        selected.setUid(null);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
@@ -966,6 +1056,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         selected.setOfflineUpdateDate(new Date());
         this.save();
+        if(selected.isSpecialAsset()){
+            specialAssetInfo.setAssetId(selected.getId());
+            specialAssetInfo.setAssetUid(selected.getUid());
+            List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getName() != null).collect(Collectors.toList());
+            assetAnnualInspectionReports.forEach(item->item.setSpecialAssetUid(specialAssetInfo.getId()));
+            List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getCertificateName() != null).collect(Collectors.toList());
+            specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+            specialAssetInfo.setPermitInfos(permitInfos);
+            specialAssetInfoService.saveSpecialAsset(specialAssetInfo);
+            onAfterNewObjectPermit();
+
+        }
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(selected,assetInfo);
         if(isCreate){
@@ -996,6 +1098,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         saveOrUpdateAssetTags();
+        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+            return "specialAssetList?faces-redirect=true";
+        }
         if(isStatus){
             return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }
@@ -1159,6 +1264,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
+    public String getSpecialListPageLink() {
+
+        return "specialAssetList?faces-redirect=true";
+    }
+
     //三码合一设置
     public String getAssetCodeConfig() {
         return config == null ? null : config.getAssetCodeConfig();
@@ -1284,6 +1394,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
+        return "AssetList?faces-redirect=true";
+    }
+
+    //转入特种设备
+    public String transforSpecialAsset() {
+        selected.setSpecialAsset(true);
+        specialAssetInfoService.initSpecialAsset(selected);
+        dao.save(selected);
+        WebUtil.addSuccessMessage("特种设备转入成功");
+
         return "AssetList?faces-redirect=true";
     }
 
@@ -1939,4 +2059,304 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
+
+    public SpecialAssetInfo getSpecialAssetInfo() {
+        return specialAssetInfo;
+    }
+
+    public void setSpecialAssetInfo(SpecialAssetInfo specialAssetInfo) {
+        this.specialAssetInfo = specialAssetInfo;
+    }
+
+    public void checkAssessmentNoExists () {
+        List<SpecialAssetInfo> list = specialAssetInfoService.findByAssessmentNoAndTenantUID(specialAssetInfo.getAndAssessmentNo(), selected.getTenantUID());
+        if (CollectionUtils.isNotEmpty(list)) {
+            WebUtil.addWarnMessage("预评批号已存在！");
+        }
+    }
+
+    private AssetAnnualInspectionReport assetAnnualInspectionReport;
+    private PermitInfo permitInfo;
+    public void onAddReport() {
+        assetAnnualInspectionReport = new AssetAnnualInspectionReport();
+    }
+
+    public void onAddPermitInfo() {
+        permitInfo = new PermitInfo();
+    }
+
+    public void onEditReport(String uid,Integer nodId,String name) {
+        for (AssetAnnualInspectionReport report : specialAssetInfo.getAssetAnnualInspectionReports()) {
+            if (StringUtils.isNotBlank(uid) && uid.equals(report.getUid())) {
+                assetAnnualInspectionReport = report;
+                return;
+            }
+            if (StringUtils.isNotBlank(name) && name.equals(report.getName())) {
+                assetAnnualInspectionReport = report;
+                return;
+            }
+            if (null != nodId && nodId==report.getNodeId()) {
+                assetAnnualInspectionReport = report;
+                return;
+            }
+
+        }
+    }
+
+    public void onEditPermitInfo(String uid,Integer nodId,String name) {
+        for (PermitInfo permit : specialAssetInfo.getPermitInfos()) {
+            if (StringUtils.isNotBlank(uid) && uid.equals(permit.getUid())) {
+                permitInfo = permit;
+                return;
+            }
+            if (StringUtils.isNotBlank(name) && name.equals(permit.getCertificateName())) {
+                permitInfo = permit;
+                return;
+            }
+            if (null != nodId && nodId==permit.getNodeId()) {
+                permitInfo = permit;
+                return;
+            }
+        }
+    }
+
+
+    public void delReport(String name) {
+        List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> !name.equals(item.getName())).collect(Collectors.toList());
+        specialAssetInfo.setAssetAnnualInspectionReports(collect);
+
+    }
+
+
+    public void delPermitInfo(String name) {
+        List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> !name.equals(item.getCertificateName())).collect(Collectors.toList());
+        specialAssetInfo.setPermitInfos(collect);
+
+    }
+
+    public void saveReport() {
+
+        if(assetAnnualInspectionReport!=null &&( assetAnnualInspectionReport.getUid()!=null || assetAnnualInspectionReport.getNodeId()!=null)){
+            return;
+        }
+        List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports();
+        if(assetAnnualInspectionReports==null){
+            assetAnnualInspectionReports=new ArrayList<>();
+        }
+        assetAnnualInspectionReport.setCreatedByName(loginUser.getName());
+        assetAnnualInspectionReport.setCreatedByUid(loginUser.getUid());
+        assetAnnualInspectionReport.setNodeId(assetAnnualInspectionReports.size());
+        assetAnnualInspectionReports.add(assetAnnualInspectionReport);
+    }
+
+    public void savePermitInfo() {
+        if(permitInfo!=null &&( permitInfo.getUid()!=null || permitInfo.getNodeId()!=null)){
+            return;
+        }
+        List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos();
+        if(permitInfos==null){
+            permitInfos=new ArrayList<>();
+        }
+        permitInfo.setTenantUID(loginUser.getTenantUID());
+        permitInfo.setSiteUID(loginUser.getSiteUID());
+        permitInfo.setHospitalUID(loginUser.getHospitalUID());
+        permitInfo.setInstitutionUID(loginUser.getInstitutionUID());
+        permitInfo.setCreatedByName(loginUser.getName());
+        permitInfo.setCreatedByUid(loginUser.getUid());
+        permitInfo.setNodeId(permitInfos.size());
+
+        permitInfos.add(permitInfo);
+    }
+
+    public AssetAnnualInspectionReport getAssetAnnualInspectionReport() {
+        return assetAnnualInspectionReport;
+    }
+
+    public void setAssetAnnualInspectionReport(AssetAnnualInspectionReport assetAnnualInspectionReport) {
+        this.assetAnnualInspectionReport = assetAnnualInspectionReport;
+    }
+    public PermitInfo getPermitInfo( ) {
+        return permitInfo;
+    }
+
+    public void setPermitInfo(PermitInfo permitInfo) {
+        this.permitInfo = permitInfo;
+    }
+
+
+    public List<AssetAnnualInspectionReport> getAssetAnnualInspectionReports() {
+        AssetAnnualInspectionReport assetAnnualInspectionReport = new AssetAnnualInspectionReport();
+        assetAnnualInspectionReport.setNodeId(0);
+        List<AssetAnnualInspectionReport> assetAnnualInspectionReports=null;
+        if(specialAssetInfo.getAssetAnnualInspectionReports()==null){
+            assetAnnualInspectionReports = new ArrayList<>();
+        }else{
+            List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+            for (int i = 0; i < collect.size(); i++) {
+                AssetAnnualInspectionReport assetAnnualInspectionReport1 = collect.get(i);
+                assetAnnualInspectionReport1.setNodeId(i+1);
+            }
+            assetAnnualInspectionReports=collect;
+
+        }
+        specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
+        assetAnnualInspectionReports.add(assetAnnualInspectionReport);
+        return assetAnnualInspectionReports;
+    }
+
+    private Set<PermitInfo> permitInfos;
+
+    public List<PermitInfo> getPermitInfos() {
+        PermitInfo permitInfo=new PermitInfo();
+        permitInfo.setNodeId(0);
+        List<PermitInfo> permitInfos = null;
+        if(CollectionUtils.isEmpty(specialAssetInfo.getPermitInfos())){
+            permitInfos= new ArrayList<>();
+
+        }else{
+            List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+            for (int i = 0; i < collect.size(); i++) {
+                PermitInfo permitInfo1 = collect.get(i);
+                permitInfo1.setNodeId(i+1);
+            }
+            permitInfos=collect;
+
+        }
+        specialAssetInfo.setPermitInfos(permitInfos);
+        permitInfos.add(permitInfo);
+
+        return permitInfos;
+
+    }
+
+    public void processInputChange( ) {
+        System.out.println("processInputChange");
+    }
+
+
+    public void removePermitAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        Set<V2_BlobObject> blobObjects = permitInfo.getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        permitInfo.setBlobObjects(blobObjects);
+    }
+    public void removeReportAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        Set<V2_BlobObject> blobObjects = assetAnnualInspectionReport.getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        permitInfo.setBlobObjects(blobObjects);
+    }
+
+    public void removeReportAttachmentById(String blobId,Integer nodeId) {
+        blobService.deleteBlobFileById(blobId);
+
+        List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
+        Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        for (AssetAnnualInspectionReport annualInspectionReport : specialAssetInfo.getAssetAnnualInspectionReports()) {
+            if(annualInspectionReport.getNodeId()==nodeId){
+                annualInspectionReport.setBlobObjects(blobObjects);
+            }
+        }
+    }
+
+    public void removePermitAttachmentById(String blobId,Integer nodeId) {
+        blobService.deleteBlobFileById(blobId);
+
+        List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
+        Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
+        blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
+        for (PermitInfo permitInfo : specialAssetInfo.getPermitInfos()) {
+            if(permitInfo.getNodeId()==nodeId){
+                permitInfo.setBlobObjects(blobObjects);
+            }
+        }
+    }
+
+
+    public void handleFileUploadPermit(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            if(permitInfo.getBlobObjects()==null){
+                Set<V2_BlobObject> objects = new HashSet<>();
+                permitInfo.setBlobObjects(objects);
+            }
+            permitInfo.getBlobObjects().add(blobObject);
+//            blobObject.setBoId(permitInfo.getUid());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_SpecialAssetPermitInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(permitInfo.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadReport(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            if(assetAnnualInspectionReport.getBlobObjects()==null){
+                Set<V2_BlobObject> objects = new HashSet<>();
+                assetAnnualInspectionReport.setBlobObjects(objects);
+            }
+            assetAnnualInspectionReport.getBlobObjects().add(blobObject);
+//            blobObject.setBoId(permitInfo.getUid());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_SpecialAssetReportInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(assetAnnualInspectionReport.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void onAfterNewObjectPermit() {
+
+        if(specialAssetInfo.getPermitInfos() !=null){
+            specialAssetInfo.getPermitInfos().forEach(item -> {
+                    Set<V2_BlobObject> blobObjects = item.getBlobObjects();
+                    if(blobObjects!=null){
+                        blobObjects.forEach(ite->{
+                            if (ite.getBoUuid() == null) {
+//                                ite.setBoId(object.getId());
+                                ite.setBoUuid(item.getUid());
+                                blobService.saveBlobObject(ite);
+                            }
+                        });
+                    }
+
+                });
+        }
+
+        if(specialAssetInfo.getAssetAnnualInspectionReports() !=null){
+            specialAssetInfo.getAssetAnnualInspectionReports().forEach(item -> {
+                Set<V2_BlobObject> blobObjects = item.getBlobObjects();
+                if(blobObjects!=null){
+                    blobObjects.forEach(ite->{
+//                                ite.setBoId(object.getId());
+                            ite.setBoUuid(item.getUid());
+                            blobService.saveBlobObject(ite);
+
+                    });
+                }
+
+            });
+        }
+
+    }
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
+
 }

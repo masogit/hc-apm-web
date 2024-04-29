@@ -8,10 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -137,7 +134,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     public List<AssetInfo> findByUidIn(List<String> assetUids);
 
-    public List<AssetInfo> findByIdIn(List<Integer> assetIds);
+    public List<AssetInfo> findByIdIn(Collection<Integer> assetIds);
 
     public List<AssetInfo> findByUidIn(List<String> assetUids, Sort sort);
 
@@ -368,4 +365,20 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Query(value= "UPDATE asset_info  set asset_group=?1 where tenant_uid=?2 and asset_type=?3 and site_uid in (?4)",nativeQuery = true)
     void batchUpdateAssetInfoAssetGroup(Integer newAssetGroup,String tenantUid, String encoded,List<String> siteUids);
+
+    @Transactional
+    @Modifying
+    @Query(value= "update asset_info set last_inventory_date = now() where id in (?1)",nativeQuery = true)
+    void bathInventory(Collection<Integer> assetIds);
+
+    @Transactional
+    @Modifying
+    @Query(value= "update asset_info set last_inventory_date = ?2 where id = ?1",nativeQuery = true)
+    void updateLastInventoryDate(Integer assetId, Date lastInventoryDate);
+
+
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info  set is_special_asset=?2 where id=?1",nativeQuery = true)
+    void updateSpecialAsset(Integer assetId, boolean b);
 }

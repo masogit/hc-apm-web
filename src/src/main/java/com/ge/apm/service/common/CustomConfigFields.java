@@ -86,6 +86,7 @@ public enum CustomConfigFields {
     lastPmDate(fieldName, "lastPmDate" ,Text),    //上次保养日期
     lastQaDate(fieldName, "lastQaDate" ,Text),   //上次巡检日期
     lastMeteringDate(fieldName, "lastMeteringDate" ,Text),   //上次计量日期
+    lastInventoryDate(fieldName, "lastInventoryDate" ,Text),   //上次盘点日期
     warranty(fieldName, "isWarrantyNotice" ,Text),        //是否对维保到期提醒
     assetValueCategory(fieldName, "assetValueCategory" ,Text),    //资产价值分类
     pmOwnerName(fieldName, "pmOwnerName" ,Text),   //保养负责人

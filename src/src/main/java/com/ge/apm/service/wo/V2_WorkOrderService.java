@@ -434,6 +434,8 @@ public class V2_WorkOrderService {
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setEntryType(selectedWorkOrder.getEntryType());
+        //【最新进展】
+        formData.setComment(selectedWorkOrder.getComment());
 
         if(selectedWorkOrder.getEntryType() == 1){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
@@ -497,6 +499,8 @@ public class V2_WorkOrderService {
         if(selectedWorkOrder.getEntryType() == 1){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
         }
+        //【最新进展】
+        formData.setComment(selectedWorkOrder.getComment());
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
@@ -517,6 +521,8 @@ public class V2_WorkOrderService {
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setCaseType(selectedWorkOrder.getCaseType()==null?null:selectedWorkOrder.getCaseType().toString());
         formData.setAttachments(picList);
+        //待关单增加【最新进展】
+        formData.setComment(selectedWorkOrder.getComment());
 
         String res = srApi.invokeWorkOrderAction(token, formData, "close", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {

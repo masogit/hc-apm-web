@@ -37,14 +37,14 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
     public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocumentStreamingReader doc) {
 
         List<Map<String, Object>> result = new ArrayList<>();
-        int dataRow = 5;
+        int dataRow = 1;
 
         Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator = doc.iterator();
         while (iterator.hasNext()) {
             Map<String, ExcelDocument.ValueWrapper> rowMap = iterator.next();
 
 
-            String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门名称"));
+            String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门列表"));
 
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 continue;
@@ -76,7 +76,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        int dataRow = 7;
+        int dataRow = 1;
 
 //        boolean crossSite = false;
 //        if (doc.containsColumn(WebUtil.getMessage("Institution"))) {

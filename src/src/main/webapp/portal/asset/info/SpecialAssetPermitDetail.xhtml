@@ -1,0 +1,381 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
+        <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
+        <style>
+            div.ui-panelgrid-cell>label+div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+            div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
+                max-width: 200px;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+            .demo-container {
+                border: 1px solid #009BE3;
+                padding:0 20px;
+                font-family: "Myriad Pro Regular","Trebuchet MS";
+            }
+
+            .demo-container a, .demo-container a:link, .demo-container a:visited, .demo-container a:hover, .demo-container a:focus, .demo-container a:active {
+                color: #009BE3;
+            }
+
+            .demo-container ul {
+                list-style-type:none;
+                padding:0;
+                margin:1em 0;
+                width:100%;
+                overflow:hidden;
+            }
+
+            .demo-container ul span {
+                color: #A0A600;
+            }
+
+            .demo-container li {
+                float:left;
+                margin-right:1em;
+            }
+
+            .demo-container p span.track-name {
+                color: #CC0090;
+            }
+
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{specialAssetPermitEditController.CRUDActionName} 特种设备证照信息"/>
+            </div>
+            <div class="ui-g-12 card">
+
+                <h:form id="permitInfoCreateForm">
+
+                    <p:fieldset>
+
+                        <ui:include src="SelectedAssetList.xhtml"></ui:include>
+                    </p:fieldset>
+
+                    <p:fieldset legend="证件信息" style="margin-bottom:20px">
+                        <p:dataTable id="permitInfoList"
+                                     value="#{specialAssetPermitEditController.permitInfos}" var="item"
+                                     lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                                     emptyMessage="#{msg.noRecordFound}">
+
+                            <p:column headerText="证书名称">
+                                <h:outputText value="#{item.certificateName}"/>
+                            </p:column>
+                            <p:column headerText="持证人">
+                                <h:outputText value="#{item.holder}"/>
+                            </p:column>
+                            <p:column headerText="证书类型">
+                                <h:outputText value="#{item.certificateType}"/>
+                            </p:column>
+                            <p:column headerText="证书生效时间">
+                                <h:outputText value="#{item.effectiveTime}">
+                                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="证书到期时间">
+                                <h:outputText value="#{item.expiryDate}">
+                                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="上传人">
+                                <h:outputText value="#{item.createdByName}"/>
+                            </p:column>
+
+
+<!--                            <p:column headerText="操作">-->
+<!--                                <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"-->
+<!--                                                 oncomplete="PF('permitInfoDlg').show()"-->
+<!--                                                 rendered="#{empty item.certificateName}"-->
+<!--                                                 actionListener="#{specialAssetPermitEditController.onAddPermitInfo()}"-->
+<!--                                                 update="permitInfoDlg"/>-->
+<!--                                <p:commandButton disabled="true"  process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"-->
+<!--                                                 actionListener="#{specialAssetPermitEditController.onEditPermitInfo(item.certificateName)}"-->
+<!--                                                 oncomplete="PF('permitInfoDlg').show()"-->
+<!--                                                 update="permitInfoDlg" rendered="#{not empty item.certificateName}"/>-->
+<!--                                <p:commandButton disabled="true"  process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"-->
+<!--                                                 actionListener="#{specialAssetPermitEditController.delPermitInfo(item.certificateName)}"-->
+<!--                                                 update="permitInfoCreateForm:permitInfoList"-->
+<!--                                                 rendered="#{not empty item.certificateName}">-->
+<!--                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"-->
+<!--                                               icon="ui-icon-alert"/>-->
+<!--                                </p:commandButton>-->
+<!--                            </p:column>-->
+                        </p:dataTable>
+                        <p:dataList id="permitattachmentList" value="#{specialAssetPermitEditController.permitInfos}" var="permit"
+                                    type="definition" emptyMessage="#{msg.noRecordFound}">
+
+                            <p:dataGrid id="permitattachmentList1" var="fileitem" rendered="#{not empty permit.blobObjects}"
+                                        value="#{permit.blobObjects}" columns="5" layout="grid">
+                                <f:facet name="header">#{permit.certificateName}</f:facet>
+                                <p:panel style="text-align:center">
+                                    <h:panelGroup rendered="#{specialAssetPermitEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    </h:panelGroup>
+
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false"
+                                                   actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
+                                                   styleClass="p-mr-2"/>
+<!--                                    <p:commandButton-->
+<!--                                            actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id,permit.nodeId)}"-->
+<!--                                            update="permitInfoCreateForm:permitattachmentList" icon="ui-icon-clear"-->
+<!--                                            title="#{msg.Delete}" class="popupIconButton" process="@this">-->
+<!--                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"-->
+<!--                                                   icon="ui-icon-warning"/>-->
+<!--                                    </p:commandButton>-->
+
+                                </p:panel>
+                            </p:dataGrid>
+                        </p:dataList>
+
+                    </p:fieldset>
+
+                    <p:commandButton rendered="false" id="saveButtonId" validateClient="true" value="#{msg.Save}" disabled="true"  process="@parent" update=":growl,:permitInfoCreateForm" icon="ui-icon-check"
+                                     oncomplete="PF('permitInfoDlg').hide();handleSubmit(args, 'permitInfoDlg')" action="#{specialAssetPermitEditController.savePermit}"
+                                     timeout="180000" />
+
+                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"  action="specialAssetPermitList?faces-redirect=true" />
+
+
+                </h:form>
+
+            </div>
+        </div>
+
+        <p:dialog id="permitInfoDlg" widgetVar="permitInfoDlg" modal="true" resizable="true" draggable="true"
+                  appendTo="@(body)" header="新增证照信息" width="800" height="400">
+            <h:form id="permitInfoEditForm"><h:panelGroup id="displayssy">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">证件名称<span
+                                style="color:red"></span></label>
+                        <p:inputText id="certificateName"
+                                     value="#{specialAssetPermitEditController.permitInfo.certificateName}"
+                                     requiredMessage="#{msg.reportName} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">证书类型<span
+                                style="color:red"></span></label>
+                        <p:inputText id="certificateType"
+                                     value="#{specialAssetPermitEditController.permitInfo.certificateType}"
+                                     requiredMessage="#{msg.certificateType} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">持证人<span
+                                style="color:red"></span></label>
+                        <p:inputText id="holder"
+                                     value="#{specialAssetPermitEditController.permitInfo.holder}"
+                                     requiredMessage="#{msg.holder} #{msg.ValidationRequire}"
+                        >
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告生效时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{specialAssetPermitEditController.permitInfo.effectiveTime}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.effectiveTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">报告到期时间<span
+                                style="color:red"></span></label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{specialAssetPermitEditController.permitInfo.expiryDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" requiredMessage="#{msg.expiryDate} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+
+                </p:panelGrid>
+
+                <h:panelGroup >
+                    <p:dataList id="permitAttachList" value="#{specialAssetPermitEditController.permitInfo.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+
+
+                        <h:panelGroup rendered="#{specialAssetPermitEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                        <p:commandButton actionListener="#{specialAssetPermitEditController.removePermitAttachmentById(fileitem.id)}" update="permitAttachList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:dataList>
+                    <p:fileUpload id="permittype1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{specialAssetPermitEditController.handleFileUploadPermit}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true"  sizeLimit="100000000"  update="permitAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                </h:panelGroup>
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{specialAssetPermitEditController.savePermitInfo}"
+                                 value="#{msg.Save}" disabled="true" update="permitInfoCreateForm:permitInfoList" icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'permitInfoDlg');"
+                />
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('permitInfoDlg').hide()"/>
+
+            </h:panelGroup></h:form>
+        </p:dialog>
+
+        <script id="shwoPicDialog_s" type="text/javascript">$(function () {
+            PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+        });
+        </script>
+        <script>
+            //<![CDATA[
+
+            function handleComplete(xhr, status, args) {
+                var unCheckedNursesiteMaintainSite = args.unCheckedNursesiteMaintainSite;
+                var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
+                if(unCheckedNursesiteMaintainSite==true && toDeleteNurseMaintainSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                }
+            }
+
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
+                PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i < 10; i++) {
+                    ImageSuofang(true);
+                }
+            }
+
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height && num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
+            })
+
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
+                        return;
+                    }
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+
+            $(document).ready(function () {
+                var $audioUlEle = $("#audioUl");
+                var audioList = $("input[id*='audio']");
+                $.each(audioList, function (index) {
+                    var audioClass = (index == 0 ? "track-default" : "");
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    $audioUlEle.append(templ);
+                });
+
+                // Local copy of jQuery selectors, for performance.
+                var my_jPlayer = $("#jquery_jplayer"),
+                    my_trackName = $("#jp_container .track-name"),
+                    my_playState = $("#jp_container .play-state"),
+                    my_extraPlayInfo = $("#jp_container .extra-play-info");
+
+                // Some options
+                var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
+                    opt_auto_play = true, // If true, when a track is selected, it will auto-play.
+                    opt_text_playing = "播放", // Text when playing
+                    opt_text_selected = "选择"; // Text when not playing
+
+                // A flag to capture the first track
+                var first_track = true;
+
+                // Change the time format
+                $.jPlayer.timeFormat.padMin = false;
+                $.jPlayer.timeFormat.padSec = false;
+                $.jPlayer.timeFormat.sepMin = " 分 ";
+                $.jPlayer.timeFormat.sepSec = " 秒";
+
+                // Initialize the play state text
+                my_playState.text(opt_text_selected);
+
+                // Instance jPlayer
+                my_jPlayer.jPlayer({
+                    ready: function () {
+                        $("#jp_container .track-default").click();
+                    },
+                    timeupdate: function (event) {
+                        my_extraPlayInfo.text(parseInt(event.jPlayer.status.currentPercentAbsolute, 10) + "%");
+                    },
+                    play: function (event) {
+                        my_playState.text(opt_text_playing);
+                    },
+                    pause: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    ended: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    swfPath: "../../dist/jplayer",
+                    cssSelectorAncestor: "#jp_container",
+                    supplied: "mp3",
+                    wmode: "window"
+                });
+
+                // Create click handlers for the different tracks
+                var temp = $("#jp_container .track");
+                $("#jp_container .track").click(function (e) {
+                    my_trackName.text($(this).text());
+                    my_jPlayer.jPlayer("setMedia", {
+                        mp3: $(this).attr("href")
+                    });
+                    if ((opt_play_first && first_track) || (opt_auto_play && !first_track)) {
+                        my_jPlayer.jPlayer("play");
+                    }
+                    first_track = false;
+                    $(this).blur();
+                    return false;
+                });
+
+            });
+            //]]>
+        </script>
+
+
+
+
+
+    </ui:define>
+</ui:composition>

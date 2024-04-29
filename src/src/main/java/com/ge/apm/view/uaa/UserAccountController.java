@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
@@ -14,8 +15,12 @@ import com.ge.apm.service.uaa.*;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -79,6 +84,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final Integer LX_USER_TYPE = -1; // lixinag usertype
     private boolean isShowButton = true;
 
+    AssetTypeGroupMapper assetTypeGroupMapper;
     UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
     UserAccountMapper userAccountMapper;
@@ -274,6 +280,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         userAssetTypeGroupMapper = WebUtil.getBean(UserAssetTypeGroupMapper.class);
         userAssetGroupDao = WebUtil.getBean(UserAssetGroupRepository.class);
+        assetTypeGroupMapper = WebUtil.getBean(AssetTypeGroupMapper.class);
         setITAdmin();
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -297,6 +304,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedOrg = null;
         selected = null;
         selectedTenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        isEnableAssetTypeGroup = selectedTenant.getFeatureList().contains("CONFIG_ASSET_TYPE_GROUP");
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         String orgInfoUID = loginUser.getOrgInfoUID();
         affiliationDepartmentGroup= orgInfoDao.getHospitalChildrenByUids(Arrays.asList(orgInfoUID));
@@ -332,12 +340,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
+        assetTypeGroupList = assetTypeGroupMapper.findDtoByTenantUid(tenantUid);
+        assetTypeGroupMap = assetTypeGroupList.stream().distinct().collect(Collectors.toMap(AssetTypeGroupDto::getUid, t -> t));
         if (selectedTenant != null && selectedTenant.getUid().equals(tenantUid)) return;
 
         searchFilters.clear();
         selectedOrg = null;
         selected = null;
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+        isEnableAssetTypeGroup = selectedTenant.getFeatureList().contains("CONFIG_ASSET_TYPE_GROUP");
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         if (selectedTenant != null && selectedTenant.getId() != 46) { // skip building tenant org tree for apm ib user
@@ -412,7 +423,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         return dao;
     }
 
+    List<SearchFilter> searchFilterList;
+
     private void generateListSearchFilter() {
+        searchFilterList = new ArrayList<>(searchFilters);
         if(isITAdmin){
             itAdminFilter();
         }else{
@@ -420,7 +434,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         boolean nameFilter = false;
         Object nameValue = "";
-        for (SearchFilter filter : searchFilters) {
+        for (SearchFilter filter : searchFilterList) {
             if (filter.fieldName.equals("name")) {
                 nameFilter = true;
                 nameValue = filter.value;
@@ -429,24 +443,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         if (nameFilter) {
             nameValue = ((String) nameValue).toLowerCase();
-            searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
+            searchFilterList.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
         }
     }
     private void itAdminFilter(){
         if (selectedOrg == null) {
-            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN,childNodeUid));
+            searchFilterList.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN,childNodeUid));
         }else{
             String uid = selectedOrg.getUid();
             Set<String> child=new HashSet<>();
             getSubOrgInfo(uid,child);
-            searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, child));
+            searchFilterList.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, child));
         }
         if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
             List<String> customRolesUser = customRoleRepository.findCustomRolesUser(loginUser.getTenantUID());
             if(CollectionUtils.isEmpty(customRolesUser)){
                 customRolesUser.add("-1");
             }
-            searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,customRolesUser));
+            searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN,customRolesUser));
         }
     }
     private void getSubOrgInfo(String uid,Set<String> result){
@@ -459,21 +473,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     private void superAdminFilter() {
         if (selectedOrg == null) {
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
+            searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
         } else {
             if (selectedOrg.getId() == -1) {
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
+                searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
             } else {
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilterList.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilterList.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilterList.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 if (selectedOrg.getOrgType() == 4) {
                     //clinical dept may include child clinical dept
                     OrgInfoClinicalDeptService clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
                     List<OrgInfo> allClinicals = clinicalDeptService.collectChildClinicalDept(selectedOrg);
                     List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-                    searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalUids, "1*2+"));
+                    searchFilterList.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalUids, "1*2+"));
 
                 }
             }
@@ -484,20 +498,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         generateListSearchFilter();
         Boolean isDisable = false;
-        for (SearchFilter searchFilter : searchFilters) {
+        for (SearchFilter searchFilter : searchFilterList) {
             if ("isDisable".equals(searchFilter.fieldName)) {
                 isDisable = (Boolean) searchFilter.value;
                 break;
             }
         }
-        searchFilters.removeIf(e -> e.fieldName.equals("isDisable"));
-        searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ, isDisable, "1*3+"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("isDisable"));
+        searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ, isDisable, "1*3+"));
         if (!isDisable) {
-            searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull, null, "1*3+"));
+            searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull, null, "1*3+"));
         }
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*4+"));
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*4+"));
-        Page<UserAccount> pageUserAccount = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*4+"));
+        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*4+"));
+        if (ObjectUtil.isNotEmpty(assetTypeUserUidSet)) {
+            searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN, assetTypeUserUidSet, "1*"));
+        }
+        Page<UserAccount> pageUserAccount = dao.findBySearchFilter(this.searchFilterList, pageRequest);
         for (UserAccount user : pageUserAccount) {
             List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
             if (!orgListByUid.isEmpty()) {
@@ -1738,7 +1755,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void exportAll() {
         generateListSearchFilter();
-        List<UserAccount> listUserAccount = dao.findBySearchFilter(searchFilters);
+        List<UserAccount> listUserAccount = dao.findBySearchFilter(searchFilterList);
         if (listUserAccount == null || listUserAccount.size() == 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NoData"));
             return;
@@ -1993,4 +2010,67 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             setSelectedSysAuthGroupTree(item, userAuthGroupUids);
         }
     }
+
+    @Getter @Setter
+    private Boolean isEnableAssetTypeGroup = false;
+    @Getter @Setter
+    private String filterAssetTypeGroup;
+    @Getter @Setter
+    private List<AssetTypeGroupDto> assetTypeGroupList;
+    @Getter @Setter
+    private Map<String, AssetTypeGroupDto> assetTypeGroupMap;
+    @Getter @Setter
+    private Set<String> assetTypeUserUidSet;
+    @Getter @Setter
+    private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
+
+    public List<String> autoCompleteAssetTypeGroupName(String query) {
+        if (assetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroupDto> res = this.assetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .filter(item -> ObjectUtil.isEmpty(item.getParentUid()))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroupDto::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onAssetTypeGroupNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetTypeGroup = (String) ((SelectEvent) event).getObject();
+        }
+
+
+        if (!Strings.isNullOrEmpty(filterAssetTypeGroup) && !assetTypeGroupList.stream().anyMatch(item -> filterAssetTypeGroup.equals(item.getName()))) {
+            filterAssetTypeGroup = null;
+        }
+        if (filterAssetTypeGroup != null) {
+            List<AssetTypeGroupDto> assetTypeGroupsMatchingByName = this.assetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeGroup)).collect(Collectors.toList());
+            List<AssetTypeGroupDto> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList1(assetTypeGroupsMatchingByName, assetTypeGroupList);
+            assetTypeUserUidSet = matchedList.stream().map(AssetTypeGroupDto::getUserUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+            if (ObjectUtil.isEmpty(assetTypeUserUidSet)) {
+                assetTypeUserUidSet = Collections.singleton("-1");
+            }
+        } else {
+            assetTypeUserUidSet = Collections.emptySet();
+        }
+    }
+
+    public String convertAssetTypeGroupEncodedToName(String uid) {
+        List<AssetTypeGroupDto> userGroups = assetTypeGroupList.stream().filter(t -> uid.equals(t.getUserUid())).collect(Collectors.toList());
+        Set<String> nameList = new HashSet<>();
+        for (AssetTypeGroupDto assetTypeGroupDto : userGroups) {
+            nameList.add(findParent(assetTypeGroupDto).getName());
+        }
+        return nameList.stream().collect(Collectors.joining(" "));
+    }
+
+    private AssetTypeGroupDto findParent(AssetTypeGroupDto assetTypeGroupDto) {
+        if (ObjectUtil.isNotEmpty(assetTypeGroupDto.getParentUid())) {
+            assetTypeGroupDto = findParent(assetTypeGroupMap.get(assetTypeGroupDto.getParentUid()));
+        }
+        return assetTypeGroupDto;
+    }
+
 }

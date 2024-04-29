@@ -34,6 +34,12 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT count(*) from zkb_part_order where current_step = ?1 and tenant_uid = ?2 and data_type = 'test.'", nativeQuery = true)
     Integer fetchQtyByStepForTest(String currentStep,String tenantUid);
 
+    @Query(value = "SELECT count(*) from zkb_part_order where current_step in ?1 and tenant_uid = ?2 and data_type is null", nativeQuery = true)
+    Integer fetchQtyBySteps(List<String> currentSteps,String tenantUid);
+    @Query(value = "SELECT count(*) from zkb_part_order where current_step in ?1 and tenant_uid = ?2 and data_type = 'test.'", nativeQuery = true)
+    Integer fetchQtyByStepsForTest(List<String> currentSteps,String tenantUid);
+
+
     @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id = ?1", nativeQuery = true)
     Integer fetchQty(String contractId);
 
@@ -134,5 +140,8 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
 
     @Query(value = "select  t.name from user_account t inner join tenant_info tt ON t.tenant_uid=tt.uid where tt.type='3' and t.login_name like 'test.%' ", nativeQuery = true)
     List<String> getZkbTestName();
+
+    @Query(value = "SELECT * from zkb_part_order where sr_no = ?1 and current_step in ('CompletePending', 'CompleteAuditPending') and id != ?2 ", nativeQuery = true)
+    List<ZkbPartOrder> queryBySrNo(String srNo, String partOrderId);
 }
 
