@@ -5,7 +5,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,10 +18,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.ge.apm.dao.*;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -508,100 +512,6 @@ public class InventoryOrderService {
 					break;
 			}
 		}
-	}
-
-	public List<Map<String, Object>> covQueryCondition(List<SearchFilter> searchFilters, List<Map<String, Object>> joinAssetList) {
-		if (ObjectUtil.isEmpty(searchFilters)) {
-			return joinAssetList;
-		}
-		List<Map<String, Object>> resultList = ListUtil.newArrayList();
-		List<SearchFilter> lastModifiedByFilters = searchFilters.stream().filter(s -> "lastModifiedBy".equals(s.fieldName)).collect(Collectors.toList());
-		List<String> loginNamList = ListUtil.newArrayList();
-		if (lastModifiedByFilters.size() == 1) {
-			List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(UserContextService.getCurrentUserAccount().getTenantUID(), lastModifiedByFilters.get(0).value.toString());
-			loginNamList = userAccountList.stream().map(UserAccount::getLoginName).collect(Collectors.toList());
-		}
-		for (Map<String, Object> map : joinAssetList) {
-			Set<Boolean> flags = new HashSet<>();
-			Date start = null;
-			Date end = null;
-			for (SearchFilter searchFilter : searchFilters) {
-				String fieldName = searchFilter.fieldName;
-				switch (fieldName) {
-					case "selectedOrgUid":
-						flags.add(map.get("institutionuid").toString().equals(searchFilter.value) || map.get("hospitaluid").toString().equals(searchFilter.value) || map.get("siteuid").toString().equals(searchFilter.value));
-						break;
-					case "queryAssetUid":
-						flags.add(Optional.ofNullable(map.get("queryassetuid")).map(String::valueOf).map(searchFilter.value::equals).orElse(false));
-						break;
-					case "name":
-						flags.add(Optional.ofNullable(map.get("name")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "clinicalDeptName":
-						flags.add(Optional.ofNullable(map.get("clinicaldeptname")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "qrCode":
-						flags.add(Optional.ofNullable(map.get("qrcode")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "departNum":
-						flags.add(Optional.ofNullable(map.get("departnum")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "functionType":
-						flags.add(Optional.ofNullable(map.get("functiontype")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "financingNum":
-						flags.add(Optional.ofNullable(map.get("financingnum")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "assetStatus":
-						flags.add(Optional.ofNullable(map.get("assetstatus")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "locationName":
-						flags.add(Optional.ofNullable(map.get("locationname")).map(String::valueOf).map(o -> o.contains((String) searchFilter.value)).orElse(false));
-						break;
-					case "isSolved":
-						boolean isSolved = Boolean.parseBoolean(searchFilter.value.toString());
-						if (isSolved) {
-							flags.add(Optional.ofNullable(map.get("issolved")).map(String::valueOf).map("是"::equals).orElse(false));
-						} else {
-							flags.add(Optional.ofNullable(map.get("issolved")).map(String::valueOf).map("否"::equals).orElse(false));
-						}
-						break;
-					case "lastModifiedBy":
-						if (ObjectUtil.isNotEmpty(loginNamList)) {
-							flags.add(Optional.ofNullable(map.get("lastmodifiedby")).map(String::valueOf).map(loginNamList::contains).orElse(false));
-						} else {
-							flags.add(false);
-						}
-						break;
-					case "status":
-						flags.add(Optional.ofNullable(map.get("status")).map(String::valueOf).map(searchFilter.value::equals).orElse(false));
-						break;
-					case "lastModifiedDate":
-						if (searchFilter.operator.name().equals("GTE")) {
-							start = (Date) searchFilter.value;
-                        } else {
-							end = (Date) searchFilter.value;
-                        }
-                        break;
-					default:
-						break;
-				}
-			}
-            if (ObjectUtil.isAllNotEmpty(start, end)) {
-                Date date = Optional.ofNullable(map.get("lastmodifieddate")).map(String::valueOf).map(DateUtil::parse).orElse(null);
-                if (ObjectUtil.isEmpty(date)) {
-                    flags.add(Boolean.FALSE);
-                } else if (date.after(start) && date.before(end)) {
-                    flags.add(Boolean.TRUE);
-                } else {
-                    flags.add(Boolean.TRUE);
-                }
-            }
-			if (!flags.contains(Boolean.FALSE)) {
-				resultList.add(map);
-			}
-		}
-		return resultList;
 	}
 
 }
