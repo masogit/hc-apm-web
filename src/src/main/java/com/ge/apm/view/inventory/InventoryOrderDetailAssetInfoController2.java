@@ -2,6 +2,7 @@ package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,15 +11,15 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ge.apm.dao.InventoryIssueRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryIssue;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
@@ -39,13 +40,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryIssueRepository inventoryIssueRepository;
     private UserAccountRepository userAccountRepository;
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
-	private InventoryOrderService service;
-	private static final String ORG_NAME = "orgName";
+    private AssetInfoRepository assetInfoRepository;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 1;
@@ -54,19 +53,18 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-		service=WebUtil.getBean(InventoryOrderService.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
         if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
-            listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+            listClinicalDeptName=inventoryOrderService.getInventoryClinicalDeptUID(orderId,true,0);
         }
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 
@@ -100,9 +98,10 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
-            if(!orderIdList.isEmpty()){
-                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            if(orderIdList.isEmpty()){
+                orderIdList = ListUtil.newArrayList("-1");
             }
+            searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
@@ -192,5 +191,20 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
+
+    public void transferNonInventory(InventoryOrderDetail inventoryOrderDetail) {
+        InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(inventoryOrderDetail.getAssetInfo().getId(), inventoryOrderDetail.getInventoryOrderId());
+        if (ObjectUtil.isNotEmpty(inventoryIssue)) {
+            WebUtil.addErrorMessage("当前资产有问题未解决，请检查！");
+            return;
+        }
+        inventoryOrderDetail.setStatus(0);
+        dao.save(inventoryOrderDetail);
+        Integer assetId = inventoryOrderDetail.getAssetInfo().getId();
+        Date lastInventoryDate = dao.findLastInventoryDateByAssetId(assetId);
+        AssetInfo assetInfo = assetInfoRepository.findById(assetId);
+        assetInfo.setLastInventoryDate(lastInventoryDate);
+        assetInfoRepository.save(assetInfo);
+    }
 
 }

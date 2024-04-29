@@ -73,6 +73,13 @@
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 			</h:outputText>
 		</p:column>
+		<p:column headerText="#{msg.Actions}" style="width: 130px">
+			<p:commandButton id="updateButton" value="转入未盘点" actionListener="#{inventoryOrderDetailAssetInfoController2.transferNonInventory(item)}"
+							 update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoListForm"
+							 process="@this" disabled="#{item.isSolved eq false}">
+				<p:confirm header="转入未盘点确认" message="您确定要将本台设备转入未盘点么？" icon="ui-icon-warning"/>
+			</p:commandButton>
+		</p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist2" fileName="InventoryOrderDetailAssetInfo2_export" />

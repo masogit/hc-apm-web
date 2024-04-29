@@ -8,9 +8,11 @@ import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import org.primefaces.event.NodeSelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +39,12 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     private UserAccountRepository userAccountRepository;
     private InventoryOrderMapper inventoryOrderMapper;
     private UaaService uaaService;
-	private List<String> listClinicalDeptName;
+    private UserContextService userContextService;
+    private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
     private String queryAssetUid;
+    //选定的院区
+    private OrgInfo selectSite;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -47,6 +52,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
@@ -71,6 +77,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     @Override
     protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
+        /*if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }*/
         Map<String, Object> param = MapUtil.newHashMap();
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
@@ -78,11 +87,17 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
         List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        /*if (currentUser.isEnableAssetTypeGroup()) {
+            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+        }*/
         param.put("tenantUid", currentUser.getTenantUID());
         param.put("page", pageRequest.getPageSize());
         param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
         if (ObjectUtil.isNotEmpty(orderIdList)) {
             param.put("orderIdList", orderIdList);
+        }
+        if (ObjectUtil.isNotEmpty(selectSite)) {
+            param.put("selectedOrgUid", selectSite.getUid());
         }
         if (ObjectUtil.isNotEmpty(orgUidList)) {
             param.put("orgUidList", orgUidList);
@@ -117,6 +132,19 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 		object.setSiteUID(currentUser.getSiteUID());
 	}
 
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+    }
+
 	public List<String> getListClinicalDeptName() {
 		return listClinicalDeptName;
 	}
@@ -125,4 +153,11 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 		this.listClinicalDeptName = listClinicalDeptName;
 	}
 
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
 }

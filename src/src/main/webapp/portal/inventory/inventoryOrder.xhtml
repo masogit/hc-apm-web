@@ -8,8 +8,8 @@
 			</div>
 
 			<div class="ui-g-12 card">
-                <p:commandButton value="工单视图" rendered="#{userContextService.hasCurrentTenantName('')}"  action="#{inventoryOrderDetailAssetInfoAllController.changePage(true)}" disabled="true"/>
-                <p:commandButton value="全院视图" rendered="#{userContextService.hasCurrentTenantName('')}" action="#{inventoryOrderDetailAssetInfoAllController.changePage(false)}"/>
+                <p:commandButton value="工单视图" action="#{inventoryOrderDetailAssetInfoAllController.changePage(true)}" disabled="true"/>
+                <p:commandButton value="全院视图" action="#{inventoryOrderDetailAssetInfoAllController.changePage(false)}"/>
                 <h:form id="inventoryOrderListForm">
 					<p:dataTable id="datalist" value="#{inventoryOrderController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{inventoryOrderController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"

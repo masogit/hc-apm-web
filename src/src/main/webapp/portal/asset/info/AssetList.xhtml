@@ -143,7 +143,11 @@
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
-                            </h:panelGroup>
+                                    <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') and !userContextService.isEnableBtnByKey('enableDeviceReplication')}" >
+                                        <p:graphicImage value="/images/icons/copyy.png" style="width: 30px; height: 30px;"/>
+<!--                                        <p:graphicImage name="icons/copy.png" style="width: 30px; height: 30px;"/>-->
+                                    </p:link>
+                        </h:panelGroup>
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -252,6 +256,16 @@
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{assetInfoListController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'lastInventoryDate'}">
+                                <p:column  headerText="#{msg.lastInventoryDate}" sortBy="#{item.lastInventoryDate}" filterBy="#{item.lastInventoryDate}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterLastInventoryDate" widgetVar="varFilterLastInventoryDate" value="#{assetInfoListController.lastInventoryDateFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.lastInventoryDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'nationalStandardCode'}">
@@ -985,6 +999,17 @@
                         </h:panelGrid>
                         <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                         <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterLastInventoryDate" widgetVar="panelFilterLastInventoryDate" for=":AssetInfoListForm:datalist:filterLastInventoryDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('lastInventoryDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varLastInventoryDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varLastInventoryDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterLastInventoryDate', 'varLastInventoryDateFrom', 'varLastInventoryDateTo'); PF('panelFilterLastInventoryDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterLastInventoryDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
                     </p:overlayPanel>
 
                     <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('createdDate')}">

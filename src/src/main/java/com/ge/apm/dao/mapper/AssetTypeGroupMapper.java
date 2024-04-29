@@ -64,4 +64,7 @@ public interface AssetTypeGroupMapper {
 					"</script>"})
 	List<AssetTypeGroup> getAssetTypeByUids(@Param("uids") List<String> uids);
 
+	@Select("SELECT atg.uid, atg.name, atg.encoded, atg.parent_uid parentUid, uag.user_uid FROM asset_type_group atg left join user_asset_group uag on atg.uid = uag.asset_group_uid where atg.tenant_uid = #{tenantUid}")
+	List<AssetTypeGroupDto> findDtoByTenantUid(@Param("tenantUid") String tenantUid);
+
 }

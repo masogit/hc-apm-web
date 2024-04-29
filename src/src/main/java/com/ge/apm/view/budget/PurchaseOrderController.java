@@ -193,22 +193,14 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             searchFilters = new ArrayList<>();
         }
         updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
-        if (tabIndex == 0) {//待转信息确认
-            updateSearchFilter(new SearchFilter("orderStep", SearchFilter.Operator.IsNull, null));
-            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.IsNull, null));
-        } else if(tabIndex == 1){//待信息确认
-            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "ToConfirmedInfo"));
-            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.IsNull, null));
-        } else if(tabIndex == 2){//待过会确认
-            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "ToConfirmedInfoMeet"));
-            updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.EQ, "ConfirmedInfo"));
-        } else if(tabIndex == 3){//待招标
+        if (tabIndex == 0) {//待招标弯沉
             updateSearchFilter(new SearchFilter("orderStep", SearchFilter.Operator.EQ, "ToConfirmedInfoTendered"));
             updateSearchFilter(new SearchFilter("stepStatus", SearchFilter.Operator.EQ, "ConfirmedInfoMeet"));
-        } else if(tabIndex == 4){//完成
+        } else if(tabIndex == 1){//招标完成
             updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.EQ, "Complete"));
             updateSearchFilter(new SearchFilter("stepStatus",SearchFilter.Operator.EQ, "Complete"));
-        } else if(tabIndex == 5){//全部
+        }  else if(tabIndex == 5){//全部
+            updateSearchFilter(new SearchFilter("orderStep",  SearchFilter.Operator.IN, Arrays.asList("Complete","ToConfirmedInfoTendered")));
         }
         queryByUserRole(org,searchFilters);
         return searchFilters;
@@ -240,15 +232,6 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
         switch (event.getTab().getId()) {
             case "s1":
                 tabIndex = 1;
-                break;
-            case "s2":
-                tabIndex = 2;
-                break;
-            case "s3":
-                tabIndex = 3;
-                break;
-            case "s4":
-                tabIndex = 4;
                 break;
             case "s5":
                 tabIndex = 5;

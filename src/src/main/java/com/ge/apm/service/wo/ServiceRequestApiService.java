@@ -543,6 +543,17 @@ class WorkOrderActionForm {
     List<V2_WorkOrderManHoursDetail> workHoursList;
     Boolean generatePartsRequest;
 
+    //维修中【最新进展】
+    String comment;
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public Boolean getGeneratePartsRequest() {
         return generatePartsRequest;
     }

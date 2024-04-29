@@ -15,11 +15,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * @author 212579464
@@ -129,6 +131,31 @@ public class SharedAssetService extends MicroServiceInvoker {
             ResponseEntity<LinkedHashMap> response = template.exchange(url,method, requestEntity, LinkedHashMap.class);
             logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
         });
+    }
+
+    public void asynRemoteCall(GatewayURL gatewayUrl, HttpMethod method, Map<String, Object> requestData, Function<String,String> function){
+        String url = getGatewayURL(gatewayUrl);
+         url =function.apply(url);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity requestEntity = new HttpEntity<>(requestData, header);
+        runAsync(url,method,requestEntity);
+    }
+
+    public String getSrNum(String key) {
+        String gatewayURL = getGatewayURL(GatewayURL.SECONDMENT_GENERATE_NO).concat("?key=");
+        if(StringUtils.hasText(key)){
+            gatewayURL.concat(key);
+        }
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return String.valueOf(responseMap.get("data"));
+        } else {
+            return null;
+        }
     }
 
 }

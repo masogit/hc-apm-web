@@ -145,6 +145,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String installDateFormatTime = null;
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
+    private String lastInventoryDateFormatTime = null;
     @Getter @Setter
     private String mvsContractStartDate = null;
     @Getter @Setter
@@ -652,6 +653,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public String getEditPage(String assetUid, String assetName) {
         String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetUid
+                + "&asset_name=" + assetName
+                + "&terminate=" + this.terminate;
+        return UrlEncryptController.encodeUrlParam(operation);
+    }
+
+    public String getCopyPage(String assetUid, String assetName) {
+        String operation = "AssetCreate.xhtml?actionName=Copy&selectedid=" + assetUid
                 + "&asset_name=" + assetName
                 + "&terminate=" + this.terminate;
         return UrlEncryptController.encodeUrlParam(operation);
@@ -1619,7 +1627,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
     }
 
-//    public String getOneQrCodeStatus() {
+    public String getLastInventoryDateFormatTime() {
+        return lastInventoryDateFormatTime;
+    }
+
+    public void setLastInventoryDateFormatTime(String lastInventoryDateFormatTime) {
+        this.lastInventoryDateFormatTime = lastInventoryDateFormatTime;
+    }
+
+    //    public String getOneQrCodeStatus() {
 //        return oneQrCodeStatus;
 //    }
 //

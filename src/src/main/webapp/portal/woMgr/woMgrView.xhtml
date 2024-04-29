@@ -258,6 +258,10 @@
                                     <label class="label">外部报价</label>
                                     <p:outputLabel value="#{woItem.externalQuotation}"/>
                                 </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.LatestDevelopments}</label>
+                                    <p:outputLabel value="#{woItem.comment}"/>
+                                </h:panelGroup>
                                 <c:if test="#{userContextService.countyArea}">
                                     <h:panelGroup>
                                         <label class="label">#{msg.siebleNumber}</label>

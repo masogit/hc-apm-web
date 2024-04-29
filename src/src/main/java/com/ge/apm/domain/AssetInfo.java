@@ -247,6 +247,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Temporal(TemporalType.DATE)
     private Date lastMeteringDate;//上次计量日期
 
+    @Column(name = "last_inventory_date")
+    @Temporal(TemporalType.DATE)
+    private Date lastInventoryDate;//上次盘点日期
+
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
     private Date lastQaDate;//2级保养 上次保养日期
@@ -1016,7 +1020,35 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     @Column(name = "spare05")
     private String spare05;
+    @Getter
+    @Setter
+    @Column(name = "billing_time")
+    private Long billingTime; // 累计借用计费时长分钟
 
+    @Getter
+    @Setter
+    @Column(name = "billing_cost",columnDefinition = "decimal(11,2)")
+    private Double billingCost;//累计费用
+    @Getter
+    @Setter
+    @Column(name = "borrowed_status")
+    private Integer borrowedStatus;  // 借用状态 -1不可借出，0 可借，1占用
+    @Getter
+    @Setter
+    @Column(name = "borrow_config_id")
+    private String borrowConfigId;
+
+
+    @Column(name = "is_special_asset", columnDefinition = "boolean default false")
+    private boolean isSpecialAsset; //是否特种设备
+
+    public boolean isSpecialAsset() {
+        return isSpecialAsset;
+    }
+
+    public void setSpecialAsset(boolean specialAsset) {
+        isSpecialAsset = specialAsset;
+    }
 
     public void setSupplierPyCode(String supplierPyCode) {
         this.supplierPyCode = supplierPyCode;
@@ -1921,7 +1953,7 @@ public class AssetInfo implements ChineseName,Serializable {
         return serialNum;
     }
 
-    public void setSerialNum(String serialNum) {
+    public void setSerialNum(String serialNum)   {
         this.serialNum = serialNum;
     }
 
@@ -2138,6 +2170,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setLastMeteringDate(Date lastMeteringDate) {
         this.lastMeteringDate = lastMeteringDate;
+    }
+
+    public Date getLastInventoryDate() {
+        return lastInventoryDate;
+    }
+
+    public void setLastInventoryDate(Date lastInventoryDate) {
+        this.lastInventoryDate = lastInventoryDate;
     }
 
     public Date getLastQaDate() {

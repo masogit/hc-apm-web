@@ -6,6 +6,7 @@ import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.mapper.UserAssetTypeGroupMapper;
 import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -191,6 +192,22 @@ public class AssetTypeGroupService {
         for (AssetTypeGroup assetTypeGroup : assetTypeGroupList) {
             if (!parentAssetTypeGroup.getUid().equals(assetTypeGroup.getParentUid())) continue;
             collectChildAssetTypeGroupInExstingList(assetTypeGroup, assetTypeGroupList, assetTypeGroupSet);
+        }
+    }
+
+    public List<AssetTypeGroupDto> collectChildAssetTypeGroupInExstingList1(List<AssetTypeGroupDto> assetTypeGroupsMatchingByName, List<AssetTypeGroupDto> assetTypeGroupList) {
+        List<AssetTypeGroupDto> assetTypeGroupSet = new ArrayList<>();
+        for (AssetTypeGroupDto assetTypeGroup: assetTypeGroupsMatchingByName) {
+            collectChildAssetTypeGroupInExstingList1(assetTypeGroup, assetTypeGroupList, assetTypeGroupSet);
+        }
+        return assetTypeGroupSet;
+    }
+
+    public void collectChildAssetTypeGroupInExstingList1(AssetTypeGroupDto parentAssetTypeGroup, List<AssetTypeGroupDto> assetTypeGroupList, List<AssetTypeGroupDto> assetTypeGroupSet) {
+        assetTypeGroupSet.add(parentAssetTypeGroup);
+        for (AssetTypeGroupDto assetTypeGroup : assetTypeGroupList) {
+            if (!parentAssetTypeGroup.getUid().equals(assetTypeGroup.getParentUid())) continue;
+            collectChildAssetTypeGroupInExstingList1(assetTypeGroup, assetTypeGroupList, assetTypeGroupSet);
         }
     }
 }

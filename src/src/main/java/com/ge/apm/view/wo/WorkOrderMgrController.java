@@ -351,11 +351,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
             }
             if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 11;
-                }else {
-                    queryIndex = 0;
-                }
+                //云南阜外由默认全部改为默认待办
+                queryIndex = 0;
             } else {
                 queryIndex = Integer.valueOf(query);
                 searchList(queryIndex);

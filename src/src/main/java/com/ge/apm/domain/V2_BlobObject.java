@@ -83,6 +83,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PMORDER_REPORT_TEMPLATE = "PmOrderReportTemplate";
     public static final String BO_TYPE_InspectionOrder = "InspectionOrder";
     public static final String BO_TYPE_AssetInfo = "AssetInfo";
+    public static final String BO_TYPE_SpecialAssetPermitInfo = "SpecialAssetPermitInfo";
+    public static final String BO_TYPE_SpecialAssetReportInfo = "SpecialAssetReportInfo";
     public static final String BO_TYPE_Supply = "supplier";
     public static final String BO_TYPE_AssetContract = "AssetContract";
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
@@ -103,6 +105,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_COURSE_TRAIN = "ZkbCourseTrain";
     public static final String BO_TYPE_ZKB_FE_PART_ORDER = "ZkbFePartOrder";
     public static final String BO_TYPE_ZKB_PART_ORDER_LETTER = "ZkbPartOrderLetter";
+    public static final String BO_TYPE_ZKB_PART_CLOSE_FILE = "ZkbPartOrderClose";
     public static final String BO_TYPE_ZKB_PART_ORDER_PROVE = "ZkbPartOrderProve";
     public static final String BO_TYPE_ZKB_PART_ORDER_RETURN = "ZkbPartOrderReturn";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";

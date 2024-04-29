@@ -1,12 +1,14 @@
 package com.ge.apm.view.inventory;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,8 +23,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -34,11 +35,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
 	private InventoryOrderService service;
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
-	private static final String ORG_NAME = "orgName";
+	private AssetInfoRepository assetInfoRepository;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
@@ -46,10 +46,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -68,15 +68,17 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		return dao;
 	}
 
+	List<SearchFilter> bathFilters;
+
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
 		//before
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+			searchFilters = new ArrayList<>();
 		}
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -89,28 +91,19 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
-            if(!orderIdList.isEmpty()){
-                searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            if(orderIdList.isEmpty()){
+				orderIdList = ListUtil.newArrayList("-1");
             }
-        }else {
+			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+		}else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
 		searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
 		if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
-//		if(!pageAssetInfo.getContent().isEmpty()){
-//            for (InventoryOrderDetail inventoryOrderDetail :pageAssetInfo.getContent()){
-//                if(inventoryOrderDetail.getClinicalDeptName()==null){
-//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
-//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
-//                }
-//            }
-//        }
-
-		//after
-		return pageAssetInfo;
+		bathFilters = searchFilters;
+		return dao.findBySearchFilter(searchFilters,pageRequest);
 	}
 
 	@Override
@@ -140,6 +133,20 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public void bathInventory() {
+		List<InventoryOrderDetail> nonInventoryOrderDetails = dao.findBySearchFilter(bathFilters);
+		Date date = new Date();
+		nonInventoryOrderDetails.forEach(d -> {
+			d.setStatus(1);
+			d.setLastModifiedDate(date);
+			d.setLastModifiedBy(currentUser.getLoginName());
+		});
+		dao.save(nonInventoryOrderDetails);
+		// 更新资产盘点日期
+		Set<Integer> assetIds = nonInventoryOrderDetails.stream().map(t -> t.getAssetInfo().getId()).collect(Collectors.toSet());
+		assetInfoRepository.bathInventory(assetIds);
 	}
 
 }

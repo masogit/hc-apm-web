@@ -29,7 +29,7 @@ public class AssetFileImportSupportingService {
 
     public static final String ASSET_CODE_MERGE_THREE = "DFQ";
     public static final String ASSET_CODE_MERGE_TWO = "DF";
-    public static final String OLD_QRCODE_KEY = "old_qrcode";
+    public static final String  OLD_QRCODE_KEY = "old_qrcode";
 
     @Autowired
     private UserAccountRepository userDao;

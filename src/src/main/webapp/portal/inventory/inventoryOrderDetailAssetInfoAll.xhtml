@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
-
+<h:form id="searchForm" class="searchForm">
+	<h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
+		<p:commandButton id="btnOrg" value="#{empty inventoryOrderDetailAssetInfoAllController.selectSite? msg.AllHospitals:inventoryOrderDetailAssetInfoAllController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+		<p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+			<p:inputText id="treeNodeNameFilter" class="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+			<p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree)" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+			<p:scrollPanel style="height:300px;border: 0" mode="native">
+				<p:tree id="orgTree" class="orgTree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+					<p:ajax process="@this" event="select" listener="#{inventoryOrderDetailAssetInfoAllController.onSelectSiteTreeNode}" update=":inventoryOrderDetailAssetInfoTab:searchForm :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoAllListForm" oncomplete="PF('varPanelOrg').hide();"/>
+					<p:ajax process="@this" event="expand"/>
+					<p:ajax process="@this" event="collapse"/>
+					<p:treeNode type="org">
+						<h:outputText value="#{node.name}"/>
+					</p:treeNode>
+					<p:treeNode type="hidden" rendered="false"/>
+				</p:tree>
+			</p:scrollPanel>
+		</p:overlayPanel>
+	</h:panelGroup>
+</h:form>
 <h:form id="inventoryOrderDetailAssetInfoAllListForm">
 	<p:dataTable id="datalistAll" value="#{inventoryOrderDetailAssetInfoAllController.lazyModel}" var="item" widgetVar="varDataListAll" selectionMode="single"
 		selection="#{inventoryOrderDetailAssetInfoAllController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -72,13 +91,13 @@
             <h:outputText value="#{item.isSolved}"/>
         </p:column>
         <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
-            <h:outputText value="#{inventoryOrderDetailAssetInfoAllController.getUserName(item.lastModifiedBy)}"/>
+            <h:outputText value="#{item.status == 0 ? '' : inventoryOrderDetailAssetInfoAllController.getUserName(item.lastModifiedBy)}"/>
         </p:column>
         <p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
             <f:facet name="filter">
                 <p:inputText id="filterLastModifiedDateAll" widgetVar="varFilterLastModifiedDateAll" />
             </f:facet>
-            <h:outputText value="#{item.lastModifiedDate}">
+            <h:outputText value="#{item.status == 0 ? '' : item.lastModifiedDate}">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </h:outputText>
         </p:column>
