@@ -725,7 +725,7 @@ public class AssetImportDataCheckService {
             asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
             asset.setIsValid(true);
-            asset.setDeleted(Boolean.FALSE);
+            asset.setIsDeleted(Boolean.FALSE);
 
             asset.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             asset.setCreatedDate(now);
