@@ -156,15 +156,52 @@ public class AssetFileImportSupportingService {
 
         return supplier;
 
-    }  @Transactional
-    public synchronized Supplier importSupplierIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel,UserAccount userAccount) {
+    }
+
+    @Transactional
+    public synchronized Supplier importSupplierIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel, UserAccount userAccount,int type) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            updateSupplierType(supplier,type);
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel,userAccount);
+            supplierDao.save(supplier);
+        }
+
+        //existing records, update type
+        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
+            updateSupplierType(supplier,type);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    public void updateSupplierType(Supplier supplier, int type) {
+        switch (type) {
+            case 1:
+                supplier.setSupplierT(true);
+                break;
+            case 2:
+                supplier.setMaintainerT(true);
+                break;
+            case 3:
+                supplier.setManufacturerT(true);
+                break;
+        }
+    }
+
+    @Transactional
+    public synchronized Supplier importSupplierIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel, UserAccount userAccount) {
 
         Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
         if (supplier == null) {
             supplier = new Supplier();
             supplier.setSupplierT(true);
 
-            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel,userAccount);
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel, userAccount);
             supplierDao.save(supplier);
         }
 
@@ -198,7 +235,9 @@ public class AssetFileImportSupportingService {
 
         return supplier;
 
-    }@Transactional
+    }
+
+    @Transactional
     public synchronized Supplier importMaintainancerIfNeededSync(OrgInfo selectedOrgToImport, String name, String tel, UserAccount userAccount) {
 
         Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
@@ -206,7 +245,7 @@ public class AssetFileImportSupportingService {
             supplier = new Supplier();
             supplier.setMaintainerT(true);
 
-            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel,userAccount);
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, tel, userAccount);
             supplierDao.save(supplier);
         }
 
@@ -241,6 +280,7 @@ public class AssetFileImportSupportingService {
         return supplier;
 
     }
+
     @Transactional
     public synchronized Supplier importManufacturerIfNeededSync(OrgInfo selectedOrgToImport, String name, UserAccount userAccount) {
 
@@ -249,7 +289,7 @@ public class AssetFileImportSupportingService {
             supplier = new Supplier();
             supplier.setManufacturerT(true);
 
-            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, null,userAccount);
+            setDefaultValueForSupplierAsync(supplier, selectedOrgToImport, name, null, userAccount);
             supplierDao.save(supplier);
         }
 
@@ -284,7 +324,9 @@ public class AssetFileImportSupportingService {
         supplier.setLastModifiedBy(userAccount.getLoginName());
         supplier.setLastModifiedDate(now);
 
-    }    private void setDefaultValueForSupplierAsync(Supplier supplier, OrgInfo selectedOrgToImport, String name, String tel,UserAccount userAccount) {
+    }
+
+    private void setDefaultValueForSupplierAsync(Supplier supplier, OrgInfo selectedOrgToImport, String name, String tel, UserAccount userAccount) {
 
         Date now = new Date();
 
@@ -324,7 +366,7 @@ public class AssetFileImportSupportingService {
 
         List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
         if (resultList.size() > 0) {
-           // logger.info("check depart num duplicate: departNUm: {}, siteUid:{}, asset uid:{}", asset.getDepartNum(), siteUid, asset.getUid());
+            // logger.info("check depart num duplicate: departNUm: {}, siteUid:{}, asset uid:{}", asset.getDepartNum(), siteUid, asset.getUid());
             return true;
         } else {
             return false;
@@ -350,7 +392,7 @@ public class AssetFileImportSupportingService {
 
         List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
         if (resultList.size() > 0) {
-           // logger.info("check depart num duplicate: departNUm: {}, siteUid:{}, asset uid:{}", asset.getDepartNum(), siteUid, asset.getUid());
+            // logger.info("check depart num duplicate: departNUm: {}, siteUid:{}, asset uid:{}", asset.getDepartNum(), siteUid, asset.getUid());
             return true;
         } else {
             return false;

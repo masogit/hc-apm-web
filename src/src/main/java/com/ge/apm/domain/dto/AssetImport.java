@@ -3,6 +3,7 @@ package com.ge.apm.domain.dto;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
+import com.ge.apm.service.utils.AssetImportDateConvert;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -154,34 +155,34 @@ public class AssetImport implements Serializable {
 
     private String statusStr = "1";
 
-    @ExcelProperty(value = "manufactDate")
+    @ExcelProperty(value = "manufactDate",converter = AssetImportDateConvert.class)
     private Date manufactDate;//出厂日期
     private Date lastMeasuringDate;
-    @ExcelProperty("purchaseDate")
+    @ExcelProperty(value = "purchaseDate",converter = AssetImportDateConvert.class)
     private Date purchaseDate;//采购日期
 
-    @ExcelProperty("arriveDate")
+    @ExcelProperty(value = "arriveDate",converter = AssetImportDateConvert.class)
     private Date arriveDate;//到货日期
 
-    @ExcelProperty("StartUsingDate")
+    @ExcelProperty(value = "StartUsingDate",converter = AssetImportDateConvert.class)
     private Date installDate;//启用日期
 
-    @ExcelProperty("warrantyDate")
+    @ExcelProperty(value = "warrantyDate",converter = AssetImportDateConvert.class)
     private Date warrantyDate;//维保截止日期
 
-    @ExcelProperty("terminateDate")
+    @ExcelProperty(value = "terminateDate",converter = AssetImportDateConvert.class)
     private Date terminateDate;//报废日期
 
-    @ExcelProperty("lastPmDate")
+    @ExcelProperty(value = "lastPmDate",converter = AssetImportDateConvert.class)
     private Date lastPmDate;//3级保养 上次保养日期
 
 
-    @ExcelProperty("lastMeteringDate")
+    @ExcelProperty(value = "lastMeteringDate",converter = AssetImportDateConvert.class)
     private Date lastMeteringDate;//上次计量日期
 
     private Date lastInventoryDate;//上次盘点日期
 
-    @ExcelProperty("LastInspectionDate")
+    @ExcelProperty(value = "LastInspectionDate",converter = AssetImportDateConvert.class)
     private Date lastQaDate;//2级保养 上次保养日期
 
     private Date lastPmDateOne;//1级保养 上次保养日期
@@ -1571,11 +1572,11 @@ public class AssetImport implements Serializable {
         this.systemNum5 = systemNum5;
     }
 
-    public Boolean getDeleted() {
+    public Boolean getIsDeleted() {
         return isDeleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setIsDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
 
