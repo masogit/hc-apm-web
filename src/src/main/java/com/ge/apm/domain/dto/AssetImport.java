@@ -23,6 +23,7 @@ public class AssetImport implements Serializable {
 
     private Integer rowNum;
 
+    @ExcelProperty("UUID")
     private String uid;
 
     private Integer siteId;
@@ -145,15 +146,15 @@ public class AssetImport implements Serializable {
 
     private String assetOwnerTel;//维修负责人电话
 
-    private boolean isValid=true;//在用？
+    private boolean isValid = true;//在用？
 
     //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
-    private Integer status=1;//当前状态
+    private Integer status = 1;//当前状态
     @ExcelProperty(value = "CurrentStatus")
 
     private String statusStr = "1";
 
-    @ExcelProperty("manufactDate")
+    @ExcelProperty(value = "manufactDate")
     private Date manufactDate;//出厂日期
     private Date lastMeasuringDate;
     @ExcelProperty("purchaseDate")
