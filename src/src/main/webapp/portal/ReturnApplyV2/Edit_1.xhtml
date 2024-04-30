@@ -159,6 +159,11 @@
                             <h:outputText value="借用中" rendered="#{item.state eq '0'}"></h:outputText> 
                             <h:outputText value="已归还" rendered="#{item.state eq '1'}"></h:outputText> 
                         </p:column>-->
+                        <p:column headerText="预计归还时间"  >
+                            <h:outputText value="#{sharedAssetReqDetailV2Controller.getExpectDateByDetail(item)}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
                             <h:outputText value="#{item.chargingBeginTime}">
                                 <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
@@ -189,7 +194,7 @@
                     </f:facet>  -->
                         <p:columnGroup type="footer">
                             <p:row>
-                                <p:column footerText="总费用: " colspan="5" style="text-align:right"/>
+                                <p:column footerText="总费用: " colspan="6" style="text-align:right"/>
                                 <p:column footerText="¥#{sharedAssetRequestV2Controller.total}" />
                             </p:row>
                         </p:columnGroup>

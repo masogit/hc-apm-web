@@ -98,6 +98,11 @@
                         <p:column headerText="状态" sortBy="#{item.state}">
                             <h:outputText value="#{item.state}"/>
                         </p:column>
+                        <p:column headerText="预计归还时间" >
+                            <h:outputText value="#{sharedAssetReqDetailV2Controller.getExpectDateByDetail(item)}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
                             <h:outputText value="#{item.chargingBeginTime}" />
                         </p:column>

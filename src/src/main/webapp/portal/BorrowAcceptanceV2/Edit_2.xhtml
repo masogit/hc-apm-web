@@ -149,7 +149,7 @@
                             <p:column headerText="操作"  >
                                 <p:commandButton  icon="ui-icon-cloud-download" title="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                 <p:commandButton  actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" title="预览" update="viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
-                                <p:commandButton rendered="#{sharedAssetRequestV2Controller.selected.state != 6}"  actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}"  update="IouEditForm:uploadPanelGroup" icon="ui-icon-delete" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:commandButton rendered="#{sharedAssetRequestV2Controller.selected.state != 6}"  actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}"  update="SharedAssetRequestBorrowEditForm:uploadPanelGroup" icon="ui-icon-delete" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:column>
