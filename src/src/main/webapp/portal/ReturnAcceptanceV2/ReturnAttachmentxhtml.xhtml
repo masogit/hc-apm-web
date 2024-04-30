@@ -19,7 +19,7 @@
         <h:panelGroup>
                 <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{sharedAssetRequestV2Controller.sharedAssetRequests}">
                     <p:tab title="#{o.sardList.get(0).assetName}" >
-                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="名称" >
                                 <h:outputText value="#{fileitem.objectName}"/>
                             </p:column>

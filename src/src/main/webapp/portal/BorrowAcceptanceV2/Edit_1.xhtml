@@ -121,9 +121,9 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <p:messages id="messages1" closable="true" style="width: 900px" />
+                            <p:messages id="messages" closable="true" style="width: 900px" />
                             <p:inputText id="applyAssetInfo" placeholder="资产编号/设备编号/二维码" maxlength="100" style="width: 200px" value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
-                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages1" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.accepter)}" />
+                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.accepter)}" />
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -179,17 +179,25 @@
                     </p:dataTable>
                 </p:fieldset>
                 <p:fieldset legend="附件上传" style="margin-bottom:20px">
-                    <h:panelGroup >
-                        <p:dataList id="contractList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                            <f:facet name="header">#{msg.Attachment}</f:facet>
-                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                            <p:commandButton actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}" update="IouEditForm" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                            </p:commandButton>
-                        </p:dataList>
-                        <p:fileUpload disabled="#{sharedAssetRequestV2Controller.selected.attachments.size() >= 5}" id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                    <h:panelGroup id="uploadPanelGroup">
+                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="名称" >
+                                <h:outputText value="#{fileitem.objectName}"/>
+                            </p:column>
+                            <p:column headerText="图片"  >
+                                <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
+                            </p:column>
+                            <p:column headerText="操作"  >
+                                <p:commandButton  icon="ui-icon-cloud-download" title="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandButton  actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" title="预览" update="viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
+                                <p:commandButton rendered="#{sharedAssetRequestV2Controller.selected.state != 6}"  actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}"  update="IouEditForm:uploadPanelGroup" icon="ui-icon-delete" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                        <p:fileUpload rendered="#{sharedAssetRequestV2Controller.selected.state != 6}" disabled="#{sharedAssetRequestV2Controller.selected.attachments.size() >= 5}" id="File" allowTypes="/(\.|\/)(jpeg|jpg|png|txt|ps|JPEG|JPG|PNG|TXT|PS)$/"
                                       mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{sharedAssetRequestV2Controller.handleFileUpload}"
-                                      multiple="true"  sizeLimit="500000000"  update="IouEditForm" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="500000000"  update="uploadPanelGroup" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
 
                     </h:panelGroup>
                 </p:fieldset>
@@ -207,6 +215,9 @@
                 <ui:include src="EditDetail.xhtml"/>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+                <p:dialog  id="viewImage" widgetVar="viewImageDialog" modal="true" height="500" width="500"  resizable="true" draggable="true" appendTo="@(body)" >
+                    <p:graphicImage  url="#{fileDownloadService.getImgUrl(sharedAssetRequestV2Controller.getViewImageStr())}" alt="不支持预览" style="width: 100%" />
+                </p:dialog>
          </div>
         </div>
         <script>
