@@ -177,7 +177,7 @@ public class AssetFileImportController {
             displayAssetsNew = new ArrayList<>();
             uploadProgress = new Progress();
             LocalDateTime startTime = LocalDateTime.now();
-            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).autoCloseStream(true).sheet(0).registerConverter(new ApmI18nConverter(selectedOrg.getSiteId())).doRead();
+            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).registerConverter(new ApmI18nConverter()).autoCloseStream(true).sheet(0).doRead();
             logger.info("found asset record count: {}", displayAssetsNew.size());
             LocalDateTime endTime = LocalDateTime.now();
             Duration duration = Duration.between(startTime, endTime);
@@ -207,6 +207,7 @@ public class AssetFileImportController {
 
         } catch (Exception e) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--" + e.getMessage(), null);
+
             logger.error(e.getMessage(), e);
         }
     }
