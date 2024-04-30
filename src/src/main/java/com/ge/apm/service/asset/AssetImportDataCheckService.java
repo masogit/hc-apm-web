@@ -181,7 +181,7 @@ public class AssetImportDataCheckService {
         result.put("unCheckedNurseSite", Boolean.FALSE);
         Map<String, OrgInfo> orgNamesUriCache = null;
         if (crossSite) {
-            orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
+            orgNamesUriCache=   orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
         }
         for (AssetImport assetImport : assetImportList) {
 
