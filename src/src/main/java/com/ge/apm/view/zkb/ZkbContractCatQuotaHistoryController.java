@@ -74,16 +74,19 @@ public class ZkbContractCatQuotaHistoryController extends GenericCRUDUUIDControl
     }
 
     public String returnTypeFieldRender(String partOrderNo, String partOrderId){
+        if(StrUtil.isEmpty(partOrderNo)){
+            return "";
+        }
         if(partOrderNo.startsWith("PO")){
             ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(partOrderId);
-            if(StrUtil.isNotEmpty(zkbPartOrder.getReturnType())){
+            if(zkbPartOrder != null && StrUtil.isNotEmpty(zkbPartOrder.getReturnType())){
                 String key = "zkbPoReturnType" + "-" + zkbPartOrder.getReturnType();
                 return WebUtil.getMessage(key);
             }
             return zkbPartOrder.getReturnType();
         }else if(partOrderNo.startsWith("FEPO")){
             ZkbFePartOrder zkbFePartOrder = zkbFePartOrderRepository.findById(partOrderId);
-            if(StrUtil.isNotEmpty(zkbFePartOrder.getReturnType())){
+            if(zkbFePartOrder != null && StrUtil.isNotEmpty(zkbFePartOrder.getReturnType())){
                 String key = "zkbFePartOrder_zkbPoReturnType" + "-" + zkbFePartOrder.getReturnType();
                 return WebUtil.getMessage(key);
             }
