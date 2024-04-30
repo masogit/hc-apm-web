@@ -56,6 +56,9 @@
                        <p:column headerText="名额数量">
                            <h:outputText value="#{item.qty}"/>
                        </p:column>
+                       <p:column headerText="归还类型">
+                           <h:outputText value="#{zkbContractCatQuotaHistoryController.returnTypeFieldRender(item.partOrderNo, item.partOrderId)}"/>
+                       </p:column>
                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="LIKE">
                            <h:outputText value="#{item.status}"/>
                            <f:facet name="filter">
@@ -86,6 +89,9 @@
                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractCatQuotaHistoryController.prepareEdit}"
                                             update=":contractCatQuotaEditDlg" oncomplete="PF('contractCatQuotaEditDlg').show()"
                                             disabled="#{empty zkbContractCatQuotaHistoryController.selected}" />
+                           <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                               <p:dataExporter type="xls" target="datalist" fileName="Zkb_contract_cat_quota"/>
+                           </p:commandButton>
                        </f:facet>
                     </p:dataTable>
 

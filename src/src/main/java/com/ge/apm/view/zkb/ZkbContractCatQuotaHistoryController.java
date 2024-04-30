@@ -2,9 +2,11 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.ZkbContractCatQuotaHistoryRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContractCatQuotaHistory;
+import com.ge.apm.dao.ZkbFePartOrderRepository;
+import com.ge.apm.dao.ZkbPartOrderRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
@@ -13,12 +15,11 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.service.DbMessageSource;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @ManagedBean
 @ViewScoped
@@ -30,17 +31,29 @@ public class ZkbContractCatQuotaHistoryController extends GenericCRUDUUIDControl
 
     private UserAccountRepository userAccountRepository;
 
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
+    private ZkbFePartOrderRepository zkbFePartOrderRepository;
+
     @Getter@Setter
     private String createdDateFormat;
 
     @Getter@Setter
     private String lastModifiedDateFormat;
 
+
+
     @Override
     protected void init() {
         super.init();
         zkbContractCatQuotaHistoryRepository = WebUtil.getBean(ZkbContractCatQuotaHistoryRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        zkbPartOrderRepository = WebUtil.getBean(ZkbPartOrderRepository.class);
+        zkbFePartOrderRepository = WebUtil.getBean(ZkbFePartOrderRepository.class);
+    }
+
+    public void initReturnTYpe(){
+
     }
 
     @Override
@@ -58,6 +71,25 @@ public class ZkbContractCatQuotaHistoryController extends GenericCRUDUUIDControl
     @Override
     protected GenericRepositoryUUID<ZkbContractCatQuotaHistory> getDAO() {
         return zkbContractCatQuotaHistoryRepository;
+    }
+
+    public String returnTypeFieldRender(String partOrderNo, String partOrderId){
+        if(partOrderNo.startsWith("PO")){
+            ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(partOrderId);
+            if(StrUtil.isNotEmpty(zkbPartOrder.getReturnType())){
+                String key = "zkbPoReturnType" + "-" + zkbPartOrder.getReturnType();
+                return WebUtil.getMessage(key);
+            }
+            return zkbPartOrder.getReturnType();
+        }else if(partOrderNo.startsWith("FEPO")){
+            ZkbFePartOrder zkbFePartOrder = zkbFePartOrderRepository.findById(partOrderId);
+            if(StrUtil.isNotEmpty(zkbFePartOrder.getReturnType())){
+                String key = "zkbFePartOrder_zkbPoReturnType" + "-" + zkbFePartOrder.getReturnType();
+                return WebUtil.getMessage(key);
+            }
+            return zkbFePartOrder.getReturnType();
+        }
+        return null;
     }
 
     public String getFieldNameByType(String type, String val){
