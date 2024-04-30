@@ -19,20 +19,16 @@
         <h:panelGroup>
                 <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{sharedAssetRequestV2Controller.sharedAssetRequests}">
                     <p:tab title="#{o.sardList.get(0).assetName}" >
-                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="名称" >
                                 <h:outputText value="#{fileitem.objectName}"/>
-                            </p:column>
-                            <p:column headerText="类型"  >
-                                <h:outputText value="#{fileitem.boSubType}"/>
                             </p:column>
                             <p:column headerText="图片"  >
                                 <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
                             </p:column>
                             <p:column headerText="操作"  >
-                                <p:commandButton value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                                <p:commandLink  value="预览" ajax="false" actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" oncomplete="PF('viewImageDialog').show()" styleClass="p-mr-2"/>-->
-                                <p:commandButton  actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" value="放大" update="IouEditForm:viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
+                                <p:commandButton  icon="ui-icon-cloud-download" title="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandButton  actionListener="#{sharedAssetRequestV2Controller.setViewImageStr(fileitem.objectStorageId)}" title="预览" update="viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
                             </p:column>
                         </p:dataTable>
                     </p:tab>
