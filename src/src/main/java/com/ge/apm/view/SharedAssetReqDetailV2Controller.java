@@ -11,6 +11,7 @@ import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple3;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
@@ -623,5 +624,17 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
       dao.save(selected);
       WebUtil.addSuccessMessage("设备归还人修改成功");
   }
-    
+  public Date getExpectDateByDetail(SharedAssetReqDetail detail){
+       String assetInfoId = detail.getAssetInfoId();
+       String borrowId = detail.getBorrowId();
+       AssetInfo assetInfo = asiDao.findByUid(assetInfoId);
+       if(assetInfo != null && StringUtils.isNotBlank(assetInfo.getSharedAssetTypeUid())){
+           SharedAssetReqType sharedAssetReqType = apdDao.findByIdsharedIdandSwapTypeid(borrowId,assetInfo.getSharedAssetTypeUid());
+           if(sharedAssetReqType != null){
+               return sharedAssetReqType.getExpectDate();
+           }
+       }
+       return null;
+
+  }
 }
