@@ -1028,13 +1028,7 @@ public class AssetFileImportBaseService {
         }
 
         assetDao.save(newAsset);
-       /* if (isCreate) {
-            newAsset.setId(null);
-        }*/
-//        this.saveAssetHistory(assetInfo);
-
         assetDepreciationService.saveAssetDerpeciation(newAsset);
-
         supportingService.saveOrUpdateAssetTags(newAsset, importData);
 
         if (isMvs(userAccount)) {
@@ -1045,6 +1039,9 @@ public class AssetFileImportBaseService {
 
             mvsUtil.copyToMvsTableIfMvsEquip(newAsset);
 
+        }
+        if (isCreate) {
+            newAsset.setId(null);
         }
         return newAsset;
     }

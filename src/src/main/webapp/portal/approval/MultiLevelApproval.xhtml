@@ -231,6 +231,7 @@
                             document.getElementById('approvalDialogForm:openSignature2').click();
                         }else{
                             PF('MultiLevelApprovalClaimDialog').hide();
+                            PF('returnDlg').hide();
                         }
                     }
                     function handleApproveSuccess(xhr, status, args) {
@@ -258,7 +259,7 @@
                     <br/>
 
                     <p:commandButton  validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(3)}" value="确定" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args)"/>
-                    <p:commandButton  validateClient="true" immediate="false"  value="取消" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="PF('returnDlg').hide()"/>
+                    <p:commandButton   immediate="true"  value="取消" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="PF('returnDlg').hide()"/>
 <!--                    <p:commandButton style="display: none" id="openSignature2" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />-->
                 </h:form>
 
