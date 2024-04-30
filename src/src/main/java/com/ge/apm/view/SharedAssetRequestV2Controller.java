@@ -1009,6 +1009,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                  }
                  //清理sardList
                  sardList.remove(sharedAssetReqDetail);
+                 if(!CollectionUtils.isEmpty(this.sharedAssetRequests)){
+                     this.sharedAssetRequests=this.sharedAssetRequests.stream().filter(item -> !item.getSardList().stream().allMatch(detail->detail.getId().equals(sharedAssetReqDetail.getId()))).collect(Collectors.toList());
+                 }
                  break;
              }
          }
