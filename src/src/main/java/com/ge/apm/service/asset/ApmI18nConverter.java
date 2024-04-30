@@ -15,7 +15,6 @@ import java.util.Objects;
 
 public class ApmI18nConverter implements Converter<Integer> {
 
-    private Integer institutionId;
 
     @Override
     public Class<?> supportJavaTypeKey() {
@@ -39,25 +38,14 @@ public class ApmI18nConverter implements Converter<Integer> {
         I18n i18n = context.getContentProperty().getField().getAnnotation(I18n.class);
         if (Objects.nonNull(i18n)) {
             String i18nKey = i18n.value();
-            Map<String, I18nMessage> cache = DbMessageSource.getMessageCache(institutionId);
-            if (Objects.nonNull(cache)) {
-                I18nMessage i18nMessage = cache.get(i18nKey);
-            }
+
+
 
         }
 
         return 0;
     }
 
-    public Integer getInstitutionId() {
-        return institutionId;
-    }
 
-    public void setInstitutionId(Integer institutionId) {
-        this.institutionId = institutionId;
-    }
 
-    public ApmI18nConverter(Integer institutionId) {
-        this.institutionId = institutionId;
-    }
 }
