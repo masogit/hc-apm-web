@@ -121,9 +121,9 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <p:messages id="messages" closable="true" style="width: 900px" />
+                            <p:messages id="messages1" closable="true" style="width: 900px" />
                             <p:inputText id="applyAssetInfo" placeholder="资产编号/设备编号/二维码" maxlength="100" style="width: 200px" value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
-                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.accepter)}" />
+                            <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages1" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.accepter)}" />
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -183,13 +183,13 @@
                         <p:dataList id="contractList" value="#{sharedAssetRequestV2Controller.selected.attachments}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.Attachment}</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                            <p:commandButton actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:commandButton actionListener="#{sharedAssetRequestV2Controller.removeAttachmentById(fileitem.id)}" update="IouEditForm" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
+                        <p:fileUpload disabled="#{sharedAssetRequestV2Controller.selected.attachments.size() >= 5}" id="File" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
                                       mode="advanced" dragDropSupport="false" style="width:100%" fileUploadListener="#{sharedAssetRequestV2Controller.handleFileUpload}"
-                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="500000000"  update="IouEditForm" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
 
                     </h:panelGroup>
                 </p:fieldset>
