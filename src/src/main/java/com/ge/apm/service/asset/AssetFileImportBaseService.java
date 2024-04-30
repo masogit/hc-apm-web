@@ -914,7 +914,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
             supplier = supplierCache.get(newAsset.getVendor());
             if (Objects.isNull(supplier)) {
-                supplier = supportingService.importSupplierIfNeededSync(siteOrg, newAsset.getVendor(), newAsset.getVendorTel(),userAccount);
+                supplier = supportingService.importSupplierIfNeededSync(siteOrg, newAsset.getVendor(), newAsset.getVendorTel(),userAccount,1);
                 supplierCache.put(newAsset.getVendor(), supplier);
             }
             newAsset.setSupplierId(supplier.getId());
@@ -926,7 +926,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
            Supplier maitananceSupplier = supplierCache.get(newAsset.getMaitanance());
             if (Objects.isNull(maitananceSupplier)) {
-                maitananceSupplier = supportingService.importMaintainancerIfNeededSync(siteOrg, newAsset.getMaitanance(), newAsset.getMaitananceTel(),userAccount);
+                maitananceSupplier = supportingService.importSupplierIfNeededSync(siteOrg, newAsset.getMaitanance(), newAsset.getMaitananceTel(),userAccount,2);
             }
             newAsset.setMaitananceId(maitananceSupplier.getId().toString());
             supplierCache.put(newAsset.getMaitanance(),maitananceSupplier);
@@ -938,7 +938,7 @@ public class AssetFileImportBaseService {
         if (!StringUtils.isEmpty(newAsset.getManufacture())) {
            Supplier manufacturSupplier=supplierCache.get(newAsset.getManufacture());
             if(Objects.isNull(manufacturSupplier)){
-                manufacturSupplier = supportingService.importManufacturerIfNeededSync(siteOrg, newAsset.getManufacture(),userAccount);
+                manufacturSupplier = supportingService.importSupplierIfNeededSync(siteOrg, newAsset.getManufacture(),newAsset.getManufactureTel(),userAccount,3);
             }
             newAsset.setManufactureId(manufacturSupplier.getId().toString());
             supplierCache.put(newAsset.getManufacture(),manufacturSupplier);
