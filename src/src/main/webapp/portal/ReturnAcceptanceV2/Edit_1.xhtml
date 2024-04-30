@@ -215,7 +215,7 @@
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
                         <p:column headerText="删除">
-                            <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestV2Controller.deleteBy(item.id)}"  update=":IouEditForm:datalistDetail, datalistOperation">
+                            <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestV2Controller.deleteBy(item.id)}"  update=":IouEditForm:datalistDetail,IouEditForm:sharedAssetRequests, datalistOperation">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </p:column>
