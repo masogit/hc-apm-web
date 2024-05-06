@@ -238,7 +238,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty("PurchasePrice")
     private Double purchasePrice;//采购价格(元)
 
-    @ExcelProperty("FinalSalvageValue")
+    @ExcelProperty("salvageValue")
     private Double salvageValue;//最终残值(元)
 
     @ExcelProperty(value = "LifeCycle", converter = AssetImportIntegerConverter.class)
@@ -1505,7 +1505,11 @@ public class AssetImport implements Serializable {
     }
 
     public void setLifecycle(Integer lifecycle) {
-        this.lifecycle = lifecycle;
+        if (lifecycle == null) {
+            this.lifecycle = null;
+        } else {
+            this.lifecycle = new Double(lifecycle * 12).intValue();
+        }
     }
 
     public Integer getDepreciationMethod() {

@@ -742,8 +742,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("ManufacturerSerialNumber"), "123456");
 
         map.put(WebUtil.getMessage("PurchasePrice"), 100.0);
-        map.put(WebUtil.getMessage("FinalSalvageValue"), 0.0);
-        map.put(WebUtil.getMessage("LifeCycle"), null);
+        map.put(WebUtil.getMessage("salvageValue"), 0.0);
+        map.put(WebUtil.getMessage("LifeCycle"), 10);
         map.put(WebUtil.getMessage("depreciationMethod"), "平均年限");
 
         map.put(WebUtil.getMessage("UsageClassification"), "治疗类");
