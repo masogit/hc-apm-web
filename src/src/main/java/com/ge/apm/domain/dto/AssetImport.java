@@ -43,7 +43,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "medicalInstrumentClassification")
     private String functionGroupStr;//功能分组   医疗器械分类(旧)Str
 
-    @ExcelProperty("medicalApparatusClassification")
+    @ExcelProperty("医疗器械分类编码")
     private String medicalApparatusClassification; // 医疗器械分类
 
     @ExcelProperty("functionType")
