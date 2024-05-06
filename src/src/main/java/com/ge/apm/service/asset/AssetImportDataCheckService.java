@@ -822,4 +822,17 @@ public class AssetImportDataCheckService {
         String[] properties = new String[nullProperty.size()];
         return nullProperty.toArray(properties);
     }
+    public void orgCheck(List<Map<String, Object>> importOrgMap){
+        if (!crossSite) {
+            //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
+            importOrgMap.forEach(item -> {
+                OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+
+                //parent uid is not working for child clinical dept, so we use site id
+                OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
+
+                item.put("status", orgInfo == null ? AssetFileImportBaseService.ImportStatus.New : AssetFileImportBaseService.ImportStatus.Exist);
+            });
+        }
+    }
 }
