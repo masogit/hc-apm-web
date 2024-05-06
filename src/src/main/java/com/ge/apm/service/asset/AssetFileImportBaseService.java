@@ -703,6 +703,7 @@ public class AssetFileImportBaseService {
     protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache,UserAccount userAccount) {
         AssetInfo newAsset = new AssetInfo();
         BeanUtils.copyProperties(importData, newAsset);
+        newAsset.setWarranty(importData.getIsWarranty());
         AssetInfo dbAsset = null;
         if (!StringUtils.isEmpty(importData.getUid())) {
             dbAsset = assetDao.findByUid(importData.getUid());
