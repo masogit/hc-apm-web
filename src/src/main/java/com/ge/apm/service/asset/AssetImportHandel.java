@@ -35,7 +35,7 @@ public class AssetImportHandel implements ReadListener<AssetImport> {
     private Map<String, Map<String, Object>> i18nMap;
     private Progress progress;
 
-    private Integer rowNum=1;
+    private Integer rowNum = 1;
 
     public AssetImportHandel(List<AssetImport> importData, boolean crossSite, AssetImportDataCheckService assetImportDataCheckService, List<Map<String, Object>> importOrgMap, List<AssetInfo> unCheckNurseSiteMaintainList, OrgInfo selectedOrgToImport, OrgInfoRepository orgDao, Progress progress) {
         this.importData = importData;
@@ -80,15 +80,17 @@ public class AssetImportHandel implements ReadListener<AssetImport> {
             ExcelProperty excelProperty = value.getField().getAnnotation(ExcelProperty.class);
             if (excelProperty != null && excelProperty.value().length > 0 && StringUtils.isNotEmpty(excelProperty.value()[0])) {
                 String columnName = WebUtil.getMessage(excelProperty.value()[0]);
-                excelHeadDataMap.entrySet().stream().filter(e -> columnName.equals(e.getValue())).findFirst().ifPresent(config -> {
-                    value.setColumnIndex(config.getKey());
-                    headMapConverted.put(config.getKey(), value);
-                });
+                if (StringUtils.isNotEmpty(columnName)) {
+                    excelHeadDataMap.entrySet().stream().filter(e -> columnName.equals(e.getValue())).findFirst().ifPresent(config -> {
+                        value.setColumnIndex(config.getKey());
+                        headMapConverted.put(config.getKey(), value);
+                    });
+                }
             }
         }
         ExcelReadHeadProperty readHeadProperty = context.readSheetHolder().getExcelReadHeadProperty();
         readHeadProperty.setHeadMap(headMapConverted);
-        progress.setTotal(context.getTotalCount()-1);
+        progress.setTotal(context.getTotalCount() - 1);
     }
 
     public List<AssetImport> getImportData() {
