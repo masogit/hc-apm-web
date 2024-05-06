@@ -193,6 +193,7 @@ public class AssetFileImportController {
             }
             logger.info("start to check data");
             LocalDateTime checkStartime = LocalDateTime.now();
+            assetImportDataCheckService.orgCheck(importOrgMap);
             Map<String, Boolean> checkresult = assetImportDataCheckService.checkData(displayAssetsNew, importOrgMap, unCheckNurseSiteMaintainList, uploadProgress);
             LocalDateTime checkEndTime = LocalDateTime.now();
             Duration checkDuration = Duration.between(checkStartime, checkEndTime);
