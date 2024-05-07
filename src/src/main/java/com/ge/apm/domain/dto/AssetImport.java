@@ -3,6 +3,8 @@ package com.ge.apm.domain.dto;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
+import com.ge.apm.service.asset.AssetImportBooleanConvert;
+import com.ge.apm.service.asset.AssetImportIntegerConverter;
 import com.ge.apm.service.utils.AssetImportDateConvert;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,13 +43,13 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "medicalInstrumentClassification")
     private String functionGroupStr;//功能分组   医疗器械分类(旧)Str
 
-    @ExcelProperty("medicalApparatusClassification")
+    @ExcelProperty("医疗器械分类编码")
     private String medicalApparatusClassification; // 医疗器械分类
 
     @ExcelProperty("functionType")
     private String functionType;//设备型号
 
-    @ExcelProperty(value = "functionGrade")
+    @ExcelProperty(value = "functionGrade", converter = AssetImportIntegerConverter.class)
     private Integer functionGrade;//功能等级
 
     @ExcelProperty("manufacture")
@@ -128,7 +130,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "assetClass")
     private String assetClassStr;//资产分类Str
 
-    @ExcelProperty(value = "assetGroupSecondary")
+    @ExcelProperty(value = "assetGroupSecondary", converter = AssetImportIntegerConverter.class)
     private Integer assetGroupSecondary;//设备分类2级
 
     private Integer assetDeptId;//使用设备科
@@ -155,34 +157,34 @@ public class AssetImport implements Serializable {
 
     private String statusStr = "1";
 
-    @ExcelProperty(value = "manufactDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "manufactDate", converter = AssetImportDateConvert.class)
     private Date manufactDate;//出厂日期
     private Date lastMeasuringDate;
-    @ExcelProperty(value = "purchaseDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "purchaseDate", converter = AssetImportDateConvert.class)
     private Date purchaseDate;//采购日期
 
-    @ExcelProperty(value = "arriveDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "arriveDate", converter = AssetImportDateConvert.class)
     private Date arriveDate;//到货日期
 
-    @ExcelProperty(value = "StartUsingDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "StartUsingDate", converter = AssetImportDateConvert.class)
     private Date installDate;//启用日期
 
-    @ExcelProperty(value = "warrantyDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "warrantyDate", converter = AssetImportDateConvert.class)
     private Date warrantyDate;//维保截止日期
 
-    @ExcelProperty(value = "terminateDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "terminateDate", converter = AssetImportDateConvert.class)
     private Date terminateDate;//报废日期
 
-    @ExcelProperty(value = "lastPmDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "lastPmDate", converter = AssetImportDateConvert.class)
     private Date lastPmDate;//3级保养 上次保养日期
 
 
-    @ExcelProperty(value = "lastMeteringDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "lastMeteringDate", converter = AssetImportDateConvert.class)
     private Date lastMeteringDate;//上次计量日期
 
     private Date lastInventoryDate;//上次盘点日期
 
-    @ExcelProperty(value = "LastInspectionDate",converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "LastInspectionDate", converter = AssetImportDateConvert.class)
     private Date lastQaDate;//2级保养 上次保养日期
 
     private Date lastPmDateOne;//1级保养 上次保养日期
@@ -206,7 +208,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty("acceptDate")
     private Date acceptDate;//验收日期
 
-    @ExcelProperty(value = "WarrantyPeriodMonths")
+    @ExcelProperty(value = "WarrantyPeriodMonths", converter = AssetImportIntegerConverter.class)
     private Integer warrantyMonth;//质保时间（月）
 
     @ExcelProperty("QRCode")
@@ -236,10 +238,10 @@ public class AssetImport implements Serializable {
     @ExcelProperty("PurchasePrice")
     private Double purchasePrice;//采购价格(元)
 
-    @ExcelProperty("FinalSalvageValue")
+    @ExcelProperty("salvageValue")
     private Double salvageValue;//最终残值(元)
 
-    @ExcelProperty(value = "LifeCycle")
+    @ExcelProperty(value = "LifeCycle", converter = AssetImportIntegerConverter.class)
     private Integer lifecycle;//使用年限
 
     private Integer depreciationMethod;//折旧算法
@@ -290,8 +292,9 @@ public class AssetImport implements Serializable {
     private Date inventoryTime;
 
     //医疗器械子分类
-    @ExcelProperty(value = "assetCode68")
     private Integer assetCode68;
+    @ExcelProperty(value = "assetCode68")
+    private String assetCode68Str;
 
     @ExcelProperty("Remark")
     private String comments;//备注
@@ -392,8 +395,7 @@ public class AssetImport implements Serializable {
     private String makerShortName;
 
     private Date nextMeteringDate;//下次计量日期
-    @ExcelProperty("isWarrantyNotice")
-
+    @ExcelProperty(value = "isWarrantyNotice", converter = AssetImportBooleanConvert.class)
     private Boolean isWarranty = Boolean.TRUE;//是否对质保到期进行提醒(默认提醒)
 
     private String meteringNO;//计量编号
@@ -403,14 +405,16 @@ public class AssetImport implements Serializable {
 
     private String repairFormStr; //1和null是纯内修。 2，纯外修。3，先内修再外修
 
+    @ExcelProperty(value = "IsPM", converter = AssetImportBooleanConvert.class)
     private Boolean isPm = Boolean.TRUE;//是否保养
 
     @ExcelProperty("isUseRegistration")
     private Boolean isUseRegistration = Boolean.TRUE;
 
-    @ExcelProperty("isFixed")
+    @ExcelProperty(value = "isFixed", converter = AssetImportBooleanConvert.class)
     private Boolean isFixed = Boolean.TRUE;//是否固定资产
 
+    @ExcelProperty(value = "IsChecked", converter = AssetImportBooleanConvert.class)
     private Boolean isChecked = Boolean.TRUE;//是否盘点
 
     private String createdBy;
@@ -427,7 +431,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty("ProprietaryClass")
     private String proprietaryClass;
 
-    @ExcelProperty(value = "geDeviceType")
+    @ExcelProperty(value = "geDeviceType", converter = AssetImportIntegerConverter.class)
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
 
     private String sharedAssetTypeUid;
@@ -587,7 +591,7 @@ public class AssetImport implements Serializable {
 
     @Getter
     @Setter
-    @ExcelProperty(value = "assetQuantity")
+    @ExcelProperty(value = "assetQuantity", converter = AssetImportIntegerConverter.class)
     private Integer assetQuantity; //设备数量 YHAAO-16852
 
     @Getter
@@ -643,10 +647,6 @@ public class AssetImport implements Serializable {
     private OrgInfo clinicalDeptOrg;
 
     private Supplier supplier;
-    @ExcelProperty("IsPM")
-    private String isPmValue;
-    @ExcelProperty("IsChecked")
-    private String isCheckedValue;
     private String warrantyValue;
     @Getter
     @Setter
@@ -1505,7 +1505,11 @@ public class AssetImport implements Serializable {
     }
 
     public void setLifecycle(Integer lifecycle) {
-        this.lifecycle = lifecycle;
+        if (lifecycle == null) {
+            this.lifecycle = null;
+        } else {
+            this.lifecycle = new Double(lifecycle * 12).intValue();
+        }
     }
 
     public Integer getDepreciationMethod() {
@@ -1852,11 +1856,11 @@ public class AssetImport implements Serializable {
         this.nextMeteringDate = nextMeteringDate;
     }
 
-    public Boolean getWarranty() {
+    public Boolean getIsWarranty() {
         return isWarranty;
     }
 
-    public void setWarranty(Boolean warranty) {
+    public void setIsWarranty(Boolean warranty) {
         isWarranty = warranty;
     }
 
@@ -1876,11 +1880,11 @@ public class AssetImport implements Serializable {
         this.repairForm = repairForm;
     }
 
-    public Boolean getPm() {
+    public Boolean getIsPm() {
         return isPm;
     }
 
-    public void setPm(Boolean pm) {
+    public void setIsPm(Boolean pm) {
         isPm = pm;
     }
 
@@ -1892,19 +1896,19 @@ public class AssetImport implements Serializable {
         isUseRegistration = useRegistration;
     }
 
-    public Boolean getFixed() {
+    public Boolean getIsFixed() {
         return isFixed;
     }
 
-    public void setFixed(Boolean fixed) {
+    public void setIsFixed(Boolean fixed) {
         isFixed = fixed;
     }
 
-    public Boolean getChecked() {
+    public Boolean getIsChecked() {
         return isChecked;
     }
 
-    public void setChecked(Boolean checked) {
+    public void setIsChecked(Boolean checked) {
         isChecked = checked;
     }
 
@@ -2507,22 +2511,6 @@ public class AssetImport implements Serializable {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
-    }
-
-    public String getIsPmValue() {
-        return isPmValue;
-    }
-
-    public void setIsPmValue(String isPmValue) {
-        this.isPmValue = isPmValue;
-    }
-
-    public String getIsCheckedValue() {
-        return isCheckedValue;
-    }
-
-    public void setIsCheckedValue(String isCheckedValue) {
-        this.isCheckedValue = isCheckedValue;
     }
 
     public String getWarrantyValue() {
@@ -3240,5 +3228,13 @@ public class AssetImport implements Serializable {
 
     public void setRowNum(Integer rowNum) {
         this.rowNum = rowNum;
+    }
+
+    public String getAssetCode68Str() {
+        return assetCode68Str;
+    }
+
+    public void setAssetCode68Str(String assetCode68Str) {
+        this.assetCode68Str = assetCode68Str;
     }
 }

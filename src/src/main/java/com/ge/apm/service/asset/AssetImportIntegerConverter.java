@@ -6,14 +6,11 @@ import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.GlobalConfiguration;
 import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.service.utils.I18n;
-import webapp.framework.web.service.DbMessageSource;
 
-import java.util.Map;
+import java.math.BigDecimal;
 import java.util.Objects;
 
-public class ApmI18nConverter implements Converter<Integer> {
+public class AssetImportIntegerConverter implements Converter<Integer> {
 
 
     @Override
@@ -35,17 +32,12 @@ public class ApmI18nConverter implements Converter<Integer> {
 
     @Override
     public Integer convertToJavaData(ReadConverterContext<?> context) throws Exception {
-        I18n i18n = context.getContentProperty().getField().getAnnotation(I18n.class);
-        if (Objects.nonNull(i18n)) {
-            String i18nKey = i18n.value();
-
-
-
+        BigDecimal numberValue = context.getReadCellData().getNumberValue();
+        if (Objects.nonNull(numberValue)) {
+            return numberValue.intValue();
+        } else {
+            String stringValue = context.getReadCellData().getStringValue();
+            return Integer.parseInt(stringValue);
         }
-
-        return 0;
     }
-
-
-
 }
