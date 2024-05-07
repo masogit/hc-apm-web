@@ -17,6 +17,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -81,6 +82,7 @@ public class AssetImportDataCheckService {
     public Map<String, String> proprietaryClassList = i18nMap(FieldValueMessageController.getFieldValueList("proprietaryClass", siteId));
     public Map<String, String> assetQualityList = i18nMap(FieldValueMessageController.getFieldValueList("assetQuality", siteId));
     public Map<String, String> productSegmentList = i18nMap(FieldValueMessageController.getFieldValueList("productSegment", siteId));
+    public Map<String, String> asset68 = new HashMap<>();
 
     @Autowired
     protected AssetInfoRepository assetDao;
@@ -181,7 +183,7 @@ public class AssetImportDataCheckService {
         result.put("unCheckedNurseSite", Boolean.FALSE);
         Map<String, OrgInfo> orgNamesUriCache = null;
         if (crossSite) {
-            orgNamesUriCache=   orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
+            orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
         }
         for (AssetImport assetImport : assetImportList) {
 
@@ -443,7 +445,7 @@ public class AssetImportDataCheckService {
 
             //check QrCode
             if (!StringUtils.isEmpty(assetImport.getQrCode())) {
-                if(!Objects.equals(assetImport.getQrCode(),assetImport.getOldQrCode())){
+                if (!Objects.equals(assetImport.getQrCode(), assetImport.getOldQrCode())) {
                     if (supportingService.isQrCodeNewOrChanged(assetImport)) {
                         if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                             //三码合一情况下，可以创建新的二维码或者二维码已发行
@@ -632,7 +634,7 @@ public class AssetImportDataCheckService {
             if (Objects.isNull(value)) {
                 setErrorMsg(assetImport, "CurrentStatus", assetImport.getStatusStr());
             } else {
-                assetImport.setRepairForm(Integer.parseInt(value));
+                assetImport.setStatus(Integer.parseInt(value));
             }
         }
         if (!StringUtils.isEmpty(assetImport.getAssetValueCategory())) {
@@ -689,6 +691,21 @@ public class AssetImportDataCheckService {
                 setErrorMsg(assetImport, "productSegment", assetImport.getProductSegmentStr());
             } else {
                 assetImport.setProductSegment(Integer.parseInt(value));
+            }
+        }
+        if (!StringUtils.isEmpty(assetImport.getAssetCode68Str())) {
+            String value = asset68.get(assetImport.getAssetCode68Str());
+            if (Objects.nonNull(value)) {
+                assetImport.setAssetCode68(Integer.parseInt(value));
+            } else {
+                Integer functionGroup = assetImport.getFunctionGroup();
+                Map<String, String> assetCode68ByFunctionGroup = i18nMap(FieldValueMessageController.getFieldValueList(String.valueOf(functionGroup), siteId));
+                if (MapUtils.isNotEmpty(assetCode68ByFunctionGroup)) {
+                    assetImport.setAssetCode68(Integer.parseInt(assetCode68ByFunctionGroup.get(assetImport.getAssetCode68Str())));
+                    asset68.putAll(assetCode68ByFunctionGroup);
+                } else {
+                    setErrorMsg(assetImport, "assetCode68", assetImport.getAssetCode68Str());
+                }
             }
         }
     }
@@ -805,5 +822,17 @@ public class AssetImportDataCheckService {
         String[] properties = new String[nullProperty.size()];
         return nullProperty.toArray(properties);
     }
+    public void orgCheck(List<Map<String, Object>> importOrgMap){
+        if (!crossSite) {
+            //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
+            importOrgMap.forEach(item -> {
+                OrgInfo newOrgInfo = (OrgInfo) item.get("org");
 
+                //parent uid is not working for child clinical dept, so we use site id
+                OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
+
+                item.put("status", orgInfo == null ? AssetFileImportBaseService.ImportStatus.New : AssetFileImportBaseService.ImportStatus.Exist);
+            });
+        }
+    }
 }

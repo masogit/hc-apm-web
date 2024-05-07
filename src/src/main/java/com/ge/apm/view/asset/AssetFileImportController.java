@@ -177,7 +177,7 @@ public class AssetFileImportController {
             displayAssetsNew = new ArrayList<>();
             uploadProgress = new Progress();
             LocalDateTime startTime = LocalDateTime.now();
-            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).registerConverter(new ApmI18nConverter()).autoCloseStream(true).sheet(0).doRead();
+            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).autoCloseStream(true).sheet(0).doRead();
             logger.info("found asset record count: {}", displayAssetsNew.size());
             LocalDateTime endTime = LocalDateTime.now();
             Duration duration = Duration.between(startTime, endTime);
@@ -193,6 +193,7 @@ public class AssetFileImportController {
             }
             logger.info("start to check data");
             LocalDateTime checkStartime = LocalDateTime.now();
+            assetImportDataCheckService.orgCheck(importOrgMap);
             Map<String, Boolean> checkresult = assetImportDataCheckService.checkData(displayAssetsNew, importOrgMap, unCheckNurseSiteMaintainList, uploadProgress);
             LocalDateTime checkEndTime = LocalDateTime.now();
             Duration checkDuration = Duration.between(checkStartime, checkEndTime);

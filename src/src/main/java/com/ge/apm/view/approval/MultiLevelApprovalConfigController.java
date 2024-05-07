@@ -253,6 +253,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         node.setNodeId(nodesList.size());
         node.setNodeName(approvalNode.getNodeName());
         node.setUsingRole(approvalNode.getUsingRole());
+        node.setApprovalStrategy(approvalNode.getApprovalStrategy());
         if (approvalNode.getUsingRole()) {
             node.setApproveRoles(approvalNode.getApproveRoles());
         } else {
@@ -326,7 +327,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     WebUtil.addWarnMessage("当前配置下审批节点中审核人为空,不允许保存！");
                     return;
                 }
-                item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+                if(CollectionUtils.isNotEmpty(item.getApproveUsers())){
+                    item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+                }
 //                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //
 //                if(item.isClinicalDepartmentDirector()){
@@ -337,6 +340,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setRoleUids(null);
             }
         });
+        if(checkNode(collect)){
+            WebUtil.addWarnMessage("当前配置下审批节点上级审批不可唯一,不允许保存！");
+            return;
+        }
         if(nodeApprovalUserIsNull.get()){
             return;
         }
@@ -353,7 +360,23 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selected.setConfigration(configration);
         super.save();
     }
-
+    private boolean checkNode(List<ApprovalNode> nodes){
+        boolean flag = Boolean.FALSE;
+        if(CollectionUtils.isNotEmpty(nodes)){
+            int size = nodes.size();
+            ApprovalNode approvalNode = null;
+            if(size == 1){
+                approvalNode = nodes.get(0);
+            }else{
+                approvalNode = nodes.get(size - 1);
+            }
+            String approvalStrategy = approvalNode.getApprovalStrategy();
+            if(StringUtils.isNotBlank(approvalStrategy)){
+                flag = Boolean.TRUE;
+            }
+        }
+        return flag;
+    }
 
     private void userAssetTypeUpdate() {
         Set<AssetTypeGroup> selectedSysAuthGroups = gatherUserAuthGroup();
@@ -500,6 +523,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         approvalNode.setRoleApproveCondition(new RoleApproveCondition());
 //        roleApproveCondition = new RoleApproveCondition();
         selectedUserOrg = null;
+        approvalRoleAssetHead = Boolean.FALSE;
     }
 
     public void onEditNode(int nodeId) {
