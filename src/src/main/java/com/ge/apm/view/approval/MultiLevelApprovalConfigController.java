@@ -219,11 +219,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     node.setApproveRoles(roles);
                 } else {
                     List<String> userUids = node.getUserUids();
-                    List<UserAccount> users = new ArrayList();
-                    userUids.stream().forEach(useruid -> {
-                        users.add(userAccountDao.getByUid(useruid));
-                    });
-                    node.setApproveUsers(users);
+                    if(CollectionUtils.isNotEmpty(userUids)){
+                        List<UserAccount> users = new ArrayList();
+                        userUids.stream().forEach(useruid -> {
+                            users.add(userAccountDao.getByUid(useruid));
+                        });
+                        node.setApproveUsers(users);
+                    }
                 }
                 node.setNodeId(i + 1);
             }
