@@ -751,7 +751,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         map.put(WebUtil.getMessage("UsageClassification"), "治疗类");
         map.put(WebUtil.getMessage("capitalSource"), "医疗");
-        map.put(WebUtil.getMessage("riskGrade"), CollectionUtils.isEmpty(riskGradeList)?"二级":riskGradeList.get(0).getValueZh());
+        map.put(WebUtil.getMessage("riskGrade"), "二级");
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
 
         List<I18nMessage> measuringItemCategory = I18nMessageService.getMessagesByType("measuringItemCategory", -1);
