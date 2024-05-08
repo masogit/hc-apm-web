@@ -8,7 +8,10 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
@@ -16,7 +19,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.CellType;
@@ -748,7 +751,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         map.put(WebUtil.getMessage("UsageClassification"), "治疗类");
         map.put(WebUtil.getMessage("capitalSource"), "医疗");
-        map.put(WebUtil.getMessage("riskGrade"), "二级");
+        map.put(WebUtil.getMessage("riskGrade"), CollectionUtils.isEmpty(riskGradeList)?"二级":riskGradeList.get(0).getValueZh());
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
 
         List<I18nMessage> measuringItemCategory = I18nMessageService.getMessagesByType("measuringItemCategory", -1);
