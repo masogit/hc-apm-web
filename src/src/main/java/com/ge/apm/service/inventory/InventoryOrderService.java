@@ -351,7 +351,7 @@ public class InventoryOrderService {
 				listFilterInventoryOrder = listUserInventoryOrder;
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e.getMessage(), e);
 		}
 		if (currentUser.isEnableAssetTypeGroup()) {
 			if (currentUser.getAssetTypeGroupList().isEmpty()) {
@@ -367,7 +367,7 @@ public class InventoryOrderService {
 				return false;
 			}).collect(Collectors.toList());
 			Set<String> assetTypes = listFilterInventoryOrder.stream().map(InventoryOrder::getAssetType).collect(Collectors.toSet());
-			List<AssetTypeGroup> assetTypeGroups = assetTypeGroupRepository.findByEncodedIn(assetTypes);
+			List<AssetTypeGroup> assetTypeGroups = assetTypeGroupRepository.findByTenantUidAndEncodedIn(currentUser.getTenantUID(), assetTypes);
 			Map<String, String> assetTypeMap = assetTypeGroups.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
 			for (InventoryOrder order : listFilterInventoryOrder) {
 				List<Map> clinicalDeptList = JSON.parseArray(order.getAssigneeOrg(), Map.class);
