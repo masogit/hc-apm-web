@@ -234,9 +234,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                              List<String> strings = generationAdjustment(approvalNodes, approvalNode,approvableTarget.getBusinessUid(),approvableTarget.getBusinessType());
                             if(CollectionUtils.isNotEmpty(strings)){
-                                userUids.clear();
-                                userUids.addAll(strings);
-                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                userUids = strings;
                             }
                             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
@@ -867,9 +865,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 }
                                 List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                                 if(CollectionUtils.isNotEmpty(strings)){
-                                    userUids.clear();
-                                    userUids.addAll(strings);
-                                    userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                    userUids = strings;
                                 }
                                 userAccounts = userAccountRepository.findByUidIn(userUids);
                                 for (UserAccount user : userAccounts) {
@@ -1443,9 +1439,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                             List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                             if(CollectionUtils.isNotEmpty(strings)){
-                                userUids.clear();
-                                userUids.addAll(strings);
-                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                userUids = strings;
                             }
                             userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
@@ -1581,9 +1575,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                             List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                             if(CollectionUtils.isNotEmpty(strings)){
-                                userUids.clear();
-                                userUids.addAll(strings);
-                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                userUids = strings;
                             }
                             userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
