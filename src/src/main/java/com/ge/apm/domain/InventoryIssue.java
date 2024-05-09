@@ -58,6 +58,9 @@ public class InventoryIssue implements Serializable {
     @Column(name = "is_solved")
     private boolean isSolved;
 
+    @Column(name = "is_last")
+    private boolean isLast;
+
     @Column(name = "comment")
     private String comment;
     
@@ -112,6 +115,14 @@ public class InventoryIssue implements Serializable {
 
     public void setIsSolved(boolean isSolved) {
         this.isSolved = isSolved;
+    }
+
+    public boolean getIsLast() {
+        return isLast;
+    }
+
+    public void setIsLast(boolean isLast) {
+        this.isLast = isLast;
     }
 
     public String getComment() {
