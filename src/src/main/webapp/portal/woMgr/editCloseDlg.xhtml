@@ -47,11 +47,11 @@
                             <label class="label">#{msg.equipmentTaker}</label>
                             <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="false"/>
                             <label class="label">#{msg.equiptaketime}</label>
-<!--                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button" 
-                                        readonlyInput="true" showButtonPanel="false" navigator="true" mask="true" disabled="true"/>-->
-                            <h:outputText value="#{workOrderMgrController.takeTime}"  >
+                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button"
+                                        showButtonPanel="false" navigator="true" mask="true"/>
+                            <!--<h:outputText value="#{workOrderMgrController.takeTime}"  >
                                 <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                            </h:outputText>
+                            </h:outputText>-->
                             <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update="woTab:EditCloseDialogForm:equipmentTaker :growl" disabled="false"/>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -105,7 +105,7 @@
                         </p:dataGrid>
                         <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{workOrderMgrController.handleFileUploadPDF}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-                    </p:fieldset>、
+                    </p:fieldset>
 
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveEditedWorkOrder}" value="#{msg.save}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleEditClose(xhr, status, args);"/>
