@@ -198,6 +198,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setSiebleNumber(newServiceRequest.getSiebleNumber());
         formData.setCallCenterNumber(newServiceRequest.getCallCenterNumber());
         formData.setOrderType(newServiceRequest.getOrderType());
+        formData.setRepairReportSendPlace(newServiceRequest.getRepairReportSendPlace());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -338,6 +339,17 @@ class ServiceRequestForm {
     String callCenterNumber;
     /**县域 开单类型： 1主动开单、2被动开单**/
     String orderType;
+
+    String repairReportSendPlace;
+
+    public String getRepairReportSendPlace() {
+        return repairReportSendPlace;
+    }
+
+    public void setRepairReportSendPlace(String repairReportSendPlace) {
+        this.repairReportSendPlace = repairReportSendPlace;
+    }
+
     public String getSupplierUid() {
         return supplierUid;
     }

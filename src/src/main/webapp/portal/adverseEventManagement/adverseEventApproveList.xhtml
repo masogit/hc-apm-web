@@ -87,6 +87,12 @@
                         <p:column headerText="#{msg.department}" >
                             <h:outputText value="#{adverseEventApproveController.reporterList(item.department)}"/>
                         </p:column>
+                        <p:column headerText="#{msg.adverseEventType}" >
+                            <h:outputText value="#{item.adverseEventType eq '2' ? '医疗器械不良事件哨点监测' : '医疗器械不良事件'}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.repairReportSendPlace}" >
+                            <h:outputText value="#{fieldMsg.fieldValue('repairReportSendPlace', item.repairReportSendPlace)}"/>
+                        </p:column>
                         <p:column headerText="#{msg.occurredPlace}" >
                             <h:outputText value="#{item.occurredPlace}"/>
                         </p:column>

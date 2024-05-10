@@ -625,4 +625,107 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
         return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS;
     }
 
+    /**
+     * 不良事件工单类型
+     * 1.医疗器械不良事件   2.医疗器械不良事件哨点监测
+     */
+    @Column(name = "adverse_event_type")
+    private String adverseEventType;
+
+    /**
+     * 报修发生地  病房/非病房
+     */
+    @Column(name="repair_report_send_place")
+    private String repairReportSendPlace;
+
+    /**
+     * 故障零部件或结构
+     */
+    @Column(name = "faulty_parts")
+    private String faultyParts;
+
+    /**
+     * 潜在风险（可能导致的临床风险）
+     */
+    @Column(name = "potential_risks")
+    private String potentialRisks;
+
+    /**
+     * 可能导致的伤害程度	1.死亡 2.严重伤害 3.其他
+     */
+    @Column(name = "may_fal_ht_type")
+    private String mayFalHtType;
+    /**
+     * 是否有维修方案
+     * 1.是 2.否
+     */
+    @Column(name = "has_maintenance_plan")
+    private String hasMaintenancePlan;
+
+    /**
+     * 维修方案具体内容
+     */
+    @Column(name = "maintenance_plan_info")
+    @Size(max = 2000)
+    private String maintenancePlanInfo;
+
+    /**
+     * 是否有有效维护保养措施
+     * 1.是 2.否
+     */
+    @Column(name = "has_maintenance_measures")
+    private String hasMaintenanceMeasures;
+
+    /**
+     * 有效维护保养措施具体内容
+     */
+    @Column(name = "maintenance_measures_info")
+    @Size(max = 2000)
+    private String maintenanceMeasuresInfo;
+
+
+    /**
+     * 设备启用日期
+     */
+    @Column(name = "device_start_date")
+    private Date deviceStartDate;
+
+    /**
+     * 设备报废（停用）日期
+     */
+    @Column(name = "device_end_date")
+    private Date deviceEndDate;
+
+    /**
+     * 维修机构
+     * 1.持有人 2.第三方（请输入机构名称） 3.其他（请描述）
+     */
+    @Column(name = "maintenance_organization")
+    private String maintenanceOrganization;
+
+    /**
+     * 机构名称或描述
+     */
+    @Column(name = "maintenance_organization_info")
+    private String maintenanceOrganizationInfo;
+
+    /**
+     * 故障处理方式
+     * 1.硬件维修或更换 2.软件升级  3.其他（请描述）
+     */
+    @Column(name = "processing_mode")
+    private String processingMode;
+
+    /**
+     * 故障处理方式描述
+     */
+    @Column(name = "processing_mode_info")
+    @Size(max = 2000)
+    private String processingModeInfo;
+
+    /**
+     * 使用次数
+     */
+    @Column(name = "use_cnt")
+    private Integer useCnt;
 }

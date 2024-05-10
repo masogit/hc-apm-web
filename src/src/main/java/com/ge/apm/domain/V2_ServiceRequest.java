@@ -213,6 +213,20 @@ public class V2_ServiceRequest implements Serializable {
     @Transient
     private String orderType;
 
+    /**
+     * 报修发送地  病房(ward)/非病房(non-ward)
+     */
+    @Column(name="repair_report_send_place")
+    private String repairReportSendPlace;
+
+    public String getRepairReportSendPlace() {
+        return repairReportSendPlace;
+    }
+
+    public void setRepairReportSendPlace(String repairReportSendPlace) {
+        this.repairReportSendPlace = repairReportSendPlace;
+    }
+
     public String getTenantUID() {
         return tenantUID;
     }
