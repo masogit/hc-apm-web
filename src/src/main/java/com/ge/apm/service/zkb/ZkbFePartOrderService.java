@@ -2641,4 +2641,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
         zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
     }
+
+
+    public void  modifyReturnChangeCatQuotaHistory(Integer type, ZkbFePartOrder zkbFePartOrder, ZkbContract zkbContract, UserAccount userAccount){
+        if(type == 3){
+            zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbFePartOrder.getId(), 0 - zkbFePartOrder.getQty());
+        }else if(type == 5){
+            zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,zkbFePartOrder,userAccount,"N",null);
+        }
+    }
 }

@@ -1296,6 +1296,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
             if (type > 0 && selected.getQty() != null && selected.getQty() > 0) {
                 zkbFePartOrderService.moveProbe(type, zkbContract, selected.getQty(), showZkbPoProbeQuotaType, selected.getZkbPoProbeQuotaType(), currentUser, selected, true, step);
+                //2024-04-30 2022年起探头高低端名额分类进行返还或者扣除
+                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                    zkbFePartOrderService.modifyReturnChangeCatQuotaHistory(type ,selected, zkbContract, currentUser);
+                }
             }
             if (StringUtils.isNotBlank(selected.getContractCatId())) {
                 zkbFePartOrderService.updateZkbContractCat(currentUser, true, selected.getContractCatId());
