@@ -37,6 +37,10 @@
                            <label class="label">床号*</label>
                            <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.patientBedNum}"/>
                        </h:panelGroup>
+                       <h:panelGroup >
+                           <label class="label">#{msg.remark}</label>
+                           <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.remark}"/>
+                       </h:panelGroup>
                    </p:panelGrid>
                    <h:panelGroup>
                         <p:commandButton validateClient="true"

@@ -137,6 +137,9 @@
                                     <p:column headerText="计价方式">
                                         <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetTypeEntity.chargingType)}"/>
                                     </p:column>
+                                    <p:column headerText="备注">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.remark}"/>
+                                    </p:column>
                                     <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableLeasePrintCol()}">
 										<p:commandButton value="打印" ajax="false"
 											actionListener="#{sharedAssetStockController.printVoucher(asset)}"
