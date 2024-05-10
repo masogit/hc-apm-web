@@ -5,6 +5,13 @@
         SELECT * FROM
         <include refid="joinAssetCondition"/>
         <include refid="queryCondition"/>
+        ORDER BY
+        CASE
+        WHEN status = 2 THEN 1
+        WHEN status = 3 THEN 2
+        WHEN status = 1 THEN 3
+        END
+        LIMIT #{page} OFFSET #{offset}
     </select>
 
     <select id="findJoinAssetCount" resultType="long">
@@ -88,8 +95,8 @@
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.status WHEN ii.id IS NOT NULL THEN 3 WHEN iod.status IS NULL THEN 4 ELSE iod.status END status
             FROM
                 asset_info ai
-                LEFT JOIN (select *, ROW_NUMBER() OVER (PARTITION BY asset_id ORDER BY last_modified_date DESC) AS rn from inventory_issue WHERE tenant_uid = #{tenantUid}) ii ON ai.id = ii.asset_id and ii.rn = 1
-                LEFT JOIN (select *, ROW_NUMBER() OVER (PARTITION BY asset_id ORDER BY last_modified_date DESC) AS rn from inventory_order_detail WHERE tenant_uid = #{tenantUid}) iod ON ai.id = iod.asset_id and iod.rn = 1
+                LEFT JOIN inventory_issue ii ON ai.id = ii.asset_id AND ii.is_last is true
+                LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id AND iod.is_last is true
             WHERE
                 ai.is_checked = TRUE
                 AND ai.is_deleted = FALSE

@@ -989,7 +989,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lifecycle')}" >
         <h:panelGroup>
             <label class="label">#{msg.lifecycle}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['lifecycle'].required? '*':''}</span></label>
-            <p:inputNumber minValue="0" decimalPlaces="1" id="lifecycle" value="#{assetInfoEditController.selected.lifecycleInYear}" required="#{assetInfoEditController.customConfig.assetFields['lifecycle'].required}"
+            <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1" id="lifecycle" value="#{assetInfoEditController.selected.lifecycleInYear}" required="#{assetInfoEditController.customConfig.assetFields['lifecycle'].required}"
                            requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('lifecycle')}" />
         </h:panelGroup>
     </c:if>
