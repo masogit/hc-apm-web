@@ -241,8 +241,10 @@ public class AssetImport implements Serializable {
     @ExcelProperty("salvageValue")
     private Double salvageValue;//最终残值(元)
 
-    @ExcelProperty(value = "LifeCycle", converter = AssetImportIntegerConverter.class)
     private Integer lifecycle;//使用年限
+
+    @ExcelProperty(value = "LifeCycle")
+    private Double lifecycleInYear;//使用年限(年)
 
     private Integer depreciationMethod;//折旧算法
 
@@ -1505,11 +1507,8 @@ public class AssetImport implements Serializable {
     }
 
     public void setLifecycle(Integer lifecycle) {
-        if (lifecycle == null) {
-            this.lifecycle = null;
-        } else {
-            this.lifecycle = new Double(lifecycle * 12).intValue();
-        }
+        this.lifecycle = lifecycle;
+
     }
 
     public Integer getDepreciationMethod() {
@@ -3236,5 +3235,20 @@ public class AssetImport implements Serializable {
 
     public void setAssetCode68Str(String assetCode68Str) {
         this.assetCode68Str = assetCode68Str;
+    }
+
+    public Double getLifecycleInYear() {
+        if (lifecycle == null) {
+            return null;
+        }
+        return new Double(lifecycle) / 12.0;
+    }
+
+    public void setLifecycleInYear(Double lifecycleInYear) {
+        if (lifecycleInYear == null) {
+            this.lifecycle = null;
+        } else {
+            this.lifecycle = new Double(lifecycleInYear * 12).intValue();
+        }
     }
 }
