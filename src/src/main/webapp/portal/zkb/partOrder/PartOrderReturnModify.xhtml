@@ -81,6 +81,13 @@
                         <p:outputLabel  style="color: red" value="#{zkbPartOrderAuditController.getPartSerialNumberTips()}"/>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
+                        <label class="label">外部包装*</label>
+                        <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.externalPackaging}" required="true" requiredMessage="外部包装不能为空"  >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnExternalPackaging')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
                         <label class="label">内部包装*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.internalPackaging}" required="true" requiredMessage="内部包装不能为空" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
