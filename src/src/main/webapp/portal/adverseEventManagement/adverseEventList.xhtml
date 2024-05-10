@@ -83,6 +83,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="#{msg.adverseEventType}" >
+                            <h:outputText value="#{item.adverseEventType eq '2' ? '医疗器械不良事件哨点监测' : '医疗器械不良事件'}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.repairReportSendPlace}" >
+                            <h:outputText value="#{fieldMsg.fieldValue('repairReportSendPlace', item.repairReportSendPlace)}"/>
+                        </p:column>
                         <p:column headerText="#{msg.department}" >
                             <h:outputText value="#{adverseEventManagementController.reporterList(item.department)}"/>
                         </p:column>

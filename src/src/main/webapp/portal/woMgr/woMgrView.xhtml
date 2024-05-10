@@ -119,6 +119,11 @@
                             <label class="label">医院客户职务</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.customerPosition}" />
                         </h:panelGroup>
+
+                        <h:panelGroup rendered="#{workOrderMgrController.repairReportSendPlaceRender()}">
+                            <label class="label">#{msg.repairReportSendPlace}</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('repairReportSendPlace', workOrderMgrController.selected.serviceRequest.repairReportSendPlace)}" />
+                        </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">

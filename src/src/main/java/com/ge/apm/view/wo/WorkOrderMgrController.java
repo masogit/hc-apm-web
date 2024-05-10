@@ -3863,5 +3863,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         return false;
     }
+
+    /**
+     * 控制报修发送地的显示隐藏
+     */
+    public boolean repairReportSendPlaceRender(){
+        String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
+        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);
+    }
 }
 

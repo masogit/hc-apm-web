@@ -5348,3 +5348,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'specialAsset', '特种设备', 'specialAsset', NULL, '-1');
 -- 	 YHAAO-21537 调剂中心借用申请增加多级审批
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'equipmentAdjustment', '设备调剂', 'equipment adjustment', NULL, -1);
+
+--报修发生地
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','repairReportSendPlace','报修发生地','repair Report Send Place',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairReportSendPlace','ward','病房','ward',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairReportSendPlace','non-ward','非病房','non-ward',NULL,-1);
+--不良事件工单类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','adverseEventType','不良事件工单类型','adverse Event Type',NULL,-1);
