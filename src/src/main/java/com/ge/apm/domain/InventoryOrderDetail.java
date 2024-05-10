@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -96,6 +97,9 @@ public class InventoryOrderDetail implements Serializable {
 
     @Column(name = "asset_type", length = 50)
     private String assetType;
+
+    @Column(name = "is_last")
+    private boolean isLast;
 
     @Transient
     private String inventoryCheckListItems;
@@ -364,6 +368,14 @@ public class InventoryOrderDetail implements Serializable {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public boolean getIsLast() {
+        return isLast;
+    }
+
+    public void setIsLast(boolean isLast) {
+        this.isLast = isLast;
     }
 
     public String getEncodeAssetDetailStr() {

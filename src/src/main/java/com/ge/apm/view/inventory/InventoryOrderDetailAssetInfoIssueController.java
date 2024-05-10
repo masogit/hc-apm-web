@@ -167,6 +167,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		InventoryOrderDetail inventoryOrderDetail = assetInventoryOrderDetails.get(0);
 		inventoryOrderDetail.setLastModifiedBy(user.getLoginName());
 		inventoryOrderDetail.setLastModifiedDate(DateUtil.now());
+		inventoryOrderDetailDao.updateIsLastByAssetIds(ListUtil.newArrayList(assetInfo.getId()));
+		inventoryOrderDetail.setIsLast(true);
 		inventoryOrderDetailDao.save(inventoryOrderDetail);
 		dao.delete(assetInventoryIssues);
 	}
