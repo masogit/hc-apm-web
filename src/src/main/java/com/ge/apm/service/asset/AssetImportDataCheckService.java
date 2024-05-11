@@ -802,7 +802,7 @@ public class AssetImportDataCheckService {
         String hospital = asset.getHospitalName();
         String site = asset.getSiteName();
         String clinicalDept = asset.getClinicalDeptName();
-        String assetDept = asset.getDeptName();
+        String assetDept = asset.getAssetDeptName();
 
         SiteOrgWithDeptOrg siteOrgWithDeptOrg = orgInfoLocalCacheService.findSiteOrgByFlatternedMap(orgNamesUriCache, institution, hospital, site, clinicalDept, assetDept);
 
