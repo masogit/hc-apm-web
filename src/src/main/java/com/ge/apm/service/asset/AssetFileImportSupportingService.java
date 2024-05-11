@@ -752,7 +752,7 @@ public class AssetFileImportSupportingService {
         String hospital = importData.getHospitalName();
         String site = importData.getSiteName();
         String clinicalDept = importData.getClinicalDeptName();
-        String assetDept = importData.getDeptName();
+        String assetDept = importData.getAssetDeptName();
 
         SiteOrgWithDeptOrg siteOrgWithDeptOrg = orgInfoLocalCacheService.findSiteOrgByFlatternedMap(orgNamesUriCache, institution, hospital, site, clinicalDept, assetDept);
 
