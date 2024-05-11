@@ -242,6 +242,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     List<AssetInfo> findBySupplierIdOrMaitananceIdOrManufactureId(Integer supplierId, String maitananceId, String manufactureId);
 
+    @Query(value = "select * from asset_info where is_deleted = false and (supplier_id = ?1 or maitanance_id = ?2 or manufacture_id = ?3)",nativeQuery = true)
+    List<AssetInfo> findCanDelete(Integer supplierId, String maitananceId, String manufactureId);
+
     AssetInfo findFirstByQrCode(String qrCode);
 
     /**
