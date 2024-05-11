@@ -113,10 +113,8 @@ public class AssetImport implements Serializable {
     private String accountingDeptUID;//账号科室
     private String modalityType;
     @ExcelProperty("assetDeptName")
-
     private String assetDeptName;//使用科室
 
-    @ExcelProperty("assetDeptId")
     private String deptName;//使用科室
 
     private Integer assetGroup;//设备分类
