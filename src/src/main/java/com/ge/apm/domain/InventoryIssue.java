@@ -59,7 +59,7 @@ public class InventoryIssue implements Serializable {
     private boolean isSolved;
 
     @Column(name = "is_last")
-    private boolean isLast;
+    private Boolean isLast;
 
     @Column(name = "comment")
     private String comment;
@@ -117,11 +117,11 @@ public class InventoryIssue implements Serializable {
         this.isSolved = isSolved;
     }
 
-    public boolean getIsLast() {
+    public Boolean getIsLast() {
         return isLast;
     }
 
-    public void setIsLast(boolean isLast) {
+    public void setIsLast(Boolean isLast) {
         this.isLast = isLast;
     }
 
