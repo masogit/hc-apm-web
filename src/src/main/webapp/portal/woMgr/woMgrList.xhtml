@@ -212,8 +212,8 @@
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                    <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
+                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                    <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
