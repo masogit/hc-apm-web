@@ -60,19 +60,23 @@ public class UserCommonService {
     private ConfigService configService;
 
     public List<UserAccount> getWorkerList(Integer assetId, String orgUid) {
-        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId == null ? 0 : assetId, orgUid);
-        if (null != res) {
-            List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
-            List<UserAccount> userList = mapList.stream().map(item -> {
-                UserAccount u = new UserAccount();
-                u.setId(Integer.parseInt(item.get("id").toString()));
-                u.setUid(item.get("uid").toString());
-                u.setName(item.get("name").toString());
-                u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
-                return u;
-            }).collect(Collectors.toList());
+        try {
+            Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId == null ? 0 : assetId, orgUid);
+            if (null != res) {
+                List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
+                List<UserAccount> userList = mapList.stream().map(item -> {
+                    UserAccount u = new UserAccount();
+                    u.setId(Integer.parseInt(item.get("id").toString()));
+                    u.setUid(item.get("uid").toString());
+                    u.setName(item.get("name").toString());
+                    u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
+                    return u;
+                }).collect(Collectors.toList());
 
-            return userList;
+                return userList;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
