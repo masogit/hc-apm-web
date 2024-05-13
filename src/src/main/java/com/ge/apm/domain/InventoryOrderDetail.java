@@ -99,7 +99,7 @@ public class InventoryOrderDetail implements Serializable {
     private String assetType;
 
     @Column(name = "is_last")
-    private boolean isLast;
+    private Boolean isLast;
 
     @Transient
     private String inventoryCheckListItems;
@@ -370,11 +370,11 @@ public class InventoryOrderDetail implements Serializable {
         this.assetType = assetType;
     }
 
-    public boolean getIsLast() {
+    public Boolean getIsLast() {
         return isLast;
     }
 
-    public void setIsLast(boolean isLast) {
+    public void setIsLast(Boolean isLast) {
         this.isLast = isLast;
     }
 
