@@ -17,16 +17,23 @@
                 <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false" activeIndex="#{workOrderTabController.queryTab}" >
 
                     <p:ajax event="tabChange" listener="#{workOrderMgrController.onTabChange}"/>
-                    <p:tab class="ui-g-12" title="#{msg.InternalWorkorder}" id="inWorkOrder" rendered="#{workOrderTabController.showInOrder and not userContextService.isZtbTenant()}">
+                    <p:tab class="ui-g-12" title="#{msg.InternalWorkorder}" id="inWorkOrder" rendered="#{workOrderTabController.showInOrder and not userContextService.isZtbTenant()}" disabled="#{workOrderMgrController.viewIng}">
                         <ui:include src="woMgrList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="MVS工单" id="mvsWorkOrder" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                    <p:tab class="ui-g-12" title="MVS工单" id="mvsWorkOrder" rendered="#{userContextService.isYiMaiYangGuangTenant()}" disabled="#{workOrderMgrController.viewIng}">
                         <ui:include src="mvs/woMvsMgrList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser() or userContextService.accessContainsFunctionMenu('REPAIR_EXORDER_VIEW')}">
-                        <ui:include src="woMgrOutList.xhtml"/>
-                    </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()  or userContextService.accessContainsFunctionMenu('REPAIR_REMOTE_ORDER_VIEW')}">
+                    <c:if test="#{!userContextService.isZkbAccount()}">
+                        <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{(not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser() or userContextService.accessContainsFunctionMenu('REPAIR_EXORDER_VIEW'))}">
+                            <ui:include src="woMgrOutList.xhtml"/>
+                        </p:tab>
+                    </c:if>
+                    <c:if test="#{userContextService.isZkbAccount()}">
+                        <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outZkbWorkOrder" rendered="#{ userContextService.isZkbAccount()}">
+                            <ui:include src="woMgrZkbOutList.xhtml"/>
+                        </p:tab>
+                    </c:if>
+                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()  or userContextService.accessContainsFunctionMenu('REPAIR_REMOTE_ORDER_VIEW')}" disabled="#{workOrderMgrController.viewIng}">
                         <ui:include src="woMgrOutRemoteList.xhtml"/>
                     </p:tab>
                 </p:tabView>

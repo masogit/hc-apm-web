@@ -76,7 +76,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		return dao;
 	}
 
-	private PageRequest addRequiredSortById(PageRequest pageRequest) {
+	public PageRequest addRequiredSortById(PageRequest pageRequest) {
 		Iterator<Sort.Order> orders = pageRequest.getSort()!=null ? pageRequest.getSort().iterator() : new ArrayList<Sort.Order>().iterator();
 		boolean exists = false;
 		while(orders.hasNext()){
@@ -122,7 +122,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		return pageResult;
 	}
 
-	private void updateSelectStatus(Page<AssetLifecycleEvent> pageResult) {
+	public void updateSelectStatus(Page<AssetLifecycleEvent> pageResult) {
 		boolean tempAllSelect = false;
 		if (pageResult != null) {
 			List<AssetLifecycleEvent> tempList = pageResult.getContent();
@@ -141,7 +141,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		}
 	}
 
-	private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult) {
+	public void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult) {
 		Set<String> listErrorDateEvent=new HashSet<String>();
 		Calendar currentCa = Calendar.getInstance();
 		Date currentDate = currentCa.getTime();
