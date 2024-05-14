@@ -153,7 +153,7 @@ public class AssetImport implements Serializable {
     private Integer status = 1;//当前状态
     @ExcelProperty(value = "CurrentStatus")
 
-    private String statusStr = "1";
+    private String statusStr = "正常";
 
     @ExcelProperty(value = "manufactDate", converter = AssetImportDateConvert.class)
     private Date manufactDate;//出厂日期
