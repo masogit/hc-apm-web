@@ -28,6 +28,7 @@ import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
@@ -283,6 +284,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<Map<String,String>> maintenancePersonInformation;
 
     private ConfigItemValueRepository configItemValueRepository;
+    @Getter @Setter
+    private boolean viewIng = false;
     @Override
     protected void init() {
         try {
@@ -337,34 +340,41 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
-            if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
-                queryAssetUid = queryAssetUID_href;
-            }
-            if (!Strings.isNullOrEmpty(enCodeParameters)) {
-                requestAssetUid = (String) UrlEncryptController
-                        .getValueFromMap(enCodeParameters, "assetUID");
-                queryAssetUid = (String) UrlEncryptController
-                        .getValueFromMap(enCodeParameters, "queryAssetUID");
-                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                    query = (String) UrlEncryptController
-                            .getValueFromMap(enCodeParameters, "query");
-                }
-            }
-            if (Strings.isNullOrEmpty(query)) {
-                //云南阜外由默认全部改为默认待办
-                queryIndex = 0;
+            if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+                queryIndex = Integer.valueOf(UrlEncryptController.getValueFromMap(enCodeParameters, "queryIndex").toString());
+                selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+                viewIng = true;
+                onSelectWorkOrder();
             } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
+                if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
+                    queryAssetUid = queryAssetUID_href;
+                }
+                if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                    requestAssetUid = (String) UrlEncryptController
+                            .getValueFromMap(enCodeParameters, "assetUID");
+                    queryAssetUid = (String) UrlEncryptController
+                            .getValueFromMap(enCodeParameters, "queryAssetUID");
+                    if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                        query = (String) UrlEncryptController
+                                .getValueFromMap(enCodeParameters, "query");
+                    }
+                }
+                if (Strings.isNullOrEmpty(query)) {
+                    //云南阜外由默认全部改为默认待办
+                    queryIndex = 0;
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
+                this.filterBySite = false;
+                this.filterByHospital = false;
+                terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+                List<I18nMessage> ix2 = FieldValueMessageController
+                        .getFieldValueListByMsgType("woSteps");
+                ix2.stream().forEach(
+                        item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
+                loadClinicalDeptList();
             }
-            this.filterBySite = false;
-            this.filterByHospital = false;
-            terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
-            List<I18nMessage> ix2 = FieldValueMessageController
-                    .getFieldValueListByMsgType("woSteps");
-            ix2.stream().forEach(
-                    item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
-            loadClinicalDeptList();
         } catch (Exception e) {
             LOGGER.error("init occur exception", e);
             throw e;
@@ -1129,6 +1139,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         // 获取temp user信息
         initExternalTempUser();
     }
+
+    public void onSelectOrder() throws IOException {
+        onSelectWorkOrder();
+        String url = "actionName=View&selectedid="
+                + selected.getId().toString()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
     private void initExternalTempUser(){
         externalTempUser = externalTempUserDao.findByWoId(selected.getId());
         if(ObjectUtil.isNotEmpty(externalTempUser)){
