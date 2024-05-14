@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 
 import com.ge.apm.callback.DataDelVO;
 import com.ge.healthcare.cn.common.cons.ApmServiceName;
+import com.ge.healthcare.cn.common.core.message.WechatMsgEvent;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.domain.AssetInfo;
@@ -152,4 +153,8 @@ public class MqUtils {
             log.error("sendApprovalMessage error :",e);
         }
     }
+    public void sendWxMsgToMq(WechatMsgEvent wechatMsgEvent,String exChange,String routingKey) {
+        rabbitTemplate.convertAndSend(exChange, routingKey, wechatMsgEvent);
+    }
+
 }
