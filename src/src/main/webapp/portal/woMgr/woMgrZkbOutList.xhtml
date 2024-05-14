@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+	<div class="ui-g-12 card">
+		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+
+		<h:form id="woMgrOutListZkbForm">
+
+			<p:dataTable id="datalist" value="#{assetLifecycleEventZkbController.lazyModel}" var="item" widgetVar="varWoMgrOutDataList" lazy="true" paginator="true"
+				paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" selectionMode="single"
+				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEventZkbController.selected}">
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEventZkbController.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutListZkbForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');">
+							<p:ajax listener="#{assetLifecycleEventZkbController.onSelectAllItemsEvent()}"></p:ajax>
+						</p:selectBooleanCheckbox>
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
+						<p:ajax listener="#{assetLifecycleEventZkbController.onItemSelect(item)}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</p:column>
+				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutListZkbForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');"></p:ajax>
+				<p:ajax event="filter" listener="#{assetLifecycleEventZkbController.onFilter}" />
+				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetName}" />
+				</p:column>
+				<p:column headerText="#{msg.ExternalWorkorderID}" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.eventUid}" />
+				</p:column>
+				<p:column headerText="#{msg.UpdateTime}" sortBy="#{item.createTime}" >
+					<h:outputText value="#{item.createTime}">
+						<f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat8()} HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.systemId}" />
+				</p:column>
+				<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+					filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+				</p:column>
+				<p:column headerText="#{msg.status}" filterBy="#{item.description}" filterMatchMode="LIKE">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('varWoMgrOutDataList').filter()">
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItem itemLabel="Open" itemValue="1" />
+							<f:selectItem itemLabel="Assigned" itemValue="2" />
+							<f:selectItem itemLabel="Equipment Up" itemValue="Equipment Up" />
+							<f:selectItem itemLabel="Closed" itemValue="Closed" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{assetLifecycleEventZkbController.getMsStatus(item)}" />
+				</p:column>
+				<p:column headerText="#{msg.ReportDownload}" exportable="false">
+					<p:repeat value="#{item.reports}" var="report">
+						<h:commandLink action="#{assetLifecycleEventZkbController.getAnonymousReport(report.storageId)}" value="#{report.displayName}" />
+						<br />
+					</p:repeat>
+				</p:column>
+				<f:facet name="{Toolbar}">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
+						actionListener="#{assetLifecycleEventZkbController.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEventZkbController.exportFile}" />
+					</p:commandButton>
+					<p:commandButton id="downloadAllId" title="#{msg.ReportDownload}" icon="ui-icon-file-download" ajax="false"
+						actionListener="#{assetLifecycleEventZkbController.downloadSelectedReport()}" process=":woTab:woMgrOutListZkbForm:datalist" update=":growl">
+						<p:fileDownload value="#{assetLifecycleEventZkbController.exportFile}" />
+					</p:commandButton>
+				</f:facet>
+			</p:dataTable>
+		</h:form>
+
+	</div>
+
+
+	<script>
+		//<![CDATA[
+		afterPageLoad = function() {
+			var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+			var isActive = "#{userContextService.isActive()}";
+			if (isActive == '1') {
+				PF('ActiveDlg').show();
+			}
+		};
+		//]]>
+	</script>
+</ui:composition>
+</html>
