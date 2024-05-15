@@ -34,4 +34,5 @@ public class V2WorkOrderReportDto implements Serializable {
     private Map<String,String> filterMap = MapUtil.newHashMap();
     private Set<String> assetTypeGroupEncodedSet;
     private String srNum;
+    private String tenantUid;
 }

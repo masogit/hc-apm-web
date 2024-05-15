@@ -17,6 +17,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import org.apache.commons.beanutils.ConvertUtils;
+import org.primefaces.context.RequestContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,6 +65,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private List<SecondmentOrder.ProcessRecords> processRecords;
     private AssetInfo assetInfo;
     private V2_WorkOrderRepository v2_workOrderRepository;
+    private List<UserAccount> emergencyContactList = new ArrayList<>();
 
     @Override
     protected GenericRepositoryUUID<SecondmentOrderDto> getDAO() {
@@ -159,6 +161,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
         if(StringUtils.hasText(configSnapshot)){
             secondmentConfig = JSON.parseObject(configSnapshot, SecondmentConfig.class);
         }
+        emergencyContactList = userAccountList.stream().filter(item-> item.getOrgInfoUID().equals(selected.getLendDeptUid())).distinct().collect(Collectors.toList());
     }
 
     public void statusUpdate(SecondmentOrderDto dto,Integer status){
@@ -239,7 +242,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"交付",null,null);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"领用",null,null);
                  secondmentOrderRepository.save(order);
                  sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
@@ -247,13 +250,13 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                  dto.setBillingTime(null);
                  dto.setCost(null);
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝",order.getDenialReason(),null);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"拒绝",order.getDenialReason(),order.getApprovalRemarks());
                  secondmentOrderRepository.save(order);
                  sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_PUSH_WECHAT_MSG,HttpMethod.POST,new HashMap<>(),(url)->url.replace("{orderId}",order.getId()).replace("{type}",order.getStatus().toString()));
                  break;
              case -1: //已取消
                  BeanUtils.copyProperties(dto,order);
-                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),null);
+                 SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"取消",order.getDenialReason(),order.getApprovalRemarks());
                  secondmentOrderRepository.save(order);
                  updateDeviceStatus(assetInfo);
                  break;
@@ -540,5 +543,44 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public List<UserAccount> getEmergencyContactList() {
+        return emergencyContactList;
+    }
+
+    public void setEmergencyContactList(List<UserAccount> emergencyContactList) {
+        this.emergencyContactList = emergencyContactList;
+    }
+
+    public void updateEmergencyContact(){
+        String emergencyContactUid = selected.getEmergencyContactUid();
+        if(StringUtils.hasText(emergencyContactUid)){
+            Optional<UserAccount> first = emergencyContactList.stream().filter(item -> emergencyContactUid.equals(item.getUid())).findFirst();
+            if (first.isPresent()) {
+                UserAccount userAccount = first.get();
+                selected.setEmergencyContactName(userAccount.getName());
+                selected.setEmergencyContactTel(userAccount.getTelephone());
+            }
+        }else{
+            selected.setEmergencyContactUid(null);
+            selected.setEmergencyContactName(null);
+            selected.setEmergencyContactTel(null);
+        }
+    }
+
+    public void checkData(){
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        SecondmentOrderDto selected = this.selected;
+        String emergencyContactUid = selected.getEmergencyContactUid();
+        String emergencyContactTel= selected.getEmergencyContactTel();
+        if(StringUtils.isEmpty(emergencyContactUid)){
+            WebUtil.addErrorMessage("设备紧急联系人，输入不可为空");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        }
+        if(StringUtils.isEmpty(emergencyContactTel)){
+            WebUtil.addErrorMessage("紧急联系人电话，输入不可为空");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        }
     }
 }

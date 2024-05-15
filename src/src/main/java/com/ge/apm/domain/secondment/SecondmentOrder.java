@@ -43,7 +43,11 @@ public class SecondmentOrder implements Serializable {
     private String sparePartsRemark;
 
     @Column(name="applicant_uid")
-    private String applicantUid; //借用科室id（借用申请人uid）
+    private String applicantUid; //（借用申请人uid）
+    @Column(name="applicant_name")
+    private String applicantName; //（借用申请人Name）
+    @Column(name="applicant_tel")
+    private String applicantTel; //（借用申请人uid 电话）
 
     @Column(name="apply_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -120,6 +124,12 @@ public class SecondmentOrder implements Serializable {
     private String approvalSuggestions; // 审批意见
     @Column(name = "approval_remarks", columnDefinition = "text")
     private String approvalRemarks; // 审批备注
+    @Column(name = "emergency_contact_uid")
+    private String emergencyContactUid;
+    @Column(name = "emergency_contact_name")
+    private String emergencyContactName;
+    @Column(name = "emergency_contact_tel")
+    private String emergencyContactTel;
     @Override
     public int hashCode() {
         Integer hash = 0;
