@@ -44,6 +44,20 @@
                             <label class="label">#{msg.clinicalDeptName}</label>
                             <p:inputText value="#{secondmentOrderManageController.getBorrowDeptName(secondmentOrderManageController.selected.lendDeptUid)}" readonly="true"  />
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">设备紧急联系人<span style="color:red">*</span></label>
+<!--                            <p:inputText value="#{secondmentOrderManageController.selected.emergencyContactUid}" required="#{(secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0)}" readonly="#{!(secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0)}" />-->
+                            <p:selectOneMenu   value="#{secondmentOrderManageController.selected.emergencyContactUid}" disabled="#{!(secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0)}">
+                                <!--                                <f:selectItems  value="#{fieldMsg.getFieldValueList('borrowedStatus')}"  var="option" itemLabel="#{option.value}" itemValue="#{option.msgKey}"/>-->
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                <f:selectItems value="#{secondmentOrderManageController.emergencyContactList}" var="item" itemValue="#{item.uid}" itemLabel="#{item.name}" />
+                                <p:ajax listener="#{secondmentOrderManageController.updateEmergencyContact()}" update="secondmentOrderEditFrom"/>
+                            </p:selectOneMenu >
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">紧急联系人电话<span style="color:red">*</span></label>
+                            <p:inputText  value="#{secondmentOrderManageController.selected.emergencyContactTel}"  readonly="#{!(secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0)}" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请科室</label>
                             <p:inputText value="#{secondmentOrderManageController.getBorrowDeptName(secondmentOrderManageController.selected.borrowDeptUid)}" readonly="true" />
@@ -76,13 +90,17 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup id="sparePartsRemark" rendered="#{secondmentOrderManageController.selected.needSpareParts}">
-                            <label class="label">备件备注</label>
+                            <label class="label">附件备注</label>
                             <p:inputText value="#{secondmentOrderManageController.selected.sparePartsRemark}"  />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">申请人</label>
                             <p:inputText value="#{secondmentOrderManageController.getUserName(secondmentOrderManageController.selected.applicantUid)}" readonly="true"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">申请人联系电话</label>
+                            <p:inputText value="#{secondmentOrderAssetController.secondmentOrder.applicantTel}"  readonly="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间</label>
@@ -167,9 +185,9 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="审批意见">
-                            <h:outputText value="#{node.approvalSuggestions}" />
-                        </p:column>
+<!--                        <p:column headerText="审批意见">-->
+<!--                            <h:outputText value="#{node.approvalSuggestions}" />-->
+<!--                        </p:column>-->
                         <p:column headerText="审批备注">
                             <h:outputText value="#{node.approvalRemarks}" />
                         </p:column>
@@ -181,11 +199,11 @@
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==-2}" validateClient="true" disabled="#{secondmentOrderManageController.selected.status ==-2}" actionListener="#{secondmentOrderManageController.statusUpdate(null,0)}" value="提交申请" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,4)}" value="维修中" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
 
-                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varApprovalDlg').show();">
+                <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}"  validateClient="false" value="同意" actionListener="#{secondmentOrderManageController.checkData()}" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'varApprovalDlg');">
                     <p:confirm disabled="#{!(secondmentOrderManageController.assetInfo.borrowedStatus eq -1)}" header="注意" message="当前设备调剂状态为:暂停借出" icon="ui-icon-alert"/>
                 </p:commandButton>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==0}" validateClient="true"  value="不同意" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varRejectDlg').show();"/>
-                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认交付" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
+                <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==1}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,2)}" value="确认领用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{!secondmentOrderManageController.borrowFlag and (secondmentOrderManageController.secondmentOrderDtoTemp.status ==0 or secondmentOrderManageController.secondmentOrderDtoTemp.status == 1)}" validateClient="true"  value="取消借用" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="PF('varCancelDlg').show();"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and (secondmentOrderManageController.secondmentOrderDtoTemp.status ==2 or secondmentOrderManageController.secondmentOrderDtoTemp.status ==4)}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,3)}" value="确认已归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
                 <p:commandButton rendered="#{secondmentOrderManageController.borrowFlag and secondmentOrderManageController.secondmentOrderDtoTemp.status ==2}" validateClient="true" actionListener="#{secondmentOrderManageController.statusUpdate(null,5)}" value="提醒归还" update=":secondmentOrderManage:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmitDigital(args,'secondmentOrderEdit')"/>
@@ -196,8 +214,8 @@
                 <h:form id="selectAssetForm1" >
                     <p:panelGrid columns="1" layout="grid">
                         <h:panelGroup>
-                            <label class="label">拒绝原因<span style="color: red">*</span></label>
-                            <p:inputTextarea required="true" id="denialReason1"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                            <label class="label">拒绝原因</label>
+                            <p:inputTextarea  id="denialReason1"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.approvalRemarks}"  />
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:commandButton validateClient="true" value="#{msg.Confirm}" icon="ui-icon-check" update=":secondmentOrderManage:datalist :growl" actionListener="#{secondmentOrderManageController.statusUpdate(null,-2)}" oncomplete="closeDigital(args,'varRejectDlg','secondmentOrderEdit');"/>
@@ -209,20 +227,20 @@
                     <p:panelGrid columns="1" layout="grid">
                         <h:panelGroup>
                             <label class="label">取消原因<span style="color: red">*</span></label>
-                            <p:inputTextarea required="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.denialReason}"  />
+                            <p:inputTextarea required="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.approvalRemarks}"  />
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:commandButton validateClient="true" value="#{msg.Confirm}" icon="ui-icon-check" update=":secondmentOrderManage:datalist :growl" actionListener="#{secondmentOrderManageController.statusUpdate(null,-1)}" oncomplete="closeDigital(args,'varCancelDlg','secondmentOrderEdit');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varCancelDlg').hide()"/>
                 </h:form>
             </p:dialog>
-            <p:dialog id="approvalDlg"  widgetVar="varApprovalDlg" modal="true" resizable="true" draggable="true" header="同意申请" appendTo="@(body)" width="50%" height="400">
+            <p:dialog id="approvalDlg"  widgetVar="varApprovalDlg" modal="true" resizable="true" draggable="true" header="同意申请" appendTo="@(body)" width="50%" height="200">
                 <h:form id="approvalForm1" >
                     <p:panelGrid columns="1" layout="grid">
-                        <h:panelGroup>
-                            <label class="label">审批意见<span style="color: red">*</span></label>
-                            <p:inputTextarea required="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.approvalSuggestions}"  />
-                        </h:panelGroup>
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">审批意见<span style="color: red">*</span></label>-->
+<!--                            <p:inputTextarea required="true"  rows="6" cols="100" value="#{secondmentOrderManageController.selected.approvalSuggestions}"  />-->
+<!--                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">审批备注</label>
                             <p:inputTextarea   rows="6" cols="100" value="#{secondmentOrderManageController.selected.approvalRemarks}"  />
