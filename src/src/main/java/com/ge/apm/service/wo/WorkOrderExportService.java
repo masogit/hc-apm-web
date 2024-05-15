@@ -98,6 +98,9 @@ public class WorkOrderExportService {
 
         List<SearchFilter> searchFilters = new ArrayList<>();
 
+        if (v2WorkOrderReportDto.getTenantUid() != null) {
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getTenantUid()));
+        }
         if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 0) {
             SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(tenantFilter);
