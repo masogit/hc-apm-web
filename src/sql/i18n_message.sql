@@ -5353,6 +5353,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','repairReportSendPlace','报修发生地','repair Report Send Place',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairReportSendPlace','ward','病房','ward',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairReportSendPlace','non-ward','非病房','non-ward',NULL,-1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','DisplayRepairReportSendPlace','显示报修发生地','Display repairReportSendPlace',NULL,-1);
+
 --不良事件工单类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','adverseEventType','不良事件工单类型','adverse Event Type',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventType','1','医疗器械不良事件','1',NULL,-1);
