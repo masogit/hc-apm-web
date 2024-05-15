@@ -191,7 +191,7 @@ public class NurseSiteMaintainHistoryService {
 					tempItem.setModifyBy(getUserAccount(modifyByUid));
 				}
 				if (StringUtils.isNotEmpty(createByUid)) {
-					tempItem.setModifyBy(getUserAccount(createByUid));
+					tempItem.setCreateBy(getUserAccount(createByUid));
 				}
 				List<NurseSiteMaintainDataHistory> tempListData=mapData.get(tempItem.getId());
 				if(tempListData!=null){
