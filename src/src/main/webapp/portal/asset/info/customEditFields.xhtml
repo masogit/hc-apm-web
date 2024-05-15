@@ -158,7 +158,7 @@
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="pmOwnerName" value="#{assetInfoEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerName')}"
-                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.PMOwner} #{msg.ValidationRequire}"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
@@ -674,7 +674,7 @@
             <p:inputText id="locationName" value="#{assetInfoEditController.selected.locationName}" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}"
                          requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" /> <p/>
             <p:autoComplete dropdown="true" value="#{assetInfoEditController.locationName}"
-                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}" requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.managementListString}"
+                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoEditController.managementListString}"
                             class="locationNameChange" id="locationNameChange" >
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.locationNamechangeSelect}" update="@(.locationCode) locationName locationNameChange" />
                 <p:ajax listener="#{assetInfoEditController.locationNamechange}" process="@this" update="@(.locationCode) locationName locationNameChange" />
