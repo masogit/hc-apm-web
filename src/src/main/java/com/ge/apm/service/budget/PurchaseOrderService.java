@@ -340,22 +340,23 @@ public class PurchaseOrderService {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
                 })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
-            List<WechatParam> paramList = ListUtil.newArrayList();
+//            List<WechatParam> paramList = ListUtil.newArrayList();
+            List<String> sendUserUids = ListUtil.newArrayList();
             if (node.getUsingRole()) {
                 // 角色审批, 目前ACCT没有角色审批
                 Optional.ofNullable(node.getRoleUids()).flatMap(list -> Optional.ofNullable(userDao.getApprovalPersonByRoleId(list)))
                         .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
-                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
+                                .forEach(user -> sendUserUids.add(user.getUid())));
             } else {
                 // 用户审批
                 Optional.ofNullable(node.getUserUids()).flatMap(list -> Optional.ofNullable(userDao.findByUidIn(list)))
                         .ifPresent(userList -> userList.stream().filter(user -> ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias()))
-                                .forEach(user -> paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()))));
+                                .forEach(user -> sendUserUids.add(user.getUid())));
             }
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + purchaseOrderInfo.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(paramList, message, "待审批","");
+            approvalService.sendWxMsg(sendUserUids, message, "待审批","");
         });
     }
     public boolean checkMultiLevelApproval (PurchaseOrderInfo purchaseOrderInfo){

@@ -663,7 +663,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetInfo.setSiteUID(listItem.getArrivalList().getSiteUID());
         assetInfo.setCreatedDate(new Date());
         assetInfo.setClinicalDeptUID(listItem.getClinicalDeptUID());
-        wxMessageService.submitAssetApprovalSendMessage(assetInfo, token);
+        wxMessageService.submitAssetApprovalSendMessage(assetInfo, "待审核");
     }
 
     public void finishInstallHandle(List<ArrivalListItem> itemList) {

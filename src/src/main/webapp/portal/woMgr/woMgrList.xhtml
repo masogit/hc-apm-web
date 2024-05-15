@@ -8,7 +8,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition>
     <div class="ui-g-12 card">
-        <h:form id="woMgrListForm">
+        <h:form id="woMgrListForm" rendered="#{!workOrderMgrController.viewIng}">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                 <c:choose>
                     <c:when test="#{!userContextService.hasCurrentTenantName('')}">
@@ -47,8 +47,8 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
 
-                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm manHoursManageButton "/>
-                <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist woTab:woMgrDetailForm " oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" update=" woTab:ServiceRequestCreateForm manHoursManageButton "/>
+                <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist   " oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
                 <p:column width="36" id="checkBoxColumn" visible="#{workOrderMgrController.queryIndex == 10 or workOrderMgrController.queryIndex == 5}" exportable="false">
@@ -447,6 +447,15 @@
             if(isActive == '1'){
                 PF('ActiveDlg').show();
             }
+        }
+
+        var newWin;
+        function prepareOrderViewWindow() {
+            newWin = window.open('about:blank', '_blank');
+            newWin.document.body.innerHTML = '加载中...';
+        }
+        function openOrderViewWindow(xhr, status, args) {
+            newWin.location.href = args.url;
         }
         function updateSelectAllCheckBox() {
             var checkboxlist = $(".selectCheckBox");
