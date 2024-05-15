@@ -35,4 +35,5 @@ public class V2WorkOrderReportDto implements Serializable {
     private Set<String> assetTypeGroupEncodedSet;
     private String srNum;
     private String tenantUid;
+    private String siteUid;
 }

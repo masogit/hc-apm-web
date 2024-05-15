@@ -121,6 +121,8 @@ public class WorkOrderExportService {
         if (v2WorkOrderReportDto.getSelectedOrg() != null) {
             SearchFilter siteFilter = new SearchFilter("orgUID", SearchFilter.Operator.IN, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(siteFilter);
+        } else if (v2WorkOrderReportDto.getSiteUid() != null) {
+            searchFilters.add(new SearchFilter("orgUID", SearchFilter.Operator.IN, v2WorkOrderReportDto.getSiteUid()));
         }
 
         if (v2WorkOrderReportDto.getClinicalDept() != null) {

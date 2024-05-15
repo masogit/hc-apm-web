@@ -359,6 +359,7 @@ public class WorkOrderReportExportController implements Serializable {
         V2WorkOrderReportDto v2WorkOrderReportDto = new V2WorkOrderReportDto();
         v2WorkOrderReportDto.setSrNum(srNumStr);
         v2WorkOrderReportDto.setTenantUid(currentUser.getTenantUID());
+        v2WorkOrderReportDto.setSiteUid(currentUser.getSiteUID());
         workOrderList = workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto);
     }
 
