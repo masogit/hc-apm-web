@@ -728,4 +728,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      */
     @Column(name = "use_cnt")
     private Integer useCnt;
+
+    @Column(name = "wo_id")
+    private String woId;
 }
