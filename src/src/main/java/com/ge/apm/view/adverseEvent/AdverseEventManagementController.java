@@ -160,6 +160,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setDepartment(selectSite.getUid());
             //发生地默认【境内】
             this.selected.setOccurredPlace("境内");
+            //默认不良事件工单类型
+            this.selected.setAdverseEventType("1");
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
