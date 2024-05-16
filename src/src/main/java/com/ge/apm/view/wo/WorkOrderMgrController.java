@@ -2347,7 +2347,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         saveItem();
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
-            BeanUtils.copyProperties(vwd,itemDetail);;
+            BeanUtils.copyProperties(itemDetail,vwd);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2363,6 +2363,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         vwd.setComment(null);
         vwd.setPartsType(null);
         selectedObjectMap = new HashMap();
+        partsItem = null;
         itemDetail= vwd;
         itemDetail.setPartUseType(null);
         itemDetail.setPartsDescription(null);
