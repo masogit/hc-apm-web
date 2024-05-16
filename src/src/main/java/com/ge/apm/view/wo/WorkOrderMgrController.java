@@ -2257,8 +2257,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
-        accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        itemDetail = detailDao.findById(itemId);
+//        accessoryList = woService.getWorkOrderDetails(woId);//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+//        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
 
         supplierName=itemDetail.getSupplier();
