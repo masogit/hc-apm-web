@@ -41,10 +41,10 @@ public class WxMessageService extends MicroServiceInvoker {
     private static final Logger logger = LoggerFactory.getLogger(WxMessageService.class);
 
     public void sendMessage(AssetInfo assetInfo, String approvalName, ApprovableTarget
-        approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason) {
+        approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason,MSGEvent msgEvent) {
         HashMap<String, String> params = combineMsg(approvalName, approvableTarget, assetInfo,user,reason);
         List<String> sendUids= userAccounts.stream().filter(item-> StringUtils.isNotBlank(item.getUid())).map(UserAccount::getUid).collect(Collectors.toList());
-        sendWxMsgToMq(params,linkUrl,MSGEvent.ASSET_SCRAP,sendUids,null);
+        sendWxMsgToMq(params,linkUrl,msgEvent,sendUids,null);
     }
 
     public void send(Map<String, Object> map,String token){
