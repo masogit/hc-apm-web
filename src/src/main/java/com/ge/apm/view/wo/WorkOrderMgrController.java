@@ -286,6 +286,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ConfigItemValueRepository configItemValueRepository;
     @Getter @Setter
     private boolean viewIng = false;
+    @Getter @Setter
+    private boolean repaFlag = false;
     @Override
     protected void init() {
         try {
@@ -1881,6 +1883,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             newServiceRequest.setRequestReason(requestReason.toString());
         }
 
+        Object repairReportSendPlaceFlag =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlaceFlag != null){
+            repaFlag= Boolean.valueOf(repairReportSendPlaceFlag.toString());
+        }
+        Object repairReportSendPlace=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.defaultValue[0]");
+
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
@@ -1890,6 +1898,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
         newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestTime(new Date());
+        if(repairReportSendPlace != null){
+            newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
+        }
         if(selectedAsset != null && userContextService.isCountyArea()){
             OrgInfo orgInfo = cacheService.findOrgByUid(selectedAsset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
@@ -3893,8 +3904,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 控制报修发送地的显示隐藏
      */
     public boolean repairReportSendPlaceRender(){
-        String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
-        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);
+       /* String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
+        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);*/
+        //从配置信息获取紧急程度
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
+        //从配置信息获取当前状态
+        Object repairReportSendPlace =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlace == null){
+            return false;
+        }
+
+        return Boolean.valueOf(repairReportSendPlace.toString());
     }
 }
 
