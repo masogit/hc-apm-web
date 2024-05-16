@@ -275,6 +275,8 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         secondmentOrder.setConfigId(config.getId());
         secondmentOrder.setApplyTime(now);
         secondmentOrder.setApplicantUid(userAccount.getUid());
+        secondmentOrder.setApplicantName(userAccount.getName());
+        secondmentOrder.setApplicantTel(userAccount.getTelephone());
         secondmentOrder.setLendDeptUid(assetInfo.getClinicalDeptUID());
         secondmentOrder.setBorrowDeptUid(chooseDept?null:userAccount.getOrgInfoUID());
         secondmentOrder.setBillingType(config.getBillingType());

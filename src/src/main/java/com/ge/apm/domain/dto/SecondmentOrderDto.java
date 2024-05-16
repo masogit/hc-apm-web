@@ -29,6 +29,8 @@ public class SecondmentOrderDto implements Serializable {
     private String sparePartsRemark;
 
     private String applicantUid; //借用科室id（借用申请人uid）
+    private String applicantName; //借用科室id（借用申请人uid）
+    private String applicantTel; //（借用申请人uid 电话）
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date applyTime;
@@ -81,6 +83,9 @@ public class SecondmentOrderDto implements Serializable {
     private Boolean isRepair;
     private String approvalSuggestions; // 审批意见
     private String approvalRemarks; // 审批备注
+    private String emergencyContactUid;
+    private String emergencyContactName;
+    private String emergencyContactTel;
     @Override
     public int hashCode() {
         Integer hash = 0;

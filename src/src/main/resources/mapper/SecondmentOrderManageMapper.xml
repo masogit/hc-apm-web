@@ -17,6 +17,8 @@
             <result column="need_spare_parts" property="needSpareParts"/>
             <result column="spare_parts_remark" property="sparePartsRemark"/>
             <result column="applicant_uid" property="applicantUid"/>
+            <result column="applicant_name" property="applicantName"/>
+            <result column="applicant_tel" property="applicantTel"/>
             <result column="apply_time" property="applyTime"/>
             <result column="billing_type" property="billingType"/>
             <result column="unit_price" property="unitPrice"/>
@@ -42,6 +44,10 @@
             <result column="is_repair" property="isRepair"/>
             <result column="approval_suggestions" property="approvalSuggestions"/>
             <result column="approval_remarks" property="approvalRemarks"/>
+            <result column="applicant_tel" property="applicantTel"/>
+            <result column="emergency_contact_uid" property="emergencyContactUid"/>
+            <result column="emergency_contact_name" property="emergencyContactName"/>
+            <result column="emergency_contact_tel" property="emergencyContactTel"/>
 
     </resultMap>
 
@@ -60,6 +66,8 @@
             so.need_spare_parts ,
             so.spare_parts_remark ,
             so.applicant_uid ,
+            so.applicant_name ,
+            so.applicant_tel ,
             so.apply_time,
             so.billing_type,
             so.unit_price ,
@@ -84,7 +92,11 @@
             so.process_records,
             so.is_repair,
             so.approval_suggestions,
-            so.approval_remarks
+            so.approval_remarks,
+            so.applicant_tel,
+            so.emergency_contact_uid,
+            so.emergency_contact_name,
+            so.emergency_contact_tel
             from secondment_order so left join asset_info ai on so.asset_uid = ai.uid
         <where>${ew.sqlSegment}</where>
     </select>
