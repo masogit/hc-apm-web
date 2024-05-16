@@ -42,7 +42,7 @@
                         and nsm.schedule_date >= #{scheduleDateStart}
                     </if>
                     <if test="scheduleDateEnd != null">
-                        and nsm.schedule_date &lt; #{scheduleDateEnd}
+                        and nsm.schedule_date &lt;= #{scheduleDateEnd}
                     </if>
                     <if test="tenantUid != null">
                         and nsm.tenant_uid = #{tenantUid}

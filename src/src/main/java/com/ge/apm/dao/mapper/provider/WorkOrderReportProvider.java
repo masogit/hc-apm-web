@@ -269,6 +269,9 @@ public class WorkOrderReportProvider {
             SearchFilter.Operator op = searchFilter.operator;
 
             switch (tempColumn) {
+                case "tenantUID":
+                    sb.append(" and (wo.tenant_uid='").append(value).append("') ");
+                    break;
                 case "orgUID":
                     sb.append(" and (wo.tenant_uid='").append(value).append("' or wo.institution_uid='").append(value).append("' or wo.hospital_uid='").append(value).append("' or wo.site_uid='").append(value).append("') ");
                     break;

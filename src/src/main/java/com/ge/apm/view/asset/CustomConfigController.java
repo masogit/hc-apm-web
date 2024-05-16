@@ -127,6 +127,24 @@ public class CustomConfigController {
                 }
             }
         }
+        /**
+         * 增加显示报修发送地字段
+         */
+        JSONObject pageWorkOrderMobilePage = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder");
+        JSONArray group2 = pageWorkOrderMobilePage.getJSONArray("group");
+        for (int i = 0; i < group2.size(); i++) {
+            JSONObject obj = group2.getJSONObject(i);
+            if("orderFields".equals(obj.get("type"))){
+                JSONObject repairReportSendPlace = obj.getJSONObject("repairReportSendPlace");
+                if (repairReportSendPlace == null) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("enable", false);
+                    jsonObject.put("defaultValue", "non-ward");
+                    jsonObject.put("required", true);
+                    obj.put("repairReportSendPlace", jsonObject);
+                }
+            }
+        }
         updateConfigInfo();
     }
 
