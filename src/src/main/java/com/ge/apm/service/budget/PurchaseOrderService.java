@@ -9,6 +9,7 @@ import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -356,7 +357,7 @@ public class PurchaseOrderService {
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + purchaseOrderInfo.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(sendUserUids, message, "待审批","");
+            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED);
         });
     }
     public boolean checkMultiLevelApproval (PurchaseOrderInfo purchaseOrderInfo){
