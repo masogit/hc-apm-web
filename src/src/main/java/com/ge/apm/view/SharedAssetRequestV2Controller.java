@@ -9,12 +9,15 @@ import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.ChargingType;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple3;
@@ -26,6 +29,8 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +44,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -95,9 +101,15 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private UserAccountRepository userAccountRepository;
     private MultiLevelApprovalService multiLevelApprovalService;
     private BlobFileService blobService;
+    private NurseSiteMaintainService nurseSiteMaintainService;
     private List<SharedAssetRequest> sharedAssetRequests;
     private List<V2_BlobObject> deleteAttachments;
     private String viewImageStr;
+    private String signatureContent;
+    private StreamedContent signatureContentStream;
+    private V2_WorkOrderService v2_workOrderService;
+    List<Map<String, String>> userSignature;
+    String lastSignatureId ;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -219,6 +231,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
+        nurseSiteMaintainService = WebUtil.getBean( NurseSiteMaintainService.class);
+        v2_workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
         sharedAssetRequests = new ArrayList<>();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
@@ -244,6 +258,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                         addSharedAssetRequests(sharedAssetReqDetail);
                     }
                 }
+
+               initSignatureContent();
             }
             prepareEdit();
         }
@@ -342,6 +358,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 stateList.add("6");
                 searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
             }else if(p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){//分配页面初始List
+                reviseState();
                 List<String> stateList = new ArrayList<String>();
                 stateList.add("7");
                 stateList.add("8");
@@ -377,7 +394,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
-    
+    public void reviseState(){
+        if(!CollectionUtils.isEmpty(searchFilters)){
+          boolean flag = searchFilters.stream().anyMatch(item -> "state".equals(item.fieldName) && "14".equals(item.value));
+          if(flag){
+              SearchFilter searchFilterState = new SearchFilter("state", SearchFilter.Operator.EQ,"12");
+              updateSearchFilter(searchFilterState);
+              SearchFilter searchFilterSignatureId = new SearchFilter("signatureId", SearchFilter.Operator.IsNull,null);
+              searchFilters.add(searchFilterSignatureId);
+          }
+        }
+    }
     public String getOperation() {
         return operation;
     }
@@ -762,6 +789,23 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
              return;
          }
     }
+    private void initSignatureContent(){
+        String signatureId = selected.getSignatureId();
+        if(StringUtils.isNotBlank(signatureId)){
+            signatureContentStream = nurseSiteMaintainService.getMaintainSignature(signatureId);
+        }else{
+            try {
+                 userSignature = v2_workOrderService.getUserSignature();
+                if(!CollectionUtils.isEmpty(userSignature)){
+                    lastSignatureId = userSignature.get(userSignature.size() - 1).get("signatureUid");
+                    this.signatureContentStream = nurseSiteMaintainService.getMaintainSignature(lastSignatureId);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void addSharedAssetRequests(SharedAssetReqDetail sard){
         if(sard == null)return;
         String borrowId = sard.getBorrowId();
@@ -2414,6 +2458,59 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public void setViewImageStr(String viewImageStr) {
         this.viewImageStr = viewImageStr;
+    }
+
+    public String getSignatureContent() {
+        return signatureContent;
+    }
+
+    public void setSignatureContent(String signatureContent) {
+        this.signatureContent = signatureContent;
+    }
+
+    public StreamedContent getSignatureContentStream() {
+        return signatureContentStream;
+    }
+
+    public void setSignatureContentStream(StreamedContent signatureContentStream) {
+        this.signatureContentStream = signatureContentStream;
+    }
+
+    public void saveSignature() {
+        V2_BlobObject blobObject = null;
+            if(StringUtils.isNotBlank(lastSignatureId)){
+                selected.setSignatureId(lastSignatureId);
+                selected.setSignatory(UserContextService.getCurrentUserAccount().getName());
+                selected.setSignatureTime(new Date());
+                dao.save(selected);
+            }else{
+                try {
+                    if(StringUtils.isNotBlank(signatureContent)){
+                        blobObject = blobService.uploadFileString(signatureContent);
+                        blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                        blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+                        blobObject.setBoUuid(selected.getId());
+                        blobService.saveBlobObject(blobObject);
+                        if(blobObject != null){
+                            String objectStorageId = blobObject.getObjectStorageId();
+                            selected.setSignatureId(objectStorageId);
+                            selected.setSignatory(UserContextService.getCurrentUserAccount().getName());
+                            selected.setSignatureTime(new Date());
+                            dao.save(selected);
+                            v2_workOrderService.addUserSignature(objectStorageId);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            initSignatureContent();
+    }
+
+    public void resetSignature() {
+        this.lastSignatureId = null;
+        this.signatureContent = null;
+        this.signatureContentStream = null;
     }
 }
     

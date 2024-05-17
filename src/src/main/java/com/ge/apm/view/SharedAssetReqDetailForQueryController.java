@@ -13,6 +13,7 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
@@ -21,6 +22,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.datatable.DataTable;
+import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,6 +65,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     private CustomConfigService ccService;
     @Autowired
     SharedAssetReqDetailService sharedAssetReqDetailService;
+    private NurseSiteMaintainService nurseSiteMaintainService;
     private Date filterBeginTime;
     private Date filterEndTime;
     private String oneSearchStr;
@@ -72,6 +75,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     public String getOneSearchStr() {
         return oneSearchStr;
     }
+    private String signatureId;
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
@@ -119,6 +123,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         swapIndexRepository=WebUtil.getBean(SharedAssetSwapIndexRepository.class);
+        nurseSiteMaintainService=WebUtil.getBean(NurseSiteMaintainService.class);
         ccService=WebUtil.getBean(CustomConfigService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
@@ -436,5 +441,24 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
     public void setAssetAllocateFields(List<String> assetAllocateFields) {
         this.assetAllocateFields = assetAllocateFields;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
+    }
+
+    public StreamedContent previewSignature(){
+        try {
+            if(StringUtils.isNotEmpty(signatureId)){
+                return nurseSiteMaintainService.getMaintainSignature(signatureId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
     }
 }

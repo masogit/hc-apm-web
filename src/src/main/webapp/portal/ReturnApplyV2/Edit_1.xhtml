@@ -228,6 +228,27 @@
                     </h:panelGroup>
                 </p:fieldset>
                 <ui:include src="/portal/ReturnAcceptanceV2/ReturnAttachmentxhtml.xhtml"/>
+                <p:fieldset legend="签名" style="margin-bottom:20px" id="signatureFieldset">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup >
+                            <p:signature  id="signatureContent" style="width:400px;height:200px" widgetVar="sig" base64Value="#{sharedAssetRequestV2Controller.signatureContent}"
+                                         required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{sharedAssetRequestV2Controller.signatureContentStream == null}" />
+                            <p:graphicImage value="#{sharedAssetRequestV2Controller.signatureContentStream}" stream="false" rendered="#{sharedAssetRequestV2Controller.signatureContentStream!=null}"></p:graphicImage>
+                            <p:commandButton value="确认" actionListener="#{sharedAssetRequestV2Controller.saveSignature()}" update=":IouEditForm:signatureFieldset" rendered="#{sharedAssetRequestV2Controller.selected.signatory ==null}" />
+                            <p:commandButton value="重写"  rendered="#{sharedAssetRequestV2Controller.selected.signatory == null}" actionListener="#{sharedAssetRequestV2Controller.resetSignature()}" update="signatureFieldset" oncomplete="PF('sig').clear()"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>签名操作人</label>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.signatory}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>签名时间</label>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.signatureTime}">
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmitR}" action="List?faces-redirect=true" value="确认归还" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 9}"/>
