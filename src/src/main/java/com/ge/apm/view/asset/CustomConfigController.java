@@ -28,6 +28,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbMessageSource;
 
@@ -138,7 +139,8 @@ public class CustomConfigController {
                 JSONObject repairReportSendPlace = obj.getJSONObject("repairReportSendPlace");
                 if (repairReportSendPlace == null) {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("enable", false);
+                    String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
+                    jsonObject.put("enable", StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue));
                     jsonObject.put("defaultValue", "non-ward");
                     jsonObject.put("required", true);
                     obj.put("repairReportSendPlace", jsonObject);

@@ -8,6 +8,9 @@ select id, ROW_NUMBER() OVER (PARTITION BY asset_id ORDER BY last_modified_date 
 where inventory_issue.id = t.id and t.rn = 1;
 
 
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '启用不良事件哨兵模式', 'enableAdverseEventSentinelMode', '启用不良事件哨兵模式', 'f','t',3 where not exists(select * from config_item where key = 'enableAdverseEventSentinelMode');
+
 
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
