@@ -223,6 +223,32 @@
                                         </h:outputText>
                                     </p:column>
                                </c:if>
+                                <c:if test="#{columnItem eq 'status'}">
+                                    <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ"  >
+                                        <f:facet name="filter">
+                                            <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
+                                                <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItem itemLabel="已预约" itemValue="已预约" />
+                                                <f:selectItem itemLabel="使用中" itemValue="使用中" />
+                                                <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
+                                                    <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
+                                                    <f:selectItem itemLabel="已完成" itemValue="已完成" />
+                                                </c:if>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{item.state}" />
+                                    </p:column>
+                                </c:if>
+                                <c:if test="#{columnItem eq 'swapIndex'}">
+                                    <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE"  >
+                                        <h:outputText value="#{item.swapIndex}" />
+                                    </p:column>
+                                </c:if>
+                                <c:if test="#{columnItem eq 'precautions'}">
+                                    <p:column headerText="注意事项"   >
+                                        <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
+                                    </p:column>
+                                </c:if>
                             </c:if>
                             <c:if test="#{!sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
                                <c:if test="#{columnItem eq 'cost'}">
@@ -232,36 +258,26 @@
                                        </h:outputText>
                                    </p:column>
                                </c:if>
-                            </c:if>
-                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                               <c:if test="#{columnItem eq 'status'}">
-                                    <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ"  >
-                                        <f:facet name="filter">
-                                            <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
-                                                    <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                                    <f:selectItem itemLabel="已预约" itemValue="已预约" />
-                                                    <f:selectItem itemLabel="使用中" itemValue="使用中" />
-                                                    <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
-                                                        <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
-                                                        <f:selectItem itemLabel="已完成" itemValue="已完成" />
-                                                    </c:if>
-                                            </p:selectOneMenu>
-                                        </f:facet>
-                                        <h:outputText value="#{item.state}" />
+                                <c:if test="#{columnItem eq 'signatory'}">
+                                    <p:column headerText="签名操作人"  >
+                                        <h:outputText value="#{item.signatory}"/>
                                     </p:column>
-                               </c:if>
-                               <c:if test="#{columnItem eq 'swapIndex'}">
-                                    <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE"  >
-                                        <h:outputText value="#{item.swapIndex}" />
-                                    </p:column>
-                               </c:if>
-                               <c:if test="#{columnItem eq 'precautions'}">
-                                    <p:column headerText="注意事项"   >
-                                        <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
-                                    </p:column>
-                               </c:if>
+                                </c:if>
 
-                             </c:if>
+                                <c:if test="#{columnItem eq 'signatureTime'}">
+                                    <p:column headerText="签名日期"  >
+                                        <h:outputText value="#{item.signatureTime}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </c:if>
+                                <c:if test="#{columnItem eq 'signatureId'}">
+                                    <p:column headerText="签名" exportable="false" >
+                                        <p:commandButton disabled="#{item.signatureId == null}" actionListener="#{sharedAssetReqDetailForQueryController.setSignatureId(item.signatureId)}" title="预览" update="viewImage" icon="ui-icon-search" oncomplete="PF('viewImageDialog').show();"/>
+                                    </p:column>
+                                </c:if>
+                            </c:if>
+
                            </c:forEach>
 
                             <f:facet name="{Toolbar}">
@@ -270,45 +286,10 @@
                                 </p:commandButton>
                             </f:facet>
                         </p:dataTable>
-                        <!--<p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":IouListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">-->
-                            <!--<h:panelGrid columns="3">-->
-                                <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">-->
-                                    <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
-                                <!--</p:inputNumber>-->
-                                <!--&#45;&#45;-->
-                                <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">-->
-                                    <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
-                                <!--</p:inputNumber>-->
-                            <!--</h:panelGrid>-->
-                        <!--</p:overlayPanel>-->
-
-                        <!--<p:overlayPanel id="panelForFilterCost" widgetVar="panelFilterUnitCost" for=":IouListForm:datalist:filterCost" showCloseIcon="true" dismissable="false">-->
-                            <!--<h:panelGrid columns="3">-->
-                                <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterCostFrom}" decimalPlaces="0" minValue="0">-->
-                                    <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
-                                <!--</p:inputNumber>-->
-                                <!--&#45;&#45;-->
-                                <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterCostTo}" decimalPlaces="0" minValue="0">-->
-                                    <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
-                                <!--</p:inputNumber>-->
-                            <!--</h:panelGrid>-->
-                        <!--</p:overlayPanel>-->
-<!--                         <p:contextMenu for="datalist" rendered="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">-->
-<!--                             <p:menuitem value="状态与时间" update="productDetail" icon="pi pi-search"-->
-<!--                                         oncomplete="PF('productDialog').show()"/>-->
-<!--                         </p:contextMenu>-->
-<!--                         <p:dialog header="状态与时间" widgetVar="productDialog" modal="true" showEffect="fade"-->
-<!--                                   hideEffect="fade" resizable="false">-->
-<!--                             <div class="card" >-->
-<!--                                         <p:steps id="productDetail" activeIndex="5">-->
-<!--                                             <p:menuitem  value="已预约:#{sharedAssetReqDetailForQueryController.jsonFormatDate(1)}" />-->
-<!--                                             <p:menuitem value="使用中:#{sharedAssetReqDetailForQueryController.jsonFormatDate(2)}" />-->
-<!--                                             <p:menuitem value="已归还（未清洁保养）:#{sharedAssetReqDetailForQueryController.jsonFormatDate(3)}" />-->
-<!--                                             <p:menuitem value="已完成:#{sharedAssetReqDetailForQueryController.jsonFormatDate(4)}" />-->
-<!--                                         </p:steps>-->
-<!--                             </div>-->
-<!--                         </p:dialog>-->
                     </h:form>
+                    <p:dialog  id="viewImage" widgetVar="viewImageDialog" modal="true" height="500" width="500"  resizable="true" draggable="true" appendTo="@(body)" >
+                        <p:graphicImage  value="#{sharedAssetReqDetailForQueryController.previewSignature()}" alt="不支持预览" stream="false" style="width: 100%" />
+                    </p:dialog>
                 </div>
             </div>
         </div>

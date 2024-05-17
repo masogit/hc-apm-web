@@ -43,11 +43,12 @@
         <result column="brand_name" property="brandName"/>
         <result column="swap_name" property="swapName"/>
         <result column="qr_code" property="qrCode"/>
+        <result column="signature_id" property="signatureId"/>
+        <result column="signatory" property="signatory"/>
+        <result column="signature_time" property="signatureTime"/>
     </resultMap>
-
-    <select id="getTotalRowCount" resultType="int">
-            select count(distinct id) from (
-                select
+    <sql id="selectSql">
+        select
                 sard.id,
                 sard.borrow_id,
                 sard.return_id,
@@ -89,66 +90,27 @@
                 end) state,
                 ai.function_type,
                 ai.make_short_name as brand_name,
-                sat.swap_name
+                sat.swap_name,
+                bsarr.signature_id,
+                bsarr.signatory,
+                bsarr.signature_time
                 from  shared_asset_req_detail sard
                 left join shared_asset_request bsar on bsar.id=sard.borrow_id
                 left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
                 left join asset_info ai on ai.uid=sard.asset_info_id
                 left join shared_asset_type  sat on ai.shared_asset_type=sat.id
+                left join shared_asset_request bsarr on bsarr.id=sard.return_id
+    </sql>
+    <select id="getTotalRowCount" resultType="int">
+            select count(distinct id) from (
+               <include refid="selectSql" />
             ) t1
         <where>${ew.sqlSegment}</where>
     </select>
 
     <select id="loadSharedAssets" resultMap="sharedAssetReqDetailResult">
         select * from (
-            select
-            sard.id,
-            sard.borrow_id,
-            sard.return_id,
-            sard.asset_info_id,
-            sard.shared_asset_type,
-            sard.asset_number,
-            sard.asset_name,
-            sard.unit,
-            sard.unit_price,
-            sard.charging_type,
-            sard.charging_begin_time,
-            sard.charging_end_time,
-            sard.count_qty,
-            sard.tenant_uid,
-            sard.institution_uid,
-            sard.hospital_uid,
-            sard.site_uid,
-            sard.clinical_dept_uid,
-            sard.clinical_dept_name,
-            sard.starting_price,
-            sard.starting_duration,
-            sard.gratis_duration,
-            sard.discount_start_date,
-            sard.discount_end_date,
-            sard.discount,
-            sard.is_cleaned,
-            sard.compensation_amount,
-            sard.patient_num,
-            sard.patient_bed_num,
-            sard.qr_code,
-            sasi.swap_index,
-            sasi.remark,
-            (case
-            when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
-            when  sard.charging_end_time is not null and sard.is_cleaned != true then '已归还（未清洁保养）'
-            when	 bsar.state = 6 and  sard.charging_end_time is null then '使用中'
-            when  bsar.state = 3 then '已预约'
-            else ''
-            end) state,
-            ai.function_type,
-            ai.make_short_name as brand_name,
-            sat.swap_name
-            from  shared_asset_req_detail sard
-            left join shared_asset_request bsar on bsar.id=sard.borrow_id
-            left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
-            left join asset_info ai on ai.uid=sard.asset_info_id
-            left join shared_asset_type  sat on ai.shared_asset_type=sat.id
+          <include refid="selectSql" />
         ) t1
         <where>${ew.sqlSegment}</where>
     </select>

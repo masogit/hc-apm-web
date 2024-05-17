@@ -197,6 +197,12 @@
                                       multiple="true"  sizeLimit="500000000"  update="uploadPanelGroup" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
 
                     </h:panelGroup>
+                    <h:panelGroup >
+                        <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" base64Value="#{sharedAssetRequestV2Controller.signatureContent}"
+                                     required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false"  />
+<!--                            <p:graphicImage value="#{maintainController.signatureContentStream}" stream="false" rendered="#{maintainController.signatureContentStream!=null}"></p:graphicImage>-->
+                        <p:commandButton value="重写" actionListener="#{sharedAssetRequestV2Controller.setSignatureContent('')}" update="signatureContent"/>
+                    </h:panelGroup>
                 </p:fieldset>
                 <ui:include src="ReturnAttachmentxhtml.xhtml"/>
             </h:form>

@@ -231,6 +231,14 @@ public class SharedAssetReqDetail implements Serializable{
     @Transient
     private String brandName;//品牌名称
 
+    @Transient
+    private String signatureId;
+
+    @Transient
+    private String signatory;
+
+    @Transient
+    private Date signatureTime;
 
     public String getId() {
         return id;
@@ -1112,5 +1120,29 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setMsgAccepter(String msgAccepter) {
         this.msgAccepter = msgAccepter;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
+    }
+
+    public String getSignatory() {
+        return signatory;
+    }
+
+    public void setSignatory(String signatory) {
+        this.signatory = signatory;
+    }
+
+    public Date getSignatureTime() {
+        return signatureTime;
+    }
+
+    public void setSignatureTime(Date signatureTime) {
+        this.signatureTime = signatureTime;
     }
 }
