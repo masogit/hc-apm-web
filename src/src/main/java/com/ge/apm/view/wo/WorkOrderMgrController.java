@@ -1985,6 +1985,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                             blobObject.setId(null);
                         }
                     }
+                    newServiceRequest.setSrRepairSource(RepairSourceEnum.Measurement.name());
+
                     woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
 
                 }
@@ -2044,6 +2046,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
             cancel();
         }
@@ -2088,6 +2091,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
+
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,2);
             cancel();
         }

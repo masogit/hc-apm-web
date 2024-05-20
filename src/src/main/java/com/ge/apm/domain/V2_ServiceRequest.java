@@ -219,6 +219,9 @@ public class V2_ServiceRequest implements Serializable {
     @Column(name="repair_report_send_place")
     private String repairReportSendPlace;
 
+    @Column(name="sr_repair_source")
+    private String srRepairSource;
+
     public String getRepairReportSendPlace() {
         return repairReportSendPlace;
     }
@@ -593,6 +596,14 @@ public class V2_ServiceRequest implements Serializable {
 
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
+    }
+
+    public String getSrRepairSource() {
+        return srRepairSource;
+    }
+
+    public void setSrRepairSource(String srRepairSource) {
+        this.srRepairSource = srRepairSource;
     }
 
     @Override

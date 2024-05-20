@@ -208,6 +208,8 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
         newServiceRequest.setRequestReason("设备故障");
     }
         selectedAsset.setStatus(currentStatus);
+        newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
+
         woService.createServiceRequest(newServiceRequest, selectedAsset,null,null);
         cancel();
     }
