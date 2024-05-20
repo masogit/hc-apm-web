@@ -1013,7 +1013,7 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
-			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
+//			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
 			boolean hasComment=StringUtils.isNotEmpty(tempItem.getComment())?true:false;
 			//0：未检查,1:已检查，4进行中,2:通过没commnet没有delay，5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，3有问题，延期了,8，有问题，没有延期
             String itemId = tempItem.getId();
@@ -1038,45 +1038,49 @@ public class NurseSiteMaintainService {
                     }
                 }
             }
-			int nullNum=0;
-			while (itData.hasNext()) {
-				NurseSiteMaintainData tempData = itData.next();
-				Boolean value = tempData.getCheckValue();
-				if (value == null) {
-					nullNum++;
-					hasNotChecked = true;
-					if (itemStatus == 2 || itemStatus == 5|| itemStatus == 6|| itemStatus == 7) {
-						itemStatus = 4;
-					}
-				} else if (value) {
-					if (itemStatus == 0) {
-						if(delay&& hasComment){
-							itemStatus = 6;
+            if(tempItem.getUpdateDate()!=null){
+				boolean delay=tempItem.getUpdateDate().after(sheculeDate)?true:false;
+				int nullNum=0;
+				while (itData.hasNext()) {
+					NurseSiteMaintainData tempData = itData.next();
+					Boolean value = tempData.getCheckValue();
+					if (value == null) {
+						nullNum++;
+						hasNotChecked = true;
+						if (itemStatus == 2 || itemStatus == 5|| itemStatus == 6|| itemStatus == 7) {
+							itemStatus = 4;
 						}
-						else if(delay){
-							itemStatus = 7;
+					} else if (value) {
+						if (itemStatus == 0) {
+							if(delay&& hasComment){
+								itemStatus = 6;
+							}
+							else if(delay){
+								itemStatus = 7;
+							}
+							else if(hasComment){
+								itemStatus = 5;
+							}
+							else{
+								itemStatus = 2;
+							}
 						}
-						else if(hasComment){
-							itemStatus = 5;
+					} else {
+						if(delay){
+							itemStatus = 3;
 						}
 						else{
-							itemStatus = 2;
+							itemStatus = 8;
 						}
+						break;
 					}
-				} else {
-					if(delay){
-						itemStatus = 3;
-					}
-					else{
-						itemStatus = 8;
-					}
-					break;
 				}
+				if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
+					itemStatus=nullNum==listData.size()?0:4;
+				}
+				tempItem.setStatus(itemStatus);
+
 			}
-			if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
-				itemStatus=nullNum==listData.size()?0:4;
-			}
-			tempItem.setStatus(itemStatus);
 		}
 		return true;
 	}
