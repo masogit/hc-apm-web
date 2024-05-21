@@ -478,7 +478,7 @@ public class AssetImportDataCheckService {
                 }
             }
             // 资产分类校验
-            if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup()) {
                 if (ObjectUtil.isEmpty(assetImport.getAssetType())) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);

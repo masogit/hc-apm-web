@@ -290,12 +290,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     private List<String> generationAdjustment(List<ApprovalNode> approvalNodes,ApprovalNode approvalNode,String businessUid,int businessType) {
         List<String> uids = new ArrayList<>();
-        if(ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT != businessType) return uids;
+        if(!Arrays.asList(ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT,ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP).contains(businessType)) return uids;
         if(StringUtils.isNotEmpty(approvalNode.getApprovalStrategy())){
-            SharedAssetRequest request = sharedAssetRequestRepository.findById(businessUid);
-            String clinicalDeptUid = request.getClinicalDeptUid();
-            int roleId = roleDao.getIdByName(ApmSystemRole.DeptHead.name());
-            List<String> orgUidByRoleId = userRoleDao.findOrgUidByRoleId(clinicalDeptUid, roleId);
+            List<String> orgUidByRoleId =getUserListByBusinessType(approvalNode,businessUid,businessType);
             if(CollectionUtils.isNotEmpty(orgUidByRoleId)){
                 uids.addAll(orgUidByRoleId);
             }else{
@@ -308,6 +305,25 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }else{
             uids.addAll(approvalNode.getUserUids());
         }
+        return uids;
+    }
+    private List<String> getUserListByBusinessType(ApprovalNode approvalNode,String businessUid,int businessType){
+        List<String> uids = new ArrayList<>();
+        String clinicalDeptUid = null;
+        switch (businessType){
+            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+                SharedAssetRequest request = sharedAssetRequestRepository.findById(businessUid);
+                clinicalDeptUid = request.getClinicalDeptUid();
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                AssetScrap assetScrap = assetScrapDao.findById(businessUid);
+                clinicalDeptUid = assetScrap.getClinicalDeptUid();
+                break;
+            default:
+                return uids;
+        }
+        int roleId = roleDao.getIdByName(ApmSystemRole.DeptHead.name());
+        uids = userRoleDao.findOrgUidByRoleId(clinicalDeptUid, roleId);
         return uids;
     }
 
