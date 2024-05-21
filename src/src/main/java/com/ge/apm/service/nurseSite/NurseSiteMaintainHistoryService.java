@@ -92,6 +92,7 @@ public class NurseSiteMaintainHistoryService {
 	BlobObjectRepository blobObjectRepository;
 
 	private static final String STR_ASSET_NAME = "设备名";
+	private static final String CLINICAL_DEPT_NAME = "所属科室";
 	private static final String STR_ASSET_DEPTNUM = "设备编号";
 	private static final String STR_SERIAL_NUM = "制造商序列号";
 	private static final String STR_ASSET_FUNCTIONTYPE = "设备型号";
@@ -191,7 +192,7 @@ public class NurseSiteMaintainHistoryService {
 					tempItem.setModifyBy(getUserAccount(modifyByUid));
 				}
 				if (StringUtils.isNotEmpty(createByUid)) {
-					tempItem.setModifyBy(getUserAccount(createByUid));
+					tempItem.setCreateBy(getUserAccount(createByUid));
 				}
 				List<NurseSiteMaintainDataHistory> tempListData=mapData.get(tempItem.getId());
 				if(tempListData!=null){
@@ -439,7 +440,7 @@ public class NurseSiteMaintainHistoryService {
 		int sequenceRow = keyRow + 4;
 		int modifyByRow = keyRow + 5;
 		int rowIndex = 7;
-		int dataColumnIndex = 5;
+		int dataColumnIndex = 6;
 		if (mapAssetUidMaintainItem.size() > 0) {
 			Iterator<List<NurseSiteMaintainItemHistory>> it = mapAssetUidMaintainItem.values().iterator();
 			while (it.hasNext()) {
@@ -448,6 +449,8 @@ public class NurseSiteMaintainHistoryService {
 					columnIndex = 1;
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
+					headerColumnIndex = writeExcelSheetHeader(header, CLINICAL_DEPT_NAME, doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getClinicalDeptName());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow, false);
@@ -578,6 +581,7 @@ public class NurseSiteMaintainHistoryService {
 		writeExcelSheetHeader(header, STR_NURSESITEREPORT, doc, 1, keyRow, false);
 		int headerColumnIndex = 1;
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow + 1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, CLINICAL_DEPT_NAME, doc, headerColumnIndex, keyRow + 1, false);
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow + 1, false);
 		headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow + 1, false);
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow + 1, false);

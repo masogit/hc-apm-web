@@ -89,6 +89,18 @@
             <p:inputText id="pmOwnerTel" value="#{assetInfoDetailController.selected.pmOwnerTel}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'patrolInspectionOwnerName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerName}</label>
+            <p:inputText id="patrolInspectionOwnerName" value="#{assetInfoDetailController.selected.patrolInspectionOwnerName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'patrolInspectionOwnerTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.patrolInspectionOwnerTel}</label>
+            <p:inputText id="patrolInspectionOwnerTel" value="#{assetInfoDetailController.selected.patrolInspectionOwnerTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'siteUID')}">
         <h:panelGroup >
             <label class="label">#{msg.hospitalId}</label>

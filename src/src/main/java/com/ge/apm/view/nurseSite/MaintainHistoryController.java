@@ -132,6 +132,11 @@ public class MaintainHistoryController {
             ca.add(Calendar.MONTH, 1);
             end = ca.getTime();
         }
+        if(end!=null){
+            end.setHours(23);
+            end.setMinutes(59);
+            end.setSeconds(59);
+        }
         Map<String, Object> param = MapUtil.newHashMap();
         param.put("tenantUid", currentUser.getTenantUID());
         param.put("scheduleDateStart", start);

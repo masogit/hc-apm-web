@@ -851,6 +851,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             }else{
                 newServiceRequest.setCasePriority(casePriority);
             }
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Measurement.name());
 
             woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单

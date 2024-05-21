@@ -98,6 +98,9 @@ public class WorkOrderExportService {
 
         List<SearchFilter> searchFilters = new ArrayList<>();
 
+        if (v2WorkOrderReportDto.getTenantUid() != null) {
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getTenantUid()));
+        }
         if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 0) {
             SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(tenantFilter);
@@ -118,6 +121,8 @@ public class WorkOrderExportService {
         if (v2WorkOrderReportDto.getSelectedOrg() != null) {
             SearchFilter siteFilter = new SearchFilter("orgUID", SearchFilter.Operator.IN, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(siteFilter);
+        } else if (v2WorkOrderReportDto.getSiteUid() != null) {
+            searchFilters.add(new SearchFilter("orgUID", SearchFilter.Operator.IN, v2WorkOrderReportDto.getSiteUid()));
         }
 
         if (v2WorkOrderReportDto.getClinicalDept() != null) {

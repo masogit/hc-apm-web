@@ -1554,6 +1554,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        newServiceRequest.setSrRepairSource(RepairSourceEnum.Maintenance.name());
         if (selectedPmOrder != null) {
             selectedAsset = selectedPmOrder.getAssetInfo();
             currentStatus=3;
@@ -1593,7 +1594,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }else{
                 newServiceRequest.setCasePriority(casePriority);
             }
-
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Maintenance.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);

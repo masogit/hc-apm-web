@@ -65,7 +65,7 @@
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.repairReportSendPlaceRender()}">
+                        <h:panelGroup rendered="#{workOrderMgrController.repaFlag}">
                             <label class="label">#{msg.repairReportSendPlace}</label>
                             <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.repairReportSendPlace}" >
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

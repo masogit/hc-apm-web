@@ -247,6 +247,20 @@
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
                                         </p:panelGrid>
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="repairReportSendPlace">
+                                            <h:panelGroup >
+                                                <label class="label">#{msg.DisplayRepairReportSendPlace}</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.repairReportSendPlace.enable}" >
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <label class="label">#{msg.Default}</label>
+                                                <p:selectOneMenu value="#{groupItem.repairReportSendPlace.defaultValue}" >
+                                                    <f:selectItem   itemLabel="#{fieldMsg.fieldValue('repairReportSendPlace', 'ward')}" itemValue="ward"/>
+                                                    <f:selectItem   itemLabel="#{fieldMsg.fieldValue('repairReportSendPlace', 'non-ward')}" itemValue="non-ward"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
 
                                         <h:panelGroup style="float:right;padding-left: 5px">
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="#{msg.ShiftUp}"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}"/>
