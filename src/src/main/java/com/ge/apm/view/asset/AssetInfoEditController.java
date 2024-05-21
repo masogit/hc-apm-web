@@ -261,6 +261,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private boolean approval=false;
     private String applyReason;
     private String approvalReason;
+    private String equipmentDisposalMethod;
+    private String customDisposalMethod;
+
+    private boolean showCustomDisposalMethod;
+
     private String locationName;
     private UserAccount loginUser;
 
@@ -1426,7 +1431,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String applyAssetScrap(){
-        assetScrapService.apply(selected.getId(),applyReason,approvalReason);
+        if(StringUtils.isBlank(applyReason) ||  StringUtils.isBlank(approvalReason) ||  StringUtils.isBlank(equipmentDisposalMethod)   ){
+            WebUtil.addErrorMessage("必填项为空");
+        }else{
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason);
+        }
         return "AssetList?faces-redirect=true";
     }
 
@@ -2087,6 +2096,30 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setApprovalReason(String approvalReason) {
         this.approvalReason = approvalReason;
+    }
+
+
+    public String getEquipmentDisposalMethod() {
+        return equipmentDisposalMethod;
+    }
+
+    public void setEquipmentDisposalMethod(String equipmentDisposalMethod) {
+        this.equipmentDisposalMethod = equipmentDisposalMethod;
+    }
+
+    public String getCustomDisposalMethod() {
+        return customDisposalMethod;
+    }
+
+    public void setCustomDisposalMethod(String customDisposalMethod) {
+        this.customDisposalMethod = customDisposalMethod;
+    }
+    public boolean getShowCustomDisposalMethod() {
+        return showCustomDisposalMethod;
+    }
+
+    public void setShowCustomDisposalMethod(boolean customDisposalMethod) {
+        this.showCustomDisposalMethod = customDisposalMethod;
     }
 
     public String getLocationName() {
