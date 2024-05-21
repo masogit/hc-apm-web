@@ -1434,7 +1434,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(StringUtils.isBlank(applyReason) ||  StringUtils.isBlank(approvalReason) ||  StringUtils.isBlank(equipmentDisposalMethod)   ){
             WebUtil.addErrorMessage("必填项为空");
         }else{
-            assetScrapService.apply(selected.getId(),applyReason,approvalReason);
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod);
         }
         return "AssetList?faces-redirect=true";
     }
