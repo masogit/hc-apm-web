@@ -149,7 +149,13 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
     private Integer approvalStatus;  // 多级审批状态 0 审批中 1 审批通过，2 审批不通过
     @Column(name = "request_num")
     private String requestNum;
-
+    @Column(name="signature_id")
+    private String signatureId;
+    @Column(name="signatory")
+    private String signatory;
+    @Column(name="signature_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date signatureTime;
     @Transient
     @JsonProperty
     private List<V2_BlobObject> attachments;
@@ -598,5 +604,29 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
 
     public void setAttachments(List<V2_BlobObject> attachments) {
         this.attachments = attachments;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
+    }
+
+    public String getSignatory() {
+        return signatory;
+    }
+
+    public void setSignatory(String signatory) {
+        this.signatory = signatory;
+    }
+
+    public Date getSignatureTime() {
+        return signatureTime;
+    }
+
+    public void setSignatureTime(Date signatureTime) {
+        this.signatureTime = signatureTime;
     }
 }

@@ -1196,6 +1196,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,2);
             cancel();
         }

@@ -43,7 +43,7 @@ public enum  AllocateCustomConfigConstant  {
             return Arrays.asList("reclinicalDept","arrivalListAssetName","departNum","swapName","functionType",
                     "brand","chargingBeginTime","chargingEndTime","unitPrice","chargingType","rentalTime","totalAmount",
                     "compensationAmount","gratisDuration","gratisFee","discountPeriod","discount","discountTime","discountFee","cost",
-                    "status","swapIndex","precautions");
+                    "status","swapIndex","precautions","signatory","signatureTime","signatureId");
         }
     };
     public  LinkedHashMap<String,String> getAllAllocateFields(){return new LinkedHashMap<>();}

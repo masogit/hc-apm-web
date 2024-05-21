@@ -1668,7 +1668,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         String redirectUrl = applyChange();
         if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
             String token = UserContextService.getAccessToken();
-            wxMessageService.submitAssetApprovalSendMessage(selected,token);
+            wxMessageService.submitAssetApprovalSendMessage(selected,"待审核");
         }
         return redirectUrl;
     }

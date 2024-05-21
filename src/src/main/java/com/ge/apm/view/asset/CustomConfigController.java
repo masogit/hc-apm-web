@@ -28,6 +28,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbMessageSource;
 
@@ -124,6 +125,25 @@ public class CustomConfigController {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("enable", false);
                     obj.put("externalQuotation", jsonObject);
+                }
+            }
+        }
+        /**
+         * 增加显示报修发送地字段
+         */
+        JSONObject pageWorkOrderMobilePage = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder");
+        JSONArray group2 = pageWorkOrderMobilePage.getJSONArray("group");
+        for (int i = 0; i < group2.size(); i++) {
+            JSONObject obj = group2.getJSONObject(i);
+            if("orderFields".equals(obj.get("type"))){
+                JSONObject repairReportSendPlace = obj.getJSONObject("repairReportSendPlace");
+                if (repairReportSendPlace == null) {
+                    JSONObject jsonObject = new JSONObject();
+                    String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
+                    jsonObject.put("enable", StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue));
+                    jsonObject.put("defaultValue", "non-ward");
+                    jsonObject.put("required", true);
+                    obj.put("repairReportSendPlace", jsonObject);
                 }
             }
         }

@@ -286,6 +286,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ConfigItemValueRepository configItemValueRepository;
     @Getter @Setter
     private boolean viewIng = false;
+    @Getter @Setter
+    private boolean repaFlag = false;
     @Override
     protected void init() {
         try {
@@ -1881,6 +1883,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             newServiceRequest.setRequestReason(requestReason.toString());
         }
 
+        Object repairReportSendPlaceFlag =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlaceFlag != null){
+            repaFlag= Boolean.valueOf(repairReportSendPlaceFlag.toString());
+        }
+        Object repairReportSendPlace=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.defaultValue[0]");
+
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
@@ -1890,6 +1898,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
         newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestTime(new Date());
+        if(repairReportSendPlace != null){
+            newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
+        }
         if(selectedAsset != null && userContextService.isCountyArea()){
             OrgInfo orgInfo = cacheService.findOrgByUid(selectedAsset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
@@ -1974,6 +1985,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                             blobObject.setId(null);
                         }
                     }
+                    newServiceRequest.setSrRepairSource(RepairSourceEnum.Measurement.name());
+
                     woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
 
                 }
@@ -2033,6 +2046,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
             cancel();
         }
@@ -2077,6 +2091,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
+            newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
+
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,2);
             cancel();
         }
@@ -2257,8 +2273,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
-        accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        itemDetail = detailDao.findById(itemId);
+//        accessoryList = woService.getWorkOrderDetails(woId);//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+//        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
 
         supplierName=itemDetail.getSupplier();
@@ -2346,7 +2363,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         saveItem();
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
-            BeanUtils.copyProperties(vwd,itemDetail);;
+            BeanUtils.copyProperties(itemDetail,vwd);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2362,6 +2379,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         vwd.setComment(null);
         vwd.setPartsType(null);
         selectedObjectMap = new HashMap();
+        partsItem = null;
         itemDetail= vwd;
         itemDetail.setPartUseType(null);
         itemDetail.setPartsDescription(null);
@@ -3891,8 +3909,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 控制报修发送地的显示隐藏
      */
     public boolean repairReportSendPlaceRender(){
-        String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
-        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);
+       /* String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
+        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);*/
+        //从配置信息获取紧急程度
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
+        //从配置信息获取当前状态
+        Object repairReportSendPlace =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlace == null){
+            return false;
+        }
+
+        return Boolean.valueOf(repairReportSendPlace.toString());
     }
 }
 
