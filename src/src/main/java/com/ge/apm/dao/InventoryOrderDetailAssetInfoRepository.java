@@ -32,6 +32,7 @@ public interface InventoryOrderDetailAssetInfoRepository extends GenericReposito
     Date findLastInventoryDateByAssetId(Integer assetId);
 
     @Modifying
+    @Transactional
     @Query(value = "update inventory_order_detail set is_last = false where is_last = true and asset_id in (?1)", nativeQuery = true)
     void updateIsLastByAssetIds(List<Integer> newArrayList);
 }
