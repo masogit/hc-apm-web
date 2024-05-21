@@ -667,7 +667,7 @@ public class AssetFileImportBaseService {
         }
 
         // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(newAsset.getAssetType())) {
+        if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
             if (assetTypeGroupList.isEmpty()) {
                 item.put("assetType", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 资产分类为空！");
@@ -1020,7 +1020,7 @@ public class AssetFileImportBaseService {
         }
 
         // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(newAsset.getAssetType())) {
+        if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
             if (assetTypeGroupList.isEmpty()) {
                 importData.setImportStatus(ImportStatus.Failure);
                 AssetRow.addErrMessage(importData, "错误: 资产分类为空！");
@@ -1391,7 +1391,7 @@ public class AssetFileImportBaseService {
                 }
             }
             // 资产分类校验
-            if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup()) {
                 if (ObjectUtil.isEmpty(newAsset.getAssetType())) {
                     item.put("status", ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);
