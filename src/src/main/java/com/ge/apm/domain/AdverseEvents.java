@@ -571,6 +571,9 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
     @LastModifiedDate
     private Date lastModifiedDate = new Date();
 
+    @Column(name="create_user_uid")
+    private String createUserUID;
+
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
 

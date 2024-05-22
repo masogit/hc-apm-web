@@ -85,7 +85,7 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                             <h:panelGrid>
-                                <p:commandButton value="搜索设备" action="#{adverseEventManagementController.assetList()}" update="dataList AdverseEventCreateForm" validateClient="true"  style="float:left" disabled="#{not empty adverseEventManagementController.selected.woId}" />
+                                <p:commandButton value="搜索设备" action="#{adverseEventManagementController.assetList()}" update="dataList AdverseEventCreateForm" validateClient="true"  style="float:left" disabled="#{adverseEventManagementController.selected.adverseEventType eq '2'}" />
                             </h:panelGrid>
                             <p:panelGrid columns="1" >
                                 <p:dataTable id="dataList" class="dataList" value="#{adverseEventManagementController.assets}" selectionMode="single" var="item"
