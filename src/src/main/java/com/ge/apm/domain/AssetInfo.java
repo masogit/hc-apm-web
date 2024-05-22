@@ -2900,6 +2900,7 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
         reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
         reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
+        reqDetail.put("remark", this.getSharedAssetReqDetail().getRemark());
         return reqDetail;
     }
 

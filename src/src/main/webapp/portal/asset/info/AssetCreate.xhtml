@@ -552,19 +552,38 @@
         </p:dialog>
 
 
-        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="300" width="500" header="报废申请">
+        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="500" width="500" header="报废申请">
             <h:form id="nodeForm" >
-                <h:panelGroup>
-                    <label class="label">申请理由</label>
-                    <p:inputTextarea placeholder="报废申请*" value="#{assetInfoEditController.applyReason}" maxlength="256" />
-                    <p:outputLabel value="#{assetInfoEditController.applyReason}" />
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">鉴定理由</label>
-                    <p:inputTextarea placeholder="申请通过*" value="#{assetInfoEditController.approvalReason}" maxlength="256" />
-                    <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
-                </h:panelGroup>
-                <br/>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">申请理由*</label>
+                        <p:inputTextarea placeholder="报废申请*" required="true" value="#{assetInfoEditController.applyReason}" maxlength="256" />
+                        <p:outputLabel value="#{assetInfoEditController.applyReason}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">鉴定理由*</label>
+                        <p:inputTextarea placeholder="鉴定理由*" required="true" value="#{assetInfoEditController.approvalReason}" maxlength="256" />
+                        <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">处置方式*</label>
+                        <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" requiredMessage="#{msg.equipmentDisposalMethod} #{msg.ValidationRequire}}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('equipmentDisposalMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax event="itemSelect"  update="nodeForm:customDisposalMethod"/>
+
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="customDisposalMethod">
+                        <h:panelGroup  rendered="#{assetInfoEditController.equipmentDisposalMethod eq '0'}" >
+                            <label class="label">自定义处置方式</label>
+                            <p:inputTextarea placeholder="自定义处置方式" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256" />
+                            <p:outputLabel value="#{assetInfoEditController.customDisposalMethod}" />
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </p:panelGrid>
+
                 <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.applyAssetScrap()}" value="确定"  icon="ui-icon-check"  oncomplete="PF('scrapapply').hide()"/>
                 <p:commandButton  validateClient="true" immediate="false"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
             </h:form>
