@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.metadata.Cell;
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.read.listener.ReadListener;
@@ -15,9 +16,7 @@ import com.ge.apm.domain.dto.AssetImport;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.web.WebUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AssetImportHandel implements ReadListener<AssetImport> {
     private List<AssetImport> importData;
@@ -52,6 +51,9 @@ public class AssetImportHandel implements ReadListener<AssetImport> {
     @Override
     public void invoke(AssetImport assetImport, AnalysisContext analysisContext) {
         assetImport.setRowNum(rowNum++);
+        Map<Integer, Cell> cellMap = analysisContext.readRowHolder().getCellMap();
+        dataFormatErrorHandel(cellMap, assetImport);
+        deletedFieldHandel(cellMap, assetImport);
         if (StringUtils.isNotEmpty(assetImport.getUid())) {
             assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.Exist);
         } else {
@@ -65,6 +67,33 @@ public class AssetImportHandel implements ReadListener<AssetImport> {
     @Override
     public void doAfterAllAnalysed(AnalysisContext analysisContext) {
 
+    }
+
+    public void dataFormatErrorHandel(Map<Integer, Cell> cellMap, AssetImport assetImport) {
+        if (Objects.nonNull(cellMap) && Objects.nonNull(cellMap.get(ApmEasyExcelConvert.ERROR_MSG_INDEX))) {
+            Cell cell = cellMap.get(ApmEasyExcelConvert.ERROR_MSG_INDEX);
+            if (cell instanceof ReadCellData) {
+                ReadCellData readCellData = (ReadCellData) cell;
+                String errorStr = readCellData.getStringValue();
+                if (StringUtils.isNotEmpty(errorStr)) {
+                    assetImport.setErrMsg(Arrays.asList(errorStr.split(";")));
+                }
+            }
+
+        }
+    }
+
+    public void deletedFieldHandel(Map<Integer, Cell> cellMap, AssetImport assetImport) {
+        if (Objects.nonNull(cellMap) && Objects.nonNull(cellMap.get(ApmEasyExcelConvert.DELETE_FIELD_INDEX))) {
+            Cell cell = cellMap.get(ApmEasyExcelConvert.DELETE_FIELD_INDEX);
+            if (cell instanceof ReadCellData) {
+                ReadCellData readCellData = (ReadCellData) cell;
+                String errorStr = readCellData.getStringValue();
+                if (StringUtils.isNotEmpty(errorStr)) {
+                    assetImport.setDeletedField(Arrays.asList(errorStr.split(";")));
+                }
+            }
+        }
     }
 
     @Override

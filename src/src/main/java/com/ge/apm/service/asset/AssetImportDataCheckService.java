@@ -12,7 +12,6 @@ import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -206,7 +205,9 @@ public class AssetImportDataCheckService {
             } else {
                 markDefautValue(assetImport, selectedOrgToImport, isNeedAudit);
             }
-
+            if (CollectionUtils.isNotEmpty(assetImport.getErrMsg())) {
+                result.put("canBeImport", Boolean.FALSE);
+            }
             if (null == assetImport.getAssetGroup()) {
                 assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                 result.put("canBeImport", Boolean.FALSE);
@@ -516,7 +517,6 @@ public class AssetImportDataCheckService {
         if (workflowConfig != null) {
             assetCodeConfig = workflowConfig.getAssetCodeConfig();
         }
-
         isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
 
     }
@@ -813,16 +813,19 @@ public class AssetImportDataCheckService {
         final BeanWrapper src = new BeanWrapperImpl(assetImport);
         PropertyDescriptor[] pds = src.getPropertyDescriptors();
         Set<String> nullProperty = new HashSet<>();
+        AssetImport assetImport1 = (AssetImport) assetImport;
+        List<String> deletedFiled = assetImport1.getDeletedField();
         for (PropertyDescriptor item : pds) {
             Object value = src.getPropertyValue(item.getName());
-            if (value == null) {
+            if (value == null && !deletedFiled.contains(item.getName())) {
                 nullProperty.add(item.getName());
             }
         }
         String[] properties = new String[nullProperty.size()];
         return nullProperty.toArray(properties);
     }
-    public void orgCheck(List<Map<String, Object>> importOrgMap){
+
+    public void orgCheck(List<Map<String, Object>> importOrgMap) {
         if (!crossSite) {
             //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
             importOrgMap.forEach(item -> {
