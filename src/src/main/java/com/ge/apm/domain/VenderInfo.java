@@ -23,7 +23,7 @@ public class VenderInfo implements Serializable {
 
 
     public enum BidType {
-        Vender,Company
+        Vender,Company,Supplier
     }
     //投标人类型预供应商和招标公司
     @Column(name = "bid_Type")
@@ -61,6 +61,17 @@ public class VenderInfo implements Serializable {
     //负责人
     @Column(name = "company_contacts")
     private String companyContacts;
+
+    //是否为管理员
+    @Column(name = "is_admin")
+    private Boolean isAdmin;
+
+    @Column(name = "vender_company_id")
+    private String venderCompanyId;
+
+    @ManyToOne
+    @JoinColumn(name = "vender_company_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), insertable = false, updatable = false)
+    private VenderCompany venderCompany;
 
     @Transient
     private String promptText;
@@ -188,6 +199,30 @@ public class VenderInfo implements Serializable {
 
     public void setVenderContacts(String venderContacts) {
         this.venderContacts = venderContacts;
+    }
+
+    public Boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public String getVenderCompanyId() {
+        return venderCompanyId;
+    }
+
+    public void setVenderCompanyId(String venderCompanyId) {
+        this.venderCompanyId = venderCompanyId;
+    }
+
+    public VenderCompany getVenderCompany() {
+        return venderCompany;
+    }
+
+    public void setVenderCompany(VenderCompany venderCompany) {
+        this.venderCompany = venderCompany;
     }
 
     @Override
