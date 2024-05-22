@@ -10,13 +10,16 @@
             </div>
 
             <div class="ui-g-12">
-                <p:tabView id="supplierTab" class="ui-g-12">
+                <p:tabView id="supplierTab" class="ui-g-12" activeIndex="0" dynamic="true" cache="true">
                     <p:ajax event="tabChange" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                     <p:tab title="#{msg.Supplier}" id="supplierList" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
                         <ui:include src="List.xhtml"/>
                     </p:tab>
                     <p:tab title="供应商导入" id="supplierImport" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
                         <ui:include src="import.xhtml"/>
+                    </p:tab>
+                    <p:tab title="供应商关联" id="supplierRelation" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
+                        <ui:include src="relation.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>
