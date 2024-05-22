@@ -14,6 +14,8 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.AssetImportDateConvert;
+import com.ge.apm.service.utils.AssetImportStringConvert;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -177,7 +179,13 @@ public class AssetFileImportController {
             displayAssetsNew = new ArrayList<>();
             uploadProgress = new Progress();
             LocalDateTime startTime = LocalDateTime.now();
-            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress)).autoCloseStream(true).sheet(0).doRead();
+            EasyExcel.read(file.getInputstream(), AssetImport.class, new AssetImportHandel(displayAssetsNew, crossSite, assetImportDataCheckService, importOrgMap, unCheckNurseSiteMaintainList, selectedOrg, orgDao, uploadProgress))
+                    .registerConverter(new AssetImportDoubleConverter())
+                    .registerConverter(new AssetImportIntegerConverter())
+                    .registerConverter(new AssetImportDateConvert())
+                    .registerConverter(new AssetImportBooleanConvert())
+                    .registerConverter(new AssetImportStringConvert())
+                    .autoCloseStream(true).sheet(0).doRead();
             logger.info("found asset record count: {}", displayAssetsNew.size());
             LocalDateTime endTime = LocalDateTime.now();
             Duration duration = Duration.between(startTime, endTime);
