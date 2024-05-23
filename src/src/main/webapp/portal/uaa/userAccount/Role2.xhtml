@@ -111,11 +111,10 @@
 <!--                        </p:tab>-->
                     </p:tabView>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display2,:userAccountTab, :userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog2');"/>
+                    <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="PF('RoleEditDialog2').hide()"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('RoleEditDialog2').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
     </ui:composition>
 </html>
