@@ -2491,10 +2491,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                         BASE64Decoder decoder = new BASE64Decoder();
                         byte[] decode = decoder.decodeBuffer(base64);
                         blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
-                        blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-                        blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-                        blobObject.setBoUuid(selected.getId());
-                        blobService.saveBlobObject(blobObject);
                         if(blobObject != null){
                             String objectStorageId = blobObject.getObjectStorageId();
                             selected.setSignatureId(objectStorageId);
