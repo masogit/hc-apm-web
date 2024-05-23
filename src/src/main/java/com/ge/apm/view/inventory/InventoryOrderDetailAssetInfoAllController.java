@@ -110,11 +110,19 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             param.put("queryAssetUid", queryAssetUid);
             searchFilters.add(new SearchFilter("queryAssetUid", SearchFilter.Operator.EQ, queryAssetUid));
         }
-        inventoryOrderService.covQueryCondition(searchFilters, param);
         List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-        Long count = inventoryOrderMapper.findJoinAssetCount(param);
-        List<InventoryOrderDetail> resultList = joinAssetList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-        return new PageImpl<>(resultList, pageRequest, count);
+        joinAssetList = inventoryOrderService.covQueryCondition(searchFilters, joinAssetList);
+        Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
+        List<Map<String, Object>> mapList = ListUtil.newArrayList();
+        Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+        Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+        Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+        Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+        Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+        Page<Map<String, Object>> page = pageUtil.pageNum(mapList, pageRequest);
+//        Long count = inventoryOrderMapper.findJoinAssetCount(param);
+        List<InventoryOrderDetail> resultList = page.getContent().stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+        return new PageImpl<>(resultList, pageRequest, mapList.size());
     }
 
     public String  getUserName(String loginName){
