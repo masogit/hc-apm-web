@@ -140,23 +140,28 @@ public class WxMessageService extends MicroServiceInvoker {
     private ConfigItemValueRepository configItemValueRepository;
 
     public  void submitAssetApprovalSendMessage(AssetInfo assetInfo,String status) {
-        String value = configItemValueRepository.findByKeyAndSiteForUseParent(assetInfo.getSiteUID(),assetInfo.getHospitalUID(),assetInfo.getInstitutionUID(),assetInfo.getTenantUID(),"assetReviewMessage");
-        if(Boolean.FALSE.toString().equalsIgnoreCase(value)){
-            return;
+        try {
+            String value = configItemValueRepository.findByKeyAndSiteForUseParent(assetInfo.getSiteUID(),assetInfo.getHospitalUID(),assetInfo.getInstitutionUID(),assetInfo.getTenantUID(),"assetReviewMessage");
+            if(Boolean.FALSE.toString().equalsIgnoreCase(value)){
+                return;
+            }
+            List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
+            List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
+            Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
+            List<UserAccount> resultUser = userAccounts2.stream().filter(item -> uids.contains(item.getId())).distinct().collect(Collectors.toList());
+            logger.info("submitApprovalSendMessage users:{}",JSON.toJSONString(resultUser));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dateString = simpleDateFormat.format(assetInfo.getCreatedDate());
+            HashMap<String, String> params = new HashMap<>();
+            params.put("businessType","资产入库审核");
+            params.put("status", status);
+            params.put("date", dateString);
+            List<String> sendUids = resultUser.stream().distinct().map(UserAccount::getUid).collect(Collectors.toList());
+            sendWxMsgToMq(params,null,MSGEvent.ASSET_AUDIT,sendUids,null);
+        }catch (Exception e){
+            logger.error("submitAssetApprovalSendMessage error e:",e);
         }
-        List<UserAccount> userAccounts = acService.getAssetApprovalUser(assetInfo.getSiteUID());
-        List<UserAccount> userAccounts2=userAccountRepository.findByClinicalDeptUID(assetInfo.getClinicalDeptUID());
-        Set<Integer> uids = userAccounts.stream().map(UserAccount::getId).collect(Collectors.toSet());
-        List<UserAccount> resultUser = userAccounts2.stream().filter(item -> uids.contains(item.getId())).distinct().collect(Collectors.toList());
-        logger.info("submitApprovalSendMessage users:{}",JSON.toJSONString(resultUser));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = simpleDateFormat.format(assetInfo.getCreatedDate());
-        HashMap<String, String> params = new HashMap<>();
-        params.put("businessType","资产入库审核");
-        params.put("status", status);
-        params.put("date", dateString);
-        List<String> sendUids = resultUser.stream().distinct().map(UserAccount::getUid).collect(Collectors.toList());
-        sendWxMsgToMq(params,null,MSGEvent.ASSET_AUDIT,sendUids,null);
+
     }
 
     public void sendWxMsgToMq(Map<String, String> eventParams , String link, MSGEvent event, List<String> userUIds, List<Integer> userIds) {
