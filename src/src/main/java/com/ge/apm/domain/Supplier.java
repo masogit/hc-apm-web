@@ -112,6 +112,13 @@ public class Supplier implements Serializable, ChineseName {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
+    @Size(max = 32)
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "vender_company_id")
+    private String venderCompanyId;
+
     //供应商资质
     //供应商编码
     @Column(name = "supplier_code")
@@ -392,6 +399,22 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getVenderCompanyId() {
+        return venderCompanyId;
+    }
+
+    public void setVenderCompanyId(String venderCompanyId) {
+        this.venderCompanyId = venderCompanyId;
     }
 
     public String getEmail() {

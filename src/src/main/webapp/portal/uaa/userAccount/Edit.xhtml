@@ -119,7 +119,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true"  actionListener="#{userAccountController.save}" value="#{msg.Save}" update="userAccountTab:UserAccountListForm, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAccountEditDialog');"/>
+                    <p:commandButton validateClient="true"  actionListener="#{userAccountController.save}" value="#{msg.Save}" update="userAccountTab:UserAccountListForm, :growl" icon="ui-icon-check" oncomplete="PF('UserAccountEditDialog').hide()"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('UserAccountEditDialog').hide()"/>
                 </h:panelGroup>
