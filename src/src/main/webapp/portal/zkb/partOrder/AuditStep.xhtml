@@ -1440,7 +1440,7 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
-                            <p:fileUpload allowTypes="/(\.|\/)(pdf|jpeg|jpg|png|PDF|JPEG|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleCloseFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                            <p:fileUpload allowTypes="/(\.|\/)(pdf|jpg|PDF|JPG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleCloseFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                           multiple="true"  sizeLimit="100000000"  update="closeFileList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
                         </h:panelGroup>
