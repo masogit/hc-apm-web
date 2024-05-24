@@ -42,7 +42,7 @@
                     <p:dataTable id="adverseEventsList" value="#{adverseEventManagementController.lazyModel}"
                                  var="item" widgetVar="varDataList" lazy="true"
                                  selectionMode="single" scrollable="false" selection="#{adverseEventManagementController.selected}"
-                                 rowKey="#{item.id}"
+                                 rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.workOrderNum}"
                                  paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
