@@ -384,23 +384,23 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         boolean isValid = true;
         if(selected.getEventDiscoverDate().getTime() < selected.getEventOccurredDate().getTime()){
             isValid = false;
-            WebUtil.addErrorMessage("发现或获知日期不得早于事件发生日期！");
+            MessageUtil.outPutReturnFacesMessage("发现或获知日期不得早于事件发生日期！", FacesMessage.SEVERITY_ERROR);
         }
         if(selected.getDeviceUsedDate().getTime() > selected.getEventOccurredDate().getTime()){
             isValid = false;
-            WebUtil.addErrorMessage("器械使用日期不得晚于事件发生日期！");
+            MessageUtil.outPutReturnFacesMessage("器械使用日期不得晚于事件发生日期！", FacesMessage.SEVERITY_ERROR);
         }
         return isValid;
     }
 
     public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
-        if(!checkSave()){
-            return;
-        }
         if (status == 0) {
             selected.setStatus(0);
             readOnlyCreateForm = false;
             renderedSearchForm = true;
+            return;
+        }
+        if(status != 1 &&!checkSave()){
             return;
         }
         Integer oldStatus = selected.getStatus();
