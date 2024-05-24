@@ -525,7 +525,6 @@
                                 <h:panelGroup>
                                     <label class="label">维修机构<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.maintenanceOrganization}" id="maintenanceOrganization" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="维修机构不能为空">
-                                        <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:maintenanceOrganizationInfoGroup" />
                                         <f:selectItem itemValue="1"/>
                                         <f:selectItem itemValue="2" />
                                         <f:selectItem itemValue="3" />
@@ -542,36 +541,25 @@
                                         <p:radioButton for="maintenanceOrganization" itemIndex="2"/>
                                         <h:outputLabel value="其他（请描述）" styleClass="radiolabelPF"/>
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3'}">
+                                        <label class="label">机构名称或描述<span style="color:red">*</span></label>
+                                        <p:inputText value="#{adverseEventApproveController.selected.maintenanceOrganizationInfo}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? true : false}" requiredMessage="机构名称或描述不能为空"/>
+                                    </h:panelGroup>
                                 </h:panelGroup>
-                                <h:panelGroup id="maintenanceOrganizationInfoGroup">
-                                    <label class="label">机构名称或描述<span style="color:red">#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? '*' : ''}</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.maintenanceOrganizationInfo}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? true : false}" requiredMessage="机构名称或描述不能为空"/>
-                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <label class="label">故障处理方式<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.processingMode}" id="processingMode" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="故障处理方式不能为空" >
-                                        <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:processingModeInfoGroup" />
-                                        <f:selectItem itemValue="1"/>
-                                        <f:selectItem itemValue="2" />
-                                        <f:selectItem itemValue="3" />
+                                        <f:selectItem itemValue="1" itemLabel="硬件维修或更换"/>
+                                        <f:selectItem itemValue="2" itemLabel="软件升级"/>
+                                        <f:selectItem itemValue="3" itemLabel="其他（请描述）"/>
                                     </p:selectOneRadio>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="0"/>
-                                        <h:outputLabel value="硬件维修或更换" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="1"/>
-                                        <h:outputLabel value="软件升级" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="2"/>
-                                        <h:outputLabel value="其他（请描述）" styleClass="radiolabelPF"/>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.selected.processingMode eq '3'}">
+                                        <label class="label">故障处理方式描述<span style="color:red">*</span></label>
+                                        <p:inputText value="#{adverseEventApproveController.selected.processingModeInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}" />
                                     </h:panelGroup>
                                 </h:panelGroup>
-                                <h:panelGroup id="processingModeInfoGroup">
-                                    <label class="label">故障处理方式描述<span style="color:red">#{adverseEventApproveController.selected.processingMode eq '3' ? '*' : ''}</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.processingModeInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.processingMode eq '3' ? true : false}" requiredMessage="故障处理方式描述不能为空"/>
-                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <label class="label">使用次数</label>
                                     <p:spinner id="useCnt" value="#{adverseEventApproveController.selected.useCnt}" min="0" max="10000000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
