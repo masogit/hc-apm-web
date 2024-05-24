@@ -651,6 +651,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 潜在风险（可能导致的临床风险）
      */
     @Column(name = "potential_risks")
+    @Size(max=2000)
     private String potentialRisks;
 
     /**
