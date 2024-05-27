@@ -567,7 +567,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">处置方式*</label>
+                        <label class="label">处置方式</label>
                         <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" requiredMessage="#{msg.equipmentDisposalMethod} #{msg.ValidationRequire}}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('equipmentDisposalMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
