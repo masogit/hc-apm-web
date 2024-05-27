@@ -414,7 +414,14 @@
                         <p:tab title="事件原因初步分析与处置">
                             <h:panelGroup>
                                 <label class="label">事件原因分析<span style="color:red">*</span></label>
-                                <p:selectOneRadio value="#{adverseEventApproveController.selected.eventCauseAnalyze}" required="true" requiredMessage="事件原因分析必填" id="eventCauseAnalyze" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" >
+                                <p:selectManyCheckbox  value="#{adverseEventApproveController.selectedOptions}" widgetVar="blub"  required="true" requiredMessage="事件原因分析不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"
+                                                       layout="lineDirection" columns="1" styleClass="grid-checkbox"  >
+                                    <f:selectItem itemLabel="产品原因（包括说明书等）" itemValue="1" />
+                                    <f:selectItem itemLabel="操作原因" itemValue="2" />
+                                    <f:selectItem itemLabel="患者自身原因" itemValue="3" />
+                                    <f:selectItem itemLabel="无法确定" itemValue="4" />
+                                </p:selectManyCheckbox>
+                               <!-- <p:selectOneRadio value="#{adverseEventApproveController.selected.eventCauseAnalyze}" required="true" requiredMessage="事件原因分析必填" id="eventCauseAnalyze" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" >
                                     <f:selectItem itemValue="1"/>
                                     <f:selectItem itemValue="2" />
                                     <f:selectItem itemValue="3" />
@@ -435,7 +442,7 @@
                                 <h:panelGroup>
                                     <p:radioButton for="eventCauseAnalyze" itemIndex="3"/>
                                     <h:outputLabel value="无法确定" styleClass="radiolabelPF"/>
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">事件原因分析描述</label>
@@ -698,6 +705,15 @@
                             <p:commandButton value="返回" icon="ui-icon-cancel" action="adverseEventApproveList.xhtml?faces-redirect=true" immediate="true" style="float:left"/>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <style>
+                        /*.ui-selectmanycheckbox.ui-widget td, .ui-selectoneradio.ui-widget label, .ui-selectoneradio.ui-widget td {
+                            color: red;
+                        }*/
+                        .ui-selectmanycheckbox .ui-chkbox {
+                            width: 5%!important;
+                            padding-right: 8px;
+                        }
+                    </style>
                 </h:form>
             </div>
             <p:dialog modal="true" id="returnReasonDisable" widgetVar="returnReasonDisable" header="退回" appendTo="@(body)">

@@ -12,6 +12,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
@@ -88,6 +89,9 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     @Getter@Setter
     private StreamedContent exportPdf;
 
+    @Getter@Setter
+    private String[] selectedOptions;
+
     @Override
     protected void init() {
         /*接口类*/
@@ -122,6 +126,10 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
             }
             //设备类型赋值
             assetType = selected.getDevicesClass() == null ? 1 : selected.getDevicesClass();
+            //事件原因分析由字符串转为数组
+            if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
+                selectedOptions = selected.getEventCauseAnalyze().split(",");
+            }
         }
     }
 
