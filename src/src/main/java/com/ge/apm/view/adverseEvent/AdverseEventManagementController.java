@@ -418,7 +418,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
         //事件原因分析由数组转为字符串（可编辑状态下）
         if(status == 0 || status == 1 || status == 2){
-            if(selectedOptions.length > 0){
+            if(selectedOptions != null && selectedOptions.length > 0){
                 String str4 = org.apache.commons.lang.StringUtils.join(selectedOptions, ",");
                 selected.setEventCauseAnalyze(str4);
             }
