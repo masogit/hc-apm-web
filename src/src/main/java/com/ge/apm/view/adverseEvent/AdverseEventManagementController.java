@@ -21,6 +21,7 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -121,6 +122,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private String queryStr = "";
     @Getter@Setter
     private StreamedContent exportPdf;
+    @Getter@Setter
+    private String[] selectedOptions;
+
 
     @Override
     protected void init() {
@@ -173,6 +177,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             }
             //设备类型赋值
             assetType = selected.getDevicesClass() == null ? 1 : selected.getDevicesClass();
+            //事件原因分析由字符串转为数组
+            if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
+                selectedOptions = selected.getEventCauseAnalyze().split(",");
+            }
         }
     }
 
@@ -407,6 +415,15 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         processFile();
         selected.setStatus(status);
         selected.setDevicesClass(assetType);
+
+        //事件原因分析由数组转为字符串（可编辑状态下）
+        if(status == 0 || status == 1 || status == 2){
+            if(selectedOptions.length > 0){
+                String str4 = org.apache.commons.lang.StringUtils.join(selectedOptions, ",");
+                selected.setEventCauseAnalyze(str4);
+            }
+        }
+
         try {
             AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
             if (!ObjectUtils.isEmpty(result)) {
