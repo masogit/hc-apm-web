@@ -219,6 +219,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
                      BeanUtils.copyProperties(dto,order);
                      SecondmentOrderAssetController.generateProcessRecords(order,userAccount.getUid(),userAccount.getName(),"归还",null,null);
                      secondmentOrderRepository.save(order);
+                     sharedAssetService.asynRemoteCall(GatewayURL.SECONDMENT_REMINDER_TO_RETURN, HttpMethod.POST,new HashMap<>(),(url)-> url.replace("{orderId}",dto.getId()));
                      assetInfoRepository.save(assetInfo);
                      saveAssetHistory(assetInfo,"科室调剂更新设备使用科室");
                  break;
