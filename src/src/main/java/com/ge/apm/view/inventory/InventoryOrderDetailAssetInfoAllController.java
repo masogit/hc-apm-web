@@ -108,8 +108,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             param.put("queryAssetUid", queryAssetUid);
             searchFilters.add(new SearchFilter("queryAssetUid", SearchFilter.Operator.EQ, queryAssetUid));
         }
+        inventoryOrderService.covQueryCondition(searchFilters, param);
         List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-        joinAssetList = inventoryOrderService.covQueryCondition(searchFilters, joinAssetList);
         Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
         List<Map<String, Object>> mapList = ListUtil.newArrayList();
         Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
