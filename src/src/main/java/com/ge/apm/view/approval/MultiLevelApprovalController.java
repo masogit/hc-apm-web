@@ -437,17 +437,17 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public boolean handValidateData(PurchaseOrderInfo purchaseOrderInfo){
         boolean validateArg = true;
-        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEngineerOpinion())){
+       /* if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEngineerOpinion())){
             WebUtil.addWarnMessage("专业工程师意见不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             validateArg = false;
-        }
+        }*/
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingExistingBrands())){
             WebUtil.addWarnMessage("医院现有品牌不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             validateArg = false;
         }
-        if(StringUtils.isBlank(purchaseOrderInfo.getMeetingFeeItems())){
+       /* if(StringUtils.isBlank(purchaseOrderInfo.getMeetingFeeItems())){
             WebUtil.addWarnMessage("收费项目不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             validateArg = false;
@@ -456,7 +456,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("耗材或试剂说明不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             validateArg = false;
-        }
+        }*/
         if(StringUtils.isBlank(purchaseOrderInfo.getMeetingEquipmentDeptOpin())){
             WebUtil.addWarnMessage("器械科审核意见不可为空！");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
