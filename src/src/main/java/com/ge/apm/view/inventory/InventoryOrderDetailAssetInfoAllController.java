@@ -120,9 +120,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
         Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
         Page<Map<String, Object>> page = pageUtil.pageNum(mapList, pageRequest);
-//        Long count = inventoryOrderMapper.findJoinAssetCount(param);
+        Long count = inventoryOrderMapper.findJoinAssetCount(param);
         List<InventoryOrderDetail> resultList = page.getContent().stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-        return new PageImpl<>(resultList, pageRequest, mapList.size());
+        return new PageImpl<>(resultList, pageRequest, count);
     }
 
     public String  getUserName(String loginName){
