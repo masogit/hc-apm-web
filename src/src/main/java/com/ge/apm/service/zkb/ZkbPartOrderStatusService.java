@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -927,6 +928,94 @@ public class ZkbPartOrderStatusService {
         return "";
     }
 
+    public boolean checkComplete(ZkbPartOrder selected, List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList, List<V2_BlobObject> closeBlobObjectList, ZkbPartOrderCloseInfo zkbPartOrderCloseInfo){
+        boolean r = true;
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getUdi())){
+            WebUtil.addErrorMessage("设备UDI不能为空！",  "");
+            r = false;
+        }
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getSafetyConcern())){
+            WebUtil.addErrorMessage("该故障是否会导致实际！",  "");
+            r = false;
+        }
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientUse())){
+            WebUtil.addErrorMessage("故障发生时是否有病人在使用机器不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getProcedureType() == null){
+            WebUtil.addErrorMessage("事件发生的时间不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getQualityContactPerson() == null){
+            WebUtil.addErrorMessage("质量联系人不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getQualityContactPhone() == null){
+            WebUtil.addErrorMessage("质量联系人电话不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getAllegedPatientConsequence() == null){
+            WebUtil.addErrorMessage("病人结果不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getInterventionRequired() == null){
+            WebUtil.addErrorMessage("需要的干涉不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getAdditionalDetails() == null){
+            WebUtil.addErrorMessage("额外的信息不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getProblemReason() == null){
+            WebUtil.addErrorMessage("工程师服务原因不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getActionContent() == null){
+            WebUtil.addErrorMessage("工程师服务内容不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getTestResult() == null){
+            WebUtil.addErrorMessage("工程师服务结果为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseWorkTimeList == null || zkbPartOrderCloseWorkTimeList.size() == 0){
+            WebUtil.addErrorMessage("工作&差旅时间不能为空!","");
+            r = false;
+        }else{
+            boolean f = false;
+            String errorMsg = "";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+            for(ZkbPartOrderCloseWorkTime t : zkbPartOrderCloseWorkTimeList){
+                if("Phone Support".equals(t.getDateType())){
+                    f = true;
+                }else if("onsite".equals(t.getDateType())){
+                    f = true;
+                }
+                if(t.getStartTime().getTime() >= t.getEndTime().getTime()){
+                    /*errorMsg += "日期：【" + simpleDateFormat.format(t.getWorkDated()) + "】开始时间不能大于结束时间！";*/
+                    errorMsg += String.format("日期：【%tF】开始时间不能大于等于结束时间！\r", t.getWorkDated());
+                }
+            }
+            if(!f){
+                WebUtil.addErrorMessage("必须有一个【远程支持】或【现场维修】时间类型!","");
+            }
+            if(StringUtils.isNotEmpty(errorMsg)){
+                WebUtil.addErrorMessage(errorMsg,"");
+                r = false;
+            }
+        }
+        if(closeBlobObjectList == null || closeBlobObjectList.size() == 0){
+            WebUtil.addErrorMessage("服务记录单不能为空!","");
+            r = false;
+        }
+        if(zkbPartOrderService.checkCloseInfoBySrNum(selected.getSrNo(), zkbPartOrderCloseInfo)){
+            WebUtil.addErrorMessage("srNo已经存在完成信息，不需要重复提交!","");
+            r = false;
+        }
+        return r;
+    }
+
     public String normalCheckPartQuota(ZkbPartOrder selected, ZkbContract c){
         if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
             boolean flag = true;
@@ -1054,6 +1143,11 @@ public class ZkbPartOrderStatusService {
 
 
     public List<ZkbPartOrderCloseWorkTime> getZkbPartOrderCloseWorkTimeList(String closeId){
-        return zkbPartOrderCloseWorkTimeRepository.findByCloseId(closeId);
+        List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList = zkbPartOrderCloseWorkTimeRepository.findByCloseId(closeId);
+        for (int i =0; i< zkbPartOrderCloseWorkTimeList.size(); i++){
+            ZkbPartOrderCloseWorkTime zkbPartOrderCloseWorkTime = zkbPartOrderCloseWorkTimeList.get(i);
+            zkbPartOrderCloseWorkTime.setIndex(i);
+        }
+        return zkbPartOrderCloseWorkTimeList;
     }
 }

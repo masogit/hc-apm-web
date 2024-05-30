@@ -1306,12 +1306,12 @@
                         <h:panelGroup>
                             <label class="label">设备UDI*</label>
                             <p:outputLabel style="color: red" value="如果该设备没有UDI，请填写“无UDI“"/><br/>
-                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.udi}" required="true" requiredMessage="设备UDI不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
+                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.udi}" required="false" requiredMessage="设备UDI不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">该故障是否会导致实际/潜在伤害*</label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern}" required="true" requiredMessage="该故障是否会导致实际/潜在伤害不能为空！"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern}" required="false" requiredMessage="该故障是否会导致实际/潜在伤害不能为空！"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                                 <p:ajax event="change" update="allegedPatientConsequenceGroup" listener="#{zkbPartOrderAuditController.getAllegedPatientConsequence()}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnSafetyConcernType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -1320,7 +1320,7 @@
                         <h:panelGroup>
                             <label class="label">故障发生时是否有病人在使用机器*</label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse}" required="true" requiredMessage="故障发生时是否有病人在使用机器不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse}" required="false" requiredMessage="故障发生时是否有病人在使用机器不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
                                 <p:ajax event="change" update="allegedPatientConsequenceGroup" listener="#{zkbPartOrderAuditController.getAllegedPatientConsequence()}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPatientUseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -1329,11 +1329,11 @@
                         <h:panelGroup>
                             <label class="label">事件发生的时间*</label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.eventDated}" required="true" requiredMessage="事件发生的时间不能为空" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
+                            <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.eventDated}" required="false" requiredMessage="事件发生的时间不能为空" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="false">
                             <label class="label">过程类型*</label>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.procedureType}" required="true" requiredMessage="Procedure Type过程类型不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.procedureType}" required="false" requiredMessage="Procedure Type过程类型不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnProcedureType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -1342,30 +1342,30 @@
                         <h:panelGroup>
                             <label class="label">质量联系人*</label>
                             <p:outputLabel style="color: red">明确谁提供信息，联系信息，角色（医生，护士，办公人员和其他）</p:outputLabel><br/>
-                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.qualityContactPerson}" required="true" requiredMessage="质量联系人不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
+                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.qualityContactPerson}" required="false" requiredMessage="质量联系人不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">质量联系人电话*</label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.qualityContactPhone}" required="true" requiredMessage="质量联系人电话不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
+                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.qualityContactPhone}" required="false" requiredMessage="质量联系人电话不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"/>
                         </h:panelGroup>
                         <h:panelGroup id="allegedPatientConsequenceGroup">
                             <label class="label">病人结果*</label>
                             <p:outputLabel style="color: red">事件对病人造成的影响，重新扫描，发现或其他</p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.allegedPatientConsequence}" rows="4" cols="40" required="true" requiredMessage="质量联系人不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag) or zkbPartOrderAuditController.zkbPartOrderStatusVo.allegedPatientConsequenceFlag}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.allegedPatientConsequence}" rows="4" cols="40" required="false" requiredMessage="病人结果不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag) or zkbPartOrderAuditController.zkbPartOrderStatusVo.allegedPatientConsequenceFlag}">
                                 <p:ajax />
                             </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">需要的干涉*</label>
                             <p:outputLabel style="color: red">临床医生必须要做什么来补救当时的情况。拔管，重新扫描或其他</p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.interventionRequired}" rows="4" cols="40" required="true" requiredMessage="需要的干涉不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.interventionRequired}" rows="4" cols="40" required="false" requiredMessage="需要的干涉不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">额外的信息*</label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.additionalDetails}" rows="4" cols="40" required="true" requiredMessage="额外的信息不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.additionalDetails}" rows="4" cols="40" required="false" requiredMessage="额外的信息不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -1376,7 +1376,7 @@
                             <p:outputLabel style="color: red" >发生了什么事情（客户看到/听到/观察到什么）</p:outputLabel><br/>
                             <p:outputLabel style="color: red" >造成了什么影响，客户是否/如何消除影响的</p:outputLabel><br/>
                             <p:outputLabel style="color: red" >应写清楚具体的医疗器械问题，提供清晰而准确的故障信息</p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.problemReason}" rows="4" cols="120" required="true" requiredMessage="服务原因不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.problemReason}" rows="4" cols="120" required="false" requiredMessage="服务原因不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                             <p:outputLabel style="color: red" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">请在服务原因里填写旧探头型号和序列号</p:outputLabel>
                         </h:panelGroup>
@@ -1385,7 +1385,7 @@
                             <p:outputLabel style="color: red">已经采取了哪些故障排查/诊断措施？</p:outputLabel><br/>
                             <p:outputLabel style="color: red">通过故障排查/诊断测试获得了什么结果？</p:outputLabel><br/>
                             <p:outputLabel style="color: red">关于故障原因的结论是什么？</p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.actionContent}" rows="4" cols="120" required="true" requiredMessage="服务内容不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.actionContent}" rows="4" cols="120" required="false" requiredMessage="服务内容不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -1394,7 +1394,7 @@
                             <p:outputLabel style="color: red">为了确认问题已纠正，执行了何种测试？</p:outputLabel><br/>
                             <p:outputLabel style="color: red">是否通过测试？</p:outputLabel><br/>
                             <p:outputLabel style="color: red">如果问题未纠正，那么导致问题未纠正的原因是什么？</p:outputLabel><br/>
-                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.testResult}" rows="4" cols="120" required="true" requiredMessage="服务结果为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
+                            <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.testResult}" rows="4" cols="120" required="false" requiredMessage="服务结果为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                             <p:outputLabel style="color: red" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.selected.returnType eq 'badReturn'}">请在服务结果里填写新探头型号和序列号</p:outputLabel>
                         </h:panelGroup>
@@ -1464,6 +1464,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.saveTips}"/><br/>
+                <p:commandButton validateClient="true" value="保存" action="#{zkbPartOrderAuditController.tempSaveComplete()}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '1' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and zkbPartOrderAuditController.selected.currentStep eq 'CompletePending'}"/>
                 <p:commandButton validateClient="true" value="#{zkbPartOrderAuditController.normalNextText()}" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '1' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and !(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}"/>
                 <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' or zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' ) and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
                 <p:commandButton immediate="false" process="@this" value="审批不通过" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
