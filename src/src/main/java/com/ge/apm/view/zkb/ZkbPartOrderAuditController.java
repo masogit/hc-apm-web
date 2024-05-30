@@ -606,6 +606,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
+    /**
+     * 关单暂存
+     */
     public void tempSaveComplete(){
         zkbPartOrderService.tempSaveComplete(zkbPartOrderCloseInfo, selected, zkbPartOrderCloseWorkTimeList, closeBlobObjectList, currentUser);
     }
