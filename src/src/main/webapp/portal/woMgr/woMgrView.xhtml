@@ -39,9 +39,17 @@
                             <label class="label">#{msg.srNum}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.srNum}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{'Maintenance'.equals(workOrderMgrController.selected.serviceRequest.srRepairSource) or 'DailyCheck'.equals(workOrderMgrController.selected.serviceRequest.srRepairSource)}">
+                            <label class="label">#{msg.RepairSource}</label>
+                            <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',workOrderMgrController.selected.serviceRequest.srRepairSource)}"   />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestorName}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestorName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.requestorName}电话</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestorTel}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestTime}</label>
