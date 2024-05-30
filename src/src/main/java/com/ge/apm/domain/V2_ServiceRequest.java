@@ -68,8 +68,11 @@ public class V2_ServiceRequest implements Serializable {
     @Size(min = 1, max = 16)
     @Column(name = "requestor_name")
     private String requestorName;
-    @Basic(optional = false)
 
+    @Column(name = "requestor_tel")
+    private String requestorTel;
+
+    @Basic(optional = false)
     @NotNull
     @Column(name = "request_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -332,6 +335,14 @@ public class V2_ServiceRequest implements Serializable {
 
     public void setRequestorName(String requestorName) {
         this.requestorName = requestorName;
+    }
+
+    public String getRequestorTel() {
+        return requestorTel;
+    }
+
+    public void setRequestorTel(String requestorTel) {
+        this.requestorTel = requestorTel;
     }
 
     public Date getRequestTime() {
