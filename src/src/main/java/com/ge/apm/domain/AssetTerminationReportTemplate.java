@@ -59,6 +59,15 @@ public class AssetTerminationReportTemplate implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
 
+
+    @Column(name = "template_type")
+    private String templateType;  //模板类型
+
+    @Column(name = "single_file_import", columnDefinition = "boolean default true")
+    private boolean singleFileImport;  //单文件导出
+
+
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -141,6 +150,22 @@ public class AssetTerminationReportTemplate implements Serializable {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public boolean getSingleFileImport() {
+        return singleFileImport;
+    }
+
+    public void setSingleFileImport(boolean singleFileImport) {
+        this.singleFileImport = singleFileImport;
     }
 
     @Override
