@@ -942,7 +942,7 @@ public class ZkbPartOrderStatusService {
             WebUtil.addErrorMessage("Patient Use(故障发生时是否有病人在使用机器)不能为空！",  "");
             r = false;
         }
-        if(zkbPartOrderCloseInfo.getProcedureType() == null){
+        if(zkbPartOrderCloseInfo.getEventDated() == null){
             WebUtil.addErrorMessage("Event Date(病人影响事件发生的时间)不能为空！",  "");
             r = false;
         }
