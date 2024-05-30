@@ -1398,8 +1398,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return result;
     }
 
-
-
     public void probeOrderNewCatChangeCalcQty(ZkbPartOrder zkbPartOrder, ZkbContract zkbContract){
         if(StrUtil.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
             if(!zkbPartOrder.getNewCatFlag().equals(zkbPartOrder.getTenantNewCatFlag())){
@@ -1444,6 +1442,33 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }
         }
+    }
+
+    public void tempSaveComplete(ZkbPartOrderCloseInfo zkbPartOrderCloseInfo, ZkbPartOrder zkbPartOrder, List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList, List<V2_BlobObject> v2BlobObjectList, UserAccount userAccount){
+        if(StringUtils.isEmpty(zkbPartOrderCloseInfo.getPartOrderId())){
+            zkbPartOrderCloseInfo.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+            zkbPartOrderCloseInfo.setPartOrderId(zkbPartOrder.getId());
+            zkbPartOrderCloseInfo.setSrNo(zkbPartOrder.getSrNo());
+        }
+        zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.save(zkbPartOrderCloseInfo);
+        for(ZkbPartOrderCloseWorkTime w : zkbPartOrderCloseWorkTimeList){
+            if(StrUtil.isEmpty(w.getCloseId())){
+                w.setSrNo(zkbPartOrder.getSrNo());
+                w.setPartOrderId(zkbPartOrder.getId());
+                w.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+                w.setCloseId(zkbPartOrderCloseInfo.getId());
+            }
+        }
+        zkbPartOrderCloseWorkTimeRepository.save(zkbPartOrderCloseWorkTimeList);
+
+        for(V2_BlobObject v :v2BlobObjectList){
+            if(StrUtil.isEmpty(v.getBoUuid())){
+                v.setBoUuid(zkbPartOrderCloseInfo.getId());
+            }
+        }
+        blobObjectRepository.save(v2BlobObjectList);
+        //將其他srNo的數據設置為已完成。
+        updateCompleteAuditBySrNum(zkbPartOrder);
     }
 
     @Transactional(rollbackFor = Exception.class)
