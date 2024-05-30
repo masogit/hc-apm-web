@@ -231,6 +231,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                         } else {//用户审批
                             List<String> userUids = approvalNode.getUserUids();
+                            if(CollectionUtils.isEmpty(userUids)){
+                                userUids=new ArrayList<>();
+                            }
                             List<String> uids=  getRoleApproveCondition(approvalNode,approvableTarget.getBusinessUid(),approvableTarget.getBusinessType());
                             if(CollectionUtils.isNotEmpty(uids)){
                                 userUids.addAll(uids);
@@ -899,6 +902,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 }
                             } else {//用户审批
                                 List<String> userUids = node.getUserUids();
+                                if(CollectionUtils.isEmpty(userUids)){
+                                    userUids=new ArrayList<>();
+                                }
                                 List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                                 if(CollectionUtils.isNotEmpty(uids)){
                                     userUids.addAll(uids);
@@ -1071,6 +1077,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 }
                             } else {//用户审批
                                 List<String> userUids = node.getUserUids();
+                                if(CollectionUtils.isEmpty(userUids)){
+                                    userUids=new ArrayList<>();
+                                }
                                 List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                                 if(CollectionUtils.isNotEmpty(uids)){
                                     userUids.addAll(uids);
@@ -1477,6 +1486,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                         } else {//用户审批
                             List<String> userUids = node.getUserUids();
+                            if(CollectionUtils.isEmpty(userUids)){
+                                userUids=new ArrayList<>();
+                            }
                             List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                             if(CollectionUtils.isNotEmpty(uids)){
                                 userUids.addAll(uids);
@@ -1623,6 +1635,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                         } else {//用户审批
                             List<String> userUids = node.getUserUids();
+                            if(CollectionUtils.isEmpty(userUids)){
+                                userUids=new ArrayList<>();
+                            }
                             List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
                             if(CollectionUtils.isNotEmpty(uids)){
                                 userUids.addAll(uids);
