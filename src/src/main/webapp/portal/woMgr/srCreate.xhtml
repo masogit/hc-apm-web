@@ -32,6 +32,11 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
+                            <label class="label">#{msg.requestorName}电话*</label>
+                            <p:inputText id="requestorTel" required="true" requiredMessage="#{msg.requestorName}电话 #{msg.ValidationRequire}" value="#{workOrderMgrController.newServiceRequest.requestorTel}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
                             <label class="label">#{msg.casePriority}*</label>
                             <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.casePriority}" >
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
