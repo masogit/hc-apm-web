@@ -4,10 +4,8 @@ import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.ApmStreamedContent;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.AssetTerminationReportTemplate;
-import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
@@ -17,6 +15,8 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.context.LocaleHolder;
@@ -27,17 +27,27 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
 
 @Component
 public class ExportToBeTerminatedAppraisalService {
+    private static final Logger logger = LoggerFactory.getLogger(ExportToBeTerminatedAppraisalService.class);
 
     protected enum ASSET_DETAIL {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
-        maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date
+        maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date,
+        asset_dept_name,asset_dept_owner_name,salvage_value,termination_cause,comments,num,accumulated_depreciation,
+        application_date,clinical_dept_name,site
     }
 
     @Autowired
@@ -51,6 +61,9 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private AssetLifecyleService assetLifecyleService;
 
     public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
         ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
@@ -87,9 +100,8 @@ public class ExportToBeTerminatedAppraisalService {
         return result;
     }
 
-    public StreamedContent export(List<String> selectedIds, byte[] templateBytes) {
-        Map<String, Object> datas = getData(selectedIds);
-
+    public StreamedContent export(List<String> selectedIds, byte[] templateBytes ) {
+        Map<String, Object> datas = getData(selectedIds,true);
         byte[] bytes;
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -113,18 +125,76 @@ public class ExportToBeTerminatedAppraisalService {
         }
     }
 
-    public Map<String, Object> getData(List<String> selectedIds) {
+
+    public StreamedContent exportZip(List<String> selectedIds, byte[] templateBytes ) {
+        Map<String, Object> datas = getData(selectedIds,false);
+        List<Map<ASSET_DETAIL, Object>> list= (List<Map<ASSET_DETAIL, Object>>) datas.get("asset_detail_table");
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+             ZipOutputStream zout = new ZipOutputStream(out)) {
+            list.forEach(item -> {
+                Object o = item.get(asset_name);
+                    try {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.putAll(datas);
+                        item.forEach((k, v) ->
+                            map.put(k.name(), v)
+                        );
+                        byte[] bytes = generate(map, templateBytes);
+                        if (bytes != null) {
+                            String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";
+                            zout.putNextEntry(new ZipEntry(name));
+                            IOUtils.write(bytes, zout);
+                            zout.closeEntry();
+
+                        }
+                    } catch (Exception e) {
+                        final String s = o.toString();
+                        logger.error("assetUid {},待报废鉴定表导出异常：e", s, e);
+                    }
+
+
+            });
+            return new ApmStreamedContent(new ByteArrayInputStream(out.toByteArray()), "application/zip", "报废鉴定.zip");
+        } catch (Exception e) {
+            logger.error("报废鉴定表导出失败 e:", e);
+            return null;
+        }
+    }
+
+    private byte[] generate( Map<String, Object> map, byte[] templateBytes) {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+        template.render(map);
+        try {
+            template.write(out);
+        } catch (IOException e) {
+            logger.error("报废鉴定报导出失败 generate error:", e);
+            return null;
+        }
+        return out.toByteArray();
+    }
+    public Map<String, Object> getData(List<String> selectedIds,boolean single) {
         Map<String, Object> datas = new HashMap<>();
         Set<String> departmentName = new HashSet<>();
         Set<String> terminalCause = new HashSet<>();
         Set<String> siteName = new HashSet<>();
         List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
+        List<AssetInfo> assetInfos = assetInfoRepository.getByUids(new HashSet<>(selectedIds));
+        Map<String, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(e -> e.getUid(), e -> e));
+        Set<String> siteUidSet = assetInfos.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
+
+        List<OrgInfo> orgInfos = orgInfoRepository.findByUids(siteUidSet);
+        Map<String, OrgInfo> orgInfoMap = orgInfos.stream().collect(Collectors.toMap(e -> e.getSiteUID(), e -> e));
+
         for (String id : selectedIds) {
-            AssetInfo assetInfo = assetInfoRepository.findByUid(id);
-            setValue(departmentName, assetInfo.getClinicalDeptName(), WebUtil.getMessage("Inconsistent"));
-            setValue(terminalCause, assetInfo.getTerminationCause(), WebUtil.getMessage("ReasonInconsistent"));
-            setValue(siteName, assetInfo.getSiteUID(), WebUtil.getMessage("SiteInconsistent"));
-            Map<ASSET_DETAIL, Object> map = new HashMap<>();
+            AssetInfo assetInfo = assetInfoMap.get(id);
+            if(single){
+                setValue(departmentName, assetInfo.getClinicalDeptName(), WebUtil.getMessage("Inconsistent"));
+                setValue(terminalCause, assetInfo.getTerminationCause(), WebUtil.getMessage("ReasonInconsistent"));
+                setValue(siteName, assetInfo.getSiteUID(), WebUtil.getMessage("SiteInconsistent"));
+            }
+            Map<ASSET_DETAIL, Object> map = new EnumMap<>(ASSET_DETAIL.class);
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
             map.put(function_type, assetInfo.getFunctionType());
@@ -139,6 +209,39 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(system_id, assetInfo.getSystemId());
             map.put(purchase_price, assetInfo.getPurchasePrice());
             map.put(purchase_date, assetInfo.getPurchaseDate());
+            map.put(salvage_value, assetInfo.getPurchaseDate());   //最终残值
+            map.put(asset_dept_name, assetInfo.getAssetDeptName());   //使用科室
+            map.put(termination_cause, assetInfo.getTerminationCause());   //报废原因
+            map.put(asset_dept_owner_name, "");   //科室负责人
+            map.put(clinical_dept_name, assetInfo.getClinicalDeptName());   //所属科室
+            map.put(site, orgInfoMap.get(assetInfo.getSiteUID()));   //所属科室
+            map.put(comments, null);   //维修部门意见
+            map.put(num, 1);   //数量
+
+            String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
+            Integer lifecycle = assetInfo.getLifecycle();
+            Double purchasePrice = assetInfo.getPurchasePrice();
+
+            if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
+                double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
+                double price = assetUsedLifecycleDouble / lifecycle * purchasePrice;
+                BigDecimal bigDecimal = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                map.put(accumulated_depreciation, bigDecimal);   //累计折旧
+            }
+
+
+            AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
+            if(lifecycles!=null){
+//                map.put(application_date, lifecycles!=null?lifecycles.getModifyTime().toString():"");   //申报时间
+                Date modifyTime = lifecycles.getModifyTime();
+                final Instant instant = modifyTime.toInstant();
+                ZoneId zoneId = ZoneId.systemDefault();
+                LocalDate localDate = instant.atZone(zoneId).toLocalDate();
+                int year = localDate.getYear();
+                int month = localDate.getMonthValue();
+                int day = localDate.getDayOfMonth();
+                map.put(application_date, year+"年"+month+"月"+day+"日");   //申报时间
+            }
             list.add(map);
         }
         datas.put("asset_detail_table", list);
@@ -170,7 +273,6 @@ public class ExportToBeTerminatedAppraisalService {
             XWPFTableRow labelRow = table.getRow(1);
             List<XWPFTableCell> tableCells = labelRow.getTableCells();
             List<String> values = tableCells.stream().map(i -> i.getText()).collect(Collectors.toList());
-
             table.removeRow(1);
 
             int n = 2;
@@ -194,15 +296,7 @@ public class ExportToBeTerminatedAppraisalService {
 
     public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
         byte[] templateBytes = null;
-        List<String> uids = new ArrayList<>();
-        populateUidList(uids, siteUID);
-        if (!isInsulate) {
-            populateUidList(uids, hospitalUID);
-            populateUidList(uids, institutionUID);
-            populateUidList(uids, tenantUID);
-        }
-
-        AssetTerminationReportTemplate template = getPrioritizedTemplate(uids);
+        AssetTerminationReportTemplate template = getAssetTerminationReportTemplate(isInsulate, siteUID, hospitalUID, institutionUID, tenantUID);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
             try {
@@ -223,10 +317,23 @@ public class ExportToBeTerminatedAppraisalService {
         return templateBytes;
     }
 
+    public AssetTerminationReportTemplate getAssetTerminationReportTemplate(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
+        List<String> uids = new ArrayList<>();
+        populateUidList(uids, siteUID);
+        if (!isInsulate) {
+            populateUidList(uids, hospitalUID);
+            populateUidList(uids, institutionUID);
+            populateUidList(uids, tenantUID);
+        }
+
+        AssetTerminationReportTemplate prioritizedTemplate = getPrioritizedTemplate(uids);
+        return prioritizedTemplate;
+    }
+
     private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids) {
         List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         for (String uid : uids) {
-            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
+            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),"ToBeTerminated")    ).findFirst();
             if (optional.isPresent()) {
                 return optional.get();
             }
@@ -241,8 +348,12 @@ public class ExportToBeTerminatedAppraisalService {
     }
 
     public boolean existsSiteTemplate(String siteUid) {
-        List list = templateRepository.findBySiteUID(siteUid);
-        return list != null && !list.isEmpty();
+        List<AssetTerminationReportTemplate> list = templateRepository.findBySiteUID(siteUid);
+        return list != null && !list.isEmpty() && list.size()>1  ;
+    }
+
+    public List<AssetTerminationReportTemplate> siteTemplate(String siteUid) {
+       return  templateRepository.findBySiteUID(siteUid);
     }
 
 }

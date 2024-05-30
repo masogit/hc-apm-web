@@ -22,14 +22,37 @@
                                         value="#{toBeTerminatedTemplateController.getActiveTemplate()}"/>
                             </p:commandButton>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">模板类型</label>
+                            <p:selectOneMenu id="templateType" value="#{toBeTerminatedTemplateController.selected.templateType}" requiredMessage="模板类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('importTemplateType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">是否单个文件导出</label>
+                            <p:selectOneRadio value="#{toBeTerminatedTemplateController.selected.singleFileImport}"
+                                              requiredMessage="是否单个文件导出 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="fileName">
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>
-                            <h:outputText value="#{toBeTerminatedTemplateController.file.fileName}"
+                            <h:outputText  value="#{toBeTerminatedTemplateController.file.fileName}"
                                           rendered="#{not empty toBeTerminatedTemplateController.file}"/>
+                        </h:panelGroup>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup>
                             <p:fileUpload fileUploadListener="#{toBeTerminatedTemplateController.uploadDataFile}"
                                           value="#{toBeTerminatedTemplateController.file}" mode="advanced"
                                           dragDropSupport="false" style="width:100%" process="@this"
-                                          multiple="false" sizeLimit="10000000" update=":WoExportTemplateEditForm"
+                                          multiple="false" sizeLimit="10000000" update=":WoExportTemplateEditForm:fileName"
                                           auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
                                           allowTypes="/(\.|\/)(docx)$/" label="#{msg.Add}"/>
                         </h:panelGroup>
