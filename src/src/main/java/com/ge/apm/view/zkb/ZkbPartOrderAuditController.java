@@ -145,18 +145,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
 
-            if(ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.Complete.toString().equals(selected.getCurrentStep())) {
-                if (ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())) {
-                    zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(selected.getSrNo());
-                    if (zkbPartOrderCloseInfo == null) {
-                        zkbPartOrderCloseInfo = new ZkbPartOrderCloseInfo();
-                    } else {
-                        closeBlobObjectList = blobService.findBlobObjectsByBoUid(zkbPartOrderCloseInfo.getId());
-                        zkbPartOrderCloseWorkTimeList = zkbPartOrderStatusService.getZkbPartOrderCloseWorkTimeList(zkbPartOrderCloseInfo.getId());
-                    }
+            List<String> sts = Arrays.asList(ZkbPartOrderStep.PartOrderStep.CompletePending.toString(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString(), ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            if(sts.contains(selected.getCurrentStep())) {
+                zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(selected.getSrNo());
+                if (zkbPartOrderCloseInfo == null) {
+                    zkbPartOrderCloseInfo = new ZkbPartOrderCloseInfo();
+                } else {
+                    closeBlobObjectList = blobService.findBlobObjectsByBoUid(zkbPartOrderCloseInfo.getId());
+                    zkbPartOrderCloseWorkTimeList = zkbPartOrderStatusService.getZkbPartOrderCloseWorkTimeList(zkbPartOrderCloseInfo.getId());
                 }
             }
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
@@ -673,10 +669,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser,zkbPartOrderReturnList);
                 selected = zkbPartOrderRepository.findById(selected.getId());
             }
-        } else if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) ||
-                ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()))
-                && ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())){
-
+        } else if(ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())){
             if(!zkbPartOrderStatusService.checkComplete(selected, zkbPartOrderCloseWorkTimeList, closeBlobObjectList, zkbPartOrderCloseInfo)){
                 return "";
             }
