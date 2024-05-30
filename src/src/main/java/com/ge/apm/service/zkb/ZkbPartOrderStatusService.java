@@ -935,47 +935,47 @@ public class ZkbPartOrderStatusService {
             r = false;
         }
         if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getSafetyConcern())){
-            WebUtil.addErrorMessage("该故障是否会导致实际！",  "");
+            WebUtil.addErrorMessage("Safety Concern(该故障是否存在潜在伤害或已导致实际伤害)不能为空！",  "");
             r = false;
         }
         if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientUse())){
-            WebUtil.addErrorMessage("故障发生时是否有病人在使用机器不能为空！",  "");
+            WebUtil.addErrorMessage("Patient Use(故障发生时是否有病人在使用机器)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getProcedureType() == null){
-            WebUtil.addErrorMessage("事件发生的时间不能为空！",  "");
+            WebUtil.addErrorMessage("Event Date(病人影响事件发生的时间)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getQualityContactPerson() == null){
-            WebUtil.addErrorMessage("质量联系人不能为空！",  "");
+            WebUtil.addErrorMessage("Quality Contact(质量联系人姓名)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getQualityContactPhone() == null){
-            WebUtil.addErrorMessage("质量联系人电话不能为空！",  "");
+            WebUtil.addErrorMessage("Quality Contact(质量联系人电话)不能为空！",  "");
             r = false;
         }
-        if(zkbPartOrderCloseInfo.getAllegedPatientConsequence() == null){
+        /*if(zkbPartOrderCloseInfo.getAllegedPatientConsequence() == null){
             WebUtil.addErrorMessage("病人结果不能为空！",  "");
             r = false;
-        }
+        }*/
         if(zkbPartOrderCloseInfo.getInterventionRequired() == null){
-            WebUtil.addErrorMessage("需要的干涉不能为空！",  "");
+            WebUtil.addErrorMessage("Intervention Required(需要的干涉)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getAdditionalDetails() == null){
-            WebUtil.addErrorMessage("额外的信息不能为空！",  "");
+            WebUtil.addErrorMessage("Additional Details(额外的信息)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getProblemReason() == null){
-            WebUtil.addErrorMessage("工程师服务原因不能为空！",  "");
+            WebUtil.addErrorMessage("Problem(工程师服务原因)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getActionContent() == null){
-            WebUtil.addErrorMessage("工程师服务内容不能为空！",  "");
+            WebUtil.addErrorMessage("Action(工程师服务内容)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseInfo.getTestResult() == null){
-            WebUtil.addErrorMessage("工程师服务结果为空！",  "");
+            WebUtil.addErrorMessage("Test(工程师服务结果)不能为空！",  "");
             r = false;
         }
         if(zkbPartOrderCloseWorkTimeList == null || zkbPartOrderCloseWorkTimeList.size() == 0){
