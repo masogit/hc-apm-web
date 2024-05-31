@@ -1107,6 +1107,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
     //endregion
 
+    public boolean completeRequiredCheck(String column){
+        if("Yes".equals(zkbPartOrderCloseInfo.getPatientUse()) || "Potential".equals(zkbPartOrderCloseInfo.getSafetyConcern()) || "Actual".equals(zkbPartOrderCloseInfo.getSafetyConcern())){
+            return true;
+        }else if("NotReported".equals(zkbPartOrderCloseInfo.getPatientUse()) && "No".equals(zkbPartOrderCloseInfo.getSafetyConcern()) ){
+            if("qualityContact".equals(column)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void preLogistics(String id){
         ZkbPartOrderItem se = null;
         for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -1232,7 +1244,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void getAllegedPatientConsequence(){
-        if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
+        /*if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
             zkbPartOrderCloseInfo.setAllegedPatientConsequence("非患者扫描时出现问题，不涉及患者");
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(true);
         }else if("非患者扫描时出现问题，不涉及患者".equals(zkbPartOrderCloseInfo.getAllegedPatientConsequence())){
@@ -1240,6 +1252,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderCloseInfo.setAllegedPatientConsequence("");
             }
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(false);
+        }*/
+        if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
+            zkbPartOrderCloseInfo.setPatientImpactOutcome("NoPatientInvolved");
         }
     }
 

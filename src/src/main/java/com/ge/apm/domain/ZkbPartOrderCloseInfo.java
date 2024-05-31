@@ -165,5 +165,38 @@ public class ZkbPartOrderCloseInfo implements Serializable {
     @Column(name = "complete_auditer_uid")
     private String completeAuditerUid;
 
+    /**
+     * 有病人使用，存在病患风险，请选择风险分类
+     */
+    @Getter@Setter
+    @Column(name = "risk_type")
+    private String riskType;
 
+    /**
+     * 没有病人使用，没有病患风险，请选择没有风险分类
+     */
+    @Getter@Setter
+    @Column(name = "no_risk_type")
+    private String noRiskType;
+
+    /**
+     * 请选择没有告知是否有病患/未报告的类别
+     */
+    @Getter@Setter
+    @Column(name = "no_report_type")
+    private String noReportType;
+
+    /**
+     * 病人影响/结果
+     */
+    @Getter@Setter
+    @Column(name = "patient_impact_outcome")
+    private String patientImpactOutcome;
+
+    /**
+     * 该故障导致实际伤害事件的时间
+     */
+    @Getter@Setter
+    @Column(name = "incident_date")
+    private Date incidentDate;
 }
