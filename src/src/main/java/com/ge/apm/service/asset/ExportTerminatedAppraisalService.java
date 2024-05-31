@@ -318,7 +318,7 @@ public class ExportTerminatedAppraisalService {
     private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids) {
         List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         for (String uid : uids) {
-            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
+            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),"Terminated")   ).findFirst();
             if (optional.isPresent()) {
                 return optional.get();
             }

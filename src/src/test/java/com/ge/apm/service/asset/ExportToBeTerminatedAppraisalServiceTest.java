@@ -43,7 +43,7 @@ public class ExportToBeTerminatedAppraisalServiceTest {
         Map<String, Object> datas = new HashMap<>();
         datas.put("asset_detail_table", list);
 
-        doReturn(datas).when(service).getData(any());
+        doReturn(datas).when(service).getData(any(),true);
 
         StreamedContent export = service.export(new ArrayList<>(), IOUtils.toByteArray(new FileInputStream("d:\\1.docx")));
         FileUtils.writeByteArrayToFile(new File("d:\\test.docx"), IOUtils.toByteArray(export.getStream()));
