@@ -110,7 +110,12 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
 
     public StreamedContent getActiveTemplate() {
         try {
-            byte[] activeTemplateBytes = service.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            String templateType = selected.getTemplateType();
+            if(StringUtils.isBlank(templateType)){
+                WebUtil.addErrorMessage("请选择模板类型");
+                return null;
+            }
+            byte[] activeTemplateBytes = service.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),templateType);
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
         } catch (IOException e) {
             WebUtil.addErrorMessage("Fail to download work order template");
