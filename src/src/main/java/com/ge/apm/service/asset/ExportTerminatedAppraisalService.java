@@ -4,21 +4,11 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.bo.MaintenanceTemplate;
-import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
-import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
-import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
-import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
-import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
-import com.ge.apm.view.asset.AssetInfoToBeTerminatedListController;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +25,9 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -118,20 +106,22 @@ public class ExportTerminatedAppraisalService {
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(out)) {
+            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(selectedIds);
+            Map<String, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(e -> e.getUid(), e -> e));
             selectedIds.forEach(item -> {
-                AssetScrap assetScrap = assetScrapRepository.findByAssetUid(item);
-                if (assetScrap != null) {
+                AssetInfo assetInfo = assetInfoMap.get(item);
+                if (assetInfo != null) {
                     try {
-                        byte[] bytes = generate(assetScrap, templateBytes);
-                        if (bytes != null) {
-                            String name = assetScrap.getAssetName() + "-" + "资产报废单" + ".docx";
+                        byte[] bytes = generate(assetInfo, templateBytes);
+                        if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
+                            String name = assetInfo.getName() + "-" + "资产报废单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();
 
                         }
                     } catch (Exception e) {
-                        logger.error("assetUid:{},报废鉴定表导出异常：e", assetScrap.getAssetUid(), e);
+                        logger.error("assetUid:{},报废鉴定表导出异常：e", assetInfo.getUid(), e);
                     }
                 }else{
                     logger.info("assetUid:{},没有报废流", item);
@@ -139,16 +129,14 @@ public class ExportTerminatedAppraisalService {
                 }
 
             });
-            zout.close();
             return new ApmStreamedContent(new ByteArrayInputStream(out.toByteArray()), "application/zip", "报废鉴定.zip");
         } catch (Exception e) {
             logger.error("报废鉴定表导出失败 e:", e);
             return null;
         }
     }
-
-    private byte[] generate(AssetScrap assetScrap, byte[] templateBytes) {
-        Map<String, Object> datas = getData(assetScrap);
+    private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
+        Map<String, Object> datas = getData(assetInfo);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
         template.render(datas);
@@ -156,15 +144,14 @@ public class ExportTerminatedAppraisalService {
             template.write(out);
         } catch (IOException e) {
             logger.error("报废鉴定报导出失败 generate error:", e);
-            return null;
+            return new byte[0];
         }
         return out.toByteArray();
     }
 
-    public Map<String, Object> getData(AssetScrap assetScrap) {
+    public Map<String, Object> getData(AssetInfo assetInfo) {
         Map<String, Object> map = new HashMap<>();
 
-        AssetInfo assetInfo = assetInfoRepository.findByUid(assetScrap.getAssetUid());
         OrgInfo orgInfo = orgInfoRepository.findByUid(assetInfo.getSiteUID());
         map.put(site_name.name(), orgInfo.getName());
 
@@ -182,11 +169,6 @@ public class ExportTerminatedAppraisalService {
 
         if(assetInfo.getInstallDate()!=null){
             Date installDate = assetInfo.getInstallDate();
-//            LocalDate localDate = installDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//            LocalDate now=LocalDate.now();
-//            long days = ChronoUnit.DAYS.between(localDate, now);
-//            BigDecimal scale = BigDecimal.valueOf(days / 365).setScale(2, BigDecimal.ROUND_HALF_UP);
-//            map.put(used_lifecycle.name(), scale);
             String assetUsedLifecycle = getAssetUsedLifecycle(installDate);
             map.put(used_lifecycle.name(), assetUsedLifecycle);
 
@@ -195,56 +177,60 @@ public class ExportTerminatedAppraisalService {
             map.put(lifecycle.name(),assetInfo.getLifecycleInYear());
         }
         if(assetInfo.getPurchasePrice()!=null){
-            String normalNumber = new BigDecimal(assetInfo.getPurchasePrice()).toPlainString();
-
-//            DecimalFormat format = new DecimalFormat("0.00");
-//            String formattedNumber = format.format(normalNumber);
+            String normalNumber =  BigDecimal.valueOf(assetInfo.getPurchasePrice()).toPlainString();
             map.put(purchase_price.name(), normalNumber);
 
         }
         map.put(clinical_dept_name.name(), assetInfo.getClinicalDeptName());
-        map.put(apply_name.name(), assetScrap.getCreatedBy());
-        String date = SDF.format(assetScrap.getCreatedDate());
-        map.put(apply_date.name(), date);
-        map.put(applyResone.name(), assetScrap.getApplyReason());
-        map.put(approvalResone.name(), assetScrap.getApprovalReason());
-        if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
-            byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
-            map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+        AssetScrap assetScrap =null;
+        if(StringUtils.isNotBlank(assetInfo.getAssetScrapId())){
+            assetScrap=assetScrapRepository.findById(assetInfo.getAssetScrapId());
         }
+        if(assetScrap!=null){
+            map.put(apply_name.name(), assetScrap.getCreatedBy());
+            String date = format.format(assetScrap.getCreatedDate());
+            map.put(apply_date.name(), date);
+            map.put(applyResone.name(), assetScrap.getApplyReason());
+            map.put(approvalResone.name(), assetScrap.getApprovalReason());
+            if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
+                byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
+                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+            }
 
-        List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
+            List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
-        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(assetScrap.getBusinessUid());
-        Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
-        listMap.forEach((id, approvalList) -> {
-            List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
-            multiLevelApprovals1.add(collect.get(0));
-        });
+            List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(assetScrap.getBusinessUid());
+            Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
+            listMap.forEach((id, approvalList) -> {
+                List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
+                multiLevelApprovals1.add(collect.get(0));
+            });
 
-        List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
-        for (int i=1;i<=levelApprovals.size();i++){
-            if(i>3){
+            List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
+            for (int i=1;i<=3;i++){
+                if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
+                    continue;
+                }
+                byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
+                map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
+            }
+            if(levelApprovals.size()>3){
                 logger.info("审批节点大于三");
-                break;
             }
-            if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
-                continue;
-            }
-            byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
-            map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
         }
+
+
         return map;
     }
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+    public  final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    public static String getAssetUsedLifecycle(Date installDate) {
+    public  String getAssetUsedLifecycle(Date installDate) {
         if (ObjectUtil.isEmpty(installDate)) {
             return null;
         }
-        Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
-        Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
+        Temporal temporal1 = LocalDate.parse(format.format(installDate));
+        Temporal temporal2 = LocalDate.parse(format.format(System.currentTimeMillis()));
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 
@@ -255,33 +241,6 @@ public class ExportTerminatedAppraisalService {
         if (original.size() > 1) {
             throw new IllegalStateException(errorMessage);
         }
-    }
-
-    private class AssetDetailsRenderPolicy extends AbstractWoTableRenderPolicy {
-        public void render(XWPFTable table, Object o) {
-            XWPFTableRow labelRow = table.getRow(1);
-            List<XWPFTableCell> tableCells = labelRow.getTableCells();
-            List<String> values = tableCells.stream().map(i -> i.getText()).collect(Collectors.toList());
-
-            table.removeRow(1);
-
-            int n = 2;
-            if (o instanceof List) {
-                List<Map<ASSET_DETAIL, Object>> parts = (List) o;
-                for (Map<ASSET_DETAIL, Object> part : parts) {
-                    XWPFTableRow row = addRow(table, n++);
-                    values.forEach(i -> {
-                        if (StringUtils.isBlank(i)) {
-                            addCell(row, "");
-                        } else {
-                            addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i)));
-                        }
-                    });
-                }
-            }
-            table.removeRow(1);
-        }
-
     }
 
     public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
@@ -304,7 +263,7 @@ public class ExportTerminatedAppraisalService {
             }
         }
         if (templateBytes == null) {
-            String fileName = "terminated_template.docx";
+            String fileName = null;
             if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
                 fileName = "terminated_template_zh.docx";
             } else {
@@ -333,8 +292,8 @@ public class ExportTerminatedAppraisalService {
     }
 
     public boolean existsSiteTemplate(String siteUid) {
-        List list = templateRepository.findBySiteUID(siteUid);
-        return list != null && !list.isEmpty();
+        List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUID(siteUid);
+        return templates != null && !templates.isEmpty();
     }
 
 
