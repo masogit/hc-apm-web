@@ -16,7 +16,6 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
@@ -700,6 +699,19 @@ public class AssetFileImportBaseService {
         return assetInfo;
     }
 
+    /**
+     * 此方法已被改为被多线程调用，不能通过UserContextService.getCurrentUserAccount()方法获取当前用户
+     * 而应使用方法参数列表中的userAccount
+     *
+     * @param importData
+     * @param autoGenerateQrcode
+     * @param orgNamesUriCache
+     * @param orgCache
+     * @param userCache
+     * @param supplierCache
+     * @param userAccount 当前用户
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
     protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache, UserAccount userAccount) {
         AssetInfo newAsset = new AssetInfo();
@@ -1020,7 +1032,7 @@ public class AssetFileImportBaseService {
         }
 
         // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
-        if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
+        if (userAccount.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
             if (assetTypeGroupList.isEmpty()) {
                 importData.setImportStatus(ImportStatus.Failure);
                 AssetRow.addErrMessage(importData, "错误: 资产分类为空！");
