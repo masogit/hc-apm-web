@@ -297,30 +297,35 @@ public class ExportToBeTerminatedAppraisalService {
 
     }
 
-    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
+    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID,String templateType) throws IOException {
         byte[] templateBytes = null;
-        AssetTerminationReportTemplate template = getAssetTerminationReportTemplate(isInsulate, siteUID, hospitalUID, institutionUID, tenantUID);
-
+        AssetTerminationReportTemplate template = getAssetTerminationReportTemplate(isInsulate, siteUID, hospitalUID, institutionUID, tenantUID,templateType);
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
             try {
                 templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
-            }catch (Exception e){
+            } catch (IOException e) {
                 templateBytes=null;
             }
         }
+
         if (templateBytes == null) {
-            String fileName = null;
-            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-                fileName = "tobeterminated_template_zh.docx";
-            } else {
-                fileName = "tobeterminated_template_en.docx";
-            }
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
+            Map<String, String> templateMapping = new HashMap<>();
+            templateMapping.put("ToBeTerminated", "tobeterminated_template");
+            templateMapping.put("Terminated", "terminated_template");
+            templateMapping.put("zh", "_zh.docx");
+            templateMapping.put("en", "_en.docx");
+             String localeSuffix = LocaleHolder.getLocale().toString().substring(0, 2).toLowerCase();
+             String fileNameBase = templateMapping.get(templateType);
+             String fileExtension = templateMapping.get(localeSuffix);
+             String fileName = fileNameBase + fileExtension;
+             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
         }
+
+
         return templateBytes;
     }
 
-    public AssetTerminationReportTemplate getAssetTerminationReportTemplate(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
+    public AssetTerminationReportTemplate getAssetTerminationReportTemplate(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID,String templateType) {
         List<String> uids = new ArrayList<>();
         populateUidList(uids, siteUID);
         if (!isInsulate) {
@@ -329,14 +334,14 @@ public class ExportToBeTerminatedAppraisalService {
             populateUidList(uids, tenantUID);
         }
 
-        AssetTerminationReportTemplate prioritizedTemplate = getPrioritizedTemplate(uids);
+        AssetTerminationReportTemplate prioritizedTemplate = getPrioritizedTemplate(uids,templateType);
         return prioritizedTemplate;
     }
 
-    private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids) {
+    private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids,String templateType) {
         List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         for (String uid : uids) {
-            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),"ToBeTerminated")    ).findFirst();
+            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),templateType)    ).findFirst();
             if (optional.isPresent()) {
                 return optional.get();
             }
