@@ -43,6 +43,13 @@
                                   filterMatchMode="EQ">
                             <h:outputText value="#{toBeTerminatedTemplateController.getSiteNameByUId(item.siteUID)}"/>
                         </p:column>
+
+
+                        <p:column headerText="模板类型" sortBy="#{item.templateType}" filterBy="#{item.templateType}"
+                                  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('importTemplateType', item.templateType)}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
                             <p:commandLink value="#{item.fileName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.storageId)}" styleClass="p-mr-2"/>

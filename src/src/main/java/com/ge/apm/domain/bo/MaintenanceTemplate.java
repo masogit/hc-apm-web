@@ -400,7 +400,9 @@ public class MaintenanceTemplate {
         OEM("oem", Widget.TEXT),
         SERIAL("serial", Widget.TEXT),
         NUMBER("number", Widget.TEXT),
-        QR("qr", Widget.TEXT);
+        QR("qr", Widget.TEXT),
+        MAKER("maker", Widget.TEXT),
+        ;
 
         private final String key;
         private final Widget widget;

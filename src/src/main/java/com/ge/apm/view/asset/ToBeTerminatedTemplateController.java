@@ -19,6 +19,7 @@ import org.primefaces.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -250,6 +251,15 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("File has not been uploaded");
             return;
+        }
+        List<AssetTerminationReportTemplate> assetTerminationReportTemplates = service.siteTemplate(user.getSiteUID());
+        if(!CollectionUtils.isEmpty(assetTerminationReportTemplates)){
+            boolean b = assetTerminationReportTemplates.stream().anyMatch(item -> item.getTemplateType().equals(selected.getTemplateType()) && !item.getId().equals(selected.getId()));
+            if((selected.getId()==null && b )|| (selected.getId()!=null&& b)){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessage("已存在模板类型");
+                return;
+            }
         }
         super.save();
         selectedUserOrg = null;

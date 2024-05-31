@@ -220,6 +220,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Device.SERIAL.toString(), pmOrder.getAssetInfo().getSerialNum());
         content.put(MaintenanceTemplate.Device.NUMBER.toString(), pmOrder.getAssetInfo().getDepartNum());
         content.put(MaintenanceTemplate.Device.QR.toString(), pmOrder.getAssetInfo().getQrCode());
+        content.put(MaintenanceTemplate.Device.MAKER.toString(), pmOrder.getAssetInfo().getMakerShortName());
 
         // Maintenance information
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
