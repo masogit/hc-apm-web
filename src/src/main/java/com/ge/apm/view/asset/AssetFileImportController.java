@@ -29,6 +29,7 @@ import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.DbResourcesUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -264,7 +265,7 @@ public class AssetFileImportController {
                 streamingService.deleteNursiteMaintain(unCheckNurseSiteMaintainList);
                 toDeleteCheckedNurseSite = false;
             }
-            //importUseCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
+            //importU seCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
             filterErrorRecords();
@@ -668,8 +669,9 @@ public class AssetFileImportController {
     public List<AssetInfo> importAssetDataAsync(List<AssetImport> assetData, Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
         int mid = assetData.size() / 2;
         UserAccount currentAccount = UserContextService.getCurrentUserAccount();
-        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache, currentAccount))
-                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid, assetData.size()), autoGenerateQrcode, orgNamesUriCache, currentAccount)), (a, b) -> {
+        DbResourcesUtil resourcesUtil=WebUtil.getBean(DbResourcesUtil.class);
+        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache, currentAccount,resourcesUtil))
+                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid, assetData.size()), autoGenerateQrcode, orgNamesUriCache, currentAccount,resourcesUtil)), (a, b) -> {
                     List<AssetInfo> result = new ArrayList<>();
                     if (CollectionUtils.isNotEmpty(a)) {
                         result.addAll(a);
