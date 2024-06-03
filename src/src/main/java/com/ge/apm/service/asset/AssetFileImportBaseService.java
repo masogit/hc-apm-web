@@ -32,6 +32,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.DbResourcesUtil;
 
 import java.beans.PropertyDescriptor;
 import java.time.Duration;
@@ -289,6 +290,7 @@ public class AssetFileImportBaseService {
 
         int row = 0;
         List<AssetInfo> saveList = ListUtil.newArrayList();
+        DbResourcesUtil resourcesUtil=WebUtil.getBean(DbResourcesUtil.class);
         try {
             if (UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID) {
 
@@ -298,7 +300,7 @@ public class AssetFileImportBaseService {
                 //first iteration: import parent asset
                 for (AssetImport item : importDataList) {
                     if (supportingService.isParentAssetForIBTenant(item)) {
-                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount());
+                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount(),resourcesUtil);
                         if (ObjectUtil.isNotEmpty(newAsset)) {
                             saveList.add(newAsset);
                         }
@@ -311,7 +313,7 @@ public class AssetFileImportBaseService {
                         continue;
                     }
                     supportingService.parentAssetSetting(item, parentAssetsMap);
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount());
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount(),resourcesUtil);
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -323,7 +325,7 @@ public class AssetFileImportBaseService {
                         logger.info("imported {} rows", row);
                     }
                     ++row;
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount());
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, UserContextService.getCurrentUserAccount(),resourcesUtil);
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -342,7 +344,7 @@ public class AssetFileImportBaseService {
     }
 
     public List<AssetInfo> importAssetDataAsync(List<AssetImport> importDataList,
-                                                Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, UserAccount currentAccount) {
+                                                Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, UserAccount currentAccount,DbResourcesUtil resourcesUtil) {
 
         LocalDateTime startTime = LocalDateTime.now();
         Map<String, OrgInfo> orgCache = new HashMap<>();
@@ -360,7 +362,7 @@ public class AssetFileImportBaseService {
                 //first iteration: import parent asset
                 for (AssetImport item : importDataList) {
                     if (supportingService.isParentAssetForIBTenant(item)) {
-                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount);
+                        AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount,resourcesUtil);
                         if (ObjectUtil.isNotEmpty(newAsset)) {
                             saveList.add(newAsset);
                         }
@@ -373,7 +375,7 @@ public class AssetFileImportBaseService {
                         continue;
                     }
                     supportingService.parentAssetSetting(item, parentAssetsMap);
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount);
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount,resourcesUtil);
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -385,7 +387,7 @@ public class AssetFileImportBaseService {
                         logger.info("imported {} rows", row);
                     }
                     ++row;
-                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount);
+                    AssetInfo newAsset = importOneAssetNew(item, autoGenerateQrcode, orgNamesUriCache, orgCache, userCache, supplierCache, currentAccount,resourcesUtil);
                     if (ObjectUtil.isNotEmpty(newAsset)) {
                         saveList.add(newAsset);
                     }
@@ -713,7 +715,8 @@ public class AssetFileImportBaseService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache, UserAccount userAccount) {
+    protected AssetInfo importOneAssetNew(AssetImport importData, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, Map<String, OrgInfo> orgCache, Map<String, UserAccount> userCache, Map<String, Supplier> supplierCache, UserAccount userAccount, DbResourcesUtil resourcesUtil) {
+        UserContextService.setLoginUser(userAccount);
         AssetInfo newAsset = new AssetInfo();
         BeanUtils.copyProperties(importData, newAsset);
         newAsset.setWarranty(importData.getIsWarranty());
@@ -785,7 +788,7 @@ public class AssetFileImportBaseService {
         List<UserAccount> userAccounts;
         //for AssetOwner
         if (newAsset.getAssetOwnerName() == null) {
-            AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + "未设置");
         } else {
             UserAccount owner = userCache.get(newAsset.getAssetOwnerName());
             if (Objects.nonNull(owner)) {
@@ -794,10 +797,10 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                     newAsset.setAssetOwnerName(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "此用已停用");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + newAsset.getAssetOwnerName() + "此用已停用");
                     newAsset.setAssetOwnerName(null);
                 } else {
                     newAsset.setAssetOwnerId(userAccounts.get(0).getId());
@@ -842,10 +845,10 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName3());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
                     newAsset.setAssetOwnerName3(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "此用户已停用");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("assetOwnerName3") + newAsset.getAssetOwnerName3() + "此用户已停用");
                     newAsset.setAssetOwnerName3(null);
                 } else {
                     newAsset.setAssetOwnerId3(userAccounts.get(0).getId());
@@ -857,7 +860,7 @@ public class AssetFileImportBaseService {
 
         //for ClinicalOwner
         if (newAsset.getClinicalOwnerName() == null) {
-            AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
+            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("ClinicalOwnerName") + "未设置");
         } else {
             UserAccount owner = userCache.get(newAsset.getAssetOwnerName());
             if (Objects.nonNull(owner)) {
@@ -866,10 +869,10 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getClinicalOwnerName());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
                     newAsset.setClinicalOwnerName(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "此用户已停用");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "此用户已停用");
                     newAsset.setClinicalOwnerName(null);
                 } else {
                     newAsset.setClinicalOwnerId(userAccounts.get(0).getId());
@@ -881,7 +884,7 @@ public class AssetFileImportBaseService {
 
         //for Pm OwnerName
         if (newAsset.getPmOwnerName() == null) {
-            AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("pmOwnerName") + "未设置");
+            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("pmOwnerName") + "未设置");
         } else {
             UserAccount owner = userCache.get(newAsset.getAssetOwnerName());
             if (Objects.nonNull(owner)) {
@@ -890,10 +893,10 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPmOwnerName());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
                     newAsset.setPmOwnerName(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "此用户已停用");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("pmOwnerName") + newAsset.getPmOwnerName() + "此用户已停用");
                     newAsset.setPmOwnerName(null);
                 } else {
                     newAsset.setPmOwnerId(userAccounts.get(0).getId());
@@ -903,7 +906,7 @@ public class AssetFileImportBaseService {
             }
         }
         if (newAsset.getPatrolInspectionOwnerName() == null) {
-            AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + "未设置");
+            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("patrolInspectionOwnerName") + "未设置");
         } else {
             UserAccount owner = userCache.get(newAsset.getAssetOwnerName());
             if (Objects.nonNull(owner)) {
@@ -912,7 +915,7 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPatrolInspectionOwnerName());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "无此用户/无法关联");
                     newAsset.setPatrolInspectionOwnerName(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
                     AssetRow.addErrMessage(importData, "警告:" + WebUtil.getMessage("patrolInspectionOwnerName") + newAsset.getPatrolInspectionOwnerName() + "此用户已停用");
