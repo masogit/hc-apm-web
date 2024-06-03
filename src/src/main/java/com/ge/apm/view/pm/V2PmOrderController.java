@@ -1677,6 +1677,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
+        orgList = new ArrayList<>();
+        orgListMVS = new ArrayList<>();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
