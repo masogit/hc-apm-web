@@ -301,8 +301,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         try {
             toBeTerminatedAppraisalFile = null;
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
-            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
-            AssetTerminationReportTemplate assetTerminationReportTemplate = exportToBeTerminatedAppraisalService.getAssetTerminationReportTemplate(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
+            AssetTerminationReportTemplate assetTerminationReportTemplate = exportToBeTerminatedAppraisalService.getAssetTerminationReportTemplate(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
             boolean singleFileImport = (assetTerminationReportTemplate != null && assetTerminationReportTemplate.getSingleFileImport()) || assetTerminationReportTemplate == null;
             if(singleFileImport){
                 toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
