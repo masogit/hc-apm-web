@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -927,6 +928,130 @@ public class ZkbPartOrderStatusService {
         return "";
     }
 
+    public boolean checkComplete(ZkbPartOrder selected, List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList, List<V2_BlobObject> closeBlobObjectList, ZkbPartOrderCloseInfo zkbPartOrderCloseInfo){
+        boolean r = true;
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getUdi())){
+            WebUtil.addErrorMessage("设备UDI不能为空！",  "");
+            r = false;
+        }
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getSafetyConcern())){
+            WebUtil.addErrorMessage("Safety Concern(该故障是否存在潜在伤害或已导致实际伤害)不能为空！",  "");
+            r = false;
+        }
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientUse())){
+            WebUtil.addErrorMessage("Patient Use(故障发生时是否有病人在使用机器)不能为空！",  "");
+            r = false;
+        }else {
+            if("Yes".equals(zkbPartOrderCloseInfo.getPatientUse())){
+                if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getRiskType())){
+                    WebUtil.addErrorMessage("有病人使用，存在病患风险，请选择风险分类不能为空！",  "");
+                    r = false;
+                }
+            }else if("No".equals(zkbPartOrderCloseInfo.getPatientUse())){
+                if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getNoRiskType())){
+                    WebUtil.addErrorMessage("没有病人使用，没有病患风险，请选择没有风险分类不能为空！",  "");
+                    r = false;
+                }
+            }else if("NotReported".equals(zkbPartOrderCloseInfo.getPatientUse())){
+                if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getNoReportType())){
+                    WebUtil.addErrorMessage("请选择没有告知是否有病患/未报告的类别不能为空！",  "");
+                    r = false;
+                }
+            }
+        }
+        if("Yes".equals(zkbPartOrderCloseInfo.getPatientUse()) || "Potential".equals(zkbPartOrderCloseInfo.getSafetyConcern()) || "Actual".equals(zkbPartOrderCloseInfo.getSafetyConcern())){
+            if(zkbPartOrderCloseInfo.getEventDated() == null){
+                WebUtil.addErrorMessage("Event Date(病人影响事件发生的时间)不能为空！",  "");
+                r = false;
+            }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getQualityContactPerson())){
+                WebUtil.addErrorMessage("Quality Contact(质量联系人姓名)不能为空！",  "");
+                r = false;
+            }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getQualityContactPhone())){
+                WebUtil.addErrorMessage("Quality Contact(质量联系人电话)不能为空！",  "");
+                r = false;
+            }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getInterventionRequired())){
+                WebUtil.addErrorMessage("Intervention Required(需要的干涉)不能为空！",  "");
+                r = false;
+            }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getAdditionalDetails())){
+                WebUtil.addErrorMessage("Additional Details(额外的信息)不能为空！",  "");
+                r = false;
+            }
+        }else if("NotReported".equals(zkbPartOrderCloseInfo.getPatientUse()) && "No".equals(zkbPartOrderCloseInfo.getSafetyConcern()) ){
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getQualityContactPerson())){
+                WebUtil.addErrorMessage("Quality Contact(质量联系人姓名)不能为空！",  "");
+                r = false;
+            }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getQualityContactPhone())){
+                WebUtil.addErrorMessage("Quality Contact(质量联系人电话)不能为空！",  "");
+                r = false;
+            }
+        }
+        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientImpactOutcome())){
+            WebUtil.addErrorMessage("Patient Impact/Outcome病人影响/结果不能为空！",  "");
+            r = false;
+        }
+        if("Actual".equals(zkbPartOrderCloseInfo.getSafetyConcern())){
+            if(zkbPartOrderCloseInfo.getIncidentDate() == null){
+                WebUtil.addErrorMessage("Incident date(该故障导致实际伤害事件的时间)不能为空！",  "");
+                r = false;
+            }
+        }
+        /*if(zkbPartOrderCloseInfo.getAllegedPatientConsequence() == null){
+            WebUtil.addErrorMessage("病人结果不能为空！",  "");
+            r = false;
+        }*/
+
+        if(zkbPartOrderCloseInfo.getProblemReason() == null){
+            WebUtil.addErrorMessage("Problem(工程师服务原因)不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getActionContent() == null){
+            WebUtil.addErrorMessage("Action(工程师服务内容)不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseInfo.getTestResult() == null){
+            WebUtil.addErrorMessage("Test(工程师服务结果)不能为空！",  "");
+            r = false;
+        }
+        if(zkbPartOrderCloseWorkTimeList == null || zkbPartOrderCloseWorkTimeList.size() == 0){
+            WebUtil.addErrorMessage("工作&差旅时间不能为空!","");
+            r = false;
+        }else{
+            boolean f = false;
+            StringBuilder errorMsg = new StringBuilder();
+            for(ZkbPartOrderCloseWorkTime t : zkbPartOrderCloseWorkTimeList){
+                if("Phone Support".equals(t.getDateType())){
+                    f = true;
+                }else if("onsite".equals(t.getDateType())){
+                    f = true;
+                }
+                if(t.getStartTime().getTime() >= t.getEndTime().getTime()){
+                    errorMsg.append(String.format("日期：【%tF】开始时间不能大于等于结束时间！\r", t.getWorkDated()));
+                }
+            }
+            if(!f){
+                WebUtil.addErrorMessage("必须有一个【远程支持】或【现场维修】时间类型!","");
+            }
+            if(StringUtils.isNotEmpty(errorMsg)){
+                WebUtil.addErrorMessage(errorMsg.toString(),"");
+                r = false;
+            }
+        }
+        if(closeBlobObjectList == null || closeBlobObjectList.size() == 0){
+            WebUtil.addErrorMessage("服务记录单不能为空!","");
+            r = false;
+        }
+        if(zkbPartOrderService.checkCloseInfoBySrNum(selected.getSrNo(), zkbPartOrderCloseInfo)){
+            WebUtil.addErrorMessage("srNo已经存在完成信息，不需要重复提交!","");
+            r = false;
+        }
+        return r;
+    }
+
     public String normalCheckPartQuota(ZkbPartOrder selected, ZkbContract c){
         if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
             boolean flag = true;
@@ -1054,6 +1179,11 @@ public class ZkbPartOrderStatusService {
 
 
     public List<ZkbPartOrderCloseWorkTime> getZkbPartOrderCloseWorkTimeList(String closeId){
-        return zkbPartOrderCloseWorkTimeRepository.findByCloseId(closeId);
+        List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList = zkbPartOrderCloseWorkTimeRepository.findByCloseId(closeId);
+        for (int i =0; i< zkbPartOrderCloseWorkTimeList.size(); i++){
+            ZkbPartOrderCloseWorkTime zkbPartOrderCloseWorkTime = zkbPartOrderCloseWorkTimeList.get(i);
+            zkbPartOrderCloseWorkTime.setIndex(i);
+        }
+        return zkbPartOrderCloseWorkTimeList;
     }
 }

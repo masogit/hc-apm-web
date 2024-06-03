@@ -414,7 +414,14 @@
                         <p:tab title="事件原因初步分析与处置">
                             <h:panelGroup>
                                 <label class="label">事件原因分析<span style="color:red">*</span></label>
-                                <p:selectOneRadio value="#{adverseEventApproveController.selected.eventCauseAnalyze}" required="true" requiredMessage="事件原因分析必填" id="eventCauseAnalyze" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" >
+                                <p:selectManyCheckbox  value="#{adverseEventApproveController.selectedOptions}" widgetVar="blub"  required="true" requiredMessage="事件原因分析不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"
+                                                       layout="lineDirection" columns="1" styleClass="grid-checkbox"  >
+                                    <f:selectItem itemLabel="产品原因（包括说明书等）" itemValue="1" />
+                                    <f:selectItem itemLabel="操作原因" itemValue="2" />
+                                    <f:selectItem itemLabel="患者自身原因" itemValue="3" />
+                                    <f:selectItem itemLabel="无法确定" itemValue="4" />
+                                </p:selectManyCheckbox>
+                               <!-- <p:selectOneRadio value="#{adverseEventApproveController.selected.eventCauseAnalyze}" required="true" requiredMessage="事件原因分析必填" id="eventCauseAnalyze" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" >
                                     <f:selectItem itemValue="1"/>
                                     <f:selectItem itemValue="2" />
                                     <f:selectItem itemValue="3" />
@@ -435,7 +442,7 @@
                                 <h:panelGroup>
                                     <p:radioButton for="eventCauseAnalyze" itemIndex="3"/>
                                     <h:outputLabel value="无法确定" styleClass="radiolabelPF"/>
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">事件原因分析描述</label>
@@ -450,11 +457,11 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">故障零部件或结构<span style="color:red">*</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.faultyParts}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="故障零部件或结构不能为空"/>
+                                    <p:inputTextarea value="#{adverseEventApproveController.selected.faultyParts}" maxlength="500" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="故障零部件或结构不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">潜在风险（可能导致的临床风险）<span style="color:red">*</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.potentialRisks}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="潜在风险（可能导致的临床风险）不能为空"/>
+                                    <p:inputTextarea value="#{adverseEventApproveController.selected.potentialRisks}" maxlength="500" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="潜在风险（可能导致的临床风险）不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">可能导致的伤害程度<span style="color:red">*</span></label>
@@ -492,10 +499,6 @@
                                     </h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">维修方案具体内容</label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.maintenancePlanInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
                                     <label class="label">是否有有效维护保养措施<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.hasMaintenanceMeasures}" id="hasMaintenanceMeasures" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="是否有有效维护保养措施不能为空">
                                         <f:selectItem itemValue="1"/>
@@ -511,12 +514,16 @@
                                     </h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">有效维护保养措施具体内容</label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.maintenanceMeasuresInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
                                     <label class="label">设备启用日期<span style="color:red">*</span></label>
                                     <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.deviceStartDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="设备启用日期不能为空"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">维修方案具体内容</label>
+                                    <p:inputText value="#{adverseEventApproveController.selected.maintenancePlanInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">有效维护保养措施具体内容</label>
+                                    <p:inputText value="#{adverseEventApproveController.selected.maintenanceMeasuresInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">设备报废（停用）日期</label>
@@ -525,7 +532,6 @@
                                 <h:panelGroup>
                                     <label class="label">维修机构<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.maintenanceOrganization}" id="maintenanceOrganization" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="维修机构不能为空">
-                                        <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:maintenanceOrganizationInfoGroup" />
                                         <f:selectItem itemValue="1"/>
                                         <f:selectItem itemValue="2" />
                                         <f:selectItem itemValue="3" />
@@ -542,36 +548,25 @@
                                         <p:radioButton for="maintenanceOrganization" itemIndex="2"/>
                                         <h:outputLabel value="其他（请描述）" styleClass="radiolabelPF"/>
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3'}">
+                                        <label class="label">机构名称或描述<span style="color:red">*</span></label>
+                                        <p:inputText value="#{adverseEventApproveController.selected.maintenanceOrganizationInfo}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? true : false}" requiredMessage="机构名称或描述不能为空"/>
+                                    </h:panelGroup>
                                 </h:panelGroup>
-                                <h:panelGroup id="maintenanceOrganizationInfoGroup">
-                                    <label class="label">机构名称或描述<span style="color:red">#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? '*' : ''}</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.maintenanceOrganizationInfo}" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.maintenanceOrganization eq '2' or adverseEventApproveController.selected.maintenanceOrganization eq '3' ? true : false}" requiredMessage="机构名称或描述不能为空"/>
-                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <label class="label">故障处理方式<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.processingMode}" id="processingMode" layout="custom" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="true" requiredMessage="故障处理方式不能为空" >
-                                        <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:processingModeInfoGroup" />
-                                        <f:selectItem itemValue="1"/>
-                                        <f:selectItem itemValue="2" />
-                                        <f:selectItem itemValue="3" />
+                                        <f:selectItem itemValue="1" itemLabel="硬件维修或更换"/>
+                                        <f:selectItem itemValue="2" itemLabel="软件升级"/>
+                                        <f:selectItem itemValue="3" itemLabel="其他（请描述）"/>
                                     </p:selectOneRadio>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="0"/>
-                                        <h:outputLabel value="硬件维修或更换" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="1"/>
-                                        <h:outputLabel value="软件升级" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="processingMode" itemIndex="2"/>
-                                        <h:outputLabel value="其他（请描述）" styleClass="radiolabelPF"/>
+                                    <h:panelGroup rendered="#{adverseEventApproveController.selected.processingMode eq '3'}">
+                                        <label class="label">故障处理方式描述<span style="color:red">*</span></label>
+                                        <p:inputText value="#{adverseEventApproveController.selected.processingModeInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}" />
                                     </h:panelGroup>
                                 </h:panelGroup>
-                                <h:panelGroup id="processingModeInfoGroup">
-                                    <label class="label">故障处理方式描述<span style="color:red">#{adverseEventApproveController.selected.processingMode eq '3' ? '*' : ''}</span></label>
-                                    <p:inputText value="#{adverseEventApproveController.selected.processingModeInfo}" maxlength="2000" disabled="#{adverseEventApproveController.readOnlyCreateForm}" required="#{adverseEventApproveController.selected.processingMode eq '3' ? true : false}" requiredMessage="故障处理方式描述不能为空"/>
-                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <label class="label">使用次数</label>
                                     <p:spinner id="useCnt" value="#{adverseEventApproveController.selected.useCnt}" min="0" max="10000000" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
@@ -706,10 +701,19 @@
                             <p:commandButton value="暂存" actionListener="#{adverseEventApproveController.tempSaveAdverseEvent(3)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3}" validateClient="true" update="AdverseEventApproveEditForm "/>
                             <p:commandButton value="提交" actionListener="#{adverseEventApproveController.tempSaveAdverseEvent(6)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3 }" validateClient="true" update="AdverseEventApproveEditForm "/>
                             <p:commandButton value="退回" icon="ui-icon-check" style="float:left" validateClient="true" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3}" update="returnReasonDisable " oncomplete="PF('returnReasonDisable').show()"/>
-                            <p:commandButton value="邮件上报" icon="ui-icon-check" style="float:left" immediate="true" rendered="#{adverseEventApproveController.selected.status == 7}" update="dlgSendMailDisable " oncomplete="PF('dlgSendMailDisable').show()"/>
+                            <p:commandButton value="邮件上报" icon="ui-icon-check" style="float:left" immediate="true" rendered="#{adverseEventApproveController.selected.status == 7 and adverseEventApproveController.selected.adverseEventType != '2'}" update="dlgSendMailDisable " oncomplete="PF('dlgSendMailDisable').show()"/>
                             <p:commandButton value="返回" icon="ui-icon-cancel" action="adverseEventApproveList.xhtml?faces-redirect=true" immediate="true" style="float:left"/>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <style>
+                        /*.ui-selectmanycheckbox.ui-widget td, .ui-selectoneradio.ui-widget label, .ui-selectoneradio.ui-widget td {
+                            color: red;
+                        }*/
+                        .ui-selectmanycheckbox .ui-chkbox {
+                            width: 5%!important;
+                            padding-right: 8px;
+                        }
+                    </style>
                 </h:form>
             </div>
             <p:dialog modal="true" id="returnReasonDisable" widgetVar="returnReasonDisable" header="退回" appendTo="@(body)">

@@ -3769,6 +3769,35 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','onsite','onsite(现场维修时间)','onsite',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoWorkDateType','Phone Support','Phone Support(远程支持时间)','Phone Support',NULL,-1);
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','ContrasRadioPharm','Contrast/RadioPharm injected（造影剂/放射性药物注射）','ContrasRadio Pharmt injected',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','DeviceConnectedToPatient','Device connected to patient（器械连接到患者）','Device connected to patient',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','ImagesScansAndReviewed','Images/Scans acquired/reviewed（图像/扫描采集/审查）','Images/Scans acquired/reviewed',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','InfantInWarmer','Infant in warmer/incubator（保暖台/保育箱中的婴儿）','Infant in warmer/incubator',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','PatientInjectedWithContrast','Patient injected with contrast（注射造影剂的患者）','Patient injected with contrast',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','ProcedureProcess','Exam/Procedure was in progress（检查/手术进行中）','Exam/Procedure was in progress',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoRiskType','PatientOnTable','Patient was on table（患者位于检查床上）','Patient was on table',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoNoRiskType','PreUseCheckout','Pre use checkout/quality tests（使用前核对检查/质量测试）','Pre use checkout',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoNoRiskType','ServicingDevice','Servicing or handling device（器械检修或处理）','Servicing or handling device',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoNoReportType','RequestedDeclined','Requested, customer declined（已提出请求，客户已拒绝）','Requested, customer declined',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoNoReportType','UseNotReported','Use Not Reported（未报告使用情况）', 'Use Not Reported',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','ProcedureImagingCompleted','Procedure/imaging completed（手术/成像已完成）', 'Procedure/imaging completed',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','CaseCompleteVitalsUnaffected','Case complete vitals unaffectd（病例完结，生命体征未受影响）', 'Case complete vitals unaffectd',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','ProcedureImagingRepeated','Procedure/imaging repeated（手术/成像重复）', 'Procedure/imaging repeated',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','ContrastRadioPharmReinjected','Contrast/RadioPharm reinjected（造影剂/放射性药物再注射）', 'Contrast/RadioPharm reinjected',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','ResumedOnAnotherSystem','Resumed on another system（在另一套系统上恢复）', 'Resumed on another system',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','ResumedOnCurrentSystem','Resumed on current system（在当前系统上恢复）', 'Resumed on current system',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','Rescheduled','Rescheduled（重新安排）', 'Rescheduled',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','Xfer','Xfer Device, vitals unaffected（Xfer器械，生命体征未受影响）', 'Xfer Device, vitals unaffected',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','PersonInjured','Person Injured（人员受伤）', 'Person Injured',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','MisdiagnosedNeed','Misdiagnosed-Need More Info（误诊 - 需要更多信息）', 'Misdiagnosed-Need More Info',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','NoPatientInvolved','No Patient Involved（未累及患者）', 'No Patient Involved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','NotReported','Not Reported - Need More Info（未报告 - 需要更多信息）', 'Not Reported - Need More Info',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoPatientImpactOutcome','Other','Other - Impact in more info（其他 - 影响，需要更多信息）', 'Other - Impact in more info',NULL,-1);
+
+
 
 -- 归还类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_zkbPoReturnType','badReturn','坏还','Bad Return',NULL,-1);
@@ -5369,3 +5398,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('RepairSource','Measurement','计量','Measurement',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('RepairSource','Inventory','盘点','Inventory',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','RepairSource','维修工单来源','RepairSource',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('importTemplateType','ToBeTerminated','待报废模板','ToBeTerminated',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('importTemplateType','Terminated','报废模板','Terminated',NULL,-1);

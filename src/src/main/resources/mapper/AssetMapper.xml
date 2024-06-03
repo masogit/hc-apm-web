@@ -143,10 +143,10 @@
             </if>
 
             <if test="functionType != null">
-                AND ai.functionType like concat('%',#{functionType},'%')
+                AND ai.function_type like concat('%',#{functionType},'%')
             </if>
             <if test="financingNum != null">
-                AND ai.financingNum like concat('%',#{financingNum},'%')
+                AND ai.financing_num like concat('%',#{financingNum},'%')
             </if>
             <if test="departNum != null">
                 AND ai.depart_num = #{departNum}

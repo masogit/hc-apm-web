@@ -5,7 +5,6 @@ import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -29,7 +28,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -303,8 +301,17 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         try {
             toBeTerminatedAppraisalFile = null;
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
-            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
-            toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
+            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
+            AssetTerminationReportTemplate assetTerminationReportTemplate = exportToBeTerminatedAppraisalService.getAssetTerminationReportTemplate(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
+            boolean singleFileImport = (assetTerminationReportTemplate != null && assetTerminationReportTemplate.getSingleFileImport()) || assetTerminationReportTemplate == null;
+            if(singleFileImport){
+                toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
+            }else{
+                toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.exportZip(selectedIds, activeTemplateBytes);
+
+            }
+
+
         } catch (IllegalStateException e) {
             WebUtil.addErrorMessage(e.getMessage());
         } catch (IOException e) {

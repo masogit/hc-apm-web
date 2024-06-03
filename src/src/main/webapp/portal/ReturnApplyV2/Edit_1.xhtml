@@ -228,7 +228,7 @@
                     </h:panelGroup>
                 </p:fieldset>
                 <ui:include src="/portal/ReturnAcceptanceV2/ReturnAttachmentxhtml.xhtml"/>
-                <p:fieldset legend="签名" style="margin-bottom:20px" id="signatureFieldset">
+                <p:fieldset legend="签名" style="margin-bottom:20px" id="signatureFieldset" rendered="#{sharedAssetRequestV2Controller.selected.state == 12}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup >
                             <p:signature  id="signatureContent" style="width:400px;height:200px" widgetVar="sig" base64Value="#{sharedAssetRequestV2Controller.signatureContent}"

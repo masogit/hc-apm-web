@@ -41,8 +41,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     Logger logger = LoggerFactory.getLogger(ZkbPartOrderService.class);
 
-    private boolean completeOpenFlag = true;
-
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
@@ -319,8 +317,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.CommercialReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseApproved.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseFailed.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseCommited.toString()));
         List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
         Integer unReturnQty = 0;
         for(ZkbPartOrder o : zkbPartOrders){
@@ -410,10 +413,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
                 if(StrUtil.isEmpty(selected.getSrNo())){
-                    errorLog.append("SR#不能为空，\r\n");
+                    errorLog.append("服务序号SR#不能为空，\r\n");
                 }
                 if(StrUtil.isEmpty(selected.getActivityNo())){
-                    errorLog.append("Act#不能为空，\r\n");
+                    errorLog.append("服务编号Activity#不能为空，\r\n");
                 }
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 if(StrUtil.isEmpty(selected.getOrderNo())){
@@ -451,10 +454,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 if(StrUtil.isEmpty(selected.getSrNo())){
-                    errorLog.append("SR#不能为空，\r\n");
+                    errorLog.append("服务序号SR#不能为空，\r\n");
                 }
                 if(StrUtil.isEmpty(selected.getActivityNo())){
-                    errorLog.append("Act#不能为空，\r\n");
+                    errorLog.append("服务编号Activity#不能为空，\r\n");
                 }
             }
         }
@@ -478,6 +481,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
         }
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseApproved.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseFailed.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.CloseCommited.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
@@ -1208,15 +1215,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setClosedAuditer(userAccount.getName());
                 zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
                 //如果srNo之前存在了完成信息，那么直接结束，否则进行完成信息的填写
-                if(completeOpenFlag){
-                    ZkbPartOrderCloseInfo ci = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
-                    if(ci == null || StringUtils.isEmpty(ci.getId())){
-                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
-                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
-                    }else{
-                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
-                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
-                    }
+                ZkbPartOrderCloseInfo ci = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
+                if(ci == null || StringUtils.isEmpty(ci.getId())){
+                    zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
                 }else{
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
@@ -1258,11 +1260,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Returned.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
             }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(zkbPartOrder.getStatus())){
+                if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
+                    //如果srNo之前存在了完成信息，那么直接结束，否则进行完成信息的填写
+                    ZkbPartOrderCloseInfo ci = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
+                    if(ci == null || StringUtils.isEmpty(ci.getId())){
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompletePending.toString());
+                    }else{
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+                    }
+                }else{
+                    zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+                }
                 zkbPartOrder.setClosedDate(new Date());
                 zkbPartOrder.setClosedAuditer(userAccount.getName());
                 zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
-                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
-                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.CompletePending.toString())) {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString());
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.CloseCommited.toString());
@@ -1389,8 +1403,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return result;
     }
 
-
-
     public void probeOrderNewCatChangeCalcQty(ZkbPartOrder zkbPartOrder, ZkbContract zkbContract){
         if(StrUtil.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
             if(!zkbPartOrder.getNewCatFlag().equals(zkbPartOrder.getTenantNewCatFlag())){
@@ -1435,6 +1447,33 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }
         }
+    }
+
+    public void tempSaveComplete(ZkbPartOrderCloseInfo zkbPartOrderCloseInfo, ZkbPartOrder zkbPartOrder, List<ZkbPartOrderCloseWorkTime> zkbPartOrderCloseWorkTimeList, List<V2_BlobObject> v2BlobObjectList, UserAccount userAccount){
+        if(StringUtils.isEmpty(zkbPartOrderCloseInfo.getPartOrderId())){
+            zkbPartOrderCloseInfo.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+            zkbPartOrderCloseInfo.setPartOrderId(zkbPartOrder.getId());
+            zkbPartOrderCloseInfo.setSrNo(zkbPartOrder.getSrNo());
+        }
+        zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.save(zkbPartOrderCloseInfo);
+        for(ZkbPartOrderCloseWorkTime w : zkbPartOrderCloseWorkTimeList){
+            if(StrUtil.isEmpty(w.getCloseId())){
+                w.setSrNo(zkbPartOrder.getSrNo());
+                w.setPartOrderId(zkbPartOrder.getId());
+                w.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+                w.setCloseId(zkbPartOrderCloseInfo.getId());
+            }
+        }
+        zkbPartOrderCloseWorkTimeRepository.save(zkbPartOrderCloseWorkTimeList);
+
+        for(V2_BlobObject v :v2BlobObjectList){
+            if(StrUtil.isEmpty(v.getBoUuid())){
+                v.setBoUuid(zkbPartOrderCloseInfo.getId());
+            }
+        }
+        blobObjectRepository.save(v2BlobObjectList);
+        //將其他srNo的數據設置為已完成。
+        updateCompleteAuditBySrNum(zkbPartOrder);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -2978,7 +3017,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setClosedDate(new Date());
             zkbPartOrder.setClosedAuditer(userAccount.getName());
             zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
-            if(completeOpenFlag && StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
+            if(StringUtils.isEmpty(zkbPartOrder.getNotGeAsset())){
                 ZkbPartOrderCloseInfo zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(zkbPartOrder.getSrNo());
                 if(zkbPartOrderCloseInfo == null){
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString());

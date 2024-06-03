@@ -10,7 +10,7 @@ import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class AssetImportIntegerConverter implements Converter<Integer> {
+public class AssetImportIntegerConverter implements ApmEasyExcelConvert, Converter<Integer> {
 
 
     @Override
@@ -37,7 +37,16 @@ public class AssetImportIntegerConverter implements Converter<Integer> {
             return numberValue.intValue();
         } else {
             String stringValue = context.getReadCellData().getStringValue();
-            return Integer.parseInt(stringValue);
+            if ("#".equals(stringValue)) {
+                deleteMarkHandel(context);
+                return null;
+            }
+            try {
+                return Integer.parseInt(stringValue);
+            } catch (Exception e) {
+                dataFormatHandel(context, "应为数字类型");
+            }
         }
+        return null;
     }
 }

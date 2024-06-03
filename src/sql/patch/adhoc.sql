@@ -32,3 +32,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 14, '', '不良事件上报SecretKey', 'adverseEventsReportSecretKey', '不良事件上报SecretKey', 'f','t',1 where not exists(select * from config_item where key = 'adverseEventsReportSecretKey');
 
 ALTER TABLE public.delay_template_message ALTER COLUMN param TYPE text USING param::text;
+
+--不良事件历史数据【不良工单类型】赋值
+update adverse_events set adverse_event_type = '1'  where adverse_event_type is null;

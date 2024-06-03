@@ -260,6 +260,12 @@
                             <p:column headerText="意向品牌">
                                 <h:outputText value="#{item.confirmBrand}"/>
                             </p:column>
+                            <p:column headerText="收费项目">
+                                <h:outputText value="#{item.meetingFeeItems}"/>
+                            </p:column>
+                            <p:column headerText="耗材或试剂说明">
+                                <h:outputText value="#{item.meetingConsumableDescription}"/>
+                            </p:column>
                             <p:column headerText="确认数量（台）">
                                 <h:outputText value="#{item.confirmQuantity}"/>
                             </p:column>
@@ -282,7 +288,7 @@
                     <p:fieldset legend="过会信息" id="purchaseInfoMeeting" rendered="#{multiLevelApprovalController.approvaLevelPurchase() eq 2}" >
                             <p:fieldset legend="设备科意见" >
                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="false">
                                         <label class="label">专业工程师意见<span style="color: red">*</span></label>
                                         <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEngineerOpinion}" />
                                     </h:panelGroup>
@@ -290,14 +296,14 @@
                                         <label class="label">医院现有品牌<span style="color: red">*</span></label>
                                         <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingExistingBrands}" />
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <!--<h:panelGroup>
                                         <label class="label">收费项目<span style="color: red">*</span></label>
                                         <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingFeeItems}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">耗材或试剂说明<span style="color: red">*</span></label>
                                         <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingConsumableDescription}" />
-                                    </h:panelGroup>
+                                    </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">器械科审核意见<span style="color: red">*</span></label>
                                         <p:inputText  value="#{multiLevelApprovalController.purchaseOrderInfo.meetingEquipmentDeptOpin}" />

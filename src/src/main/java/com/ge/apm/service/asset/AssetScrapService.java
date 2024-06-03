@@ -20,17 +20,20 @@ public class AssetScrapService  extends MicroServiceInvoker {
 
 
 
-    public void apply(Integer assetId,String applyReason,String approvalReason) {
+    public void apply(Integer assetId,String applyReason,String approvalReason,String equipmentDisposalMethod,String customDisposalMethod) {
         HashMap<String, String> map = new HashMap<>();
         map.put("assetId",String.valueOf(assetId));
         map.put("applyReason",applyReason);
-        map.put("approvalReason",approvalReason);
+        map.put("reviewReason",approvalReason);
+        map.put("equipmentDisposalMethod",equipmentDisposalMethod);
+        map.put("customDisposalMethod",customDisposalMethod);
         String token = UserContextService.getAccessToken();
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_APPLY);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
         if (isOkay(response)) {
+            WebUtil.addSuccessMessage("申请成功");
             logger.info("AssetScrapService apply assetId:{},result:{}", assetId , responseMap.get("data"));
         }else {
             WebUtil.addErrorMessage((String)responseMap.get("message"));
