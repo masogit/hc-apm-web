@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.AssetScrapRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
@@ -64,6 +65,9 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private AssetLifecyleService assetLifecyleService;
+
+    @Autowired
+    private AssetScrapRepository assetScrapRepository;
 
     public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
         ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
@@ -140,7 +144,7 @@ public class ExportToBeTerminatedAppraisalService {
                             map.put(k.name(), v)
                         );
                         byte[] bytes = generate(map, templateBytes);
-                        if (bytes != null) {
+                        if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
                             String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
@@ -170,7 +174,7 @@ public class ExportToBeTerminatedAppraisalService {
             template.write(out);
         } catch (IOException e) {
             logger.error("报废鉴定报导出失败 generate error:", e);
-            return null;
+            return new byte[0];
         }
         return out.toByteArray();
     }
@@ -214,22 +218,21 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(termination_cause, assetInfo.getTerminationCause());   //报废原因
             map.put(asset_dept_owner_name, "");   //科室负责人
             map.put(clinical_dept_name, assetInfo.getClinicalDeptName());   //所属科室
-            map.put(site, orgInfoMap.get(assetInfo.getSiteUID()));   //所属科室
-            map.put(comments, null);   //维修部门意见
+            map.put(site, orgInfoMap.get(assetInfo.getSiteUID()));   //院区
+            if(StringUtils.isNotBlank(assetInfo.getAssetScrapId())){
+                AssetScrap assetScrap = assetScrapRepository.findById(assetInfo.getAssetScrapId());
+                map.put(comments, assetScrap.getApprovalReason());   //维修部门意见
+            }
             map.put(num, 1);   //数量
-
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
             Integer lifecycle = assetInfo.getLifecycle();
             Double purchasePrice = assetInfo.getPurchasePrice();
-
             if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
                 double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
                 double price = assetUsedLifecycleDouble / lifecycle * purchasePrice;
                 BigDecimal bigDecimal = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
                 map.put(accumulated_depreciation, bigDecimal);   //累计折旧
             }
-
-
             AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
             if(lifecycles!=null){
 //                map.put(application_date, lifecycles!=null?lifecycles.getModifyTime().toString():"");   //申报时间
@@ -294,30 +297,35 @@ public class ExportToBeTerminatedAppraisalService {
 
     }
 
-    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
+    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID,String templateType) throws IOException {
         byte[] templateBytes = null;
-        AssetTerminationReportTemplate template = getAssetTerminationReportTemplate(isInsulate, siteUID, hospitalUID, institutionUID, tenantUID);
-
+        AssetTerminationReportTemplate template = getAssetTerminationReportTemplate(isInsulate, siteUID, hospitalUID, institutionUID, tenantUID,templateType);
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
             try {
                 templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
-            }catch (Exception e){
+            } catch (IOException e) {
                 templateBytes=null;
             }
         }
+
         if (templateBytes == null) {
-            String fileName = "tobeterminated_template.docx";
-            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-                fileName = "tobeterminated_template_zh.docx";
-            } else {
-                fileName = "tobeterminated_template_en.docx";
-            }
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
+            Map<String, String> templateMapping = new HashMap<>();
+            templateMapping.put("ToBeTerminated", "tobeterminated_template");
+            templateMapping.put("Terminated", "terminated_template");
+            templateMapping.put("zh", "_zh.docx");
+            templateMapping.put("en", "_en.docx");
+             String localeSuffix = LocaleHolder.getLocale().toString().substring(0, 2).toLowerCase();
+             String fileNameBase = templateMapping.get(templateType);
+             String fileExtension = templateMapping.get(localeSuffix);
+             String fileName = fileNameBase + fileExtension;
+             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
         }
+
+
         return templateBytes;
     }
 
-    public AssetTerminationReportTemplate getAssetTerminationReportTemplate(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
+    public AssetTerminationReportTemplate getAssetTerminationReportTemplate(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID,String templateType) {
         List<String> uids = new ArrayList<>();
         populateUidList(uids, siteUID);
         if (!isInsulate) {
@@ -326,14 +334,14 @@ public class ExportToBeTerminatedAppraisalService {
             populateUidList(uids, tenantUID);
         }
 
-        AssetTerminationReportTemplate prioritizedTemplate = getPrioritizedTemplate(uids);
+        AssetTerminationReportTemplate prioritizedTemplate = getPrioritizedTemplate(uids,templateType);
         return prioritizedTemplate;
     }
 
-    private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids) {
+    private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids,String templateType) {
         List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         for (String uid : uids) {
-            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),"ToBeTerminated")    ).findFirst();
+            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)   && StringUtils.equals(i.getTemplateType(),templateType)    ).findFirst();
             if (optional.isPresent()) {
                 return optional.get();
             }
