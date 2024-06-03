@@ -28,7 +28,8 @@ public class BudgetApplicationProvider {
                 "  t.data_source," +
                 "  uap.name as approveName," +
                 "  oi.name as applicationDeptName," +
-                "  t.approval_date" +
+                "  t.approval_date," +
+                "  baa.offline_application_quantity" +
                 "  from budget_application t" +
                 "  inner join budget_application_asset baa on t.id = baa.application_id" +
                 "  left join user_account ua on t.applicant_id = ua.id" +

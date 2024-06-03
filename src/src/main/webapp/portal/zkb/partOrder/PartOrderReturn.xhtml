@@ -44,6 +44,15 @@
                     </c:when>
                     <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <h:panelGroup>
+                            <label class="label">归还数量*</label>
+                            <p:spinner value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="1000"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">备注</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">归还类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" required="true" requiredMessage="归还类型不能为空"  disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}">
                                 <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup goodReturnAttachment sevenReturnedFlagGroup" />

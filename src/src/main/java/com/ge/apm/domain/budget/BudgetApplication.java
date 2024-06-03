@@ -225,6 +225,17 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "confirm_status")
     private String confirmStatus;
 
+    @Transient
+    private Integer offlineApplicationQuantity;
+
+    public Integer getOfflineApplicationQuantity() {
+        return offlineApplicationQuantity;
+    }
+
+    public void setOfflineApplicationQuantity(Integer offlineApplicationQuantity) {
+        this.offlineApplicationQuantity = offlineApplicationQuantity;
+    }
+
     public String getApprovalLoginName() {
         return approvalLoginName;
     }

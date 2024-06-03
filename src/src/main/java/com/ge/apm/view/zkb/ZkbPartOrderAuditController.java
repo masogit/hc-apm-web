@@ -145,18 +145,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
 
-            if(ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString().equals(selected.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.Complete.toString().equals(selected.getCurrentStep())) {
-                if (ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())) {
-                    zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(selected.getSrNo());
-                    if (zkbPartOrderCloseInfo == null) {
-                        zkbPartOrderCloseInfo = new ZkbPartOrderCloseInfo();
-                    } else {
-                        closeBlobObjectList = blobService.findBlobObjectsByBoUid(zkbPartOrderCloseInfo.getId());
-                        zkbPartOrderCloseWorkTimeList = zkbPartOrderStatusService.getZkbPartOrderCloseWorkTimeList(zkbPartOrderCloseInfo.getId());
-                    }
+            List<String> sts = Arrays.asList(ZkbPartOrderStep.PartOrderStep.CompletePending.toString(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString(),ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString(), ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            if(sts.contains(selected.getCurrentStep())) {
+                zkbPartOrderCloseInfo = zkbPartOrderCloseInfoRepository.findFirstBySrNo(selected.getSrNo());
+                if (zkbPartOrderCloseInfo == null) {
+                    zkbPartOrderCloseInfo = new ZkbPartOrderCloseInfo();
+                } else {
+                    closeBlobObjectList = blobService.findBlobObjectsByBoUid(zkbPartOrderCloseInfo.getId());
+                    zkbPartOrderCloseWorkTimeList = zkbPartOrderStatusService.getZkbPartOrderCloseWorkTimeList(zkbPartOrderCloseInfo.getId());
                 }
             }
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
@@ -606,6 +602,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
+    /**
+     * 关单暂存
+     */
+    public void tempSaveComplete(){
+        zkbPartOrderService.tempSaveComplete(zkbPartOrderCloseInfo, selected, zkbPartOrderCloseWorkTimeList, closeBlobObjectList, currentUser);
+    }
+
     public String normalNextText(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(selected.getCurrentStep()) && zkbPartOrderStatusVo.isCanEditFlag()){
@@ -666,43 +669,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser,zkbPartOrderReturnList);
                 selected = zkbPartOrderRepository.findById(selected.getId());
             }
-        } else if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) ||
-                ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()))
-                && ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())){
-            if(zkbPartOrderCloseWorkTimeList == null || zkbPartOrderCloseWorkTimeList.size() == 0){
-                WebUtil.addErrorMessage("工作&差旅时间不能为空!","");
-                return "";
-            }else{
-                boolean f = false;
-                String errorMsg = "";
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
-                for(ZkbPartOrderCloseWorkTime t : zkbPartOrderCloseWorkTimeList){
-                    if("Phone Support".equals(t.getDateType())){
-                        f = true;
-                    }else if("onsite".equals(t.getDateType())){
-                        f = true;
-                    }
-                    if(t.getStartTime().getTime() >= t.getEndTime().getTime()){
-                        /*errorMsg += "日期：【" + simpleDateFormat.format(t.getWorkDated()) + "】开始时间不能大于结束时间！";*/
-                        errorMsg += String.format("日期：【%tF】开始时间不能大于等于结束时间！\r", t.getWorkDated());
-                    }
-                }
-                if(!f){
-                    WebUtil.addErrorMessage("必须有一个【远程支持】或【现场维修】时间类型!","");
-                    return "";
-                }
-                if(StringUtils.isNotEmpty(errorMsg)){
-                    WebUtil.addErrorMessage(errorMsg,"");
-                    return "";
-                }
-            }
-            if(closeBlobObjectList == null || closeBlobObjectList.size() == 0){
-                WebUtil.addErrorMessage("服务记录单不能为空!","");
-                return "";
-            }
-            if(zkbPartOrderService.checkCloseInfoBySrNum(selected.getSrNo(), zkbPartOrderCloseInfo)){
-                WebUtil.addErrorMessage("srNo已经存在完成信息，不需要重复提交!","");
+        } else if(ZkbPartOrderStep.PartOrderStep.CompletePending.toString().equals(selected.getCurrentStep())){
+            if(!zkbPartOrderStatusService.checkComplete(selected, zkbPartOrderCloseWorkTimeList, closeBlobObjectList, zkbPartOrderCloseInfo)){
                 return "";
             }
             zkbPartOrderService.normalNextComplete(zkbPartOrderCloseInfo,selected,zkbPartOrderCloseWorkTimeList, closeBlobObjectList,currentUser);
@@ -1139,6 +1107,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
     //endregion
 
+    public boolean completeRequiredCheck(String column){
+        if("Yes".equals(zkbPartOrderCloseInfo.getPatientUse()) || "Potential".equals(zkbPartOrderCloseInfo.getSafetyConcern()) || "Actual".equals(zkbPartOrderCloseInfo.getSafetyConcern())){
+            return true;
+        }else if("NotReported".equals(zkbPartOrderCloseInfo.getPatientUse()) && "No".equals(zkbPartOrderCloseInfo.getSafetyConcern()) ){
+            if("qualityContact".equals(column)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void preLogistics(String id){
         ZkbPartOrderItem se = null;
         for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -1264,7 +1244,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void getAllegedPatientConsequence(){
-        if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
+        /*if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
             zkbPartOrderCloseInfo.setAllegedPatientConsequence("非患者扫描时出现问题，不涉及患者");
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(true);
         }else if("非患者扫描时出现问题，不涉及患者".equals(zkbPartOrderCloseInfo.getAllegedPatientConsequence())){
@@ -1272,6 +1252,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderCloseInfo.setAllegedPatientConsequence("");
             }
             zkbPartOrderStatusVo.setAllegedPatientConsequenceFlag(false);
+        }*/
+        if(CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getSafetyConcern()) && CopyByInvok.NORMAL_NO.equals(zkbPartOrderCloseInfo.getPatientUse())){
+            zkbPartOrderCloseInfo.setPatientImpactOutcome("NoPatientInvolved");
         }
     }
 

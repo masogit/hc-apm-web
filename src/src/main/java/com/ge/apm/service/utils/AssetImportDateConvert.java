@@ -6,6 +6,7 @@ import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.GlobalConfiguration;
 import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
+import com.ge.apm.service.asset.ApmEasyExcelConvert;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -13,9 +14,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-public class AssetImportDateConvert implements Converter<Date> {
+public class AssetImportDateConvert implements ApmEasyExcelConvert, Converter<Date> {
 
-    private String[] dateFormatSet = {"yyyy-MM-dd", "yyyy/MM/dd","dd/MM/yyyy",  "MM/dd/yy", "dd/MM/yy"};
+    private String[] dateFormatSet = {"yyyy-MM-dd", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yy", "dd/MM/yy"};
 
     @Override
     public Class<?> supportJavaTypeKey() {
@@ -35,12 +36,24 @@ public class AssetImportDateConvert implements Converter<Date> {
     @Override
     public Date convertToJavaData(ReadConverterContext<?> context) throws Exception {
         String dateStr = context.getReadCellData().getStringValue();
-        if (StringUtils.isNotEmpty(dateStr)) {
-            return stringDateConvert(dateStr);
+        if ("#".equals(dateStr)) {
+            deleteMarkHandel(context);
+            return null;
+
+        } else if (StringUtils.isNotEmpty(dateStr)) {
+            Date date = stringDateConvert(dateStr);
+            if (Objects.isNull(date)) {
+                dataFormatHandel(context, "请填入正确的日期");
+            }
+            return null;
         }
         BigDecimal dateNum = context.getReadCellData().getNumberValue();
         if (Objects.nonNull(dateNum)) {
-            return numberDataConvert(dateNum);
+            Date date = numberDataConvert(dateNum);
+            if (Objects.isNull(date)) {
+                dataFormatHandel(context, "请填入正确的日期");
+            }
+            return date;
         }
         return null;
 
@@ -54,7 +67,7 @@ public class AssetImportDateConvert implements Converter<Date> {
         //获取时间
         Calendar c = Calendar.getInstance();
         c.set(1900, 0, 1);
-        c.add(Calendar.DATE, days-2);
+        c.add(Calendar.DATE, days - 2);
         int hour = mills / 3600;
         int minute = (mills - hour * 3600) / 60;
         int second = mills - hour * 3600 - minute * 60;

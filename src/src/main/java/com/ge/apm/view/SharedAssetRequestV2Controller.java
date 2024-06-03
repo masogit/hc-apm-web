@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -2486,11 +2487,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }else{
                 try {
                     if(StringUtils.isNotBlank(signatureContent)){
-                        blobObject = blobService.uploadFileString(signatureContent);
-                        blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-                        blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-                        blobObject.setBoUuid(selected.getId());
-                        blobService.saveBlobObject(blobObject);
+                        String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                        BASE64Decoder decoder = new BASE64Decoder();
+                        byte[] decode = decoder.decodeBuffer(base64);
+                        blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
                         if(blobObject != null){
                             String objectStorageId = blobObject.getObjectStorageId();
                             selected.setSignatureId(objectStorageId);

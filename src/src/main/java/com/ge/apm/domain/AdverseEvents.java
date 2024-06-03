@@ -124,7 +124,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 曾用注册证编号
      */
     @Column(name = "previously_registration_num")
-    @Size(min = 1, max = 100)
+    @Size( max = 100)
     private String previouslyRegistrationNum;
 
     /**
@@ -137,21 +137,21 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 型号
      */
     @Column(name = "model")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String model;
 
     /**
      * 规格
      */
     @Column(name = "standard")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String standard;
 
     /**
      * 产品类别
      */
     @Column(name = "product_category")
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
     private String productCategory;
 
     /**
@@ -164,14 +164,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 产品批号
      */
     @Column(name = "product_lot_num")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String productLotNum;
 
     /**
      * 产品编号
      */
     @Column(name = "product_num")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String productNum;
 
     /**
@@ -214,7 +214,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 操作人描述
      */
     @Column(name = "operator_desc")
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
     private String operatorDesc;
 
     /**
@@ -239,14 +239,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 伤害程度描述
      */
     @Column(name = "harm_degree_desc")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String harmDegreeDesc;
 
     /**
      * 伤害表现
      */
     @Column(name = "harm_perform")
-    @Size(min = 1, max = 1000)
+    @Size(max = 1000)
     private String harmPerform;
 
     /**
@@ -260,7 +260,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 器械故障表现
      */
     @Column(name = "device_fault_perform")
-    @Size(min = 1, max = 1000)
+    @Size(max = 1000)
     private String deviceFaultPerform;
 
     /**
@@ -274,7 +274,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 患者姓名
      */
     @Column(name = "patient_name")
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
     private String patientName;
 
     /**
@@ -305,21 +305,21 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 患者病历号
      */
     @Column(name = "medical_case_num")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String medicalCaseNum;
 
     /**
      * 既往病史
      */
     @Column(name = "medical_history")
-    @Size(min = 1, max = 1000)
+    @Size(max = 1000)
     private String medicalHistory;
 
     /**
      * 预期治疗疾病或者作用
      */
     @Column(name = "except_affect")
-    @Size(min = 1, max = 1000)
+    @Size(max = 1000)
     private String exceptAffect;
 
     /**
@@ -338,7 +338,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 场所名称
      */
     @Column(name = "place_name")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String placeName;
 
     /**
@@ -352,7 +352,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 合并用药/器械情况说明
      */
     @Column(name = "device_desc")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String deviceDesc;
 
     /**
@@ -366,7 +366,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 事件原因分析描述
      */
     @Column(name = "event_cause_desc")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String eventCauseDesc;
 
     /**
@@ -408,7 +408,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 修改字段
      */
     @Column(name = "update_col")
-    @Size(min = 1, max = 5000)
+    @Size(max = 5000)
     private String updateCol;
 
     /**
@@ -421,7 +421,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 调查情况
      */
     @Column(name = "survey_situ")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String surveySitu;
 
     /**
@@ -435,14 +435,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 关联性评价
      */
     @Column(name = "relevance_eval")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String relevanceEval;
 
     /**
      * 评价结果-事件原因分析
      */
     @Column(name = "eval_cause_analyze")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String evalCauseAnalyze;
 
     /**
@@ -462,7 +462,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 具体控制措施
      */
     @Column(name = "control_measure_desc")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String controlMeasureDesc;
 
     /**
@@ -476,7 +476,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 未采取控制措施原因
      */
     @Column(name = "not_control_cause")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String notControlCause;
 
     /**
@@ -489,7 +489,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 错报误报原因
      */
     @Column(name = "false_report_cause")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String falseReportCause;
 
     /**
@@ -516,7 +516,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 退回原因
      */
     @Column(name = "return_reason")
-    @Size(min = 1, max = 500)
+    @Size(max = 500)
     private String returnReason;
 
     /**
@@ -541,7 +541,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 报告合并编码
      */
     @Column(name = "report_merge_code")
-    @Size(min = 1, max = 100)
+    @Size(max = 100)
     private String reportMergeCode;
 
     /**
@@ -570,6 +570,9 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
     @JsonIgnore
     @LastModifiedDate
     private Date lastModifiedDate = new Date();
+
+    @Column(name="create_user_uid")
+    private String createUserUID;
 
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -648,6 +651,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 潜在风险（可能导致的临床风险）
      */
     @Column(name = "potential_risks")
+    @Size(max=2000)
     private String potentialRisks;
 
     /**

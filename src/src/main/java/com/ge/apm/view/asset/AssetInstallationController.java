@@ -437,7 +437,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }*/
         //configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())
-        if (isApproved()) {
+        boolean approved = isApproved();
+        if (approved) {
             //待审核
             arrivalListItem.setUsageStatus(2);
         } else {
@@ -455,9 +456,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
         }
         String arrivalListId = arrivalListItem.getArrivalListId();
-        if(isApproved()){
-            String token = UserContextService.getAccessToken();
-            extracted(token, arrivalListItem);
+        if(approved){
+            extracted(arrivalListItem);
         }
         if(arrivalListId != null ){
             //获取到arrival_list实体类对象
@@ -630,8 +630,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 calender.add(Calendar.MONTH, monthLong);
                 arrivalListItem.setFactoryWarrantyDate(calender.getTime());
             }*/
-
-            if (isApproved()) {
+            boolean approved = isApproved();
+            if (approved) {
                 //待审核
                 arrivalListItem.setUsageStatus(2);
             } else {
@@ -650,19 +650,21 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
         finishInstallHandle(itemList);
         if(isApproved()){
-            String token = UserContextService.getAccessToken();
             for (ArrivalListItem listItem : itemList) {
-                extracted(token, listItem);
+                extracted(listItem);
             }
         }
         return returnAction();
     }
 
-    private void extracted(String token, ArrivalListItem listItem) {
+    private void extracted(ArrivalListItem listItem) {
         AssetInfo assetInfo = new AssetInfo();
         assetInfo.setSiteUID(listItem.getArrivalList().getSiteUID());
         assetInfo.setCreatedDate(new Date());
         assetInfo.setClinicalDeptUID(listItem.getClinicalDeptUID());
+        assetInfo.setTenantUID(listItem.getArrivalList().getTenantUID());
+        assetInfo.setHospitalUID(listItem.getArrivalList().getHospitalUID());
+        assetInfo.setInstitutionUID(listItem.getArrivalList().getInstitutionUID());
         wxMessageService.submitAssetApprovalSendMessage(assetInfo, "待审核");
     }
 

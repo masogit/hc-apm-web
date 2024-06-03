@@ -1897,6 +1897,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setRequestorId(loginUser.getId());
         newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
         newServiceRequest.setRequestorName(loginUser.getName());
+        newServiceRequest.setRequestorTel(loginUser.getTelephone());
         newServiceRequest.setRequestTime(new Date());
         if(repairReportSendPlace != null){
             newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());

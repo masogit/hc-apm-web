@@ -39,9 +39,17 @@
                             <label class="label">#{msg.srNum}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.srNum}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{'Maintenance'.equals(workOrderMgrController.selected.serviceRequest.srRepairSource) or 'DailyCheck'.equals(workOrderMgrController.selected.serviceRequest.srRepairSource)}">
+                            <label class="label">#{msg.RepairSource}</label>
+                            <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',workOrderMgrController.selected.serviceRequest.srRepairSource)}"   />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestorName}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestorName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.requestorName}电话</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestorTel}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestTime}</label>
@@ -125,12 +133,12 @@
                             <p:outputLabel value="#{fieldMsg.fieldValue('repairReportSendPlace', workOrderMgrController.selected.serviceRequest.repairReportSendPlace)}" />
                         </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">维修工单来源</label>
-                            <c:if test="#{workOrderMgrController.selected.serviceRequest.srRepairSource!=null}">
-                                <p:outputLabel value="#{fieldMsg.fieldValue('RepairSource',workOrderMgrController.selected.serviceRequest.srRepairSource)}" />
-                            </c:if>
-                        </h:panelGroup>
+<!--                        <h:panelGroup>-->
+<!--                            <label class="label">维修工单来源</label>-->
+<!--                            <c:if test="#{workOrderMgrController.selected.serviceRequest.srRepairSource!=null}">-->
+<!--                                <p:outputLabel value="#{fieldMsg.fieldValue('RepairSource',workOrderMgrController.selected.serviceRequest.srRepairSource)}" />-->
+<!--                            </c:if>-->
+<!--                        </h:panelGroup>-->
                     </p:panelGrid>
 
                     <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">

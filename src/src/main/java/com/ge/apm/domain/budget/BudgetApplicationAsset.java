@@ -325,6 +325,28 @@ public class BudgetApplicationAsset implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private BudgetApplication budgetApplication;
 
+    @Column(name = "meeting_fee_items")
+    private String meetingFeeItems; //收费项目
+
+    @Column(name = "meeting_consumable_description")
+    private String meetingConsumableDescription;//耗材或试剂说明
+
+    public String getMeetingFeeItems() {
+        return meetingFeeItems;
+    }
+
+    public void setMeetingFeeItems(String meetingFeeItems) {
+        this.meetingFeeItems = meetingFeeItems;
+    }
+
+    public String getMeetingConsumableDescription() {
+        return meetingConsumableDescription;
+    }
+
+    public void setMeetingConsumableDescription(String meetingConsumableDescription) {
+        this.meetingConsumableDescription = meetingConsumableDescription;
+    }
+
     public String getOfflineApprovalComplete() {
         return offlineApprovalComplete;
     }

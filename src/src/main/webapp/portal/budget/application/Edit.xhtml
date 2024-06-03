@@ -383,7 +383,14 @@
                                 </p:inputTextarea>
                             </h:panelGroup>
 
-
+                            <h:panelGroup>
+                                <label class="label">收费项目<span style="color: red">*</span></label>
+                                <p:inputText  value="#{budgetController.curSelectApplicationBudgetAsset.meetingFeeItems}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">耗材或试剂说明<span style="color: red">*</span></label>
+                                <p:inputText  value="#{budgetController.curSelectApplicationBudgetAsset.meetingConsumableDescription}" />
+                            </h:panelGroup>
                             <!--
                             <h:panelGroup>
                                 <p:outputLabel class="label">栏标价<span style="color: red">*</span></p:outputLabel>

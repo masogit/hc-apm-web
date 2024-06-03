@@ -1043,6 +1043,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_special_asset", columnDefinition = "boolean default false")
     private boolean isSpecialAsset; //是否特种设备
 
+
+    @Column(name = "asset_scrap_id")
+    private String assetScrapId; //设备报废id
+
+
     public boolean isSpecialAsset() {
         return isSpecialAsset;
     }
@@ -2900,6 +2905,7 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
         reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
         reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
+        reqDetail.put("remark", this.getSharedAssetReqDetail().getRemark());
         return reqDetail;
     }
 
@@ -3231,5 +3237,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setEncodeAssetDetailStr(String encodeAssetDetailStr) {
         this.encodeAssetDetailStr = encodeAssetDetailStr;
+    }
+
+
+    public String getAssetScrapId() {
+        return assetScrapId;
+    }
+
+    public void setAssetScrapId(String assetScrapId) {
+        this.assetScrapId = assetScrapId;
     }
 }

@@ -11,10 +11,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AssetImport implements Serializable {
 
@@ -22,6 +19,7 @@ public class AssetImport implements Serializable {
 
     private AssetFileImportBaseService.ImportStatus importStatus;
     private List<String> errMsg = new ArrayList<>();
+    private List<String> deletedField = new ArrayList<>();
     private Integer id;
 
     private Integer rowNum;
@@ -147,13 +145,13 @@ public class AssetImport implements Serializable {
 
     private String assetOwnerTel;//维修负责人电话
 
-    private boolean isValid = true;//在用？
+    private Boolean isValid;//在用？
 
     //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
-    private Integer status = 1;//当前状态
+    private Integer status;//当前状态
     @ExcelProperty(value = "CurrentStatus")
 
-    private String statusStr = "1";
+    private String statusStr;
 
     @ExcelProperty(value = "manufactDate", converter = AssetImportDateConvert.class)
     private Date manufactDate;//出厂日期
@@ -274,10 +272,10 @@ public class AssetImport implements Serializable {
 
     private String deviceStatusStr;
 
-    private Integer networkingStatus = 0;  //联网状态 0 未联网  1 内网  3 外网
+    private Integer networkingStatus;  //联网状态 0 未联网  1 内网  3 外网
     @ExcelProperty(value = "networkingStatus")
 
-    private String networkingStatusStr = "未联网";  //联网状态 0 未联网  1 内网  3 外网
+    private String networkingStatusStr;  //联网状态 0 未联网  1 内网  3 外网
 
     //null   1 empowerment  //这个字段不需要编辑和展示，所以只存null 和1
     private Integer empowermentStatus;
@@ -396,7 +394,7 @@ public class AssetImport implements Serializable {
 
     private Date nextMeteringDate;//下次计量日期
     @ExcelProperty(value = "isWarrantyNotice", converter = AssetImportBooleanConvert.class)
-    private Boolean isWarranty = Boolean.TRUE;//是否对质保到期进行提醒(默认提醒)
+    private Boolean isWarranty;//是否对质保到期进行提醒(默认提醒)
 
     private String meteringNO;//计量编号
 
@@ -406,16 +404,16 @@ public class AssetImport implements Serializable {
     private String repairFormStr; //1和null是纯内修。 2，纯外修。3，先内修再外修
 
     @ExcelProperty(value = "IsPM", converter = AssetImportBooleanConvert.class)
-    private Boolean isPm = Boolean.TRUE;//是否保养
+    private Boolean isPm;//是否保养
 
     @ExcelProperty("isUseRegistration")
-    private Boolean isUseRegistration = Boolean.TRUE;
+    private Boolean isUseRegistration;
 
     @ExcelProperty(value = "isFixed", converter = AssetImportBooleanConvert.class)
-    private Boolean isFixed = Boolean.TRUE;//是否固定资产
+    private Boolean isFixed;//是否固定资产
 
     @ExcelProperty(value = "IsChecked", converter = AssetImportBooleanConvert.class)
-    private Boolean isChecked = Boolean.TRUE;//是否盘点
+    private Boolean isChecked;//是否盘点
 
     private String createdBy;
 
@@ -518,14 +516,14 @@ public class AssetImport implements Serializable {
     private String secondDirectory;
 
     //联通状态，默认 1未联通，2 联通, 3 N/A
-    private Integer connectToInsite = 3;
+    private Integer connectToInsite;
 
     //默认1：未见异常、 2：报警、 3：维修中、 4: 无联通无报警、 5： 无显示
-    private Integer ibDeviceStatus = 5;
+    private Integer ibDeviceStatus;
 
 
     //全量IB客户可见性标记
-    private Integer visibleStatus = 1;
+    private Integer visibleStatus;
 
     private Double monitorRate;
 
@@ -1228,11 +1226,11 @@ public class AssetImport implements Serializable {
         this.assetOwnerTel = assetOwnerTel;
     }
 
-    public boolean getIsValid() {
+    public Boolean getIsValid() {
         return isValid;
     }
 
-    public void setIsValid(boolean valid) {
+    public void setIsValid(Boolean valid) {
         isValid = valid;
     }
 
@@ -3248,5 +3246,49 @@ public class AssetImport implements Serializable {
         } else {
             this.lifecycle = new Double(lifecycleInYear * 12).intValue();
         }
+    }
+
+    public List<String> getDeletedField() {
+        return deletedField;
+    }
+
+    public void setDeletedField(List<String> deletedField) {
+        this.deletedField = deletedField;
+    }
+
+    /**
+     * 导入新数据资产的时候统一设置默认值
+     */
+    public void setDefultValue() {
+        if (Objects.isNull(status)) {
+            this.setStatus(1);
+        }
+        if (Objects.isNull(isPm)) {
+            this.setIsPm(true);
+        }
+        //新增资产默认内修
+        if (Objects.isNull(uid)) {
+            this.setRepairForm(1);
+        }
+        if (Objects.isNull(isChecked)) {
+            this.setIsChecked(true);
+        }
+        if (Objects.isNull(isUseRegistration)) {
+            this.setUseRegistration(true);
+        }
+        if (Objects.isNull(isWarranty)) {
+            this.setIsWarranty(true);
+        }
+        if (Objects.isNull(isFixed)) {
+            this.setIsFixed(true);
+        }
+        if(Objects.isNull(networkingStatus))
+        {
+            this.setNetworkingStatus(0);
+        }
+        this.setIsValid(true);
+        this.setConnectToInsite(3);
+        this.setIbDeviceStatus(5);
+        this.setVisibleStatus(1);
     }
 }

@@ -141,7 +141,7 @@ public class CustomConfigController {
                     JSONObject jsonObject = new JSONObject();
                     String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
                     jsonObject.put("enable", StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue));
-                    jsonObject.put("defaultValue", "non-ward");
+                    jsonObject.put("defaultValue", "");
                     jsonObject.put("required", true);
                     obj.put("repairReportSendPlace", jsonObject);
                 }
