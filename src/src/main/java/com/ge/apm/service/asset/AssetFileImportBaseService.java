@@ -787,7 +787,7 @@ public class AssetFileImportBaseService {
         List<UserAccount> userAccounts;
         //for AssetOwner
         if (newAsset.getAssetOwnerName() == null) {
-            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + "未设置");
+            AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getMsgValue("AssetOwnerName",Locale.CHINA) + "未设置");
         } else {
             UserAccount owner = userCache.get(newAsset.getAssetOwnerName());
             if (Objects.nonNull(owner)) {
@@ -796,10 +796,10 @@ public class AssetFileImportBaseService {
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getAssetOwnerName());
                 if (userAccounts.size() != 1) {
-                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getMsgValue("AssetOwnerName",Locale.CHINA) + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                     newAsset.setAssetOwnerName(null);
                 } else if (userAccounts.get(0).getIsDisable()) {
-                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getProperty("AssetOwnerName") + newAsset.getAssetOwnerName() + "此用已停用");
+                    AssetRow.addErrMessage(importData, "警告:" + resourcesUtil.getMsgValue("AssetOwnerName",Locale.CHINA) + newAsset.getAssetOwnerName() + "此用已停用");
                     newAsset.setAssetOwnerName(null);
                 } else {
                     newAsset.setAssetOwnerId(userAccounts.get(0).getId());
