@@ -1684,6 +1684,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
+        orgList = new ArrayList<>();
+        orgListMVS = new ArrayList<>();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -3086,24 +3088,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<OrgInfo> LoadSiteNameList() {
-        if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
-                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
-            }
-            if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
-                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgList)) {
+            List<OrgInfo> orgInfos = uaaService.getUserAccessibleSiteList(loginUser.getUid());
+            if (!CollectionUtils.isEmpty(orgInfos)) {
+                orgList = orgInfos.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
         return orgList;
     }
 
     public List<OrgInfo> LoadSiteNameListMVS() {
-        if (org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
-            }
-            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
-                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgListMVS)) {
+            List<OrgInfo> orgInfos = uaaService.getUserAccessibleSiteList(loginUser.getUid());
+            if (!CollectionUtils.isEmpty(orgInfos)) {
+                orgListMVS = orgInfos.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
         return orgListMVS;
