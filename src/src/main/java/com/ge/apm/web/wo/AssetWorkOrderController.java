@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.AssetWorkOrderService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -21,13 +22,16 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,6 +62,7 @@ public class AssetWorkOrderController implements Serializable {
     private String searchStr;
     private Date startDate;
     private Date endDate;
+    private String contextPath;
 
     @PostConstruct
     protected void init() {
@@ -73,7 +78,8 @@ public class AssetWorkOrderController implements Serializable {
         if (enableAssetTypeGroup) {
             assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
         }
-
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        contextPath = request.getContextPath();
         this.loadData();
         this.initOrgTree();
         this.loadClinicalDept();
@@ -81,8 +87,18 @@ public class AssetWorkOrderController implements Serializable {
 
     public void loadData() {
         assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate, assetTypeGroupEncodedSet);
+        setDataLinkUrl();
     }
-
+    private void setDataLinkUrl(){
+        if(CollectionUtils.isEmpty(assetWorkOrderList)) return;
+        String prefix="/portal/woMgr/workOrderList.xhtml?faces-redirect=true&query=12&queryAssetUID=";
+        assetWorkOrderList= assetWorkOrderList.stream().map(item->{
+             String linkUrl = UrlEncryptController.encodeUrlParam(prefix.concat(item.getUid()));
+            linkUrl = linkUrl.replaceAll("&amp;","&");
+            item.setLinkUrl(contextPath+linkUrl);
+           return item;
+        }).collect(Collectors.toList());
+    }
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();

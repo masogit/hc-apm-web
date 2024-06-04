@@ -108,7 +108,7 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
-                            <h:outputText value="#{item.name}" title="#{item.name}"/>
+                            <p:link  href="#{item.linkUrl}" value="#{item.name}" target="_self" />
                         </p:column>
                         <p:column headerText="#{msg.functionType}">
                             <h:outputText value="#{item.functionType}" title="#{item.functionType}"/>
@@ -129,9 +129,9 @@
                             <h:outputText value="#{item.qrCode}" title="#{item.qrCode}" />
                         </p:column>
                         <p:column headerText="#{msg.WorkorderQuantity}">
-                            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">
+<!--                            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">-->
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
-                            </p:commandLink>
+<!--                            </p:commandLink>-->
                         </p:column>
 
                         <f:facet name="{Toolbar}">

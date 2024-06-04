@@ -30,6 +30,8 @@ public class AssetWorkOrder {
     //工单数量
     private Integer workOrderCount;
 
+    private String linkUrl;
+
     public Integer getId() {
         return id;
     }
@@ -124,5 +126,13 @@ public class AssetWorkOrder {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public String getLinkUrl() {
+        return linkUrl;
+    }
+
+    public void setLinkUrl(String linkUrl) {
+        this.linkUrl = linkUrl;
     }
 }
