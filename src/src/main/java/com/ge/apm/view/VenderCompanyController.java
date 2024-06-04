@@ -60,6 +60,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(selected, supplier);
         supplier.setId(null);
+        supplier.setName(supplier.getName());
         supplier.setVenderCompanyId(selected.getId());
         supplier.setSupplierT(supplierT);
         supplier.setMaintainerT(maintainerT);
