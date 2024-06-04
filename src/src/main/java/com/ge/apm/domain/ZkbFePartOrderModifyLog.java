@@ -61,6 +61,28 @@ public class ZkbFePartOrderModifyLog {
     @Column(name = "part_name")
     private String partName;
 
+    @Column(name = "ge_engineer_name")
+    private String geEngineerName;
+
+    @Column(name = "ge_engineer_phone")
+    private String geEngineerPhone;
+
+    public String getGeEngineerName() {
+        return geEngineerName;
+    }
+
+    public void setGeEngineerName(String geEngineerName) {
+        this.geEngineerName = geEngineerName;
+    }
+
+    public String getGeEngineerPhone() {
+        return geEngineerPhone;
+    }
+
+    public void setGeEngineerPhone(String geEngineerPhone) {
+        this.geEngineerPhone = geEngineerPhone;
+    }
+
     public String getId() {
         return id;
     }

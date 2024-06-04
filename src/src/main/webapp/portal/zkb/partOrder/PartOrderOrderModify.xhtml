@@ -51,6 +51,38 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                             </c:when>
+                            <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                                <h:panelGroup >
+                                    <label class="label">SR#*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">Act#*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.activityNo}" required="true" requiredMessage="#{msg.zkbPartOrder_activityNo} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">GE工程师姓名*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerName}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerName} #{msg.ValidationRequire}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">GE工程师电话*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{(!(zkbPartOrderAuditController.selected.artificialType eq '2') or zkbPartOrderAuditController.selected.maintainFlag eq 't')}">
+                                    <c:choose>
+                                        <c:when test="#{zkbPartOrderAuditController.selected.scoreFlag eq 't'}">
+                                            <label class="label">是否扣除积分*</label>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <label class="label">是否扣除名额*</label>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.whetherDeductEdit}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </c:when>
                         </c:choose>
                     </c:when>
                 </c:choose>
