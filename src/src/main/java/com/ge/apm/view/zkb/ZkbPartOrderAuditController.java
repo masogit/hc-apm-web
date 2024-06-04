@@ -692,6 +692,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             (ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString().equals(zkbPartOrder.getCurrentStep()))){
             zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER,UserContextService.getAccessToken());
         }
+        //推送工程师、系统激活专用角色微信
+        if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                zkbPartOrderService.sendWeChatOrdered(zkbPartOrder,UserContextService.getAccessToken());
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())){
+                zkbPartOrderService.sendWeChatOrdered(zkbPartOrder,UserContextService.getAccessToken());
+            }
+        }
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
