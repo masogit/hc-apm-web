@@ -528,9 +528,9 @@ public class WorkOrderReportProvider {
                 }
             } else if (tempColumn.equals("totalPrice")) {
                 if (op.equals(SearchFilter.Operator.GTE)) {
-                    sb.append(" and (wod.parts_quantity * wod.closed_price)>=" + value);
+                    sb.append(" and (wod.closed_price)>=" + value);
                 } else if (op.equals(SearchFilter.Operator.LTE)) {
-                    sb.append(" and (wod.parts_quantity * wod.closed_price)<=" + value);
+                    sb.append(" and (wod.closed_price)<=" + value);
                 }
             } else if (tempColumn.equals("statementStatus")) {
                 if (Boolean.valueOf(value.toString())) {
