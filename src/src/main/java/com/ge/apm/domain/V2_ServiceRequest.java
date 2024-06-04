@@ -69,8 +69,8 @@ public class V2_ServiceRequest implements Serializable {
     @Column(name = "requestor_name")
     private String requestorName;
 
-    @Column(name = "requestor_tel")
-    private String requestorTel;
+    @Column(name = "requestor_phone")
+    private String requestorPhone;
 
     @Basic(optional = false)
     @NotNull
@@ -337,12 +337,12 @@ public class V2_ServiceRequest implements Serializable {
         this.requestorName = requestorName;
     }
 
-    public String getRequestorTel() {
-        return requestorTel;
+    public String getRequestorPhone() {
+        return requestorPhone;
     }
 
-    public void setRequestorTel(String requestorTel) {
-        this.requestorTel = requestorTel;
+    public void setRequestorPhone(String requestorPhone) {
+        this.requestorPhone = requestorPhone;
     }
 
     public Date getRequestTime() {
