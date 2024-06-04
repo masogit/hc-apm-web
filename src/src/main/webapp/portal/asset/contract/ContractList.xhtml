@@ -86,6 +86,9 @@
                         <p:column headerText="#{msg.PaymentProgress}">
                             <h:outputText value="#{item.paymentProgress}"/>
                         </p:column>
+                        <p:column headerText="完成情况">
+                            <h:outputText value="#{contractInfoController.getCompletion(item)}"/>
+                        </p:column>
                         <p:column headerText="#{msg.Actions}">
                             <p:commandButton value="#{msg.ContractComplete}"
                                              rendered="#{item.contractType == 'Equipment'}"

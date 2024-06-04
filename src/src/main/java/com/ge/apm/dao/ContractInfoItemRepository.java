@@ -18,7 +18,9 @@ import java.util.List;
 public interface ContractInfoItemRepository extends GenericRepositoryUUID<ContractInfoItem>{
 
    List<ContractInfoItem>  findByContractId(String id);
-   
+
+   List<ContractInfoItem>  findByContractIdAndItemType(String id, String itemType);
+
    List<ContractInfoItem>  findByAssetUid(String id);
    
    ContractInfoItem getByArrivalItemId(String id);
