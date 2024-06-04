@@ -337,6 +337,9 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             //统计计量到期本月、下月总台数
             for (AssetInfo assetInfoTemp : assetInfoList){
                 Date nextMeteringDate = assetInfoTemp.getNextMeteringDate();
+                if (ObjectUtil.isEmpty(nextMeteringDate)) {
+                    continue;
+                }
                 if(Boolean.TRUE.equals(DateUtil.isSameMonth(currentDate, nextMeteringDate))){
                     //统计本月总台数
                     currentMonthCount = currentMonthCount + 1;

@@ -1,15 +1,19 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
+import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
 import com.ge.apm.domain.ArrivalList;
+import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -33,6 +38,9 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     private UaaService uaaService;
     private ContractInfoService contractService;
     private ContractInfoRepository dao = null;
+    private ArrivalListRepository arrivalListRepository;
+    private ArrivalListItemRepository arrivalListItemRepository;
+    private ContractInfoItemRepository contractInfoItemRepository;
     private String assetUid;
 
     @Override
@@ -40,6 +48,9 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         dao = WebUtil.getBean(ContractInfoRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
+        arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
+        contractInfoItemRepository = WebUtil.getBean(ContractInfoItemRepository.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         assetUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetUid");
@@ -158,6 +169,38 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         }else{
             WebUtil.addErrorMessage(WebUtil.getMessage("CannotBeDeleted"));
         }
+    }
+
+    public String getCompletion(ContractInfo contractInfo) {
+        if (ContractInfo.ContractType.Equipment.toString().equals(contractInfo.getContractType())) {
+            List<ContractInfoItem> purchases = contractInfoItemRepository.findByContractIdAndItemType(contractInfo.getId(), "Purchase");
+            List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(purchases.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
+            if (ObjectUtil.isNotEmpty(arrivalLists)) {
+                Set<Integer> arrivalStatus = arrivalLists.stream().map(ArrivalList::getStatus).collect(Collectors.toSet());
+                if (1 == arrivalStatus.size() && arrivalStatus.size() == purchases.size() && arrivalStatus.contains(3)) {
+                    return  "到货完成 验收完成";
+                }
+                List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListIdIn(arrivalLists.stream().map(ArrivalList::getId).collect(Collectors.toList()));
+                if (purchases.size() == arrivalListItems.size()) {
+                    // 到货完成
+                    Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
+                    if (arrivalItemStatus.contains("instorage") || arrivalItemStatus.contains("rejected")) {
+                        return  "到货完成 验收中";
+                    } else {
+                        return "到货完成 未安装";
+                    }
+                } else {
+                    if (ObjectUtil.isNotEmpty(arrivalListItems)) {
+                        return "到货中 验收中";
+                    } else {
+                        return "到货中 未安装";
+                    }
+                }
+            } else {
+                return "未到货";
+            }
+        }
+        return "";
     }
     
     public String createAction() {
