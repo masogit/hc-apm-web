@@ -9,6 +9,24 @@
 <ui:composition>
     <p:dialog id="zkbFePartOrderModifyDlg" widgetVar="zkbFePartOrderModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="下单信息修改" width="70%" height="620">
         <h:form id="zkbFeOrderModifyForm" style="height: 100%">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderDetailController.selected.orderType=='ManMade'}">
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_sr}*</label>
+                    <p:inputText value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_act}*</label>
+                    <p:inputText value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_geEngineerName}*</label>
+                    <p:inputText value="#{zkbFePartOrderDetailController.selected.geEngineerName}"  required="true" requiredMessage="#{msg.zkbFePartOrder_geEngineerName} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_geEngineerPhone}*</label>
+                    <p:inputText value="#{zkbFePartOrderDetailController.selected.geEngineerPhone}"  required="true" requiredMessage="#{msg.zkbFePartOrder_geEngineerPhone} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+            </p:panelGrid>
             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
@@ -51,6 +69,7 @@
             </p:dataTable>
 
 
+            <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbFePartOrderDetailController.saveOrderModify}" update=":growl :zkbFePartOrderEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbFePartOrderModifyDlg');" rendered="#{zkbFePartOrderSparePartDetailController.selected.orderType=='ManMade'}"/>
             <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbFePartOrderSparePartDetailController.saveOrderModify}" update=":growl :zkbFePartOrderSparePartsEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbFePartOrderModifyDlg');" rendered="#{zkbFePartOrderSparePartDetailController.selected.orderType=='SpareParts'}"/>
             <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbFePartOrderProbeController.saveOrderModify}" update=":growl :zkbFePartOrderProbeEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbFePartOrderModifyDlg');" rendered="#{zkbFePartOrderProbeController.selected.orderType=='Probe'}"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" action="#{zkbFePartOrderSparePartDetailController.cancelOrderModify}" update=":growl :zkbFePartOrderProbeEditForm" onclick="PF('zkbFePartOrderModifyDlg').hide()"/>

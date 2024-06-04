@@ -570,6 +570,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART,this.notGeAssetBox);
     }
 
+    public void saveOrderModify(){
+        zkbFePartOrderService.saveOrderModify(selected, currentUser);
+        this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
+    }
+
     /**
      * 判断当前用户在当前节点是否有编辑权限
      *

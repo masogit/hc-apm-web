@@ -1262,14 +1262,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
 
     public boolean hasOrderModifyRight(String orderType,String currentStatus,Map<String, String> configTypeMap) {
         boolean right = false;
-        if(orderType.equals(ZkbFePartOrder.OrderType.ManMade.toString())){
+        /*if(orderType.equals(ZkbFePartOrder.OrderType.ManMade.toString())){
             return right;
-        }
+        }*/
         if(currentStatus.equals(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString())){
             if(hasAdminRight(configTypeMap)){
                 right = true;
             }
-            if(orderType.equals(ZkbFePartOrder.OrderType.SpareParts.toString())){
+            if(orderType.equals(ZkbFePartOrder.OrderType.SpareParts.toString()) || orderType.equals(ZkbFePartOrder.OrderType.ManMade.toString())){
                 if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())) {
                     right = true;
                 }
@@ -2569,6 +2569,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbPartOrderModifyLog.setCreateUserDate(new Date());
             zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
             zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+            zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+        }else if(ZkbFePartOrder.OrderType.ManMade.toString().equals(zkbPartOrder.getOrderType())){
+            ZkbFePartOrderModifyLog zkbPartOrderModifyLog = new ZkbFePartOrderModifyLog();
+            zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+            zkbPartOrderModifyLog.setCreateUserDate(new Date());
+            zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+            zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+            zkbPartOrderModifyLog.setGeEngineerName(oldZkbPartOrder.getGeEngineerName());
+            zkbPartOrderModifyLog.setGeEngineerPhone(oldZkbPartOrder.getGeEngineerPhone());
             zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
         }else{
             return ;
