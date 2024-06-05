@@ -9,11 +9,8 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.core.message.WechatMsgEvent;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
@@ -23,9 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -47,20 +41,8 @@ public class WxMessageService extends MicroServiceInvoker {
         sendWxMsgToMq(params,linkUrl,msgEvent,sendUids,null);
     }
 
-    public void send(Map<String, Object> map,String token){
-
-        HttpEntity<Map> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.SEND_WE_CHAT);
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
-        if (!isOkay(response)) {
-            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-            String str = responseMap.get("message").toString();
-            throw new RuntimeException(str);
-        }
-    }
-
-
     private HashMap<String, String> combineMsg(String woSteps, ApprovableTarget approvableTarget, AssetInfo assetInfo ,UserAccount user,String reason) {
+        String status="status";
         HashMap<String, String> params = new HashMap<>();
         String handler = user.getName();
         params.put("orderCode", approvableTarget.getBusinessNumber());
@@ -68,9 +50,9 @@ public class WxMessageService extends MicroServiceInvoker {
         params.put("content", reason);
         params.put("assetName", assetInfo.getName() );
         if(woSteps.equals("审批通过") || woSteps.equals("审批失败")){
-            params.put("status", woSteps);
+            params.put(status, woSteps);
         }else{
-            params.put("status", "待" + woSteps + "审批");
+            params.put(status, "待" + woSteps + "审批");
         }
         params.put("assetStaff", handler);
         params.put("businessType",  setBusinessTypeName(approvableTarget.getBusinessType()));
@@ -112,6 +94,7 @@ public class WxMessageService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER:
                 businessTypeName=(ApprovalConstant.APPROVAL_ASSET_TRANSFER_CHI);
+                break;
             case ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT:
                 businessTypeName=(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN);
                 break;
@@ -123,6 +106,8 @@ public class WxMessageService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 businessTypeName=(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI);
+                break;
+            default:
                 break;
         }
         return businessTypeName;
@@ -167,11 +152,7 @@ public class WxMessageService extends MicroServiceInvoker {
     public void sendWxMsgToMq(Map<String, String> eventParams , String link, MSGEvent event, List<String> userUIds, List<Integer> userIds) {
         WechatMsgEvent msgEvent=new WechatMsgEvent(event,eventParams);
         msgEvent.setLink(link);
-//        if(CollectionUtils.isEmpty(userIds)  && CollectionUtils.isEmpty(userUIds) ){
-//            logger.error("sendWxMsgToMq user is null");
-//            return;
-//        }
-        if(CollectionUtils.isEmpty(userUIds) ){
+        if(CollectionUtils.isEmpty(userUIds) && CollectionUtils.isNotEmpty(userIds) ){
             Set<Integer> setIds =userIds.stream().collect(Collectors.toSet());
             List<UserAccount> accounts = userAccountRepository.getByIds(setIds);
             userUIds = accounts.stream().distinct().filter(user -> ObjectUtil.isNotEmpty(user.getUid())).map(UserAccount::getUid).collect(Collectors.toList());
