@@ -110,7 +110,7 @@ public class WordReportExportService {
                         } else if (Boolean.FALSE.equals(checkValue)) {
                             stringList.add("x");
                         } else {
-                            stringList.add("");
+                            stringList.add("o");
                         }
                     }
                     assetNameMap.put(assetInfo.getName(), stringList);
@@ -249,7 +249,7 @@ public class WordReportExportService {
                         } else if (Boolean.FALSE.equals(checkValue)) {
                             stringList.add("x");
                         } else {
-                            stringList.add(null);
+                            stringList.add("o");
                         }
                     }
                     assetNameMap.put(assetInfo.getName(), stringList);
