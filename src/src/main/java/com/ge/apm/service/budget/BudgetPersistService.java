@@ -222,7 +222,7 @@ public class BudgetPersistService {
                 application.setApprovalConfigId(approval.getWorkflowConfigApproveUid());
                 approvalDao.save(approval);
                 budgetApplicationDao.save(application);
-                sendMsg(application, approvalConfig);
+                sendMsg(application, approvalConfig, approval);
             }
        /* } else {
             // 编辑
@@ -323,7 +323,7 @@ public class BudgetPersistService {
         });
         return approval.get();
     }
-    private void sendMsg(BudgetApplication application, MultiLevelApprovalConfig config) {
+    private void sendMsg(BudgetApplication application, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
                 })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
@@ -343,7 +343,7 @@ public class BudgetPersistService {
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + application.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED);
+            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED,approval);
         });
     }
 

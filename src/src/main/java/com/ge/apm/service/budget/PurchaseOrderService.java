@@ -245,7 +245,7 @@ public class PurchaseOrderService {
             purchaseOrderInfo.setApprovalConfigId(approval.getWorkflowConfigApproveUid());
             approvalDao.save(approval);
             purchaseOrderInfoRepository.save(purchaseOrderInfo);
-            sendMsg(purchaseOrderInfo, approvalConfig);
+            sendMsg(purchaseOrderInfo, approvalConfig,approval);
         }
        /* } else {
             // 编辑
@@ -337,7 +337,7 @@ public class PurchaseOrderService {
         });
         return approval.get();
     }
-    private void sendMsg(PurchaseOrderInfo purchaseOrderInfo, MultiLevelApprovalConfig config) {
+    private void sendMsg(PurchaseOrderInfo purchaseOrderInfo, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
                 })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
@@ -357,7 +357,7 @@ public class PurchaseOrderService {
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + purchaseOrderInfo.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED);
+            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED,approval);
         });
     }
     public boolean checkMultiLevelApproval (PurchaseOrderInfo purchaseOrderInfo){
