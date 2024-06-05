@@ -110,7 +110,7 @@ public class WordReportExportService {
                         } else if (Boolean.FALSE.equals(checkValue)) {
                             stringList.add("x");
                         } else {
-                            stringList.add(null);
+                            stringList.add("");
                         }
                     }
                     assetNameMap.put(assetInfo.getName(), stringList);
