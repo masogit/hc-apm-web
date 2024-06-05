@@ -2678,74 +2678,49 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-            logger.info(zkbPartOrder.getPartOrderNo()+" "+ url + " " +response.toString());
+            logger.info(zkbPartOrder.getPartOrderNo()+" sendEmail " +response.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
     public void sendMessage(ZkbPartOrder zkbPartOrder,String token) {
-        if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
-           ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
-            ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrder.getCurrentStep()) ||    ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) ||
-            ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
-            ZkbPartOrder.PartOrderStatus.TseReject.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.OsscReject.toString().equals(zkbPartOrder.getStatus()) ||
-            ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus())) {
-            HashMap<String, Object> emailWrapperMap = null;
-            try {
-                emailWrapperMap = new HashMap<>();
-                emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
-                emailWrapperMap.put("systemId", zkbPartOrder.getId());
-                emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
-                emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
-                emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+        HashMap<String, Object> emailWrapperMap = null;
+        try {
+            emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
+            emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
 
-                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
-                //String token = UserContextService.getAccessToken();
-                HttpHeaders header = createHttpHeaders(token);
-                HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
-                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-                logger.info(zkbPartOrder.getPartOrderNo()+" sendMessage "+response.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
+            //String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" sendMessage "+response.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     /**
      * 发送微信消息
      */
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder,String token){
-        //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
-        List<String> statusList = new ArrayList<>();
-        statusList.add(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.ManageReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.Ordered.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.OrderedReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.DirectorReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.CommercialReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.TseAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.TseReject.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.OsscAccept.toString());
-        statusList.add(ZkbPartOrder.PartOrderStatus.OsscReject.toString());
-        if (statusList.contains(zkbPartOrder.getStatus())) {
-            try {
-                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
-                //String token = UserContextService.getAccessToken();
-                HttpHeaders header = createHttpHeaders(token);
-                HttpEntity<Map> requestEntity = new HttpEntity<>(header);
-                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-                logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatMessages "+response.toString());
-            } catch (RestClientException e) {
-                e.printStackTrace();
-            }
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
+            //String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatMessages "+response.toString());
+        } catch (RestClientException e) {
+            e.printStackTrace();
         }
+
     }
 
     public void sendWeChatBackMessages(ZkbPartOrder zkbPartOrder){
