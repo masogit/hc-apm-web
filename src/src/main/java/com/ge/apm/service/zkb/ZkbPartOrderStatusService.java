@@ -980,6 +980,10 @@ public class ZkbPartOrderStatusService {
                 WebUtil.addErrorMessage("Additional Details(额外的信息)不能为空！",  "");
                 r = false;
             }
+            if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientImpactOutcome())){
+                WebUtil.addErrorMessage("Patient Impact/Outcome病人影响/结果不能为空！",  "");
+                r = false;
+            }
         }else if("NotReported".equals(zkbPartOrderCloseInfo.getPatientUse()) && "No".equals(zkbPartOrderCloseInfo.getSafetyConcern()) ){
             if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getQualityContactPerson())){
                 WebUtil.addErrorMessage("Quality Contact(质量联系人姓名)不能为空！",  "");
@@ -990,10 +994,7 @@ public class ZkbPartOrderStatusService {
                 r = false;
             }
         }
-        if(StrUtil.isEmpty(zkbPartOrderCloseInfo.getPatientImpactOutcome())){
-            WebUtil.addErrorMessage("Patient Impact/Outcome病人影响/结果不能为空！",  "");
-            r = false;
-        }
+
         if("Actual".equals(zkbPartOrderCloseInfo.getSafetyConcern())){
             if(zkbPartOrderCloseInfo.getIncidentDate() == null){
                 WebUtil.addErrorMessage("Incident date(该故障导致实际伤害事件的时间)不能为空！",  "");
