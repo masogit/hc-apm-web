@@ -3744,9 +3744,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','Actual','Actual(该故障已导致实际伤害)','Actual',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnSafetyConcernType','No','No(该故障不会导致潜在或实际伤害)','No',NULL,-1);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','Yes','Yes(故障发生时，有病人在使用这台机器)','Yes',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','No','No(故障发生时，没有病人使用这台机器)','No',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','NotReported','Not reported(客户没有告知，不清楚故障发生时有没有病人在使用这台机器)','Not reported',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','Yes','Yes(有病人使用，存在病患风险)','Yes',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','No','No(没有病人使用，没有病患风险)','No',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnPatientUseType','NotReported','Not reported(没有告知是否有病患/未报告)','Not reported',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Diagnosis','Diagnosis(诊断)','Diagnosis',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnProcedureType','Treatment','Treatment(治疗)','Treatment',NULL,-1);
