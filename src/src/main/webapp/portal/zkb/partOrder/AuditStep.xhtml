@@ -1406,7 +1406,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">Patient Impact/Outcome病人影响/结果<span style="color:red;">*</span></label>
+                            <label class="label">Patient Impact/Outcome病人影响/结果<span style="color:red;">#{zkbPartOrderAuditController.completeRequiredCheck('patientImpactOutcome') ? '*' : ''}</span></label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientImpactOutcome}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag) or (zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern eq 'No' and zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'No')}" >
                                 <p:ajax />
