@@ -45,7 +45,7 @@ public class AssetImportDateConvert implements ApmEasyExcelConvert, Converter<Da
             if (Objects.isNull(date)) {
                 dataFormatHandel(context, "请填入正确的日期");
             }
-            return null;
+            return date;
         }
         BigDecimal dateNum = context.getReadCellData().getNumberValue();
         if (Objects.nonNull(dateNum)) {
