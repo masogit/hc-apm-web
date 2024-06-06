@@ -636,6 +636,10 @@ public class AssetImportDataCheckService {
             } else {
                 assetImport.setStatus(Integer.parseInt(value));
             }
+        } else {
+            if (StringUtils.isEmpty(assetImport.getUid())) {
+                assetImport.setStatus(1);
+            }
         }
         if (!StringUtils.isEmpty(assetImport.getAssetValueCategory())) {
             String value = assetValueCategoryList.get(assetImport.getAssetValueCategory());
