@@ -2788,13 +2788,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Async
-    public boolean sendWeChatOrdered(ZkbPartOrder zkbPartOrder, String token){
+    public boolean sendEmailToEngineer(ZkbPartOrder zkbPartOrder, String token){
         try {
-            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_ORDERED).concat("?id=").concat(zkbPartOrder.getId());
-            //String token = UserContextService.getAccessToken();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
+            emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL_ENGINEER);
+
             HttpHeaders header = createHttpHeaders(token);
-            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" sendEmailToEngineer " +response.toString());
             if(response.getStatusCode() == HttpStatus.OK){
                 return true;
             }
@@ -2802,7 +2806,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             e.printStackTrace();
             return false;
         }
-        return false;
+        return true;
     }
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){

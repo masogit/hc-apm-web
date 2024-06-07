@@ -197,6 +197,7 @@ public class ZkbIntegralService {
         zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
         zkbIntegralRecord.setCreatedBy(userAccount.getName());
         zkbIntegralRecord.setCreatedDate(new Date());
+        zkbIntegralRecord.setRemark(zkbIntegral.getModifyReason());
         zkbIntegralRecordRepository.save(zkbIntegralRecord);
     }
 
