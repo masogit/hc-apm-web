@@ -630,15 +630,6 @@ public class AssetImport implements Serializable {
     private OrgInfo assetDeptOrg;
 
 
-    private Boolean canBorrow;
-
-
-    private Boolean canReturn;
-
-
-    private Boolean canEdit;
-
-
     private Integer verificationConclusion;
 
 
@@ -2458,30 +2449,6 @@ public class AssetImport implements Serializable {
 
     public void setAssetDeptOrg(OrgInfo assetDeptOrg) {
         this.assetDeptOrg = assetDeptOrg;
-    }
-
-    public Boolean getCanBorrow() {
-        return canBorrow;
-    }
-
-    public void setCanBorrow(Boolean canBorrow) {
-        this.canBorrow = canBorrow;
-    }
-
-    public Boolean getCanReturn() {
-        return canReturn;
-    }
-
-    public void setCanReturn(Boolean canReturn) {
-        this.canReturn = canReturn;
-    }
-
-    public Boolean getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(Boolean canEdit) {
-        this.canEdit = canEdit;
     }
 
     public Integer getVerificationConclusion() {
