@@ -200,6 +200,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setOrderType(newServiceRequest.getOrderType());
         formData.setRepairReportSendPlace(newServiceRequest.getRepairReportSendPlace());
         formData.setRepairSource(newServiceRequest.getSrRepairSource());
+        formData.setRequestorPhone(newServiceRequest.getRequestorPhone());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -344,7 +345,7 @@ class ServiceRequestForm {
     String repairReportSendPlace;
 
     String repairSource;
-
+    private String requestorPhone;
     public String getRepairReportSendPlace() {
         return repairReportSendPlace;
     }
@@ -525,6 +526,14 @@ class ServiceRequestForm {
 
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
+    }
+
+    public String getRequestorPhone() {
+        return requestorPhone;
+    }
+
+    public void setRequestorPhone(String requestorPhone) {
+        this.requestorPhone = requestorPhone;
     }
 }
 
