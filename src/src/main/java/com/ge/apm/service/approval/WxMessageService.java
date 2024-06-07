@@ -141,6 +141,11 @@ public class WxMessageService extends MicroServiceInvoker {
             params.put("businessType","资产入库审核");
             params.put("status", status);
             params.put("date", dateString);
+            params.put("assetName", assetInfo.getName());
+            params.put("dept", assetInfo.getClinicalDeptName());
+            params.put("financingNum", assetInfo.getFinancingNum());
+            params.put("departNum", assetInfo.getDepartNum());
+            params.put("functionType", assetInfo.getFunctionType());
             List<String> sendUids = resultUser.stream().distinct().map(UserAccount::getUid).collect(Collectors.toList());
             sendWxMsgToMq(params,null,MSGEvent.ASSET_AUDIT,sendUids,null);
         }catch (Exception e){

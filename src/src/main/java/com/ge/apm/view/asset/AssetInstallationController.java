@@ -665,6 +665,12 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetInfo.setTenantUID(listItem.getArrivalList().getTenantUID());
         assetInfo.setHospitalUID(listItem.getArrivalList().getHospitalUID());
         assetInfo.setInstitutionUID(listItem.getArrivalList().getInstitutionUID());
+        OrgInfo clinicalDept = orgInfoRepository.findByUid(listItem.getClinicalDeptUID());
+        assetInfo.setName(listItem.getArrivalList().getAssetName());
+        assetInfo.setClinicalDeptName(clinicalDept.getName());
+        assetInfo.setDepartNum(listItem.getDepartNum());
+        assetInfo.setFinancingNum(listItem.getFinancingNum());
+        assetInfo.setFunctionType(listItem.getFunctionType());
         wxMessageService.submitAssetApprovalSendMessage(assetInfo, "待审核");
     }
 

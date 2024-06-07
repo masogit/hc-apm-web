@@ -329,8 +329,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void totalMeasureExpireMonths() {
         Wrapper<AssetInfo> wrapper = convert();
-        wrapper.isNotNull("next_metering_date");
-        wrapper.between("next_metering_date", DateUtil.currentMonthFirstDay(), DateUtil.nextMonthLastDay());
+        wrapper.isNotNull("ai.next_metering_date");
+        wrapper.between("ai.next_metering_date", DateUtil.currentMonthFirstDay(), DateUtil.nextMonthLastDay());
+        wrapper.isNotNull("mcd.valid_date_to");
+        wrapper.between("mcd.valid_date_to", DateUtil.currentMonthFirstDay(), DateUtil.nextMonthLastDay());
         List<AssetInfo> assetInfoList = assetInfoMapper.selectMeasureResult(wrapper);
         if (ObjectUtil.isNotEmpty(assetInfoList)) {
             Date currentDate = new Date();
