@@ -123,7 +123,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_WECHAT_BACK_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatBackMessages"),
     PART_ORDER_SEND_WECHAT_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatRemindLetter"),
     PART_ORDER_SEND_WECHAT_RETURN_AUDIT("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatReturnAudit"),
-    PART_ORDER_SEND_WECHAT_ORDERED("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatOrdered"),
+    PART_ORDER_SEND_EMAIL_ENGINEER("/hcapmreportservice/api/apm/report/partOrder/sendHtmlToEngineerByGeAdmin"),
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
