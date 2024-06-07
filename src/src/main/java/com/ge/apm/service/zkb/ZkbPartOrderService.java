@@ -2787,7 +2787,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return false;
     }
 
-    @Async
     public boolean sendEmailToEngineer(ZkbPartOrder zkbPartOrder, String token){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
