@@ -221,6 +221,7 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(site, orgInfoMap.get(assetInfo.getSiteUID()));   //院区
             if(StringUtils.isNotBlank(assetInfo.getAssetScrapId())){
                 AssetScrap assetScrap = assetScrapRepository.findById(assetInfo.getAssetScrapId());
+                map.put(termination_cause, assetScrap.getApplyReason());   //报废原因
                 map.put(comments, assetScrap.getApprovalReason());   //维修部门意见
             }
             map.put(num, 1);   //数量
