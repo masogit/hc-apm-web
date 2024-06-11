@@ -20,7 +20,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ContractInfoItem implements Serializable {
 
     public enum ContractInfoItemType {
-        ExistAsset, Purchase, ArrivalledItem,paymentRecord
+        ExistAsset, Purchase, ArrivalledItem,paymentRecord, Invoice
     }
 
     public enum PaymentMode {
@@ -134,6 +134,15 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "invoice_num")
     private String invoiceNum;
 
+    //发票金额
+    @Column(name = "invoice_price")
+    private Double invoicePrice;
+
+    //开票时间
+    @Column(name = "invoice_time")
+    @Temporal(TemporalType.DATE)
+    private Date invoiceTime;
+
     //报送首付日期
     @Basic(optional = true)
     @Column(name = "down_payment_date")
@@ -189,6 +198,14 @@ public class ContractInfoItem implements Serializable {
     //excel行数
     @Transient
     private int lineNum;
+
+    //付款期
+    @Column(name = "payment_period")
+    private Integer paymentPeriod;
+
+    //付款日期
+    @Column(name = "paid")
+    private Boolean paid = Boolean.FALSE;
 
     public String getId() {
         return id;
@@ -449,6 +466,38 @@ public class ContractInfoItem implements Serializable {
     public Integer getNoInstallQuntity() { return noInstallQuntity; }
 
     public void setNoInstallQuntity(Integer noInstallQuntity) { this.noInstallQuntity = noInstallQuntity; }
+
+    public Double getInvoicePrice() {
+        return invoicePrice;
+    }
+
+    public void setInvoicePrice(Double invoicePrice) {
+        this.invoicePrice = invoicePrice;
+    }
+
+    public Date getInvoiceTime() {
+        return invoiceTime;
+    }
+
+    public void setInvoiceTime(Date invoiceTime) {
+        this.invoiceTime = invoiceTime;
+    }
+
+    public Integer getPaymentPeriod() {
+        return paymentPeriod;
+    }
+
+    public void setPaymentPeriod(Integer paymentPeriod) {
+        this.paymentPeriod = paymentPeriod;
+    }
+
+    public Boolean getPaid() {
+        return paid;
+    }
+
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
+    }
 
     @Override
     public int hashCode() {

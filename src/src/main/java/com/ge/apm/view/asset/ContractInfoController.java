@@ -25,10 +25,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -177,23 +174,25 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(purchases.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
             if (ObjectUtil.isNotEmpty(arrivalLists)) {
                 Set<Integer> arrivalStatus = arrivalLists.stream().map(ArrivalList::getStatus).collect(Collectors.toSet());
-                if (1 == arrivalStatus.size() && arrivalStatus.size() == purchases.size() && arrivalStatus.contains(3)) {
-                    return  "到货完成 验收完成";
-                }
-                List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListIdIn(arrivalLists.stream().map(ArrivalList::getId).collect(Collectors.toList()));
-                if (purchases.size() == arrivalListItems.size()) {
+                List<ArrivalListItem> arrivalListItems = Optional.ofNullable(arrivalListItemRepository.findByArrivalListIdIn(arrivalLists.stream().map(ArrivalList::getId).collect(Collectors.toList()))).orElse(new ArrayList<>());
+                Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
+                Map<String, Integer> contractItemMap = purchases.stream().collect(Collectors.toMap(ContractInfoItem::getId, ContractInfoItem::getContractAssetQuantity));
+                Map<String, List<ArrivalList>> arrivalMap = arrivalLists.stream().collect(Collectors.groupingBy(ArrivalList::getContractItemId));
+                if (contractItemMap.size() == arrivalMap.size()) {
                     // 到货完成
-                    Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
-                    if (arrivalItemStatus.contains("instorage") || arrivalItemStatus.contains("rejected")) {
-                        return  "到货完成 验收中";
-                    } else {
+                    if (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new")) {
                         return "到货完成 未安装";
                     }
-                } else {
-                    if (ObjectUtil.isNotEmpty(arrivalListItems)) {
-                        return "到货中 验收中";
+                    if (arrivalStatus.size() == 1 && arrivalStatus.contains("finished")) {
+                        return "到货完成 验收完成";
                     } else {
-                        return "到货中 未安装";
+                        return "到货完成 验收中";
+                    }
+                } else {
+                    if (arrivalItemStatus.contains("instorage") || arrivalItemStatus.contains("rejected")) {
+                        return  "到货中 验收中";
+                    } else {
+                        return  "到货中 未安装";
                     }
                 }
             } else {
