@@ -48,7 +48,7 @@ public class ExportToBeTerminatedAppraisalService {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
         maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date,
         asset_dept_name,asset_dept_owner_name,salvage_value,termination_cause,comments,num,accumulated_depreciation,
-        application_date,clinical_dept_name,site
+        application_date,clinical_dept_name,site,unit_price
     }
 
     @Autowired
@@ -212,9 +212,18 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(depart_num, assetInfo.getDepartNum());
             map.put(system_id, assetInfo.getSystemId());
             map.put(purchase_price, assetInfo.getPurchasePrice());
+            if(assetInfo.getPurchasePrice()!=null){
+                map.put(unit_price, "1 X "+assetInfo.getPurchasePrice());
+            }
+
             map.put(purchase_date, assetInfo.getPurchaseDate());
-            map.put(salvage_value, assetInfo.getPurchaseDate());   //最终残值
-            map.put(asset_dept_name, assetInfo.getAssetDeptName());   //使用科室
+            map.put(salvage_value, assetInfo.getSalvageValue());   //最终残值
+
+             String assetDeptUid = assetInfo.getAssetDeptUID();
+             if(StringUtils.isNotBlank(assetDeptUid)){
+                 OrgInfo byUid = orgInfoRepository.findByUid(assetDeptUid);
+                 map.put(asset_dept_name, byUid.getName());   //使用科室
+             }
             map.put(termination_cause, assetInfo.getTerminationCause());   //报废原因
             map.put(asset_dept_owner_name, "");   //科室负责人
             map.put(clinical_dept_name, assetInfo.getClinicalDeptName());   //所属科室
