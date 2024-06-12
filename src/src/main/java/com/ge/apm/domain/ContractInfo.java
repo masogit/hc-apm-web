@@ -11,10 +11,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 /**
  *
@@ -320,6 +318,39 @@ public class ContractInfo implements Serializable {
     @Column(name = "arrival_time")
     @Temporal(TemporalType.DATE)
     private Date arrivalTime;
+
+    // 状态 1：新建 2：审核 3：退回
+    @Column(name = "status")
+    private Integer status;
+
+    // 采购单号
+    @Column(name = "purchase_num")
+    private String purchaseNum;
+
+    // 标的名称
+    @Column(name = "bid_name")
+    private String bidName;
+
+    // 招标编码
+    @Column(name = "bid_num")
+    private String bidNum;
+
+    // 维保开始日期
+    @Column(name = "warranty_start_date")
+    private Date warrantyStartDate;
+
+    // 维保结束日期
+    @Column(name = "warranty_end_date")
+    private Date warrantyEndDate;
+
+    // 补充协议信息
+    @Column(name = "supplementary")
+    @Type(type = "text")
+    private String supplementary;
+
+    // 补充协议合同金额
+    @Column(name = "supplementary_amount")
+    private Double supplementaryAmount;
 
     public Date getBudgetRequestTime() {
         return budgetRequestTime;
@@ -791,6 +822,70 @@ public class ContractInfo implements Serializable {
 
     public void setPaymentProgress(String paymentProgress) {
         this.paymentProgress = paymentProgress;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getPurchaseNum() {
+        return purchaseNum;
+    }
+
+    public void setPurchaseNum(String purchaseNum) {
+        this.purchaseNum = purchaseNum;
+    }
+
+    public String getBidName() {
+        return bidName;
+    }
+
+    public void setBidName(String bidName) {
+        this.bidName = bidName;
+    }
+
+    public String getBidNum() {
+        return bidNum;
+    }
+
+    public void setBidNum(String bidNum) {
+        this.bidNum = bidNum;
+    }
+
+    public Date getWarrantyStartDate() {
+        return warrantyStartDate;
+    }
+
+    public void setWarrantyStartDate(Date warrantyStartDate) {
+        this.warrantyStartDate = warrantyStartDate;
+    }
+
+    public Date getWarrantyEndDate() {
+        return warrantyEndDate;
+    }
+
+    public void setWarrantyEndDate(Date warrantyEndDate) {
+        this.warrantyEndDate = warrantyEndDate;
+    }
+
+    public String getSupplementary() {
+        return supplementary;
+    }
+
+    public void setSupplementary(String supplementary) {
+        this.supplementary = supplementary;
+    }
+
+    public Double getSupplementaryAmount() {
+        return supplementaryAmount;
+    }
+
+    public void setSupplementaryAmount(Double supplementaryAmount) {
+        this.supplementaryAmount = supplementaryAmount;
     }
 
     @Override

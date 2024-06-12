@@ -30,6 +30,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private Boolean maintainerT = Boolean.FALSE;
     @Getter @Setter
     private Boolean manufacturerT = Boolean.FALSE;
+    @Getter @Setter
+    private String supplierType;
 
     @Override
     protected void init() {
@@ -76,5 +78,27 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         supplier.setLastModifiedDate(new Date());
         supplier.setSource("VenderCompany");
         supplierRepository.save(supplier);
+    }
+
+    public String getType(VenderCompany supplier){
+        if(supplier==null){
+            return "";
+        }
+        String name =new String();
+        if(supplier.getMaintainerT() != null && supplier.getMaintainerT()){
+            name= name.concat(WebUtil.getMessage("maitanance")+" ");
+        }
+        if(supplier.getManufacturerT() != null && supplier.getManufacturerT()){
+            name= name.concat(WebUtil.getMessage("manufacture")+" ");
+        }
+        if(supplier.getSupplierT() != null && supplier.getSupplierT()){
+            name= name.concat(WebUtil.getMessage("vendor")+" ");
+        }
+
+        name= name.replace(" ","/");
+        if(name.length()>0 && name.charAt(name.length()-1)=='/'){
+            name= name.substring(0,name.length()-1);
+        }
+        return name;
     }
 }
