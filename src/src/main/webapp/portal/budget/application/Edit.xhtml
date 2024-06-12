@@ -25,14 +25,17 @@
                                 <h:outputText value="#{budgetController.selected.courtyardArea}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+
                                 <p:outputLabel class="label">#{msg.ApplicationDept}<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText  id="dept" value="#{budgetController.selected.applicationDeptName}" readonly="true" required="true" requiredMessage="申请科室 #{msg.ValidationRequire}"/>
                                 <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" />
-                                <p:overlayPanel  id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit" hideEffect="fade"
+                                <p:overlayPanel  id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit"
                                                 style="position: absolute; left: 0; top: 0; width: 300px;"
                                                 dynamic="false" modal="false" dismissable="true"   >
                                     <p:scrollPanel style="height:300px; border: 0" mode="native"  >
+                                        <p:inputText id="searchDeptName" value="#{budgetController.searchDeptName}"  />
+                                        <p:commandButton process=":BudgetApplicationEditForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTreeEdit" actionListener="#{budgetController.treeSeachCondition()}" value="检索"/>
                                         <p:tree id="orgTreeEdit" value="#{budgetController.orgTreeEdit}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0"  >
                                            <p:ajax process="@this" event="select"
