@@ -413,7 +413,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                         throw new RuntimeException();
                     }
                     if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
-                        if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null || baa.getConfirmMaximumPrice() == null){
+                        if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null ){
                             throw new RuntimeException();
                         }
                     }

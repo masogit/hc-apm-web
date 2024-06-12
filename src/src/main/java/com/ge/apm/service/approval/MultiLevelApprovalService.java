@@ -1583,7 +1583,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         budgetApplicationAsset.setConfirmMajorFunction(budgetApplicationAssetConfirm.getConfirmMajorFunction());
         budgetApplicationAsset.setConfirmParameters(budgetApplicationAssetConfirm.getConfirmParameters());
         budgetApplicationAsset.setConfirmBrand(budgetApplicationAssetConfirm.getConfirmBrand());
-        budgetApplicationAsset.setConfirmMaximumPrice(budgetApplicationAssetConfirm.getConfirmMaximumPrice());
+        //budgetApplicationAsset.setConfirmMaximumPrice(budgetApplicationAssetConfirm.getConfirmMaximumPrice());
         budgetApplicationAsset.setConfirmRemark(budgetApplicationAssetConfirm.getConfirmRemark());
         budgetApplicationAssetRepository.save(budgetApplicationAsset);
 

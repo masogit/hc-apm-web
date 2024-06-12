@@ -19,6 +19,7 @@ import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,6 +47,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.FacesEvent;
+import javax.faces.event.ValueChangeEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -73,6 +77,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
     private BlobFileService blobService;
+    private UaaService uaaService;
 
     /**
      * 编辑数据主键
@@ -120,6 +125,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private StreamedContent exportFile;
     @Getter @Setter
     private List<String> removeFileBlobId = new ArrayList<>();
+    @Getter @Setter
+    private String searchDeptName;
     @Override
     protected void init() {
         AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
@@ -134,7 +141,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         persistService = WebUtil.getBean(BudgetPersistService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-        UaaService uaaService = WebUtil.getBean(UaaService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         TreeNode treeNodeImport = uaaService.getOrgTreeByParentIdWithSelectedChildren(account.getSiteUID(), account.getUid());
@@ -733,5 +740,16 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         return args;
     }
     /**  **************************批量导入**************************           **/
+
+
+    public void treeSeachCondition(){
+        TreeNode treeNodeEdit = null;
+        if(StrUtil.isEmpty(searchDeptName)){
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        }else{
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+        }
+        orgTreeEdit = initOrgTree(treeNodeEdit);
+    }
 
 }

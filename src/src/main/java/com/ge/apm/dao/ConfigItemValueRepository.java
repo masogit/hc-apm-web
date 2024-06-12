@@ -2,13 +2,10 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.ConfigItemVO;
 import com.ge.apm.domain.ConfigItemValue;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by 503266962
