@@ -12,6 +12,7 @@ import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -1271,6 +1272,15 @@ public class UaaService {
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, selectableLevel);
     }
 
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
+        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, orgInfoSelectableList, selectableLevel);
+    }
+
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(String parentOrgId, String userUid) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
@@ -1319,6 +1329,9 @@ public class UaaService {
                 } else if (treeMap.get(current.getParentUID()) == null){
                     rootNode = treeMap.get(current.getUid());
                 }
+            }else {
+                OrgInfo rootOrg = (OrgInfo)rootNode.getData();
+
             }
         }
 

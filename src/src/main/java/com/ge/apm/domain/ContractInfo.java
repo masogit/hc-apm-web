@@ -11,8 +11,12 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+import webapp.framework.util.TimeUtil;
 
 /**
  *
@@ -63,7 +67,7 @@ public class ContractInfo implements Serializable {
     @Column(name = "name")
     private String name;
 
-    // 合同编号    
+    // 合同编号
     @Column(name = "contract_num")
     private String contractNum;
 
@@ -924,4 +928,37 @@ public class ContractInfo implements Serializable {
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
     }
+
+    @Transient
+    @TableField(exist = false)
+    private String completion;
+
+    @Transient
+    @TableField(exist = false)
+    private String contractAlertStatus = null;
+
+    public String getCompletion() {
+        return completion;
+    }
+
+    public void setCompletion(String completion) {
+        this.completion = completion;
+    }
+
+    public String getContractAlertStatus() {
+        return contractAlertStatus;
+    }
+
+    public void setContractAlertStatus(Integer contractAlertDays) {
+        if(ObjectUtil.isAllNotEmpty(completion, expectArrivalDate) && !completion.contains("到货完成")) {
+            DateTime dt = TimeUtil.toJodaDate(expectArrivalDate);
+            if(dt.isBeforeNow()) {
+                contractAlertStatus = "contractExpired";
+            } else if(dt.minusDays(contractAlertDays).isBeforeNow()) {
+                contractAlertStatus = "contractExpiredSoon";
+            }
+        }
+    }
+
+
 }

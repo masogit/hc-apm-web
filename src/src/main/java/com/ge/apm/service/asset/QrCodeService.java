@@ -234,6 +234,13 @@ public class QrCodeService {
                     template.setV2BlobObject(v2BlobObjects.get(0));
                 }
             }
+        }else {
+            if(template.getV2BlobObject() == null){
+                List<V2_BlobObject> v2BlobObjects = blobObjectService.findBlobObjectsByBoUid(template.getId());
+                if(!v2BlobObjects.isEmpty()){
+                    template.setV2BlobObject(v2BlobObjects.get(0));
+                }
+            }
         }
 
         if (null == asset) {
