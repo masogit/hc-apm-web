@@ -745,6 +745,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);
     }
+    public AssetInfo getAssetInfoByUid(String assetUid){
+        return assetDao.findByUid(assetUid);
+    }
     public UserAccountRepository getUserDao() {
         return userDao;
     }

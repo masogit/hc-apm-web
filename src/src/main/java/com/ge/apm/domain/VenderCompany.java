@@ -32,8 +32,24 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+    // 基本信息
     @Column(name = "name")
     private String name;
+    // 企业法人
+    @Column(name = "corporate")
+    private String corporate;
+    // 法人联系方式
+    @Column(name = "corporate_tel")
+    private String corporateTel;
+    // 统一社会信用编码
+    @Column(name = "credit_code")
+    private String creditCode;
+    // 供应商组织机构编码
+    @Column(name = "supplier_code")
+    private String supplierCode;
+    // 供应商名称缩写
+    @Column(name = "supplier_abbreviation")
+    private String supplierAbbreviation;
     @Column(name = "name_py_code")
     private String namePyCode;
     @Size(max = 32)
@@ -53,53 +69,76 @@ public class VenderCompany implements Serializable {
     private String tel;
     @Column(name = "email")
     private String email;
+    // 项目对接人姓名
+    @Column(name = "project_docker_name")
+    private String projectDockerName;
+    // 项目对接人电话
+    @Column(name = "project_docker_tel")
+    private String projectDockerTel;
+    // 项目对接人职位
+    @Column(name = "project_docker_position")
+    private String projectDockerPosition;
+    @Column(name = "maintainer_t")
+    private Boolean maintainerT  = Boolean.FALSE;
+    @Column(name = "manufacturer_t")
+    private Boolean manufacturerT  = Boolean.FALSE;
+    @Column(name = "supplier_t")
+    private Boolean supplierT  = Boolean.FALSE;
 
-    //供应商资质
-    //供应商编码
-    @Column(name = "supplier_code")
-    private String supplierCode;
-    //供应商名称缩写
-    @Column(name = "supplier_abbreviation")
-    private String supplierAbbreviation;
-    //企业法人
-    @Column(name = "corporate")
-    private String corporate;
-    //统一社会信用编码
-    @Column(name = "credit_code")
-    private String creditCode;
-    //营业执照编码
+    // 营业执照编码
     @Column(name = "license_code")
     private String licenseCode;
-    //营业执照截止日期
+    // 营业执照开始日期
+    @Column(name = "license_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date licenseStartDate;
+    // 营业执照结束日期
     @Column(name = "license_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date licenseEndDate;
-    //营业许可证编码
+    // 业务范围
+    @Column(name = "license_scope")
+    private String licenseScope;
+
+    // 营业许可证编码
     @Column(name = "permit_code")
     private String permitCode;
-    //营业许可证截止日期
+    // 营业许可证开始日期
+    @Column(name = "permit_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date permitStartDate;
+    // 营业许可证结束日期
     @Column(name = "permit_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date permitEndDate;
-    //生产许可证编码
+
+    // 生产许可证编码
     @Column(name = "manufacturing_permit_code")
     private String manufacturingPermitCode;
-    //生产许可证截止日期
+    // 生产许可证开始日期
+    @Column(name = "manufacturing_permit_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date manufacturingPermitStartDate;
+    // 生产许可证结束日期
     @Column(name = "manufacturing_permit_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitEndDate;
-    //产品注册证编号
+
+    // 产品注册证编号
     @Column(name = "product_registration_code")
     private String productRegistrationCode;
-    //产品注册证开始日期
+    // 产品注册证开始日期
     @Column(name = "product_registration_start_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date productRegistrationStartDate;
-    //产品注册证结束日期
+    // 产品注册证结束日期
     @Column(name = "product_registration_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
@@ -135,6 +174,46 @@ public class VenderCompany implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCorporate() {
+        return corporate;
+    }
+
+    public void setCorporate(String corporate) {
+        this.corporate = corporate;
+    }
+
+    public String getCorporateTel() {
+        return corporateTel;
+    }
+
+    public void setCorporateTel(String corporateTel) {
+        this.corporateTel = corporateTel;
+    }
+
+    public String getCreditCode() {
+        return creditCode;
+    }
+
+    public void setCreditCode(String creditCode) {
+        this.creditCode = creditCode;
+    }
+
+    public String getSupplierCode() {
+        return supplierCode;
+    }
+
+    public void setSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
+    }
+
+    public String getSupplierAbbreviation() {
+        return supplierAbbreviation;
+    }
+
+    public void setSupplierAbbreviation(String supplierAbbreviation) {
+        this.supplierAbbreviation = supplierAbbreviation;
     }
 
     public String getNamePyCode() {
@@ -193,36 +272,52 @@ public class VenderCompany implements Serializable {
         this.email = email;
     }
 
-    public String getSupplierCode() {
-        return supplierCode;
+    public String getProjectDockerName() {
+        return projectDockerName;
     }
 
-    public void setSupplierCode(String supplierCode) {
-        this.supplierCode = supplierCode;
+    public void setProjectDockerName(String projectDockerName) {
+        this.projectDockerName = projectDockerName;
     }
 
-    public String getSupplierAbbreviation() {
-        return supplierAbbreviation;
+    public String getProjectDockerTel() {
+        return projectDockerTel;
     }
 
-    public void setSupplierAbbreviation(String supplierAbbreviation) {
-        this.supplierAbbreviation = supplierAbbreviation;
+    public void setProjectDockerTel(String projectDockerTel) {
+        this.projectDockerTel = projectDockerTel;
     }
 
-    public String getCorporate() {
-        return corporate;
+    public String getProjectDockerPosition() {
+        return projectDockerPosition;
     }
 
-    public void setCorporate(String corporate) {
-        this.corporate = corporate;
+    public void setProjectDockerPosition(String projectDockerPosition) {
+        this.projectDockerPosition = projectDockerPosition;
     }
 
-    public String getCreditCode() {
-        return creditCode;
+    public Boolean getMaintainerT() {
+        return maintainerT;
     }
 
-    public void setCreditCode(String creditCode) {
-        this.creditCode = creditCode;
+    public void setMaintainerT(Boolean maintainerT) {
+        this.maintainerT = maintainerT;
+    }
+
+    public Boolean getManufacturerT() {
+        return manufacturerT;
+    }
+
+    public void setManufacturerT(Boolean manufacturerT) {
+        this.manufacturerT = manufacturerT;
+    }
+
+    public Boolean getSupplierT() {
+        return supplierT;
+    }
+
+    public void setSupplierT(Boolean supplierT) {
+        this.supplierT = supplierT;
     }
 
     public String getLicenseCode() {
@@ -233,6 +328,14 @@ public class VenderCompany implements Serializable {
         this.licenseCode = licenseCode;
     }
 
+    public Date getLicenseStartDate() {
+        return licenseStartDate;
+    }
+
+    public void setLicenseStartDate(Date licenseStartDate) {
+        this.licenseStartDate = licenseStartDate;
+    }
+
     public Date getLicenseEndDate() {
         return licenseEndDate;
     }
@@ -241,12 +344,28 @@ public class VenderCompany implements Serializable {
         this.licenseEndDate = licenseEndDate;
     }
 
+    public String getLicenseScope() {
+        return licenseScope;
+    }
+
+    public void setLicenseScope(String licenseScope) {
+        this.licenseScope = licenseScope;
+    }
+
     public String getPermitCode() {
         return permitCode;
     }
 
     public void setPermitCode(String permitCode) {
         this.permitCode = permitCode;
+    }
+
+    public Date getPermitStartDate() {
+        return permitStartDate;
+    }
+
+    public void setPermitStartDate(Date permitStartDate) {
+        this.permitStartDate = permitStartDate;
     }
 
     public Date getPermitEndDate() {
@@ -263,6 +382,14 @@ public class VenderCompany implements Serializable {
 
     public void setManufacturingPermitCode(String manufacturingPermitCode) {
         this.manufacturingPermitCode = manufacturingPermitCode;
+    }
+
+    public Date getManufacturingPermitStartDate() {
+        return manufacturingPermitStartDate;
+    }
+
+    public void setManufacturingPermitStartDate(Date manufacturingPermitStartDate) {
+        this.manufacturingPermitStartDate = manufacturingPermitStartDate;
     }
 
     public Date getManufacturingPermitEndDate() {
