@@ -345,6 +345,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public String customerTel;
     @Getter @Setter
     public String siteName;
+    @Getter @Setter
+    private String requestAssetUid;
     public boolean downloadButton(){
         if(queryIndex==10){
             return false;
@@ -1463,6 +1465,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void createPMRequest() {
         cancel();
+        if(StringUtils.isNotBlank(requestAssetUid)){
+            Object  eventObject= pmOrderService.getAssetInfoByUid(requestAssetUid);
+            this.onServerEvent("onAssetSelected",eventObject);
+            requestAssetUid = null;
+        }
     }
 
     public void onStatusChange() {
@@ -1690,6 +1697,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
             if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
                 query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
