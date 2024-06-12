@@ -379,7 +379,11 @@
                                 <label class="label">意向品牌<span style="color: red">*</span></label>
                                 <p:inputText  value="#{budgetController.curSelectApplicationBudgetAsset.confirmBrand}" class="confirm" required="true" requiredMessage="意向品牌 #{msg.ValidationRequire}" />
                             </h:panelGroup>
-
+                            <h:panelGroup>
+                                <p:outputLabel class="label">栏标价<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="栏标价 #{msg.ValidationRequire}"
+                                                value="#{budgetController.curSelectApplicationBudgetAsset.confirmMaximumPrice}" />
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">备注<span style="color: red">*</span></p:outputLabel>
                                 <p:inputTextarea  value="#{budgetController.curSelectApplicationBudgetAsset.confirmRemark}" class="confirm" required="true" requiredMessage="备注 #{msg.ValidationRequire}" rows="2"  cols="20">
