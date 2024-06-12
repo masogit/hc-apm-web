@@ -3,10 +3,11 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,23 @@ public class SupplierService {
 
     @Transactional
     public void saveSupplier(Supplier supplier) {
+        if (ObjectUtil.isEmpty(supplier.getId())) {
+            Supplier save = supplierDao.findBySiteIdAndName(supplier.getSiteId(), supplier.getName());
+            if (ObjectUtil.isNotEmpty(save)) {
+                List<String> contactorList = ListUtil.newArrayList();
+                List<String> telList = ListUtil.newArrayList();
+                Optional.ofNullable(save.getContactor()).map(contactorList::add);
+                Optional.ofNullable(supplier.getContactor()).map(contactorList::add);
+                Optional.ofNullable(save.getTel()).map(telList::add);
+                Optional.ofNullable(supplier.getTel()).map(telList::add);
+                save.setContactor(StringUtils.join(contactorList, ","));
+                save.setTel(StringUtils.join(telList, ","));
+                save.setSupplierT(Boolean.TRUE.equals(supplier.getSupplierT()) || Boolean.TRUE.equals(save.getSupplierT()));
+                save.setMaintainerT(Boolean.TRUE.equals(supplier.getMaintainerT()) || Boolean.TRUE.equals(save.getMaintainerT()));
+                save.setManufacturerT(Boolean.TRUE.equals(supplier.getManufacturerT()) || Boolean.TRUE.equals(save.getManufacturerT()));
+                supplier = save;
+            }
+        }
         supplierDao.save(supplier);
 
         assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
