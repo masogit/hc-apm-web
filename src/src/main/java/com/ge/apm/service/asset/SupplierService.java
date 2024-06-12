@@ -166,6 +166,9 @@ public class SupplierService {
                 save.setSupplierT(Boolean.TRUE.equals(supplier.getSupplierT()) || Boolean.TRUE.equals(save.getSupplierT()));
                 save.setMaintainerT(Boolean.TRUE.equals(supplier.getMaintainerT()) || Boolean.TRUE.equals(save.getMaintainerT()));
                 save.setManufacturerT(Boolean.TRUE.equals(supplier.getManufacturerT()) || Boolean.TRUE.equals(save.getManufacturerT()));
+                save.setCity(supplier.getCity());
+                save.setAddress(supplier.getAddress());
+                save.setZipcode(supplier.getZipcode());
                 supplier = save;
             }
         }
