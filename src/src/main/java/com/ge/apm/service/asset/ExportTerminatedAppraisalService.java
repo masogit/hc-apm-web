@@ -135,6 +135,16 @@ public class ExportTerminatedAppraisalService {
             return null;
         }
     }
+    public byte[] getDefaultSignatureBytes() {
+        byte[] data = null;
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("/image/dot.png")) {
+            data = IOUtils.toByteArray(inputStream);
+        } catch (IOException ignore) {
+            // ignore
+        }
+        return data;
+    }
+
     private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
         Map<String, Object> datas = getData(assetInfo);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -192,11 +202,16 @@ public class ExportTerminatedAppraisalService {
             map.put(apply_date.name(), date);
             map.put(applyResone.name(), assetScrap.getApplyReason());
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
+            byte[] defaultSignatureBytes = getDefaultSignatureBytes();
+            String signature="signature.png";
+            map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+            map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+            map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+            map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
             if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
                 byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
-                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, signatureBytes));
             }
-
             List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
             List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(assetScrap.getBusinessUid());
@@ -207,12 +222,12 @@ public class ExportTerminatedAppraisalService {
             });
 
             List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
-            for (int i=1;i<=3;i++){
+            for (int i=1;i<=levelApprovals.size();i++){
                 if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
                     continue;
                 }
                 byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
-                map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
+                map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, signature, levelSignatureBytes));
             }
             if(levelApprovals.size()>3){
                 logger.info("审批节点大于三");
