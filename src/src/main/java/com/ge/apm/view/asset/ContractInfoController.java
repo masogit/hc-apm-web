@@ -1,19 +1,15 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.druid.util.StringUtils;
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.dao.ContractInfoRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.ContractInfoItem;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,7 +34,11 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     private ArrivalListRepository arrivalListRepository;
     private ArrivalListItemRepository arrivalListItemRepository;
     private ContractInfoItemRepository contractInfoItemRepository;
+    private ConfigItemValueRepository configItemValueRepository;
     private String assetUid;
+    private UserAccount currentUser;
+    @Getter @Setter
+    Integer contractExpirationReminderDays = 0;
 
     @Override
     protected void init() {
@@ -48,9 +48,14 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         contractInfoItemRepository = WebUtil.getBean(ContractInfoItemRepository.class);
-
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         assetUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetUid");
+        ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid("contractExpirationReminderDays", currentUser.getSiteUID());
+        if (ObjectUtil.isNotEmpty(configItemValue)) {
+            contractExpirationReminderDays = Integer.parseInt(configItemValue.getValue());
+        }
     }
 
     @Override
@@ -87,6 +92,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 
         Page<ContractInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<ContractInfo> list = page.getContent();
+        list.forEach(this::getCompletion);
         calcPercentage(list);
         return page;
     }
@@ -168,7 +174,8 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         }
     }
 
-    public String getCompletion(ContractInfo contractInfo) {
+    public void getCompletion(ContractInfo contractInfo) {
+        String completion = "";
         if (ContractInfo.ContractType.Equipment.toString().equals(contractInfo.getContractType())) {
             List<ContractInfoItem> purchases = contractInfoItemRepository.findByContractIdAndItemType(contractInfo.getId(), "Purchase");
             List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(purchases.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
@@ -181,25 +188,29 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                 if (contractItemMap.size() == arrivalMap.size()) {
                     // 到货完成
                     if (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new")) {
-                        return "到货完成 未安装";
-                    }
-                    if (arrivalStatus.size() == 1 && arrivalStatus.contains("finished")) {
-                        return "到货完成 验收完成";
+                        completion = "到货完成 未安装";
                     } else {
-                        return "到货完成 验收中";
+                        if (arrivalStatus.size() == 1 && arrivalStatus.contains("finished")) {
+                            completion = "到货完成 验收完成";
+                        } else {
+                            completion = "到货完成 验收中";
+                        }
                     }
                 } else {
                     if (arrivalItemStatus.contains("instorage") || arrivalItemStatus.contains("rejected")) {
-                        return  "到货中 验收中";
+                        completion =  "到货中 验收中";
                     } else {
-                        return  "到货中 未安装";
+                        completion =  "到货中 未安装";
                     }
                 }
             } else {
-                return "未到货";
+                completion = "未到货";
             }
         }
-        return "";
+        contractInfo.setCompletion(completion);
+        if (ObjectUtil.isNotEmpty(completion) && contractExpirationReminderDays > 0) {
+            contractInfo.setContractAlertStatus(contractExpirationReminderDays);
+        }
     }
     
     public String createAction() {

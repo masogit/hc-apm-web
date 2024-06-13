@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.MvsIbMappingMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ServiceRequestProjection;
 import com.ge.apm.service.uaa.UaaService;
@@ -33,6 +34,7 @@ public class InspectionServiceController {
     V2_PmOrderRepository pmDao = WebUtil.getBean(V2_PmOrderRepository.class);
     UaaService uuaService = WebUtil.getBean(UaaService.class);
     AssetInfoMapper assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
+    MvsIbMappingMapper mvsIbMappingMapper =  WebUtil.getBean(MvsIbMappingMapper.class);
     ServiceRequestApiService serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
 
     public List<InspectionOrder> getInspectionOrderList(Integer assetId,Integer orderType,Integer limit){
@@ -50,7 +52,7 @@ public class InspectionServiceController {
     }
 
     public List<ServiceRequestProjection> getWorkOrderList(Integer assetId){
-        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
         PageRequest pr =  new PageRequest(0, 5000, sort);
@@ -58,7 +60,7 @@ public class InspectionServiceController {
     }
 
     public List<ServiceRequestProjection> getWorkOrderList(Integer assetId, Integer limit){
-        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
         PageRequest pr =  new PageRequest(0, limit, sort);
@@ -66,7 +68,7 @@ public class InspectionServiceController {
     }
 
     public List<V2_PmOrder> getPmOrderList(Integer assetId){
-        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "startTime");
         PageRequest pr =  new PageRequest(0, 5000, sort);
@@ -76,7 +78,7 @@ public class InspectionServiceController {
     }
 
     public List<V2_PmOrder> getPmOrderList(Integer assetId,Integer limit){
-        List<Integer> assetIds = assetInfoMapper.findMvsAssetIds(assetId);
+        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
         Sort sort = new Sort(Sort.Direction.DESC, "startTime");
         PageRequest pr =  new PageRequest(0, limit, sort);
