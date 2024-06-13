@@ -219,6 +219,12 @@ public class AssetImportDataCheckService {
                 result.put("canBeImport", Boolean.FALSE);
                 assetImport.addErrMsg("错误: 设备编号是必须的");
             }
+            if (StringUtils.isEmpty(assetImport.getName())) {
+                assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                result.put("canBeImport", Boolean.FALSE);
+                assetImport.addErrMsg("错误: 设备名称是必须的");
+
+            }
             UserContextService userContextService = WebUtil.getBean(UserContextService.class);
             boolean zkbAccountBoolean = userContextService.isZkbAccount();
             if (zkbAccountBoolean) {
