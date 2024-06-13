@@ -10,8 +10,10 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webapp.framework.web.WebUtil;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
     final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
+
+    private List<String> requiredFields = Arrays.asList(WebUtil.getMessage("EquipmentID"), WebUtil.getMessage("EquipmentName"), WebUtil.getMessage("assetGroup"),WebUtil.getMessage("clinicalDeptId"));
 
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
         SXSSFSheet sheet = workBook.getSheet(sheetName);
@@ -105,6 +109,13 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         }
     }
 
+    /**
+     *
+     * @param rowNum
+     * @param colNum
+     * @param value
+     * @param bold 可变程度字段，bold[0]：是否加粗；bold[1]：单元格背景填充红色，目前只用在下载资产导入模板必填字段
+     */
     public void writeCellData(int rowNum, int colNum, Object value, boolean... bold) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
@@ -121,6 +132,10 @@ public class ExcelDocumentStreamingWriter implements Closeable {
             Font font = workBook.createFont();
             font.setBold(true);
             cellStyle.setFont(font);
+            if (bold.length == 2 && bold[1] == true && requiredFields.contains(value)) {
+                cellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+                cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            }
             cell.setCellStyle(cellStyle);
         }
         writeCellData(cell, value);
@@ -141,7 +156,6 @@ public class ExcelDocumentStreamingWriter implements Closeable {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
             cell.setCellValue((Date) data);
-
         } else if (data instanceof Integer) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Integer) data);
@@ -179,12 +193,12 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    public void writeToFile(File file){
+    public void writeToFile(File file) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream(); FileOutputStream fos = new FileOutputStream(file);) {
             this.workBook.write(out);
             fos.write(out.toByteArray());
         } catch (Exception e) {
-            logger.error("excelDocumentStreamWrite error:{}",e.getMessage());
+            logger.error("excelDocumentStreamWrite error:{}", e.getMessage());
         }
     }
 

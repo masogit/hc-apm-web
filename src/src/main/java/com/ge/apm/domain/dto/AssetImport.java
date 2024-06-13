@@ -72,7 +72,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty("MaintainerTelephone")
     private String maitananceTel;//维修电话
 
-    @ExcelProperty("NationalCode")
+    @ExcelProperty("nationalStandardCode")
     private String nationalStandardCode;//2010国家编码
 
     @ExcelProperty("serialNum")
@@ -197,7 +197,6 @@ public class AssetImport implements Serializable {
 
     @ExcelProperty("RegistrationNumber")
     private String registrationNo;//注册证号
-
     @ExcelProperty("factoryWarrantyDate")
     private Date factoryWarrantyDate;//质保截止日期
 
@@ -454,6 +453,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty("PMOwner")
     private String pmOwnerName;
 
+    @ExcelProperty("measuringOwner")
     private String measuringOwnerName;
 
     private String pmOwnerTel;
@@ -525,8 +525,10 @@ public class AssetImport implements Serializable {
     //全量IB客户可见性标记
     private Integer visibleStatus;
 
+    @ExcelProperty("monitorRate")
     private Double monitorRate;
 
+    @ExcelProperty("otherPower")
     private Double otherPower;
 
     private Double unitPriceElectricity;
@@ -3249,8 +3251,7 @@ public class AssetImport implements Serializable {
         if (Objects.isNull(isFixed)) {
             this.setIsFixed(true);
         }
-        if(Objects.isNull(networkingStatus))
-        {
+        if (Objects.isNull(networkingStatus)) {
             this.setNetworkingStatus(0);
         }
         this.setIsValid(true);
