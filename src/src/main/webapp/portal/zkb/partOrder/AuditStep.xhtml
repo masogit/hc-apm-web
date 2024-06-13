@@ -1303,11 +1303,7 @@
 
                 <p:fieldset id="completeFieldset" class="fs" legend="关单信息(红色文字为关单信息填写提示；带*为必填项)" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showComplete}">
                     <p:panelGrid id="completeGrid" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
-                            <label class="label">设备UDI<span style="color:red;">*</span></label>
-                            <p:outputLabel style="color: red" value="如果该设备没有UDI，请填写“无UDI“"/><br/>
-                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.udi}" required="false" requiredMessage="设备UDI不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"><p:ajax /></p:inputText>
-                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">Safety Concern(该故障是否存在潜在伤害或已导致实际伤害)<span style="color:red;">*</span></label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
@@ -1325,6 +1321,33 @@
                                 <p:ajax event="change" update="completeGrid" listener="#{zkbPartOrderAuditController.getAllegedPatientConsequence()}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPatientUseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'Yes'}">
+                            <label class="label">有病人使用，存在病患风险，请选择风险分类<span style="color:red;">*</span></label>
+                            <p:outputLabel style="color: red"></p:outputLabel><br/>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.riskType}" required="false" requiredMessage="有病人使用，存在病患风险，请选择风险分类不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
+                                <p:ajax />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoRiskType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'No'}">
+                            <label class="label">没有病人使用，没有病患风险，请选择没有风险分类<span style="color:red;">*</span></label>
+                            <p:outputLabel style="color: red"></p:outputLabel><br/>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.noRiskType}" required="false" requiredMessage="没有病人使用，没有病患风险，请选择没有风险分类不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
+                                <p:ajax />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoNoRiskType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'NotReported'}">
+                            <label class="label">请选择没有告知是否有病患/未报告的类别<span style="color:red;">*</span></label>
+                            <p:outputLabel style="color: red"></p:outputLabel><br/>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.noReportType}" required="false" requiredMessage="请选择没有告知是否有病患/未报告的类别不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
+                                <p:ajax />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoNoReportType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -1365,6 +1388,15 @@
                             </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">Patient Impact/Outcome病人影响/结果<span style="color:red;">#{zkbPartOrderAuditController.completeRequiredCheck('patientImpactOutcome') ? '*' : ''}</span></label>
+                            <p:outputLabel style="color: red"></p:outputLabel><br/>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientImpactOutcome}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag) or (zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern eq 'No' and zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'No')}" >
+                                <p:ajax />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoPatientImpactOutcome')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">Intervention Required(需要的干涉)<span style="color:red;">#{zkbPartOrderAuditController.completeRequiredCheck('interventionRequired') ? '*' : ''}</span></label>
                             <p:outputLabel style="color: red">临床医生必须要做什么来补救当时的情况。拔管，重新扫描或其他</p:outputLabel><br/>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.interventionRequired}" rows="4" cols="40" required="false" requiredMessage="需要的干涉不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
@@ -1378,42 +1410,7 @@
                                 <p:ajax />
                             </p:inputTextarea>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'Yes'}">
-                            <label class="label">有病人使用，存在病患风险，请选择风险分类<span style="color:red;">*</span></label>
-                            <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.riskType}" required="false" requiredMessage="有病人使用，存在病患风险，请选择风险分类不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
-                                <p:ajax />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoRiskType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'No'}">
-                            <label class="label">没有病人使用，没有病患风险，请选择没有风险分类<span style="color:red;">*</span></label>
-                            <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.noRiskType}" required="false" requiredMessage="没有病人使用，没有病患风险，请选择没有风险分类不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
-                                <p:ajax />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoNoRiskType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'NotReported'}">
-                            <label class="label">请选择没有告知是否有病患/未报告的类别<span style="color:red;">*</span></label>
-                            <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.noReportType}" required="false" requiredMessage="请选择没有告知是否有病患/未报告的类别不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
-                                <p:ajax />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoNoReportType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">Patient Impact/Outcome病人影响/结果<span style="color:red;">#{zkbPartOrderAuditController.completeRequiredCheck('patientImpactOutcome') ? '*' : ''}</span></label>
-                            <p:outputLabel style="color: red"></p:outputLabel><br/>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientImpactOutcome}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag) or (zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern eq 'No' and zkbPartOrderAuditController.zkbPartOrderCloseInfo.patientUse eq 'No')}" >
-                                <p:ajax />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoPatientImpactOutcome')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.safetyConcern eq 'Actual'}">
                             <label class="label">Incident date(该故障导致实际伤害事件的时间)<span style="color:red;">*</span></label>
                             <p:outputLabel style="color: red"></p:outputLabel><br/>
@@ -1450,6 +1447,11 @@
                             <p:inputTextarea value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.testResult}" rows="4" cols="120" required="false" requiredMessage="服务结果为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
                             <p:outputLabel style="color: red" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.selected.returnType eq 'badReturn'}">请在服务结果里填写新探头型号和序列号</p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备UDI<span style="color:red;">*</span></label>
+                            <p:outputLabel style="color: red" value="如果该设备没有UDI，请填写“无UDI“"/><br/>
+                            <p:inputText value="#{zkbPartOrderAuditController.zkbPartOrderCloseInfo.udi}" required="false" requiredMessage="设备UDI不能为空！" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CompletePending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}"><p:ajax /></p:inputText>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:dataTable id="zkbCloseWorkTimeDatalist"  value="#{zkbPartOrderAuditController.zkbPartOrderCloseWorkTimeList}" var="item"
