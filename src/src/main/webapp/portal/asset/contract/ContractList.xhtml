@@ -115,10 +115,11 @@
                         </p:column>
                         <p:column headerText="#{msg.Actions}">
                             <p:commandButton value="#{msg.ContractComplete}"
-                                             rendered="#{item.contractType == 'Equipment'}"
+                                             rendered="#{item.contractType == 'Equipment' and (item.status == null or item.status == 4)}"
                                              disabled="#{item.isContractComplete()}"
                                              update=":AssetContractListForm:datalist"
                                              action="#{contractInfoController.completeContract(item)}"/>
+                            <p:commandButton id="audit" value="#{msg.Approval}" process="@this" update="ContractAuditDlg" actionListener="#{contractInfoEditController.prepareApproval(item)}" rendered="#{item.status == 2}" oncomplete="PF('ContractAuditDialog').show()"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" title="#{msg.Create}" action="#{contractInfoController.createAction}" />
@@ -133,6 +134,37 @@
                 </h:form>
             </div>
         </div>
+
+        <p:dialog id="ContractAuditDlg" class="ContractAuditDlgCls" width="300" widgetVar="ContractAuditDialog" modal="true" resizable="true"
+                  draggable="true" appendTo="@this" header="#{msg.Supplier}">
+            <h:form id="ContractAuditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
+                        <h:panelGroup>
+                            <label class="label">审核状态<span style="color:red">*</span></label>
+                            <p:selectOneRadio id="auditStatus" value="#{contractInfoEditController.selected.approvalStatus}" required="true" requiredMessage="请选择审核状态">
+                                <f:selectItem itemLabel="通过" itemValue="true"/>
+                                <f:selectItem itemLabel="不通过" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">审核结果</label>
+                            <p:inputText id="city" value="#{contractInfoEditController.selected.approvalResult}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true"
+                                     actionListener="#{contractInfoEditController.approval}"
+                                     value="#{msg.Approval}"
+                                     icon="ui-icon-check"
+                                     update="AssetContractListForm:datalist :growl"
+                                     oncomplete="handleSubmit(args, 'ContractAuditDialog');"/>
+                    <p:commandButton immediate="true"
+                                     value="#{msg.Cancel}"
+                                     icon="ui-icon-cancel"
+                                     onclick="PF('ContractAuditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
     </ui:define>
     <script type="text/javascript">
         function start() {

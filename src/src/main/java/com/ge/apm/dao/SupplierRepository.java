@@ -58,4 +58,6 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
 
     List<Supplier> findByTenantUIDAndVenderCompanyIdIsNotNull(String tenantUid);
 
+    Supplier findByTenantUIDAndVenderCompanyId(String tenantUid, String venderCompanyId);
+
 }
