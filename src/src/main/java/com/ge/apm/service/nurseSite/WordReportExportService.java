@@ -440,8 +440,12 @@ public class WordReportExportService {
             Map<String, Map<String, String>> stringListMap = stringMap.get(date);
             Map<String, String> itemMap = stringListMap.get(assetInfoName);
             for (Object detail : itemDetails) {
-                logger.error("detail : {}", JSON.toJSONString(detail));
-                tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
+                try {
+                    tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
+                } catch (Exception e) {
+                    logger.error("detail : {}", JSON.toJSONString(detail));
+                    logger.error("error : {}", e.getMessage(), e);
+                }
             }
             for (int m = 1; m <= 2; m++) {
                 if( m==1){
