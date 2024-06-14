@@ -1,3 +1,3 @@
-update asset_termination_report_template  set template_type='ToBeTerminated'
+update asset_termination_report_template  set template_type='ToBeTerminated';
 -- YHAAO-21868 合同增加到期提醒天数配置项
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, '0', '合同列表到期标红（0默认不开启）', 'contractExpirationReminderDays', '合同到期提醒天数', 'f', 't', 2 where not exists (select * from config_item where key = 'contractExpirationReminderDays');
