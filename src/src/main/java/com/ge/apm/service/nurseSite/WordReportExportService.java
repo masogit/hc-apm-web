@@ -422,7 +422,11 @@ public class WordReportExportService {
         String assetInfoName = assetInfo.getName();
         tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")"
                 + "-"+ DateFormatUtils.format(dataMap.get(1), "yyyy-MM"));
-        tableOneRowTwo.getCell(0).setText("日期");
+        XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
+        dateCell.setText("日期");
+        CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
+        dateWidth.setW(BigInteger.valueOf(1200));
+        dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
         int num = itemDetails.size();
@@ -430,8 +434,16 @@ public class WordReportExportService {
             JSONObject jsonObject = (JSONObject) itemDetails.get(m);
             tableOneRowTwo.addNewTableCell().setText(jsonObject.getString("name"));
         }
-        tableOneRowTwo.addNewTableCell().setText("检查者");
-        tableOneRowTwo.addNewTableCell().setText("备注");
+        XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
+        userCell.setText("检查者");
+        CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
+        userWidth.setW(BigInteger.valueOf(1000));
+        userWidth.setType(STTblWidth.DXA);
+        XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
+        remarkCell.setText("备注");
+        CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
+        remarkWidth.setW(BigInteger.valueOf(1500));
+        remarkWidth.setType(STTblWidth.DXA);
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
