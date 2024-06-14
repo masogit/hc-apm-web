@@ -35,8 +35,6 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     final CellStyle DEFAULT_CELL_STYLE_DATE;
     final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
 
-    private List<String> requiredFields = Arrays.asList(WebUtil.getMessage("EquipmentID"), WebUtil.getMessage("EquipmentName"), WebUtil.getMessage("assetGroup"),WebUtil.getMessage("clinicalDeptId"));
-
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
         SXSSFSheet sheet = workBook.getSheet(sheetName);
         if (sheet == null) {
@@ -114,7 +112,7 @@ public class ExcelDocumentStreamingWriter implements Closeable {
      * @param rowNum
      * @param colNum
      * @param value
-     * @param bold 可变程度字段，bold[0]：是否加粗；bold[1]：单元格背景填充红色，目前只用在下载资产导入模板必填字段
+     * @param bold 可变长度字段，bold[0]：是否加粗
      */
     public void writeCellData(int rowNum, int colNum, Object value, boolean... bold) {
         Row dataRow = sheet.getRow(rowNum - 1);
@@ -132,10 +130,6 @@ public class ExcelDocumentStreamingWriter implements Closeable {
             Font font = workBook.createFont();
             font.setBold(true);
             cellStyle.setFont(font);
-            if (bold.length == 2 && bold[1] == true && requiredFields.contains(value)) {
-                cellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
-                cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            }
             cell.setCellStyle(cellStyle);
         }
         writeCellData(cell, value);
