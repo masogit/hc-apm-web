@@ -189,12 +189,28 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                 Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
                 Map<String, Integer> contractItemMap = purchases.stream().collect(Collectors.toMap(ContractInfoItem::getId, ContractInfoItem::getContractAssetQuantity));
                 Map<String, List<ArrivalList>> arrivalMap = arrivalLists.stream().collect(Collectors.groupingBy(ArrivalList::getContractItemId));
-                if (contractItemMap.size() == arrivalMap.size()) {
+                boolean isFinished = Boolean.FALSE;
+                for (Map.Entry<String, Integer> item : contractItemMap.entrySet()) {
+                    Integer quantity = item.getValue();
+                    List<ArrivalList> lists = arrivalMap.get(item.getKey());
+                    if (ObjectUtil.isNotEmpty(lists)) {
+                        int sum = lists.stream().mapToInt(ArrivalList::getQuantity).sum();
+                        if (sum >= quantity) {
+                            isFinished = Boolean.TRUE;
+                        } else {
+                            isFinished = Boolean.FALSE;
+                        }
+                    } else {
+                        isFinished = Boolean.FALSE;
+                    }
+                }
+                if (Boolean.TRUE.equals(isFinished)) {
                     // 到货完成
-                    if (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new")) {
+                    if (arrivalItemStatus.isEmpty()) {
+                        // 未安装
                         completion = "到货完成 未安装";
                     } else {
-                        if (arrivalStatus.size() == 1 && arrivalStatus.contains("finished")) {
+                        if (arrivalStatus.size() == 1 && arrivalStatus.contains(3)) {
                             completion = "到货完成 验收完成";
                         } else {
                             completion = "到货完成 验收中";
