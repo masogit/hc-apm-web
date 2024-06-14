@@ -20,6 +20,8 @@ import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class WordReportExportService {
+
+    public static  final Logger logger = LoggerFactory.getLogger(WordReportExportService.class);
 
     @Autowired
     private BlobFileService blobFileService;
@@ -436,6 +440,7 @@ public class WordReportExportService {
             Map<String, Map<String, String>> stringListMap = stringMap.get(date);
             Map<String, String> itemMap = stringListMap.get(assetInfoName);
             for (Object detail : itemDetails) {
+                logger.error("detail : {}", JSON.toJSONString(detail));
                 tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
             }
             for (int m = 1; m <= 2; m++) {
