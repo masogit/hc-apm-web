@@ -90,6 +90,10 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IsNull, null, "1*3+"));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2, "1*3+"));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 4, "1*3+"));
+
         Page<ContractInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<ContractInfo> list = page.getContent();
         list.forEach(this::getCompletion);
