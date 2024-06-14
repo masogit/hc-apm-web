@@ -443,7 +443,7 @@ public class WordReportExportService {
                 try {
                     tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
                 } catch (Exception e) {
-                    logger.error("detail : {}", JSON.toJSONString(detail));
+                    logger.error("itemMap : {}, stringMap : {}, detail : {}", JSON.toJSONString(itemMap), JSON.toJSONString(stringMap), JSON.toJSONString(detail));
                     logger.error("error : {}", e.getMessage(), e);
                 }
             }
