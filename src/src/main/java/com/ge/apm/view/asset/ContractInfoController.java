@@ -217,10 +217,10 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                         }
                     }
                 } else {
-                    if (arrivalItemStatus.contains("instorage") || arrivalItemStatus.contains("rejected")) {
-                        completion =  "到货中 验收中";
-                    } else {
+                    if (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new")) {
                         completion =  "到货中 未安装";
+                    } else {
+                        completion =  "到货中 验收中";
                     }
                 }
             } else {
