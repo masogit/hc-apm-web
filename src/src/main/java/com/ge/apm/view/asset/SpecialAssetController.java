@@ -285,7 +285,7 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
 
 
 //        AssetInfo assetInfo = assetInfoRepository.findById(specialAssetInfo.getAssetId());
-        String operation = "SpecialAssetCreate.xhtml?actionName=Edit&selectedid=" + specialAssetInfo.getAssetInfo().getUid()
+        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + specialAssetInfo.getAssetInfo().getUid()
                 + "&asset_name=" + specialAssetInfo.getAssetInfo().getName()
                 +"&type=SpecialAsset"
                 + "&terminate=" + this.terminate;
@@ -309,7 +309,7 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
                 + selected.getAssetInfo().getUid()
                 + "&asset_name=" + selected.getAssetInfo().getName()
                 + "&terminate=" + this.terminate;
-        url = "SpecialAssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
