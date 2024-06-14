@@ -414,6 +414,15 @@ public class WordReportExportService {
 
     public void creatPage( int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document, List<NurseSiteMaintainItem> nurseSiteMaintainItemList,
                            Map<Date,Map<String,Map<String, String>>> stringMap,Map<Date,Map<String,String>> commentMapMap,Map<Date,Map<String,String>> updateByMapMap, Map<String, String> configMap){
+        // 获取或创建页面设置的CTSectPr对象
+        CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+        CTPageMar pageMar = sectPr.addNewPgMar();
+        // 设置上、下、左、右的页边距，单位是毫米（mm）
+        pageMar.setTop(BigInteger.valueOf(200));
+        pageMar.setBottom(BigInteger.valueOf(200));
+        pageMar.setLeft(BigInteger.valueOf(200));
+        pageMar.setRight(BigInteger.valueOf(200));
+
         XWPFTable table = document.createTable();
         XWPFTableRow tableOneRowOne = table.getRow(0);
         XWPFTableRow tableOneRowTwo = table.createRow();
@@ -497,7 +506,7 @@ public class WordReportExportService {
         //表格宽度
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
-        tblPr.getTblW().setW(new BigInteger("9370"));
+        tblPr.getTblW().setW(new BigInteger("11850"));
     }
 
     public byte[] zip(Map<String,Map<Integer,List<byte[]>>> reportMapMap) throws IOException {
