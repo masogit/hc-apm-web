@@ -418,10 +418,10 @@ public class WordReportExportService {
         CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
         CTPageMar pageMar = sectPr.addNewPgMar();
         // 设置上、下、左、右的页边距，单位是毫米（mm）
-        pageMar.setTop(BigInteger.valueOf(200));
-        pageMar.setBottom(BigInteger.valueOf(200));
-        pageMar.setLeft(BigInteger.valueOf(200));
-        pageMar.setRight(BigInteger.valueOf(200));
+        pageMar.setTop(BigInteger.valueOf(500));
+        pageMar.setBottom(BigInteger.valueOf(500));
+        pageMar.setLeft(BigInteger.valueOf(500));
+        pageMar.setRight(BigInteger.valueOf(500));
 
         XWPFTable table = document.createTable();
         XWPFTableRow tableOneRowOne = table.getRow(0);
@@ -506,7 +506,7 @@ public class WordReportExportService {
         //表格宽度
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
-        tblPr.getTblW().setW(new BigInteger("11850"));
+        tblPr.getTblW().setW(new BigInteger("11250"));
     }
 
     public byte[] zip(Map<String,Map<Integer,List<byte[]>>> reportMapMap) throws IOException {
