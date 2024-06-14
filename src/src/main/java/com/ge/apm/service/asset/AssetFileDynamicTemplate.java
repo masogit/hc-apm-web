@@ -573,7 +573,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         //create asset table
 //        createAssetTable(columnTitles);
 
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles, true,true);
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles, true);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         writer.writeRowData(startRow, buildSampleAsset(clinicalDeptList));
@@ -755,17 +755,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
         map.put(WebUtil.getMessage("IsImportEquipment"), "进口");
         map.put(WebUtil.getMessage("CurrentStatus"), "正常");
-        map.put(WebUtil.getMessage("assetOwnerTel"), "139XXXX1000");
-        map.put(WebUtil.getMessage("assetOwnerTel2"), "139XXXX1000");
-        map.put(WebUtil.getMessage("assetOwnerTel3"), "139XXXX1000");
-        map.put(WebUtil.getMessage("RepairOwner3"), "139XXXX1000");
         map.put(WebUtil.getMessage("PMOwner"), "张三");
-        map.put(WebUtil.getMessage("PMOwnerTel"), "139XXXX1000");
         map.put(WebUtil.getMessage("patrolInspectionOwnerName"), "张三");
-        map.put(WebUtil.getMessage("patrolInspectionOwnerTel"), "139XXXX1000");
         map.put(WebUtil.getMessage("hospitalId"), UserContextService.getCurrentUserAccount().getSiteName());
         map.put(WebUtil.getMessage("UseOwner"), "张三");
-        map.put(WebUtil.getMessage("UseOwnerTel"), "139XXXX1000");
         map.put(WebUtil.getMessage("assetDeptName"), clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
         map.put(WebUtil.getMessage("BrandManufacturerShortName"), "XXX医疗器械有限公司");
         map.put(WebUtil.getMessage("EquipmentStandardName"), "XXX");
@@ -789,11 +782,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("lastQaDate"), new Date(124, Calendar.SEPTEMBER, 24));//上次巡检日期
         map.put(WebUtil.getMessage("lastInventoryDate"), new Date(124, Calendar.OCTOBER, 25));//上次盘点日期
         map.put(WebUtil.getMessage("Maintainer"), "XXX设备有限公司");//维修商
-        map.put(WebUtil.getMessage("QRCode"), "2406065846760XXX");//二维码
-        map.put(WebUtil.getMessage("InstallationLocationCode"), "10102XX");//安装位置编码
         map.put(WebUtil.getMessage("InstallationLocation"), "住院部X层");//安装位置
         map.put(WebUtil.getMessage("InstallationLocationNotes"), "XXX科室");//位置备注1(科室)
-        map.put(WebUtil.getMessage("Remark"), "XXX");//备注
         map.put(WebUtil.getMessage("capitalSource2"), CollectionUtils.isEmpty(capitalSource2List) ? "" : capitalSource2List.get(0).getValueZh());//资金来源2
         map.put(WebUtil.getMessage("IsPM"), "是");//是否pm
         map.put(WebUtil.getMessage("isFixed"), "是");//是否固定资产
@@ -801,46 +791,31 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("assetValueCategory"), CollectionUtils.isEmpty(assetValueCategoryList) ? "" : assetValueCategoryList.get(0).getValueZh());//资产价值分布
         map.put(WebUtil.getMessage("deviceStatus"), CollectionUtils.isEmpty(deviceStatusList) ? "" : deviceStatusList.get(0).getValueZh());//资产状态
         map.put(WebUtil.getMessage("isWarrantyNotice"), "是");//资产状态
-        map.put(WebUtil.getMessage("assetTags"), "XX1,XX2");//标签
-        map.put(WebUtil.getMessage("UCMID"), "U-2Y1XXX");//ucmid
         map.put(WebUtil.getMessage("rfGroup"), "20422200XX,20422200XX");//射频码分组
-        map.put(WebUtil.getMessage("currentId"), "XXXX");//电流id
-        map.put(WebUtil.getMessage("powerOnThreshold"), 1.0);//电流id
         map.put(WebUtil.getMessage("rfId"), "123");//射频码
-        map.put(WebUtil.getMessage("isValid"), "是");//是否在用
-        map.put(WebUtil.getMessage("monitorRate"), 100.0);//主机功率
-        map.put(WebUtil.getMessage("otherPower"), 100.0);//其他功率
-        map.put(WebUtil.getMessage("assetUsedLifecycle"), 10);//设备已使用年限
         assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
         map.put(WebUtil.getMessage("assetTypeGroupEncoded"), CollectionUtils.isEmpty(assetTypeGroupList) ? "" : assetTypeGroupList.get(0).getEncoded());//设备已使用年限
         map.put(WebUtil.getMessage("AccountingCategory"), CollectionUtils.isEmpty(accountingCategoryList) ? "" : accountingCategoryList.get(0).getValueZh());//核算级别
-        map.put(WebUtil.getMessage("medicalApparatusClassification"), "医疗设备");//医疗器械分类
         map.put("医疗器械分类编码", "01");//医疗器械分类编码
-        map.put(WebUtil.getMessage("accountingDeptName"), CollectionUtils.isEmpty(clinicalDeptList)?"":clinicalDeptList.get(0).getName());//账户科室
-        map.put(WebUtil.getMessage("unitPriceElectricity"), 1.0);//电费单价
         map.put(WebUtil.getMessage("measuringOwner"), "张三");//计量负责人
-        map.put(WebUtil.getMessage("clinicalOwnerTel"), "139XXXX1000");//计量负责人
-        String siteUid=UserContextService.getCurrentUserAccount().getSiteUID();
-        String hospitalUid=UserContextService.getCurrentUserAccount().getHospitalUID();
-        String institutionUid=UserContextService.getCurrentUserAccount().getInstitutionUID();
+        String siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
+        String hospitalUid = UserContextService.getCurrentUserAccount().getHospitalUID();
+        String institutionUid = UserContextService.getCurrentUserAccount().getInstitutionUID();
         OrgInfo site = null;
-        OrgInfo hospital=null;
-        OrgInfo institution=null;
-        if(Objects.nonNull(siteUid)){
-           site= orgDao.getByUid(siteUid);
+        OrgInfo hospital = null;
+        OrgInfo institution = null;
+        if (Objects.nonNull(siteUid)) {
+            site = orgDao.getByUid(siteUid);
         }
-        if(Objects.nonNull(hospitalUid)){
-            hospital=orgDao.getByUid(hospitalUid);
+        if (Objects.nonNull(hospitalUid)) {
+            hospital = orgDao.getByUid(hospitalUid);
         }
-        if(Objects.nonNull(institutionUid)){
-            institution=orgDao.getByUid(institutionUid);
+        if (Objects.nonNull(institutionUid)) {
+            institution = orgDao.getByUid(institutionUid);
         }
-        map.put(WebUtil.getMessage("hospitalId"),Objects.isNull(site)?"":site.getName());
-        map.put(WebUtil.getMessage("Hospital"),Objects.isNull(hospital)?"":hospital.getName());
-        map.put(WebUtil.getMessage("Institution"),Objects.isNull(institution)?"":institution.getName());
-        map.put(WebUtil.getMessage("assetDisposalResults"),"XXX");
-
-
+        map.put(WebUtil.getMessage("hospitalId"), Objects.isNull(site) ? "" : site.getName());
+        map.put(WebUtil.getMessage("Hospital"), Objects.isNull(hospital) ? "" : hospital.getName());
+        map.put(WebUtil.getMessage("Institution"), Objects.isNull(institution) ? "" : institution.getName());
         return map;
 
     }
