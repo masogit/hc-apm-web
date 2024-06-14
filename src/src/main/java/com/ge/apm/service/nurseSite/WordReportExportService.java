@@ -12,6 +12,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -437,15 +438,14 @@ public class WordReportExportService {
             Date date = dataMap.get(n);
             String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
-            Map<String, Map<String, String>> stringListMap = stringMap.get(date);
-            Map<String, String> itemMap = stringListMap.get(assetInfoName);
+            Map<String, Map<String, String>> assetNameMap = stringMap.get(date);
+            Map<String, String> itemMap = assetNameMap.get(assetInfoName);
             for (Object detail : itemDetails) {
-                try {
-                    tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
-                } catch (Exception e) {
-                    logger.error("itemMap : {}, stringMap : {}, detail : {}", JSON.toJSONString(itemMap), JSON.toJSONString(stringMap), JSON.toJSONString(detail));
-                    logger.error("error : {}", e.getMessage(), e);
+                String valText = "";
+                if (ObjectUtil.isNotEmpty(itemMap)) {
+                    valText = itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name"));
                 }
+                tableOneRow.addNewTableCell().setText(valText);
             }
             for (int m = 1; m <= 2; m++) {
                 if( m==1){
