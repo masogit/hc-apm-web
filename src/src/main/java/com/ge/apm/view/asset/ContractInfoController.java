@@ -200,9 +200,10 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                         }
                     }
                 }
+                boolean arrival = arrivalItemStatus.isEmpty() || (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new"));
                 if (isFinished == contractItemMap.size()) {
                     // 到货完成
-                    if (arrivalItemStatus.isEmpty()) {
+                    if (arrival) {
                         // 未安装
                         completion = "到货完成 未安装";
                     } else {
@@ -213,7 +214,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                         }
                     }
                 } else {
-                    if (arrivalItemStatus.isEmpty() || (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new"))) {
+                    if (arrival) {
                         completion =  "到货中 未安装";
                     } else {
                         completion =  "到货中 验收中";
