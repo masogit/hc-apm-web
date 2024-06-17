@@ -635,8 +635,20 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     }
 
+    public void prepareApproval(ContractInfo contractInfo) {
+        this.selected = contractInfo;
+    }
 
-
+    public void approval() {
+        this.selected.setApprovalTime(new Date());
+        this.selected.setAuditor(UserContextService.getCurrentUserAccount().getName());
+        if (Boolean.TRUE.equals(this.selected.getApprovalStatus())) {
+            this.selected.setStatus(4);
+        } else {
+            this.selected.setStatus(3);
+        }
+        dao.save(this.selected);
+    }
 
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();

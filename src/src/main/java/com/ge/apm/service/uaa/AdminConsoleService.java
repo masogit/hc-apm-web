@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AdminConsoleMapper;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.MvsIbMappingMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
@@ -191,6 +192,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	AssetTypeGroupRepository assetTypeGroupDao;
+
+	@Autowired
+	private MvsIbMappingMapper mvsIbMappingMapper;
 
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
 	private String baseURL;
@@ -1581,5 +1585,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			}
 		}
 		blobObjectRepository.save(saveList);
+	}
+
+	public void initMvsMapping() {
+		mvsIbMappingMapper.initMvsMapping();
 	}
 }

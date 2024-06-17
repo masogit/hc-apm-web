@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Quan Tang
  */
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
@@ -72,8 +71,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public static Map<String, String> columnFormulas;
 
-    static
-    {
+    static {
         //we need to use formula for 2nd level dependant dropdown list, name range define is ok for others
         columnFormulas = new HashMap<>();
         columnFormulas.put("医疗器械子分类(旧)", "=OFFSET(INDIRECT(\"医疗器械子分类!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)),0,0,1,INDIRECT(\"医疗器械子分类!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)))");
@@ -100,7 +98,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     @Autowired
     private AssetTypeGroupRepository assetTypeGroupRepository;
-
 //    int siteId;
 
     public AssetFileDynamicTemplate(boolean crossSite) throws IOException {
@@ -115,14 +112,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         String fileName = "APM_Asset_Dynamic_Template.xlsx";
-        if(userContextService.isCountyArea()){
-            if (userContextService.isLocale()){
+        if (userContextService.isCountyArea()) {
+            if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template.xlsx";
             } else {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template_en.xlsx";
             }
-        }else{
-            if (userContextService.isLocale()){
+        } else {
+            if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_Template.xlsx";
             } else {
                 fileName = "APM_Asset_Dynamic_Template_en.xlsx";
@@ -149,7 +146,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             tcmSheet = workBook.createSheet(SHEET_TCM);
         }
         tcmSheet.setDisplayGridlines(true);
-
 
 
         dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
@@ -187,8 +183,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         if (!crossSite) {
             createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$2,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-            createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$2,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-            createFormulaForExistingDropdown( WebUtil.getMessage("spare01"), "OFFSET('TCM List'!$A$2,0,0,COUNTA('TCM List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown(WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$2,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown(WebUtil.getMessage("spare01"), "OFFSET('TCM List'!$A$2,0,0,COUNTA('TCM List'!$A:$A) - 2, 1)");
         }
 
     }
@@ -215,7 +211,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CurrentStatus"), assetStatusList, false);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("AssetValueCategory"), assetValueCategoryList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CapitalSourceTwo"), capitalSource2List, true);
-        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("assetClass"),assetClassList , true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("assetClass"), assetClassList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("networkingStatus"), networkingStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
@@ -258,7 +254,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(2).setCellValue(WebUtil.getMessage("ListItem"));
 
         int rowNum = 1;
-        for (I18nMessage msg: assetGroup) {
+        for (I18nMessage msg : assetGroup) {
             String title = msg.getValueZh();
             String msgType = "assetGroupSecondary_" + msg.getMsgKey();
 
@@ -287,7 +283,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(2).setCellValue(WebUtil.getMessage("ListItem"));
 
         int rowNum = 1;
-        for (I18nMessage msg: assetFunctionTypes) {
+        for (I18nMessage msg : assetFunctionTypes) {
             String title = msg.getValueZh();
             String msgType = msg.getMsgKey();
 
@@ -309,7 +305,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int columnIndex = 1;
 
-        for (String msg: msgList) {
+        for (String msg : msgList) {
             row.createCell(columnIndex++, CellType.STRING).setCellValue(msg);
         }
 
@@ -331,7 +327,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int columnIndex = 2;
 
-        for (String msg: msgList) {
+        for (String msg : msgList) {
             row.createCell(columnIndex++, CellType.STRING).setCellValue(msg);
         }
 
@@ -345,7 +341,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private void createDropdownWithNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
         List<String> msgs = null;
-        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
             msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
         } else {
             msgs = msgList.stream().map(I18nMessage::getValueEn).collect(Collectors.toList());
@@ -363,13 +359,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private void createDropdownWithKeyNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
         List<String> msgs = new ArrayList<>(msgList.size());
-        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
             for (I18nMessage i18nMessage : msgList) {
-                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh());
+                msgs.add(i18nMessage.getMsgKey() + " " + i18nMessage.getValueZh());
             }
         } else {
             for (I18nMessage i18nMessage : msgList) {
-                msgs.add(i18nMessage.getMsgKey()+" "+i18nMessage.getValueEn());
+                msgs.add(i18nMessage.getMsgKey() + " " + i18nMessage.getValueEn());
             }
         }
 
@@ -394,7 +390,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     private String getRangeName(String fieldName) {
-        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll("[\\(\\)]", "_").replaceAll(" ","_").replaceAll("\\?","_") + WebUtil.getMessage("List");
+        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll("[\\(\\)]", "_").replaceAll(" ", "_").replaceAll("\\?", "_") + WebUtil.getMessage("List");
         return normalizedName;
     }
 
@@ -424,7 +420,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void applyCellDropdownIfPossible(List<String> exportFields, String currentField) {
 
-        if(null == currentField){
+        if (null == currentField) {
             return;
         }
         String normalizedName = getRangeName(currentField);
@@ -470,7 +466,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         //write sum formula
         writeSummaryFormula(writer, exportFields, maxRows);
 
-        String[] columnTitles = exportFields.toArray(new String[] {});
+        String[] columnTitles = exportFields.toArray(new String[]{});
 
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
 
@@ -482,10 +478,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map supliers = getAllElement.getSupliers();
         Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
 
-        for (AssetInfo assetInfo: assetList) {
+        for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag,assetMap,parentAssets, supliers, encodedToAssetTypeGroupPath);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -519,9 +515,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         //write sum formula
         writeSummaryFormula(writer, exportFields, maxRows);
 
-        String[] columnTitles = exportFields.toArray(new String[] {});
+        String[] columnTitles = exportFields.toArray(new String[]{});
 
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles,true);
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles, true);
         return writer;
     }
 
@@ -543,10 +539,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 //            List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
 //            userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
 //        }
-        for (AssetInfo assetInfo: assetList) {
+        for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(userMap, flag,assetMap,parentAssets, supliers, encodedToAssetTypeGroupPath);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(userMap, flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -572,12 +568,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         //write sum formula
         writeSummaryFormula(writer, exportFields, maxRows);
 
-        String[] columnTitles = exportFields.toArray(new String[] {});
+        String[] columnTitles = exportFields.toArray(new String[]{});
 
         //create asset table
 //        createAssetTable(columnTitles);
 
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles,true);
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles, true);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         writer.writeRowData(startRow, buildSampleAsset(clinicalDeptList));
@@ -594,7 +590,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
 
         int startRow = EXCEL_ORG_DATA_ROW;
-        for (OrgInfo orgInfo: clinicalDeptList) {
+        for (OrgInfo orgInfo : clinicalDeptList) {
 
             writer.writeRowData(startRow, new String[]{orgInfo.getName()});
 
@@ -611,9 +607,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, tcmSheet.getSheetName(), null);
 
         int startRow = EXCEL_ORG_DATA_ROW;
-        for (I18nMessage i18nMessage: messages) {
+        for (I18nMessage i18nMessage : messages) {
 
-            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey()+" "+i18nMessage.getValueZh()});
+            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey() + " " + i18nMessage.getValueZh()});
 
             ++startRow;
         }
@@ -646,7 +642,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         writeSampleAsset(exportFields, clinicalDeptList);
     }
 
-    public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields,List<I18nMessage> tcm) throws IOException {
+    public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields, List<I18nMessage> tcm) throws IOException {
         writeI18nMessage(tcm);
     }
 
@@ -719,7 +715,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
 
-
     }
 
     public Map<String, Object> buildSampleAsset(List<OrgInfo> clinicalDeptList) {
@@ -751,7 +746,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         map.put(WebUtil.getMessage("UsageClassification"), "治疗类");
         map.put(WebUtil.getMessage("capitalSource"), "医疗");
-        map.put(WebUtil.getMessage("riskGrade"), "二级");
+        map.put(WebUtil.getMessage("riskGrade"), CollectionUtils.isEmpty(riskGradeList) ? "二级" : riskGradeList.get(0).getValueZh());
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
 
         List<I18nMessage> measuringItemCategory = I18nMessageService.getMessagesByType("measuringItemCategory", -1);
@@ -760,7 +755,67 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
         map.put(WebUtil.getMessage("IsImportEquipment"), "进口");
         map.put(WebUtil.getMessage("CurrentStatus"), "正常");
-
+        map.put(WebUtil.getMessage("PMOwner"), "张三");
+        map.put(WebUtil.getMessage("patrolInspectionOwnerName"), "张三");
+        map.put(WebUtil.getMessage("hospitalId"), UserContextService.getCurrentUserAccount().getSiteName());
+        map.put(WebUtil.getMessage("UseOwner"), "张三");
+        map.put(WebUtil.getMessage("assetDeptName"), clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
+        map.put(WebUtil.getMessage("BrandManufacturerShortName"), "XXX医疗器械有限公司");
+        map.put(WebUtil.getMessage("EquipmentStandardName"), "XXX");
+        map.put(WebUtil.getMessage("RegistrationNumber"), "国械备XXX号");
+        map.put(WebUtil.getMessage("functionGrade"), "1");//功能等级
+        map.put(WebUtil.getMessage("repairForm"), CollectionUtils.isEmpty(repairFormList) ? "" : repairFormList.get(0).getValueZh());//维修类型
+        map.put(WebUtil.getMessage("systemId"), "0824211XX343");//SystemID/厂商报修ID
+        map.put(WebUtil.getMessage("nationalStandardCode"), "20109XX");//设备国标码
+        map.put(WebUtil.getMessage("AssetID"), "200868560XXX");//资产编号
+        map.put(WebUtil.getMessage("BarCode"), "123456XXX");//条码
+        map.put(WebUtil.getMessage("ITSystemID"), "30700238");//院内IT系统编号
+        map.put(WebUtil.getMessage("manufactDate"), new Date(124, Calendar.JANUARY, 15));//出厂日期
+        map.put(WebUtil.getMessage("purchaseDate"), new Date(124, Calendar.FEBRUARY, 16));//采后日期
+        map.put(WebUtil.getMessage("arriveDate"), new Date(124, Calendar.MARCH, 17));//到货日期
+        map.put(WebUtil.getMessage("StartUsingDate"), new Date(124, Calendar.APRIL, 18));//启用日期
+        map.put(WebUtil.getMessage("warrantyDate"), new Date(124, Calendar.MAY, 19));//维保截至日期
+        map.put(WebUtil.getMessage("factoryWarrantyDate"), new Date(124, Calendar.MAY, 20));//质保截至日期
+        map.put(WebUtil.getMessage("terminateDate"), new Date(124, Calendar.JUNE, 21));//报废日期
+        map.put(WebUtil.getMessage("lastPmDate"), new Date(124, Calendar.JULY, 22));//上次保养日期
+        map.put(WebUtil.getMessage("lastMeteringDate"), new Date(124, Calendar.AUGUST, 23));//上次计量日期
+        map.put(WebUtil.getMessage("lastQaDate"), new Date(124, Calendar.SEPTEMBER, 24));//上次巡检日期
+        map.put(WebUtil.getMessage("lastInventoryDate"), new Date(124, Calendar.OCTOBER, 25));//上次盘点日期
+        map.put(WebUtil.getMessage("Maintainer"), "XXX设备有限公司");//维修商
+        map.put(WebUtil.getMessage("InstallationLocation"), "住院部X层");//安装位置
+        map.put(WebUtil.getMessage("InstallationLocationNotes"), "XXX科室");//位置备注1(科室)
+        map.put(WebUtil.getMessage("capitalSource2"), CollectionUtils.isEmpty(capitalSource2List) ? "" : capitalSource2List.get(0).getValueZh());//资金来源2
+        map.put(WebUtil.getMessage("IsPM"), "是");//是否pm
+        map.put(WebUtil.getMessage("isFixed"), "是");//是否固定资产
+        map.put(WebUtil.getMessage("IsChecked"), "是");//是否盘点
+        map.put(WebUtil.getMessage("assetValueCategory"), CollectionUtils.isEmpty(assetValueCategoryList) ? "" : assetValueCategoryList.get(0).getValueZh());//资产价值分布
+        map.put(WebUtil.getMessage("deviceStatus"), CollectionUtils.isEmpty(deviceStatusList) ? "" : deviceStatusList.get(0).getValueZh());//资产状态
+        map.put(WebUtil.getMessage("isWarrantyNotice"), "是");//资产状态
+        map.put(WebUtil.getMessage("rfGroup"), "20422200XX,20422200XX");//射频码分组
+        map.put(WebUtil.getMessage("rfId"), "123");//射频码
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
+        map.put(WebUtil.getMessage("assetTypeGroupEncoded"), CollectionUtils.isEmpty(assetTypeGroupList) ? "" : assetTypeGroupList.get(0).getEncoded());//设备已使用年限
+        map.put(WebUtil.getMessage("AccountingCategory"), CollectionUtils.isEmpty(accountingCategoryList) ? "" : accountingCategoryList.get(0).getValueZh());//核算级别
+        map.put("医疗器械分类编码", "01");//医疗器械分类编码
+        map.put(WebUtil.getMessage("measuringOwner"), "张三");//计量负责人
+        String siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
+        String hospitalUid = UserContextService.getCurrentUserAccount().getHospitalUID();
+        String institutionUid = UserContextService.getCurrentUserAccount().getInstitutionUID();
+        OrgInfo site = null;
+        OrgInfo hospital = null;
+        OrgInfo institution = null;
+        if (Objects.nonNull(siteUid)) {
+            site = orgDao.getByUid(siteUid);
+        }
+        if (Objects.nonNull(hospitalUid)) {
+            hospital = orgDao.getByUid(hospitalUid);
+        }
+        if (Objects.nonNull(institutionUid)) {
+            institution = orgDao.getByUid(institutionUid);
+        }
+        map.put(WebUtil.getMessage("hospitalId"), Objects.isNull(site) ? "" : site.getName());
+        map.put(WebUtil.getMessage("Hospital"), Objects.isNull(hospital) ? "" : hospital.getName());
+        map.put(WebUtil.getMessage("Institution"), Objects.isNull(institution) ? "" : institution.getName());
         return map;
 
     }
@@ -797,20 +852,20 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         public GetAllElement invoke() {
             List<String> uids = new ArrayList<>();
-            Set<Integer> parendAssetIds= new HashSet<>();//父id集合
+            Set<Integer> parendAssetIds = new HashSet<>();//父id集合
             Set<Integer> suplierIds = new HashSet<>();//供应商id集合
             for (int i = 0; i < assetList.size(); i++) {
                 uids.add(assetList.get(i).getUid());
-                if(null !=assetList.get(i).getParentAssetId()){
+                if (null != assetList.get(i).getParentAssetId()) {
                     parendAssetIds.add(assetList.get(i).getParentAssetId());//获取parentAssetId准备获取parent节点的信息
                 }
-                if(null!= assetList.get(i).getSupplierId()){
+                if (null != assetList.get(i).getSupplierId()) {
                     suplierIds.add(assetList.get(i).getSupplierId());
                 }
-                if(null!= assetList.get(i).getMaitananceId()){
+                if (null != assetList.get(i).getMaitananceId()) {
                     suplierIds.add(Integer.parseInt(assetList.get(i).getMaitananceId()));
                 }
-                if(null!= assetList.get(i).getManufactureId()){
+                if (null != assetList.get(i).getManufactureId()) {
                     suplierIds.add(Integer.parseInt(assetList.get(i).getManufactureId()));
                 }
             }
@@ -823,31 +878,31 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             for (int i = 0; i < num; i++) {
                 map.addAll(assetTagsMapper.getTagsByAssetMap(uids.subList(i * 5000, (i + 1) * 5000)));
             }
-            if (cycles > 0){
+            if (cycles > 0) {
                 map.addAll(assetTagsMapper.getTagsByAssetMap(uids.subList(num * 5000, size)));
             }
 
             assetMap = new HashMap<>();
 
-            for (int i = 0; i <map.size() ; i++) {
+            for (int i = 0; i < map.size(); i++) {
                 //判断assetMap中有没有当前的key
                 List<String> assetTagNow = assetMap.get(map.get(i).get("asset_uid"));//尝试从当前assetMap中获取asset_uid对应的数组
-                if(null==assetTagNow){//如果没有塞过值则放入新值
+                if (null == assetTagNow) {//如果没有塞过值则放入新值
                     List<String> assetTags = new ArrayList();
                     assetTags.add((String) map.get(i).get("tag"));
-                    assetMap.put((String) map.get(i).get("asset_uid"),assetTags);
-                }else{//不为空的情况直接取出来往后面加
+                    assetMap.put((String) map.get(i).get("asset_uid"), assetTags);
+                } else {//不为空的情况直接取出来往后面加
                     List<String> assetTagOld = assetMap.get(map.get(i).get("asset_uid"));
                     assetTagOld.add((String) map.get(i).get("tag"));
-                    assetMap.put((String) map.get(i).get("asset_uid"),assetTagOld);
+                    assetMap.put((String) map.get(i).get("asset_uid"), assetTagOld);
                 }
             }
 
             List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
             List<AssetInfo> parentAssetMap = new ArrayList();
-            if(parendAssetIdList.size()==0){
+            if (parendAssetIdList.size() == 0) {
                 logger.info("====================export asset  data parentAssetMap.size is 0 ");
-            }else{
+            } else {
                 parentAssetMap = assetInfoMapper.getAssetMap(parendAssetIdList);
             }
             List<Integer> suplierIdList = new ArrayList<>(suplierIds);
@@ -858,20 +913,20 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             }
 
             parentAssets = new HashMap();
-            for (int i = 0; i <parentAssetMap.size() ; i++) {
-                parentAssets.put(parentAssetMap.get(i).getId(),parentAssetMap.get(i));
+            for (int i = 0; i < parentAssetMap.size(); i++) {
+                parentAssets.put(parentAssetMap.get(i).getId(), parentAssetMap.get(i));
             }
 
             supliers = new HashMap();
             for (int i = 0; i < suplierList.size(); i++) {
-                supliers.put(suplierList.get(i).getId(),suplierList.get(i).getTel());
+                supliers.put(suplierList.get(i).getId(), suplierList.get(i).getTel());
             }
 
             assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
             encodedToAssetTypeGroupPath = new HashMap<>();
-            for(Object obj : assetTypeGroupPaths){
+            for (Object obj : assetTypeGroupPaths) {
                 Object[] obj1 = (Object[]) obj;
-                String encoded =  obj1[0].toString();
+                String encoded = obj1[0].toString();
                 String authGroupPaths = obj1[1].toString();
                 encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
             }

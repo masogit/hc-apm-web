@@ -12,6 +12,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -20,6 +21,8 @@ import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,8 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class WordReportExportService {
+
+    public static  final Logger logger = LoggerFactory.getLogger(WordReportExportService.class);
 
     @Autowired
     private BlobFileService blobFileService;
@@ -409,6 +414,15 @@ public class WordReportExportService {
 
     public void creatPage( int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document, List<NurseSiteMaintainItem> nurseSiteMaintainItemList,
                            Map<Date,Map<String,Map<String, String>>> stringMap,Map<Date,Map<String,String>> commentMapMap,Map<Date,Map<String,String>> updateByMapMap, Map<String, String> configMap){
+        // 获取或创建页面设置的CTSectPr对象
+        CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+        CTPageMar pageMar = sectPr.addNewPgMar();
+        // 设置上、下、左、右的页边距，单位是毫米（mm）
+        pageMar.setTop(BigInteger.valueOf(500));
+        pageMar.setBottom(BigInteger.valueOf(500));
+        pageMar.setLeft(BigInteger.valueOf(500));
+        pageMar.setRight(BigInteger.valueOf(500));
+
         XWPFTable table = document.createTable();
         XWPFTableRow tableOneRowOne = table.getRow(0);
         XWPFTableRow tableOneRowTwo = table.createRow();
@@ -417,7 +431,11 @@ public class WordReportExportService {
         String assetInfoName = assetInfo.getName();
         tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")"
                 + "-"+ DateFormatUtils.format(dataMap.get(1), "yyyy-MM"));
-        tableOneRowTwo.getCell(0).setText("日期");
+        XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
+        dateCell.setText("日期");
+        CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
+        dateWidth.setW(BigInteger.valueOf(1200));
+        dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
         int num = itemDetails.size();
@@ -425,18 +443,30 @@ public class WordReportExportService {
             JSONObject jsonObject = (JSONObject) itemDetails.get(m);
             tableOneRowTwo.addNewTableCell().setText(jsonObject.getString("name"));
         }
-        tableOneRowTwo.addNewTableCell().setText("检查者");
-        tableOneRowTwo.addNewTableCell().setText("备注");
+        XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
+        userCell.setText("检查者");
+        CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
+        userWidth.setW(BigInteger.valueOf(1000));
+        userWidth.setType(STTblWidth.DXA);
+        XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
+        remarkCell.setText("备注");
+        CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
+        remarkWidth.setW(BigInteger.valueOf(1500));
+        remarkWidth.setType(STTblWidth.DXA);
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
             String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
-            Map<String, Map<String, String>> stringListMap = stringMap.get(date);
-            Map<String, String> itemMap = stringListMap.get(assetInfoName);
+            Map<String, Map<String, String>> assetNameMap = stringMap.get(date);
+            Map<String, String> itemMap = assetNameMap.get(assetInfoName);
             for (Object detail : itemDetails) {
-                tableOneRow.addNewTableCell().setText(itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name")));
+                String valText = "";
+                if (ObjectUtil.isNotEmpty(itemMap)) {
+                    valText = itemMap.get(JSON.parseObject(JSON.toJSONString(detail)).getString("name"));
+                }
+                tableOneRow.addNewTableCell().setText(valText);
             }
             for (int m = 1; m <= 2; m++) {
                 if( m==1){
@@ -476,7 +506,7 @@ public class WordReportExportService {
         //表格宽度
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
-        tblPr.getTblW().setW(new BigInteger("9370"));
+        tblPr.getTblW().setW(new BigInteger("11250"));
     }
 
     public byte[] zip(Map<String,Map<Integer,List<byte[]>>> reportMapMap) throws IOException {

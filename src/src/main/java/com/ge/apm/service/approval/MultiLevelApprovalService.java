@@ -1106,7 +1106,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         assetScrap.setLastModifiedBy(userAccount.getLoginName());
         assetScrap.setCurrentStatus(status);
         assetScrap.setLastModifiedDate(new Date());
-        assetScrap.setApprovalReason(approvalOpinion);
+//        assetScrap.setApprovalReason(approvalOpinion);
         assetScrapDao.save(assetScrap);
         AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
 

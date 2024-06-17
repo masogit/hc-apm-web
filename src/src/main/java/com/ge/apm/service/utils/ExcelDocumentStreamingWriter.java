@@ -10,8 +10,10 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webapp.framework.web.WebUtil;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,13 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         }
     }
 
+    /**
+     *
+     * @param rowNum
+     * @param colNum
+     * @param value
+     * @param bold 可变长度字段，bold[0]：是否加粗
+     */
     public void writeCellData(int rowNum, int colNum, Object value, boolean... bold) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
@@ -141,7 +150,6 @@ public class ExcelDocumentStreamingWriter implements Closeable {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
             cell.setCellValue((Date) data);
-
         } else if (data instanceof Integer) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Integer) data);
@@ -179,12 +187,12 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    public void writeToFile(File file){
+    public void writeToFile(File file) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream(); FileOutputStream fos = new FileOutputStream(file);) {
             this.workBook.write(out);
             fos.write(out.toByteArray());
         } catch (Exception e) {
-            logger.error("excelDocumentStreamWrite error:{}",e.getMessage());
+            logger.error("excelDocumentStreamWrite error:{}", e.getMessage());
         }
     }
 

@@ -298,11 +298,6 @@ public class ContractInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date budgetRequestTime;
 
-    //审批时间
-    @Column(name = "approval_time")
-    @Temporal(TemporalType.DATE)
-    private Date approvalTime;
-
     //论证通过时间
     @Column(name = "argument_through_time")
     @Temporal(TemporalType.DATE)
@@ -323,7 +318,7 @@ public class ContractInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date arrivalTime;
 
-    // 状态 1：新建 2：审核 3：退回
+    // 状态 1：新建 2：审核 3：退回 4：归档
     @Column(name = "status")
     private Integer status;
 
@@ -355,6 +350,72 @@ public class ContractInfo implements Serializable {
     // 补充协议合同金额
     @Column(name = "supplementary_amount")
     private Double supplementaryAmount;
+
+    // 提交人
+    @Column(name = "author")
+    private String author;
+
+    //提交时间
+    @Column(name = "submit_time")
+    @Temporal(TemporalType.DATE)
+    private Date submitTime;
+
+    // 审核人
+    @Column(name = "auditor")
+    private String auditor;
+
+    //审批时间
+    @Column(name = "approval_time")
+    @Temporal(TemporalType.DATE)
+    private Date approvalTime;
+
+    // 审核结果
+    @Column(name = "approval_status")
+    private Boolean approvalStatus;
+
+    // 审核结果
+    @Column(name = "approval_result")
+    private String approvalResult;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Date getSubmitTime() {
+        return submitTime;
+    }
+
+    public void setSubmitTime(Date submitTime) {
+        this.submitTime = submitTime;
+    }
+
+    public String getAuditor() {
+        return auditor;
+    }
+
+    public void setAuditor(String auditor) {
+        this.auditor = auditor;
+    }
+
+    public Boolean getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(Boolean approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public String getApprovalResult() {
+        return approvalResult;
+    }
+
+    public void setApprovalResult(String approvalResult) {
+        this.approvalResult = approvalResult;
+    }
 
     public Date getBudgetRequestTime() {
         return budgetRequestTime;

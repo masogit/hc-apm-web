@@ -313,10 +313,10 @@
                                     <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval(2)}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and ((assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                                    <p:commandButton id="specialAssetInfo"  rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
 
-                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="preInactiveEnable" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   oncomplete="PF('scrapapply').show()"  immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.CRUDActionName eq '修改' and  assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   oncomplete="PF('scrapapply').show()"  immediate="true"  update=":growl" style="float:right;"/>
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
@@ -665,9 +665,24 @@
 
 
                 </p:panelGrid>
+                <h:panelGroup >
+                    <p:dataList id="reportAttachList" value="#{assetInfoEditController.assetAnnualInspectionReport.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                        <h:panelGroup rendered="#{assetInfoEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                        <p:commandButton actionListener="#{assetInfoEditController.removeReportAttachmentById(fileitem.id)}" update="reportAttachList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:dataList>
+                    <p:fileUpload id="reportttype1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUploadReport}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true"  sizeLimit="100000000"  update="reportAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                </h:panelGroup>
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.saveReport}"
-                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:reportInfoList" icon="ui-icon-check"
+                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:reportInfoList tab:CreateSpecialAssetForm:reportattachmentList" icon="ui-icon-check"
                                  oncomplete="handleSubmit(args, 'annualInspectionReportDlg');"
                 />
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
@@ -731,10 +746,27 @@
                     </h:panelGroup>
 
 
+
+
                 </p:panelGrid>
+                <h:panelGroup >
+                    <p:dataList id="permitAttachList" value="#{assetInfoEditController.permitInfo.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                        <h:panelGroup rendered="#{assetInfoEditController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                        </h:panelGroup>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                        <p:commandButton actionListener="#{assetInfoEditController.removePermitAttachmentById(fileitem.id)}" update="permitAttachList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:dataList>
+                    <p:fileUpload id="permittype1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUploadPermit}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true"  sizeLimit="100000000"  update="permitAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                </h:panelGroup>
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.savePermitInfo}"
-                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:permitInfoList" icon="ui-icon-check"
+                                 value="#{msg.Save}" update="tab:CreateSpecialAssetForm:permitInfoList tab:CreateSpecialAssetForm:permitattachmentList" icon="ui-icon-check"
                                  oncomplete="handleSubmit(args, 'permitInfoDlg');"
                 />
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
