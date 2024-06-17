@@ -30,6 +30,7 @@ import javax.faces.bean.ViewScoped;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.Collections;
@@ -648,6 +649,24 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             this.selected.setStatus(3);
         }
         dao.save(this.selected);
+    }
+
+    public void onBlur() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            this.newSupplier = supplier;
+        } else {
+            String name = newSupplier.getName();
+            boolean ManufacturerT = newSupplier.getManufacturerT();
+            boolean SupplierT = newSupplier.getSupplierT();
+            boolean MaintainerT = newSupplier.getMaintainerT();
+            prepareCreateSupplier("manufacturer");
+            newSupplier.setName(name);
+            newSupplier.setSupplierT(SupplierT);
+            newSupplier.setMaintainerT(MaintainerT);
+            newSupplier.setManufacturerT(ManufacturerT);
+        }
     }
 
     public void saveNewSupplier() {
