@@ -9,14 +9,12 @@ import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -24,6 +22,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
 
     private VenderCompanyRepository dao;
     private SupplierRepository supplierRepository;
+    private SupplierController supplierController;
     @Getter @Setter
     private Boolean supplierT = Boolean.FALSE;
     @Getter @Setter
@@ -37,6 +36,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     protected void init() {
         dao = WebUtil.getBean(VenderCompanyRepository.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
         this.filterBySite = false;
     }
 
@@ -50,15 +50,20 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         if(this.searchFilters == null){
             searchFilters =  new ArrayList<>();
         }
-        List<Supplier> hasSuppliers = supplierRepository.findByTenantUIDAndVenderCompanyIdIsNotNull(UserContextService.getCurrentUserAccount().getTenantUID());
+        /*List<Supplier> hasSuppliers = supplierRepository.findByTenantUIDAndVenderCompanyIdIsNotNull(UserContextService.getCurrentUserAccount().getTenantUID());
         if (ObjectUtil.isNotEmpty(hasSuppliers)) {
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.NotIN, hasSuppliers.stream().map(Supplier::getVenderCompanyId).collect(Collectors.toList())));
-        }
+        }*/
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     public void relation(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        Supplier temp = supplierRepository.findByTenantUIDAndVenderCompanyId(userAccount.getTenantUID(), selected.getId());
+        if (ObjectUtil.isNotEmpty(temp)) {
+            WebUtil.addErrorMessage("当前租户已添加该供应商");
+            return;
+        }
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(selected, supplier);
         supplier.setId(null);
@@ -78,6 +83,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         supplier.setLastModifiedDate(new Date());
         supplier.setSource("VenderCompany");
         supplierRepository.save(supplier);
+        supplierController.setSelected(supplier);
+        supplierController.saveSubmit();
     }
 
     public String getType(VenderCompany supplier){
