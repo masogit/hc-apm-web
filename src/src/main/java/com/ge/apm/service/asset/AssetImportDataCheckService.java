@@ -751,9 +751,36 @@ public class AssetImportDataCheckService {
             asset.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
             asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
-            asset.setIsValid(true);
-            asset.setIsDeleted(Boolean.FALSE);
-
+            if (Objects.isNull(asset.getUid())) {
+                asset.setIsValid(true);
+                asset.setIsDeleted(Boolean.FALSE);
+                if (Objects.isNull(asset.getStatus())) {
+                    asset.setStatus(1);
+                }
+                if (Objects.isNull(asset.getIsPm())) {
+                    asset.setIsPm(true);
+                }
+                //新增资产默认内修
+                asset.setRepairForm(1);
+                if (Objects.isNull(asset.getIsChecked())) {
+                    asset.setIsChecked(true);
+                }
+                if (Objects.isNull(asset.getUseRegistration())) {
+                    asset.setUseRegistration(true);
+                }
+                if (Objects.isNull(asset.getIsWarranty())) {
+                    asset.setIsWarranty(true);
+                }
+                if (Objects.isNull(asset.getIsFixed())) {
+                    asset.setIsFixed(true);
+                }
+                if (Objects.isNull(asset.getNetworkingStatus())) {
+                    asset.setNetworkingStatus(0);
+                }
+                asset.setConnectToInsite(3);
+                asset.setIbDeviceStatus(5);
+                asset.setVisibleStatus(1);
+            }
             asset.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             asset.setCreatedDate(now);
             asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
