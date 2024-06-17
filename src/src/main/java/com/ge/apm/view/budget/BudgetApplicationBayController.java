@@ -23,6 +23,7 @@ import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -109,6 +110,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private UserContextService userContextService;
     private BudgetPersistService persistService;
 
+    private UaaService uaaService;
+
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
     @Getter @Setter
@@ -123,6 +126,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     private OrgInfo selectedDept;
     @Getter @Setter
     private List<String> removeFileBlobId = new ArrayList<>();
+    @Getter @Setter
+    private String searchDeptName;
     @Override
     protected void init() {
         AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
@@ -135,7 +140,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         persistService = WebUtil.getBean(BudgetPersistService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
-        UaaService uaaService = WebUtil.getBean(UaaService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getSiteUID(), null);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         TreeNode treeNodeImport = uaaService.getOrgTreeByParentIdWithSelectedChildren(account.getSiteUID(), account.getUid());
@@ -746,6 +751,26 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     /**  **************************批量导入**************************           **/
 
+    public void treeSeachCondition(String type){
+        if("list".equals(type)){
+            TreeNode treeNode = null;
+            if(StrUtil.isEmpty(searchDeptName)){
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+            }else{
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+            }
+            orgTree = initOrgTree(treeNode);
+        }else{
+            TreeNode treeNodeEdit = null;
+            if(StrUtil.isEmpty(searchDeptName)){
+                treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+            }else{
+                treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+            }
+            orgTreeEdit = initOrgTree(treeNodeEdit);
+        }
+
+    }
 
 
 }

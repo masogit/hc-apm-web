@@ -33,6 +33,8 @@
                                                 style="position: absolute; left: 0; top: 0; width: 300px;"
                                                 dynamic="false" modal="false" dismissable="true"   >
                                     <p:scrollPanel style="height:300px; border: 0" mode="native"  >
+                                        <p:inputText id="searchDeptName" value="#{budgetBayController.searchDeptName}"  />
+                                        <p:commandButton process=":BudgetApplicationEditForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTreeEdit" actionListener="#{budgetBayController.treeSeachCondition('edit')}" value="检索"/>
                                         <p:tree id="orgTreeEdit" value="#{budgetBayController.orgTreeEdit}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0"  >
                                            <p:ajax process="@this" event="select"
@@ -381,13 +383,24 @@
                                 <label class="label">意向品牌<span style="color: red">*</span></label>
                                 <p:inputText  value="#{budgetBayController.curSelectApplicationBudgetAsset.confirmBrand}" class="confirm" required="true" requiredMessage="意向品牌 #{msg.ValidationRequire}" />
                             </h:panelGroup>
-
+                            <h:panelGroup>
+                                <p:outputLabel class="label">栏标价<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber  inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" class="confirm" required="true" requiredMessage="栏标价 #{msg.ValidationRequire}"
+                                                value="#{budgetBayController.curSelectApplicationBudgetAsset.confirmMaximumPrice}" />
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">备注<span style="color: red">*</span></p:outputLabel>
                                 <p:inputTextarea  value="#{budgetBayController.curSelectApplicationBudgetAsset.confirmRemark}" class="confirm" required="true" requiredMessage="备注 #{msg.ValidationRequire}" rows="2"  cols="20">
                                 </p:inputTextarea>
                             </h:panelGroup>
-
+                            <h:panelGroup>
+                                <label class="label">收费项目<span style="color: red">*</span></label>
+                                <p:inputText  value="#{budgetBayController.curSelectApplicationBudgetAsset.meetingFeeItems}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">耗材或试剂说明<span style="color: red">*</span></label>
+                                <p:inputText  value="#{budgetBayController.curSelectApplicationBudgetAsset.meetingConsumableDescription}" />
+                            </h:panelGroup>
 
                             <!--
                             <h:panelGroup>
