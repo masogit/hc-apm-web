@@ -189,22 +189,18 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                 Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
                 Map<String, Integer> contractItemMap = purchases.stream().collect(Collectors.toMap(ContractInfoItem::getId, ContractInfoItem::getContractAssetQuantity));
                 Map<String, List<ArrivalList>> arrivalMap = arrivalLists.stream().collect(Collectors.groupingBy(ArrivalList::getContractItemId));
-                boolean isFinished = Boolean.FALSE;
+                int isFinished = 0;
                 for (Map.Entry<String, Integer> item : contractItemMap.entrySet()) {
                     Integer quantity = item.getValue();
                     List<ArrivalList> lists = arrivalMap.get(item.getKey());
                     if (ObjectUtil.isNotEmpty(lists)) {
                         int sum = lists.stream().mapToInt(ArrivalList::getQuantity).sum();
                         if (sum >= quantity) {
-                            isFinished = Boolean.TRUE;
-                        } else {
-                            isFinished = Boolean.FALSE;
+                            isFinished++;
                         }
-                    } else {
-                        isFinished = Boolean.FALSE;
                     }
                 }
-                if (Boolean.TRUE.equals(isFinished)) {
+                if (isFinished == contractItemMap.size()) {
                     // 到货完成
                     if (arrivalItemStatus.isEmpty()) {
                         // 未安装
@@ -217,7 +213,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
                         }
                     }
                 } else {
-                    if (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new")) {
+                    if (arrivalItemStatus.isEmpty() || (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new"))) {
                         completion =  "到货中 未安装";
                     } else {
                         completion =  "到货中 验收中";
