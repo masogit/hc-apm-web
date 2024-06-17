@@ -759,7 +759,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("patrolInspectionOwnerName"), "张三");
         map.put(WebUtil.getMessage("hospitalId"), UserContextService.getCurrentUserAccount().getSiteName());
         map.put(WebUtil.getMessage("UseOwner"), "张三");
-        map.put(WebUtil.getMessage("assetDeptName"), clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
         map.put(WebUtil.getMessage("BrandManufacturerShortName"), "XXX医疗器械有限公司");
         map.put(WebUtil.getMessage("EquipmentStandardName"), "XXX");
         map.put(WebUtil.getMessage("RegistrationNumber"), "国械备XXX号");
