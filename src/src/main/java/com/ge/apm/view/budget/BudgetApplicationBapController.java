@@ -742,14 +742,25 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     /**  **************************批量导入**************************           **/
 
 
-    public void treeSeachCondition(){
-        TreeNode treeNodeEdit = null;
-        if(StrUtil.isEmpty(searchDeptName)){
-            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+    public void treeSeachCondition(String type){
+        if("list".equals(type)){
+            TreeNode treeNode = null;
+            if(StrUtil.isEmpty(searchDeptName)){
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+            }else{
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+            }
+            orgTree = initOrgTree(treeNode);
         }else{
-            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+            TreeNode treeNodeEdit = null;
+            if(StrUtil.isEmpty(searchDeptName)){
+                treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+            }else{
+                treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4, searchDeptName);
+            }
+            orgTreeEdit = initOrgTree(treeNodeEdit);
         }
-        orgTreeEdit = initOrgTree(treeNodeEdit);
+
     }
 
 }

@@ -35,7 +35,7 @@
                                                 dynamic="false" modal="false" dismissable="true"   >
                                     <p:scrollPanel style="height:300px; border: 0" mode="native"  >
                                         <p:inputText id="searchDeptName" value="#{budgetController.searchDeptName}"  />
-                                        <p:commandButton process=":BudgetApplicationEditForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTreeEdit" actionListener="#{budgetController.treeSeachCondition()}" value="检索"/>
+                                        <p:commandButton process=":BudgetApplicationEditForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTreeEdit" actionListener="#{budgetController.treeSeachCondition('edit')}" value="检索"/>
                                         <p:tree id="orgTreeEdit" value="#{budgetController.orgTreeEdit}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0"  >
                                            <p:ajax process="@this" event="select"
