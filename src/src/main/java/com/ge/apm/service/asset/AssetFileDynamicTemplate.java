@@ -774,13 +774,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("purchaseDate"), new Date(124, Calendar.FEBRUARY, 16));//采后日期
         map.put(WebUtil.getMessage("arriveDate"), new Date(124, Calendar.MARCH, 17));//到货日期
         map.put(WebUtil.getMessage("StartUsingDate"), new Date(124, Calendar.APRIL, 18));//启用日期
-        map.put(WebUtil.getMessage("warrantyDate"), new Date(124, Calendar.MAY, 19));//维保截至日期
-        map.put(WebUtil.getMessage("factoryWarrantyDate"), new Date(124, Calendar.MAY, 20));//质保截至日期
-        map.put(WebUtil.getMessage("terminateDate"), new Date(124, Calendar.JUNE, 21));//报废日期
-        map.put(WebUtil.getMessage("lastPmDate"), new Date(124, Calendar.JULY, 22));//上次保养日期
-        map.put(WebUtil.getMessage("lastMeteringDate"), new Date(124, Calendar.AUGUST, 23));//上次计量日期
-        map.put(WebUtil.getMessage("lastQaDate"), new Date(124, Calendar.SEPTEMBER, 24));//上次巡检日期
-        map.put(WebUtil.getMessage("lastInventoryDate"), new Date(124, Calendar.OCTOBER, 25));//上次盘点日期
         map.put(WebUtil.getMessage("Maintainer"), "XXX设备有限公司");//维修商
         map.put(WebUtil.getMessage("InstallationLocation"), "住院部X层");//安装位置
         map.put(WebUtil.getMessage("InstallationLocationNotes"), "XXX科室");//位置备注1(科室)
@@ -791,7 +784,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("assetValueCategory"), CollectionUtils.isEmpty(assetValueCategoryList) ? "" : assetValueCategoryList.get(0).getValueZh());//资产价值分布
         map.put(WebUtil.getMessage("deviceStatus"), CollectionUtils.isEmpty(deviceStatusList) ? "" : deviceStatusList.get(0).getValueZh());//资产状态
         map.put(WebUtil.getMessage("isWarrantyNotice"), "是");//资产状态
-        map.put(WebUtil.getMessage("rfGroup"), "20422200XX,20422200XX");//射频码分组
+        map.put(WebUtil.getMessage("rfGroup"), "20422200XX");//射频码分组
         map.put(WebUtil.getMessage("rfId"), "123");//射频码
         assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
         map.put(WebUtil.getMessage("assetTypeGroupEncoded"), CollectionUtils.isEmpty(assetTypeGroupList) ? "" : assetTypeGroupList.get(0).getEncoded());//设备已使用年限
