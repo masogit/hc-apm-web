@@ -63,6 +63,9 @@
             <p:column headerText="步骤">
                 <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationStep', item.applicationStep)}"/>
             </p:column>
+            <p:column headerText="审批数量">
+                <h:outputText value="#{item.offlineApplicationQuantity}"/>
+            </p:column>
             <p:column headerText="#{msg.Approver}" >
                 <h:outputText value="#{item.approveName}"/>
             </p:column>
