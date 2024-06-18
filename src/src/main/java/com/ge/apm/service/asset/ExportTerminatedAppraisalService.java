@@ -196,18 +196,18 @@ public class ExportTerminatedAppraisalService {
         if(StringUtils.isNotBlank(assetInfo.getAssetScrapId())){
             assetScrap=assetScrapRepository.findById(assetInfo.getAssetScrapId());
         }
+        byte[] defaultSignatureBytes = getDefaultSignatureBytes();
+        String signature="signature.png";
+        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+        map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+        map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
         if(assetScrap!=null){
             map.put(apply_name.name(), assetScrap.getCreatedBy());
             String date = format.format(assetScrap.getCreatedDate());
             map.put(apply_date.name(), date);
             map.put(applyResone.name(), assetScrap.getApplyReason());
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
-            byte[] defaultSignatureBytes = getDefaultSignatureBytes();
-            String signature="signature.png";
-            map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-            map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-            map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-            map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
             if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
                 byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
                 map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, signatureBytes));
