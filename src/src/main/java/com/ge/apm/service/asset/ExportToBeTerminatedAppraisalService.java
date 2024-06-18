@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.ge.apm.service.asset.ExportTerminatedAppraisalService.ASSET_DETAIL.lifecycle;
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
 
 @Component
@@ -236,11 +237,12 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(num, 1);   //数量
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
             Integer lifecycle = assetInfo.getLifecycle();
+            Double lifecycleInYear = assetInfo.getLifecycleInYear();
             Double purchasePrice = assetInfo.getPurchasePrice();
             if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
                 double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
-                double price = assetUsedLifecycleDouble / lifecycle * purchasePrice;
-                BigDecimal bigDecimal = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",assetUsedLifecycleDouble, ExportTerminatedAppraisalService.ASSET_DETAIL.lifecycle,purchasePrice);
+                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear)).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, RoundingMode.HALF_UP);
                 map.put(accumulated_depreciation, bigDecimal);   //累计折旧
             }
             AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
