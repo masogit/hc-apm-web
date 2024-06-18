@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.mq.MqContext;
@@ -41,17 +43,23 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import sun.misc.BASE64Decoder;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,6 +112,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
+
+    private V2_WorkOrderService woService;
+
+    private WorkflowService workflowService;
 
     @Getter @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
@@ -249,6 +261,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter @Setter
     private NurseSiteMaintainConfigJN selectedNurseSiteMaintainConfigJN;
 
+    // 签名相关
+    @Getter
+    @Setter
+    private String signatureContent;
+    @Getter
+    private StreamedContent signatureContentStream;
+    @Getter
+    private String signatureId;
+    @Getter
+    private boolean newSignature = true;
+
     // TreeNodeName Filter
     private String treeNodeNameFilter;
     public String getTreeNodeNameFilter() {
@@ -325,7 +348,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
         specialAssetInfoService = WebUtil.getBean(SpecialAssetInfoService.class);
-
+        woService= WebUtil.getBean(V2_WorkOrderService.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -1430,13 +1454,44 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
-    public String applyAssetScrap(){
+    public void applyAssetScrap(){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+        }
+        if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
+            try {
+                String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                BASE64Decoder decoder = new BASE64Decoder();
+                byte[] decode = decoder.decodeBuffer(base64);
+
+                V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                if (null != blobObject) {
+                    this.signatureId = blobObject.getObjectStorageId();
+                    woService.addUserSignature(this.signatureId);
+                }else{
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+                WebUtil.addErrorMessage("签名保存失败！");
+                response.setStatus(206);
+                return;
+            }
+        }
+
         if(StringUtils.isBlank(applyReason) ||  StringUtils.isBlank(approvalReason)){
             WebUtil.addErrorMessage("必填项为空");
         }else{
-            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod);
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId);
         }
-        return "AssetList?faces-redirect=true";
+        return ;
     }
 
     //重新启用
@@ -2429,4 +2484,42 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return false;
     }
 
+
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!org.springframework.util.CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureId = null;
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
+    }
+
+
+    public void  getSig() {
+
+        if (StringUtils.isNotEmpty(selected.getSiteUID())) {
+            WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(selected.getSiteUID());
+            if (workflowConfig != null && Boolean.TRUE.equals(workflowConfig.getPartsNeedSign())) {
+                // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+                response.setStatus(205);
+                return;
+            }
+        }
+    }
 }
