@@ -15,6 +15,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 
 import java.time.Instant;
@@ -683,17 +684,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         supplierController.saveSubmit();
 
         if("manufacturer".equals(newSupplierType)){
+            if (ObjectUtil.isNotEmpty(newSupplier.getId())) {
+                manufactureList.removeIf(t -> t.getId().equals(newSupplier.getId()));
+            }
             manufactureList.add(newSupplier);
         }else if("supplier".equals(newSupplierType)){
+            if (ObjectUtil.isNotEmpty(newSupplier.getId())) {
+                supplierList.removeIf(t -> t.getId().equals(newSupplier.getId()));
+            }
             supplierList.add(newSupplier);
         }
-
-//        supplierList.add(newSupplier);
-//        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
-//            supplierList.add(newSupplier);
-//        }
-//        changeSelect(createTpye);
-
     }
 
 
