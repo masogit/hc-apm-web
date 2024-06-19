@@ -40,17 +40,17 @@
                             <label class="label">#{msg.type}*</label>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{venderCompanyController.maintainerT}"/>
+                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{venderCompanyController.selected.maintainerT}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{venderCompanyController.manufacturerT}"/>
+                            <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{venderCompanyController.selected.manufacturerT}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.supplierT}"/>
+                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.selected.supplierT}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" value="#{msg.Save}" update="supplierTab:VenderCompanyForm:datalist1 :growl" icon="ui-icon-check" oncomplete="PF('SupplierRelationDialog').hide()"/>
+                <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" value="#{msg.Save}" update="supplierTab:VenderCompanyForm:datalist1  supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="PF('SupplierRelationDialog').hide()"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierRelationDialog').hide()"/>
             </h:form>
         </p:dialog>
