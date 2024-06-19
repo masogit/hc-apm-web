@@ -377,6 +377,17 @@ public class ContractInfo implements Serializable {
     @Column(name = "approval_result")
     private String approvalResult;
 
+    @Column(name = "vender_company_id")
+    private String venderCompanyId;
+
+    public String getVenderCompanyId() {
+        return venderCompanyId;
+    }
+
+    public void setVenderCompanyId(String venderCompanyId) {
+        this.venderCompanyId = venderCompanyId;
+    }
+
     public String getAuthor() {
         return author;
     }

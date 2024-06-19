@@ -24,12 +24,6 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private SupplierRepository supplierRepository;
     private SupplierController supplierController;
     @Getter @Setter
-    private Boolean supplierT = Boolean.FALSE;
-    @Getter @Setter
-    private Boolean maintainerT = Boolean.FALSE;
-    @Getter @Setter
-    private Boolean manufacturerT = Boolean.FALSE;
-    @Getter @Setter
     private String supplierType;
 
     @Override
@@ -69,9 +63,6 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         supplier.setId(null);
         supplier.setName(supplier.getName());
         supplier.setVenderCompanyId(selected.getId());
-        supplier.setSupplierT(supplierT);
-        supplier.setMaintainerT(maintainerT);
-        supplier.setManufacturerT(manufacturerT);
         supplier.setTenantUID(userAccount.getTenantUID());
         supplier.setInstitutionUID(userAccount.getInstitutionUID());
         supplier.setHospitalUID(userAccount.getHospitalUID());
