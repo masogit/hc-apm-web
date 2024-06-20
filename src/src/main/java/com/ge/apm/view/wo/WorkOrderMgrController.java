@@ -81,7 +81,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -289,7 +288,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private boolean viewIng = false;
     @Getter @Setter
     private boolean repaFlag = false;
-    private Pattern pattern = Pattern.compile("^1[3-9]\\d{9}$|^0\\d{2,3}-?\\d{7,8}$");
     @Override
     protected void init() {
         try {
@@ -2028,8 +2026,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
-        if(!pattern.matcher(newServiceRequest.getRequestorPhone()).matches()){
-            String msg =WebUtil.getMessage("requestorName")+"电话,输入不合法!";
+        if(StringUtils.isEmpty(newServiceRequest.getRequestorPhone())){
+            String msg =WebUtil.getMessage("requestorName")+"电话,不能为空!";
             WebUtil.addErrorMessage(msg);
             //前端弹窗不退出并提示错误信息
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
