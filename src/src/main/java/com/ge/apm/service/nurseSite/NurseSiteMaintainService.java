@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper;
 import com.ge.apm.dao.mapper.NurseSiteMaintainMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExportUtil;
@@ -1875,7 +1876,8 @@ public class NurseSiteMaintainService {
 		Map<String, Integer> mapSignature = new HashMap<String, Integer>();
 		Map<String, Integer> mapCheckItemSequence = new HashMap<String, Integer>();
 		List<String> header = new ArrayList<String>();
-		List<String> secondHeader = new ArrayList<String>();
+		Set<String> ids = new HashSet<>();
+		ids.add("-1");
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
 			supplementMaintain(tempMaintain,0,0,true);
@@ -1890,6 +1892,7 @@ public class NurseSiteMaintainService {
 					} else {
 						List<NurseSiteMaintainItem> tempListItem = new ArrayList<NurseSiteMaintainItem>();
 						tempListItem.add(tempItem);
+						ids.add(tempItem.getId());
 						mapAssetUidMaintainItem.put(tempItem.getAssetUid(), tempListItem);
 						mapAssetInfo.put(tempItem.getAssetUid(), tempItem.getAssetInfo().getName());
 					}
@@ -1911,6 +1914,14 @@ public class NurseSiteMaintainService {
 		int rowIndex = 7;
 		int dataColumnIndex = 6;
 		if (mapAssetUidMaintainItem.size() > 0) {
+			List<V2_BlobObject> v2BlobObjects = blobObjectRepository.fetchListByBoUUIds(ids);
+			Set<String> objectIds = v2BlobObjects.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
+			Map<String, List<V2_BlobObject>> blobMap = v2BlobObjects.stream().collect(Collectors.groupingBy(V2_BlobObject::getBoUuid));
+			List<FileInfoResult> files = ListUtil.newArrayList();
+			if (ObjectUtil.isNotEmpty(objectIds)) {
+				files = microServiceUtil.getFiles(objectIds);
+			}
+			Map<String, byte[]> fileMap = files.stream().collect(Collectors.toMap(FileInfoResult::getObjectId, FileInfoResult::getBytes));
 			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
 			while (it.hasNext()) {
 				List<NurseSiteMaintainItem> tempListItem = it.next();
@@ -1993,7 +2004,8 @@ public class NurseSiteMaintainService {
 							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempComment);
 							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, STR_COMMENT);
 						}
-						List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(tempItem.getId());
+//						List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(tempItem.getId());
+						List<V2_BlobObject> byBoUuid = blobMap.get(tempItem.getId());
 						if(CollectionUtils.isNotEmpty(byBoUuid)){
 							for (int x=0;x<byBoUuid.size();x++) {
 								V2_BlobObject v2_blobObject = byBoUuid.get(x);
@@ -2013,8 +2025,10 @@ public class NurseSiteMaintainService {
 									if(integers != null) {
 										int x1 = integers[0];
 										int y1 = integers[1];
-										InputStream inputStream = microServiceUtil.downloadRepeatedReadFile(v2_blobObject.getObjectStorageId());
+//										InputStream inputStream = microServiceUtil.downloadRepeatedReadFile(v2_blobObject.getObjectStorageId());
+										byte[] bytes = fileMap.get(v2_blobObject.getObjectStorageId());
 										//BufferedImage bufferImg = ImageIO.read(new File("C:\\Users\\503263052\\Downloads\\图片2.png"));
+										ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 										BufferedImage bufferImg = ImageIO.read(inputStream);
 										ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 										ImageIO.write(bufferImg, "png", byteArrayOut);
