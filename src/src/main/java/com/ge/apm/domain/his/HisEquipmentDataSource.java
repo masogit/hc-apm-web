@@ -102,6 +102,8 @@ public class HisEquipmentDataSource implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
+    @Column(name = "record_count")
+    private int recordCount;  //记录条数
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({

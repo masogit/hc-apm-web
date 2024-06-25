@@ -96,4 +96,7 @@ public class HisEquipmentDataResult implements Serializable {
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
+
+    @Column(name = "receipt_num",scale = 4)
+    private BigDecimal receiptNum;//项目数量
 }
