@@ -11,6 +11,8 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -619,13 +621,21 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void batchProcessToTerminated() {
         Map<String, Boolean> map = this.selectedMap;
+        List<String> assetUidList = ListUtil.newArrayList("-1");
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-            if (!entry.getValue()) {
+            if (Boolean.FALSE.equals(entry.getValue())) {
                 continue;
             }
-
-            String assetUid = entry.getKey();
-            AssetInfo assetInfo = dao.getByUid(assetUid);
+            assetUidList.add(entry.getKey());
+        }
+        List<AssetInfo> assetInfos = dao.findByUidIn(assetUidList);
+        List<AssetInfo> assetScrapList = assetInfos.stream().filter(t -> ObjectUtil.isNotEmpty(t.getAssetScrapId())).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(assetScrapList)) {
+            String assetNames = StringUtils.join(assetScrapList.stream().map(AssetInfo::getName).collect(Collectors.toSet()), "、");
+            WebUtil.addErrorMessage(assetNames + " 待多级审批通过，才能报废");
+            return;
+        }
+        for (AssetInfo assetInfo : assetInfos) {
             terminateAsset(assetInfo);
         }
         this.selectedMap.clear();
