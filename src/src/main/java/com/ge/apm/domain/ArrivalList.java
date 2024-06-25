@@ -242,7 +242,16 @@ public class ArrivalList implements Serializable {
     @Column(name = "enable_generate_qrcode")
     private Boolean enableGenerateQrcode;
 
+    @Column(name = "vender_company_id")
+    private String venderCompanyId;
 
+    public String getVenderCompanyId() {
+        return venderCompanyId;
+    }
+
+    public void setVenderCompanyId(String venderCompanyId) {
+        this.venderCompanyId = venderCompanyId;
+    }
 
     public String getId() {
         return id;
