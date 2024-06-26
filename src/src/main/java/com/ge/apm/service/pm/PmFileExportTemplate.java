@@ -43,14 +43,14 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
         pmSheet = workBook.getSheet("Sheet1");
     }
-    public void exportPm(List<V2_PmOrder> assetList, List<String> exportFields) throws IOException {
+    public void exportPm(List<V2_PmOrder> assetList, List<String> exportFields,int queryIndex) throws IOException {
         logger.info("export asset list");
-        writePm(assetList, exportFields);
+        writePm(assetList, exportFields,queryIndex);
     }
 
     public static final int EXCEL_PM_DATA_ROW = 2;
     public static final int EXCEL_PM_HEADER_ROW = 1;
-    public void writePm(List<V2_PmOrder> pmList,List<String> exportFields) {
+    public void writePm(List<V2_PmOrder> pmList,List<String> exportFields,int queryIndex) {
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, pmSheet.getSheetName(), exportFields);
 
         int maxRows = pmList.size() + EXCEL_PM_DATA_ROW > ASSET_FORMULA_DEFAULT_MAX_ROWS ? pmList.size() + EXCEL_PM_HEADER_ROW : ASSET_FORMULA_DEFAULT_MAX_ROWS;
@@ -61,7 +61,7 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
 
         for (V2_PmOrder v2PmOrder: pmList) {
             PmExportFormatter fm = new PmExportFormatter(v2PmOrder);
-            Map<String, Object> rowMap = fm.buildExcelColumnKeyValueMap();
+            Map<String, Object> rowMap = fm.buildExcelColumnKeyValueMap(queryIndex);
             writer.writeRowData(startRow, rowMap);
             if (startRow % 1000 == 0) {
                 logger.info("export PM order rows {}", startRow);

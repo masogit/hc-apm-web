@@ -15,7 +15,8 @@ public enum ExportFields {
     PMNUM("保养编号", "Maintenance ID"),
     CURRENTSTEP("当前处理步骤", "Current Processing Step"),
     ORDERTYPE("工单类型", "Workorder Type"),
-    PLANTIME("计划完成时间", "Planned Completion Time");
+    PLANTIME("计划完成时间", "Planned Completion Time"),
+    ACTUALCOMPLETIONTIME("实际完成时间", "Actual Completion Time");
 
     private final String english;
 
