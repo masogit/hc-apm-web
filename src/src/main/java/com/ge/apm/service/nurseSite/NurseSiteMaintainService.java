@@ -2030,7 +2030,7 @@ public class NurseSiteMaintainService {
 			doc.writeCellData(SHEET_Maintain, checkDateRow, 1, STR_CHECK_DATE);
 			writeExcelSecondHeader(doc, keyRow, sequenceRow, dataColumnIndex, 2, STR_SEQUENCE, 0);
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, STR_MODIFIED_BY);
-			if (setSignature.size() > 0) {
+			if (!setSignature.isEmpty()) {
 				writeExcelSheetHeader(header, STR_SIGNATURE, doc, 1, rowIndex++, false);
 				writeSignatureToExcel(doc, rowIndex++, dataColumnIndex, 3, 12, setSignature, mapSignature);
 			}
@@ -2045,7 +2045,7 @@ public class NurseSiteMaintainService {
 			return out.toByteArray();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			LOGGER.error(e.getMessage());
+			LOGGER.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -2099,7 +2099,9 @@ public class NurseSiteMaintainService {
 	}
 	private void writeSignatureToExcel(ExcelDocument doc, int row, int columnIndex, int width, int height, Set<String> signatureIds, Map<String, Integer> mapSignature) {
 		try {
+			long start = System.currentTimeMillis();
 			List<FileInfoResult> files = microServiceUtil.getFiles(signatureIds);
+			LOGGER.error("NurseSiteMaintainService getFiles {}", System.currentTimeMillis() - start);
 			Map<String, byte[]> fileMap = files.stream().collect(Collectors.toMap(FileInfoResult::getObjectId, FileInfoResult::getBytes));
 			for (String tempSignature : signatureIds) {
 				Integer type = mapSignature.get(tempSignature);
@@ -2113,7 +2115,6 @@ public class NurseSiteMaintainService {
 					InputStream input = new ByteArrayInputStream(fileMap.get(tempSignature));
 					byte[] b = new byte[1024];
 					StringBuilder sb = new StringBuilder();
-					String result;
 					int i;
 					try {
 						while ((i = input.read(b)) > 0) {
@@ -2125,11 +2126,11 @@ public class NurseSiteMaintainService {
 						try {
 							input.close();
 						} catch (IOException e1) {
-							LOGGER.error(e.getMessage());
+							LOGGER.error("NurseSiteMaintainService input close error {}", e.getMessage(), e);
 						}
-						LOGGER.error(e.getMessage());
+						LOGGER.error("NurseSiteMaintainService input read error {}", e.getMessage(), e);
 					}
-					result = sb.toString();
+					String result = sb.toString();
 					inputStream = new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(result));
 				}
 //				if (sc != null) {
@@ -2140,7 +2141,7 @@ public class NurseSiteMaintainService {
 //				}
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error("NurseSiteMaintainService addPicture error {}", e.getMessage(), e);
 		}
 	}
 

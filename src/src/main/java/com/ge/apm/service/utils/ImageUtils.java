@@ -35,6 +35,6 @@ public class ImageUtils {
 				return decoder.decode(str);
 			}
 		}
-		return new byte[0];
+		return new byte[1024];
 	}
 }
