@@ -30,11 +30,11 @@ public class ImageUtils {
 		if(StringUtils.isNotEmpty(str)){
 			int index=str.indexOf(",");
 			if(index>0){
-				str=str.substring(index+1, str.length());
+				str=str.substring(index+1);
 				Decoder decoder=Base64.getDecoder();
 				return decoder.decode(str);
 			}
 		}
-		return null;
+		return new byte[1024];
 	}
 }

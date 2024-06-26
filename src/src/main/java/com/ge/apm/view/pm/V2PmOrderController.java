@@ -402,7 +402,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
-        template.exportPm(pmOrderList,pmFieldsExport);
+        template.exportPm(pmOrderList,pmFieldsExport,queryIndex);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
    }
 
