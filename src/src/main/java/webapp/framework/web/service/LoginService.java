@@ -527,7 +527,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
-        Map<String,String> map = getMsMCode(telephone);
+        Map<String,String> map = msUtil.getMsMCode(telephone);
         if(map == null){
             WebUtil.addErrorMessage("验证码已失效，请重新获取");
             requestContext.addCallbackParam("validationFailed", true);
@@ -550,14 +550,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             requestContext.addCallbackParam("validationFailed", true);
         }
     }
-    private Map<String,String> getMsMCode(String telephone){
-        Map<String,String> map = msUtil.getMsMCode(telephone);
-        if(map == null){
-            map= new HashMap<>();
-            map.put("code","111111");
-        }
-        return map;
-    }
+
     public void sendMsMCode(){
         RequestContext requestContext = RequestContext.getCurrentInstance();
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
