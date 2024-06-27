@@ -12,6 +12,7 @@ import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.token.TokenBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -21,7 +22,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -344,6 +348,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String gatewayURL = getGatewayURL(GatewayURL.MSM_SEND_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
+        if(StringUtils.isEmpty(token)){
+            token = TokenBuilder.defaultToken(tokenSecretkey);
+        }
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for sendMsMCode: " + url);
@@ -365,6 +372,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String gatewayURL = getGatewayURL(GatewayURL.MSM_GET_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
+        if(StringUtils.isEmpty(token)){
+            token = TokenBuilder.defaultToken(tokenSecretkey);
+        }
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for getMsMCode: " + url);

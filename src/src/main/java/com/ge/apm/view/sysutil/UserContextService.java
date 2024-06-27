@@ -69,6 +69,7 @@ public class UserContextService implements Serializable {
     private Boolean flagIsAgentTenant = null;
     private Boolean flagIsHospitalUser = null;
     private Boolean enableAssetGroupAssetTypeGroupAssociation = null;// 开启资产分类是否关联设备分类
+    private Boolean enableAuditGroupConfiguration = null;// 开启核心组审核
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
@@ -113,6 +114,10 @@ public class UserContextService implements Serializable {
 
     public void processAfterLogin() {
         getLoginUser();
+    }
+    public static void removeLoginUser(){
+        UserContextService contextService = WebUtil.getBean(UserContextService.class);
+        contextService.userAccount = null;
     }
 
     public boolean isLoggedIn() {
@@ -1317,26 +1322,6 @@ public class UserContextService implements Serializable {
 
     }
 
-    public static Boolean isHospitalName(String tenantName){
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
-        if(currentTenantInfo == null){
-            return Boolean.FALSE;
-        }
-        if(StringUtils.isBlank(tenantName)){
-            if(WorkOrderConstant.DESIGNATED_USER.equals(currentTenantInfo.getName().trim())){
-                return Boolean.TRUE;
-            }
-        }else{
-            if(tenantName.equals(currentTenantInfo.getName().trim())){
-                return Boolean.TRUE;
-            }
-        }
-        return Boolean.FALSE;
-    }
-
-
-
     /**
      * 验证租户名称
      * @param tenantName 非必填，如不填将验证方法中指定的租户是否为当前登录用户所属租户
@@ -1392,19 +1377,30 @@ public class UserContextService implements Serializable {
     public boolean enableAssetGroupAssetTypeGroupAssociation(){
         if(enableAssetGroupAssetTypeGroupAssociation == null){
             enableAssetGroupAssetTypeGroupAssociation = Boolean.FALSE;
-            UserAccount user = getCurrentUserAccount();
-            String enableAssetGroup = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "enableAssetGroupAssetTypeGroupAssociation");
+            String enableAssetGroup = getConfigItemValue( "enableAssetGroupAssetTypeGroupAssociation");
             enableAssetGroupAssetTypeGroupAssociation=Boolean.TRUE.toString().equalsIgnoreCase(enableAssetGroup);
         }
 
         return enableAssetGroupAssetTypeGroupAssociation;
     }
-
     /**
-     *  通过key获取指定的配置
-     * @param key
+     *  核心组审核
      * @return
      */
+    public boolean enableAuditGroupConfiguration() {
+        if (enableAuditGroupConfiguration == null) {
+            enableAuditGroupConfiguration = Boolean.FALSE;
+            String enableAssetGroup = getConfigItemValue("enableAuditGroupConfiguration");
+            enableAuditGroupConfiguration = Boolean.TRUE.toString().equalsIgnoreCase(enableAssetGroup);
+        }
+
+        return enableAuditGroupConfiguration;
+    }
+        /**
+         *  通过key获取指定的配置
+         * @param key
+         * @return
+         */
     public String getConfigItemValue(String key){
             UserAccount user = getCurrentUserAccount();
             String value = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), key);
