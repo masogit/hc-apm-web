@@ -241,7 +241,7 @@ public class MaintainExportController {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            byte[] result = nurseSiteMaintainService.writeMaintainDetailToExcel(doc, new ArrayList<NurseSiteMaintain>(listMaintainData));
+            byte[] result = nurseSiteMaintainService.writeMaintainDetailToExcel(doc, new ArrayList<>(listMaintainData));
             if (result != null) {
                 exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/vnd.ms-excel", "NurseSiteMaintainDetail.xlsx");
             }
