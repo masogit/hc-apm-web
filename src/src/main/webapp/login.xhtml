@@ -236,8 +236,8 @@
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" type="button" onclick="PF('dlgAccountLocked').hide()"/>
             </p:dialog>
-            <ui:include src="loginFroPassword.xhtml" />
-            <ui:include src="loginFroPhone.xhtml" />
+            <ui:include src="/portal/login/loginFroPassword.xhtml" />
+            <ui:include src="/portal/login/loginFroPhone.xhtml" />
             <p:dialog modal="true" style="background-color: #ffffff" header="请修改密码" widgetVar="dlgResetPassword" minHeight="40" closable="false" appendTo="@(body)">
                 <h:form prependId="false">
                     <p:fieldset>
