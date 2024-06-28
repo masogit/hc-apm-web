@@ -15,8 +15,6 @@ ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS hospital_uid char(32);
 ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS site_uid char(32);
 
 update approve_schedule apc set tenant_uid=wo.tenant_uid,institution_uid=wo.institution_uid,hospital_uid=wo.hospital_uid,site_uid=wo.site_uid  from v2_work_order wo   where wo.id = apc.business_uid;
--- 报修人电话同步历史数据
-update v2_service_request sr set requestor_phone = ua.telephone from user_account ua where sr.requestor_id = ua.id and sr.requestor_phone is null and ua.telephone is not null;
 
 
 

@@ -380,7 +380,8 @@
                         <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="#{msg.MaintenanceType}#{msg.ValidationRequire}">
                             <p:ajax event="change" update="@this pmTab:PmRequestCreateForm:pmRuleUid"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+                            <f:selectItems value="#{v2PmOrderController.pmTypeWebList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup id="pmRuleUid"   style="#{v2PmOrderController.pmRulesListVisable()}" >
