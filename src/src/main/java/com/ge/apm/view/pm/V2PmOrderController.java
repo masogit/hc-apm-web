@@ -291,6 +291,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private List<OrgInfo> orgList;
 
+    @Getter@Setter
+    private List<I18nMessage> pmTypeWebList = new ArrayList<>();
 
     private WorkflowService workflowService;
 
@@ -1742,7 +1744,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
         loadRuleList();
+        initPmTypeWeb();
+    }
 
+    public void initPmTypeWeb(){
+        List<I18nMessage> i18nMessages = i18nMessageRepository.findI18nByType("pmTypeWeb");
+        pmTypeWebList = i18nMessages.stream().filter(t -> !t.getMsgKey().equals("4")).collect(Collectors.toList());
     }
 
     public void loadRuleList(){

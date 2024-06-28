@@ -85,6 +85,10 @@
                             <label class="label">#{msg.pmComment}</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.comments}"></p:outputLabel>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{v2PmOrderController.selected.pmType eq 4}">
+                            <label class="label">#{msg.originalPmNum}</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.originalPmNum}"></p:outputLabel>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
