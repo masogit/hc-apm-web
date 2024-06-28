@@ -280,8 +280,8 @@
                     <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
-                    <label class="label">#{msg.CancellationReason}</label>
-                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" />
+                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.selected.pmType eq 4 ? '*' : ''} </span></label>
+                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" required="#{v2PmOrderController.selected.pmType eq 4 ? true :false}" requiredMessage="工单的取消原因不能为空！"/>
                 </h:panelGroup>
                 <br></br>
                 <h:panelGroup>
