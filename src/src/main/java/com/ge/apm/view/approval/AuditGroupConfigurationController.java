@@ -68,6 +68,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         buildApproveUserList();
+        searchFilters = new ArrayList<>();
     }
     //获取拥有审核权限的用户
     public void buildApproveUserList() {
@@ -86,7 +87,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     }
     @Override
     protected Page<AuditGroupConfiguration> loadData(PageRequest pageRequest) {
-        searchFilters.add(new SearchFilter("hierOrgUid", SearchFilter.Operator.EQ,currentUser.getHospitalUID()));
+        updateSearchFilter(new SearchFilter("hierOrgUid", SearchFilter.Operator.EQ,currentUser.getHospitalUID()));
         Page<AuditGroupConfiguration> bySearchFilter = auditGroupConfigurationRepository.findBySearchFilter(searchFilters, pageRequest);
         return bySearchFilter;
     }
