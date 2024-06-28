@@ -288,6 +288,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private boolean viewIng = false;
     @Getter @Setter
     private boolean repaFlag = false;
+    private Boolean enableAuditGroupConfiguration;
     @Override
     protected void init() {
         try {
@@ -338,7 +339,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
             selectedBatchMap = new HashMap<>();
-
+            enableAuditGroupConfiguration();
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -821,8 +822,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
                 String tenantUID = loginUser.getTenantUID();
-                TenantInfo tenantInfo = cacheService.getTenantByUid(tenantUID);
-                if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+                if (enableAuditGroupConfiguration) {
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(loginUser.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     if (auditGroupConfiguration != null) {
@@ -940,9 +940,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = pageResult.getContent();
             }
-            TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
             List<V2_WorkOrder> workOrderList = new ArrayList<>();
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
+            if(enableAuditGroupConfiguration && queryIndex == 10){
                 List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
                 if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
                     for (V2_WorkOrder v2_workOrder :v2_workOrders) {
@@ -1035,8 +1034,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
         if (!this.hasFilterOnField("siteUID")) {
-            TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
+            if(enableAuditGroupConfiguration && queryIndex == 10) {
                 String hospitalUID = loginUser.getHospitalUID();
                 updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
@@ -1339,7 +1337,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
         TenantInfo tenantInfo = cacheService.getTenantByUid(loginUser.getTenantUID());
-        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+        if(enableAuditGroupConfiguration){
             List<V2_WorkOrder_Detail> approvedDetailList = new ArrayList<>();
             approvedDetails.stream().forEach(item -> {
                 if (item.getApproved() == null || !item.getApproved()) {
@@ -2024,13 +2022,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
-            return;
-        }
-        if(StringUtils.isEmpty(newServiceRequest.getRequestorPhone())){
-            String msg =WebUtil.getMessage("requestorName")+"电话,不能为空!";
-            WebUtil.addErrorMessage(msg);
-            //前端弹窗不退出并提示错误信息
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         WorkflowConfig woc = configService.findConfigBySite(selectedAsset.getSiteUID());
@@ -2821,9 +2812,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public List<UserAccount> getApproverList(String name) {
-        Boolean hospitalNameBoolean = UserContextService.isHospitalName("");
+//        Boolean hospitalNameBoolean = UserContextService.isHospitalName("");
         List<UserAccount> uaList=new ArrayList<>();
-        if (hospitalNameBoolean){
+        if (enableAuditGroupConfiguration){
             AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(loginUser.getHospitalUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
             if(auditGroupConfiguration!=null){
                 String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
@@ -3928,6 +3919,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         return Boolean.valueOf(repairReportSendPlace.toString());
+    }
+
+    private boolean enableAuditGroupConfiguration(){
+        if(enableAuditGroupConfiguration == null){
+            String value = userContextService.getConfigItemValue("enableAuditGroupConfiguration");
+            enableAuditGroupConfiguration = Boolean.TRUE.toString().equalsIgnoreCase(value);
+        }
+       return enableAuditGroupConfiguration;
     }
 }
 

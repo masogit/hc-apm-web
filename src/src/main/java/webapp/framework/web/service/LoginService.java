@@ -5,6 +5,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.UserApiService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.LoginVerificationCodeService;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -17,6 +18,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,6 +38,8 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
 import webapp.framework.context.WrappedRequest;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
@@ -69,9 +73,11 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     protected UserAccount user;
     protected String telephone;
     protected String verificationCode;
+    protected String encryTelephone;
     protected boolean readonlyFlag = false;
     protected String bizStatusCode = "OK";
-
+    protected MicroServiceUtil msUtil;
+    protected int initialLogin; // 0:密码 , 1:手机 , 2,手机 -> 密码（双因素验证） 3,密码 -> 手机（）
     public boolean isReadonlyFlag() {
         return readonlyFlag;
     }
@@ -95,6 +101,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
+
+    public String getEncryTelephone() {
+        return encryTelephone;
+    }
+
+    public void setEncryTelephone(String encryTelephone) {
+        this.encryTelephone = encryTelephone;
+    }
+
     static {
         IdFuzzyResolver.registerResolver();
         // Global setting: change default timezone to UTC+0
@@ -112,6 +127,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         securityContextRepository = ctx.getBean(SecurityContextRepository.class);
         messageUtil = ctx.getBean(MessageUtil.class);
         userApi = ctx.getBean(UserApiService.class);
+        msUtil = ctx.getBean(MicroServiceUtil.class);
         loginVerificationCodeService = WebUtil.getBean(LoginVerificationCodeService.class);
         telephone = null;
         verificationCode = null;
@@ -301,7 +317,26 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             addErrorMessage(response, 401, "login_error");
             return;
         }
+        initialLogin = 0; //密码登录
+        UserContextService.removeLoginUser();
+        doLogin(request, response, userName, passwordPlain);
+    }
+    public void doLoginTwoFactorValid(){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+        String userName = request.getParameter("j_username3");
+        String tempPasswordPlain = request.getParameter("password3");
+        String passwordPlain = UserContextService.decryptData(tempPasswordPlain);
+        if (passwordPlain == null){
+            addErrorMessage(response, 401, "login_error");
+            return;
+        }
+        initialLogin = 2;
+        doLogin(request, response, userName, passwordPlain);
+    }
 
+    private void doLogin(HttpServletRequest request, HttpServletResponse response, String userName, String passwordPlain) {
         user = userAccountDao.getByLoginName(userName);
         if(user==null){
             String geLoginName = "ge" + userName;
@@ -474,4 +509,89 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             messageUtil.error("security_bad_credentials");
         }
     }
+
+    public void doLoginPhone(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+        String telephone = request.getParameter("telephone");
+        String verificationCode = request.getParameter("verificationCode");
+        if(StringUtils.isEmpty(telephone)){
+            WebUtil.addErrorMessage("请输入手机号");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isEmpty(verificationCode)){
+            WebUtil.addErrorMessage("请输入手机号验证码");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        Map<String,String> map = msUtil.getMsMCode(telephone);
+        if(map == null){
+            WebUtil.addErrorMessage("验证码已失效，请重新获取");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        String code = map.get("code");
+        if(verificationCode.equals(code)){
+            UserAccount user = userAccountDao.findByTelephone(telephone);
+            if (isPhoneValidLogin(user)) {
+                initialLogin = 2; // 手机登录——> 密码验证（双因素登录）
+                requestContext.addCallbackParam("twoFactorValid", initialLogin);
+                requestContext.addCallbackParam("loginName", user.getLoginName());
+                return;
+            }else{
+                initialLogin = 1; // 手机登录
+                doSpringSecuritylogin(request,response,user);
+            }
+        }else{
+            WebUtil.addErrorMessage("无效的验证码");
+            requestContext.addCallbackParam("validationFailed", true);
+        }
+    }
+
+    public void sendMsMCode(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        String telephone = request.getParameter("telephone");
+        if(StringUtils.isEmpty(telephone)){
+            WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("telephone", SearchFilter.Operator.EQ,telephone));
+        long count = userAccountDao.count(searchFilters);
+        if(count == 0){
+            WebUtil.addErrorMessage("手机号码未录入");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        logger.info("发送短信验证码");
+        try{
+            logger.info("sendMsMCode,telephone={}",telephone);
+            Map<String,String> map = msUtil.getMsMCode(telephone);
+            if(map==null){
+                Boolean isSuccess = msUtil.sendMsMCode(telephone);
+                if(isSuccess){
+                    WebUtil.addSuccessMessage("验证码已发送,请查收短信");
+                }else {
+                    WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
+                    requestContext.addCallbackParam("validationFailed", true);
+                }
+
+            }else {
+                String expire = map.get("expire");
+                WebUtil.addSuccessMessage("验证码已发送,请查收短信."+expire+"分钟后可以重新发送");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
+            requestContext.addCallbackParam("validationFailed", true);
+        }
+    }
+
+
 }
