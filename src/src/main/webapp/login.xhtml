@@ -133,7 +133,7 @@
                     // only removes cache entries for this logged out user
                     lscache.flush();
                 }
-                
+
                 function handleLoginError(xhr, status, exception) {
                     if(xhr.status===401){
                         PF("dlgLoginError").show();
@@ -151,7 +151,7 @@
                     if(xhr.status===205){
                         document.getElementById("hiddenPwd").value = document.getElementById("j_password").value;
                         document.getElementById("hiddenUname").value = document.getElementById("j_username").value;
-                    
+
                         PF("dlgResetPassword").show();
                     }
                 }
@@ -177,16 +177,35 @@
                                 <label style="color: white;"><h1>GE APM</h1></label>
                             </center>
                         </div>
-                        <div class="ui-g-12">
-                            <p:inputText id="j_username" required="true" requiredMessage="#{msg.login_name}: #{msg.ValidationRequire}" placeholder="#{msg.login_name}"/>
-                            <i class="fa fa-user" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
-                            <br/><br/>
-                            <p:password id="j_password" required="true" requiredMessage="#{msg.password}: #{msg.ValidationRequire}" placeholder="#{msg.password}" autocomplete="off"/>
-                            <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
-                        </div>
-                        <div class="ui-g-12" style="margin-bottom: 0px;">
-                            <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
-                        </div>
+                        <p:tabView  activeIndex="0" prependId="false">
+                            <p:tab title="密码登录" id="psw">
+                                <div class="ui-g-12">
+                                    <p:inputText id="j_username"  placeholder="#{msg.login_name}" />
+                                    <i class="fa fa-user" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
+                                    <br/><br/>
+                                    <p:password id="j_password"  placeholder="#{msg.password}" autocomplete="off" />
+                                    <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
+
+                                </div>
+                                <div class="ui-g-12" style="margin-bottom: 0px;">
+                                    <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary"  validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl dlgAccountLoginPhone" oncomplete="pwdLoginAfter(xhr, status, args);"/>
+                                </div>
+                            </p:tab>
+                            <p:tab title="短信登录" id="sms">
+                                <div class="ui-g-12">
+                                    <p:inputText id="telephone" requiredMessage="#{msg.login_name}: #{msg.ValidationRequire}" placeholder="登录手机号" style="width: 80%" />
+                                    <i class="fa fa-mobile-phone" style="height: 0px;float: left;left: -20px;top: 5px;position: relative;"/>
+                                    <p:commandButton id="sendCode"  actionListener="#{loginController.sendMsMCode()}" styleClass="send-button" style="height: 23px" update="growl" value="获取验证码"  oncomplete="sendSmsAfter(xhr, status, args)"/>
+                                    <br/><br/>
+                                    <p:inputText id="verificationCode" requiredMessage="#{msg.password}: #{msg.ValidationRequire}" placeholder="短信验证码" autocomplete="off" style="width: 80%"/>
+
+                                </div>
+                                <div class="ui-g-12" style="margin-bottom: 0px;">
+                                    <p:commandButton  styleClass="secondary"  actionListener="#{loginController.doLoginPhone()}" value="#{msg.login}" update="growl" oncomplete="smsLoginAfter(xhr, status, args);"/>
+                                </div>
+                            </p:tab>
+                        </p:tabView>
+
                     </div>
                 </div>
 
@@ -197,28 +216,29 @@
             </p:dialog>
             <p:growl id="growl"/>
 
-            <p:dialog modal="true" widgetVar="dlgLoginError" header="登录失败" appendTo="@(body)">
+            <p:dialog modal="true" style="background-color: #ffffff" widgetVar="dlgLoginError" header="登录失败" appendTo="@(body)">
                 <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
                 <h:outputText value="用户名或密码错误。请重新输入用户名和密码！"/>
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgLoginError').hide()"/>
             </p:dialog>
 
-            <p:dialog modal="true" widgetVar="dlgAccountDisable" header="登录失败" appendTo="@(body)">
+            <p:dialog modal="true" style="background-color: #ffffff" widgetVar="dlgAccountDisable" header="登录失败" appendTo="@(body)">
                 <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
                 <h:outputText value="该账号已被停用，请联系系统管理员!"/>
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgAccountDisable').hide()"/>
             </p:dialog>
 
-            <p:dialog modal="true" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">
+            <p:dialog modal="true" style="background-color: #ffffff" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">
                 <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
                 <h:outputText value="帐号被锁定，请24小时后再试！"/>
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" type="button" onclick="PF('dlgAccountLocked').hide()"/>
             </p:dialog>
-
-            <p:dialog modal="true" header="请修改密码" widgetVar="dlgResetPassword" minHeight="40" closable="false" appendTo="@(body)">
+            <ui:include src="/portal/login/loginFroPassword.xhtml" />
+            <ui:include src="/portal/login/loginFroPhone.xhtml" />
+            <p:dialog modal="true" style="background-color: #ffffff" header="请修改密码" widgetVar="dlgResetPassword" minHeight="40" closable="false" appendTo="@(body)">
                 <h:form prependId="false">
                     <p:fieldset>
                         <label>根据中国电信云平台最新安全规范要求，为保障用户权益和信息安全， </label><br/>

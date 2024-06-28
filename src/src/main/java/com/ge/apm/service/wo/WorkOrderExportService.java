@@ -7,7 +7,6 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
-import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -385,7 +384,7 @@ public class WorkOrderExportService {
         UserAccount userAccount = userContextService.getCurrentUserAccount();
         String tenantUID = userAccount.getTenantUID();
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-
+        String enableAuditGroupConfiguration = userContextService.getConfigItemValue("enableAuditGroupConfiguration");
         Map<String, List<V2_WorkOrder_Detail>> workOrderDetails = new HashMap<>();
 
         Map<String, String> partsSignatureMap = new HashMap<>();
@@ -434,7 +433,7 @@ public class WorkOrderExportService {
                     .map(o -> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
 
-            if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+            if (Boolean.TRUE.toString().equalsIgnoreCase(enableAuditGroupConfiguration)){
                 m.put("partsSignature", partsSignatureMap.get(woid));
                 m.put("medicalWorkerApproverSignature", medicalWorkerApproverSignatureMap.get(woid));
                 m.put("approverSignatureList", Optional.ofNullable(approverSignatureObjMap.get(woid))

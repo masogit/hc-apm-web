@@ -1494,9 +1494,9 @@ public class NurseSiteMaintainService {
 	}
 
 	public StreamedContent getMaintainSignatureWeiXin(String signatureId) {
-		StreamedContent streamedContent = blobFileService.getBlobObjectByStorageId(signatureId);
-		return streamedContent;
+		return blobFileService.getBlobObjectByStorageId(signatureId);
 	}
+
 	public StreamedContent getMaintainSignature(String signatureId){
 		String typePrefix="text";
 		List<V2_BlobObject> blobObjectsByStorageId = blobFileService.getBlobObjectsByStorageId(signatureId);
@@ -1866,35 +1866,28 @@ public class NurseSiteMaintainService {
 	}
 
 	public byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) throws IOException {
+		long l1 = System.currentTimeMillis();
+		LOGGER.error("NurseSiteMaintainService writeMaintainDetailToExcel start");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		XSSFDrawing patriarch = doc.getPatriarch(SHEET_Maintain);
 		listMaintain.sort(new NurseSiteMaintainComparator());
-		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
-		Map<String, String> mapAssetInfo = new HashMap<String, String>();
-		Set<String> setSignature = new HashSet<String>();
-		Map<String, Integer> mapSignature = new HashMap<String, Integer>();
-		Map<String, Integer> mapCheckItemSequence = new HashMap<String, Integer>();
-		List<String> header = new ArrayList<String>();
-		Set<String> ids = new HashSet<>();
-		ids.add("-1");
-		for (int i = 0; i < listMaintain.size(); ++i) {
-			NurseSiteMaintain tempMaintain = listMaintain.get(i);
-			supplementMaintain(tempMaintain,0,0,true);
+		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<>();
+		Set<String> setSignature = new HashSet<>();
+		Map<String, Integer> mapSignature = new HashMap<>();
+		Map<String, Integer> mapCheckItemSequence = new HashMap<>();
+		List<String> header = new ArrayList<>();
+		List<NurseSiteMaintainItem> itemList = ListUtil.newArrayList();
+		for (NurseSiteMaintain tempMaintain : listMaintain) {
 			List<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
-			if (listItem != null && listItem.size() > 0) {
-				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
-				while (itItem.hasNext()) {
-					NurseSiteMaintainItem tempItem = itItem.next();
+			if (listItem != null && !listItem.isEmpty()) {
+				itemList.addAll(listItem);
+				for (NurseSiteMaintainItem tempItem : listItem) {
 					if (mapAssetUidMaintainItem.containsKey(tempItem.getAssetUid())) {
 						List<NurseSiteMaintainItem> tempListItem = mapAssetUidMaintainItem.get(tempItem.getAssetUid());
 						tempListItem.add(tempItem);
 					} else {
-						List<NurseSiteMaintainItem> tempListItem = new ArrayList<NurseSiteMaintainItem>();
+						List<NurseSiteMaintainItem> tempListItem = new ArrayList<>();
 						tempListItem.add(tempItem);
-						ids.add(tempItem.getId());
 						mapAssetUidMaintainItem.put(tempItem.getAssetUid(), tempListItem);
-						mapAssetInfo.put(tempItem.getAssetUid(), tempItem.getAssetInfo().getName());
 					}
 				}
 			}
@@ -1903,6 +1896,16 @@ public class NurseSiteMaintainService {
 				mapSignature.put(tempMaintain.getSignatureId(), tempMaintain.getSignatureSourceType());
 			}
 		}
+		Set<String> ids = itemList.stream().map(NurseSiteMaintainItem::getId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+		Set<String> assetUidList = itemList.stream().map(NurseSiteMaintainItem::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+		Set<String> userUidList = itemList.stream().map(NurseSiteMaintainItem::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+		ids.add("-1");assetUidList.add("-1");userUidList.add("-1");
+		List<NurseSiteMaintainData> dataList = nurseSiteMaintainItemMapper.findDataList(ids);
+		Map<String, List<NurseSiteMaintainData>> dataMap = dataList.stream().collect(Collectors.groupingBy(NurseSiteMaintainData::getParentId));
+		List<AssetInfo> assetList = nurseSiteMaintainItemMapper.findAssetList(assetUidList);
+		Map<String, AssetInfo> assetMap = assetList.stream().collect(Collectors.toMap(AssetInfo::getUid, t -> t));
+		List<UserAccount> userList = nurseSiteMaintainItemMapper.findUserList(userUidList);
+		Map<String, String> userMap = userList.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
 		int headerColumnIndex = 1;
 		int columnIndex = 1;
 		int keyRow = 1;
@@ -1914,6 +1917,7 @@ public class NurseSiteMaintainService {
 		int rowIndex = 7;
 		int dataColumnIndex = 6;
 		if (mapAssetUidMaintainItem.size() > 0) {
+			LOGGER.error("NurseSiteMaintainService query end {}", System.currentTimeMillis() - l1);
 			List<V2_BlobObject> v2BlobObjects = blobObjectRepository.fetchListByBoUUIds(ids);
 			Set<String> objectIds = v2BlobObjects.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
 			Map<String, List<V2_BlobObject>> blobMap = v2BlobObjects.stream().collect(Collectors.groupingBy(V2_BlobObject::getBoUuid));
@@ -1921,121 +1925,100 @@ public class NurseSiteMaintainService {
 			if (ObjectUtil.isNotEmpty(objectIds)) {
 				files = microServiceUtil.getFiles(objectIds);
 			}
+			LOGGER.error("NurseSiteMaintainService getFiles end {}", System.currentTimeMillis() - l1);
 			Map<String, byte[]> fileMap = files.stream().collect(Collectors.toMap(FileInfoResult::getObjectId, FileInfoResult::getBytes));
-			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
-			while (it.hasNext()) {
-				List<NurseSiteMaintainItem> tempListItem = it.next();
-				if (tempListItem != null && tempListItem.size() > 0) {
+			for (List<NurseSiteMaintainItem> tempListItem : mapAssetUidMaintainItem.values()) {
+				if (tempListItem != null && !tempListItem.isEmpty()) {
 					columnIndex = 1;
+					AssetInfo assetInfo = assetMap.get(tempListItem.get(0).getAssetUid());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, assetInfo.getName());
 					headerColumnIndex = writeExcelSheetHeader(header, CLINICAL_DEPT_NAME, doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getClinicalDeptName());
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, assetInfo.getClinicalDeptName());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, assetInfo.getDepartNum());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, assetInfo.getSerialNum());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
-					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
-					// STR_SEQUENCE, doc, secondHeaderColumnIndex,2,false);
-					// secondHeaderColumnIndex=5;
-					for (int i = 0; i < tempListItem.size(); ++i) {
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex, assetInfo.getFunctionType());
+					StringBuilder keyName = new StringBuilder();
+					for (NurseSiteMaintainItem nurseSiteMaintainItem : tempListItem) {
 						mapCheckItemSequence.clear();
-						NurseSiteMaintainItem tempItem = tempListItem.get(i);
-						List<NurseSiteMaintainData> listData = tempItem.getListData();
-						Map<String,NurseSiteMaintainConfigCheckItem> configMap=initConfig(tempItem);
-						String keyName = "";
-						if (listData != null && listData.size() > 0) {
-							Iterator<NurseSiteMaintainData> itData = listData.iterator();
-							while (itData.hasNext()) {
-								NurseSiteMaintainData tempData = itData.next();
-								// doc.writeCellData(SHEET_Maintain, rowIndex,
-								// headerColumnIndex++,tempData.getCheckItem()+"-"+
-								// tempItem.getSequence());
-								// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
-								// tempItem.getSequenceName(), doc,
-								// secondHeaderColumnIndex,2,true);
-								// keyName =
-								// sdf.format(tempItem.getScheduleDate())+","+tempItem.getCheckDate()+","+tempItem.getSequenceName()+","+tempData.getCheckItem();
-								keyName = "";
-								if (tempItem.getScheduleDate() != null) {
-									keyName += sdf.format(tempItem.getScheduleDate()) + ",";
+//						List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
+						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
+						keyName.delete(0, keyName.length());
+						if (listData != null && !listData.isEmpty()) {
+							for (NurseSiteMaintainData tempData : listData) {
+								if (nurseSiteMaintainItem.getScheduleDate() != null) {
+									keyName.append(sdf.format(nurseSiteMaintainItem.getScheduleDate())).append(",");
 								} else {
-									keyName += ",";
+									keyName.append(",");
 								}
-								keyName += tempItem.getConfigId() + ",";
-								keyName += tempItem.getSequenceName() + ",";
+								keyName.append(nurseSiteMaintainItem.getConfigId()).append(",");
+								keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
 								if (tempData.getCheckItem() != null) {
 									String checkItemStr = tempData.getCheckItem();
 									if (mapCheckItemSequence.containsKey(checkItemStr)) {
 										mapCheckItemSequence.put(checkItemStr, mapCheckItemSequence.get(checkItemStr) + 1);
-										keyName += checkItemStr + mapCheckItemSequence.get(checkItemStr) + ",";
+										keyName.append(checkItemStr).append(mapCheckItemSequence.get(checkItemStr)).append(",");
 									} else {
-										keyName += checkItemStr + ",";
+										keyName.append(checkItemStr).append(",");
 										mapCheckItemSequence.put(checkItemStr, 1);
 									}
 								} else {
-									keyName += ",";
+									keyName.append(",");
 								}
-								//String VariableText=initVariableText(tempData,configMap);
-								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
-								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName, tempItem.getModifyBy().getName());
-								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName, tempItem.getCheckDate());
-								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, tempData.getCheckItem());
-								// doc.writeCellData(SHEET_Maintain, rowIndex,
-								// columnIndex++, tempData.getStrValue());
+								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
+								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), tempData.getStrValue());
+								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
+								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
+								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), tempData.getCheckItem());
 							}
-							String tempComment = tempItem.getComment();
-							keyName = "";
-							if (tempItem.getScheduleDate() != null) {
-								keyName += sdf.format(tempItem.getScheduleDate()) + ",";
+							String tempComment = nurseSiteMaintainItem.getComment();
+							keyName.delete(0, keyName.length());
+							if (nurseSiteMaintainItem.getScheduleDate() != null) {
+								keyName.append(sdf.format(nurseSiteMaintainItem.getScheduleDate())).append(",");
 							} else {
-								keyName += ",";
+								keyName.append(",");
 							}
-							keyName += tempItem.getConfigId() + ",";
-							keyName += tempItem.getSequenceName() + ",";
-							keyName += KEY_COMMENT + ",";
-							headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
+							keyName.append(nurseSiteMaintainItem.getConfigId()).append(",");
+							keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
+							keyName.append(KEY_COMMENT).append(",");
+							headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
 							if (StringUtils.isEmpty(tempComment)) {
 								tempComment = "";
 							}
-							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempComment);
-							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, STR_COMMENT);
+							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), tempComment);
+							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), STR_COMMENT);
 						}
-//						List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(tempItem.getId());
-						List<V2_BlobObject> byBoUuid = blobMap.get(tempItem.getId());
-						if(CollectionUtils.isNotEmpty(byBoUuid)){
-							for (int x=0;x<byBoUuid.size();x++) {
-								V2_BlobObject v2_blobObject = byBoUuid.get(x);
+						List<V2_BlobObject> byBoUuid = blobMap.get(nurseSiteMaintainItem.getId());
+						if (CollectionUtils.isNotEmpty(byBoUuid)) {
+							for (int x = 0; x < byBoUuid.size(); x++) {
+								V2_BlobObject blobObject = byBoUuid.get(x);
 								try {
-									keyName = "";
-									if (tempItem.getScheduleDate() != null) {
-										keyName += sdf.format(tempItem.getScheduleDate()) + ",";
+									keyName.delete(0, keyName.length());
+									if (nurseSiteMaintainItem.getScheduleDate() != null) {
+										keyName.append(sdf.format(nurseSiteMaintainItem.getScheduleDate())).append(",");
 									} else {
-										keyName += ",";
+										keyName.append(",");
 									}
-									keyName += tempItem.getConfigId() + ",";
-									keyName += tempItem.getSequenceName() + ",";
-									keyName += "图片"+(x+1)+ ",";
-									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
-									doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, "图片"+(x+1));
-									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRow, rowIndex, keyName, "");
-									if(integers != null) {
+									keyName.append(nurseSiteMaintainItem.getConfigId()).append(",");
+									keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
+									keyName.append("图片").append(x + 1).append(",");
+									headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
+									doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), "图片" + (x + 1));
+									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), "");
+									if (integers != null) {
 										int x1 = integers[0];
 										int y1 = integers[1];
-//										InputStream inputStream = microServiceUtil.downloadRepeatedReadFile(v2_blobObject.getObjectStorageId());
-										byte[] bytes = fileMap.get(v2_blobObject.getObjectStorageId());
-										//BufferedImage bufferImg = ImageIO.read(new File("C:\\Users\\503263052\\Downloads\\图片2.png"));
+										byte[] bytes = fileMap.get(blobObject.getObjectStorageId());
 										ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 										BufferedImage bufferImg = ImageIO.read(inputStream);
 										ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 										ImageIO.write(bufferImg, "png", byteArrayOut);
-										XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, ( short) y1,
-										x1, (short) (y1+1), x1 + 1);
+										XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, (short) y1,
+												x1, (short) (y1 + 1), x1 + 1);
 										anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_AND_RESIZE);
-										XSSFPicture picture = patriarch.createPicture(anchor, doc.getWorkBook().addPicture(byteArrayOut.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
 										byteArrayOut.close();
 									}
 								} catch (Exception e) {
@@ -2047,19 +2030,16 @@ public class NurseSiteMaintainService {
 					rowIndex++;
 				}
 			}
-			// writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
+			LOGGER.error("NurseSiteMaintainService writeData end {}", System.currentTimeMillis() - l1);
 			writeExcelSecondHeader(doc, keyRow, scheduleDateRow, dataColumnIndex, 0, STR_SCHEDULE_DATE, null);
-			// writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,STR_CHECK_DATE,null);
 			doc.writeCellData(SHEET_Maintain, checkDateRow, 1, STR_CHECK_DATE);
 			writeExcelSecondHeader(doc, keyRow, sequenceRow, dataColumnIndex, 2, STR_SEQUENCE, 0);
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, STR_MODIFIED_BY);
-			if (setSignature.size() > 0) {
+			if (!setSignature.isEmpty()) {
 				writeExcelSheetHeader(header, STR_SIGNATURE, doc, 1, rowIndex++, false);
 				writeSignatureToExcel(doc, rowIndex++, dataColumnIndex, 3, 12, setSignature, mapSignature);
 			}
 			doc.removeRow(SHEET_Maintain, keyRow);
-			// doc.writeCellData(SHEET_Maintain, keyRow, 1,
-			// STR_NURSESITEREPORT);
 			writeExcelHeader(doc, keyRow);
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -2068,7 +2048,7 @@ public class NurseSiteMaintainService {
 			return out.toByteArray();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			LOGGER.error(e.getMessage());
+			LOGGER.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -2122,30 +2102,53 @@ public class NurseSiteMaintainService {
 	}
 	private void writeSignatureToExcel(ExcelDocument doc, int row, int columnIndex, int width, int height, Set<String> signatureIds, Map<String, Integer> mapSignature) {
 		try {
-			Iterator<String> it = signatureIds.iterator();
-			while (it.hasNext()) {
-				String tempSignature = it.next();
+			long start = System.currentTimeMillis();
+			List<FileInfoResult> files = microServiceUtil.getFiles(signatureIds);
+			LOGGER.error("NurseSiteMaintainService getSignatureFiles {}", System.currentTimeMillis() - start);
+			Map<String, byte[]> fileMap = files.stream().collect(Collectors.toMap(FileInfoResult::getObjectId, FileInfoResult::getBytes));
+			for (String tempSignature : signatureIds) {
 				Integer type = mapSignature.get(tempSignature);
-				StreamedContent sc = null;
+				InputStream inputStream = null;
+				byte[] bytes = fileMap.get(tempSignature);
+				if (ObjectUtil.isEmpty(bytes)) {
+					continue;
+				}
 				if (type == 1) {
-					sc = getMaintainSignatureWeiXin(tempSignature);
+					inputStream = new ByteArrayInputStream(bytes);
 				} else if (type == 0) {
-					sc = getMaintainSignatureWebToStream(tempSignature);
+					InputStream input = new ByteArrayInputStream(bytes);
+					byte[] b = new byte[1024];
+					StringBuilder sb = new StringBuilder();
+					int i;
+					try {
+						while ((i = input.read(b)) > 0) {
+							String str = new String(b, 0, i);
+							sb.append(str);
+						}
+						input.close();
+					} catch (Exception e) {
+						try {
+							input.close();
+						} catch (IOException e1) {
+							LOGGER.error("NurseSiteMaintainService input close error {}", e.getMessage(), e);
+						}
+						LOGGER.error("NurseSiteMaintainService input read error {}", e.getMessage(), e);
+					}
+					String result = sb.toString();
+					inputStream = new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(result));
 				}
-				if (sc != null) {
-					doc.mergeCell(SHEET_Maintain, row, row + height - 1, columnIndex, columnIndex + width - 1);
-					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
-					columnIndex += width;
-				}
+				doc.mergeCell(SHEET_Maintain, row, row + height - 1, columnIndex, columnIndex + width - 1);
+				doc.drawPicture(doc.addPicture(inputStream, Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
+				columnIndex += width;
 			}
+			LOGGER.error("NurseSiteMaintainService writeSignatureFiles {}", System.currentTimeMillis() - start);
 		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
+			LOGGER.error("NurseSiteMaintainService addPicture error {}", e.getMessage(), e);
 		}
 	}
 
 	private void writeExcelHeader(ExcelDocument doc, int keyRow) {
-		List<String> header = new ArrayList<String>();
+		List<String> header = new ArrayList<>();
 		writeExcelSheetHeader(header, STR_NURSESITEREPORT, doc, 1, keyRow, false);
 		int headerColumnIndex = 1;
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow + 1, false);
@@ -2156,7 +2159,7 @@ public class NurseSiteMaintainService {
 	}
 
 	private void writeExcelSecondHeader(ExcelDocument doc, int keyRow, int scheduleDateRow, int dataColumnIndex, int keyRowIndex, String label, Integer parentIndex) {
-		List<String> listScheduleDate = new ArrayList<String>();
+		List<String> listScheduleDate = new ArrayList<>();
 		String[] headerStrRow = doc.getKeyRow(SHEET_Maintain, keyRow);
 		for (int i = 0; i < headerStrRow.length; ++i) {
 			if (i + 1 < dataColumnIndex) {

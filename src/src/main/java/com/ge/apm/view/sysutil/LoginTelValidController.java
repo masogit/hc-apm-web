@@ -57,14 +57,15 @@ public class LoginTelValidController {
     private void init() {
         msUtil = WebUtil.getBean(MicroServiceUtil.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        initUser();
+    }
+    private void initUser(){
         userContextService.processAfterLogin();
         UserAccount user = userContextService.getLoginUser();
-
-        telephone = user.getTelephone();
-
-        encryTelephone = StringUtil.mobileEncrypt(telephone);
-
-
+        if(user != null){
+            telephone = user.getTelephone();
+            encryTelephone = StringUtil.mobileEncrypt(telephone);
+        }
     }
     public void sendMsMCode(){
         logger.info("发送短信验证码");
