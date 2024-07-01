@@ -1339,7 +1339,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         List<AssetInfo> assetInfos = new ArrayList<AssetInfo>(bySearchFilter.size());
         Map<String, List<ArrivalListItem>> listMap = arrivalItemList.stream().filter(item -> item.getQrCode() != null).collect(Collectors.groupingBy(ArrivalListItem::getQrCode));
+        Set<String> clinicalDeptUIDs = arrivalItemList.stream().filter(item -> item.getClinicalDeptUID() != null).map(ArrivalListItem::getClinicalDeptUID).collect(Collectors.toSet());
 
+        List<OrgInfo> orgInfos = orgDao.findInUIds(clinicalDeptUIDs);
+
+        Map<String, String> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o.getName()));
         for (QrCodeLib qrCodeLib : bySearchFilter) {
             AssetInfo assetInfo = new AssetInfo();
             assetInfo.setSiteUID(qrCodeLib.getSiteUID());
@@ -1351,8 +1355,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 assetInfo.setFinancingNum(arrivalListItem.getFinancingNum());
                 assetInfo.setDepartNum(arrivalListItem.getDepartNum());
                 assetInfo.setName(selected.getAssetName());
-                assetInfo.setClinicalDeptName(selected.getClinicalDeptName());
-                assetInfo.setClinicalDeptUID(selected.getClinicalDeptUID());
+                assetInfo.setClinicalDeptName(orgMap.get(arrivalListItem.getClinicalDeptUID()));
+                assetInfo.setClinicalDeptUID(arrivalListItem.getClinicalDeptUID());
                 assetInfo.setAssetGroup(selected.getAssetGroup());
             }
             assetInfos.add(assetInfo);
