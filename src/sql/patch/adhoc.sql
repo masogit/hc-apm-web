@@ -4,6 +4,11 @@ CREATE INDEX IF NOT exists asset_operation_record_create_date_idx ON public.asse
 CREATE INDEX IF NOT exists asset_operation_record_tenant_uid_idx ON public.asset_operation_record (tenant_uid);
 
 
+-- his 结果数据清空重新汇总
+delete from his_equipment_data_result;
+update his_equipment_data_source_split set is_sum = false;
+
+
 -- YHAAO-21097 积水潭名称判断改为配置项
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '启用审核（核心）组配置', 'enableAuditGroupConfiguration', '审核（核心）组配置', 'f', 't', 3 where not exists (select * from config_item where key = 'enableAuditGroupConfiguration');
 -- 同步北京积水潭医院租户下的配置 enableAuditGroupConfiguration
@@ -22,3 +27,7 @@ update approve_schedule apc set tenant_uid=wo.tenant_uid,institution_uid=wo.inst
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '验证工单是否执行复检流程', 'verifyPmOrderReExaminationMode', '验证工单是否执行复检流程', 'f','t',3 where not exists(select * from config_item where key = 'verifyPmOrderReExaminationMode');
+
+
+-- 删除asset_info 表site_uid 外键
+ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fk17q6mwntmk31s9vi7knjeredk;
