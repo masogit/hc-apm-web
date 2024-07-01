@@ -1,5 +1,6 @@
 package com.ge.apm.service.his.load;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 import com.ge.apm.dao.HisEquipmentDataSourceRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -7,11 +8,14 @@ import com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.domain.his.HisEquipmentDataSource;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.his.HisEquipmentDataSourceRow;
 import com.ge.apm.service.his.HisEquipmentRow;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -44,6 +48,9 @@ public class HisEquipmentDataSourceImportService {
     private HisEquipmentDataSourceMapper hisEquipmentDataSourceMapper;
     @Autowired
     private OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    private MqUtils mqUtils;
     
 
     public List<HisEquipmentDataSource> saveAll(List<HisEquipmentDataSource> data){
@@ -252,6 +259,24 @@ public class HisEquipmentDataSourceImportService {
 //        hisEquipmentDataSource.setCreatedDate(new Date());
         hisEquipmentDataSource.setIsMatched(Boolean.FALSE);
         hisEquipmentDataSourceRepository.save(hisEquipmentDataSource);
+    }
+
+    public void saveMqToEs(List<Map<String, Object>> importMapList) {
+        List<HisEquipmentDataSource> list = importMapList.stream()
+                .filter(map ->!ImportStatus.CheckFail.name().equals(map.get("status") ) && !ImportStatus.Failure.name().equals(map.get("status") ))
+                .map(map -> (HisEquipmentDataSource) map.get("hisEquipmentDataSource"))
+                .collect(Collectors.toCollection(ArrayList::new));
+        int batchSize = 1000;
+        List<List<HisEquipmentDataSource>> splitLists = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += batchSize) {
+            splitLists.add(list.subList(i, Math.min(i + batchSize, list.size())));
+        }
+        for (List<HisEquipmentDataSource> splitList : splitLists) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("data",splitList);
+            MqContext mqContext = MqContext.builder().serviceName("hc-apm-web").exChange(RabbitConfig.DATA_UPLOAD_EXCHANGE).routingKey(RabbitConfig.HIS_DATA_SOURCE_ROUTING_KEY).time(new Date()).jsonObject(jsonObject).build();
+            mqUtils.sendToMq(mqContext);
+        }
     }
 
     public enum ImportStatus {
