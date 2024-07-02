@@ -4,7 +4,6 @@ import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.pure.WorkOrderDetailPojo;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
@@ -13,6 +12,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.WorkOrderDetailExportService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -78,6 +78,7 @@ public class WorkOrderDetailExportController implements Serializable {
     private Double filterMinPrice;
     private Double filterMaxPrice;
     private String searchStr;
+    private List<String> approvedStatus = ListUtil.newArrayList("1");
 
     @PostConstruct
     protected void init() {
@@ -244,6 +245,7 @@ public class WorkOrderDetailExportController implements Serializable {
             filterMap.put("assetTypeGroupEncodedSet", assetTypeGroupEncodedSet);
         }
 
+        filterMap.put("approvedStatus", approvedStatus);
         workOrderDetailPojoList = workOrderDetailExportService.createWorkOrderDetailData(filterMap);
 
     }
@@ -414,5 +416,13 @@ public class WorkOrderDetailExportController implements Serializable {
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public List<String> getApprovedStatus() {
+        return approvedStatus;
+    }
+
+    public void setApprovedStatus(List<String> approvedStatus) {
+        this.approvedStatus = approvedStatus;
     }
 }
