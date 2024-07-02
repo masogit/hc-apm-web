@@ -111,6 +111,16 @@
                     <p:inputText id="searchText_woDetail" value="#{workOrderDetailExportController.searchStr}" placeholder="#{msg.EquipmentID}/#{msg.WorkorderID}/#{msg.invoiceNum}/#{msg.Vendor}" maxlength="100" style="width: 500px"/>
                 </h:panelGroup>
             </p:panelGrid>
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup id="status">
+                    <label class="label">备件审核状态</label>
+                    <p:selectManyCheckbox id="approvedStatus" value="#{workOrderDetailExportController.approvedStatus}">
+                        <f:selectItem itemLabel="审核通过" itemValue="1"/>
+                        <f:selectItem itemLabel="审核不通过" itemValue="2"/>
+                        <f:selectItem itemLabel="未审核" itemValue="3"/>
+                    </p:selectManyCheckbox>
+                </h:panelGroup>
+            </p:panelGrid>
         </p:fieldset>
 
         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">

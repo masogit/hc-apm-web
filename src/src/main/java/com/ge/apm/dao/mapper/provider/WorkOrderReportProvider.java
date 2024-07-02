@@ -492,7 +492,7 @@ public class WorkOrderReportProvider {
 
         sb.append("select wod.id as id,ai.clinical_dept_name as assetClinicalDeptName, ai.name as assetName,ai.depart_num as assetDepartNum,wod.supplier as supplierName,wod.parts as partsName,wod.parts_quantity as partsQuantity, " +
                 "wod.closed_price as closedPrice,wod.invoice_num as invoiceNum,wod.invoice_time as invoiceTime,wo.approver_name as approverName,wod.contract_num as contractNum,wod.comment as comment,wod.closed as statementStatus, wod.parts_type  " +
-                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id and wod.approved = true ");
+                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id ");
 
         String filter = buildFilter_WorkOrderDetail(searchFilterList);
         sb.append(filter);
@@ -551,6 +551,26 @@ public class WorkOrderReportProvider {
                 }
                 str = str.substring(0, str.length() - 1);
                 sb.append(" and ai.asset_type in (" + str + ") ");
+            } else if (tempColumn.equals("approvedStatus")) {
+                List<String> approvedStatus = (List<String>) value;
+                if (!approvedStatus.isEmpty() && approvedStatus.size() < 3) {
+                    sb.append("and (");
+                    boolean flag = false;
+                    if (approvedStatus.contains("1")) {
+                        sb.append("wod.approved = true");
+                        flag = true;
+                    }
+                    if (approvedStatus.contains("2")) {
+                        sb.append(flag ? " or " : "");
+                        sb.append("wod.approved = false");
+                        flag = true;
+                    }
+                    if (approvedStatus.contains("3")) {
+                        sb.append(flag ? " or " : "");
+                        sb.append("wod.approved = null");
+                    }
+                    sb.append(")");
+                }
             }
         }
 

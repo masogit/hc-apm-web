@@ -44,7 +44,7 @@ public class WorkOrderDetailExportService {
     public List<Map<String, Object>> createWorkOrderDetailData(Map<String, Object> filterMap){
 
         List<Map<String, Object>> resultList = new ArrayList<>();
-        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        List<SearchFilter> searchFilters = new ArrayList<>();
 
         if(filterMap.containsKey("selectedOrg")){
             OrgInfo selectedOrg = (OrgInfo)filterMap.get("selectedOrg");
@@ -108,10 +108,8 @@ public class WorkOrderDetailExportService {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet));
         }
 
-        List<WorkOrderDetailPojo> workOrderDetailList = null;
-        if(!searchFilters.isEmpty()){
-            workOrderDetailList = worDao.workOrderDetailExport(searchFilters);
-        }
+        searchFilters.add(new SearchFilter("approvedStatus", SearchFilter.Operator.IN, filterMap.get("approvedStatus")));
+        List<WorkOrderDetailPojo> workOrderDetailList =  worDao.workOrderDetailExport(searchFilters);
 
         for(WorkOrderDetailPojo workOrderDetailPojo : workOrderDetailList){
             Map<String, Object> workOrderDetailMap = new HashedMap();
