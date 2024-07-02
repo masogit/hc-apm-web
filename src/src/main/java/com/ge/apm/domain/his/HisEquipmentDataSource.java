@@ -103,7 +103,7 @@ public class HisEquipmentDataSource implements Serializable {
     private String siteUid;
 
     @Column(name = "record_count")
-    private int recordCount;  //记录条数
+    private Integer recordCount;  //记录条数
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({
