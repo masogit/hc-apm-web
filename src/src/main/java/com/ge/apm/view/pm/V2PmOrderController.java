@@ -1559,6 +1559,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestorPhone(UserContextService.getCurrentUserAccount().getTelephone());
         newServiceRequest.setRequestTime(new Date());
 
         String repairSource = RepairSourceEnum.Maintenance.name();
