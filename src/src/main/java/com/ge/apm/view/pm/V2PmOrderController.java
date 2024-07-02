@@ -291,6 +291,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private List<OrgInfo> orgList;
 
+    @Getter @Setter
+    private boolean repaFlag = false;
+
     private WorkflowService workflowService;
 
     private ConfigCacheService configCacheService;
@@ -1574,7 +1577,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             dptName = configCacheService.findOrgByUid(orgInfoUID).getName();
             casePriority =3;//一般
         }
-
+        Object repairReportSendPlaceFlag =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlaceFlag != null){
+            repaFlag= Boolean.valueOf(repairReportSendPlaceFlag.toString());
+        }
+        Object repairReportSendPlace=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.defaultValue[0]");
+        if(repairReportSendPlace != null){
+            newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
+        }
     }
 
     public void saveServiceRequest() {

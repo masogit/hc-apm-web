@@ -63,6 +63,13 @@
                             <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{v2PmOrderController.needConfirmTime}"  id="confirmedDownTime" value="#{v2PmOrderController.newServiceRequest.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{v2PmOrderController.repaFlag}">
+                            <label class="label">#{msg.repairReportSendPlace}*</label>
+                            <p:selectOneMenu value="#{v2PmOrderController.newServiceRequest.repairReportSendPlace}" required="true" requiredMessage="#{msg.repairReportSendPlace} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="请选择" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picListForRP}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
