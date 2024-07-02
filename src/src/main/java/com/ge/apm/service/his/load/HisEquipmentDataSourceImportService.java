@@ -258,6 +258,7 @@ public class HisEquipmentDataSourceImportService {
         //item.put("status", StringUtils.isEmpty(contractInfoVO.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
 //        hisEquipmentDataSource.setCreatedDate(new Date());
         hisEquipmentDataSource.setIsMatched(Boolean.FALSE);
+        hisEquipmentDataSource.setRecordCount(0);
         hisEquipmentDataSourceRepository.save(hisEquipmentDataSource);
     }
 
