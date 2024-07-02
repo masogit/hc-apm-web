@@ -125,6 +125,9 @@
                     <p:column headerText="#{msg.departNum}"  filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
+                    <p:column headerText="#{msg.serialNum}"  filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.serialNum}"/>
+                    </p:column>
                     <p:column  headerText="#{msg.assetGroup}"  filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetInfo.assetGroup)}"/>
                         <f:facet name="filter">

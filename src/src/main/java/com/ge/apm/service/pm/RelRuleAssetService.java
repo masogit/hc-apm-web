@@ -67,6 +67,7 @@ public class RelRuleAssetService {
             if(assetInfoAndRelRule.getManufacture()!=null) row.createCell(14).setCellValue(assetInfoAndRelRule.getManufacture());
             if(assetInfoAndRelRule.getCreatedDate()!=null) row.createCell(15).setCellValue(simpleDateFormat.format(assetInfoAndRelRule.getCreatedDate()));
             if(assetInfoAndRelRule.getQrCode()!=null) row.createCell(16).setCellValue(assetInfoAndRelRule.getQrCode());
+            if(assetInfoAndRelRule.getSerialNum()!=null) row.createCell(17).setCellValue(assetInfoAndRelRule.getSerialNum());
             i++;
         }
     }
@@ -90,6 +91,7 @@ public class RelRuleAssetService {
         row.createCell(14).setCellValue("制造商");
         row.createCell(15).setCellValue("配置日期");
         row.createCell(16).setCellValue("二维码");
+        row.createCell(17).setCellValue("制造商序列号");
     }
 
     public List<AssetInfoAndRelRule> mergeAssetInfoAndRelRule(List<AssetInfo> assetInfos, List<RelRuleAsset> relRuleAssets) {
@@ -127,6 +129,7 @@ public class RelRuleAssetService {
                     assetInfoAndRelRule.setMakerShortName(assetInfo.getMakerShortName());
                     assetInfoAndRelRule.setCreatedDate(relRuleAsset.getCreatedDate());
                     assetInfoAndRelRule.setQrCode(assetInfo.getQrCode());
+                    assetInfoAndRelRule.setSerialNum(assetInfo.getSerialNum());
                     hasConfigRule = true;
                 }
             }
@@ -142,6 +145,7 @@ public class RelRuleAssetService {
                 assetInfoAndRelRule.setNationalStandardCode(assetInfo.getNationalStandardCode());
                 assetInfoAndRelRule.setMakerShortName(assetInfo.getMakerShortName());
                 assetInfoAndRelRule.setQrCode(assetInfo.getQrCode());
+                assetInfoAndRelRule.setSerialNum(assetInfo.getSerialNum());
             }
             hasConfigRule = false;
             result.add(assetInfoAndRelRule);
