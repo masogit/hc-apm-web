@@ -77,7 +77,7 @@
                            <p:autoComplete id="clinicalDeptName" value="#{relRuleAssetController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
                                            forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" >
-                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                                <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
                            </p:autoComplete>
 
@@ -327,6 +327,21 @@
                 console.log(item)
                 console.log(filterValue)
                 return true;
+            }
+
+            afterPageLoad = function() {
+                var obj=document.getElementById('BatchCreateForm:AssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/型号');
+                var obj2=document.getElementById('BatchCreateForm:AssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/型号');
+
+            };
+
+            function clinicalDeptNameComplete(xhr, status, args){
+                var obj=document.getElementById('BatchCreateForm:AssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/型号');
+                var obj2=document.getElementById('BatchCreateForm:AssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/型号');
             }
         </script>
         <!--<p:overlayPanel class="o1cls" id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":BatchCreateForm:filterInstallDate">
