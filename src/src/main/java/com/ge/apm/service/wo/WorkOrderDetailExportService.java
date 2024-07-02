@@ -128,6 +128,8 @@ public class WorkOrderDetailExportService {
             workOrderDetailMap.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetailPojo.getContractNum());
             workOrderDetailMap.put(WebUtil.getMessage("Remark"), workOrderDetailPojo.getComment());
             workOrderDetailMap.put(WebUtil.getMessage("PartType"), workOrderDetailPojo.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetailPojo.getPartsType()) : "");
+            workOrderDetailMap.put(WebUtil.getMessage("ApprovalStatus"), workOrderDetailPojo.getApproved() == null ? FieldValueMessageController.fieldValue("approveStatus", "1")
+                    : Boolean.TRUE == workOrderDetailPojo.getApproved() ? FieldValueMessageController.fieldValue("approveStatus", "2") : FieldValueMessageController.fieldValue("approveStatus", "3"));
             if(workOrderDetailPojo.getStatementStatus() != null){
                 workOrderDetailMap.put(WebUtil.getMessage("CloseStatus_xlsx"), workOrderDetailPojo.getStatementStatus() == Boolean.TRUE ? WebUtil.getMessage("ClosedFinish") : WebUtil.getMessage("Opened"));
             }else{
