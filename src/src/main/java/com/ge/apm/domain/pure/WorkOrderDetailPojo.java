@@ -39,6 +39,8 @@ public class WorkOrderDetailPojo {
     private Boolean statementStatus;
     //备件类别
     private String partsType;
+    //审核状态
+    private Boolean approved;
 
     public String getId() {
         return id;
@@ -166,5 +168,13 @@ public class WorkOrderDetailPojo {
 
     public void setPartsType(String partsType) {
         this.partsType = partsType;
+    }
+
+    public Boolean getApproved() {
+        return approved;
+    }
+
+    public void setApproved(Boolean approved) {
+        this.approved = approved;
     }
 }

@@ -113,11 +113,11 @@
             </p:panelGrid>
             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup id="status">
-                    <label class="label">备件审核状态</label>
-                    <p:selectManyCheckbox id="approvedStatus" value="#{workOrderDetailExportController.approvedStatus}">
-                        <f:selectItem itemLabel="审核通过" itemValue="1"/>
-                        <f:selectItem itemLabel="审核不通过" itemValue="2"/>
-                        <f:selectItem itemLabel="未审核" itemValue="3"/>
+                    <label class="label">#{msg.approveStatus}</label>
+                    <p:selectManyCheckbox id="approveStatus" value="#{workOrderDetailExportController.approvedStatus}">
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('approveStatus', 2)}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('approveStatus', 3)}" itemValue="2"/>
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('approveStatus', 1)}" itemValue="3"/>
                     </p:selectManyCheckbox>
                 </h:panelGroup>
             </p:panelGrid>
@@ -223,6 +223,14 @@
                 </c:if>
                 <c:if test="#{!userContextService.isLocale()}">
                     <h:outputText value="#{item.Approver}"/>
+                </c:if>
+            </p:column>
+            <p:column headerText="#{msg.ApprovalStatus}">
+                <c:if test="#{userContextService.isLocale()}">
+                <h:outputText value="#{item.审核状态}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.ApprovedStatus}"/>
                 </c:if>
             </p:column>
             <p:column headerText="#{msg.contractNo}">
