@@ -1942,9 +1942,9 @@ public class NurseSiteMaintainService {
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex, assetInfo.getFunctionType());
 					StringBuilder keyName = new StringBuilder();
+					List<String> keyRows = ListUtil.newArrayList(doc.getKeyRow(SHEET_Maintain, keyRow));
 					for (NurseSiteMaintainItem nurseSiteMaintainItem : tempListItem) {
 						mapCheckItemSequence.clear();
-//						List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
 						keyName.delete(0, keyName.length());
 						if (listData != null && !listData.isEmpty()) {
@@ -1969,10 +1969,11 @@ public class NurseSiteMaintainService {
 									keyName.append(",");
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), tempData.getStrValue());
-								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
-								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
-								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), tempData.getCheckItem());
+								keyRows.add(keyName.toString());
+								doc.writeRowData(SHEET_Maintain, keyRows, rowIndex, keyName.toString(), tempData.getStrValue());
+								doc.writeRowData(SHEET_Maintain, keyRows, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
+								doc.writeRowData(SHEET_Maintain, keyRows, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
+								doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), tempData.getCheckItem());
 							}
 							String tempComment = nurseSiteMaintainItem.getComment();
 							keyName.delete(0, keyName.length());
@@ -1985,11 +1986,12 @@ public class NurseSiteMaintainService {
 							keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
 							keyName.append(KEY_COMMENT).append(",");
 							headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
+							keyRows.add(keyName.toString());
 							if (StringUtils.isEmpty(tempComment)) {
 								tempComment = "";
 							}
-							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), tempComment);
-							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), STR_COMMENT);
+							doc.writeRowData(SHEET_Maintain, keyRows, rowIndex, keyName.toString(), tempComment);
+							doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), STR_COMMENT);
 						}
 						List<V2_BlobObject> byBoUuid = blobMap.get(nurseSiteMaintainItem.getId());
 						if (CollectionUtils.isNotEmpty(byBoUuid)) {
@@ -2006,8 +2008,9 @@ public class NurseSiteMaintainService {
 									keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
 									keyName.append("图片").append(x + 1).append(",");
 									headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-									doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName.toString(), "图片" + (x + 1));
-									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRow, rowIndex, keyName.toString(), "");
+									keyRows.add(keyName.toString());
+									doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), "图片" + (x + 1));
+									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRows.toArray(new String[]{}), rowIndex, keyName.toString(), "");
 									if (integers != null) {
 										int x1 = integers[0];
 										int y1 = integers[1];
@@ -2232,7 +2235,7 @@ public class NurseSiteMaintainService {
 
 		return Boolean.TRUE;
 	}
-	
+
 	public void updateNurseSiteMaintainCheckItem(NurseSiteMaintainCheckItem item,String siteUid){
 		List<SearchFilter> searchFilters = new ArrayList<>();
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,siteUid,"1*2+"));
