@@ -542,7 +542,7 @@ public class AssetImportDataCheckService {
         if (!StringUtils.isEmpty(assetImport.getAssetGroupStr())) {
             String value = assetGroup.get(assetImport.getAssetGroupStr());
             if (Objects.isNull(value)) {
-                setErrorMsg(assetImport, "assetGroup", assetImport.getFunctionGroupStr());
+                setErrorMsg(assetImport, "assetGroup", assetImport.getAssetGroupStr());
             } else {
                 assetImport.setAssetGroup(Integer.parseInt(value));
             }
