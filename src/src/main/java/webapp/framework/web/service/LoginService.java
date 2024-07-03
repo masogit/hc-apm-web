@@ -39,7 +39,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
 import webapp.framework.context.WrappedRequest;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
@@ -562,10 +561,16 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             return;
         }
         List<SearchFilter> searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("telephone", SearchFilter.Operator.EQ,telephone));
+        searchFilters.add(new SearchFilter("telephone", SearchFilter.Operator.EQ,telephone,"1*"));
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false,"1*2+"));
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull,null,"1*2+"));
         long count = userAccountDao.count(searchFilters);
         if(count == 0){
             WebUtil.addErrorMessage("手机号码未录入");
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }else if(count > 1){
+            WebUtil.addErrorMessage("此手机号在GE医疗 APM资产智管家对应多个账号，请通过账号密码登录。");
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
