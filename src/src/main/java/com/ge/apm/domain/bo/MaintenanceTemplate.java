@@ -402,6 +402,9 @@ public class MaintenanceTemplate {
         NUMBER("number", Widget.TEXT),
         QR("qr", Widget.TEXT),
         MAKER("maker", Widget.TEXT),
+        INSTALL_DATE("installDate", Widget.TEXT),
+        LOCATION_NAME("locationName", Widget.TEXT),
+        PERIOD("period", Widget.TEXT),
         ;
 
         private final String key;

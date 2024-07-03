@@ -165,7 +165,7 @@ public class WorkOrderDocxRenderService {
                 for (int i = 0; i < size; i++) {
                     String storageId = serviceRequestPicture.get(i);
                     if (storageId !=null){
-                        mapESignSignature(storageId, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
+                        mapESignSignature(storageId, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ",260,260);
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class WorkOrderDocxRenderService {
                 for (int i = 0; i < size; i++) {
                     String storageId = workOrderPicture.get(i);
                     if (storageId !=null){
-                        mapESignSignature(storageId, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ");
+                        mapESignSignature(storageId, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ",260,260);
                     }
                 }
             }
@@ -201,7 +201,7 @@ public class WorkOrderDocxRenderService {
                 for (int i = 0; i < size; i++) {
                     String storageId = partsPicture.get(i);
                     if (storageId !=null){
-                        mapESignSignature(storageId, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ");
+                        mapESignSignature(storageId, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ",260,260);
                     }
                 }
             }
@@ -259,9 +259,12 @@ public class WorkOrderDocxRenderService {
         }
     }
     private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
+        mapESignSignature(storageId,target,key,eSignTitleKey,eSignTitleValue,100,75);
+    }
+    private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue,int width,int height) {
         byte[] blob = getBlobSignature( storageId);
         if (blob != null) {
-            target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
+            target.put(key, new PictureRenderData(width, height, "mock.png", blob));
             target.put(eSignTitleKey, eSignTitleValue);
         } else {
             target.put(key, EMPTY_PICTURE);

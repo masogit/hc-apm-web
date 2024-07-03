@@ -221,6 +221,13 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Device.NUMBER.toString(), pmOrder.getAssetInfo().getDepartNum());
         content.put(MaintenanceTemplate.Device.QR.toString(), pmOrder.getAssetInfo().getQrCode());
         content.put(MaintenanceTemplate.Device.MAKER.toString(), pmOrder.getAssetInfo().getMakerShortName());
+        content.put(MaintenanceTemplate.Device.INSTALL_DATE.toString(), pmOrder.getAssetInfo().getInstallDate() != null ? DEFAULT_DAY.print(pmOrder.getAssetInfo().getInstallDate().getTime()) : "");
+        content.put(MaintenanceTemplate.Device.LOCATION_NAME.toString(), pmOrder.getAssetInfo().getLocationName());
+        String periodUnit = pmOrder.getPeriodUnit();
+        String period = pmOrder.getPeriod() == null ?"":pmOrder.getPeriod().toString();
+        periodUnit =(StringUtils.isEmpty(periodUnit)?"":"y".equalsIgnoreCase(periodUnit)?"年":"m".equalsIgnoreCase(periodUnit)?"月":"w".equalsIgnoreCase(periodUnit)?"周":"d".equalsIgnoreCase(periodUnit)?"日":"");
+        content.put(MaintenanceTemplate.Device.PERIOD.toString(), period + periodUnit);
+
 
         // Maintenance information
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
