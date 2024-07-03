@@ -26,7 +26,7 @@ update approve_schedule apc set tenant_uid=wo.tenant_uid,institution_uid=wo.inst
 
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '验证工单是否执行复检流程', 'verifyPmOrderReExaminationMode', '验证工单是否执行复检流程', 'f','t',3 where not exists(select * from config_item where key = 'verifyPmOrderReExaminationMode');
+select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养工单是否执行复检流程', 'verifyPmOrderReExaminationMode', '保养工单是否执行复检流程', 'f','t',3 where not exists(select * from config_item where key = 'verifyPmOrderReExaminationMode');
 
 
 -- 删除asset_info 表site_uid 外键
