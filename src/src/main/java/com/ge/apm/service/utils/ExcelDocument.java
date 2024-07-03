@@ -681,8 +681,9 @@ public class ExcelDocument implements AutoCloseable{
 
     }
 
+    Map<String, Sheet> sheetMap = new HashMap<>();
     public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
             dataRow = sheet.createRow(rowNum - 1);
