@@ -909,8 +909,8 @@ public class AssetFileImportBaseService {
         } else {
             UserAccount owner = userCache.get(newAsset.getPatrolInspectionOwnerName());
             if (Objects.nonNull(owner)) {
-                newAsset.setClinicalOwnerId(owner.getId());
-                newAsset.setClinicalOwnerTel(owner.getTelephone());
+                newAsset.setPatrolInspectionOwnerUID(owner.getUid());
+                newAsset.setPatrolInspectionOwnerTel(owner.getTelephone());
             } else {
                 userAccounts = userDao.findByTenantUIDAndNameAndValid(tenantUID, newAsset.getPatrolInspectionOwnerName());
                 if (userAccounts.size() != 1) {
