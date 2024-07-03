@@ -122,6 +122,9 @@ public class HisEquipmentDataSourceSplit implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
+    @Column(name = "data_source_count")
+    private int dataSourceCount;//对应
+
     public String getId() {
         return id;
     }
@@ -368,5 +371,13 @@ public class HisEquipmentDataSourceSplit implements Serializable {
 
     public void setSum(Boolean sum) {
         isSum = sum;
+    }
+
+    public int getDataSourceCount() {
+        return dataSourceCount;
+    }
+
+    public void setDataSourceCount(int dataSourceCount) {
+        this.dataSourceCount = dataSourceCount;
     }
 }
