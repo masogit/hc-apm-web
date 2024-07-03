@@ -3784,10 +3784,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
 
     public boolean hasPermissionConfirmReturn(String requestorId){
-        return Objects.equals(requestorId , userContextService.getLoginUserId());
+        return Objects.equals(requestorId , String.valueOf(userContextService.getLoginUserId()));
     }
     public boolean hasPermissionConfirmSend(String currentPersonId){
-        return Objects.equals(currentPersonId , userContextService.getLoginUserId());
+        return Objects.equals(currentPersonId , String.valueOf(userContextService.getLoginUserId()));
     }
 
     public boolean needTwoSubStatus(String woId){
