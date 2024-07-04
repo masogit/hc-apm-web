@@ -1921,6 +1921,7 @@ public class NurseSiteMaintainService {
 			List<V2_BlobObject> v2BlobObjects = blobObjectRepository.fetchListByBoUUIds(ids);
 			Set<String> objectIds = v2BlobObjects.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
 			Map<String, List<V2_BlobObject>> blobMap = v2BlobObjects.stream().collect(Collectors.groupingBy(V2_BlobObject::getBoUuid));
+//			Map<String, List<V2_BlobObject>> blobMap = new HashMap<>();
 			List<FileInfoResult> files = ListUtil.newArrayList();
 			if (ObjectUtil.isNotEmpty(objectIds)) {
 				files = microServiceUtil.getFiles(objectIds);
@@ -1942,7 +1943,6 @@ public class NurseSiteMaintainService {
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex, assetInfo.getFunctionType());
 					StringBuilder keyName = new StringBuilder();
-					List<String> keyRows = ListUtil.newArrayList(doc.getKeyRow(SHEET_Maintain, keyRow));
 					for (NurseSiteMaintainItem nurseSiteMaintainItem : tempListItem) {
 						mapCheckItemSequence.clear();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
@@ -1969,11 +1969,10 @@ public class NurseSiteMaintainService {
 									keyName.append(",");
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-								keyRows.add(keyName.toString());
-								doc.writeRowData(SHEET_Maintain, keyRows, rowIndex, keyName.toString(), tempData.getStrValue());
-								doc.writeRowData(SHEET_Maintain, keyRows, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
-								doc.writeRowData(SHEET_Maintain, keyRows, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
-								doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), tempData.getCheckItem());
+								doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempData.getStrValue());
+								doc.writeRowData(SHEET_Maintain, header, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
+								doc.writeRowData(SHEET_Maintain, header, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
+								doc.writeRowData(SHEET_Maintain, header, checkNameRow, keyName.toString(), tempData.getCheckItem());
 							}
 							String tempComment = nurseSiteMaintainItem.getComment();
 							keyName.delete(0, keyName.length());
@@ -1986,12 +1985,11 @@ public class NurseSiteMaintainService {
 							keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
 							keyName.append(KEY_COMMENT).append(",");
 							headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-							keyRows.add(keyName.toString());
 							if (StringUtils.isEmpty(tempComment)) {
 								tempComment = "";
 							}
-							doc.writeRowData(SHEET_Maintain, keyRows, rowIndex, keyName.toString(), tempComment);
-							doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), STR_COMMENT);
+							doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempComment);
+							doc.writeRowData(SHEET_Maintain, header, checkNameRow, keyName.toString(), STR_COMMENT);
 						}
 						List<V2_BlobObject> byBoUuid = blobMap.get(nurseSiteMaintainItem.getId());
 						if (CollectionUtils.isNotEmpty(byBoUuid)) {
@@ -2008,9 +2006,8 @@ public class NurseSiteMaintainService {
 									keyName.append(nurseSiteMaintainItem.getSequenceName()).append(",");
 									keyName.append("图片").append(x + 1).append(",");
 									headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-									keyRows.add(keyName.toString());
-									doc.writeRowData(SHEET_Maintain, keyRows, checkNameRow, keyName.toString(), "图片" + (x + 1));
-									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRows.toArray(new String[]{}), rowIndex, keyName.toString(), "");
+									doc.writeRowData(SHEET_Maintain, header, checkNameRow, keyName.toString(), "图片" + (x + 1));
+									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, header.toArray(new String[]{}), rowIndex, keyName.toString(), "");
 									if (integers != null) {
 										int x1 = integers[0];
 										int y1 = integers[1];

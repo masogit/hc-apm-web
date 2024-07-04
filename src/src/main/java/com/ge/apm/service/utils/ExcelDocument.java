@@ -611,16 +611,7 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
     public void writeRowData(String sheetName, List<String> rowKey, Integer dataRowNum, String newKey,Object value) {
-        for (int index = 0; index < rowKey.size(); index++) {
-            String key = rowKey.get(index);
-            if (key == null || key.isEmpty()) {
-                continue;
-            }
-            if(key.equals(newKey)){
-            	writeCellData(sheetName, dataRowNum, index + 1, value);
-            	break;
-            }
-        }
+        writeCellData(sheetName, dataRowNum, rowKey.indexOf(newKey) + 1, value);
     }
 
     public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
