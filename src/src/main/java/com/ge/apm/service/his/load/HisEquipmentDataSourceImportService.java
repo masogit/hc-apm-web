@@ -259,6 +259,7 @@ public class HisEquipmentDataSourceImportService {
 //        hisEquipmentDataSource.setCreatedDate(new Date());
         hisEquipmentDataSource.setIsMatched(Boolean.FALSE);
         hisEquipmentDataSource.setRecordCount(0);
+        hisEquipmentDataSource.setCreateDate(new Date());
         hisEquipmentDataSourceRepository.save(hisEquipmentDataSource);
     }
 
