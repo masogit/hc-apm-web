@@ -434,7 +434,7 @@ public class WordReportExportService {
         XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
         dateCell.setText("日期");
         CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
-//        dateWidth.setW(BigInteger.valueOf(1200));
+        dateWidth.setW(BigInteger.valueOf(1200));
         dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
@@ -446,19 +446,23 @@ public class WordReportExportService {
         XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
         userCell.setText("检查者");
         CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
-//        userWidth.setW(BigInteger.valueOf(1000));
+        userWidth.setW(BigInteger.valueOf(1000));
         userWidth.setType(STTblWidth.DXA);
         XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
         remarkCell.setText("备注");
         CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
-//        remarkWidth.setW(BigInteger.valueOf(1500));
+        remarkWidth.setW(BigInteger.valueOf(1500));
         remarkWidth.setType(STTblWidth.DXA);
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "MMdd");
-            tableOneRow.getCell(0).setText(dateStr);//时间
+            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
+            XWPFTableCell dateTempCell = tableOneRow.getCell(0);
+            dateTempCell.setText(dateStr);//时间
+            CTTblWidth dateTempWidth = dateTempCell.getCTTc().addNewTcPr().addNewTcW();
+            dateTempWidth.setW(BigInteger.valueOf(1200));
+            dateTempWidth.setType(STTblWidth.DXA);
             Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
             Map<String, String> itemMap = assetUidMap.get(assetUid);
             for (Object detail : itemDetails) {
@@ -469,19 +473,27 @@ public class WordReportExportService {
                 tableOneRow.addNewTableCell().setText(valText);
             }
             for (int m = 1; m <= 2; m++) {
-                if( m==1){
+                if (m==1) {
                     Map<String, String> map = updateByMapMap.get(date);
                     String updateByUid = map.get(assetUid);
+                    XWPFTableCell userTempCell = tableOneRow.addNewTableCell();
                     if(updateByUid == null){
-                        tableOneRow.addNewTableCell().setText(null);
+                        userTempCell.setText(null);
                     }else {
                         UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
-                        tableOneRow.addNewTableCell().setText(userAccount.getName());
+                        userTempCell.setText(userAccount.getName());
                     }
+                    CTTblWidth userTempWidth = userTempCell.getCTTc().addNewTcPr().addNewTcW();
+                    userTempWidth.setW(BigInteger.valueOf(1000));
+                    userTempWidth.setType(STTblWidth.DXA);
                 } else {
                     Map<String, String> map = commentMapMap.get(date);
                     String comment = map.get(assetUid);
-                    tableOneRow.addNewTableCell().setText(comment);
+                    XWPFTableCell commentTempCell = tableOneRow.addNewTableCell();
+                    commentTempCell.setText(comment);
+                    CTTblWidth commentTempWidth = commentTempCell.getCTTc().addNewTcPr().addNewTcW();
+                    commentTempWidth.setW(BigInteger.valueOf(1500));
+                    commentTempWidth.setType(STTblWidth.DXA);
                 }
             }
 
@@ -497,10 +509,14 @@ public class WordReportExportService {
                 tableCells.get(m).getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);//继续合并
         }
         //第一行居中
-        CTTc ctTc = tableOneRowOne.getCell(0).getCTTc();
+        XWPFTableCell oneRowCell = tableOneRowOne.getCell(0);
+        CTTc ctTc = oneRowCell.getCTTc();
         CTTcPr ctTcPr = ctTc.addNewTcPr();
         ctTcPr.addNewVAlign().setVal(STVerticalJc.CENTER);
         ctTc.getPList().get(0).addNewPPr().addNewJc().setVal(STJc.CENTER);
+        CTTblWidth oneRowWidth = oneRowCell.getCTTc().addNewTcPr().addNewTcW();
+        oneRowWidth.setW(BigInteger.valueOf(11250));
+        oneRowWidth.setType(STTblWidth.DXA);
         //表格宽度
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
