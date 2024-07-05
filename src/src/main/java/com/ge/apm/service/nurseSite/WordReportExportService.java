@@ -434,7 +434,7 @@ public class WordReportExportService {
         XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
         dateCell.setText("日期");
         CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
-        dateWidth.setW(BigInteger.valueOf(1200));
+//        dateWidth.setW(BigInteger.valueOf(1200));
         dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
@@ -446,18 +446,18 @@ public class WordReportExportService {
         XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
         userCell.setText("检查者");
         CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
-        userWidth.setW(BigInteger.valueOf(1000));
+//        userWidth.setW(BigInteger.valueOf(1000));
         userWidth.setType(STTblWidth.DXA);
         XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
         remarkCell.setText("备注");
         CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
-        remarkWidth.setW(BigInteger.valueOf(1500));
+//        remarkWidth.setW(BigInteger.valueOf(1500));
         remarkWidth.setType(STTblWidth.DXA);
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
+            String dateStr = DateFormatUtils.format(date, "MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
             Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
             Map<String, String> itemMap = assetUidMap.get(assetUid);
