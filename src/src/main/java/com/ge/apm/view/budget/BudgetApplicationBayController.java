@@ -619,7 +619,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     private void addAssetSearchFilter() {
         if (null != assetSearchForm.getApplicationAssetCategory()) {
-            updateAssetSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.LIKE, assetSearchForm.getApplicationAssetCategory()));
+            updateAssetSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.EQ, assetSearchForm.getApplicationAssetCategory()));
         }
         if (null != assetSearchForm.getStandards()) {
             updateAssetSearchFilter(new SearchFilter("standards", SearchFilter.Operator.LIKE, assetSearchForm.getStandards()));
