@@ -3,6 +3,7 @@ package com.ge.apm.domain.his;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -104,6 +105,10 @@ public class HisEquipmentDataSource implements Serializable {
 
     @Column(name = "record_count")
     private Integer recordCount;  //记录条数
+
+    @CreatedDate
+    @Column(name = "create_date")
+    private Date createDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({
