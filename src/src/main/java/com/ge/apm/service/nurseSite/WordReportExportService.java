@@ -448,11 +448,7 @@ public class WordReportExportService {
         CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
         userWidth.setW(BigInteger.valueOf(1000));
         userWidth.setType(STTblWidth.DXA);
-        XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
-        remarkCell.setText("备注");
-        CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
-        remarkWidth.setW(BigInteger.valueOf(2100));
-        remarkWidth.setType(STTblWidth.DXA);
+        tableOneRowTwo.addNewTableCell().setText("备注");
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
@@ -489,11 +485,7 @@ public class WordReportExportService {
                 } else {
                     Map<String, String> map = commentMapMap.get(date);
                     String comment = map.get(assetUid);
-                    XWPFTableCell commentTempCell = tableOneRow.addNewTableCell();
-                    commentTempCell.setText(comment);
-                    CTTblWidth commentTempWidth = commentTempCell.getCTTc().addNewTcPr().addNewTcW();
-                    commentTempWidth.setW(BigInteger.valueOf(2100));
-                    commentTempWidth.setType(STTblWidth.DXA);
+                    tableOneRow.addNewTableCell().setText(comment);
                 }
             }
 
