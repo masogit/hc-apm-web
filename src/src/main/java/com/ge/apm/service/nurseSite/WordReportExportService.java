@@ -434,7 +434,7 @@ public class WordReportExportService {
         XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
         dateCell.setText("日期");
         CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
-        dateWidth.setW(BigInteger.valueOf(1200));
+        dateWidth.setW(BigInteger.valueOf(600));
         dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
@@ -451,17 +451,17 @@ public class WordReportExportService {
         XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
         remarkCell.setText("备注");
         CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
-        remarkWidth.setW(BigInteger.valueOf(1500));
+        remarkWidth.setW(BigInteger.valueOf(2100));
         remarkWidth.setType(STTblWidth.DXA);
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
+            String dateStr = DateFormatUtils.format(date, "MM-dd");
             XWPFTableCell dateTempCell = tableOneRow.getCell(0);
             dateTempCell.setText(dateStr);//时间
             CTTblWidth dateTempWidth = dateTempCell.getCTTc().addNewTcPr().addNewTcW();
-            dateTempWidth.setW(BigInteger.valueOf(1200));
+            dateTempWidth.setW(BigInteger.valueOf(600));
             dateTempWidth.setType(STTblWidth.DXA);
             Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
             Map<String, String> itemMap = assetUidMap.get(assetUid);
@@ -492,7 +492,7 @@ public class WordReportExportService {
                     XWPFTableCell commentTempCell = tableOneRow.addNewTableCell();
                     commentTempCell.setText(comment);
                     CTTblWidth commentTempWidth = commentTempCell.getCTTc().addNewTcPr().addNewTcW();
-                    commentTempWidth.setW(BigInteger.valueOf(1500));
+                    commentTempWidth.setW(BigInteger.valueOf(2100));
                     commentTempWidth.setType(STTblWidth.DXA);
                 }
             }
