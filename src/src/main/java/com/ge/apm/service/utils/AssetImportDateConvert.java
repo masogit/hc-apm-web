@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class AssetImportDateConvert implements ApmEasyExcelConvert, Converter<Date> {
 
-    private String[] dateFormatSet = {"yyyy-MM-dd", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yy", "dd/MM/yy"};
+    private String[] dateFormatSet = {"yyyy-MM-dd", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yyyy", "dd/MM/yyyy"};
 
     @Override
     public Class<?> supportJavaTypeKey() {
