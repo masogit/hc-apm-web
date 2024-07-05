@@ -457,7 +457,7 @@ public class WordReportExportService {
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "MM-dd");
+            String dateStr = DateFormatUtils.format(date, "MMdd");
             tableOneRow.getCell(0).setText(dateStr);//时间
             Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
             Map<String, String> itemMap = assetUidMap.get(assetUid);
