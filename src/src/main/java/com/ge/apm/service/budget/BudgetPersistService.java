@@ -72,7 +72,7 @@ public class BudgetPersistService {
                                                      {"申请编号"       ,"申请科室"             ,"病区代码"  ,"申请人登录账号"      ,"申请日期(YYYY/MM/DD)"}}; //主表必填字段名称，和中文名
     //明细必填字段
     private final String[][] ASSET_FIELD_REQUIRE = {{"applicationAssetName","applicationAssetCategory","applicationQuantity","unit","applicationPrice","usedOperatingRoom","offlineApprovalComplete"},
-                                                    {"设备名称"              ,"设备品类"                  ,"数量"                ,"单位" ,"预算单价"         ,"是否在手术室使用"    ,"线下审批是否完成"  }}; //明细必填字段
+                                                    {"设备名称"              ,"设备分类"                  ,"数量"                ,"单位" ,"预算单价"         ,"是否在手术室使用"    ,"线下审批是否完成"  }}; //明细必填字段
 
     //过会信息必填字段
     private final String[][] OFFLINE_APPROVAL_REQUIRE = {{"offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion","offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark"},
@@ -394,7 +394,7 @@ public class BudgetPersistService {
             budgetApplicationMap.put("病区代码",budgetApplication.getWardCode());
             budgetApplicationMap.put("申请科室",budgetApplication.getApplicationDept()==null?"":budgetApplication.getApplicationDept().getName());
             budgetApplicationMap.put("设备名称",budgetApplicationAsset.getApplicationAssetName());
-            budgetApplicationMap.put("设备品类",budgetApplicationAsset.getApplicationAssetCategory());
+            budgetApplicationMap.put("设备分类",StringUtils.isBlank(budgetApplicationAsset.getApplicationAssetCategory())?"":WebUtil.getFieldValueMessage("assetGroup", budgetApplicationAsset.getApplicationAssetCategory()));
             budgetApplicationMap.put("推荐品牌",budgetApplicationAsset.getRecommendedBrand());
             budgetApplicationMap.put("规格",budgetApplicationAsset.getStandards());
             budgetApplicationMap.put("型号",budgetApplicationAsset.getModel());
