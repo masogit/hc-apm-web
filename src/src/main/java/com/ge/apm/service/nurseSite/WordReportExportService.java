@@ -487,9 +487,9 @@ public class WordReportExportService {
                         UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
                         userTempCell.setText(userAccount.getName());
                     }
-                    CTTblWidth userTempWidth = userTempCell.getCTTc().addNewTcPr().addNewTcW();
+//                    CTTblWidth userTempWidth = userTempCell.getCTTc().addNewTcPr().addNewTcW();
 //                    userTempWidth.setW(BigInteger.valueOf(1000));
-                    userTempWidth.setType(STTblWidth.DXA);
+//                    userTempWidth.setType(STTblWidth.DXA);
                 } else {
                     Map<String, String> map = commentMapMap.get(date);
                     String comment = map.get(assetUid);
