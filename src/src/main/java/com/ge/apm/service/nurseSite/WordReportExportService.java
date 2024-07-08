@@ -431,11 +431,12 @@ public class WordReportExportService {
         String assetUid = assetInfo.getUid();
         tableOneRowOne.getCell(0).setText(assetInfo.getName() +"("+assetInfo.getDepartNum()+")"
                 + "-"+ DateFormatUtils.format(dataMap.get(1), "yyyy-MM"));
-        XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
-        dateCell.setText("日期");
-        CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
-        dateWidth.setW(BigInteger.valueOf(600));
-        dateWidth.setType(STTblWidth.DXA);
+        tableOneRowTwo.getCell(0).setText("日期");
+//        XWPFTableCell dateCell = tableOneRowTwo.getCell(0);
+//        dateCell.setText("日期");
+//        CTTblWidth dateWidth = dateCell.getCTTc().addNewTcPr().addNewTcW();
+//        dateWidth.setW(BigInteger.valueOf(600));
+//        dateWidth.setType(STTblWidth.DXA);
         String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
         JSONArray itemDetails = JSON.parseArray(itemDetail);
         int num = itemDetails.size();
@@ -443,26 +444,24 @@ public class WordReportExportService {
             JSONObject jsonObject = (JSONObject) itemDetails.get(m);
             tableOneRowTwo.addNewTableCell().setText(jsonObject.getString("name"));
         }
-        XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
-        userCell.setText("检查者");
-        CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
-        userWidth.setW(BigInteger.valueOf(1000));
-        userWidth.setType(STTblWidth.DXA);
-        XWPFTableCell remarkCell = tableOneRowTwo.addNewTableCell();
-        remarkCell.setText("备注");
-        CTTblWidth remarkWidth = remarkCell.getCTTc().addNewTcPr().addNewTcW();
-        remarkWidth.setW(BigInteger.valueOf(2100));
-        remarkWidth.setType(STTblWidth.DXA);
+        tableOneRowTwo.addNewTableCell().setText("检查者");
+//        XWPFTableCell userCell = tableOneRowTwo.addNewTableCell();
+//        userCell.setText("检查者");
+//        CTTblWidth userWidth = userCell.getCTTc().addNewTcPr().addNewTcW();
+//        userWidth.setW(BigInteger.valueOf(1000));
+//        userWidth.setType(STTblWidth.DXA);
+        tableOneRowTwo.addNewTableCell().setText("备注");
         num = num + 2;
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "MM-dd");
-            XWPFTableCell dateTempCell = tableOneRow.getCell(0);
-            dateTempCell.setText(dateStr);//时间
-            CTTblWidth dateTempWidth = dateTempCell.getCTTc().addNewTcPr().addNewTcW();
-            dateTempWidth.setW(BigInteger.valueOf(600));
-            dateTempWidth.setType(STTblWidth.DXA);
+            String dateStr = DateFormatUtils.format(date, "MMdd");
+            tableOneRow.getCell(0).setText(dateStr);
+//            XWPFTableCell dateTempCell = tableOneRow.getCell(0);
+//            dateTempCell.setText(dateStr);//时间
+//            CTTblWidth dateTempWidth = dateTempCell.getCTTc().addNewTcPr().addNewTcW();
+//            dateTempWidth.setW(BigInteger.valueOf(600));
+//            dateTempWidth.setType(STTblWidth.DXA);
             Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
             Map<String, String> itemMap = assetUidMap.get(assetUid);
             for (Object detail : itemDetails) {
@@ -483,17 +482,13 @@ public class WordReportExportService {
                         UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
                         userTempCell.setText(userAccount.getName());
                     }
-                    CTTblWidth userTempWidth = userTempCell.getCTTc().addNewTcPr().addNewTcW();
-                    userTempWidth.setW(BigInteger.valueOf(1000));
-                    userTempWidth.setType(STTblWidth.DXA);
+//                    CTTblWidth userTempWidth = userTempCell.getCTTc().addNewTcPr().addNewTcW();
+//                    userTempWidth.setW(BigInteger.valueOf(1000));
+//                    userTempWidth.setType(STTblWidth.DXA);
                 } else {
                     Map<String, String> map = commentMapMap.get(date);
                     String comment = map.get(assetUid);
-                    XWPFTableCell commentTempCell = tableOneRow.addNewTableCell();
-                    commentTempCell.setText(comment);
-                    CTTblWidth commentTempWidth = commentTempCell.getCTTc().addNewTcPr().addNewTcW();
-                    commentTempWidth.setW(BigInteger.valueOf(2100));
-                    commentTempWidth.setType(STTblWidth.DXA);
+                    tableOneRow.addNewTableCell().setText(comment);
                 }
             }
 
