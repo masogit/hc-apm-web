@@ -217,6 +217,9 @@ public class LoginController extends LoginService {
                 skipTelephoneValidlogin();
                 String str = userContextService.getUserDefaultHomePage();
                 WebUtil.redirectTo(str);
+            }else if(initialLogin == 4){
+                String str="/portal/login/phoneValid.xhtml";
+                WebUtil.redirectTo(str);
             }
         }
     }
@@ -467,6 +470,7 @@ public class LoginController extends LoginService {
                 user.setLastModifiedBy(user.getLoginName());
                 userAccountDao.save(user);
                 user.setPlainPassword(tempNewPassword);
+                initialLogin = 4;
                 doSpringSecuritylogin(request, response, user);
             }
         }
