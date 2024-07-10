@@ -114,8 +114,14 @@
                         <p:column headerText="推荐设备品牌" filterBy="#{item.assetBrand}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetBrand}"/>
                         </p:column>
-                        <p:column headerText="设备品类" filterBy="#{item.applicationAssetCategory}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.applicationAssetCategory}"/>
+                        <p:column headerText="设备分类" filterBy="#{item.applicationAssetCategory}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.applicationAssetCategory)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('varDataList').filter()"  >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="规格"  filterBy="#{item.standards}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.standards}"/>

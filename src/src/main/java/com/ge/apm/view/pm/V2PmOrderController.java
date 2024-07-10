@@ -589,6 +589,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public boolean batchCancelFlag(){
+        List<V2_PmOrder> pmList =getPmListByselectedId();
+        if (pmList == null) {
+            return false;
+        }
+        Optional<V2_PmOrder> any = pmList.stream().filter(t -> t.getPmType() == 4).findAny();
+        if (any.isPresent()){
+            return true;
+        }
+        return false;
+    }
+
     public boolean batchCancelShow(){
          if(queryIndex==0 || queryIndex==-1){
              if(!userContextService.hasRole("AssetHead"))
