@@ -760,8 +760,9 @@ public class AssetImportDataCheckService {
                 if (Objects.isNull(asset.getIsPm())) {
                     asset.setIsPm(true);
                 }
-                //新增资产默认内修
-                asset.setRepairForm(1);
+                if(Objects.isNull(asset.getRepairFormStr())){
+                    asset.setRepairForm(1);
+                }
                 if (Objects.isNull(asset.getIsChecked())) {
                     asset.setIsChecked(true);
                 }
@@ -820,6 +821,7 @@ public class AssetImportDataCheckService {
             asset.setAssetOwnerId3(null);
             asset.setAssetOwnerTel3(null);
         }
+
         if (asset.getClinicalOwnerName() == null) {
             asset.setClinicalOwnerId(null);
             asset.setClinicalOwnerTel(null);
@@ -861,6 +863,7 @@ public class AssetImportDataCheckService {
         String[] properties = new String[nullProperty.size()];
         return nullProperty.toArray(properties);
     }
+
 
     public void orgCheck(List<Map<String, Object>> importOrgMap) {
         if (!crossSite) {
