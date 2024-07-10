@@ -272,7 +272,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        AssetInfo asset = (AssetInfo) eventObject;
+        List<AssetInfo> asset = (List<AssetInfo>) eventObject;
         if (asset == null) {
             return;
         }
@@ -280,9 +280,20 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         if (this.selected == null) {
             return;
         }
-        this.selected.setBoId(asset.getId());
+        /*this.selected.setBoId(asset.getId());
         this.selected.setBoUuid(asset.getUid());
-        this.selectedAsset = asset;
+        this.selectedAsset = asset;*/
+        List<AssetInfo> addAsset = asset.stream().filter(t -> {
+            boolean r = true;
+            for (AssetInfo a : targetAssets){
+                if(a.getUid().equals(t.getUid())){
+                    r = false;
+                    break;
+                }
+            }
+            return r;
+        }).collect(Collectors.toList());
+        this.targetAssets.addAll(addAsset);
     }
 
     public void onSelectedChange() {
