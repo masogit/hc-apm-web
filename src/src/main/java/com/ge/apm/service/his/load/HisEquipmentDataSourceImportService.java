@@ -267,9 +267,12 @@ public class HisEquipmentDataSourceImportService {
     @Transactional(rollbackFor = Exception.class)
     public void saveDBAndToEs(List<Map<String, Object>> importMapList) {
         List<HisEquipmentDataSource> list = importMapList.stream()
-                .filter(map ->!ImportStatus.CheckFail.name().equals(map.get("status") ) && !ImportStatus.Failure.name().equals(map.get("status") ))
+                .filter(map ->    (map.get("status")==null ) ||            (   !ImportStatus.CheckFail.name().equals(map.get("status").toString()) && !ImportStatus.Failure.name().equals(map.get("status").toString())  ))
                 .map(map -> (HisEquipmentDataSource) map.get("hisEquipmentDataSource"))
                 .collect(Collectors.toCollection(ArrayList::new));
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
         list.stream().forEach(item->{
             item.setIsMatched(Boolean.FALSE);
             item.setRecordCount(0);
