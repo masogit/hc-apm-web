@@ -29,5 +29,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养工单是否执行复检流程', 'verifyPmOrderReExaminationMode', '保养工单是否执行复检流程', 'f','t',3 where not exists(select * from config_item where key = 'verifyPmOrderReExaminationMode');
 
 
--- 删除asset_info 表site_uid 外键
+-- 删除asset_info 表site_uid 外键  hospital_id
 ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fk17q6mwntmk31s9vi7knjeredk;
+ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fk_7c02aj6ayfx4ynsr1wkh7lyd2;
+ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fka50mkcw3uygg5h57jge9gj8tm;
