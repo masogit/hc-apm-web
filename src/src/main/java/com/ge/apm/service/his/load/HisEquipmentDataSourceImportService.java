@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -140,7 +141,7 @@ public class HisEquipmentDataSourceImportService {
             for (Map<String, Object> item : importMapList) {
                 ++row;
                 if(checkData(item, importMapList,orgCodeList,collect,map)) {
-                    importOneHisEquipment(item);
+//                    importOneHisEquipment(item);
                 }
 
             }
@@ -228,7 +229,7 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "HIS数据执行科室代码不能为空");
             isValidateData = false;
         }
-        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode()))){
+        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode())) &&  hisEquipmentDataSource.getExecTime() != null  ){
             List<HisEquipmentDataSource> hisEquipmentDataSources = collect.get(hisEquipmentDataSource.getOrgCode());
             if( hisEquipmentDataSource.getExecTime().before(hisEquipmentDataSources.get(0).getExecTime())){
                 item.put("status", ImportStatus.Failure);
@@ -263,11 +264,19 @@ public class HisEquipmentDataSourceImportService {
         hisEquipmentDataSourceRepository.save(hisEquipmentDataSource);
     }
 
-    public void saveMqToEs(List<Map<String, Object>> importMapList) {
+    @Transactional(rollbackFor = Exception.class)
+    public void saveDBAndToEs(List<Map<String, Object>> importMapList) {
         List<HisEquipmentDataSource> list = importMapList.stream()
                 .filter(map ->!ImportStatus.CheckFail.name().equals(map.get("status") ) && !ImportStatus.Failure.name().equals(map.get("status") ))
                 .map(map -> (HisEquipmentDataSource) map.get("hisEquipmentDataSource"))
                 .collect(Collectors.toCollection(ArrayList::new));
+        list.stream().forEach(item->{
+            item.setIsMatched(Boolean.FALSE);
+            item.setRecordCount(0);
+            item.setCreateDate(new Date());
+        });
+        hisEquipmentDataSourceRepository.save(list);
+
         int batchSize = 1000;
         List<List<HisEquipmentDataSource>> splitLists = new ArrayList<>();
         for (int i = 0; i < list.size(); i += batchSize) {

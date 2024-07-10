@@ -35,14 +35,16 @@
                                      requiredMessage="#{msg.EquipmentModel}#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">设备规格  <span style="color: red">*</span></p:outputLabel>
+                        <p:outputLabel class="label">设备规格<span style="color: red">*</span></p:outputLabel>
                         <p:inputText value="#{budgetController.selectedAsset.standards}" required="true"
                                      requiredMessage="设备规格#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetController.selectedAsset.applicationAssetCategory}" required="true"
-                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>
+                        <p:outputLabel class="label">设备分类<span style="color: red">*</span></p:outputLabel>
+                        <p:selectOneMenu  id="assetGroup" value="#{budgetController.selectedAsset.applicationAssetCategory}" required="true"  requiredMessage="设备分类#{msg.Blank}#{msg.ValidationRequire}"  >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
 
