@@ -254,7 +254,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
             importMapList = hisEquipmentDataSourceImportService.getMapFromTemplate(doc);
             hisEquipmentDataSourceImportService.importData(importMapList);
             errorList = hisEquipmentDataSourceImportService.filterErrorRecords(importMapList);
-            hisEquipmentDataSourceImportService.saveMqToEs(importMapList);
+            hisEquipmentDataSourceImportService.saveDBAndToEs(importMapList);
             if(errorList.size()<importMapList.size()){
                 ExcelImportRecord excelImportRecord = new ExcelImportRecord();
                 UserAccount user = UserContextService.getCurrentUserAccount();
