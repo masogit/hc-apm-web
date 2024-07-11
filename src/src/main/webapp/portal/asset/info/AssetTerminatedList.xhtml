@@ -700,7 +700,7 @@
                     </c:if>
                 </c:forEach>
 
-                <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}" filterBy="#{item.terminateDate}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}" filterBy="#{item.terminateDate}" filterMatchMode="GTE">
                     <f:facet name="filter">
                         <p:inputText id="filterTerminateDate" widgetVar="varFilterTerminateDate" value="#{assetInfoTerminatedListController.selectedObject['terminateDateFormatTime']}"/>
                     </f:facet>
@@ -754,85 +754,7 @@
             <p:remoteCommand name="rc" update=":woTab:AssetInfoListForm:datalist" immediate="true"/>
         </h:form>
 
-        <p:overlayPanel  widgetVar="panelFilterTerminateDate" for="woTab:AssetInfoListForm:datalist:filterTerminateDate" dismissable="false">
-            <h:panelGrid columns="2">
-                <p:outputLabel for="cal1" />
-                <p:calendar id="cal1" widgetVar="varFilterTerminateDateFrom" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
-                <p:outputLabel for="cal2"/>
-                <p:calendar id="cal2" widgetVar="varFilterTerminateDateTo" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
-            </h:panelGrid>
-            <p:commandButton onclick="PF('panelFilterTerminateDate').hide();setDateFilter('varDataList', 'varFilterTerminateDate', 'varFilterTerminateDateFrom', 'varFilterTerminateDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterTerminateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel  widgetVar="panelFilterCreatedDate" for="woTab:AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoTerminatedListController.isShowColumn('createdDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel for="calCreatedDate" />
-                <p:calendar id="calCreatedDate" widgetVar="varCreatedDateFrom" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
-                <p:outputLabel for="calCreatedDate2"/>
-                <p:calendar id="calCreatedDate2" widgetVar="varCreatedDateTo" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
-            </h:panelGrid>
-            <p:commandButton onclick="PF('panelFilterCreatedDate').hide();setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel widgetVar="panelFilterFactoryWarrantyDate" for="woTab:AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false" rendered="#{assetInfoTerminatedListController.isShowColumn('factoryWarrantyDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-        <p:overlayPanel id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for="woTab:AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('warrantyDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for="woTab:AssetInfoListForm:datalist:filterManufactDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('manufactDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for="woTab:AssetInfoListForm:datalist:filterInstallDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('installDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for="woTab:AssetInfoListForm:datalist:filterArriveDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('arriveDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
+        <ui:include src="assetDateFilter.xhtml"/>
     </div>
 </ui:composition>
 </html>
