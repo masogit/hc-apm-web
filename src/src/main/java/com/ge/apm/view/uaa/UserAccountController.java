@@ -1770,7 +1770,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = userAccountExportService.exportData(doc, data);
             if (exportFlag) {
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "UserAccount.xlsx");
+                InputStream streamWorkBook = doc.getStream();
+                streamWorkBook = userAccountExportService.processorTemplateFile(streamWorkBook);
+                exportFile = new DefaultStreamedContent(streamWorkBook, "application/vnd.ms-excel", "UserAccount.xlsx");
             }
         } catch (IOException ex) {
             logger.error(ex.getMessage());
