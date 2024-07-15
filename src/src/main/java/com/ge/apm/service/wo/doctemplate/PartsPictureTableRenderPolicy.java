@@ -154,7 +154,7 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
             XWPFParagraph paragraph = xwpfTableCell.getParagraphs().get(0);;
             XWPFRun run = paragraph.createRun();
             paragraph.setAlignment(ParagraphAlignment.CENTER);
-            run.addPicture(picture, XWPFDocument.PICTURE_TYPE_PNG, "banner.png", Units.toEMU(150), Units.toEMU(150));
+            run.addPicture(picture, XWPFDocument.PICTURE_TYPE_PNG, "banner.png", Units.toEMU(200), Units.toEMU(200));
         } catch (InvalidFormatException | IOException e) {
             e.printStackTrace();
         }
