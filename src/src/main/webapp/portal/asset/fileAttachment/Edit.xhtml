@@ -97,8 +97,15 @@
 
                     <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0"
                              rendered="#{'vlink' ne assetFileAttachmentController.selected.boSubType}">
-                        <h:panelGroup
-                                rendered="#{assetFileAttachmentController.isCreatAction() and assetFileAttachmentController.selected.objectName==null}">
+                        <h:panelGroup rendered="#{assetFileAttachmentController.isCreatAction()}">
+
+                            <p:dataList id="objectImages" value="#{assetFileAttachmentController.batchBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">附件</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
+                                <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="objectImages" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/"
                                           fileUploadListener="#{assetFileAttachmentController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
@@ -106,7 +113,9 @@
                                           update=":AssetFileAttachmentEditForm:upload" auto="true"
                                           invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                         </h:panelGroup>
-                        <h:panelGroup id="namepanel"
+
+
+                       <!-- <h:panelGroup id="namepanel"
                                       rendered="#{assetFileAttachmentController.selected.objectName!=null}">
                             <label class="label">#{msg.name}*</label>
                             <p:inputText id="name" value="#{assetFileAttachmentController.selected.objectName}"
@@ -119,7 +128,7 @@
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"
                                            icon="ui-icon-warning"/>
                             </p:commandButton>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                     </p:panel>
                     <p:panel id="vlinkPanel" styleClass="ui-panelgrid-blank" style=" border: 0"
                              rendered="#{'vlink' eq assetFileAttachmentController.selected.boSubType}">
