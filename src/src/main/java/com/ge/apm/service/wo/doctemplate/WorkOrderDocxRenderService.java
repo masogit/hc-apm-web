@@ -118,7 +118,7 @@ public class WorkOrderDocxRenderService {
             template.registerPolicy  ("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
-            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService));
+            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();
