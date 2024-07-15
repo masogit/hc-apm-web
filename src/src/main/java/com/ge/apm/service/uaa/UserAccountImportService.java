@@ -68,6 +68,7 @@ public class UserAccountImportService {
 
     private static final String ROLE_GUEST = "仅报修权限账号";
     private static Map<String, SysRole> sysRoleMap;
+    private static Map<String, CustomRole> customRoleMap;
     private Map<String, OrgInfo> mapOrgInfo = new HashMap<>();
     private Map<String, OrgInfo> mapUidOrgInfo = new HashMap<>();
     private Map<String, TenantInfo> mapUidTenantInfo = new HashMap<>();
@@ -121,6 +122,9 @@ public class UserAccountImportService {
 
     @Autowired
     UserAssetGroupRepository userAssetGroupDao;
+
+    @Autowired
+    CustomRoleRepository customRoleRepository;
 
     EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -515,6 +519,13 @@ public class UserAccountImportService {
                     newRole.setUserId(user.getId());
                     newRole.setRole(sysRole);
                     listRole.add(newRole);
+                } else if(customRoleMap.containsKey(tempRoleName)){
+                    CustomRole customRole = customRoleMap.get(tempRoleName);
+                    UserRole newRole = new UserRole();
+                    newRole.setRoleId(customRole.getId());
+                    newRole.setUserId(user.getId());
+                    newRole.setRoleType(1);
+                    listRole.add(newRole);
                 } else {
                     user.setStatusDisplay(UploadFileErrorTypeEnum.ROLE_NOT_EXISTS, "角色不存在;");
                     return false;
@@ -563,6 +574,16 @@ public class UserAccountImportService {
             }
         }
         return sysRoleMap;
+    }
+    private Map<String, CustomRole> getCustomRoleNameMap() {
+        if (customRoleMap != null) {
+            return customRoleMap;
+        }
+        customRoleMap = new HashMap<>();
+        List<CustomRole> customRoles = customRoleRepository.findByTenantUID(currentUser.getTenantUID());
+        if (CollectionUtils.isEmpty(customRoles)) return customRoleMap;
+        customRoleMap = customRoles.stream().collect(Collectors.toMap(CustomRole::getName,item->item));
+        return customRoleMap;
     }
 
     private boolean addUserAccessScope(UserAccount user, OrgInfo tempOrgInfo, boolean showError) {
@@ -858,6 +879,7 @@ public class UserAccountImportService {
         initParam();
         getRoleNameMap();
         currentUser = user;
+        getCustomRoleNameMap();
         affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Collections.singletonList(currentUser.getOrgInfoUID()));
         affiliatedDepartmentsUid=affiliatedDepartments.stream().map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
