@@ -11,12 +11,17 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -137,6 +142,9 @@ public class UserAccountExportService {
 		String userRoleNames = tempUser.getUserRoleNames();
 		if(StringUtils.isEmpty(userRoleNames)){
 			userRoleNames = "";
+		}
+		if(userCustomList == null){
+			return userRoleNames;
 		}
 	    List<UserRole> userRoleList = userCustomList.get(tempUser.getId());
 		if(CollectionUtils.isNotEmpty(userRoleList)){
@@ -295,5 +303,35 @@ public class UserAccountExportService {
 		}
 
 		return null;
+	}
+	public InputStream processorTemplateFile(InputStream inputStream)  {
+		return getCustomRole(inputStream);
+	}
+
+	private InputStream getCustomRole(InputStream inputStream) {
+		UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+		String tenantUID = currentUserAccount.getTenantUID();
+		List<CustomRole> customRoles = customRoleRepository.findByTenantUID(tenantUID);
+		if(org.springframework.util.CollectionUtils.isEmpty(customRoles)){
+			return inputStream;
+		}
+		try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)){
+//			String lastRow="资产分类非必填(租户开启资产分类值为资产分类的编码例如    ：01-01,01-02多项用,号分割 )";
+			XSSFSheet explanation = workbook.getSheetAt(1);
+			int lastRowNum = explanation.getLastRowNum();
+			XSSFCellStyle cellStyle = explanation.getRow(lastRowNum-1).getCell(0).getCellStyle();
+			for (int i = 0; i < customRoles.size(); i++) {
+				XSSFRow row = explanation.createRow(lastRowNum + i);
+				XSSFCell cell = row.createCell(0);
+				cell.setCellValue(customRoles.get(i).getName());
+				cell.setCellStyle(cellStyle);
+			}
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			workbook.write(outputStream);
+			return new ByteArrayInputStream(outputStream.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return inputStream;
+		}
 	}
 }
