@@ -217,7 +217,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=9")
     List<UserAccount> findByTenantUIDAndTempStaffRole(String tenantUID);
 
-    List<UserAccount> findByUidIn(List<String> userListUid);
+    List<UserAccount> findByUidIn(Collection<String> userListUid);
 
     int deleteUserAccountsByTenantUID(String tenantUid);
     int countUserAccountsByTenantUID(String tenantUid);

@@ -1,224 +1,221 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
-                template="/WEB-INF/template.xhtml">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition>
+            <h:panelGrid columns="2" rendered="#{userContextService.enableMaterialsInterface()}" style="margin-bottom: 0px;">
+                <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="待验收的到货单合同号："></h:outputText>
+                <p:inputTextarea value="#{assetArrivedItemsController.mergeContractNum}" rows="1" cols="50" readonly="true" placeholder="#{empty assetArrivedItemsController.mergeContractNum?'没有待验收合同记录':''}"></p:inputTextarea>
+            </h:panelGrid>
+            <h:form id="AssetArrivalItemListForm">
+                <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{assetArrivedItemsController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
 
-    <ui:define name="content">
-        <div class="ui-g">
-            <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.AssetArrivalListItemMgmt}"/>
-            </div>
+                    <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update="arrivalItemsTab:ItemViewForm arrivalItemsTab:ItemDetailViewForm editCompletedArrivedList"/>
+                    <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
+                    <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.arrivalList.name}"/>
+                    </p:column>
 
-            <div class="ui-g-12 card">
-                <h:panelGrid columns="2" rendered="#{userContextService.enableMaterialsInterface()}" style="margin-bottom: 0px;">
-                    <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="待验收的到货单合同号："></h:outputText>
-                    <p:inputTextarea value="#{assetArrivedItemsController.mergeContractNum}" rows="1" cols="50" readonly="true" placeholder="#{empty assetArrivedItemsController.mergeContractNum?'没有待验收合同记录':''}"></p:inputTextarea>
-                </h:panelGrid>
-                <h:form id="AssetArrivalItemListForm">
-                    <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{assetArrivedItemsController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
-
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm editCompletedArrivedList"/>
-                        <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
-                        <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.name}"/>
-                        </p:column>
-                        
-                        <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.contractNum}"/>
-                        </p:column>
-                        <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.activeSupplier()}">
-                            <h:outputText value="#{item.arrivalList.approvalNo}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.assetName}"/>
-                        </p:column>
-
-                        <p:column headerText="#{msg.clinicalDeptName}" exportable="false">
-                            <f:facet name="header"  >
-                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:inputText id="clinicalDept"  value="#{assetArrivedItemsController.fileterDeptOrg.name}"  readonly="true"/>
-                            </f:facet>
-                            <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" visible="false" exportable="true">
-                            <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.creator.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.arrivalList.agent}" filterBy="#{item.arrivalList.agent}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.agent}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.arrivalList.arrivalDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{msg.AssetArrivalListBusinessAckDate}" sortBy="#{item.businessAckDate}" filterBy="#{item.businessAckDate}" filterMatchMode="GTE">
-                            <f:facet name="filter">
-                                <p:inputText id="filterBusinessAckDate" widgetVar="varFilterBusinessAckDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.businessAckDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                            </h:outputText>
-                        </p:column>
-                        <c:choose>
-                            <c:when test="#{userContextService.activeSupplier()}">
-                                <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.functionType}"/>
-                                </p:column>
-                            </c:when>
-                            <c:otherwise>
-                                <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.arrivalList.functionType}"/>
-                                </p:column>
-                            </c:otherwise>
-                        </c:choose>
-                        <p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.financingNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.status}" filterBy="#{item.installStatus}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetArrivedItemsController.getInstallStatusList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.ArrivalProcessType}" sortBy="#{item.arrivalList.processType}" filterBy="#{item.arrivalList.processType}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.arrivalList.processType)}"/>
-                        </p:column>
-                        <p:column headerText="操作" exportable="false">
-                            
-                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier() and userContextService.accessContainsFunctionMenu('INSTALL_STORE_EDIT')}"  update=":AssetArrivalItemListForm:datalist" >接单
-                                <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
-                            </p:commandLink>
-                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
-                                <p:confirm header="接单" message="注意：同合同号、同科室的会默认全部接单!" icon="ui-icon-warning"/>
-                            </p:commandLink>
-                            <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
-                            </p:commandLink >
-                        </p:column>
-						<p:column headerText="#{msg.manufacture}" visible="false" exportable="true">
-                            <h:outputText value="#{item.arrivalList.manufacture}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.vendor}" visible="false" exportable="true">
-                            <h:outputText value="#{item.arrivalList.vendor}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
-                            <h:outputText value="#{item.serialNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.purchaseDate}" visible="false" exportable="true">
-                            <h:outputText value="#{item.purchaseDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{msg.arrivalListAgent}" visible="false" exportable="true">
-                            <h:outputText value="#{item.arrivalList.agent}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.currentPersonUID}" visible="false" exportable="true">
-                            <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.currentPersonUID).name}"/>
-                        </p:column>
-                        <p:column headerText="安装工时" visible="false" exportable="true">
-                            <h:outputText value="#{item.workHours}"/>
-                        </p:column>
-                        <f:facet name="{Toolbar}">
-                            <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                            <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                            <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.enableMaterialsInterface()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
-                            </p:commandButton>
+                    <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.arrivalList.contractNum}"/>
+                    </p:column>
+                    <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.activeSupplier()}">
+                        <h:outputText value="#{item.arrivalList.approvalNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.arrivalList.assetName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.clinicalDeptName}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{assetArrivedItemsController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetArrivedItemsController.autoCompleteDeptName}" size="5">
+                                <p:ajax event="itemSelect" listener="#{assetArrivedItemsController.onClinicalDeptNameFilterChange}" process="@this"  update="arrivalItemsTab:AssetArrivalItemListForm:datalist"/>
+                                <p:ajax process="@this" listener="#{assetArrivedItemsController.onClinicalDeptNameFilterChange}" update="arrivalItemsTab:AssetArrivalItemListForm:datalist"/>
+                            </p:autoComplete>
                         </f:facet>
-                    </p:dataTable>
+                        <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.arrivalList.creator.name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.arrivalList.agent}" filterBy="#{item.arrivalList.agent}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.arrivalList.agent}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
+                        <f:facet name="filter">
+                            <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.arrivalList.arrivalDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.AssetArrivalListBusinessAckDate}" sortBy="#{item.businessAckDate}" filterBy="#{item.businessAckDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterBusinessAckDate" widgetVar="varFilterBusinessAckDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.businessAckDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <c:choose>
+                        <c:when test="#{userContextService.activeSupplier()}">
+                            <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.functionType}"/>
+                            </p:column>
+                        </c:when>
+                        <c:otherwise>
+                            <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.arrivalList.functionType}"/>
+                            </p:column>
+                        </c:otherwise>
+                    </c:choose>
+                    <p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.financingNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.status}" filterBy="#{item.installStatus}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetArrivedItemsController.getInstallStatusList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.ArrivalProcessType}" sortBy="#{item.arrivalList.processType}" filterBy="#{item.arrivalList.processType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.arrivalList.processType)}"/>
+                    </p:column>
+                    <p:column headerText="操作" exportable="false">
+
+                        <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier() and userContextService.accessContainsFunctionMenu('INSTALL_STORE_EDIT')}"  update="arrivalItemsTab:AssetArrivalItemListForm:datalist" >接单
+                            <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
+                        </p:commandLink>
+                        <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="arrivalItemsTab:AssetArrivalItemListForm:datalist" >接单
+                            <p:confirm header="接单" message="注意：同合同号、同科室的会默认全部接单!" icon="ui-icon-warning"/>
+                        </p:commandLink>
+                        <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
+                        </p:commandLink >
+                    </p:column>
+                    <p:column headerText="#{msg.manufacture}" visible="false" exportable="true">
+                        <h:outputText value="#{item.arrivalList.manufacture}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.vendor}" visible="false" exportable="true">
+                        <h:outputText value="#{item.arrivalList.vendor}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
+                        <h:outputText value="#{item.serialNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.purchaseDate}" visible="false" exportable="true">
+                        <h:outputText value="#{item.purchaseDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.currentPersonUID}" visible="false" exportable="true">
+                        <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.currentPersonUID).name}"/>
+                    </p:column>
+                    <p:column headerText="安装工时" visible="false" exportable="true">
+                        <h:outputText value="#{item.workHours}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.arrivalListItemNum}" visible="false" exportable="true">
+                        <h:outputText value="#{item.itemNum}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
+                        <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
+                        <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.enableMaterialsInterface()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}1" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetArrivedItemsController.exportExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{assetArrivedItemsController.excelFile}" />
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="ItemView.xhtml"/>
+            <ui:include src="ItemDetailView.xhtml"/>
+            <p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TransferOrder}">
+                <h:form id="transferOrderDialogForm" >
+                    <h:panelGroup id="display2" rendered="#{not empty assetArrivedItemsController.selectedItem}">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.WorkOrderAssignee}</label>
+                                <p:selectOneMenu  value="#{assetArrivedItemsController.selectedItem.currentPersonUID}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{assetArrivedItemsController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <br/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{assetArrivedItemsController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update="arrivalItemsTab:transferOrderDialogForm :growl arrivalItemsTab:AssetArrivalItemListForm:datalist arrivalItemsTab:ItemViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetArrivedItemsController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
+                    </h:panelGroup>
                 </h:form>
-                <ui:include src="ItemView.xhtml"/>
-                <ui:include src="ItemDetailView.xhtml"/>
-                <p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TransferOrder}">
-                    <h:form id="transferOrderDialogForm" >
-                        <h:panelGroup id="display2" rendered="#{not empty assetArrivedItemsController.selectedItem}">
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.WorkOrderAssignee}</label>
-                                    <p:selectOneMenu  value="#{assetArrivedItemsController.selectedItem.currentPersonUID}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
-                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                        <f:selectItems value="#{assetArrivedItemsController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                    </p:selectOneMenu>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                            <br/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{assetArrivedItemsController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update=":transferOrderDialogForm :growl :AssetArrivalItemListForm:datalist ItemViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
-                            <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetArrivedItemsController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
-                        </h:panelGroup>
-                    </h:form>
-                </p:dialog>
-                <p:dialog id="editCompletedArrivedListDlg" height="60%" width="70%" widgetVar="editCompletedArrivedListDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="修改安装入库信息" closable="false">
-                    <h:form id="editCompletedArrivedListForm">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
-                                    <p:inputText value="#{assetArrivedItemsController.selected.arrivalList.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">品牌</label>
-                                    <p:inputText value="#{assetArrivedItemsController.selected.brand}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.functionType}</label>
-                                    <p:inputText value="#{assetArrivedItemsController.selected.functionType}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.importEquipment}</label>
-                                    <p:selectOneMenu id="importEquipment" value="#{assetArrivedItemsController.selected.importEquipment}">
-                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    </p:selectOneMenu>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">质保时间（月）</label>
-                                    <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedItemsController.selected.warrantyMonth}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">年保养次数</label>
-                                    <p:inputText value="#{assetArrivedItemsController.selected.annualMaintenanceTimes}"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.serialNum}</label>
-                                    <p:inputText value="#{assetArrivedItemsController.selected.serialNum}" id="serialNum"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.locationName}</label>
-                                    <p:inputText id="locationName" value="#{assetArrivedItemsController.selected.locationName}"></p:inputText>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                            <p:commandButton validateClient="true" action="#{assetArrivedItemsController.saveCompletedArrivedList}" value="#{msg.Save}" update=":AssetArrivalItemListForm:datalist :growl" icon="ui-icon-check"/>
-                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('editCompletedArrivedListDlg').hide()"/>
-                    </h:form>
-                </p:dialog>
-            </div>
-        </div>
-        <p:overlayPanel id="idPanelFilterArrivalDate" widgetVar="panelFilterArrivalDate" for=":AssetArrivalItemListForm:datalist:filterArrivalDate" dismissable="false">
+            </p:dialog>
+            <p:dialog id="editCompletedArrivedListDlg" height="60%" width="70%" widgetVar="editCompletedArrivedListDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="修改安装入库信息" closable="false">
+                <h:form id="editCompletedArrivedListForm">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetArrivedItemsController.selected.arrivalList.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">品牌</label>
+                                <p:inputText value="#{assetArrivedItemsController.selected.brand}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.functionType}</label>
+                                <p:inputText value="#{assetArrivedItemsController.selected.functionType}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.importEquipment}</label>
+                                <p:selectOneMenu id="importEquipment" value="#{assetArrivedItemsController.selected.importEquipment}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">质保时间（月）</label>
+                                <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedItemsController.selected.warrantyMonth}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">年保养次数</label>
+                                <p:inputText value="#{assetArrivedItemsController.selected.annualMaintenanceTimes}"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.serialNum}</label>
+                                <p:inputText value="#{assetArrivedItemsController.selected.serialNum}" id="serialNum"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.locationName}</label>
+                                <p:inputText id="locationName" value="#{assetArrivedItemsController.selected.locationName}"></p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton validateClient="true" action="#{assetArrivedItemsController.saveCompletedArrivedList}" value="#{msg.Save}" update="arrivalItemsTab:AssetArrivalItemListForm:datalist :growl" icon="ui-icon-check"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('editCompletedArrivedListDlg').hide()"/>
+                </h:form>
+            </p:dialog>
+        <p:overlayPanel id="idPanelFilterArrivalDate" widgetVar="panelFilterArrivalDate" for="arrivalItemsTab:AssetArrivalItemListForm:datalist:filterArrivalDate" dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
@@ -229,7 +226,7 @@
             <p:commandButton onclick="PF('panelFilterArrivalDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
-        <p:overlayPanel id="idPanelFilterBusinessAckDate" widgetVar="panelFilterBusinessAckDate" for=":AssetArrivalItemListForm:datalist:filterBusinessAckDate" dismissable="false">
+        <p:overlayPanel id="idPanelFilterBusinessAckDate" widgetVar="panelFilterBusinessAckDate" for="arrivalItemsTab:AssetArrivalItemListForm:datalist:filterBusinessAckDate" dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
@@ -239,19 +236,5 @@
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterBusinessAckDate', 'varArrivalDateFrom2', 'varArrivalDateTo2'); PF('panelFilterBusinessAckDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterBusinessAckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
-
-        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetArrivalItemListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
-            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(userContextService.loginUser.siteUID)}"  var="node" selectionMode="single" dynamic="false">
-                    <p:ajax process="@this" event="select"  listener="#{assetArrivedItemsController.onClinicalDeptFilter}" update=":AssetArrivalItemListForm:datalist :idVarPanelDeptOrg" oncomplete="PF('varPanelDeptOrg').hide();"/>
-                    <p:ajax process="@this" event="expand"/>
-                    <p:ajax process="@this" event="collapse"/>
-                    <p:treeNode type="org">
-                        <h:outputText value="#{node.shortName}"/>
-                    </p:treeNode>
-					<p:treeNode type="hidden" rendered="false"/>
-                </p:tree>
-            </p:scrollPanel>
-        </p:overlayPanel>
-    </ui:define>
-</ui:composition>
+    </ui:composition>
+</html>
