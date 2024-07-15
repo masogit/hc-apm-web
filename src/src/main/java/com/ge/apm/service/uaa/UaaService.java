@@ -221,7 +221,7 @@ public class UaaService {
                 }
             }
             if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
-                continue;
+                srVO.setDisable(true);
             }
             sysRoleList.add(srVO);
         }

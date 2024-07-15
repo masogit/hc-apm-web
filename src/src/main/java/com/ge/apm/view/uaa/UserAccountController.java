@@ -455,13 +455,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             getSubOrgInfo(uid,child);
             searchFilterList.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, child));
         }
-        if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
-            List<String> customRolesUser = customRoleRepository.findCustomRolesUser(loginUser.getTenantUID());
-            if(CollectionUtils.isEmpty(customRolesUser)){
-                customRolesUser.add("-1");
-            }
-            searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN,customRolesUser));
-        }
+//        if(!UserContextService.checkRole(ApmSystemRole.ITAdmin.name())){
+//            List<String> customRolesUser = customRoleRepository.findCustomRolesUser(loginUser.getTenantUID());
+//            if(CollectionUtils.isEmpty(customRolesUser)){
+//                customRolesUser.add("-1");
+//            }
+//            searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN,customRolesUser));
+//        }
     }
     private void getSubOrgInfo(String uid,Set<String> result){
         result.add(uid);
