@@ -94,8 +94,9 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         if (currentUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
-        this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
-        return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
+        this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag, false));
+
+        return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag, false);
     }
 
     public void onRowSelect(SelectEvent event) {
@@ -255,7 +256,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     public List<AssetOperationRecord> getAssetOperationRecordList(String assetUid){
         searchFilters = new HashSet<>();
         searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetUid, "1*2+"));
-        List<AssetOperationRecord> list = dao.getAll(searchFilters, "createDate", false, 1000, 0, false);
+        List<AssetOperationRecord> list = dao.getAll(searchFilters, "createDate", false, 1000, 0, false, true);
         searchFilters.clear();
         return list;
     }
