@@ -103,6 +103,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_man_hour", WebUtil.getMessage("MaintenanceEngineerManhours_xlsx"));
 
         COPY_KEY_MAPPING.put("part_table", "PartInformation");
+        COPY_KEY_MAPPING.put("parts_picture_table", "parts_picture_table");
         //COPY_KEY_MAPPING.put("proceed_table", "维修流程");
     }
 
@@ -117,6 +118,7 @@ public class WorkOrderDocxRenderService {
             template.registerPolicy  ("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
+            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService));
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();

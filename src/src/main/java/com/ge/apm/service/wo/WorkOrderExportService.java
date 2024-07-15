@@ -9,6 +9,7 @@ import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.wo.doctemplate.PartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -456,15 +457,34 @@ public class WorkOrderExportService {
                 serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
                 pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
-                Set<String> ids = workOrderDetailDao.findByWoId(woid).stream().map(p -> p.getId()).collect(Collectors.toSet());
-                if (!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
+                List<V2_WorkOrder_Detail> byWoId = workOrderDetailDao.findByWoId(woid);
+                Set<String> ids = byWoId.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                List<V2_BlobObject> partPictures = null;
+                if (!ids.isEmpty()) {
+                    partPictures = blobObjectRepository.getPartPictures(ids);
+                    partsPicture.addAll(partPictures);
+                };
                 m.put("serviceRequestPicture", serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
                 m.put("workOrderPicture", workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
                 m.put("partsPicture", partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("parts_picture_table", getPartsPictureTable(byWoId,partPictures));
             }
         });
 
         return workOrderdata;
+    }
+    private List<PartsPictureTableRenderPolicy.PartsPictureTable> getPartsPictureTable(List<V2_WorkOrder_Detail> workOrderDetails,
+                                                                                       List<V2_BlobObject> blobObjects){
+        if(CollectionUtils.isEmpty(workOrderDetails) || CollectionUtils.isEmpty(blobObjects)){
+            return null;
+        }
+       return workOrderDetails.stream().map(item->{
+            List<String> collect = blobObjects.stream().filter(blob -> blob.getBoUuid().equals(item.getId())).map(V2_BlobObject::getObjectStorageId).collect(Collectors.toList());
+            PartsPictureTableRenderPolicy.PartsPictureTable partsPictureTable = new PartsPictureTableRenderPolicy.PartsPictureTable();
+            partsPictureTable.setPartsName(item.getParts());
+            partsPictureTable.setObjectId(collect);
+            return partsPictureTable;
+        }).collect(Collectors.toList());
     }
 
     /*
