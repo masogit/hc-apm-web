@@ -139,7 +139,7 @@
                     <f:facet name="{Toolbar}">
                         <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                         <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                        <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.enableMaterialsInterface()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
+                        <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.enableMaterialsInterface()}" update="arrivalItemsTab:editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                         </p:commandButton>
