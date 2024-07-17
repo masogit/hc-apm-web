@@ -18,7 +18,7 @@
                     <p:tab title="#{msg.Search}" id="showList">
                         <ui:include src="List.xhtml"/>
                     </p:tab>
-                    <p:tab title="#{msg.Import}" id="userAccountImport">
+                    <p:tab title="#{msg.Import}" id="userAccountImport" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin')}">
                         <ui:include src="ListImport.xhtml"/>
                     </p:tab>
                     <p:tab title="注销" id="tenantDestroy" rendered="#{userAccountController.enableDestroyTenant()}">
