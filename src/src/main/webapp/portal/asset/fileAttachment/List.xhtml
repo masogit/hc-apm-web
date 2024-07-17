@@ -120,6 +120,7 @@
                 checkboxlist.each(function () {
                     selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
                 });
+
                 $("#AssetFileAttachmentListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
                 if (selectAllstatus) {
                     $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
@@ -127,7 +128,10 @@
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
+
             //]]>
+
+
         </script>
     </ui:define>
 </ui:composition>

@@ -56,6 +56,8 @@ public class AssetFileSelectAssetController extends JpaCRUDController<AssetInfo>
     @Setter@Getter
     private List<AssetInfo> selectedAssetInfos = new ArrayList<>();
 
+    AssetInfoRepository assetInfoRepository ;
+
     public void onSelectAllOfPage() {
         List<AssetInfo> currentPageAssets =  assetInfoPage.getContent();
         boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
@@ -76,6 +78,8 @@ public class AssetFileSelectAssetController extends JpaCRUDController<AssetInfo>
         this.filterByHospital = false;
         userContextService = WebUtil.getBean(UserContextService.class);
         user = UserContextService.getCurrentUserAccount();
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        selectedMap = new HashMap<>();
     }
 
 
@@ -240,23 +244,22 @@ public class AssetFileSelectAssetController extends JpaCRUDController<AssetInfo>
                 return;
             }
         }
-        if (this.selectedAsset == null && this.selectedAssetInfos.isEmpty()) {
+        if (this.selectedAsset == null && this.selectedMap.isEmpty()) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-
         showDialog = false;
         if (callingController != null) {
             if(selectedAsset != null){
-                boolean r = true;
-                for (AssetInfo a : selectedAssetInfos){
-                    if(a.getUid().equals(selectedAsset.getUid())){
-                        r = false;
+                selectedAssetInfos.add(selectedAsset);
+            }else if(!this.selectedMap.isEmpty()){
+                for (String key : selectedMap.keySet()){
+                    boolean v = selectedMap.get(key);
+                    if(v){
+                        AssetInfo a = assetInfoRepository.findByUid(key);
+                        selectedAssetInfos.add(a);
                     }
-                }
-                if(r){
-                    selectedAssetInfos.add(selectedAsset);
                 }
             }
             callingController.onServerEvent("onAssetSelected", selectedAssetInfos);
