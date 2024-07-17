@@ -1,6 +1,6 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
+import com.ge.apm.dao.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,16 +10,15 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
@@ -71,6 +70,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private UserAccountRepository userAccountRepository;
 
+    private AssetInfoRepository assetDao;
+
     private TreeNode selectedNode;
 
     private String filterClinicalDeptOrg;
@@ -89,6 +90,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
 
+    private CustomConfigService ccService;
+
+    private CustomConfigObject customConfig;
+
     private List<OrgInfo> clinicalDeptList;
 
     @Override
@@ -103,6 +108,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         supplierService = WebUtil.getBean(SupplierService.class);
         addDateTimeFields("arrivalList.arrivalDate");
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
+        assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         getSavedArrivalContractNum();
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -414,9 +422,19 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
     }
 
+    /*List<String> assetFields = ListUtil.newArrayList("parentAssetId", "aliasName", "serialNum", "departNum", "financingNum", "qrCode", "systemId", "barcode", "modalityId", "manufactDate", "installDate", "factoryWarrantyDate",
+            "warrantyDate", "assetOwnerName", "assetOwnerName2", "assetOwnerName3", "clinicalOwnerName", "locationCode", "locationName", "comments", "assetTypeGroup");*/
+
+    private List<String> assetFields = ListUtil.newArrayList("所属院区", "所属科室", "当前状态", "主设备", "设备别名", "制造商序列号", "设备编号（院方）", "资产编号", "二维码", "SystemID/厂商报修ID", "条码", "院内IT系统编号", "出厂日期", "启用日期", "质保截止日期",
+            "维保截止日期", "维修负责人", "维修负责人2", "维修负责人3", "使用责任人", "安装位置编码", "安装位置", "备注", "资产分类");
+
     public void exportExcel() throws IOException {
-        List<ArrivalListItem> arrivalListItems = dao.findBySearchFilter(this.searchFilters);
-        downloadFile(parseArrivalItemsListToMap(arrivalListItems));
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> fields = exportFields.stream().filter(assetFields::contains).collect(Collectors.toList());
+        List<SearchFilter> tempSearchFilters = this.searchFilters;
+        tempSearchFilters.add(new SearchFilter("installStatus", SearchFilter.Operator.EQ, "new", "1*"));
+        List<ArrivalListItem> arrivalListItems = dao.findBySearchFilter(tempSearchFilters);
+        downloadFile(parseArrivalItemsListToMap(arrivalListItems), fields);
     }
 
     public List<Map<String, Object>> parseArrivalItemsListToMap(List<ArrivalListItem> itemList) {
@@ -428,33 +446,31 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         List<OrgInfo> orgInfos = orgInfoDao.findByUids(orgUidList);
         Set<String> siteUidList = orgInfos.stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
         orgInfos.addAll(orgInfoDao.findByUids(siteUidList));
+        Set<Integer> assetIds = itemList.stream().map(ArrivalListItem::getParentAssetId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Map<Integer, String> assetMap = MapUtil.newHashMap();
+        if (ObjectUtil.isNotEmpty(assetIds)) {
+            List<AssetInfo> assetInfos = assetDao.getSimpleDataByIds(assetIds);
+            assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, AssetInfo::getName));
+        }
         Map<String, OrgInfo> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o));
         for (ArrivalListItem arrivalListItem : itemList) {
             Map<String, Object> tempMap = MapUtil.newHashMap();
             tempMap.put("到货单名称/编号", arrivalListItem.getArrivalList().getName());
-            tempMap.put("合同号", arrivalListItem.getArrivalList().getContractNum());
+            tempMap.put("编号", arrivalListItem.getItemNum());
             tempMap.put("资产名称", arrivalListItem.getArrivalList().getAssetName());
             OrgInfo orgInfo = orgMap.get(arrivalListItem.getClinicalDeptUID());
             tempMap.put("所属院区", Optional.ofNullable(orgInfo).map(OrgInfo::getSiteUID).map(orgMap::get).map(OrgInfo::getName).orElse(null));
             tempMap.put("所属科室", Optional.ofNullable(orgInfo).map(OrgInfo::getName).orElse(null));
-            tempMap.put("创建人", arrivalListItem.getArrivalList().getCreator().getName());
-            tempMap.put("经办人", arrivalListItem.getArrivalList().getAgent());
-            tempMap.put("到货日期", DateUtil.format(arrivalListItem.getArrivalList().getArrivalDate(), DatePattern.NORM_DATE_PATTERN));
-            tempMap.put("商务验收日期", DateUtil.format(arrivalListItem.getBusinessAckDate(), DatePattern.NORM_DATE_PATTERN));
-            tempMap.put("设备型号", arrivalListItem.getFunctionType());
-            tempMap.put("资产编号", arrivalListItem.getFinancingNum());
-            tempMap.put("当前状态", FieldValueMessageController.fieldValue("arrivalListItemStatus", arrivalListItem.getInstallStatus()));
-            tempMap.put("安装流程类型", FieldValueMessageController.fieldValue("arrivalListProcessType", arrivalListItem.getArrivalList().getProcessType()));
-            tempMap.put("制造商", arrivalListItem.getArrivalList().getManufacture());
-            tempMap.put("供应商", arrivalListItem.getArrivalList().getVendor());
-            tempMap.put("制造商序列号", arrivalListItem.getSerialNum());
-            tempMap.put("采购日期", DateUtil.format(arrivalListItem.getPurchaseDate(), DatePattern.NORM_DATE_PATTERN));
-            tempMap.put("当前处理人", userMap.get(arrivalListItem.getCurrentPersonUID()));
             tempMap.put("安装工时", arrivalListItem.getWorkHours());
-            tempMap.put("主设备", arrivalListItem.getArrivalList().getName());
+            tempMap.put("资产编号", arrivalListItem.getFinancingNum());
+            tempMap.put("制造商序列号", arrivalListItem.getSerialNum());
+            tempMap.put("主设备", assetMap.get(arrivalListItem.getParentAssetId()));
             tempMap.put("设备别名", arrivalListItem.getAliasName());
             tempMap.put("设备编号（院方）", arrivalListItem.getDepartNum());
             tempMap.put("二维码", arrivalListItem.getQrCode());
+            tempMap.put("SystemID/厂商报修ID", arrivalListItem.getSystemId());
+            tempMap.put("条码", arrivalListItem.getBarcode());
+            tempMap.put("院内IT系统编号", arrivalListItem.getBarcode());
             tempMap.put("出厂日期", DateUtil.format(arrivalListItem.getManufactDate(), DatePattern.NORM_DATE_PATTERN));
             tempMap.put("启用日期", DateUtil.format(arrivalListItem.getInstallDate(), DatePattern.NORM_DATE_PATTERN));
             tempMap.put("质保截止日期", DateUtil.format(arrivalListItem.getFactoryWarrantyDate(), DatePattern.NORM_DATE_PATTERN));
@@ -466,16 +482,18 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             tempMap.put("安装位置编码", arrivalListItem.getLocationCode());
             tempMap.put("安装位置", arrivalListItem.getLocationName());
             tempMap.put("备注", arrivalListItem.getComments());
+            tempMap.put("资产分类", arrivalListItem.getArrivalList().getAssetGroup());
+            tempMap.put("UUID", arrivalListItem.getId());
             listMapResult.add(tempMap);
         }
         return listMapResult;
     }
 
-    private void downloadFile(List<Map<String, Object>> data) {
+    private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
         try {//.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx")
             InputStream stream = AssetArrivedItemsController.class.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = exportData(doc, data);
+            Boolean exportFlag = exportData(doc, data, fields);
             if (Boolean.TRUE.equals(exportFlag)) {
                 excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ArrivalItemsList.xlsx");
             }
@@ -484,14 +502,43 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
     }
 
-    private Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {
+    private Boolean exportData(ExcelDocument doc, List<Map<String, Object>> dataList, List<String> fields) {
+        fields.add(0, "到货单名称/编号");
+        fields.add(1, "编号");
+        fields.add(2, "安装工时");
+        fields.add(3, "商务验收");
+        fields.add(4, "临床验收");
+        fields.add(5, "技术验收");
+        fields.add(6, "固定资产验收");
+        fields.add("UUID");
+        for (int index = 0; index < fields.size(); index++) {
+            doc.writeCellData("datalist", 1, index + 1, fields.get(index));
+        }
+        int dataRow = 2;
+        for (Map<String, Object> data : dataList) {
+            for (int index = 0; index < fields.size(); index++) {
+                String columnTitle = fields.get(index);
+                if (columnTitle == null || columnTitle.isEmpty()) {
+                    continue;
+                }
+                Object value = data.get(columnTitle);
+                if (value == null) continue;
+
+                doc.writeCellData("datalist", dataRow, index + 1, value);
+            }
+            dataRow++;
+        }
+        return Boolean.TRUE;
+    }
+
+   /* private Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {
         Integer keyRow = 1;
         int dataRow = 2;
         for (Map<String, Object> item : data) {
             doc.writeRowData("datalist", keyRow, dataRow++, item);
         }
         return Boolean.TRUE;
-    }
+    }*/
 
     public String getMergeContractNum() {
         return mergeContractNum;
