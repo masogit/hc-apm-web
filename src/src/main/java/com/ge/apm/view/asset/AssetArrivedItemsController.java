@@ -440,12 +440,12 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public List<Map<String, Object>> parseArrivalItemsListToMap(List<ArrivalListItem> itemList) {
         List<Map<String, Object>> listMapResult = new ArrayList<>();
         Set<String> userUidList = itemList.stream().map(ArrivalListItem::getCurrentPersonUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        List<UserAccount> users = userAccountRepository.getSimpleByUids(userUidList);
+        List<UserAccount> users = userAccountRepository.getSimpleByUids(userUidList.isEmpty() ? Collections.singletonList("-1") : userUidList);
         Map<String, String> userMap = users.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
         Set<String> orgUidList = itemList.stream().map(ArrivalListItem::getClinicalDeptUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        List<OrgInfo> orgInfos = orgInfoDao.findByUids(orgUidList);
+        List<OrgInfo> orgInfos = orgInfoDao.findByUids(orgUidList.isEmpty() ? Collections.singletonList("-1") : orgUidList);
         Set<String> siteUidList = orgInfos.stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
-        orgInfos.addAll(orgInfoDao.findByUids(siteUidList));
+        orgInfos.addAll(orgInfoDao.findByUids(siteUidList.isEmpty() ? Collections.singletonList("-1") : siteUidList));
         Set<Integer> assetIds = itemList.stream().map(ArrivalListItem::getParentAssetId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         Map<Integer, String> assetMap = MapUtil.newHashMap();
         if (ObjectUtil.isNotEmpty(assetIds)) {
@@ -455,13 +455,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         Map<String, OrgInfo> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o));
         for (ArrivalListItem arrivalListItem : itemList) {
             Map<String, Object> tempMap = MapUtil.newHashMap();
+            tempMap.put("UUID", arrivalListItem.getId());
             tempMap.put("到货单名称/编号", arrivalListItem.getArrivalList().getName());
             tempMap.put("编号", arrivalListItem.getItemNum());
             tempMap.put("资产名称", arrivalListItem.getArrivalList().getAssetName());
+            tempMap.put("安装工时", arrivalListItem.getWorkHours());
             OrgInfo orgInfo = orgMap.get(arrivalListItem.getClinicalDeptUID());
             tempMap.put("所属院区", Optional.ofNullable(orgInfo).map(OrgInfo::getSiteUID).map(orgMap::get).map(OrgInfo::getName).orElse(null));
             tempMap.put("所属科室", Optional.ofNullable(orgInfo).map(OrgInfo::getName).orElse(null));
-            tempMap.put("安装工时", arrivalListItem.getWorkHours());
             tempMap.put("资产编号", arrivalListItem.getFinancingNum());
             tempMap.put("制造商序列号", arrivalListItem.getSerialNum());
             tempMap.put("主设备", assetMap.get(arrivalListItem.getParentAssetId()));
@@ -483,7 +484,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             tempMap.put("安装位置", arrivalListItem.getLocationName());
             tempMap.put("备注", arrivalListItem.getComments());
             tempMap.put("资产分类", arrivalListItem.getArrivalList().getAssetGroup());
-            tempMap.put("UUID", arrivalListItem.getId());
             listMapResult.add(tempMap);
         }
         return listMapResult;
@@ -506,10 +506,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         fields.add(0, "到货单名称/编号");
         fields.add(1, "编号");
         fields.add(2, "安装工时");
-        fields.add(3, "商务验收");
-        fields.add(4, "临床验收");
-        fields.add(5, "技术验收");
-        fields.add(6, "固定资产验收");
         fields.add("UUID");
         for (int index = 0; index < fields.size(); index++) {
             doc.writeCellData("datalist", 1, index + 1, fields.get(index));

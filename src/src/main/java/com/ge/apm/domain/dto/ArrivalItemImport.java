@@ -27,6 +27,9 @@ public class ArrivalItemImport implements Serializable {
     @ExcelProperty("编号")
     private String itemNum;
 
+    @ExcelProperty("资产名称")
+    private String assetName;
+
     @ExcelProperty("安装工时")
     private String workHours;
 
@@ -37,7 +40,7 @@ public class ArrivalItemImport implements Serializable {
 
     @ExcelProperty("所属科室")
     private String clinicalDept;
-    @ExcelProperty("科室")
+
     private String clinicalDeptUID;
 
     @ExcelProperty("当前状态")

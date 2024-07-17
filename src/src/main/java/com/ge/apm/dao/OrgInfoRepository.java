@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -122,7 +123,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public OrgInfo getByUid(String uid);
 
     @Query(value = "select o from OrgInfo o where o.uid in ?1")
-    public List<OrgInfo> findByUids(Set<String> idc);
+    public List<OrgInfo> findByUids(Collection<String> idc);
 
     @Query(value = "select o.* from org_info o  where o.uid in ?1", nativeQuery = true)
     public List<OrgInfo> findInUIds(Set<String> ids);
