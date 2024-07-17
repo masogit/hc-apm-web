@@ -28,6 +28,7 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -436,7 +437,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         List<String> fields = exportFields.stream().filter(assetFields::contains).collect(Collectors.toList());
         List<SearchFilter> tempSearchFilters = this.searchFilters;
         tempSearchFilters.add(new SearchFilter("installStatus", SearchFilter.Operator.EQ, "new", "1*"));
-        List<ArrivalListItem> arrivalListItems = dao.findBySearchFilter(tempSearchFilters);
+        Sort sort = new Sort(Sort.Direction.DESC, "lastModifiedDate").and(new Sort(Sort.Direction.ASC, "arrivalListId")).and(new Sort(Sort.Direction.ASC, "itemNum"));
+        List<ArrivalListItem> arrivalListItems = dao.findBySearchFilter(tempSearchFilters, sort);
         downloadFile(parseArrivalItemsListToMap(arrivalListItems), fields);
     }
 
