@@ -92,7 +92,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> getByUids(Set<String> setUids);
     
     @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid in ?1 ")
-    public List<UserAccount> getSimpleByUids(Set<String> setUids);
+    public List<UserAccount> getSimpleByUids(Collection<String> setUids);
     
     @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid = ?1 ")
     public UserAccount getSimpleByUids(String uid);
