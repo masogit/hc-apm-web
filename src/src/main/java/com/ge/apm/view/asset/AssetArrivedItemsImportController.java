@@ -24,13 +24,11 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
