@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import com.ge.apm.domain.*;
@@ -51,6 +50,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private AssetInstallationService aiService;
     private UaaService uaaService;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private List<V2_BlobObject> picList;
 
     private ArrivalListItem selectedItem;
@@ -95,6 +95,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     private CustomConfigObject customConfig;
 
     private List<OrgInfo> clinicalDeptList;
+    private UserAccount currentUser;
 
     @Override
     protected void init() {
@@ -110,7 +111,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
         getSavedArrivalContractNum();
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -131,12 +134,12 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             searchFilters = new ArrayList();
         }
         if (!this.hasFilterOnField("arrivalList.siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
         }
 
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
@@ -182,7 +185,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void takeWorkOrder(String itemId) {
         ArrivalListItem item = dao.findById(itemId);
-        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+        item.setCurrentPersonUID(currentUser.getUid());
         aiService.reAssignWorkOrder(item);
         cancel();
     }
@@ -193,7 +196,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         String clinicalDeptUID = item.getClinicalDeptUID();
         String errorMessage = "";
         if(StringUtils.isEmpty(contractNum) || StringUtils.isEmpty(clinicalDeptUID)){
-            item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+            item.setCurrentPersonUID(currentUser.getUid());
             Boolean responseStatus = aiService.reAssignWorkOrder(item);
             if(!responseStatus){
                 errorMessage = "记录提交失败";
@@ -201,7 +204,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }else{
             List<ArrivalListItem> itemList = dao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
             for(ArrivalListItem arrivalListItem:itemList){
-                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+                arrivalListItem.setCurrentPersonUID(currentUser.getUid());
                 Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
                 if(!responseStatus){
                     String name = arrivalListItem.getArrivalList().getName();
@@ -222,7 +225,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
 
     public Boolean isAssignToMe(String currentPersonUID) {
-        return UserContextService.getCurrentUserAccount().getUid().equals(currentPersonUID);
+        return currentUser.getUid().equals(currentPersonUID);
     }
 
     @Override
@@ -253,7 +256,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public List<I18nMessage> getInstallStatusList() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        Integer siteId = currentUser.getSiteId();
         List<I18nMessage> statusList = FieldValueMessageController.getFieldValueList("arrivalListItemStatus", siteId);
         if (Boolean.FALSE.equals(userContextService.needInstorageCheck())) {
             return statusList.stream().filter(item -> !ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getMsgKey())).collect(Collectors.toList());
@@ -319,7 +322,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     
     public List<QrCodeTemplate> getQrCodeTemplates() {
         QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
-        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
+        return qtService.getTemplateByUser(currentUser);
     }
 
     public String getArrivalFormatTime() {
@@ -363,9 +366,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
 
     public void getSavedArrivalContractNum(){
-        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
+        List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
         if(!orgUidList.isEmpty()){
-            List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,UserContextService.getCurrentUserAccount().getUid(),ArrivalList.SupplierStatus.Saved.name());
+            List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,currentUser.getUid(),ArrivalList.SupplierStatus.Saved.name());
             mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
         }
     }
@@ -446,16 +449,19 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         List<OrgInfo> orgInfos = orgInfoDao.findByUids(orgUidList.isEmpty() ? Collections.singletonList("-1") : orgUidList);
         Set<String> siteUidList = orgInfos.stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
         orgInfos.addAll(orgInfoDao.findByUids(siteUidList.isEmpty() ? Collections.singletonList("-1") : siteUidList));
+        Map<String, OrgInfo> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o));
         Set<Integer> assetIds = itemList.stream().map(ArrivalListItem::getParentAssetId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         Map<Integer, String> assetMap = MapUtil.newHashMap();
         if (ObjectUtil.isNotEmpty(assetIds)) {
             List<AssetInfo> assetInfos = assetDao.getSimpleDataByIds(assetIds);
             assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, AssetInfo::getName));
         }
-        Map<String, OrgInfo> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o));
+        List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(currentUser.getUid());
+        Map<String, String> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
         for (ArrivalListItem arrivalListItem : itemList) {
             Map<String, Object> tempMap = MapUtil.newHashMap();
             tempMap.put("UUID", arrivalListItem.getId());
+            tempMap.put("arrivalUID", arrivalListItem.getArrivalListId());
             tempMap.put("到货单名称/编号", arrivalListItem.getArrivalList().getName());
             tempMap.put("编号", arrivalListItem.getItemNum());
             tempMap.put("资产名称", arrivalListItem.getArrivalList().getAssetName());
@@ -483,7 +489,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             tempMap.put("安装位置编码", arrivalListItem.getLocationCode());
             tempMap.put("安装位置", arrivalListItem.getLocationName());
             tempMap.put("备注", arrivalListItem.getComments());
-            tempMap.put("资产分类", arrivalListItem.getArrivalList().getAssetGroup());
+            tempMap.put("资产分类", assetTypeGroupMap.get(arrivalListItem.getEncoded()));
             listMapResult.add(tempMap);
         }
         return listMapResult;
@@ -506,7 +512,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         fields.add(0, "到货单名称/编号");
         fields.add(1, "编号");
         fields.add(2, "安装工时");
+        fields.add(3, "资产名称");
         fields.add("UUID");
+        fields.add("arrivalUID");
         for (int index = 0; index < fields.size(); index++) {
             doc.writeCellData("datalist", 1, index + 1, fields.get(index));
         }
