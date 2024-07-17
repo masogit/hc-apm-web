@@ -38,9 +38,6 @@ public class ArrivalItemImport implements Serializable {
     @ExcelProperty("所属科室")
     private String clinicalDept;
 
-    @ExcelProperty("当前状态")
-    private String installStatus;
-
     @ExcelProperty("主设备")
     private String parentAsset;
 

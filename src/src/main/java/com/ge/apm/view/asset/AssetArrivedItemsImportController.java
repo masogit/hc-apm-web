@@ -15,6 +15,8 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -199,7 +202,7 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
                 }
             } else {
                 ArrivalListItem arrivalListItem = arrivalItemMap.get(arrivalItemImport.getId());
-                BeanUtils.copyProperties(arrivalItemImport, arrivalListItem);
+                BeanUtils.copyProperties(arrivalItemImport, arrivalListItem, beanNullProperty(arrivalItemImport));
                 saveList.add(arrivalListItem);
             }
         }
@@ -210,6 +213,19 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             WebUtil.addErrorMessage("导入失败！");
         }
         return importFailedDataList;
+    }
+
+    public static String[] beanNullProperty(ArrivalItemImport arrivalItemImport) {
+        final BeanWrapper src = new BeanWrapperImpl(arrivalItemImport);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> nullProperty = new HashSet<>();
+        for (PropertyDescriptor item : pds) {
+            if (src.getPropertyValue(item.getName()) == null) {
+                nullProperty.add(item.getName());
+            }
+        }
+        String[] properties = new String[nullProperty.size()];
+        return nullProperty.toArray(properties);
     }
     
     public UploadedFile getFile() {

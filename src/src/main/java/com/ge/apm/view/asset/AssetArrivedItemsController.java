@@ -428,7 +428,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     /*List<String> assetFields = ListUtil.newArrayList("parentAssetId", "aliasName", "serialNum", "departNum", "financingNum", "qrCode", "systemId", "barcode", "modalityId", "manufactDate", "installDate", "factoryWarrantyDate",
             "warrantyDate", "assetOwnerName", "assetOwnerName2", "assetOwnerName3", "clinicalOwnerName", "locationCode", "locationName", "comments", "assetTypeGroup");*/
 
-    private List<String> assetFields = ListUtil.newArrayList("所属院区", "所属科室", "当前状态", "主设备", "设备别名", "制造商序列号", "设备编号（院方）", "资产编号", "二维码", "SystemID/厂商报修ID", "条码", "院内IT系统编号", "出厂日期", "启用日期", "质保截止日期",
+    private List<String> assetFields = ListUtil.newArrayList("所属院区", "所属科室", "主设备", "设备别名", "制造商序列号", "设备编号（院方）", "资产编号", "二维码", "SystemID/厂商报修ID", "条码", "院内IT系统编号", "出厂日期", "启用日期", "质保截止日期",
             "维保截止日期", "维修负责人", "维修负责人2", "维修负责人3", "使用责任人", "安装位置编码", "安装位置", "备注", "资产分类");
 
     public void exportExcel() throws IOException {
