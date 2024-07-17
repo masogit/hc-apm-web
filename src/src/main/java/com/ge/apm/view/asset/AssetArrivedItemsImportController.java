@@ -1,19 +1,14 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.excel.EasyExcelFactory;
-import com.alibaba.excel.read.builder.ExcelReaderBuilder;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.ArrivalItemImport;
 import com.ge.apm.service.asset.ArrivalItemImportHandel;
 import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.uaa.UserAccountImportService;
-import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -22,11 +17,10 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.GenericRepository;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDController;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -40,24 +34,24 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class AssetArrivedItemsImportController extends GenericCRUDUUIDController<ArrivalListItem> implements Serializable, ServerEventInterface {
+public class AssetArrivedItemsImportController extends GenericCRUDUUIDController<ArrivalListItem> {
 
     private ArrivalListItemRepository dao;
     private UserAccount currentUser;
-    private UserAccountService service;
     private AssetInstallationService assetInstallationService;
     private OrgInfoRepository orgInfoRepository;
     private AssetInfoRepository assetInfoRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private UploadedFile file;
-    private List<UserAccount> importFailedDataList;
+    private List<ArrivalItemImport> importFailedDataList;
     
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
-        service = WebUtil.getBean(UserAccountService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         assetInstallationService=WebUtil.getBean(AssetInstallationService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
@@ -85,11 +79,6 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
-
-    }
-
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
         List<ArrivalItemImport> importList = ListUtil.newArrayList();
@@ -97,22 +86,24 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         handleExcel(importList);
     }
 
+    @Transactional
     public List<ArrivalItemImport> handleExcel(List<ArrivalItemImport> importList) throws IOException {
+        importFailedDataList = ListUtil.newArrayList();
         List<UserAccount> workerList = assetInstallationService.getWorkerList();
         List<OrgInfo> orgList = orgInfoRepository.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(currentUser.getSiteUID());
         Map<String, OrgInfo> orgMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getName, o -> o));
-        List<ArrivalItemImport> errList = ListUtil.newArrayList();
+        List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(currentUser.getUid());
         Set<String> clinicalDeptUidList = new HashSet<>(ListUtil.newArrayList("-1"));
         Set<String> siteUidList = new HashSet<>(ListUtil.newArrayList("-1"));
         List<ArrivalListItem> saveList = ListUtil.newArrayList();
-        for (int row = 2; row < importList.size(); row++) {
-            ArrivalItemImport arrivalItemImport = importList.get(row - 2);
+        for (int row = 0; row < importList.size(); row++) {
+            ArrivalItemImport arrivalItemImport = importList.get(row);
             StringBuilder errMsg = new StringBuilder();
             OrgInfo site = orgMap.get(arrivalItemImport.getSite());
             OrgInfo clinicalDept = orgMap.get(arrivalItemImport.getClinicalDept());
             if (ObjectUtil.isNotEmpty(site)) {
                 if (ObjectUtil.isEmpty(site) || site.getOrgLevel() != 3) {
-                    errMsg.append("院区不存在；");
+                    errMsg.append("院区不存在;");
                 } else {
                     siteUidList.add(site.getUid());
                     arrivalItemImport.setSiteUID(site.getUid());
@@ -121,19 +112,19 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
              if (ObjectUtil.isNotEmpty(arrivalItemImport.getClinicalDept())) {
                  if (ObjectUtil.isNotEmpty(site)) {
                      if (ObjectUtil.isEmpty(clinicalDept) || !clinicalDept.getParentUID().equals(site.getUid())) {
-                         errMsg.append("科室不存在；");
+                         errMsg.append("科室不存在;");
                      } else {
                          clinicalDeptUidList.add(clinicalDept.getUid());
                          arrivalItemImport.setClinicalDeptUID(clinicalDept.getUid());
                      }
                  } else {
-                     errMsg.append("院区不存在；");
+                     errMsg.append("院区不存在;");
                  }
             }
             if (ObjectUtil.isNotEmpty(arrivalItemImport.getAssetOwner())) {
                 List<UserAccount> userAccounts = workerList.stream().filter(u -> u.getName().equals(arrivalItemImport.getAssetOwner())).collect(Collectors.toList());
                 if (ObjectUtil.isEmpty(userAccounts) || userAccounts.size() > 1) {
-                    errMsg.append("维修负责人不存在/无法关联；");
+                    errMsg.append("维修负责人不存在/无法关联;");
                 } else {
                     arrivalItemImport.setAssetOwnerUID(userAccounts.get(0).getUid());
                 }
@@ -141,7 +132,7 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             if (ObjectUtil.isNotEmpty(arrivalItemImport.getAssetOwner2())) {
                 List<UserAccount> userAccounts = workerList.stream().filter(u -> u.getName().equals(arrivalItemImport.getAssetOwner2())).collect(Collectors.toList());
                 if (ObjectUtil.isEmpty(userAccounts) || userAccounts.size() > 1) {
-                    errMsg.append("维修负责人2不存在/无法关联；");
+                    errMsg.append("维修负责人2不存在/无法关联;");
                 } else {
                     arrivalItemImport.setAssetOwnerUID2(userAccounts.get(0).getUid());
                 }
@@ -149,15 +140,23 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             if (ObjectUtil.isNotEmpty(arrivalItemImport.getAssetOwner3())) {
                 List<UserAccount> userAccounts = workerList.stream().filter(u -> u.getName().equals(arrivalItemImport.getAssetOwner3())).collect(Collectors.toList());
                 if (ObjectUtil.isEmpty(userAccounts) || userAccounts.size() > 1) {
-                    errMsg.append("维修负责人3不存在/无法关联；");
+                    errMsg.append("维修负责人3不存在/无法关联;");
                 } else {
                     arrivalItemImport.setAssetOwnerUID3(userAccounts.get(0).getUid());
                 }
             }
+            if (ObjectUtil.isNotEmpty(arrivalItemImport.getAssetTypeGroup())) {
+                List<AssetTypeGroup> assetTypeGroups = assetTypeGroupList.stream().filter(o -> o.getName().equals(arrivalItemImport.getAssetTypeGroup())).collect(Collectors.toList());
+                if (ObjectUtil.isEmpty(assetTypeGroups) || assetTypeGroups.size() > 1) {
+                    errMsg.append("资产分类不存在/无法关联;");
+                } else {
+                    arrivalItemImport.setEncoded(assetTypeGroups.get(0).getEncoded());
+                }
+            }
             if (errMsg.length() > 0) {
-                arrivalItemImport.setExcelRow(row);
+                arrivalItemImport.setExcelRow(row + 2);
                 arrivalItemImport.setErrMsg(errMsg.toString());
-                errList.add(arrivalItemImport);
+                importFailedDataList.add(arrivalItemImport);
             }
         }
         List<UserAccount> clinicalOwnerList = Optional.ofNullable(assetInstallationService.getClinicalOwnerList(clinicalDeptUidList)).orElse(Collections.emptyList());
@@ -169,14 +168,17 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         parentAssetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteUidList));
         parentAssetSearchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUidList));
         List<AssetInfo> parentAssets = assetInfoRepository.findBySearchFilter(parentAssetSearchFilters);
-        Set<String> errIds = errList.stream().map(ArrivalItemImport::getId).collect(Collectors.toSet());
-        for (int row = 2; row < importList.size(); row++) {
+        Set<String> errIds = importFailedDataList.stream().map(ArrivalItemImport::getId).collect(Collectors.toSet());
+        List<String> ids = importList.stream().map(ArrivalItemImport::getId).collect(Collectors.toList());
+        List<ArrivalListItem> arrivalItems = dao.findByIdIn(ids);
+        Map<String, ArrivalListItem> arrivalItemMap = arrivalItems.stream().collect(Collectors.toMap(ArrivalListItem::getId, t -> t));
+        for (int row = 0; row < importList.size(); row++) {
             StringBuilder errMsg = new StringBuilder();
-            ArrivalItemImport arrivalItemImport = importList.get(row - 2);
+            ArrivalItemImport arrivalItemImport = importList.get(row);
             if (ObjectUtil.isNotEmpty(arrivalItemImport.getParentAsset())) {
                 List<AssetInfo> assetInfos = parentAssets.stream().filter(asset -> asset.getName().equals(arrivalItemImport.getParentAsset()) && asset.getSiteUID().equals(arrivalItemImport.getSiteUID()) && asset.getClinicalDeptUID().equals(arrivalItemImport.getClinicalDeptUID())).collect(Collectors.toList());
                 if (ObjectUtil.isEmpty(assetInfos) || assetInfos.size() > 1) {
-                    errMsg.append("主设备不存在/无法关联；");
+                    errMsg.append("主设备不存在/无法关联;");
                 } else {
                     arrivalItemImport.setParentAssetId(assetInfos.get(0).getId());
                 }
@@ -184,27 +186,30 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             if (ObjectUtil.isNotEmpty(arrivalItemImport.getClinicalOwner())) {
                 List<UserAccount> accounts = clinicalOwnerList.stream().filter(u -> u.getName().equals(arrivalItemImport.getClinicalOwner()) && u.getOrgInfoUID().equals(arrivalItemImport.getClinicalDeptUID())).collect(Collectors.toList());
                 if (ObjectUtil.isEmpty(accounts) || accounts.size() > 1) {
-                    errMsg.append("使用责任人不存在/无法关联；");
+                    errMsg.append("使用责任人不存在/无法关联;");
                 } else {
                     arrivalItemImport.setClinicalOwnerUid(accounts.get(0).getUid());
                 }
             }
             if (errMsg.length() > 0) {
-                arrivalItemImport.setExcelRow(row);
+                arrivalItemImport.setExcelRow(row + 2);
                 arrivalItemImport.setErrMsg(arrivalItemImport.getErrMsg() + errMsg);
                 if (!errIds.contains(arrivalItemImport.getId())) {
-                    errList.add(arrivalItemImport);
+                    importFailedDataList.add(arrivalItemImport);
                 }
             } else {
-                ArrivalListItem arrivalListItem = new ArrivalListItem();
+                ArrivalListItem arrivalListItem = arrivalItemMap.get(arrivalItemImport.getId());
                 BeanUtils.copyProperties(arrivalItemImport, arrivalListItem);
                 saveList.add(arrivalListItem);
             }
         }
-        if (ObjectUtil.isNotEmpty(errList)) {
-            System.out.println("111");
+        if (ObjectUtil.isEmpty(importFailedDataList)) {
+            dao.save(saveList);
+            WebUtil.addSuccessMessage("导入成功！");
+        } else {
+            WebUtil.addErrorMessage("导入失败！");
         }
-        return errList;
+        return importFailedDataList;
     }
     
     public UploadedFile getFile() {
@@ -215,11 +220,11 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         this.file = file;
     }
 
-	public List<UserAccount> getImportFailedDataList() {
+	public List<ArrivalItemImport> getImportFailedDataList() {
 		return importFailedDataList;
 	}
 
-	public void setImportFailedDataList(List<UserAccount> importFailedDataList) {
+	public void setImportFailedDataList(List<ArrivalItemImport> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
     

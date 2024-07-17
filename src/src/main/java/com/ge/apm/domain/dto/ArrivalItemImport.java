@@ -14,12 +14,11 @@ import java.util.Date;
 public class ArrivalItemImport implements Serializable {
     private static final long serialVersionUID = -1647877151547239554L;
 
-    private Integer excelRow;
-
-    private String errMsg;
-
     @ExcelProperty("UUID")
     private String id;
+
+    @ExcelProperty("arrivalUID")
+    private String arrivalListId;
 
     @ExcelProperty("到货单名称/编号")
     private String name;
@@ -31,25 +30,19 @@ public class ArrivalItemImport implements Serializable {
     private String assetName;
 
     @ExcelProperty("安装工时")
-    private String workHours;
+    private Double workHours;
 
     @ExcelProperty("所属院区")
     private String site;
 
-    private String siteUID;
-
     @ExcelProperty("所属科室")
     private String clinicalDept;
-
-    private String clinicalDeptUID;
 
     @ExcelProperty("当前状态")
     private String installStatus;
 
     @ExcelProperty("主设备")
     private String parentAsset;
-
-    private Integer parentAssetId;
 
     @ExcelProperty("设备别名")
     private String aliasName;
@@ -94,22 +87,14 @@ public class ArrivalItemImport implements Serializable {
     @ExcelProperty("维修负责人")
     private String assetOwner;
 
-    private String assetOwnerUID;
-
     @ExcelProperty("维修负责人2")
     private String assetOwner2;
-
-    private String assetOwnerUID2;
 
     @ExcelProperty("维修负责人3")
     private String assetOwner3;
 
-    private String assetOwnerUID3;
-
     @ExcelProperty("使用责任人")
     private String clinicalOwner;
-
-    private String clinicalOwnerUid;
 
     @ExcelProperty("安装位置编码")
     private String locationCode;
@@ -121,6 +106,26 @@ public class ArrivalItemImport implements Serializable {
     private String comments;
 
     @ExcelProperty("资产分类")
-    private String assetGroup;
+    private String assetTypeGroup;
+
+    private Integer excelRow;
+
+    private String errMsg;
+
+    private String siteUID;
+
+    private String clinicalDeptUID;
+
+    private Integer parentAssetId;
+
+    private String assetOwnerUID;
+
+    private String assetOwnerUID2;
+
+    private String assetOwnerUID3;
+
+    private String clinicalOwnerUid;
+
+    private String encoded;
 
 }
