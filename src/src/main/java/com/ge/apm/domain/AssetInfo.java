@@ -2873,7 +2873,8 @@ public class AssetInfo implements ChineseName,Serializable {
 		return getNamePyCode();
 	}
     
-    public AssetInfo(String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        this.id = id;
         this.name = name;
         this.uid = uid;
         this.departNum = departNum;

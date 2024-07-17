@@ -24,6 +24,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -814,7 +815,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public List<UserAccount> getClinicalOwnerList() {
-        clinicalOwnerList = aiService.getClinicalOwnerList(arrivalListItem.getClinicalDeptUID());
+        clinicalOwnerList = aiService.getClinicalOwnerList(ListUtil.newArrayList(arrivalListItem.getClinicalDeptUID()));
         return clinicalOwnerList;
     }
 

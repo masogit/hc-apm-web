@@ -143,8 +143,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
     List<UserAccount> getByClinicalDept(Collection<String> orgList);
 
-    @Query(value= "select o.* from user_account o where (o.is_disable =false or o.is_disable is null ) and o.org_uid = ?1 ",nativeQuery=true)
-    List<UserAccount> findByOrgInfoUID(String orgUid);
+    @Query(value= "select o.* from user_account o where (o.is_disable =false or o.is_disable is null ) and o.org_uid in ?1 ",nativeQuery=true)
+    List<UserAccount> findByOrgInfoUIDIn(Collection<String> orgUid);
 
     UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
 

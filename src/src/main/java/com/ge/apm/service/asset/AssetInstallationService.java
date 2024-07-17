@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,11 +287,12 @@ public class AssetInstallationService {
         return ucService.getWorkerList(0, "");
     }
 
-    public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
-        if (Strings.isNullOrEmpty(clinicalDeptUid)) {
+    public List<UserAccount> getClinicalOwnerList(Collection<String> clinicalDeptUidList) {
+        clinicalDeptUidList = clinicalDeptUidList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isEmpty(clinicalDeptUidList)) {
             return null;
         }
-        List<UserAccount> userlist = userDao.findByOrgInfoUID(clinicalDeptUid);
+        List<UserAccount> userlist = userDao.findByOrgInfoUIDIn(clinicalDeptUidList);
         return userlist.stream().filter(item -> item.getUserRoleList() != null && !item.getUserRoleList().stream()
                 .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
     }
