@@ -212,14 +212,15 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(serial_num, assetInfo.getSerialNum());
             map.put(depart_num, assetInfo.getDepartNum());
             map.put(system_id, assetInfo.getSystemId());
-            map.put(purchase_price, assetInfo.getPurchasePrice());
             if(assetInfo.getPurchasePrice()!=null){
-                map.put(unit_price, "1 X "+assetInfo.getPurchasePrice());
+                map.put(unit_price, "1 X "+new BigDecimal(assetInfo.getPurchasePrice()));
+                map.put(purchase_price, new BigDecimal(assetInfo.getPurchasePrice()));
+
             }
-
             map.put(purchase_date, assetInfo.getPurchaseDate());
-            map.put(salvage_value, assetInfo.getSalvageValue());   //最终残值
-
+            if(assetInfo.getSalvageValue()!=null){
+                map.put(salvage_value,new BigDecimal(assetInfo.getSalvageValue()));   //最终残值
+            }
              String assetDeptUid = assetInfo.getAssetDeptUID();
              if(StringUtils.isNotBlank(assetDeptUid)){
                  OrgInfo byUid = orgInfoRepository.findByUid(assetDeptUid);
