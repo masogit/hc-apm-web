@@ -241,8 +241,8 @@ public class ExportToBeTerminatedAppraisalService {
             Double purchasePrice = assetInfo.getPurchasePrice();
             if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
                 double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
-                logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",assetUsedLifecycleDouble, ExportTerminatedAppraisalService.ASSET_DETAIL.lifecycle,purchasePrice);
-                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear)).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, RoundingMode.HALF_UP);
+                logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",assetUsedLifecycleDouble, lifecycle,purchasePrice);
+                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear), BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, BigDecimal.ROUND_HALF_UP);
                 map.put(accumulated_depreciation, bigDecimal);   //累计折旧
             }
             AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
