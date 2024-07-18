@@ -112,7 +112,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.qrCode}</label>
                             <p:inputText id="qrCode" value="#{assetArrivedItemsController.selected.qrCode}" readonly="true"/>
-                            <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton"/>
+                            <p:commandButton icon="ui-icon-search" title="#{msg.View}" update="arrivalItemsTab:qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.medicalApparatusClassification}</label>

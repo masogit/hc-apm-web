@@ -13,6 +13,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -415,7 +416,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public List<UserAccount> getClinicalOwnerList() {
         if (null != easyInstallItem) {
-            return aiService.getClinicalOwnerList(easyInstallItem.getClinicalDeptUID());
+            return aiService.getClinicalOwnerList(ListUtil.newArrayList(easyInstallItem.getClinicalDeptUID()));
         }
         return null;
     }
