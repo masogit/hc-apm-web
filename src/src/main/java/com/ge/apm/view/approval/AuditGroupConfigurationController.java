@@ -15,6 +15,7 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -39,6 +40,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     private UserAccountRepository userAccountDao;
     private UserRoleRepository userRoleDao;
     private I18nMessageRepository i18nDao;
+    private UserAccount currentUser;
 
     @Setter
     @Getter
@@ -66,12 +68,13 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         buildApproveUserList();
+        searchFilters = new ArrayList<>();
     }
     //获取拥有审核权限的用户
     public void buildApproveUserList() {
         approveUserList = new ArrayList<>();
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        String hospitalUID = userAccount.getHospitalUID();
+        currentUser = UserContextService.getCurrentUserAccount();
+        String hospitalUID = currentUser.getHospitalUID();
         List<SysRole> sysRoles = roleDao.getByNameIn(Arrays.asList("AssetHead"));//医学工程处主任
         List<Integer> sysRoleIdS = new ArrayList<>();
         if(sysRoles!=null && !sysRoles.isEmpty()){
@@ -84,6 +87,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     }
     @Override
     protected Page<AuditGroupConfiguration> loadData(PageRequest pageRequest) {
+        updateSearchFilter(new SearchFilter("hierOrgUid", SearchFilter.Operator.EQ,currentUser.getHospitalUID()));
         Page<AuditGroupConfiguration> bySearchFilter = auditGroupConfigurationRepository.findBySearchFilter(searchFilters, pageRequest);
         return bySearchFilter;
     }

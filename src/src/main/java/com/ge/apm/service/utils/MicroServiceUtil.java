@@ -8,8 +8,11 @@ package com.ge.apm.service.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.token.TokenBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -19,7 +22,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -46,6 +52,18 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         ByteArrayInputStream bios = new ByteArrayInputStream(result);
         bios.reset();
         return bios;
+    }
+
+    public List<FileInfoResult> getFiles(Collection<String> fileIds) {
+        HttpHeaders headers = new HttpHeaders();
+        String gatewayURL = getGatewayURL(GatewayURL.GET_FILES);
+        HttpEntity<Collection<String>> httpEntity = new HttpEntity<>(fileIds, headers);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, httpEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return JSON.parseArray(JSON.toJSONString(responseMap.get("data")), FileInfoResult.class);
+        }
+        return ListUtil.empty();
     }
 
     public String getImgBase64(String fileId) {
@@ -330,6 +348,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String gatewayURL = getGatewayURL(GatewayURL.MSM_SEND_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
+        if(StringUtils.isEmpty(token)){
+            token = TokenBuilder.defaultToken(tokenSecretkey);
+        }
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for sendMsMCode: " + url);
@@ -351,6 +372,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String gatewayURL = getGatewayURL(GatewayURL.MSM_GET_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
+        if(StringUtils.isEmpty(token)){
+            token = TokenBuilder.defaultToken(tokenSecretkey);
+        }
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for getMsMCode: " + url);

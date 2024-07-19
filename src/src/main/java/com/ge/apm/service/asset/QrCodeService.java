@@ -16,6 +16,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.model.DefaultStreamedContent;
@@ -235,7 +236,7 @@ public class QrCodeService {
                 }
             }
         }else {
-            if(template.getV2BlobObject() == null){
+            if(template.getV2BlobObject() == null && StrUtil.isNotEmpty(template.getId())){
                 List<V2_BlobObject> v2BlobObjects = blobObjectService.findBlobObjectsByBoUid(template.getId());
                 if(!v2BlobObjects.isEmpty()){
                     template.setV2BlobObject(v2BlobObjects.get(0));

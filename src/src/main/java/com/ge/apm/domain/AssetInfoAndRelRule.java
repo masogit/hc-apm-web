@@ -23,4 +23,6 @@ public class AssetInfoAndRelRule {
     private String levelOneName;  //二级规则
     private String levelFourName; //三级规则
     private Date createdDate;     //配置日期
+
+    private String serialNum;
 }

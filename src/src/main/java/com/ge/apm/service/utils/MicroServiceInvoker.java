@@ -51,6 +51,9 @@ public class MicroServiceInvoker {
     @Value("#{wxProperties.web_context_url}")
     protected String webContextUrl;
 
+    @Value("#{systemEnvironment['TOKEN_SECRETKEY'] ?: urlProperties.tokenSecretkey}")
+    protected String tokenSecretkey;
+
     @Autowired
     protected BlobObjectRepository blobObjectRepository;
 

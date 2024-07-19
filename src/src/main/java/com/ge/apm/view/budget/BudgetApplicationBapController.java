@@ -629,10 +629,10 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     private void addAssetSearchFilter() {
-        if (null != assetSearchForm.getApplicationAssetCategory()) {
-            updateAssetSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.LIKE, assetSearchForm.getApplicationAssetCategory()));
+        if (StrUtil.isNotEmpty(assetSearchForm.getApplicationAssetCategory())) {
+            updateAssetSearchFilter(new SearchFilter("applicationAssetCategory", SearchFilter.Operator.EQ, assetSearchForm.getApplicationAssetCategory()));
         }
-        if (null != assetSearchForm.getStandards()) {
+        if (StrUtil.isNotEmpty(assetSearchForm.getStandards())) {
             updateAssetSearchFilter(new SearchFilter("standards", SearchFilter.Operator.LIKE, assetSearchForm.getStandards()));
         }
         if (StringUtils.isNotBlank(assetSearchForm.getAssetBrand())) {

@@ -181,7 +181,7 @@
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
                 <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" >
-                    <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
+                    <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"  title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
 
                 <f:facet name="{Toolbar}">

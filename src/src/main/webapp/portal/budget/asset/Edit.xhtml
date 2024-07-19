@@ -53,9 +53,13 @@
                                      requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{budgetAssetController.selected.applicationAssetCategory}" required="true"
-                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>
+                        <p:outputLabel class="label">设备分类<span style="color: red">*</span></p:outputLabel>
+                       <!-- <p:inputText value="#{budgetAssetController.selected.applicationAssetCategory}" required="true"
+                                     requiredMessage="设备品类#{msg.Blank}#{msg.ValidationRequire}"/>-->
+                        <p:selectOneMenu  id="assetGroup" value="#{budgetAssetController.selected.applicationAssetCategory}" required="true"  requiredMessage="设备分类#{msg.Blank}#{msg.ValidationRequire}"  >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                     <!--<h:panelGroup>
                         <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>

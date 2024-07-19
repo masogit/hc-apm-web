@@ -105,7 +105,7 @@
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
@@ -280,8 +280,8 @@
                     <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
-                    <label class="label">#{msg.CancellationReason}</label>
-                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" />
+                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.selected.pmType eq 4 ? '*' : ''} </span></label>
+                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" required="#{v2PmOrderController.selected.pmType eq 4 ? true :false}" requiredMessage="工单的取消原因不能为空！"/>
                 </h:panelGroup>
                 <br></br>
                 <h:panelGroup>
@@ -300,8 +300,8 @@
                     <f:selectItem itemDisabled="#{not v2PmOrderController.periodShow}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
-                    <label class="label">#{msg.CancellationReason}</label>
-                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" />
+                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.batchCancelFlag() ? '*' : ''} </span></label>
+                    <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" required="#{v2PmOrderController.batchCancelFlag() ? true :false}" requiredMessage="工单的取消原因不能为空！"/>
                 </h:panelGroup>
                 <br></br>
                 <h:panelGroup>
@@ -380,7 +380,7 @@
                         <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="#{msg.MaintenanceType}#{msg.ValidationRequire}">
                             <p:ajax event="change" update="@this pmTab:PmRequestCreateForm:pmRuleUid"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup id="pmRuleUid"   style="#{v2PmOrderController.pmRulesListVisable()}" >

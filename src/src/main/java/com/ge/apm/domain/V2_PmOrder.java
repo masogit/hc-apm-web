@@ -278,6 +278,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Transient
     private String businessDigest;
 
+    @Column(name="original_pm_num")
+    private String originalPmNum;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPriceToBigDecimal;
@@ -830,5 +833,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setPmRuleUid(String pmRuleUid) {
         this.pmRuleUid = pmRuleUid;
+    }
+
+    public String getOriginalPmNum() {
+        return originalPmNum;
+    }
+
+    public void setOriginalPmNum(String originalPmNum) {
+        this.originalPmNum = originalPmNum;
     }
 }

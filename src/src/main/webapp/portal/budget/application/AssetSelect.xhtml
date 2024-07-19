@@ -33,8 +33,11 @@
                         <p:inputText value="#{budgetController.assetSearchForm.assetModel}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">设备品类</p:outputLabel>
-                        <p:inputText value="#{budgetController.assetSearchForm.applicationAssetCategory}"/>
+                        <p:outputLabel class="label">设备分类</p:outputLabel>
+                        <p:selectOneMenu  id="assetGroup" value="#{budgetController.assetSearchForm.applicationAssetCategory}"  >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup style="display: flex;">
                         <p:commandButton value="#{msg.Search}"
@@ -67,7 +70,7 @@
                 <p:column headerText="型号">
                     <h:outputText value="#{item.assetModel}"/>
                 </p:column>
-                <p:column headerText="设备品类">
+                <p:column headerText="设备分类">
                     <h:outputText value="#{item.applicationAssetCategory}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">

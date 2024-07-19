@@ -32,8 +32,8 @@
             <p:column headerText="#{msg.EquipmentName}">
                 <h:outputText value="#{item.applicationAssetName}"/>
             </p:column>
-            <p:column headerText="设备品类">
-                <h:outputText value="#{item.applicationAssetCategory}"/>
+            <p:column headerText="设备分类">
+                <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.applicationAssetCategory)}"/>
             </p:column>
             <p:column headerText="推荐设备品牌">
                 <h:outputText value="#{item.recommendedBrand}"/>
