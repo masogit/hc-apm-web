@@ -88,8 +88,11 @@
                                 <p:commandButton rendered="#{budgetController.editButtonDisplay()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:outputLabel class="label">设备品类<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetCategory}" class="budgetAssetInfoChange"/>
+                                <p:outputLabel class="label">设备分类<span style="color: red">*</span></p:outputLabel>
+                                <p:selectOneMenu  id="assetGroup" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetCategory}" required="true"  requiredMessage="设备分类#{msg.Blank}#{msg.ValidationRequire}"  disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" class="budgetAssetInfoChange">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">推荐品牌<span style="color: red">*</span></p:outputLabel>

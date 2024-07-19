@@ -186,6 +186,14 @@ public class TenantInfo implements Serializable {
     @Column(name="is_enables_menu_order", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isEnablesMenuOrder; // 控制控制租户是否启动新菜单自定义顺序排列 （true/false 默认不启动）
 
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private OrgInfo orgInfo;
+
+
+
+
     public Boolean getEnablesMenuOrder() {
         return BooleanUtils.isTrue(isEnablesMenuOrder);
     }
@@ -652,5 +660,13 @@ public class TenantInfo implements Serializable {
 
     public void setActiveUsers(String activeUsers) {
         this.activeUsers = activeUsers;
+    }
+
+    public OrgInfo getOrgInfo() {
+        return orgInfo;
+    }
+
+    public void setOrgInfo(OrgInfo orgInfo) {
+        this.orgInfo = orgInfo;
     }
 }

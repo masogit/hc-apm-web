@@ -52,6 +52,7 @@ public class ExcelDocument implements AutoCloseable{
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
     final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
+    Map<String, Sheet> sheetMap = new HashMap<>();
 
     public static ExcelType parseTypeByFileName(String path) {
         if (path.endsWith(".xls")) {
@@ -86,7 +87,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public int getLastRowNum(String sheetName, int startRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         if (sheet == null) {
             return 0;
         }
@@ -106,7 +107,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public boolean exceedMaxRowNum(String sheetName, int maxRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
 
         Row row = sheet.getRow(maxRowNum);
 
@@ -142,7 +143,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public boolean checkMaxRowNumIsFull(String sheetName, int maxRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
 
         Row row = sheet.getRow(maxRowNum);
 
@@ -157,12 +158,12 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public String[] getKeyRow(String sheetName, int keyRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         return getKeyRow(sheet, keyRowNum);
     }
     
     public String[] getKeyRow(String sheetName, int keyRowNum,int maxColumn) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         return getKeyRow(sheet, keyRowNum,maxColumn);
     }
 
@@ -172,7 +173,7 @@ public class ExcelDocument implements AutoCloseable{
     }
     
     public void mergeCell(String sheetName,int firstRow, int lastRow, int firstCol, int lastCol){
-    	Sheet sheet = workBook.getSheet(sheetName);
+    	Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
     	if(firstRow==lastRow && firstCol==lastCol){
     		return;
     	}
@@ -180,7 +181,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void cellWithAndHeightSet(String sheetName,int setRow, int setCol){
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row row = sheet.getRow(setRow);
         Cell cell = row.getCell(setCol);
         if(cell == null){
@@ -226,7 +227,7 @@ public class ExcelDocument implements AutoCloseable{
 
     public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(dataRowNum - 1);
         Map<String, String> dataMap = new LinkedHashMap();
         if (dataRow == null) {
@@ -262,7 +263,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public Map<String, Object> getDataRowMap(String sheetName, String[] rowKey, Integer dataRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(dataRowNum - 1);
         Map<String, Object> dataMap = new LinkedHashMap();
 
@@ -575,7 +576,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public String getCellStringValue(String sheetName, int dataRowNum, int cellnum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row row = sheet.getRow(dataRowNum - 1);
         if (row == null) return null;
 
@@ -608,6 +609,9 @@ public class ExcelDocument implements AutoCloseable{
             	break;
             }
         }
+    }
+    public void writeRowData(String sheetName, List<String> rowKey, Integer dataRowNum, String newKey,Object value) {
+        writeCellData(sheetName, dataRowNum, rowKey.indexOf(newKey) + 1, value);
     }
 
     public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
@@ -682,7 +686,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
             dataRow = sheet.createRow(rowNum - 1);
@@ -742,7 +746,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
             dataRow = sheet.createRow(rowNum - 1);
@@ -758,7 +762,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void removeRow(String sheetName, int rowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow != null) {
             sheet.removeRow(dataRow);
@@ -772,7 +776,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void clearRow(String sheetName, int rowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         clearRow(sheet, rowNum);
     }
 
@@ -796,7 +800,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void clearCell(String sheetName, int rowNum, int colNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         Row row = sheet.getRow(rowNum -1);
         if (row == null) return;
 
@@ -815,7 +819,7 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void clearRowsData(String sheetName, Integer startRow, Integer endRow) {
-        Sheet sheet = workBook.getSheet(sheetName);
+        Sheet sheet = sheetMap.computeIfAbsent(sheetName, key -> workBook.getSheet(key));
         for (int i = endRow; i >= startRow; i--) {
             Row dataRow = sheet.getRow(i - 1);
             if (dataRow != null) {

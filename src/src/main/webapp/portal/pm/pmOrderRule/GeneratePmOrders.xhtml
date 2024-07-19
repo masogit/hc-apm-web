@@ -220,7 +220,7 @@
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
 									<p:ajax listener="#{generatePmOrdersController.updatePMType()}"></p:ajax>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0, 3)}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>

@@ -65,7 +65,7 @@ public class PmExportFormatter<T> {
         return type;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap() {
+    public Map<String, Object> buildExcelColumnKeyValueMap(int queryIndex) {
 
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
@@ -91,6 +91,10 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.CURRENTSTEP.getChinese(), this.getCurrentStep());
             map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+            if(queryIndex == 7){
+                map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
+            }
+
         }else {
             map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
@@ -112,6 +116,9 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.CURRENTSTEP.getEnglish(), this.getCurrentStep());
             map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
+            if(queryIndex == 7){
+                map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
+            }
         }
         return map;
     }

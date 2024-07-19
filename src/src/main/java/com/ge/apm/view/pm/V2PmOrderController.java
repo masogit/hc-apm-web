@@ -291,6 +291,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private List<OrgInfo> orgList;
 
+    @Getter @Setter
+    private boolean repaFlag = false;
 
     private WorkflowService workflowService;
 
@@ -402,7 +404,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
-        template.exportPm(pmOrderList,pmFieldsExport);
+        template.exportPm(pmOrderList,pmFieldsExport,queryIndex);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
    }
 
@@ -585,6 +587,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 periodShow=false;
             }
         }
+    }
+
+    public boolean batchCancelFlag(){
+        List<V2_PmOrder> pmList =getPmListByselectedId();
+        if (pmList == null) {
+            return false;
+        }
+        Optional<V2_PmOrder> any = pmList.stream().filter(t -> t.getPmType() == 4).findAny();
+        if (any.isPresent()){
+            return true;
+        }
+        return false;
     }
 
     public boolean batchCancelShow(){
@@ -1560,6 +1574,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestorPhone(UserContextService.getCurrentUserAccount().getTelephone());
         newServiceRequest.setRequestTime(new Date());
 
         String repairSource = RepairSourceEnum.Maintenance.name();
@@ -1574,7 +1589,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             dptName = configCacheService.findOrgByUid(orgInfoUID).getName();
             casePriority =3;//一般
         }
-
+        Object repairReportSendPlaceFlag =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.enable[0]");
+        if(repairReportSendPlaceFlag != null){
+            repaFlag= Boolean.valueOf(repairReportSendPlaceFlag.toString());
+        }
+        Object repairReportSendPlace=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.defaultValue[0]");
+        if(repairReportSendPlace != null){
+            newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
+        }
     }
 
     public void saveServiceRequest() {
@@ -1742,8 +1764,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
         loadRuleList();
-
     }
+
+
 
     public void loadRuleList(){
         String tenantUID = userContextService.getLoginUser().getTenantUID();

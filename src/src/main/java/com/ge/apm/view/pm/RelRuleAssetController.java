@@ -491,8 +491,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         System.out.println();
     }
     public void addFilter() {
+        List<AssetInfo> assetInfos = getAssetList();
 
-            sourceAssets = getAssetList();
+        sourceAssets = assetInfos.stream().map(a -> {
+            a.setRemark(a.getName()+","+a.getDepartNum());
+            return a;
+        }).collect(Collectors.toList());
         targetAssets.forEach((item) -> {
             if (sourceAssets.contains(item)) {
                 sourceAssets.remove(item);

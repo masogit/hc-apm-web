@@ -81,42 +81,42 @@
                         <p:outputLabel  style="color: red" value="#{zkbPartOrderAuditController.getPartSerialNumberTips()}"/>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
-                        <label class="label">外部包装*</label>
+                        <label class="label">Packaging Status(外部包装)*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.externalPackaging}" required="true" requiredMessage="外部包装不能为空"  >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnExternalPackaging')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
-                        <label class="label">内部包装*</label>
+                        <label class="label">Internal Packaging(内部包装)*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.internalPackaging}" required="true" requiredMessage="内部包装不能为空" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnInternalPackaging')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
-                        <label class="label">密封标签类型*</label>
+                        <label class="label">Quality Seal Type(密封标签类型)*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.qualitySealType}" required="true" requiredMessage="密封标签类型不能为空" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnQualitySealType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
-                        <label class="label">密封标签状态*</label>
+                        <label class="label">Quality Seal Status(密封标签状态)*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.qualitySealStatus}" required="true" requiredMessage="密封标签状态不能为空" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnQualitySealStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}">
-                        <label class="label">备件质量*</label>
+                        <label class="label">Part Quality(备件质量)*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.partQuality}" required="true" requiredMessage="备件质量不能为空" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPartQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA' or zkbPartOrderAuditController.selected.returnType eq 'damagedShipment')}" style="text-align: left">
-                        <label class="label">备件质量问题*</label>
+                        <label class="label">Part Quality Issue(备件质量问题)*</label>
                         <p:selectOneMenu id="partQualityIssue" value="#{zkbPartOrderAuditController.selected.partQualityIssue}" style="text-align: left" required="true" requiredMessage="备件质量问题 #{msg.ValidationRequire}" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnPartQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

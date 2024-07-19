@@ -44,7 +44,7 @@ public class WorkOrderDetailExportService {
     public List<Map<String, Object>> createWorkOrderDetailData(Map<String, Object> filterMap){
 
         List<Map<String, Object>> resultList = new ArrayList<>();
-        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        List<SearchFilter> searchFilters = new ArrayList<>();
 
         if(filterMap.containsKey("selectedOrg")){
             OrgInfo selectedOrg = (OrgInfo)filterMap.get("selectedOrg");
@@ -108,10 +108,8 @@ public class WorkOrderDetailExportService {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet));
         }
 
-        List<WorkOrderDetailPojo> workOrderDetailList = null;
-        if(!searchFilters.isEmpty()){
-            workOrderDetailList = worDao.workOrderDetailExport(searchFilters);
-        }
+        searchFilters.add(new SearchFilter("approvedStatus", SearchFilter.Operator.IN, filterMap.get("approvedStatus")));
+        List<WorkOrderDetailPojo> workOrderDetailList =  worDao.workOrderDetailExport(searchFilters);
 
         for(WorkOrderDetailPojo workOrderDetailPojo : workOrderDetailList){
             Map<String, Object> workOrderDetailMap = new HashedMap();
@@ -130,6 +128,8 @@ public class WorkOrderDetailExportService {
             workOrderDetailMap.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetailPojo.getContractNum());
             workOrderDetailMap.put(WebUtil.getMessage("Remark"), workOrderDetailPojo.getComment());
             workOrderDetailMap.put(WebUtil.getMessage("PartType"), workOrderDetailPojo.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetailPojo.getPartsType()) : "");
+            workOrderDetailMap.put(WebUtil.getMessage("ApprovalStatus"), workOrderDetailPojo.getApproved() == null ? FieldValueMessageController.fieldValue("approveStatus", "1")
+                    : Boolean.TRUE == workOrderDetailPojo.getApproved() ? FieldValueMessageController.fieldValue("approveStatus", "2") : FieldValueMessageController.fieldValue("approveStatus", "3"));
             if(workOrderDetailPojo.getStatementStatus() != null){
                 workOrderDetailMap.put(WebUtil.getMessage("CloseStatus_xlsx"), workOrderDetailPojo.getStatementStatus() == Boolean.TRUE ? WebUtil.getMessage("ClosedFinish") : WebUtil.getMessage("Opened"));
             }else{

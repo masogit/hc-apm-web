@@ -1,5 +1,6 @@
 package com.ge.apm.service.his.load;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 import com.ge.apm.dao.HisEquipmentDataSourceRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -7,17 +8,21 @@ import com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.domain.his.HisEquipmentDataSource;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.his.HisEquipmentDataSourceRow;
 import com.ge.apm.service.his.HisEquipmentRow;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -44,6 +49,9 @@ public class HisEquipmentDataSourceImportService {
     private HisEquipmentDataSourceMapper hisEquipmentDataSourceMapper;
     @Autowired
     private OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    private MqUtils mqUtils;
     
 
     public List<HisEquipmentDataSource> saveAll(List<HisEquipmentDataSource> data){
@@ -133,7 +141,7 @@ public class HisEquipmentDataSourceImportService {
             for (Map<String, Object> item : importMapList) {
                 ++row;
                 if(checkData(item, importMapList,orgCodeList,collect,map)) {
-                    importOneHisEquipment(item);
+//                    importOneHisEquipment(item);
                 }
 
             }
@@ -221,7 +229,7 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "HIS数据执行科室代码不能为空");
             isValidateData = false;
         }
-        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode()))){
+        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode())) &&  hisEquipmentDataSource.getExecTime() != null  ){
             List<HisEquipmentDataSource> hisEquipmentDataSources = collect.get(hisEquipmentDataSource.getOrgCode());
             if( hisEquipmentDataSource.getExecTime().before(hisEquipmentDataSources.get(0).getExecTime())){
                 item.put("status", ImportStatus.Failure);
@@ -251,7 +259,38 @@ public class HisEquipmentDataSourceImportService {
         //item.put("status", StringUtils.isEmpty(contractInfoVO.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
 //        hisEquipmentDataSource.setCreatedDate(new Date());
         hisEquipmentDataSource.setIsMatched(Boolean.FALSE);
+        hisEquipmentDataSource.setRecordCount(0);
+        hisEquipmentDataSource.setCreateDate(new Date());
         hisEquipmentDataSourceRepository.save(hisEquipmentDataSource);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void saveDBAndToEs(List<Map<String, Object>> importMapList) {
+        List<HisEquipmentDataSource> list = importMapList.stream()
+                .filter(map ->    (map.get("status")==null ) ||            (   !ImportStatus.CheckFail.name().equals(map.get("status").toString()) && !ImportStatus.Failure.name().equals(map.get("status").toString())  ))
+                .map(map -> (HisEquipmentDataSource) map.get("hisEquipmentDataSource"))
+                .collect(Collectors.toCollection(ArrayList::new));
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
+        list.stream().forEach(item->{
+            item.setIsMatched(Boolean.FALSE);
+            item.setRecordCount(0);
+            item.setCreateDate(new Date());
+        });
+        hisEquipmentDataSourceRepository.save(list);
+
+        int batchSize = 1000;
+        List<List<HisEquipmentDataSource>> splitLists = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += batchSize) {
+            splitLists.add(list.subList(i, Math.min(i + batchSize, list.size())));
+        }
+        for (List<HisEquipmentDataSource> splitList : splitLists) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("data",splitList);
+            MqContext mqContext = MqContext.builder().serviceName("hc-apm-web").exChange(RabbitConfig.DATA_UPLOAD_EXCHANGE).routingKey(RabbitConfig.HIS_DATA_SOURCE_ROUTING_KEY).time(new Date()).jsonObject(jsonObject).build();
+            mqUtils.sendToMq(mqContext);
+        }
     }
 
     public enum ImportStatus {

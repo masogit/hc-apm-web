@@ -16,6 +16,7 @@ import org.primefaces.context.RequestContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.SessionCache;
+import webapp.framework.util.StringUtil;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.LoginService;
@@ -31,6 +32,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -199,14 +201,26 @@ public class LoginController extends LoginService {
         if (user.getPassword().equals(saltedPassword)) {
             WebUtil.redirectTo("/resetPassword2.xhtml");
         } else {
-            String str = userContextService.getUserDefaultHomePage();
+
             boolean factorValidLogin = isPhoneValidLogin(user);
-            if(!factorValidLogin){
+            if(!factorValidLogin ){
                 skipTelephoneValidlogin();
-            }else {
-                str = "/portal/login/phoneValid.xhtml";
+                String str = userContextService.getUserDefaultHomePage();
+                WebUtil.redirectTo(str);
+            }else if(initialLogin == 0){
+                initialLogin = 3;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("twoFactorValid", initialLogin);
+                telephone = user.getTelephone();
+                encryTelephone = StringUtil.mobileEncrypt(telephone);
+            }else if(initialLogin == 2){
+                skipTelephoneValidlogin();
+                String str = userContextService.getUserDefaultHomePage();
+                WebUtil.redirectTo(str);
+            }else if(initialLogin == 4){
+                String str="/portal/login/phoneValid.xhtml";
+                WebUtil.redirectTo(str);
             }
-            WebUtil.redirectTo(str);
         }
     }
     private void skipTelephoneValidlogin() {
@@ -225,7 +239,7 @@ public class LoginController extends LoginService {
         if(user.getIsActive()){
             try{
                 String accessToken = null;
-                if(user.isGeSSO()){
+                if(user.isGeSSO() || initialLogin == 1){
                 	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(loginName, user.getPassword(),userAgent);
                 }
                 else{
@@ -241,7 +255,7 @@ public class LoginController extends LoginService {
             dao.save(user);
             try{
             	String accessToken = null;
-                if(user.isGeSSO()){
+                if(user.isGeSSO() || initialLogin == 1){
                 	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(loginName, user.getPassword(),userAgent);
                 }
                 else{
@@ -456,9 +470,41 @@ public class LoginController extends LoginService {
                 user.setLastModifiedBy(user.getLoginName());
                 userAccountDao.save(user);
                 user.setPlainPassword(tempNewPassword);
+                initialLogin = 4;
                 doSpringSecuritylogin(request, response, user);
             }
         }
     }
-    
+    public void doVerificationCode(){
+        //"校验验证码,进行登录
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+//        logger.info("phone login: telephone={},mdmCode={}",telephone,verificationCode);
+        if(org.springframework.util.StringUtils.isEmpty(telephone)){
+            WebUtil.addErrorMessage("手机号不能为空");
+            return;
+        }
+        if(org.springframework.util.StringUtils.isEmpty(verificationCode)){
+            WebUtil.addErrorMessage("验证码不能为空");
+            return;
+        }
+        Map<String,String> map = msUtil.getMsMCode(telephone);
+        if(map == null){
+            WebUtil.addErrorMessage("验证码已经过期,请重新发送");
+            return;
+        }
+        String phone = map.get("phone");
+        String code = map.get("code");
+        if(phone.equals(telephone) && verificationCode.equals(code)){
+            skipTelephoneValidlogin();
+            // called after user logined.
+            String str = WebUtil.getBean(UserContextService.class).getUserDefaultHomePage();
+            WebUtil.redirectTo(str);
+        }else {
+            WebUtil.addErrorMessage("验证码错误");
+        }
+
+    }
 }
