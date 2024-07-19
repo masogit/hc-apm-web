@@ -96,15 +96,15 @@
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">推荐品牌<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange"/>
+                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange" required="true" requiredMessage="推荐品牌 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange"/>
+                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange" required="true" requiredMessage="规格 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">型号<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange"/>
+                                <p:inputText disabled="#{ budgetBayController.selected.applicationStep eq 'PendingComplete' or budgetBayController.tabIndexList eq 4}" value="#{budgetBayController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange" required="true" requiredMessage="型号 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
