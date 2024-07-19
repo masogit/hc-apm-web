@@ -84,7 +84,7 @@
                             </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">设备名称<span style="color: red">*</span></label>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange" required="true" requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}" />
                                 <p:commandButton rendered="#{budgetController.editButtonDisplay()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup >
