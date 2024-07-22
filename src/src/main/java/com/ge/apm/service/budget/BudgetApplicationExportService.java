@@ -5,14 +5,14 @@ import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.data.style.Style;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.MultiLevelApproval;
-import com.ge.apm.domain.PurchaseVender;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.VenderInfo;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -28,6 +28,8 @@ import javax.faces.context.FacesContext;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -70,6 +72,9 @@ public class BudgetApplicationExportService {
     @Autowired
     VenderInfoRepository venderInfoRepository;
 
+    @Autowired
+    private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
+
     private MicroServiceUtil msService;
 
     @PostConstruct
@@ -80,7 +85,7 @@ public class BudgetApplicationExportService {
     /**
      * 导出多个申购单
      */
-    public StreamedContent exportZip(List<BudgetApplicationAsset> budgetApplicationAssetList) throws IOException {
+    public StreamedContent exportZip(List<BudgetApplicationAsset> budgetApplicationAssetList) throws IOException, ParseException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
         for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
@@ -94,7 +99,7 @@ public class BudgetApplicationExportService {
     }
 
 
-    public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException {
+    public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException, ParseException {
         BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
         String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -105,15 +110,15 @@ public class BudgetApplicationExportService {
         return streamedContent;
     }
 
-    public void generateSingleBudget(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication, List<V2_BlobObject> blobObjects, ZipOutputStream zout,String docPrefix, String attachmentPrefix) throws IOException {
+    public void generateSingleBudget(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication, List<V2_BlobObject> blobObjects, ZipOutputStream zout,String docPrefix, String attachmentPrefix) throws IOException, ParseException {
         //1、doc模板部分
         Map<String, Object> data = createReportData(budgetApplicationAsset, budgetApplication);
-        byte[] templateBytes;
-        if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
+        byte[] templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
+        /*if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
         }else {
             templateBytes = buildReportTemplate(LESS_FIFTY_THOUSAND);
-        }
+        }*/
 
         byte[] bytes = this.renderDocx(data, templateBytes);
 
@@ -167,20 +172,37 @@ public class BudgetApplicationExportService {
     /**
       * 获取导出的doc模板数据
      */
-    public Map<String, Object> createReportData(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication) throws IOException {
+    public Map<String, Object> createReportData(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication) throws IOException, ParseException {
         Map<String, Object> mm = new HashMap<>();
         if(budgetApplicationAsset != null){
             if(budgetApplication.getApplicationDept() != null){
                 mm.put("deptName", budgetApplication.getApplicationDept().getName());
             }
             mm.put("assetName", budgetApplicationAsset.getApplicationAssetName());
-            mm.put("num", budgetApplicationAsset.getConfirmQuantity());
-            mm.put("price", budgetApplicationAsset.getConfirmPrice());
-            mm.put("total", budgetApplicationAsset.getConfirmAmount());
+            if(budgetApplicationAsset.getConfirmQuantity() != null){
+                mm.put("num", budgetApplicationAsset.getConfirmQuantity());
+                mm.put("price", budgetApplicationAsset.getConfirmPrice());
+                mm.put("total", budgetApplicationAsset.getConfirmAmount());
+            }else if(budgetApplicationAsset.getOfflineApplicationQuantity() != null){
+                mm.put("num", budgetApplicationAsset.getOfflineApplicationQuantity());
+                mm.put("price", budgetApplicationAsset.getOfflineApplicationPrice());
+                mm.put("total", budgetApplicationAsset.getOfflineApplicationAmount());
+            }else{
+                mm.put("num", budgetApplicationAsset.getApplicationQuantity());
+                mm.put("price", budgetApplicationAsset.getApplicationPrice());
+                mm.put("total", budgetApplicationAsset.getApplicationAmount().doubleValue());
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            UserAccount account = UserContextService.getCurrentUserAccount();
+            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
+                    account.getSiteUID(),sdf.parse(sdf.format(budgetApplication.getApplicationDate())));
+            if(!purchaseBudgetConfigList.isEmpty()){
+                mm.put("year", purchaseBudgetConfigList.get(0).getYear());
+            }
+
             Calendar calendar=Calendar.getInstance();
             calendar.setTime(budgetApplication.getApplicationDate());
-            int year = calendar.get(Calendar.YEAR);
-            mm.put("year", year);
+
             int applyYear = calendar.get(Calendar.YEAR);
             int applyMonth = calendar.get(Calendar.MONTH) + 1;
             int applyDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -368,7 +390,7 @@ public class BudgetApplicationExportService {
     /**
      * 生成申购单文件
      */
-    public void generateBudgetFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException{
+    public void generateBudgetFiles(ZipOutputStream zout, PurchaseOrderInfo purchaseOrderInfo) throws IOException, ParseException {
         List<BudgetApplication> budgetApplicationList = budgetApplicationRepository.findByPurchaseIdAndIsDeletedAndOrderTypeIsNotNull(purchaseOrderInfo.getId(),0);
         if(budgetApplicationList != null && budgetApplicationList.size() > 0){
             for(BudgetApplication application : budgetApplicationList){

@@ -661,6 +661,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
