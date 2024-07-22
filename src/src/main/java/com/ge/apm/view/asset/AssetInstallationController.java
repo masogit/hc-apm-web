@@ -109,14 +109,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     @Setter
     private TreeNode gbTree;
     private String src = "";
-    @Getter
-    @Setter
     private UserAccount owner1;
-    @Getter
-    @Setter
     private UserAccount owner2;
-    @Getter
-    @Setter
     private UserAccount owner3;
     @Getter
     @Setter
@@ -725,7 +719,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     public String returnAction() {
         if ("List".equals(src)) {
-            return "arrivalItemsList?faces-redirect=true";
+            return "arrivalItemsMain?faces-redirect=true";
         } else {
             return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + arrivalListItem.getArrivalListId());
         }
@@ -1276,5 +1270,29 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     public void setFactoryWarrantyDate(Date factoryWarrantyDate) {
         this.factoryWarrantyDate = factoryWarrantyDate;
         this.arrivalListItem.setFactoryWarrantyDate(factoryWarrantyDate);
+    }
+
+    public UserAccount getOwner1() {
+        return owner1;
+    }
+
+    public void setOwner1(UserAccount owner1) {
+        this.owner1 = owner1;
+    }
+
+    public UserAccount getOwner2() {
+        return owner2;
+    }
+
+    public void setOwner2(UserAccount owner2) {
+        this.owner2 = owner2;
+    }
+
+    public UserAccount getOwner3() {
+        return owner3;
+    }
+
+    public void setOwner3(UserAccount owner3) {
+        this.owner3 = owner3;
     }
 }
