@@ -158,6 +158,19 @@
                                           sizeLimit="500000000" update="ObjectUpload4" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
 
                         </p:panel>
+                        <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
+                            <p:dataList id="ObjectUpload5" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(4)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
+                                <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload3" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchVerification}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          sizeLimit="500000000" update="ObjectUpload5" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+
+                        </p:panel>
 
                         <p:panel id="vlinkPanel" styleClass="ui-panelgrid-blank" style=" border: 0" >
                             <div style="border: 1px solid #bdbdbd">
