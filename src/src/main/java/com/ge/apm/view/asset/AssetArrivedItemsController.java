@@ -453,11 +453,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         orgInfos.addAll(orgInfoDao.findByUids(siteUidList.isEmpty() ? Collections.singletonList("-1") : siteUidList));
         Map<String, OrgInfo> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o));
         Set<Integer> assetIds = itemList.stream().map(ArrivalListItem::getParentAssetId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-        Map<Integer, String> assetMap = MapUtil.newHashMap();
-        if (ObjectUtil.isNotEmpty(assetIds)) {
-            List<AssetInfo> assetInfos = assetDao.getSimpleDataByIds(assetIds);
-            assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, AssetInfo::getName));
-        }
+        List<AssetInfo> assetInfos = assetDao.getSimpleDataByIds(assetIds.isEmpty() ? Collections.singleton(-1) : assetIds);
+        Map<Integer, String> assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, AssetInfo::getName));
         List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(currentUser.getUid());
         Map<String, String> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
         for (ArrivalListItem arrivalListItem : itemList) {
