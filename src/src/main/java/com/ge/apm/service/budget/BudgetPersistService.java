@@ -8,6 +8,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
+import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -40,6 +41,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -99,6 +101,8 @@ public class BudgetPersistService {
     private BlobFileService blobService;
     @Autowired
     private OrgInfoRepository orgDao;
+    @Autowired
+    private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -158,6 +162,18 @@ public class BudgetPersistService {
         budgetApplicationAsset.setIsDeleted(0);
         if("Create".equals(crudActionName)){
             budgetApplicationAsset.setApplicationAssetName(budgetAssetInfo.getName());
+
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                List<PurchaseBudgetConfig>  purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
+                        account.getSiteUID(),sdf.parse(sdf.format(budgetApplication.getApplicationDate())));
+                if(!purchaseBudgetConfigList.isEmpty()){
+                    budgetApplication.setApplicationYear(purchaseBudgetConfigList.get(0).getYear());
+                }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
         }
     }
 

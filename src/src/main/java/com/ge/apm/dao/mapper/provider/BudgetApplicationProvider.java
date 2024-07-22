@@ -26,6 +26,7 @@ public class BudgetApplicationProvider {
                 "  t.procure_status," +
                 "  t.confirm_status," +
                 "  t.data_source," +
+                "  t.application_year," +
                 "  uap.name as approveName," +
                 "  oi.name as applicationDeptName," +
                 "  t.approval_date," +

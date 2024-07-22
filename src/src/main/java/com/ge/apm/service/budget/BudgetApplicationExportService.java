@@ -192,17 +192,10 @@ public class BudgetApplicationExportService {
                 mm.put("price", budgetApplicationAsset.getApplicationPrice());
                 mm.put("total", budgetApplicationAsset.getApplicationAmount().doubleValue());
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            UserAccount account = UserContextService.getCurrentUserAccount();
-            List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
-                    account.getSiteUID(),sdf.parse(sdf.format(budgetApplication.getApplicationDate())));
-            if(!purchaseBudgetConfigList.isEmpty()){
-                mm.put("year", purchaseBudgetConfigList.get(0).getYear());
-            }
+            mm.put("year", budgetApplication.getApplicationYear());
 
             Calendar calendar=Calendar.getInstance();
             calendar.setTime(budgetApplication.getApplicationDate());
-
             int applyYear = calendar.get(Calendar.YEAR);
             int applyMonth = calendar.get(Calendar.MONTH) + 1;
             int applyDay = calendar.get(Calendar.DAY_OF_MONTH);

@@ -157,7 +157,7 @@
 
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit'}">
                     <label class="label">审批状态*</label>
-                    <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" >
+                    <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" required="true" requiredMessage="审批状态不能为空！">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnDataStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
