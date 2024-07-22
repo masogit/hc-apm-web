@@ -462,6 +462,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         handleFileUploadBatch(event,"Measuring");
     }
 
+    public void handleFileUploadBatchVerification(FileUploadEvent event) {
+        handleFileUploadBatch(event,"4");
+    }
+
     public void handleFileUploadBatchVideoLink(FileUploadEvent event) {
         handleFileUploadBatch(event,"vlink");
     }
