@@ -225,6 +225,9 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "confirm_status")
     private String confirmStatus;
 
+    @Column(name = "application_year")
+    private String applicationYear;
+
     @Transient
     private Integer offlineApplicationQuantity;
 
@@ -697,5 +700,13 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     public void setPurchaseId(String purchaseId) {
         this.purchaseId = purchaseId;
+    }
+
+    public String getApplicationYear() {
+        return applicationYear;
+    }
+
+    public void setApplicationYear(String applicationYear) {
+        this.applicationYear = applicationYear;
     }
 }
