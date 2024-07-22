@@ -1,1 +1,3 @@
 INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), 'ac07d2c239df4ee79f645f05d153debc', 'ac07d2c239df4ee79f645f05d153debc', '常州市中医医院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='ac07d2c239df4ee79f645f05d153debc');
+
+ALTER TABLE his_equipment_data_source_backup ADD PRIMARY KEY (id);

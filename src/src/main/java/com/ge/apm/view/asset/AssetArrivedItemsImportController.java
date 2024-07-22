@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetTypeGroupRepository;
@@ -19,7 +20,6 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -87,7 +87,6 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         handleExcel(importList);
     }
 
-    @Transactional
     public List<ArrivalItemImport> handleExcel(List<ArrivalItemImport> importList) throws IOException {
         importFailedDataList = ListUtil.newArrayList();
         List<UserAccount> workerList = assetInstallationService.getWorkerList();
@@ -112,7 +111,7 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             }
              if (ObjectUtil.isNotEmpty(arrivalItemImport.getClinicalDept())) {
                  if (ObjectUtil.isNotEmpty(site)) {
-                     if (ObjectUtil.isEmpty(clinicalDept) || !clinicalDept.getParentUID().equals(site.getUid())) {
+                     if (ObjectUtil.isEmpty(clinicalDept) || !clinicalDept.getSiteUID().equals(site.getUid())) {
                          errMsg.append("科室不存在;");
                      } else {
                          clinicalDeptUidList.add(clinicalDept.getUid());
