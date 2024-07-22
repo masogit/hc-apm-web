@@ -96,7 +96,6 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
         Set<String> clinicalDeptUidList = new HashSet<>(ListUtil.newArrayList("-1"));
         Set<String> siteUidList = new HashSet<>(ListUtil.newArrayList("-1"));
         List<ArrivalListItem> saveList = ListUtil.newArrayList();
-        logger.info("importList : " + JSON.toJSONString(importList));
         for (int row = 0; row < importList.size(); row++) {
             ArrivalItemImport arrivalItemImport = importList.get(row);
             StringBuilder errMsg = new StringBuilder();
@@ -112,7 +111,7 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             }
              if (ObjectUtil.isNotEmpty(arrivalItemImport.getClinicalDept())) {
                  if (ObjectUtil.isNotEmpty(site)) {
-                     if (ObjectUtil.isEmpty(clinicalDept) || !clinicalDept.getParentUID().equals(site.getUid())) {
+                     if (ObjectUtil.isEmpty(clinicalDept) || !clinicalDept.getSiteUID().equals(site.getUid())) {
                          errMsg.append("科室不存在;");
                      } else {
                          clinicalDeptUidList.add(clinicalDept.getUid());
