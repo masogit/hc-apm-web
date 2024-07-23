@@ -293,6 +293,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
+                jsonObject.put("lifecycleInYear",asset.getLifecycleInYear());
                 List<Object> objects = new ArrayList<>();
                 objects.add(jsonObject);
                 primaryApprovalData = objects;
