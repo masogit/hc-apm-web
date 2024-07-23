@@ -143,7 +143,7 @@
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}1" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetArrivedItemsController.exportExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
+                        <p:commandButton title="导出安装单" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{assetArrivedItemsController.exportExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
                                          onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                             <p:fileDownload value="#{assetArrivedItemsController.excelFile}" />
                         </p:commandButton>
