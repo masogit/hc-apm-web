@@ -71,7 +71,7 @@
                     <h:outputText value="#{item.assetModel}"/>
                 </p:column>
                 <p:column headerText="设备分类">
-                    <h:outputText value="#{item.applicationAssetCategory}"/>
+                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.applicationAssetCategory)}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
                     <p:commandButton value="#{msg.AddNewAsset}" class="zoom-08"
