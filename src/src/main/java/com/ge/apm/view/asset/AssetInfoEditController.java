@@ -606,6 +606,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setLocationName(createRequest.getLocationName());//安装位置
         selected.setComments(createRequest.getComments());//备注
         selected.setAssetType(createRequest.getAssetType());// 资产分类
+        selected.setEmergencyEquipment(createRequest.getEmergencyEquipment());// 是否急救设备
+        selected.setLifecycleInYear(createRequest.getLifecycleInYear());// 使用年限
 
         if(null != createRequest.getManufactureId()){
             Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
