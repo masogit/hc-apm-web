@@ -18,8 +18,9 @@ CREATE INDEX his_administrative_offices_match_hos_id_idx ON public.his_administr
 CREATE INDEX his_administrative_offices_match_his_ksid_idx ON public.his_administrative_offices_match (his_ksid);
 CREATE INDEX his_administrative_offices_match_org_info_uid_idx ON public.his_administrative_offices_match (org_info_uid);
 
+delete from his_equipment_data_source where org_code='123204004672859009';
 
 -- his  his_equipment_data_source_backup 添加主键
 ALTER TABLE his_equipment_data_source_backup ADD PRIMARY KEY (id);
 
-delete from his_equipment_data_source where org_code='123204004672859009';
+
