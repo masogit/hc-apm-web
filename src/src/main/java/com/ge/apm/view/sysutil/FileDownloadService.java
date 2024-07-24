@@ -90,12 +90,15 @@ public class FileDownloadService {
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
         String fileName = DownloadTemplateFileType.getTemplateFile(type, ucs.isLocale());
         InputStream inputStream = FileDownloadService.class.getClassLoader().getResourceAsStream("template/" + fileName);
-        inputStream =processorTemplateFile(inputStream);
+        inputStream =processorTemplateFile(inputStream,type);
         exportFile(inputStream, fileName);
     }
 
-    private InputStream processorTemplateFile(InputStream inputStream)  {
-        return getCustomRole(inputStream);
+    private InputStream processorTemplateFile(InputStream inputStream,String type)  {
+        if(DownloadTemplateFileType.USER_ACCOUNT.name().equals(type)){
+            return getCustomRole(inputStream);
+        }
+        return inputStream;
     }
 
     private InputStream getCustomRole(InputStream inputStream) {
