@@ -121,7 +121,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "lastInventoryDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline");
+                "lastQaDate", "lastMeteringDate", "lastInventoryDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline", "warrantyStatus");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {

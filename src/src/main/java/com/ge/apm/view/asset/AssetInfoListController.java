@@ -1,10 +1,10 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
@@ -37,7 +37,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -82,6 +81,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
+    private ContractInfoMapper contractInfoMapper;
     //选定的院区
     private OrgInfo selectSite;
 
@@ -227,6 +227,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -363,7 +364,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){
-        assets.forEach(item -> item.setWarrantyExpireAlertDays(warrantyAlertDays));
+        List<String> assetUidList = ObjectUtil.isEmpty(assets) ? ListUtil.newArrayList("-1") : assets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+        List<Map<String, Object>> assetDateList = contractInfoMapper.findDateByAssetUidList(assetUidList);
+        Map<String, List<Map<String, Object>>> assetDateMap = assetDateList.stream().collect(Collectors.groupingBy(map -> (String) map.get("assetuid")));
+        Date now = DateUtil.now();
+        for (AssetInfo asset : assets) {
+            List<Map<String, Object>> dateList = assetDateMap.get(asset.getUid());
+            if (ObjectUtil.isNotEmpty(dateList)) {
+                long count = dateList.stream().filter(map -> ((Date) map.get("startdate")).before(now) && ((Date) map.get("enddate")).after(now)).count();
+                if (count > 0) {
+                    asset.setWarrantyStatus("在保");
+                } else {
+                    asset.setWarrantyStatus("出保");
+                }
+            } else {
+                asset.setWarrantyStatus("不确定");
+            }
+            asset.setWarrantyExpireAlertDays(warrantyAlertDays);
+        }
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -727,6 +745,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                     assetList =  orderByForParentAndChildren(assetList);
                 }
+                setWarrantyAlerts(assetList);
                 startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
             }
         } else {
@@ -734,6 +753,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                 assetList =  orderByForParentAndChildren(assetList);
             }
+            setWarrantyAlerts(assetList);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
             template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
         }
