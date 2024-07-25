@@ -59,6 +59,14 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
     private Integer empowermentSearch;
     @Getter @Setter
     private OrgInfo selectSite;
+    @Getter @Setter
+    private Supplier selectSupplier;
+    @Getter @Setter
+    private List<Supplier> supplierList;
+    @Getter @Setter
+    private Map<String, Supplier> supplierMap;
+
+    private Boolean showSupplierUser = Boolean.TRUE;
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
@@ -108,7 +116,9 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
-        return autoCompleteService.autoCompleteVendor(query, aimService.getOnlySuplierListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID()));
+        supplierList = autoCompleteService.autoCompleteVendor(query, aimService.getOnlySuplierListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID()));
+        supplierMap = supplierList.stream().collect(Collectors.toMap(Supplier::getUid, s -> s));
+        return supplierList;
     }
 
     public List<UserAccount> supplierUsers(String query) {
@@ -130,18 +140,23 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
     }
 
     public void doEmpowerment() {
-        if(selectedUserUid==null) {
-            WebUtil.addErrorMessage("请选择负责人！"); return;
+        if (selectedSupplierUid == null) {
+            WebUtil.addErrorMessage("请选择供应商！"); return;
         }
         Set selectassetUid = selectedMap.keySet();
         if(selectassetUid.isEmpty()) {
             WebUtil.addErrorMessage("请勾选设备！"); return;
+        }
+        Supplier supplier = supplierMap.get(selectedSupplierUid);
+        if(selectedUserUid == null && supplier.getVenderCompanyId() == null) {
+            WebUtil.addErrorMessage("请选择负责人！"); return;
         }
         allAssets.stream().forEach(assetInfo -> {
             if(selectassetUid.contains(assetInfo.getUid())) {
                 if(assetInfo.getEmpowermentStatus()==null || assetInfo.getEmpowermentStatus()==0) { //未赋权
                     AssetEmpowerment assetEmpowerment = new AssetEmpowerment();
                     assetEmpowerment.setAssetUid(assetInfo.getUid());
+                    assetEmpowerment.setSupplierUid(selectedSupplierUid);
                     assetEmpowerment.setUserUid(selectedUserUid);
                     assetEmpowermentRepostory.save(assetEmpowerment);
                     assetInfo.setEmpowermentStatus(1);
@@ -309,7 +324,17 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
         }
     }
-    public void onSupplierChange() { }
+    public void onSupplierChange() {
+        selectSupplier = supplierMap.get(selectedSupplierUid);
+        showSupplierUser = selectSupplier.getVenderCompanyId() == null;
+    }
     public void onSupplierUserChange() { }
 
+    public Boolean getShowSupplierUser() {
+        return showSupplierUser;
+    }
+
+    public void setShowSupplierUser(Boolean showSupplierUser) {
+        this.showSupplierUser = showSupplierUser;
+    }
 }
