@@ -867,6 +867,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String assetUsedLifecycle;
 
+    @Transient
+    @TableField(exist = false)
+    @Getter @Setter
+    private String warrantyStatus;
+
     @Getter
     @Setter
     @Column(name = "offline_update_date")
