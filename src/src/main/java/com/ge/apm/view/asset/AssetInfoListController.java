@@ -335,6 +335,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         addMisingClinicalDeptOrg(currentPageAssets);
         setWarrantyAlerts(currentPageAssets);
         assetInfoService.setSupplier(currentPageAssets);
+        assetInfoService.setWarrantyStatus(currentPageAssets);
 
 //        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 //        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
@@ -364,24 +365,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){
-        List<String> assetUidList = ObjectUtil.isEmpty(assets) ? ListUtil.newArrayList("-1") : assets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
-        List<Map<String, Object>> assetDateList = contractInfoMapper.findDateByAssetUidList(assetUidList);
-        Map<String, List<Map<String, Object>>> assetDateMap = assetDateList.stream().collect(Collectors.groupingBy(map -> (String) map.get("assetuid")));
-        Date now = DateUtil.now();
-        for (AssetInfo asset : assets) {
-            List<Map<String, Object>> dateList = assetDateMap.get(asset.getUid());
-            if (ObjectUtil.isNotEmpty(dateList)) {
-                long count = dateList.stream().filter(map -> ((Date) map.get("startdate")).before(now) && ((Date) map.get("enddate")).after(now)).count();
-                if (count > 0) {
-                    asset.setWarrantyStatus("在保");
-                } else {
-                    asset.setWarrantyStatus("出保");
-                }
-            } else {
-                asset.setWarrantyStatus("不确定");
-            }
-            asset.setWarrantyExpireAlertDays(warrantyAlertDays);
-        }
+        assets.forEach(asset -> asset.setWarrantyExpireAlertDays(warrantyAlertDays));
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -745,7 +729,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                     assetList =  orderByForParentAndChildren(assetList);
                 }
-                setWarrantyAlerts(assetList);
+                assetInfoService.setWarrantyStatus(currentPageAssets);
                 startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
             }
         } else {
@@ -753,7 +737,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                 assetList =  orderByForParentAndChildren(assetList);
             }
-            setWarrantyAlerts(assetList);
+            assetInfoService.setWarrantyStatus(currentPageAssets);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
             template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
         }
