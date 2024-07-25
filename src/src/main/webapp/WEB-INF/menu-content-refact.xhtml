@@ -131,6 +131,7 @@
                            <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_VIEW')}"/>
                            <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_STORE_VIEW')}"/>
                            <p:menuitem value="#{msg.CheckAndStore}" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.needInstorageCheck() and userContextService.accessContainsFunctionMenu('INSTALL_CHECK_EDIT')}"/>
+                           <p:menuitem value="#{msg.AssetOutStock}" outcome="/portal/asset/arrivedOutStock/arrivalOutStockMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_ASSET_OUT_STOCK_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'HISPERFORMANCE'}">

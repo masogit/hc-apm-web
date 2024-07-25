@@ -50,4 +50,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     ArrivalListItem findByQrCode(String qrCode);
 
+
+
+    List<ArrivalListItem> findBySiteUidAndOutStockNoAndOutStockNoNotNull(String siteUid, String outStockNo);
 }
