@@ -126,6 +126,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
     public void updateClinicalName(String name, String uid);
 
+    @Query(value = "select distinct a.uid from asset_info a where a.clinical_dept_uid=?1 and a.site_uid = ?2 ", nativeQuery = true)
+    List<String> findByClinicalUidAndSiteUid(String clinicalUid,String siteUid);
+
 
     @Modifying
     @Transactional

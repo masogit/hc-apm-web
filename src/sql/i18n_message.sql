@@ -3259,6 +3259,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence15', '1.5 进行其他任何违法以及侵犯其他个人、公司、社会团体、组织的合法权益的行为或者法律、行政法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他行为。', '1.5 Have any other act that violates the laws and infringes the lawful rights and interests of other individuals, companies, social groups or organizations, or are restricted or prohibited by the laws, administrative regulations, rules, regulations, and any legally binding norms.', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WelcomeToAPMManagementPlatform', '欢迎登陆APM管理平台！', 'Welcome to APM Management Platform!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CheckAndStore', '核对入库', 'Check and Store', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetOutStock', '资产出库', 'Asset Out Stock', NULL, '-1');
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'srNum_xlsx', '报修单号', 'RequestWorkorderNumber', NULL, '-1');

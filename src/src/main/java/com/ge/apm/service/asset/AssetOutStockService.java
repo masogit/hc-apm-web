@@ -1,0 +1,138 @@
+package com.ge.apm.service.asset;
+
+import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.data.RenderData;
+import com.deepoove.poi.data.TableRenderData;
+import com.deepoove.poi.data.TextRenderData;
+import com.ge.apm.dao.ArrivalListItemRepository;
+import com.ge.apm.dao.ArrivalListRepository;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetOutStockDto;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import org.apache.commons.io.IOUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.*;
+
+@Service
+public class AssetOutStockService {
+
+    @Autowired
+    ArrivalListItemRepository arrivalListItemRepository;
+
+    @Autowired
+    ArrivalListRepository arrivalListRepository;
+
+    @Autowired
+    AssetInfoRepository assetInfoRepository;
+
+    @Autowired
+    OrgInfoRepository orgInfoRepository;
+
+    public static final String PATH_WORD_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stock_template.docx";
+
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateClinicalByOutStock(AssetOutStockDto assetOutStockDto, List<ArrivalListItem> arrivalListItemList){
+
+        for(ArrivalListItem arrivalListItem : arrivalListItemList){
+            ArrivalList arrivalList = arrivalListItem.getArrivalList();
+            AssetInfo assetInfo = assetInfoRepository.findByUid(arrivalListItem.getAssetUID());
+            if(assetInfo == null){
+                return;
+            }
+            assetInfo.setClinicalDeptUID(assetOutStockDto.getStockedDeptUid());
+            assetInfo.setClinicalDeptId(assetOutStockDto.getStockedDeptId());
+            assetInfo.setClinicalDeptName(assetOutStockDto.getStockedDeptName());
+            assetInfoRepository.save(assetInfo);
+
+          /*  arrivalListItem.setClinicalDeptUID(assetOutStockDto.getStockedDeptUid());*/
+            arrivalListItem.setUnit(assetOutStockDto.getUnit());
+            arrivalListItem.setQty(assetOutStockDto.getQty());
+            arrivalListItem.setOutStockNo(assetOutStockDto.getOutStockNo());
+            arrivalListItem.setOutStocDate(assetOutStockDto.getOutStocDate());
+            arrivalListItem.setRecruiter(assetOutStockDto.getRecruiter());
+            arrivalListItemRepository.save(arrivalListItem);
+
+           /* arrivalList.setClinicalDeptUID(assetOutStockDto.getStockedDeptUid());
+            arrivalList.setClinicalDeptName(assetOutStockDto.getStockedDeptName());
+            arrivalListRepository.save(arrivalList);*/
+        }
+    }
+
+
+    public StreamedContent exportWord(AssetOutStockDto assetOutStockDto, List<ArrivalListItem> arrivalListItemList) throws IOException {
+        //1、doc模板部分
+        Map<String, Object> data = createFileData(assetOutStockDto, arrivalListItemList);
+        byte[] templateBytes = buildReportTemplate(PATH_WORD_TEMPLATE);
+
+        byte[] bytes = this.renderDocx(data, templateBytes);
+        StreamedContent streamedContent = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", "out_stock_template.docx");
+        return streamedContent;
+    }
+
+    public byte[] buildReportTemplate(String templatePath) throws IOException {
+        byte[] templateBytes = null;
+        if(templatePath != null){
+            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
+        }
+        return templateBytes;
+    }
+
+    public Map<String, Object> createFileData(AssetOutStockDto assetOutStockDto, List<ArrivalListItem> arrivalListItemList){
+        Map<String, Object> data = new HashMap<>();
+        data.put("depName", assetOutStockDto.getStockedDeptName());
+        data.put("date", DateUtil.format(assetOutStockDto.getOutStocDate(), "yyyy-MM-dd"));
+        data.put("no", assetOutStockDto.getOutStockNo());
+        data.put("lyr", assetOutStockDto.getRecruiter());
+
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for(ArrivalListItem arrivalListItem : arrivalListItemList){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("type", "专用设备");
+            mm.put("assetName", arrivalListItem.getArrivalList().getAssetName());
+            mm.put("functionType", arrivalListItem.getArrivalList().getFunctionType());
+            mm.put("unit", assetOutStockDto.getUnit());
+            mm.put("qty", "1");
+            mm.put("purchasePrice", arrivalListItem.getPurchasePrice());
+            mm.put("total", arrivalListItem.getPurchasePrice());
+            mm.put("vendor", arrivalListItem.getArrivalList().getVendor());
+            dataList.add(mm);
+        }
+
+        data.put("list", dataList);
+
+        return data;
+    }
+
+    private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
+        byte[] bytes;
+        XWPFTemplate template = null;
+        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+            template = XWPFTemplate.compile(inputStream);
+            template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+            template.render(data);
+            template.write(out);
+            bytes = out.toByteArray();
+        }finally {
+            if (template != null) {
+                template.close();
+            }
+        }
+        return bytes;
+    }
+}
