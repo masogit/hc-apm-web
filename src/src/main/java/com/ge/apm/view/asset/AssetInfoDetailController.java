@@ -159,6 +159,7 @@ public class AssetInfoDetailController {
         if(Boolean.TRUE.equals(selected.isSpecialAsset())){
             specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
         }
+        assetInfoService.setWarrantyStatus(ListUtil.newArrayList(this.selected));
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {

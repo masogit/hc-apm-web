@@ -22,6 +22,9 @@ public class AssetEmpowerment {
     @Column(name = "asset_id")
     private String assetUid;
 
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+
     public String getUid() { return uid; }
 
     public void setUid(String uid) { this.uid = uid; }
@@ -33,4 +36,12 @@ public class AssetEmpowerment {
     public String getAssetUid() { return assetUid; }
 
     public void setAssetUid(String assetUid) { this.assetUid = assetUid; }
+
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
+    }
 }

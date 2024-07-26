@@ -55,6 +55,7 @@ public enum CustomConfigFields {
     repairForm(fieldName, "repairForm" ,Text),   //维修类型
     locationCode(fieldName, "locationCode" ,Text),      //安装位置编码
     locationName(fieldName, "locationName" ,Text),     //安装位置
+    warrantyStatus(fieldName, "warrantyStatus" ,Text),     //维保状态
     status(fieldName, "status" ,Text),   //当前状态
     isValid(fieldName, "isValid" ,Text),       //是否在用
     deviceStatus(label, "deviceStatus" ,Text), //资产状态
