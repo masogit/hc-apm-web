@@ -1178,6 +1178,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("UCMID"), assetInfo.getUCMID());
         map.put(getMessage("productFamily"), assetInfo.getProductFamily());
         map.put(getMessage("productSegment"), this.getProductSegmentAsString());
+        map.put(getMessage("warrantyStatus"), assetInfo.getWarrantyStatus());
         return map;
 
     }

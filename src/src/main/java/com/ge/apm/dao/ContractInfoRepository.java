@@ -6,8 +6,6 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_WorkOrder;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,5 +41,5 @@ public interface ContractInfoRepository extends GenericRepositoryUUID<ContractIn
     @Modifying
     @Query("update ContractInfo o set o.contractStatus = ?2 where o.id = ?1")
     public int updateContractStatus(String id, String status);
-    
+
 }
