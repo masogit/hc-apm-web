@@ -98,13 +98,9 @@
                 </p:column>-->
                 <f:facet name="{Toolbar}">
                    <p:commandButton id="stockButton" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" title="批量操作" oncomplete="PF('operateDialog').show()" actionListener="#{assetUnOutStockController.batchStock}" update=":assetOutStockTab:assetOutStockListForm :assetOutStockTab:operateDialogForm" disabled="#{not assetUnOutStockController.isChecked()}"/>
-
-
                 </f:facet>
             </p:dataTable>
-
         </h:form>
-      
 
         <p:dialog id="operateDialog" widgetVar="operateDialog" modal="true" width="1000" height="550" resizable="true" draggable="true" header="调拨出库">
             <h:form id="operateDialogForm" >
@@ -198,7 +194,6 @@
             </h:form>
 
         </p:dialog>
-
         <script >
             //<![CDATA[
             function updateSelectAllCheckBox() {
@@ -224,5 +219,27 @@
 
 
         </script>
+
+        <p:overlayPanel id="idPanelFilterArrivalDate" widgetVar="panelFilterArrivalDate" for="assetOutStockTab:assetOutStockListForm:datalist:filterArrivalDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArrivalDate', 'varArrivalDateFrom', 'varArrivalDateTo'); PF('panelFilterArrivalDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterArrivalDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterBusinessAckDate" widgetVar="panelFilterBusinessAckDate" for="assetOutStockTab:assetOutStockListForm:datalist:filterBusinessAckDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateTo2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterBusinessAckDate', 'varArrivalDateFrom2', 'varArrivalDateTo2'); PF('panelFilterBusinessAckDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterBusinessAckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
     </ui:composition>
 </html>

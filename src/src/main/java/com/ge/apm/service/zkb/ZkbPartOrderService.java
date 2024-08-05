@@ -357,16 +357,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             a = unReturnQty;
             b = zkbContract.getSpareQuotaTotal();
         }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-            if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                a = unReturnQty;
-                b = zkbContract.getSpareArtificailTotal();
-            }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                a = unReturnQty;
-                b = zkbContract.getPartHighQuotaTotal();
-            }else{
-                a = unReturnQty;
-                b = zkbContract.getSpareArtificailTotal();
-            }
+            a = unReturnQty;
+            b = (zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal()) + (zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal());
         }else{
             a = unReturnQty;
             b = zkbContract.getSpareArtificailTotal();
