@@ -225,7 +225,7 @@
                    </c:when>
                    <c:when test="#{item eq 'AUDIT'}">
                        <!-- 质控评审 -->
-                       <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
+<!--                       <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>-->
                        <p:menuitem id="um445" value="#{msg.review}2.0" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT2_VIEW') and userContextService.canRender('AUDIT')}"  url="/auditV2/#/mainPage/" target="_blank"></p:menuitem>
                    </c:when>
                    <c:when test="#{item eq 'CONFIG'}">

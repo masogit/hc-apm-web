@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.excel.util.ListUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
@@ -102,9 +103,11 @@ public class UserAccountExportService {
 
 	public List<Map<String, Object>> parseUserAccountToMap(List<UserAccount> listUserAccount) {
 		List<Map<String, Object>> listMapResult = new ArrayList<>();
-		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All();
+		List<OrgInfo> orgInfoTenantAll = tenantOrgInfoAll();
+		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All(orgInfoTenantAll);
 		List<CustomRole> customRoleList = getTenantCustomRole();
 		if (listUserAccount != null && !listUserAccount.isEmpty()) {
+			setListOrgInfo(listUserAccount,orgInfoTenantAll);
 			Map<Integer, List<UserRole>> userCustomList = getUserCustomList(listUserAccount);
 			for (UserAccount tempUser : listUserAccount) {
 				Map<String, Object> tempMap = new HashMap<>();
@@ -222,10 +225,27 @@ public class UserAccountExportService {
 		}).findFirst();
 		return first.isPresent()?first.get():null;
 	}
-	private List<OrgInfo> tenantOrgInfoTypeOf4All(){
-			UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-			String tenantUID = currentUserAccount.getTenantUID();
-			return orgInfoRepository.findByTenantUIDAndOrgType(tenantUID, 4);
+	private void setListOrgInfo(List<UserAccount> userAccounts,List<OrgInfo> orgInfos){
+		if(CollectionUtils.isEmpty(userAccounts)) return;
+		if(CollectionUtils.isEmpty(orgInfos)) return;
+		Set<String> collect = userAccounts.stream().map(UserAccount::getUid).collect(Collectors.toSet());
+		List<UserOrgInfo> userOrgList = userOrgDao.findOrgUidListByUserUid(collect);
+		if(CollectionUtils.isEmpty(userOrgList)) return;
+		Map<String, OrgInfo> ogInfoMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> item));
+		Map<String, List<OrgInfo>> orgInfoMap = userOrgList.stream().collect(Collectors.groupingBy(UserOrgInfo::getUserUid,
+				Collectors.mapping(item -> ogInfoMap.get(item.getOrgUid()), Collectors.toCollection(ArrayList::new))));
+		userAccounts.forEach(item->{
+			 item.setListOrgInfo(orgInfoMap.get(item.getUid()));
+		});
+	}
+	private List<OrgInfo> tenantOrgInfoAll(){
+		UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+		String tenantUID = currentUserAccount.getTenantUID();
+		return orgInfoRepository.findByTenantUID(tenantUID);
+	}
+	private List<OrgInfo> tenantOrgInfoTypeOf4All(List<OrgInfo> orgInfos){
+		if(CollectionUtils.isEmpty(orgInfos)) return ListUtils.newArrayList();
+		return  orgInfos.stream().filter(item->item.getOrgType() != null && item.getOrgType() == 4).collect(Collectors.toList());
 	}
 	/**
 	 * use space as delimiter to group tags to export

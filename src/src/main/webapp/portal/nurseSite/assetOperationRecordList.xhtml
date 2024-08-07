@@ -45,6 +45,10 @@
 							<h:outputText value="#{item.operationByName}">
 							</h:outputText>
 						</p:column>
+						<p:column headerText="备注" filterBy="#{item.description}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.description}">
+							</h:outputText>
+						</p:column>
 						<p:column headerText="登记时间" sortBy="#{item.createDate}"  filterBy="#{item.createDate}" filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filtercreateDate" widgetVar="varFiltercreateDate" />
