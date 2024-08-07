@@ -235,7 +235,12 @@ public class UserAccountExportService {
 		Map<String, List<OrgInfo>> orgInfoMap = userOrgList.stream().collect(Collectors.groupingBy(UserOrgInfo::getUserUid,
 				Collectors.mapping(item -> ogInfoMap.get(item.getOrgUid()), Collectors.toCollection(ArrayList::new))));
 		userAccounts.forEach(item->{
-			 item.setListOrgInfo(orgInfoMap.get(item.getUid()));
+			String siteUID = item.getSiteUID();
+			List<OrgInfo> listOrgInfo = orgInfoMap.get(item.getUid()); // 过滤跨院区
+			if(CollectionUtils.isNotEmpty(listOrgInfo)){
+				listOrgInfo=listOrgInfo.stream().filter(org->siteUID.equals(org.getSiteUID()) || siteUID.equals(org.getHospitalUID()) || siteUID.equals(org.getInstitutionUID()) ||  siteUID.equals(org.getTenantUID())).collect(Collectors.toList());
+				item.setListOrgInfo(listOrgInfo);
+			}
 		});
 	}
 	private List<OrgInfo> tenantOrgInfoAll(){
