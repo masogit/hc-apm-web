@@ -72,6 +72,18 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private boolean selectClinicalDept;
     private boolean selectAssetGroup;
     private boolean approvalRoleAssetHead;
+
+    @Getter
+    @Setter
+    private String approvalUserReplaceUid;
+
+    @Getter
+    @Setter
+    private UserAccount approvalUserFirst;
+
+    @Getter
+    @Setter
+    private UserAccount approvalUserReplace;
     @Override
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -890,5 +902,54 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }else{
             this.approvalNode.setApprovalStrategy("");
         }
+    }
+
+    public void approvalUserUpdate(){
+        if( approvalUserReplace==null){
+            WebUtil.addWarnMessage("请选择替换的审批人员");
+            return;
+        }
+        boolean approveUsersExist = approvalNode.getApproveUsers().stream().anyMatch(item -> item.getUid().equals(approvalUserReplace.getUid()));
+        if(approveUsersExist){
+            WebUtil.addWarnMessage("替换的审批人员已在审批人员中");
+            return;
+        }
+        if(approvalUserFirst!=null && approvalUserFirst.getUid().equals(approvalUserReplace.getUid()) ){
+            WebUtil.addWarnMessage("选中的审批人不能相同");
+            return;
+        }
+        List<UserAccount> approvalUsers =new ArrayList<>();
+        if(approvalUserFirst!=null){
+            approvalUsers=approvalNode.getApproveUsers().stream().filter(item -> !item.getUid().equals(approvalUserFirst.getUid())).collect(Collectors.toList());
+        }else{
+            approvalUsers= approvalNode.getApproveUsers();
+        }
+        approvalUsers.add(approvalUserReplace);
+        approvalNode.setApproveUsers(approvalUsers);
+        //更新配置
+        List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
+        collect.stream().forEach(item -> {
+            if (item.getUsingRole()) {
+                item.setRoleUids(item.getApproveRoles().stream().map(a -> a.getId()).collect(Collectors.toList()));
+                item.setUserUids(null);
+            } else {
+                if(CollectionUtils.isNotEmpty(item.getApproveUsers())){
+                    item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+                }
+                item.setRoleUids(null);
+            }
+        });
+        String nodes = JSON.toJSONString(collect);
+        selected.setApprovalItem(nodes);
+        configDao.save(selected);
+        //更新审批节点
+        if(approvalUserFirst!=null){
+            multiLevelApprovalRepository.updateApprovalUser(approvalNode.getNodeId(),approvalUserFirst.getUid(),approvalUserReplace.getUid(),selected.getId());
+        }else{
+            multiLevelApprovalRepository.addApprovalUser(approvalNode.getNodeId(),approvalUserReplace.getUid()+",",selected.getId());
+        }
+        WebUtil.addSuccessMessage("多级审批更换审批人员成功");
+        approvalUserReplace=null;
+        approvalUserFirst=null;
     }
 }
