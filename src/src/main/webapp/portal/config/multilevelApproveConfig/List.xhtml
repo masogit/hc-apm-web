@@ -11,7 +11,11 @@
                 <p:outputLabel class="pageTitle" value="多级审批配置"/>
             </div>
 
+
+
             <div class="ui-g-12 card">
+                <p:commandButton  id="updatePersonnelButton" value="更换人员配置"  actionListener="#{multiLevelApprovalConfigController.preEdit}"  update="ApproveForm2" disabled="#{empty multiLevelApprovalConfigController.selected}"  oncomplete="PF('UpdateApproveDlg').show()" />
+
                 <h:form id="MultiLevelListForm">
                     <p:dataTable id="datalist" value="#{multiLevelApprovalConfigController.lazyModel}" var="item"
                                  widgetVar="varDataList"
@@ -23,7 +27,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton updatePersonnelButton"/>
                         <p:ajax event="filter" listener="#{multiLevelApprovalConfigController.onFilter}"
                                 update="createButton"/>
 
@@ -85,6 +89,7 @@
                     </p:dataTable>
                 </h:form>
                 <ui:include src="Edit.xhtml"/>
+                <ui:include src="update.xhtml"/>
             </div>
         </div>
     </ui:define>
