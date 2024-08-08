@@ -44,7 +44,6 @@
                             <p:autoComplete id="supplier" dropdown="true" value="#{supplierEmpowermentController.selectedSupplierUid}" scrollHeight="300" forceSelection="true"
                                             completeMethod="#{supplierEmpowermentController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
                                 <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="AssetEmpowermentForm:datalist AssetEmpowermentForm:showSupplierUser"/>
-                                <p:ajax listener="#{supplierEmpowermentController.onSupplierChange()}" />
                             </p:autoComplete>
                         </h:panelGroup>
                     </p:panelGrid>
