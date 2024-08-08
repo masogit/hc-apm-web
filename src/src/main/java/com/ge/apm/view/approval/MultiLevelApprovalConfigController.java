@@ -550,6 +550,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 }
             }
         }
+        approvalUserFirst=null;
+        approvalUserReplace=null;
     }
 
     public void delNode(int nodeId) {
@@ -909,7 +911,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             WebUtil.addWarnMessage("请选择替换的审批人员");
             return;
         }
-        boolean approveUsersExist = approvalNode.getApproveUsers().stream().anyMatch(item -> item.getUid().equals(approvalUserReplace.getUid()));
+        Boolean approveUsersExist = Optional.ofNullable(approvalNode.getApproveUsers()).map(nodes -> nodes.stream().anyMatch(item -> item.getUid().equals(approvalUserReplace.getUid()))).orElse(false);
         if(approveUsersExist){
             WebUtil.addWarnMessage("替换的审批人员已在审批人员中");
             return;
@@ -920,9 +922,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         List<UserAccount> approvalUsers =new ArrayList<>();
         if(approvalUserFirst!=null){
-            approvalUsers=approvalNode.getApproveUsers().stream().filter(item -> !item.getUid().equals(approvalUserFirst.getUid())).collect(Collectors.toList());
+            approvalUsers=Optional.ofNullable(approvalNode.getApproveUsers()).map(nodes->nodes.stream().filter(item -> !item.getUid().equals(approvalUserFirst.getUid())).collect(Collectors.toList())).orElse(new ArrayList<>());
         }else{
-            approvalUsers= approvalNode.getApproveUsers();
+            approvalUsers = approvalNode.getApproveUsers() != null ? approvalNode.getApproveUsers() : new ArrayList<>();
         }
         approvalUsers.add(approvalUserReplace);
         approvalNode.setApproveUsers(approvalUsers);
