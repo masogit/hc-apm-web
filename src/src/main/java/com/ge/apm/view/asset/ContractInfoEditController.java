@@ -696,41 +696,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
     }
 
+    public boolean acceptTip(ContractInfo contractInfo) {
+        boolean disable = false;
+        if ("到货完成 验收完成".equals(contractInfo.getCompletion())) {
+            disable = true;
+        }
+        return disable;
+    }
 
-
-
-//    public void remomvePaymentInfo(ContractInfoItem item) {
-//        allItemList.remove(item);
-//        if (!Strings.isNullOrEmpty(item.getId())) {
-//            // contractItemDao.delete(item);
-//            removedItemList.add(item);
-//        }
-//    }
-    // public String getPartsInvoiceNum(ContractInfoItem assetItem){
-    // V2_WorkOrder_Detail part = parts.stream().filter(item ->
-    // Objects.equals(assetItem.getAssetUid(),
-    // item.getV2WorkOrder().getAssetInfo().getUid())).findAny().orElse(null);
-    // return null==part? "": part.getInvoiceNum();
-    // }
-    // public String getPartsFieldValueByAssetUid(String assetUid, String
-    // fieldKey) {
-    // Tuple2<String, V2_WorkOrder_Detail> detail = parts.stream().filter(item
-    // -> Objects.equals(item._1(), assetUid)).findAny().orElse(null);
-    // if (null == detail) {
-    // return null;
-    // }
-    // switch (fieldKey) {
-    // case "invoiceNum":
-    // return detail._2().getInvoiceNum();
-    // case "parts":
-    // return detail._2().getParts();
-    // case "apartsQuantity":
-    // return detail._2().getApartsQuantity().toString();
-    // default:
-    // }
-    // return null;
-    // }
-    // getter and setter
     public Map<String, Object> getSelectedObjectMap() {
         return selectedObjectMap;
     }

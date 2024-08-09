@@ -19,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.*;
@@ -64,29 +65,35 @@ public class ElasticService extends MicroServiceInvoker {
     }
 
     public Page<Object> searchHistory(List<SearchFilter> searchFilters, String token, int pageNum, int pageSize, String esIndex){
-        Map<String, Object> map = MapUtil.newHashMap(4);
-        map.put("list", searchFilters);
-        map.put("pageNum", pageNum);
-        map.put("pageSize", pageSize);
-        map.put("esIndex", esIndex);
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
-        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        if (isOkay(response)) {
-            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
-            String content = JSON.toJSONString(data.get("content"));
-            List<Object> histories = JSON.parseObject(content, new TypeReference<List<Object>>() {});
-            if(histories == null){
-                histories = new ArrayList<>();
+        try {
+            Map<String, Object> map = MapUtil.newHashMap(4);
+            map.put("list", searchFilters);
+            map.put("pageNum", pageNum);
+            map.put("pageSize", pageSize);
+            map.put("esIndex", esIndex);
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
+            String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
+            ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            if (isOkay(response)) {
+                LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+                LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+                String content = JSON.toJSONString(data.get("content"));
+                List<Object> histories = JSON.parseObject(content, new TypeReference<List<Object>>() {});
+                if(histories == null){
+                    histories = new ArrayList<>();
+                }
+                int totalElements = (int) data.get("totalElements");
+                PageRequest  pageRequest = new PageRequest(pageNum, pageSize, null);
+                return new PageImpl<>(histories, pageRequest, totalElements);
+            } else {
+                logger.info("searchHistory Failed ");
+                PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
+                return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
             }
-            int totalElements = (int) data.get("totalElements");
-            PageRequest  pageRequest = new PageRequest(pageNum, pageSize, null);
-            return new PageImpl<>(histories, pageRequest, totalElements);
-        } else {
-            logger.info("searchHistory Failed ");
-            PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
-            return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            logger.error("elastic service is not available");
+            return new PageImpl<>(new ArrayList<>(), null, 0);
         }
     }
 

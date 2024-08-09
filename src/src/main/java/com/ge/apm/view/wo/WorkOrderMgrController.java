@@ -284,16 +284,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<Map<String,String>> maintenancePersonInformation;
 
     private ConfigItemValueRepository configItemValueRepository;
+    private ContractInfoRepository contractInfoRepository;
     @Getter @Setter
     private boolean viewIng = false;
     @Getter @Setter
     private boolean repaFlag = false;
     private Boolean enableAuditGroupConfiguration;
+    @Getter @Setter
+    private boolean enableMaintenanceContract = false;
     @Override
     protected void init() {
         try {
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
+            contractInfoRepository = WebUtil.getBean(ContractInfoRepository.class);
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             loginUser = UserContextService.getCurrentUserAccount();
@@ -338,6 +342,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
+            ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceContract", loginUser.getSiteUID());
+            if (ObjectUtil.isNotEmpty(configItemValue)) {
+                enableMaintenanceContract = "true".equals(configItemValue.getValue());
+            }
             selectedBatchMap = new HashMap<>();
             enableAuditGroupConfiguration();
             String query = WebUtil.getRequestParameter("query");
@@ -2004,6 +2012,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         cancel();
         String operation= "/portal/measuring/measuringResultMain.xhtml?faces-redirect=true";
         WebUtil.navigateTo(operation);
+    }
+
+    public boolean repairTip(V2_WorkOrder  curWorkOrder) {
+        boolean disable = true;
+        if (enableMaintenanceContract) {
+            AssetInfo curAsset = curWorkOrder.getAssetInfo();
+            List<ContractInfo> contractInfos = contractInfoRepository.findByAssetUidAndRequestTime(curAsset.getUid());
+            disable = ObjectUtil.isNotEmpty(contractInfos);
+        }
+        return disable;
     }
 
     public void saveServiceRequest() {

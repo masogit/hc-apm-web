@@ -55,4 +55,17 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
             "left join v2_pm_order po on ma.business_uid=po.id\n" +
             "where ma.tenant_uid=?1 and ma.initiate_approver_uid is not null and  (scrap.asset_uid=?2 or  adc.asset_uid=?2 or sr.asset_uid=?2  or po.asset_uid= ?2 ) limit ?3 offset ?4   \n",nativeQuery = true)
     List<MultiLevelApproval> getAssetProcessRecordPage(String tenantUID, String uid, Integer pageSize, Integer pageNum);
+
+
+    @Query(value = "update  multi_level_approval  set approval_uid = REPLACE(approval_uid, ?2, ?3)   where  approval_level_now=?1 and workflow_config_approve_uid=?4  and ( approval_status = 0 or approval_status = 1   ) ",nativeQuery = true)
+    @Transactional
+    @Modifying
+    void updateApprovalUser(Integer nodeId,String approvalUserFirstUid ,String approvalUserReplaceUid, String id);
+
+
+    @Query(value = "update  multi_level_approval  set approval_uid =concat(approval_uid,?2)   where  approval_level_now=?1 and workflow_config_approve_uid=?3  and ( approval_status = 0 or approval_status = 1   ) ",nativeQuery = true)
+    @Transactional
+    @Modifying
+    void addApprovalUser(Integer nodeId, String approvalUserReplaceUid, String id);
+
 }
