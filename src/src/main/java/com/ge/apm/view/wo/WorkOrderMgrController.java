@@ -385,6 +385,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         initLoadInternalSiteNameList();
     }
 
+    public boolean initCheckInBtn(){
+        String configItemValue = userContextService.getConfigItemValue("enableSignNeedScanQrCode");
+        return StringUtils.isEmpty(configItemValue) ? true : !Boolean.valueOf(configItemValue);
+    }
 
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
@@ -3908,8 +3912,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 控制报修发送地的显示隐藏
      */
     public boolean repairReportSendPlaceRender(){
-       /* String configItemValue = userContextService.getConfigItemValue("enableAdverseEventSentinelMode");
-        return StringUtils.isEmpty(configItemValue) ? false : Boolean.valueOf(configItemValue);*/
         //从配置信息获取紧急程度
         CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         //从配置信息获取当前状态
