@@ -2103,10 +2103,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private void onSelectedAsset(AssetInfo asset) {
         String lName ="";
-        final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-        OrgInfo org = cacheService.findOrgByUid(orgInfoUID);
-        if(org.getOrgType()==4){
-            lName = org.getName();
+        /*final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        OrgInfo org = cacheService.findOrgByUid(orgInfoUID);*/
+        if(StringUtils.isNotEmpty(asset.getAssetDeptName())){
+            lName= asset.getAssetDeptName();
         }else{
             lName= asset.getClinicalDeptName();
         }
