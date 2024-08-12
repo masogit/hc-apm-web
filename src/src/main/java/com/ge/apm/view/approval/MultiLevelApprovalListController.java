@@ -1,14 +1,16 @@
 package com.ge.apm.view.approval;
 
 import com.ge.apm.dao.MultiLevelApprovalRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MultiLevelApproval;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
@@ -16,22 +18,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ge.apm.service.constant.ApprovalConstant.APPROVAL_SEPARATOR;
 
 @ManagedBean
 @ViewScoped
-public class MultiLevelApprovalListController extends GenericCRUDUUIDController<MultiLevelApproval> {
+public class MultiLevelApprovalListController extends GenericCRUDUUIDController<MultiLevelApproval> implements Serializable, ServerEventInterface {
     private static final Logger logger = LoggerFactory.getLogger(MultiLevelApprovalListController.class);
 
     public static final String TAB_INITIATID_BY_ME = "TAB_INITIATID_BY_ME";
@@ -40,6 +44,11 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private MultiLevelApprovalController multiLevelApprovalController;
+
+    private UserAccountRepository userAccountRepository;
+    private OrgInfoRepository orgInfoRepository;
+
+    private Integer filterBusinessType  = null;
 
     @Getter
     @Setter
@@ -56,6 +65,10 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     protected void init() {
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         multiLevelApprovalController =  WebUtil.getBean(MultiLevelApprovalController.class);
+
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        orgInfoRepository =  WebUtil.getBean(OrgInfoRepository.class);
+        getBusinessTypeMap();
     }
 
     /**
@@ -84,7 +97,26 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
         addRequiredSortByCreatedDate(pageRequest);
         Page<MultiLevelApproval> result = multiLevelApprovalRepository.findBySearchFilter(this.searchFilters, pageRequest);
+//        addApplicantClinicalDeptName(result.getContent());
         return result;
+    }
+
+    private void addApplicantClinicalDeptName(List<MultiLevelApproval> content) {
+        if(!CollectionUtils.isEmpty(content)){
+            Set<String> userUids = content.stream().map(item -> item.getInitiateApproverUid()).collect(Collectors.toSet());
+            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
+            Set<String> orgUids = userAccounts.stream().map(ite -> ite.getOrgInfoUID()).collect(Collectors.toSet());
+            List<OrgInfo> orgInfos = orgInfoRepository.findInUIds(orgUids);
+            Map<String, UserAccount> userAccountMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, userAccount -> userAccount));
+            Map<String, OrgInfo> orgInfoMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, orgInfo -> orgInfo));
+            content.stream().forEach(item->{
+                UserAccount userAccount = userAccountMap.get(item.getInitiateApproverUid());
+                OrgInfo orgInfo = orgInfoMap.get(userAccount.getOrgInfoUID());
+                if(orgInfo.getOrgType()==4){
+                    item.setApplicationDepartment(orgInfo.getName());
+                }
+            });
+        }
     }
 
     private PageRequest addRequiredSortByCreatedDate(PageRequest pageRequest) {
@@ -159,4 +191,52 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         multiLevelApprovalController.onServerEvent(null, null);
     }
 
+    HashMap<Integer, String> businessMap = new HashMap<>();
+
+    public Map<Integer,String> getBusinessTypeMap(){
+
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT,ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_REQUEST);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT,ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_PURCHASE);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION_INT,ApprovalConstant.BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT,ApprovalConstant.APPROVAL_ASSET_REPAIR_CHi);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT,ApprovalConstant.APPROVAL_ASSET_MAINTAIN_CHi);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_OVERHAUL_INT,ApprovalConstant.APPROVAL_ASSET_BIG_REPAIR);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW,ApprovalConstant.APPROVAL_ASSET_BORROW_CHI);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE,ApprovalConstant.APPROVAL_ASSET_RECEIVE_CHI);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW_RETURN,ApprovalConstant.APPROVAL_ASSET_BORROW_RETURN_CHI);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE_RETURN,ApprovalConstant.APPROVAL_ASSET_RECEIVE_RETURN_CHI);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER,ApprovalConstant.APPROVAL_ASSET_TRANSFER_CHI);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT,ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS,ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT,ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT,ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP,ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT,ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT,ApprovalConstant.BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME);
+        return  businessMap;
+    }
+
+    public List<Integer> getBusinessTypeList(){
+        List<Integer> businessTypeList = Arrays.asList(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT, ApprovalConstant.BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION_INT,
+                ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_OVERHAUL_INT,
+               ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE, ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT, ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP, ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT, ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT
+        );
+        return  businessTypeList;
+    }
+
+    public Integer getFilterBusinessType() {
+        return filterBusinessType;
+    }
+
+    public void setFilterBusinessType(Integer filterBusinessType) {
+        this.filterBusinessType = filterBusinessType;
+    }
+
+    public HashMap<Integer, String> getBusinessMap() {
+        return businessMap;
+    }
+
+    public void setBusinessMap(HashMap<Integer, String> businessMap) {
+        this.businessMap = businessMap;
+    }
 }
