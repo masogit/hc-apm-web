@@ -38,7 +38,7 @@
                   <p:ajax process="@this" listener="#{assetOutStockedController.onClinicalDeptNameFilterChange}" update="assetOutStockTab:assetOutStockedListForm:datalist"/>
                </p:autoComplete>
             </f:facet>
-            <h:outputText value="#{assetOutStockedController.getOrgNameByUid(item.clinicalDeptUID)}"/>
+            <h:outputText value="#{assetOutStockedController.getOrgNameByUid(item.recruiteDeptUid)}"/>
          </p:column>
          <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
             <h:outputText value="#{item.arrivalList.creator.name}"/>
@@ -101,7 +101,7 @@
             </h:outputText>
          </p:column>
          <f:facet name="{Toolbar}">
-            <p:commandButton id="exportButton" ajax="false" icon="ui-icon-print" class="btn btn-sm btn-gray batch-terminated" title="打印"  actionListener="#{assetOutStockedController.exportStocked()}" disabled="#{empty assetOutStockedController.selected or empty assetOutStockedController.selected.outStockNo}">
+            <p:commandButton id="exportButton" ajax="false" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray batch-terminated" title="打印"  actionListener="#{assetOutStockedController.exportStocked()}" disabled="#{empty assetOutStockedController.selected or empty assetOutStockedController.selected.outStockNo}">
                <p:fileDownload value="#{assetOutStockedController.exportFile}"/>
             </p:commandButton>
 
