@@ -459,6 +459,40 @@
                                     </p:panel>
                                 </c:otherwise>
                             </c:choose>
+
+                            <p:panel  header="不良事件记录" >
+
+                                <p:dataTable id="approvalList" value="#{assetAdverseEventsController.lazyModel}"
+                                             var="item"
+                                             widgetVar="assetAdverseEvents"
+                                             lazy="true" paginator="true" paginatorPosition="bottom"
+                                             paginatorAlwaysVisible="true"
+                                             selectionMode="single"
+                                             rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown} {Exporters}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                             rows="5" emptyMessage="#{msg.noRecordFound}"
+                                             >
+
+                                    <p:column headerText="工单编号" >
+                                        <h:outputText value="#{item.workOrderNum}"/>
+                                    </p:column>
+
+                                    <p:column headerText="状态" >
+                                        <h:outputText value="#{item.status}"/>
+                                    </p:column>
+
+                                    <p:column headerText="报告人" >
+                                        <h:outputText value="#{item.reporterName}"/>
+                                    </p:column>
+
+                                    <p:column styleClass="textCenter"  headerText="报告时间" >
+                                        <h:outputText value="#{item.reportDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panel>
                         </p:panelGrid>
                     </h:form>
                     <p:panel  id="approvale"
