@@ -8,20 +8,39 @@
 
 <ui:composition>
 
-<!--    <ui:define name="content">-->
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
         <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
 
+        <style>
+            .supplierExpiredSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .supplierExpired {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+        </style>
+
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
                     <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                    <h:panelGrid id="filterType" columns="2" style="float: right">
+                        <h:panelGroup style="float: right">
+                            <span >#{msg.Legend}：</span>
+                            <span class="supplierExpiredSoon">供应商证照即将到期</span>
+                            <span></span>
+                            <span class="supplierExpired">供应商证照已经到期</span>
+                        </h:panelGroup>
+                    </h:panelGrid>
                 </h:form>
 
                 <h:form id="SupplierListForm">
                     <p:dataTable id="datalist" value="#{supplierController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{supplierController.selected}" stickyHeader=""
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowStyleClass="#{item.supplierAlertStatus}"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"

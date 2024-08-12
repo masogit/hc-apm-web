@@ -2,9 +2,14 @@
  */
 package com.ge.apm.domain;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateTime;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -12,7 +17,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -135,6 +142,9 @@ public class Supplier implements Serializable, ChineseName {
     //营业执照编码
     @Column(name = "license_code")
     private String licenseCode;
+    // 业务范围
+    @Column(name = "license_scope")
+    private String licenseScope;
     //营业执照截止日期
     @Column(name = "license_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -205,6 +215,13 @@ public class Supplier implements Serializable, ChineseName {
 
     @Transient
     private String errorInfo;
+
+    @Transient
+    @TableField(exist = false)
+    private String supplierAlertStatus = null;
+
+    @Transient
+    List<Date> licensesDateList = null;
 
     @PrePersist
     public void initializeUid() {
@@ -465,6 +482,14 @@ public class Supplier implements Serializable, ChineseName {
         this.licenseCode = licenseCode;
     }
 
+    public String getLicenseScope() {
+        return licenseScope;
+    }
+
+    public void setLicenseScope(String licenseScope) {
+        this.licenseScope = licenseScope;
+    }
+
     public Date getLicenseEndDate() {
         return licenseEndDate;
     }
@@ -591,6 +616,28 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setErrorInfo(String errorInfo) {
         this.errorInfo = errorInfo;
+    }
+
+    public String getSupplierAlertStatus() {
+        if (ObjectUtil.isEmpty(licensesDateList)) {
+            licensesDateList = ListUtil.newArrayList(licenseEndDate, permitEndDate, manufacturingPermitEndDate, productRegistrationEndDate, productionLicenseExpireDate, businessLicenseExpireDate, registrationCertificateExpireDate, powerOfAttorneyExpireDate)
+                    .stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+            Date now = DateUtil.now();
+            DateTime nextMonth = DateUtil.nextMonth();
+            for (Date date : licensesDateList) {
+                if (date.before(now)) {
+                    supplierAlertStatus = "supplierExpired";
+                    break;
+                } else if (date.after(now) && date.before(nextMonth)) {
+                    supplierAlertStatus = "supplierExpiredSoon";
+                }
+            }
+        }
+        return supplierAlertStatus;
+    }
+
+    public void setSupplierAlertStatus(String supplierAlertStatus) {
+        this.supplierAlertStatus = supplierAlertStatus;
     }
 
     @Override
