@@ -314,6 +314,11 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "app_alias", length = 40)
 	private String appAlias;
 
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "org_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+	private OrgInfo org;
+
 	public String getAppAlias() {
 		return appAlias;
 	}
@@ -1319,5 +1324,13 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public OrgInfo getOrg() {
+		return org;
+	}
+
+	public void setOrg(OrgInfo org) {
+		this.org = org;
 	}
 }

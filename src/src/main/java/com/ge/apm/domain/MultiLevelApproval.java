@@ -167,6 +167,12 @@ public class MultiLevelApproval implements Serializable {
 
     @Transient
     private List<V2_BlobObject> attachments;
+    @Transient
+    private String  applicationDepartment ;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "initiate_approver_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private UserAccount applyUser;
 
     public String getSignatureNurse() {
         return signatureNurse;
@@ -182,6 +188,14 @@ public class MultiLevelApproval implements Serializable {
 
     public void setApprovalIng(boolean approvalIng) {
         this.approvalIng = approvalIng;
+    }
+
+    public String getApplicationDepartment() {
+        return applicationDepartment;
+    }
+
+    public void setApplicationDepartment(String applicationDepartment) {
+        this.applicationDepartment = applicationDepartment;
     }
 
     /**
@@ -216,5 +230,14 @@ public class MultiLevelApproval implements Serializable {
             return false;
         }
         return true;
+    }
+
+
+    public UserAccount getApplyUser() {
+        return applyUser;
+    }
+
+    public void setApplyUser(UserAccount applyUser) {
+        this.applyUser = applyUser;
     }
 }
