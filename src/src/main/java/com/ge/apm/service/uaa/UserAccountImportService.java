@@ -686,30 +686,37 @@ public class UserAccountImportService {
                 }
             }
             for (String tempStr : setAccessScope) {
+                int level;
                 String key = tempStr + user.getSiteUID();
                 if (StringUtils.isNotEmpty(user.getSiteName())) {
                     // 院区不为空
+                    level = 3;
                     key = tempStr + user.getSiteUID();
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoByDepartmentKey(setAccessScope, new OrgInfo(user.getSiteUID(), user.getSiteName(), null, mapOrgInfo.get(user.getSiteName() + user.getHospitalUID()).getParentUID()));
                     }
                 } else if (StringUtils.isNotEmpty(user.getHospitalName())) {
                     // 医院不为空
+                    level = 2;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoBySiteKey(setAccessScope, new OrgInfo(user.getHospitalUID(), user.getHospitalName(), null, mapOrgInfo.get(user.getHospitalName() + user.getInstitutionUID()).getParentUID()));
                     }
                 } else if (StringUtils.isNotEmpty(user.getInstitutionName())) {
                     // 集团不为空
+                    level = 1;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoByHospitalKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, mapOrgInfo.get(user.getInstitutionName() + user.getTenantUID()).getParentUID()));
                     }
                 } else {
                     // 都为空 租户层级
+                    level = 0;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInstitutionKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, null));
                     }
                 }
-                OrgInfo tempOrgInfo = mapOrgInfo.get(key);
+                OrgInfo tempOrgInfo =  mapOrgInfo.computeIfAbsent(key,key1->{
+                    return level == 3 ? mapOrgInfo.get(tempStr + user.getHospitalUID()):(level == 2 ? mapOrgInfo.get(tempStr + user.getHospitalUID()):(level == 1 ? mapOrgInfo.get(tempStr + user.getInstitutionUID()):(level == 0 ? mapOrgInfo.get(tempStr + user.getTenantUID()):null)));
+                });
                 if (key.equals(defaultName + user.getSiteUID())) {
                     if (!addUserAccessScope(user, tempOrgInfo, false)) {
                         return false;
