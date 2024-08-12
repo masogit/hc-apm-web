@@ -125,6 +125,10 @@
                             <label class="label">营业执照截止日期</label>
                             <p:calendar timeZone="GMT+8" id="licenseEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.licenseEndDate}" required="false" requiredMessage="营业执照截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">业务范围</label>
+                            <p:inputText value="#{supplierController.selected.licenseScope}" />
+                        </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup >
                         <p:dataList id="licenseAttachements" value="#{supplierController.getAttachList('License')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
