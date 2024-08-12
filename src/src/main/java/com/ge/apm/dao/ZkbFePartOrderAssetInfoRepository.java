@@ -35,6 +35,9 @@ public interface ZkbFePartOrderAssetInfoRepository extends GenericRepositoryUUID
     @Query(value = "SELECT sum(asset_qty) from zkb_fe_part_order_asset_info where fe_part_order_id = ?1", nativeQuery = true)
     Integer fetchQty(String fePartOrderId);
 
+    @Query(value = "SELECT sum(asset_qty) from zkb_fe_part_order_asset_info where fe_part_order_id = ?1 and part_order_no in (select cat_no from zkb_part_order_cat where cat_type = ?2 and is_vaild = 'N')", nativeQuery = true)
+    Integer fetchDepotQty(String fePartOrderId, String catType);
+
     /**
      * 根据单号获取申请数量
      * @param fePartOrderId 流程ID
