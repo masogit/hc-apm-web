@@ -56,6 +56,11 @@ public class ZkbPartOrderEditService {
                     return "CCSB类型合同只能进行人工申请！";
                 }
             }
+            //超声的depot不能申请YHAAO-22468
+            if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
+                return "ZKB FE不能申请deport类型设备，请联系管理人员！";
+            }
+
             //判断要不要进行超声高端机判断
             /*
              * 2023-12-26 YHAAO-20623 只有是CCS/Biomed合同且内修的时候才能申请

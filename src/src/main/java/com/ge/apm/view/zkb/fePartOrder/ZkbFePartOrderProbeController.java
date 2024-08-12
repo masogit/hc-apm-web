@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * GEFE配件申请controller
+ * GEFE探头申请controller
  * author:503202755
  */
 @ManagedBean
@@ -522,13 +522,29 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         //ZKB CCS 2.0 offer 需要区分超声高端机New和old，并实现相关逻辑
         if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
             List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
-                    (this.selectZkbFePartOrder.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
-            if((ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))
-                    && CollectionUtils.isNotEmpty(zkbContractAssetList) && this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
-                //gefe 合同类型 ccs/biomed 超声高端机只能申请 申请外修 内修在  zkbfe
-                WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                    (this.selectZkbFePartOrder.getSystemId().equals(zc.getAssetInfo().getSystemId()))).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(zkbContractAssetList)){
+                WebUtil.addErrorMessage("GEFE维修合同中设备不存在！","");
                 this.contractError = true;
                 return;
+            }
+            ZkbContractAsset zkbContractAsset = zkbContractAssetList.get(0);
+            if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
+                WebUtil.addErrorMessage("GEFE维修探头申请不能申请超声depot设备！","");
+                this.contractError = true;
+                return;
+            }
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                    WebUtil.addErrorMessage("GEFE维修CCS或Biomed合同类型不能申请内修设备！","");
+                    this.contractError = true;
+                    return;
+                   /* if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
+                        WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                        this.contractError = true;
+                        return;
+                    }*/
+                }
             }
         }
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());

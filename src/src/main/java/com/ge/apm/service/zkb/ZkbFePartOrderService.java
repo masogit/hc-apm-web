@@ -1365,7 +1365,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (CollectionUtils.isEmpty(sparePartsZkbFePartOrderList)) {
             if (ZkbFePartOrder.OrderType.Probe.toString().equals(orderType)) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("错误：暂未检索到超声类对应报修单"));
-
             } else {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
             }
