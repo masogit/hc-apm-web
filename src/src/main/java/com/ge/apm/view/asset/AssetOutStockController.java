@@ -138,7 +138,8 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
             return new PageImpl<>(new ArrayList<>(),pageRequest, 0);
         }
 
-        this.updateSearchFilter(new SearchFilter("installStatus", SearchFilter.Operator.EQ, "instorage", "1*"));
+        List<String> status = Arrays.asList("instorage", "finished");
+        this.updateSearchFilter(new SearchFilter("installStatus", SearchFilter.Operator.IN, status, "1*"));
 
         if (!this.hasFilterOnField("arrivalList.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
