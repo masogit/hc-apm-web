@@ -65,6 +65,7 @@ public class AssetOutStockService {
             arrivalListItem.setOutStockNo(assetOutStockDto.getOutStockNo());
             arrivalListItem.setOutStocDate(assetOutStockDto.getOutStocDate());
             arrivalListItem.setRecruiter(assetOutStockDto.getRecruiter());
+            arrivalListItem.setRecruiteDeptUid(assetOutStockDto.getStockedDeptUid());
             arrivalListItemRepository.save(arrivalListItem);
 
            /* arrivalList.setClinicalDeptUID(assetOutStockDto.getStockedDeptUid());

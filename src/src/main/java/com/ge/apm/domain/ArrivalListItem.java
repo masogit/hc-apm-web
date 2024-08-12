@@ -436,6 +436,10 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "recruiter")
     private String recruiter;
 
+    //领用科室
+    @Column(name = "recruite_dept_uid")
+    private String recruiteDeptUid;
+
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;
     }

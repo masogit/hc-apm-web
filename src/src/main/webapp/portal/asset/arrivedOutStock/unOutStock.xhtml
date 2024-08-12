@@ -40,7 +40,7 @@
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.arrivalList.assetName}"/>
                 </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}">
+                <p:column headerText="安装科室">
                     <h:outputText value="#{assetUnOutStockController.getOrgNameByUid(item.clinicalDeptUID)}"/>
                 </p:column>
                 <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
@@ -183,8 +183,8 @@
                 </p:dataTable>
                 <br/>
 
-                <p:commandButton validateClient="true"  value="打印" ajax="false" title="下载压缩文件" actionListener="#{assetUnOutStockController.exportAll}"
-                                 icon="ui-icon-print" class="btn btn-sm btn-gray">
+                <p:commandButton validateClient="true"  value="导出" ajax="false" title="导出word" actionListener="#{assetUnOutStockController.exportAll}"
+                                 icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray">
                     <p:fileDownload value="#{assetUnOutStockController.exportFile}"/>
                 </p:commandButton>
                 <p:commandButton validateClient="true"  value="出库" action="#{assetUnOutStockController.stock()}" icon="ui-icon-check" oncomplete="PF('operateDialog').hide()"  update=":assetOutStockTab:assetOutStockListForm :assetOutStockTab:operateDialogForm"/>

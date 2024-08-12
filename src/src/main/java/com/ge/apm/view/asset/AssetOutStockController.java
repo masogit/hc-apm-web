@@ -15,6 +15,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -127,9 +128,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
 
     @Override
     protected Page<ArrivalListItem> loadData(PageRequest pageRequest) {
-
         ConfigItemValue configItemValue = configItemMapper.findByKey("setAssetOutStockDept", account.getSiteUID());
-
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
@@ -150,16 +149,16 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
             searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }
 
-        List<String> assetInfoList = assetInfoRepository.findByClinicalUidAndSiteUid(configItemValue.getValue(), UserContextService.getCurrentUserAccount().getSiteUID());
         if("UnOutStock".equals(tabType)){
-            if(assetInfoList.isEmpty()){
-                return new PageImpl<>(new ArrayList<>(),pageRequest, 0);
-            }
-            searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, assetInfoList, "1*"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, configItemValue.getValue(), "1*"));
         }else{
-            if(!assetInfoList.isEmpty()){
-                searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetInfoList, "1*"));
-            }
+            this.updateSearchFilter(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.NE, configItemValue.getValue(), "1*"));
+        }
+
+        if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
+            this.updateSearchFilter(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.IN, clinicalDeptOrgUidSet, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "recruiteDeptUid".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         arrivalListItemPage = arrivalListItemRepository.findBySearchFilter(this.searchFilters, pageRequest);
         arrivalListItemList = arrivalListItemPage.getContent();
