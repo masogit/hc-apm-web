@@ -53,7 +53,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">病区代码<span style="color: red">*</span></label>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.selected.wardCode}" required="true" requiredMessage="病区代码 #{msg.ValidationRequire}" />
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.selected.wardCode}" required="false" requiredMessage="病区代码 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>

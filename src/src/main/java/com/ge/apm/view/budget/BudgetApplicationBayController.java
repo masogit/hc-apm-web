@@ -9,6 +9,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.BudgetApplicationAssetVo;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
@@ -26,6 +27,7 @@ import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -51,6 +53,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -315,6 +321,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
         if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
+            if(!checkSubmit()){
+                return "";
+            }
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
                 WebUtil.addSuccessMessage("失败:无可用的审批流,请检查后重试！");
@@ -329,6 +338,29 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
              persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         }
         return this.backList();
+    }
+
+    public boolean checkSubmit(){
+        boolean result = true;
+        try{
+            BudgetApplicationAssetVo budgetApplicationAssetVo = new BudgetApplicationAssetVo();
+            BeanUtils.copyProperties(budgetApplicationAssetVo, curSelectApplicationBudgetAsset);
+            budgetApplicationAssetVo.setApplicationDeptName(selected.getApplicationDeptName());
+            ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+            Validator validator = validatorFactory.getValidator();
+            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo);
+
+            if(CollectionUtils.isNotEmpty(checkSet)){
+                for (ConstraintViolation<BudgetApplicationAssetVo> c : checkSet){
+                    WebUtil.addSuccessMessage(c.getMessage());
+                }
+                result = false;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return result;
     }
 
     public String backList() {
