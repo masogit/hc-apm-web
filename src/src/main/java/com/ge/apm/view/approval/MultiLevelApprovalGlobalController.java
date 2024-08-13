@@ -95,4 +95,9 @@ public class MultiLevelApprovalGlobalController {
 
         return multiLevelApprovalService.getBusinessType(approval);
     }
+
+    public Integer getBusinessType(String businessType){
+
+        return multiLevelApprovalService.getBusinessType(businessType);
+    }
 }

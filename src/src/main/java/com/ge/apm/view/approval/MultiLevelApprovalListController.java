@@ -1,12 +1,10 @@
 package com.ge.apm.view.approval;
 
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.MultiLevelApproval;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -48,6 +46,8 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
 
+    private I18nMessageRepository i18nDao;
+
     private Integer filterBusinessType  = null;
 
     @Getter
@@ -68,6 +68,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository =  WebUtil.getBean(OrgInfoRepository.class);
+        i18nDao =  WebUtil.getBean(I18nMessageRepository.class);
         getBusinessTypeMap();
     }
 
@@ -216,12 +217,16 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         return  businessMap;
     }
 
-    public List<Integer> getBusinessTypeList(){
-        List<Integer> businessTypeList = Arrays.asList(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT, ApprovalConstant.BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION_INT,
-                ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_OVERHAUL_INT,
-               ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE, ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT, ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP, ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT, ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT
-        );
-        return  businessTypeList;
+//    public List<Integer> getBusinessTypeList(){
+//        List<Integer> businessTypeList = Arrays.asList(ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT, ApprovalConstant.BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION_INT,
+//                ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT, ApprovalConstant.BUSINESS_TYPE_ASSET_OVERHAUL_INT,
+//               ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE, ApprovalConstant.BUSINESS_TYPE_ASSET_BORROW_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_RECEIVE_RETURN, ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER, ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT, ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT, ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP, ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT, ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT
+//        );
+//        return  businessTypeList;
+//    }
+
+    public List<I18nMessage> getBusinessTypeList(){
+        return i18nDao.findByMsgTypeOrderById(ApprovalConstant.BUSINESS_TYPE);
     }
 
     public Integer getFilterBusinessType() {
