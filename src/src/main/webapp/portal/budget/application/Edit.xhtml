@@ -84,41 +84,41 @@
                             </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">设备名称<span style="color: red">*</span></label>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange" required="true" requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}" />
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetName}" class="budgetAssetInfoChange" required="false" requiredMessage="设备名称#{msg.Blank}#{msg.ValidationRequire}" />
                                 <p:commandButton rendered="#{budgetController.editButtonDisplay()}" disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{budgetController.prepareCreateAsset}" update="AssetSelectDlg" oncomplete="PF('AssetSelectDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">设备分类<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu  id="assetGroup" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetCategory}" required="true"  requiredMessage="设备分类#{msg.Blank}#{msg.ValidationRequire}"  disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" class="budgetAssetInfoChange">
+                                <p:selectOneMenu  id="assetGroup" value="#{budgetController.curSelectApplicationBudgetAsset.applicationAssetCategory}" required="false"  requiredMessage="设备分类#{msg.Blank}#{msg.ValidationRequire}"  disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" class="budgetAssetInfoChange">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">推荐品牌<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange" required="true" requiredMessage="推荐品牌 #{msg.ValidationRequire}" />
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.recommendedBrand}" class="budgetAssetInfoChange" required="false" requiredMessage="推荐品牌 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange" required="true" requiredMessage="规格 #{msg.ValidationRequire}" />
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.standards}" class="budgetAssetInfoChange" required="false" requiredMessage="规格 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:outputLabel class="label">型号<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange" required="true" requiredMessage="型号 #{msg.ValidationRequire}" />
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.model}" class="budgetAssetInfoChange" required="false" requiredMessage="型号 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">数量<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="数量 #{msg.ValidationRequire}"  value="#{budgetController.curSelectApplicationBudgetAsset.applicationQuantity}">
+                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="数量 #{msg.ValidationRequire}"  value="#{budgetController.curSelectApplicationBudgetAsset.applicationQuantity}">
                                     <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount "/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">单位<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="true" requiredMessage="单位 #{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.unit}" required="false" requiredMessage="单位 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">预算单价<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="预算单价 #{msg.ValidationRequire}"
+                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="预算单价 #{msg.ValidationRequire}"
                                                value="#{budgetController.curSelectApplicationBudgetAsset.applicationPrice}">
                                     <p:ajax listener="#{budgetController.calcAmount(budgetController.curSelectApplicationBudgetAsset)}" update="@this applicationAmount"/>
                                 </p:inputNumber>
@@ -130,80 +130,80 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">经费来源<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.sourceFunding}" required="true"  requiredMessage="经费来源#{msg.Blank}#{msg.ValidationRequire}" >
+                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.sourceFunding}" required="false"  requiredMessage="经费来源#{msg.Blank}#{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('sourceFunding')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">科室现有同类设备数量<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" value="#{budgetController.curSelectApplicationBudgetAsset.similarDevicesNumber}" required="true" requiredMessage="科室现有同类设备数量#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" value="#{budgetController.curSelectApplicationBudgetAsset.similarDevicesNumber}" required="false" requiredMessage="科室现有同类设备数量#{msg.Blank}#{msg.ValidationRequire}">
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">科室现有同类设备利用情况<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.similarDevicesUse}" required="true" requiredMessage="科室现有同类设备利用情况#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.similarDevicesUse}" required="false" requiredMessage="科室现有同类设备利用情况#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">是否采购进口产品<span style="color: red">*</span></p:outputLabel>
                                 <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}"
-                                                 value="#{budgetController.curSelectApplicationBudgetAsset.importedOr}"  required="true" requiredMessage="是否采购进口产品#{msg.Blank}#{msg.ValidationRequire}">
+                                                 value="#{budgetController.curSelectApplicationBudgetAsset.importedOr}"  required="false" requiredMessage="是否采购进口产品#{msg.Blank}#{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">申购仪器设备的主要功能<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.majorFunction}" required="true" requiredMessage="申购仪器设备的主要功能#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.majorFunction}" required="false" requiredMessage="申购仪器设备的主要功能#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">申购仪器设备的配置<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.deviceConfiguration}" required="true" requiredMessage="申购仪器设备的配置#{msg.Blank}#{msg.ValidationRequire}"	/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.deviceConfiguration}" required="false" requiredMessage="申购仪器设备的配置#{msg.Blank}#{msg.ValidationRequire}"	/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">申购仪器设备的主要技术参数及要求<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.technicalParameter}" required="true" requiredMessage="申购仪器设备的主要技术参数及要求#{msg.Blank}#{msg.ValidationRequire}"	/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.technicalParameter}" required="false" requiredMessage="申购仪器设备的主要技术参数及要求#{msg.Blank}#{msg.ValidationRequire}"	/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">申购仪器设备在本单位医疗、教学、科研工作中的利用<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.equipmentUtilization}" required="true" requiredMessage="申购仪器设备在本单位医疗、教学、科研工作中的利用#{msg.Blank}#{msg.ValidationRequire}"	/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.equipmentUtilization}" required="false" requiredMessage="申购仪器设备在本单位医疗、教学、科研工作中的利用#{msg.Blank}#{msg.ValidationRequire}"	/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">社会,经济效益分析<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.benefitAnalysis}" required="true" requiredMessage="社会,经济效益分析#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.benefitAnalysis}" required="false" requiredMessage="社会,经济效益分析#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">同类产品比较<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.productComparison}" required="true" requiredMessage="同类产品比较#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.productComparison}" required="false" requiredMessage="同类产品比较#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">使用年限<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.serviceLife}" required="true" requiredMessage="使用年限#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.serviceLife}" required="false" requiredMessage="使用年限#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">收费标准<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.chargingStandards}" required="true" requiredMessage="收费标准#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:inputNumber disabled="#{budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.chargingStandards}" required="false" requiredMessage="收费标准#{msg.Blank}#{msg.ValidationRequire}">
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">年预估收入<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.yearIncome}" required="true" requiredMessage="年预估收入#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:inputNumber disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{budgetController.curSelectApplicationBudgetAsset.yearIncome}" required="false" requiredMessage="年预估收入#{msg.Blank}#{msg.ValidationRequire}">
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">所需耗材及使用量<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.usage}" required="true" requiredMessage="所需耗材及使用量#{msg.Blank}#{msg.ValidationRequire}"/>
+                                <p:inputText disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.usage}" required="false" requiredMessage="所需耗材及使用量#{msg.Blank}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">设备是否有放置场地<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.placeSite}"  required="true" requiredMessage="设备是否有放置场地#{msg.Blank}#{msg.ValidationRequire}" >
+                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.placeSite}"  required="false" requiredMessage="设备是否有放置场地#{msg.Blank}#{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                     <p:outputLabel class="label">是否在手术室使用<span style="color: red">*</span></p:outputLabel>
-                                    <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.usedOperatingRoom}" required="true" requiredMessage="是否在手术室使用#{msg.Blank}#{msg.ValidationRequire}">
+                                    <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.usedOperatingRoom}" required="false" requiredMessage="是否在手术室使用#{msg.Blank}#{msg.ValidationRequire}">
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                             </h:panelGroup>
@@ -218,21 +218,21 @@
 
                             <h:panelGroup>
                                 <p:outputLabel class="label">是否需要同院内信息系统对接<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.systemDocking}" required="true" requiredMessage="是否需要同院内信息系统对接#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.systemDocking}" required="false" requiredMessage="是否需要同院内信息系统对接#{msg.Blank}#{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">是否需要连接外网<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.connectNetwork}" required="true" requiredMessage="是否需要连接外网#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:selectOneMenu disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.connectNetwork}" required="false" requiredMessage="是否需要连接外网#{msg.Blank}#{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">情况说明<span style="color: red">*</span></p:outputLabel>
-                                <p:inputTextarea disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.description}" rows="2" cols="20" required="true" requiredMessage="情况说明#{msg.Blank}#{msg.ValidationRequire}">
+                                <p:inputTextarea disabled="#{ budgetController.selected.applicationStep eq 'PendingComplete' or budgetController.tabIndexList eq 4}" value="#{budgetController.curSelectApplicationBudgetAsset.description}" rows="2" cols="20" required="false" requiredMessage="情况说明#{msg.Blank}#{msg.ValidationRequire}">
                                 </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
