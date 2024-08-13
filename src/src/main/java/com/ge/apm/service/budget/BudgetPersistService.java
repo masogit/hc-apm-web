@@ -161,8 +161,9 @@ public class BudgetPersistService {
         budgetApplicationAsset.setSiteUID(curDept.getSiteUID());
         budgetApplicationAsset.setIsDeleted(0);
         if("Create".equals(crudActionName)){
-            budgetApplicationAsset.setApplicationAssetName(budgetAssetInfo.getName());
-
+            if(budgetAssetInfo != null){
+                budgetApplicationAsset.setApplicationAssetName(budgetAssetInfo.getName());
+            }
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 List<PurchaseBudgetConfig>  purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
