@@ -357,6 +357,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         try{
             BudgetApplicationAssetVo budgetApplicationAssetVo = new BudgetApplicationAssetVo();
             BeanUtils.copyProperties(budgetApplicationAssetVo, curSelectApplicationBudgetAsset);
+            budgetApplicationAssetVo.setApplicationDeptName(selected.getApplicationDeptName());
             ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
             Validator validator = validatorFactory.getValidator();
             Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo);

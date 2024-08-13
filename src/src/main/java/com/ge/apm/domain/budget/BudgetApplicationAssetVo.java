@@ -11,6 +11,13 @@ import java.math.BigDecimal;
 @Data
 public class BudgetApplicationAssetVo  {
 
+    //申请科室
+    @NotNull(message = "申请科室不能为空！")
+    private String applicationDeptName;
+
+    //病区代码
+    @NotNull(message = "病区代码不能为空！")
+    private String wardCode;
 
     /**
      * *设备名称
