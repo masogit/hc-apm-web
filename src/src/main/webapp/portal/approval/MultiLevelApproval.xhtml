@@ -53,13 +53,13 @@
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()" value="#{multiLevelApprovalListController.filterBusinessType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{multiLevelApprovalListController.getBusinessTypeList()}" var="key"   itemValue="#{key}" itemLabel="#{multiLevelApprovalGlobalController.getBusinessType(key)}" />
-                            </p:selectOneMenu>
+                                <f:selectItems value="#{multiLevelApprovalConfigController.businessTypeList}" var="item"
+                                               itemLabel="#{item.valueZh}" itemValue="#{multiLevelApprovalGlobalController.getBusinessType(item.msgKey)}"/>                            </p:selectOneMenu>
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
                     <p:column headerText="申请科室" filterBy="#{item.applyUser.org.name}" filterMatchMode="LIKE"  >
-                        <c:if test="#{item.applyUser.org.orgType==4}">
+                        <c:if test="#{item.applyUser.org.orgType eq 4}">
                             <h:outputText value="#{item.applyUser.org.name}"/>
                         </c:if>
                     </p:column>
