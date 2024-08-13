@@ -20,6 +20,8 @@ import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by 503266962
@@ -165,6 +167,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void saveConfig(){
         if(this.selectSite != null){
+            if(!regularCheck()){
+                logger.info("配置项保存，正则校验不通过：");
+                WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
+                return;
+            }
             ConfigItemValue configItemValue;
             // 如果不为空，并且siteUid相等，说明已经有配置，直接更新
             // 如果siteUid不相等，说明使用的是上级配置，需要新增数据
@@ -208,7 +215,16 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             configItemValueRepository.save(configItemValue);
         }
     }
-
+    public boolean regularCheck(){
+        if(selected == null) return Boolean.FALSE;
+        String validation = selected.getValidation();
+        if(StringUtils.isEmpty(validation)) return Boolean.TRUE;
+        String showValue = selected.getShowValue();
+        if(StringUtils.isEmpty(showValue)) return Boolean.FALSE;
+        Pattern pattern = Pattern.compile(validation);
+        Matcher matcher = pattern.matcher(showValue);
+        return  matcher.matches();
+    }
     public String formatDate(String value) throws ParseException {
         String formatValue = "";
 
