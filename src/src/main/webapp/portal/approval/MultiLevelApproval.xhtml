@@ -53,8 +53,8 @@
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()" value="#{multiLevelApprovalListController.filterBusinessType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{multiLevelApprovalListController.getBusinessTypeList()}" var="key"   itemValue="#{key}" itemLabel="#{multiLevelApprovalGlobalController.getBusinessType(key)}" />
-                            </p:selectOneMenu>
+                                <f:selectItems value="#{multiLevelApprovalConfigController.businessTypeList}" var="item"
+                                               itemLabel="#{item.valueZh}" itemValue="#{multiLevelApprovalGlobalController.getBusinessType(item.msgKey)}"/>                            </p:selectOneMenu>
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
