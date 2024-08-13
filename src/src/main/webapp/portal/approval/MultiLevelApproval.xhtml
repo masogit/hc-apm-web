@@ -59,9 +59,9 @@
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
                     <p:column headerText="申请科室" filterBy="#{item.applyUser.org.name}" filterMatchMode="LIKE"  >
-                        <c:if test="#{item.applyUser.org.orgType eq 4}">
-                            <h:outputText value="#{item.applyUser.org.name}"/>
-                        </c:if>
+<!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
+                            <h:outputText value="#{item.applyUser.org.name}" rendered="#{item.applyUser.org.orgType eq 4}"/>
+<!--                        </c:if>-->
                     </p:column>
                     <p:column headerText="总审批进度" >
                         <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
