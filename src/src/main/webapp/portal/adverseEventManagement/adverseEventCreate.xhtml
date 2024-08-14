@@ -358,7 +358,7 @@
                             <p:fieldset legend="事件主要表现">
                                 <h:panelGroup>
                                     <label class="label">伤害表现</label>
-                                    <p:inputTextarea id="harmPerform" maxlength="1000" value="#{adverseEventManagementController.selected.harmPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"></p:inputTextarea>
+                                    <p:inputTextarea id="harmPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.harmPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“伤害表现”本格填写“无”"></p:inputTextarea>
                                     <p:dataGrid id="harmPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.harmPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.harmPerformFile ne null and !empty adverseEventManagementController.selected.harmPerformFile}">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
@@ -379,11 +379,11 @@
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup >
                                     <label class="label">器械故障表现</label>
-                                    <p:inputTextarea id="deviceFaultPerform" maxlength="1000" value="#{adverseEventManagementController.selected.deviceFaultPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"></p:inputTextarea>
+                                    <p:inputTextarea id="deviceFaultPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.deviceFaultPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“器械故障表现”本格填写”无“"></p:inputTextarea>
                                     <p:dataGrid id="deviceFaultPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.deviceFaultPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.deviceFaultPerformFile ne null and !empty adverseEventManagementController.selected.deviceFaultPerformFile }">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
@@ -404,7 +404,7 @@
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{adverseEventManagementController.tempMechanicalFailureFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this mechanicalFailure" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempMechanicalFailureFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this mechanicalFailure" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
                         </p:tab>
@@ -506,13 +506,15 @@
                                     <label class="label">场所名称</label>
                                     <p:inputText id="placeName" maxlength="100" value="#{adverseEventManagementController.selected.placeName}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">使用过程<span style="color:red">*</span></label>
-                                    <p:inputTextarea id="useProcess" maxlength="500" value="#{adverseEventManagementController.selected.useProcess}" required="false" requiredMessage="使用过程不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputTextarea id="useProcess" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.useProcess}" required="false" requiredMessage="使用过程不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="至少包括使用目的、使用依据、使用情况、不良事件发生情况、对受害者的影响或伤害、采取的治疗措施、不良事件的转归"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">合并用药/器械情况说明</label>
-                                    <p:inputTextarea id="deviceDesc" maxlength="500" value="#{adverseEventManagementController.selected.deviceDesc}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputTextarea id="deviceDesc" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.deviceDesc}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="若无“合并用药/械情况”本格填写“无”"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
