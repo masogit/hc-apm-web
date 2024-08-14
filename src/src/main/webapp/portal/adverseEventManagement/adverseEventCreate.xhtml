@@ -690,6 +690,8 @@
                             <p:commandButton value="作废" actionListener="#{adverseEventManagementController.tempSaveAdverseEvent(5)}"  icon="ui-icon-clear" style="float:left" rendered="#{adverseEventManagementController.selected.status ne null and adverseEventManagementController.selected.status == 1}" update="AdverseEventCreateForm AdverseEventSearchForm"/>
                             <p:commandButton value="重新提交" actionListener="#{adverseEventManagementController.tempSaveAdverseEvent(0)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventManagementController.selected.status == 5}" update="AdverseEventCreateForm AdverseEventSearchForm"/>
                             <p:commandButton value="返回" icon="ui-icon-cancel" action="adverseEventList.xhtml?faces-redirect=true" immediate="true" style="float:left"/>
+                            <p:commandButton value="撤回" actionListener="#{adverseEventManagementController.tempSaveAdverseEvent(1)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventManagementController.selected.status == 2  and adverseEventManagementController.isWithdrawnButton()  }" validateClient="true" update="AdverseEventCreateForm AdverseEventSearchForm"/>
+
                         </h:panelGroup>
                     </p:panelGrid>
                     <style>

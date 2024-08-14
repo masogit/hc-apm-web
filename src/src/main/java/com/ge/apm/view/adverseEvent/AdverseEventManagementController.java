@@ -1,9 +1,6 @@
 package com.ge.apm.view.adverseEvent;
 
-import com.ge.apm.dao.AdverseEventsRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
@@ -66,7 +63,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private BlobFileService blobService;
     private AdverseEventServiceClient adverseEventServiceClient;
     private ConfigCacheService configCacheService;
-
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
     /*属性类*/
     static PageRequest pageRequest = new PageRequest(0, 1000);
     @Getter@Setter
@@ -139,6 +136,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
+
+        multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
+
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         if (selectSite.getOrgType() == 4) {
@@ -515,4 +515,15 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     public boolean getReadOnlyCreateForm() {
         return this.readOnlyCreateForm;
     }
+
+    public boolean isWithdrawnButton(){
+        String createUserUid = selected.getCreateUserUID();
+        String uid = UserContextService.getCurrentUserAccount().getUid();
+        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getBusinessUid());
+        if(createUserUid.equals(uid)  &&  !CollectionUtils.isEmpty(multiLevelApprovals)  &&  multiLevelApprovals.size()==1 && multiLevelApprovals.get(0).getApprovalLevelNow()==1   && multiLevelApprovals.get(0).getInitiateApproverUid().equals(selected.getCreateUserUID()) ){
+            return true;
+        }
+        return false;
+    }
+
 }
