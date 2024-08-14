@@ -68,6 +68,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private SharedAssetRequestRepository sharedAssetRequestRepository;
 
 
+    private UserAccountRepository userAccountRepository;
     private WorkflowService workflowService;
     private BlobFileService blobService;
 
@@ -180,6 +181,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         uaaService = WebUtil.getBean(UaaService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         sharedAssetRequestRepository = WebUtil.getBean(SharedAssetRequestRepository.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
@@ -279,6 +281,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                UserAccount user = userAccountRepository.findByUid(assetScrap.getRequestUserUid());
                 if(StringUtils.isNotBlank(assetScrap.getEquipmentDisposalMethod())){
                     I18nMessage equipmentDisposalMethod = i18nMessageService.getByMsgTypeAndMsgKey("equipmentDisposalMethod", assetScrap.getEquipmentDisposalMethod());
                     if(equipmentDisposalMethod!=null){
@@ -290,6 +293,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                         }
                     }
                 }
+                assetScrap.setCreatedBy(user.getName());
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
