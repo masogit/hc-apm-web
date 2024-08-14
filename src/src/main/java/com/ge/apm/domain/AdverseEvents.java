@@ -115,7 +115,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 注册证编号
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "registration_number")
     private String registrationNum;
