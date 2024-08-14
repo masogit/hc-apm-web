@@ -1,6 +1,7 @@
 package com.ge.apm.view.adverseEvent;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
@@ -119,7 +120,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private StreamedContent exportPdf;
     @Getter@Setter
     private String[] selectedOptions;
-
+    private ConfigItemMapper configItemMapper;
+    ConfigItemValue configItemValue;
 
     @Override
     protected void init() {
@@ -136,6 +138,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
+        configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
 
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
 
@@ -150,6 +153,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         injuryPerformance = new ArrayList<>();
         mechanicalFailure = new ArrayList<>();
         /*初始化方法*/
+        configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
     }
@@ -164,6 +168,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setOccurredPlace("境内");
             //默认不良事件工单类型
             this.selected.setAdverseEventType("1");
+            if(configItemValue != null && StrUtil.isNotEmpty(configItemValue.getValue()) && AdverseEvents.assetTypeCheckEnum.consumables.toString().equals(configItemValue.getValue())){
+                assetType = 2;
+            }
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
@@ -178,6 +185,30 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             //事件原因分析由字符串转为数组
             if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
+            }
+        }
+    }
+
+    public boolean assetTypeDisabledCheck(String type){
+        if("1".equals(type)){
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
+                return false;
+            }else if(AdverseEvents.assetTypeCheckEnum.all.toString().equals(configItemValue.getValue())){
+                return false;
+            }else if(AdverseEvents.assetTypeCheckEnum.equipment.toString().equals(configItemValue.getValue())){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
+                return true;
+            }else if(AdverseEvents.assetTypeCheckEnum.all.toString().equals(configItemValue.getValue())){
+                return false;
+            }else if(AdverseEvents.assetTypeCheckEnum.consumables.toString().equals(configItemValue.getValue())){
+                return false;
+            }else{
+                return true;
             }
         }
     }
