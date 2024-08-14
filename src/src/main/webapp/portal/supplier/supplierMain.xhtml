@@ -46,6 +46,17 @@
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
+
+            function copyText() {
+                let pwd = document.getElementById("VenderCompanyLoginUrl").innerText;
+                let input = document.createElement("input");
+                input.setAttribute('id', 'copyInput');
+                input.setAttribute('value', pwd);
+                document.getElementsByTagName('body')[0].appendChild(input);
+                document.getElementById('copyInput').select();
+                document.execCommand("copy");
+                document.getElementById('copyInput').remove();
+            }
             //]]>
         </script>
     </ui:define>

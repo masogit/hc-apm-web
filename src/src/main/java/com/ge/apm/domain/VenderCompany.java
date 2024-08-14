@@ -2,11 +2,16 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 
 /**
  * @author lyj
@@ -101,6 +106,11 @@ public class VenderCompany implements Serializable {
     // 业务范围
     @Column(name = "license_scope")
     private String licenseScope;
+    // 营业执照附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'license'")
+    private List<V2_BlobObject> licenseAttachments = new ArrayList<>();
 
     // 营业许可证编码
     @Column(name = "permit_code")
@@ -115,6 +125,21 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date permitEndDate;
+    // 营业许可证附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'permit'")
+    private List<V2_BlobObject> permitAttachments = new ArrayList<>();
+    // 售后服务承诺附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'afterSaleService'")
+    private List<V2_BlobObject> afterSaleServiceAttachments = new ArrayList<>();
+    // 授权书附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'authorization'")
+    private List<V2_BlobObject> authorizationAttachments = new ArrayList<>();
 
     // 生产许可证编码
     @Column(name = "manufacturing_permit_code")
@@ -129,6 +154,11 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitEndDate;
+    // 生产许可证附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'manufacturingPermit'")
+    private List<V2_BlobObject> manufacturingPermitAttachments = new ArrayList<>();
 
     // 产品注册证编号
     @Column(name = "product_registration_code")
@@ -143,6 +173,73 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date productRegistrationEndDate;
+    // 产品注册证附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'productRegistration'")
+    private List<V2_BlobObject> productRegistrationAttachments = new ArrayList<>();
+
+    // 提交人
+    @Column(name = "author")
+    private String author;
+
+    //提交时间
+    @Column(name = "submit_time")
+    @Temporal(TemporalType.DATE)
+    private Date submitTime;
+
+    // 审核人
+    @Column(name = "auditor")
+    private String auditor;
+
+    //审批时间
+    @Column(name = "approval_time")
+    @Temporal(TemporalType.DATE)
+    private Date approvalTime;
+
+    // 审核结果
+    @Column(name = "approval_result")
+    private String approvalResult;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Date getSubmitTime() {
+        return submitTime;
+    }
+
+    public void setSubmitTime(Date submitTime) {
+        this.submitTime = submitTime;
+    }
+
+    public String getAuditor() {
+        return auditor;
+    }
+
+    public void setAuditor(String auditor) {
+        this.auditor = auditor;
+    }
+
+    public Date getApprovalTime() {
+        return approvalTime;
+    }
+
+    public void setApprovalTime(Date approvalTime) {
+        this.approvalTime = approvalTime;
+    }
+
+    public String getApprovalResult() {
+        return approvalResult;
+    }
+
+    public void setApprovalResult(String approvalResult) {
+        this.approvalResult = approvalResult;
+    }
 
     public String getId() {
         return id;
@@ -422,6 +519,54 @@ public class VenderCompany implements Serializable {
 
     public void setProductRegistrationEndDate(Date productRegistrationEndDate) {
         this.productRegistrationEndDate = productRegistrationEndDate;
+    }
+
+    public List<V2_BlobObject> getLicenseAttachments() {
+        return licenseAttachments;
+    }
+
+    public void setLicenseAttachments(List<V2_BlobObject> licenseAttachments) {
+        this.licenseAttachments = licenseAttachments;
+    }
+
+    public List<V2_BlobObject> getPermitAttachments() {
+        return permitAttachments;
+    }
+
+    public void setPermitAttachments(List<V2_BlobObject> permitAttachments) {
+        this.permitAttachments = permitAttachments;
+    }
+
+    public List<V2_BlobObject> getAfterSaleServiceAttachments() {
+        return afterSaleServiceAttachments;
+    }
+
+    public void setAfterSaleServiceAttachments(List<V2_BlobObject> afterSaleServiceAttachments) {
+        this.afterSaleServiceAttachments = afterSaleServiceAttachments;
+    }
+
+    public List<V2_BlobObject> getAuthorizationAttachments() {
+        return authorizationAttachments;
+    }
+
+    public void setAuthorizationAttachments(List<V2_BlobObject> authorizationAttachments) {
+        this.authorizationAttachments = authorizationAttachments;
+    }
+
+    public List<V2_BlobObject> getManufacturingPermitAttachments() {
+        return manufacturingPermitAttachments;
+    }
+
+    public void setManufacturingPermitAttachments(List<V2_BlobObject> manufacturingPermitAttachments) {
+        this.manufacturingPermitAttachments = manufacturingPermitAttachments;
+    }
+
+    public List<V2_BlobObject> getProductRegistrationAttachments() {
+        return productRegistrationAttachments;
+    }
+
+    public void setProductRegistrationAttachments(List<V2_BlobObject> productRegistrationAttachments) {
+        this.productRegistrationAttachments = productRegistrationAttachments;
     }
 
     @Override
