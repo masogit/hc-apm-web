@@ -506,7 +506,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setAssetType(item.getAssetType());
         zkbFePartOrder.setManufacture(item.getManufacture());
         zkbFePartOrder.setAssetId(assetInfo.getUid());
-        if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
+        if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType()) || assetTypeDepot.equals(zkbFePartOrder.getAssetType()) ) {
             zkbFePartOrder.setSubtractTotalStatus("false");
             if("t".equals(zkbFePartOrder.getMaintainFlag())&&"f".equals(zkbFePartOrder.getNotGeAsset())){
                 zkbFePartOrder.setSubtractTotalStatus("true");

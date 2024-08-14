@@ -257,7 +257,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public String genConfirmMessage(){
         String confirmMessage = new String();
         ZkbContract zct = this.contractList.get(0);
-        ZkbFePartOrder zfpo = this.selected;
         if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
             if("false".equals(this.selected.getSubtractTotalStatus())){
                 confirmMessage += "本次申请不扣除名额！";
@@ -665,7 +664,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
     public void handSubtractStatus(ValueChangeEvent event){
-        if("highMachine".equals(this.selected.getAssetType())&&"f".equals(this.selected.getNotGeAsset())){
+        if(("highMachine".equals(this.selected.getAssetType()) || "depot".equals(this.selected.getAssetType())) && "f".equals(this.selected.getNotGeAsset())){
             this.selected.setSubtractTotalStatus("false");
             if("t".equals(event.getNewValue())){
                 this.selected.setSubtractTotalStatus("true");
