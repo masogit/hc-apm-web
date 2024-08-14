@@ -159,4 +159,25 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         }
         return JSON.parseObject(JSON.toJSONString(body.get("data")), TempFileUtil.class);
     }
+
+    public AdverseEvents adverseEventWithdrawn(String token, AdverseEvents adverseEvents) {
+        HttpEntity<AdverseEvents> requestEntity = new HttpEntity<>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ADVERSE_EVENTS_WITHDRAWN);
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("adverseEventUid", adverseEvents.getUid());
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromHttpUrl(gatewayURL).queryParams(paramMap);
+        ResponseEntity<LinkedHashMap> response = template.exchange(builderUrl.build(false).toUriString(), HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String message = responseMap.get("message").toString();
+            throw new RuntimeException(message);
+        }
+        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
+        if (ObjectUtils.isEmpty(body.get("data"))) {
+            return adverseEvents;
+        }
+        return JSON.parseObject(JSON.toJSONString(body.get("data")), AdverseEvents.class);
+    }
+
+
 }

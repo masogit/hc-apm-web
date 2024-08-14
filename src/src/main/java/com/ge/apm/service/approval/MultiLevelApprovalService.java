@@ -253,6 +253,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setApprovalLevelNow(level);
                         multiLevelApproval.setWorkflowConfigApproveUid(multiLevelApprovalConfig.getId());
                         multiLevelApproval.setInitiateApproverUid(userAccount.getUid());
+                        multiLevelApproval.setApplicationUid(userAccount.getUid());
                         multiLevelApproval.setCreatedDate(TimeUtils.localDateTimeConverterToDate(LocalDateTime.now()));
                         multiLevelApproval.setCreatedBy(userAccount.getName());
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
