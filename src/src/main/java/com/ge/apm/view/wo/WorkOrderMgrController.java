@@ -2123,8 +2123,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         String lName ="";
         /*final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
         OrgInfo org = cacheService.findOrgByUid(orgInfoUID);*/
-        if(StringUtils.isNotEmpty(asset.getAssetDeptName())){
-            lName= asset.getAssetDeptName();
+        if(StringUtils.isNotEmpty(asset.getAssetDeptUID())){
+            OrgInfo org = cacheService.findOrgByUid(asset.getAssetDeptUID());
+            lName= org.getName();
         }else{
             lName= asset.getClinicalDeptName();
         }
