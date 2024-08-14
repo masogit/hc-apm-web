@@ -479,7 +479,17 @@
                                     </p:column>
 
                                     <p:column headerText="状态" >
-                                        <h:outputText value="#{item.status}"/>
+                                        <h:outputText
+                                                value="#{item.status == 1?'暂存':
+                                    item.status == 2?'待审核':
+                                    item.status == 3?'审核中':
+                                    item.status == 4?'已退回':
+                                    item.status == 5?'已作废':
+                                    item.status == 6?'审核完成':
+                                    item.status == 7?'待上报':
+                                    item.status == 8?'上报完成':
+                                    item.status == 9?'买方填写':
+                                    '未知'  }"/>
                                     </p:column>
 
                                     <p:column headerText="报告人" >
