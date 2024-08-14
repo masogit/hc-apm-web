@@ -106,6 +106,14 @@ public class MultiLevelApproval implements Serializable {
      */
     @Column(name = "initiate_approver_uid")
     private String initiateApproverUid;
+
+
+    /**
+     * 多级审批申请人uid
+     */
+    @Column(name = "application_uid")
+    private String applicationUid;
+
     /**
      * 实际审批人UID
      */
@@ -171,7 +179,7 @@ public class MultiLevelApproval implements Serializable {
     private String  applicationDepartment ;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiate_approver_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    @JoinColumn(name = "application_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private UserAccount applyUser;
 
     public String getSignatureNurse() {
