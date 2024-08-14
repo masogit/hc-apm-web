@@ -67,5 +67,6 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Transactional
     @Modifying
     void addApprovalUser(Integer nodeId, String approvalUserReplaceUid, String id);
+    public List<MultiLevelApproval> findByBusinessTypeAndBusinessUidAndApprovalStatus(int businessType,String businessUid,int status);
 
 }

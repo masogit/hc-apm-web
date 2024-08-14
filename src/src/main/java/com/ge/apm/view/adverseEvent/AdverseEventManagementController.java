@@ -6,6 +6,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -550,7 +551,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     public boolean isWithdrawnButton(){
         String createUserUid = selected.getCreateUserUID();
         String uid = UserContextService.getCurrentUserAccount().getUid();
-        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getBusinessUid());
+        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUidAndApprovalStatus(ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, selected.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
         if(createUserUid.equals(uid)  &&  !CollectionUtils.isEmpty(multiLevelApprovals)  &&  multiLevelApprovals.size()==1 && multiLevelApprovals.get(0).getApprovalLevelNow()==1   && multiLevelApprovals.get(0).getInitiateApproverUid().equals(selected.getCreateUserUID()) ){
             return true;
         }
