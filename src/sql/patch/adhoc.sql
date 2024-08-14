@@ -8,6 +8,11 @@ select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '工单维修是否
 
 --YHAAO-22200 资产出库科室设置
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 3, '', '资产出库科室设置', 'setAssetOutStockDept', '资产出库科室设置', 'f', 't', 1 where not exists(select * from config_item where key = 'setAssetOutStockDept');
+select replace(uuid_generate_v4()::text,'-',''), 3, '', '资产出库科室设置,请输入科室uid', 'setAssetOutStockDept', '资产出库科室设置', 'f', 't', 1 where not exists(select * from config_item where key = 'setAssetOutStockDept');
 -- YHAAO-22426 日常检查--有问题数据显示时间调整
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 8, '30', '查询天数', 'setQueryNumberDays', '（仅对移动端有问题卡片生效）', 'f', 't', 2,'^([12][0-9]|30|[1-9])$' where not exists(select * from config_item where key = 'setQueryNumberDays');
+
+
+--YHAAO-22490不良事件产品类型设置
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 14, '', '全部为all,仅设备为equipment，仅耗材为consumables', 'setAdverseEventProductType', '不良事件产品类型设置', 'f', 't', 1 where not exists(select * from config_item where key = 'setAdverseEventProductType');

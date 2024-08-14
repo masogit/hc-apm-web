@@ -196,11 +196,11 @@
                                     <f:selectItem itemValue="2" />
                                 </p:selectOneRadio>
                                 <h:panelGroup>
-                                    <p:radioButton for="assetType" itemIndex="0"/>
+                                    <p:radioButton for="assetType" itemIndex="0" disabled="#{adverseEventManagementController.assetTypeDisabledCheck('1')}" />
                                     <h:outputLabel value="设备" styleClass="radiolabelPF"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <p:radioButton for="assetType" itemIndex="1"/>
+                                    <p:radioButton for="assetType" itemIndex="1" disabled="#{adverseEventManagementController.assetTypeDisabledCheck('2')}" />
                                     <h:outputLabel value="耗材" styleClass="radiolabelPF"/>
                                 </h:panelGroup>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="productInfo">
