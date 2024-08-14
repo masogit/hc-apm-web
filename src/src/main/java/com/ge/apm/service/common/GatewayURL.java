@@ -159,6 +159,9 @@ public enum GatewayURL {
     ADVERSE_EVENTS_INVALID("/hcapmassetservice/api/apm/asset/adverse/events/invalidAdverseEvent"),
     // 不良事件暂存上报
     ADD_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/addAdverseEvent"),
+
+    ADVERSE_EVENTS_WITHDRAWN("/hcapmassetservice/api/apm/asset/adverse/events/adverseEventWithdrawn"),
+
     // 审核人不良事件列表
     APPROVE_ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/approveList"),
     // 审核暂存

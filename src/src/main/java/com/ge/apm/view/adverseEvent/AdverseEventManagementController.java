@@ -526,4 +526,15 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         return false;
     }
 
+    public  void  adverseEventWithdrawn(){
+        AdverseEvents result = adverseEventServiceClient.adverseEventWithdrawn(UserContextService.getAccessToken(), selected);
+
+        if(result!=null && result.getStatus()==1){
+            MessageUtil.outPutReturnFacesMessage("撤回成功", FacesMessage.SEVERITY_INFO);
+
+        }
+
+
+    }
+
 }
