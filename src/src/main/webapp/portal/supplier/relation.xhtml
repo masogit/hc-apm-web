@@ -9,7 +9,9 @@
 
 <ui:composition>
     <div class="ui-g-12 card">
-
+        <h:form>
+            <p:commandButton id="VenderCompanyLoginButton" actionListener="#{supplierController.onShowQrCode}" value="供应商注册" title="供应商注册" update=":growl supplierTab:VenderCompanyLoginUrlDlg" oncomplete="PF('VenderCompanyLoginUrlDialog').show()"/>
+        </h:form>
         <h:form id="VenderCompanyForm">
             <p:dataTable id="datalist1" value="#{venderCompanyController.lazyModel}" var="item" widgetVar="varDataList1"
                          selectionMode="single" selection="#{venderCompanyController.selected}" stickyHeader=""
@@ -19,7 +21,7 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:ajax event="rowSelect" update="createButton"/>
+                <p:ajax event="rowSelect" update="supplierTab:VenderCompanyDetailForm"/>
                 <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.name}"/>
                 </p:column>
@@ -42,13 +44,24 @@
                 <p:column headerText="#{msg.city}" sortBy="#{item.city}" filterBy="#{item.city}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.city}"/>
                 </p:column>
-                <f:facet name="{Toolbar}">
-                    <p:commandButton id="createButton" icon="ui-icon-plus" title="加入供应商" actionListener="#{venderCompanyController.prepareEdit}" update="supplierTab:SupplierRelationDlg" oncomplete="PF('SupplierRelationDialog').show()" disabled="#{empty venderCompanyController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                </f:facet>
+<!--                <f:facet name="{Toolbar}">-->
+<!--                    <p:commandButton id="createButton" icon="ui-icon-plus" title="加入供应商" actionListener="#{venderCompanyController.prepareEdit}" update="supplierTab:SupplierRelationDlg" oncomplete="PF('SupplierRelationDialog').show()" disabled="#{empty venderCompanyController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>-->
+<!--                </f:facet>-->
             </p:dataTable>
         </h:form>
         <ui:include src="relationSupplier.xhtml"/>
+        <ui:include src="VenderCompanyDetail.xhtml"/>
+        <p:dialog id="VenderCompanyLoginUrlDlg" widgetVar="VenderCompanyLoginUrlDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="供应商登录地址" >
+            <h:form id="viewUrlForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <span class="label" id="VenderCompanyLoginUrl">#{venderCompanyController.getVenderCompanyLoginUrl()}</span>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton value="一键复制" onclick="copyText()" oncomplete="PF('VenderCompanyLoginUrlDialog').hide()"/>
+            </h:form>
+        </p:dialog>
     </div>
-
 </ui:composition>
 </html>
