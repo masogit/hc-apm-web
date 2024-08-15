@@ -153,6 +153,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, configItemValue.getValue(), "1*"));
         }else{
             this.updateSearchFilter(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.NE, configItemValue.getValue(), "1*"));
+            this.updateSearchFilter(new SearchFilter("outStockNo", SearchFilter.Operator.IsNotNull, "", "1*"));
         }
 
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
@@ -276,6 +277,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
             }
         }
         assetOutStockDto = new AssetOutStockDto();
+        //assetOutStockDto.setOutStockNo(assetOutStockService.queryStockNo());
         assetOutStockDto.setQty(selectedArrivalItems.size());
         if(selectedArrivalItems.get(0).getPurchasePrice() != null){
             assetOutStockDto.setPrice(new BigDecimal(selectedArrivalItems.get(0).getPurchasePrice()));

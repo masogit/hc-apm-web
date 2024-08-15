@@ -51,6 +51,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
     ArrivalListItem findByQrCode(String qrCode);
 
 
-
+    @Query(value = "select max(out_stock_no) from arrival_list_item ali where ali.out_stock_no like ?1",nativeQuery = true)
+    String queryStockNo(String stockNo);
     List<ArrivalListItem> findBySiteUidAndOutStockNoAndOutStockNoNotNull(String siteUid, String outStockNo);
 }
