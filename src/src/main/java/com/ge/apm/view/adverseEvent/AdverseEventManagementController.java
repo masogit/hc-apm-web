@@ -169,7 +169,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setOccurredPlace("境内");
             //默认不良事件工单类型
             this.selected.setAdverseEventType("1");
-            if(configItemValue != null && StrUtil.isNotEmpty(configItemValue.getValue()) && AdverseEvents.assetTypeCheckEnum.consumables.toString().equals(configItemValue.getValue())){
+            if(configItemValue != null && StrUtil.isNotEmpty(configItemValue.getValue()) && "3".equals(configItemValue.getValue())){
                 assetType = 2;
             }
         } else {
@@ -194,9 +194,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         if("1".equals(type)){
             if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
                 return false;
-            }else if(AdverseEvents.assetTypeCheckEnum.all.toString().equals(configItemValue.getValue())){
+            }else if(AdverseEvents.ALL.equals(configItemValue.getValue())){
                 return false;
-            }else if(AdverseEvents.assetTypeCheckEnum.equipment.toString().equals(configItemValue.getValue())){
+            }else if(AdverseEvents.EQUIPMENT.equals(configItemValue.getValue())){
                 return false;
             }else{
                 return true;
@@ -204,9 +204,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }else{
             if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
                 return true;
-            }else if(AdverseEvents.assetTypeCheckEnum.all.toString().equals(configItemValue.getValue())){
+            }else if(AdverseEvents.ALL.equals(configItemValue.getValue())){
                 return false;
-            }else if(AdverseEvents.assetTypeCheckEnum.consumables.toString().equals(configItemValue.getValue())){
+            }else if(AdverseEvents.CONSUMABLES.equals(configItemValue.getValue())){
                 return false;
             }else{
                 return true;

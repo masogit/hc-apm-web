@@ -33,9 +33,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
 
-    public enum assetTypeCheckEnum{
-        all, consumables, equipment
-    }
+    @Transient
+    public static String ALL = "1";
+
+    @Transient
+    public static String EQUIPMENT = "2";
+
+    @Transient
+    public static String CONSUMABLES = "1";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
