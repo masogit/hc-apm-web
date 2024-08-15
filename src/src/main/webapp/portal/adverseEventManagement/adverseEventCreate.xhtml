@@ -238,15 +238,15 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">型号<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="model" value="#{adverseEventManagementController.selected.model}" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" requiredMessage="型号不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="model" value="#{adverseEventManagementController.selected.model}" required="false" requiredMessage="型号不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">规格<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="standard" value="#{adverseEventManagementController.selected.standard}" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" requiredMessage="规格不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="standard" value="#{adverseEventManagementController.selected.standard}" required="false" requiredMessage="规格不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">产地<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="originPlace" value="#{adverseEventManagementController.selected.originPlace}" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="originPlace" value="#{adverseEventManagementController.selected.originPlace}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 1}">
                                         <label class="label">产品批号</label>
@@ -258,7 +258,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">批号<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText  maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}" required="true" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText  maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">编号</label>
@@ -266,15 +266,15 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">UDI<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="udi" value="#{adverseEventManagementController.selected.udi}" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="udi" value="#{adverseEventManagementController.selected.udi}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">生产日期<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">有效期至<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{adverseEventManagementController.assetType == 2 ? 'true':'false'}" requiredMessage="有效期至不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="有效期至不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">停用日期</label>

@@ -106,7 +106,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 设备编号
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "device_num")
     private String deviceNum;
@@ -115,7 +114,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 产品名称
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "product_name")
     private String productName;
