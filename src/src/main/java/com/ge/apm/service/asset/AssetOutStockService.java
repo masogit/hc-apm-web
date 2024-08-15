@@ -11,6 +11,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -135,5 +136,18 @@ public class AssetOutStockService {
             }
         }
         return bytes;
+    }
+
+    public String queryStockNo(){
+        String preStr = "CK002" + DateUtil.format(new Date(), "yyyyMMdd") ;
+        String oldMax = arrivalListItemRepository.queryStockNo(preStr+ "%");
+        if(StrUtil.isEmpty(oldMax)){
+            return preStr + "001";
+        }else{
+            String ls = oldMax.replace(preStr, "");
+            int index = Integer.parseInt(ls);
+            index++;
+            return preStr + String.format("%03d",index);
+        }
     }
 }
