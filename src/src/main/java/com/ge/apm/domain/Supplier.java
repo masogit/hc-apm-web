@@ -619,7 +619,7 @@ public class Supplier implements Serializable, ChineseName {
     }
 
     public String getSupplierAlertStatus() {
-        if (ObjectUtil.isEmpty(licensesDateList)) {
+        if (ObjectUtil.isEmpty(licensesDateList) && ObjectUtil.isEmpty(supplierAlertStatus)) {
             licensesDateList = ListUtil.newArrayList(licenseEndDate, permitEndDate, manufacturingPermitEndDate, productRegistrationEndDate, productionLicenseExpireDate, businessLicenseExpireDate, registrationCertificateExpireDate, powerOfAttorneyExpireDate)
                     .stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
             Date now = DateUtil.now();
