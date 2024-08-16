@@ -151,6 +151,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
 
         if("UnOutStock".equals(tabType)){
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, configItemValue.getValue(), "1*"));
+            this.updateSearchFilter(new SearchFilter("outStockNo", SearchFilter.Operator.IsNull, "", "1*"));
         }else{
             this.updateSearchFilter(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.NE, configItemValue.getValue(), "1*"));
             this.updateSearchFilter(new SearchFilter("outStockNo", SearchFilter.Operator.IsNotNull, "", "1*"));

@@ -20,14 +20,21 @@
          <p:ajax event="filter" listener="#{assetOutStockedController.onFilter}" update="datalist" />
          <p:ajax event="rowSelect" update="exportButton" />
 
+         <p:column headerText="资产类别" >
+            <h:outputText value="专用设备"/>
+         </p:column>
+         <p:column headerText="资产编号" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.financingNum}"/>
+         </p:column>
+         <p:column headerText="资产名称" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.arrivalList.assetName}"/>
+         </p:column>
+         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.arrivalList.assetGroup}" filterBy="#{item.arrivalList.assetGroup}" filterMatchMode="LIKE">
+            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.arrivalList.assetGroup)}"/>
+         </p:column>
+
          <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
             <h:outputText value="#{item.arrivalList.contractNum}"/>
-         </p:column>
-         <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.activeSupplier()}">
-            <h:outputText value="#{item.arrivalList.approvalNo}"/>
-         </p:column>
-         <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
-            <h:outputText value="#{item.arrivalList.assetName}"/>
          </p:column>
          <p:column headerText="#{msg.clinicalDeptName}">
             <f:facet name="header">
@@ -40,25 +47,11 @@
             </f:facet>
             <h:outputText value="#{assetOutStockedController.getOrgNameByUid(item.recruiteDeptUid)}"/>
          </p:column>
-         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
-            <h:outputText value="#{item.arrivalList.creator.name}"/>
-         </p:column>
-         <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.arrivalList.agent}" filterBy="#{item.arrivalList.agent}" filterMatchMode="LIKE">
-            <h:outputText value="#{item.arrivalList.agent}"/>
-         </p:column>
-         <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
+         <p:column headerText="#{msg.installDate}" sortBy="#{item.installDate}" filterBy="#{item.installDate}" filterMatchMode="GTE" >
             <f:facet name="filter">
-               <p:inputText id="filterArrivalDate2" widgetVar="varFilterArrivalDate2" value="#{assetOutStockedController.arrivalFormatTime}"/>
+               <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetUnOutStockController.arrivalFormatTime}"/>
             </f:facet>
-            <h:outputText value="#{item.arrivalList.arrivalDate}">
-               <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-            </h:outputText>
-         </p:column>
-         <p:column headerText="#{msg.AssetArrivalListBusinessAckDate}" sortBy="#{item.businessAckDate}" filterBy="#{item.businessAckDate}" filterMatchMode="GTE">
-            <f:facet name="filter">
-               <p:inputText id="filterBusinessAckDate2" widgetVar="varFilterBusinessAckDate2" value="#{assetOutStockedController.arrivalFormatTime}"/>
-            </f:facet>
-            <h:outputText value="#{item.businessAckDate}">
+            <h:outputText value="#{item.installDate}">
                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </h:outputText>
          </p:column>
@@ -80,14 +73,11 @@
          <p:column headerText="#{msg.status}" >
             <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
          </p:column>
-         <p:column headerText="#{msg.ArrivalProcessType}" sortBy="#{item.arrivalList.processType}" filterBy="#{item.arrivalList.processType}" filterMatchMode="EQ">
-            <f:facet name="filter">
-               <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                  <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-               </p:selectOneMenu>
-            </f:facet>
-            <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.arrivalList.processType)}"/>
+         <p:column headerText="数量" sortBy="#{item.qty}" >
+            <h:outputText value="#{item.qty}"/>
+         </p:column>
+         <p:column headerText="单位" sortBy="#{item.unit}" >
+            <h:outputText value="#{item.unit}"/>
          </p:column>
          <p:column headerText="出库单号" sortBy="#{item.outStockNo}" filterBy="#{item.outStockNo}" filterMatchMode="LIKE">
             <h:outputText value="#{item.outStockNo}"/>
