@@ -71,6 +71,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private Map<Integer, Boolean> selectedMap; //复选的供应商
     @Getter @Setter
     private Boolean isSelectedCurrentPage = false;
+    private boolean activeSupplier;
 
     @Override
     protected void init() {
@@ -81,6 +82,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         supplierService = WebUtil.getBean(SupplierService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        activeSupplier = supplierService.activeSupplier();
         this.filterBySite = false;
         this.selectedMapPending = new HashMap();
         this.selectedMapApproved = new HashMap();
@@ -128,6 +130,9 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
         currentPageSuppliers = res.getContent();
+        if (!activeSupplier) {
+            currentPageSuppliers.forEach(t -> t.setSupplierAlertStatus("0"));
+        }
         return res;
     }
 
@@ -540,7 +545,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public boolean activeSupplier(){
-        return supplierService.activeSupplier();
+        return activeSupplier;
     }
 
     public boolean activeSupplierCertificateManage(){
