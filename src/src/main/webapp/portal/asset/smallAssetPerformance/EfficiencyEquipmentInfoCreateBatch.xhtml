@@ -34,18 +34,30 @@
 
                             </p:autoComplete>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetGroup}</label>
+                            <p:selectOneMenu  id="assetGroup" value="#{efficiencyEquipmentInfoController.assetGroup}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>采购金额:(元)</label>
+                            <p:inputNumber id="purchasePrice" value="#{efficiencyEquipmentInfoController.purchasePrice}">
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+
 
                     </p:panelGrid>
-
-
-
-<!--                <p:pickList id="pickList" value="#{efficiencyEquipmentInfoController.assets}"-->
-<!--                            var="asset" itemLabel="#{asset}" itemValue="#{asset}"-->
-<!--                            showSourceFilter="false" showTargetFilter="false" responsive="true"-->
-<!--                            filterMatchMode="contains" converter="assetInfoConverter" class="pickList" >-->
+                <p:commandButton actionListener="#{efficiencyEquipmentInfoController.getQueryAssetsList()}"
+                                 value="查询" update="pickList"
+                                 icon="ui-icon-check"
+                                 />
 
                 <p:pickList id="pickList" value="#{efficiencyEquipmentInfoController.assets}" var="asset"
-                            itemValue="#{asset}" itemLabel="#{asset.name}" showCheckbox="false" responsive="true" immediate="true"
+                            itemValue="#{asset}" itemLabel="#{asset}" showCheckbox="false" responsive="true" immediate="true"
                             showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter">
                     <f:facet name="sourceCaption"><p style="padding-bottom:-200px">待选设备
                         <br/>

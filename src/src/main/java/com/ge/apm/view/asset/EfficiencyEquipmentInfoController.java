@@ -4,11 +4,10 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.EfficiencyEquipmentInfoRepository;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.EfficiencyEquipmentInfoService;
-import com.ge.apm.service.his.HisAssetGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
@@ -21,12 +20,10 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -58,6 +55,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     private AssetInfoService assetInfoService;
 
+    private AssetInfoMapper assetInfoMapper;
+
     //选定的院区
     private OrgInfo selectSite;
 
@@ -70,22 +69,25 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     @Getter @Setter
     private DualListModel<AssetInfo> assets = new DualListModel<>();
-//    @Getter @Setter
-//    private AssetInfo filter = new AssetInfo();
+
 
     @Getter @Setter
     private OrgInfo selectedOrg;
 
     @Getter @Setter
     private OrgInfo filterDeptOrg;
+
+
+    //采购原值(元)
+    @Getter @Setter
+    private Double purchasePrice;
+
+    @Getter @Setter
+    private Integer assetGroup;//设备分类
+
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
-
-    @Getter @Setter
-    private Boolean unCheckedNurseSite = false;
-    @Getter @Setter
-    private Boolean toDeleteNurseMaintainSite = false;
     private UserSiteOrgTreeComponentController userSiteOrgTreeComponentController;
 
     @Override
@@ -103,6 +105,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
 
         userSiteOrgTreeComponentController = WebUtil.getBean(UserSiteOrgTreeComponentController.class);
         userSiteOrgTreeComponentController.registerController(this);
@@ -184,29 +187,6 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     public void deleteAsset(EfficiencyEquipmentInfo efficiencyEquipmentInfo) {
         efficiencyEquipmentInfoRepository.delete(efficiencyEquipmentInfo);
-    }
-
-
-//    public DualListModel<AssetInfo> getAssets() {
-//
-//        List<SearchFilter> assetSearchFilters = assetFilters();
-//        PageRequest pageRequest = new PageRequest(0, 1000);
-//        Page<AssetInfo> page = assetInfoRepository.findBySearchFilter(assetSearchFilters, pageRequest);
-//        List<AssetInfo> source = new ArrayList<>(page.getContent());
-//        source.removeAll(assets.getTarget());
-//        assets.setSource(source);
-//        return assets;
-//    }
-
-
-
-
-
-
-
-    public void onTransfer(TransferEvent event) {
-        unCheckedNurseSite = false;
-        toDeleteNurseMaintainSite = false;
     }
 
 
@@ -297,7 +277,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             return new ArrayList<>();
         }
         List<String> siteOrgUids = orgInfoDao.getSiteOrgUidsByParentUid(siteOrg.getUid());
-
+//
 //        List<SearchFilter> assetFilters = new ArrayList<>();
 //
 //        assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
@@ -311,14 +291,22 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 //        if (null != clinicalDept) {
 //            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
 //        }
+//
+//        if(assetGroup!=null){
+//            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup));
+//        }
+//
+//        if(purchasePrice!=null){
+//            assetFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, purchasePrice));
+//        }
+//
+//        assetFilters.add(new SearchFilter("efficiencyEquipmentInfo.uid", SearchFilter.Operator.IsNull,null));
+//
 //        Pageable pageable =  new PageRequest(0, 5000); //PageRequest.of(0, 5000);
 //        return assetInfoRepository.findBySearchFilter(assetFilters, pageable).getContent();
-//
-//
-        List<AssetInfo>assetInfos=assetInfoRepository.getAssetInfoIsNotEfficiencyEquipment(siteOrg.getTenantUID(),siteOrgUids,clinicalDept.getUid());
 
-        return assetInfos;
-
+        List<AssetInfo> assetInfoIsNotEfficiencyEquipment = assetInfoMapper.getAssetInfoIsNotEfficiencyEquipment(siteOrg.getTenantUID(), siteOrgUids, clinicalDept.getUid(),assetGroup,purchasePrice);
+        return assetInfoIsNotEfficiencyEquipment;
 
 
     }

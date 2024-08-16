@@ -75,7 +75,7 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     private Date createdDate;
 
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
 
