@@ -456,7 +456,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public Boolean isCanModifyClose(){
-        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        //if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ){
             if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.CloseCommited.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString().equals(selected.getStatus()) ||
@@ -467,7 +467,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return Boolean.TRUE;
                 }
             }
-        }
+        //}
         return Boolean.FALSE;
     }
 
@@ -1002,7 +1002,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         actionReturnName = "ModifyEdit";
         zkbPartOrderReturn = null;
 
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             zkbPartOrderReturnModifyList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
             partNoList = new ArrayList<>();
             orderNoList = new ArrayList<>();
@@ -1046,7 +1046,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void submitCloseReturn(){
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
             for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
                 if(returnMap.containsKey(r.getPartNo())){
