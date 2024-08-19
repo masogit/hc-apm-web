@@ -223,4 +223,23 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof EfficiencyEquipmentInfo)) {
+            return false;
+        }
+        EfficiencyEquipmentInfo other = (EfficiencyEquipmentInfo) object;
+        return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
+    }
+
 }

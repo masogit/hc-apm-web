@@ -1,0 +1,78 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:his="http://www.ge.com/tags/his">
+
+<ui:composition>
+    <div class="ui-g clearfix">
+
+        <div class="ui-g-12 card">
+            <h:form id="HisOrgInfoListForm2">
+                <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                    <his:selectOrg update=":tabGroup:hisAssetListForm2:hisAssetDataList :tabGroup:HisOrgInfoListForm2"></his:selectOrg>
+                </div>
+            </h:form>
+
+            <h:form id="hisAssetListForm2">
+                <p:dataTable id="hisAssetDataList" value="#{hisAssetGroupClinicalMatchController.lazyModel}"
+                             var="item"
+                             lazy="true" paginator="true" paginatorPosition="bottom"
+                             paginatorAlwaysVisible="true"
+                             selectionMode="single" selection="#{hisAssetGroupClinicalMatchController.selected}"
+                             rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}">
+                        <h:outputText value="#{item.assetInfo.name}"/>
+                    </p:column>
+
+                    <p:column  headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.assetInfo.serialNum}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.functionGroup}" >
+                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.assetInfo.functionGroup)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.qrCode}"/>
+                    </p:column>
+
+                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}">
+                        <h:outputText value="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}"/>
+                    </p:column>
+                    <p:column headerText="分组类型" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.type}">
+                        <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroupAssetMatch.hisAssetGroup.type)}"/>
+                    </p:column>
+
+                    <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu  onchange="PF('hisAssetDataList').filter()"   value="#{hisAssetGroupClinicalMatchController.filterAssetGroup}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+
+                    </p:column>
+
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+
+                    </p:column>
+
+
+                </p:dataTable>
+            </h:form>
+
+        </div>
+    </div>
+
+</ui:composition>
+
+</html>
