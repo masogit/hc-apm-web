@@ -266,7 +266,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         selectedOrg=null;
+        userSiteOrgTreeComponentController.setSelectedOrg(null);
         filterDeptOrg=null;
+        assetGroup=null;
+        purchasePrice=null;
         assets= new DualListModel<>();
         super.prepareCreate();
     }
