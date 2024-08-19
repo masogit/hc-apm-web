@@ -40,6 +40,11 @@
                             <h:outputText value="#{item.assetGroupName}"/>
                         </p:column>
 
+
+                        <p:column headerText="设备分组类型" sortBy="#{item.hisAssetGroup.type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroup.type)}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>

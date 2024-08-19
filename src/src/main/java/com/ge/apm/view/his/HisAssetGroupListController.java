@@ -61,8 +61,9 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
             searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
         }
-
-        return hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<HisAssetGroupAssetMatch> content = hisAssetGroupAssetMatches.getContent();
+        return hisAssetGroupAssetMatches;
     }
 
     @Override
