@@ -949,7 +949,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         boolean isDepot = false;
         Map<String, String> depotMap = new HashMap<>();
         if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 isDepot = true;
                 List<ZkbPartOrderCat> zkbPartOrderCatList = zkbPartOrderCatRepository.queryByCatType(SPECIAL_PART);
                 if(CollectionUtils.isNotEmpty(zkbPartOrderCatList)){
