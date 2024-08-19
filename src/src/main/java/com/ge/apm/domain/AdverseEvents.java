@@ -40,7 +40,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
     public static String EQUIPMENT = "2";
 
     @Transient
-    public static String CONSUMABLES = "1";
+    public static String CONSUMABLES = "3";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
