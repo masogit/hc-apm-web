@@ -32,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -40,9 +41,12 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -567,6 +571,30 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
 
 
+    }
+
+    public void exportFile(TempFileUtil tempFileUtil) {
+        try {
+            InputStream inputStream = tempFileUtil.getInputStream();
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.setHeader("Content-Disposition", "attachment;filename=" + tempFileUtil.getFileName());
+            StreamUtils.copy(inputStream, response.getOutputStream());
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void exportFile(AdverseEventsFile adverseEventsFile) throws IOException {
+        InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        response.setHeader("Content-Disposition", "attachment;filename=" + adverseEventsFile.getObjectName());
+        StreamUtils.copy(inputStream, response.getOutputStream());
+        facesContext.responseComplete();
+        facesContext.renderResponse();
     }
 
 }

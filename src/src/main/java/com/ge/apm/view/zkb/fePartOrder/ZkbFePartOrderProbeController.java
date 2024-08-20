@@ -537,12 +537,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 return;
             }
             ZkbContractAsset zkbContractAsset = zkbContractAssetList.get(0);
-           /* if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
+            if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
                 WebUtil.addErrorMessage("GEFE维修探头申请不能申请超声depot设备！","");
                 this.contractError = true;
                 return;
             }
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+           /* if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
                     WebUtil.addErrorMessage("GEFE维修CCS或Biomed合同类型不能申请内修设备！","");
                     this.contractError = true;
