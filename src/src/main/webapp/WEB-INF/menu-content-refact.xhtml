@@ -213,7 +213,7 @@
                    <c:when test="#{item eq 'PERFORMANCE'}">
                        <!-- 绩效分析 -->
                        <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('PERFORMANCE_')}">
-                           <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DASHBOARD_SCREEN')}" />
+                           <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="/dashboard/#/dashboard2" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DASHBOARD_SCREEN')}" />
                            <p:menuitem id="um240" value="#{msg.DepartmentTransactionManagement}" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DEPT_MANAGE_EDIT')}"/>
                            <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_STATUS_MONITOR')}"/>
                            <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}" url="/geapm/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.loginUserSiteId eq 112 and userContextService.accessContainsFunctionMenu('PERFORMANCE_SCAN_STATISTIC')}"/>

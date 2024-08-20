@@ -195,7 +195,7 @@
                 <p:menuitem id="um37" value="#{msg.AdvancedDeviceInfoTracking}" rendered="false" style="color: orange;" outcome="/empty"/>
             </p:submenu>
             <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('performance')}">
-                <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContains('performance.bigScreen')}" />
+                <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="/dashboard/#/dashboard2" rendered="#{userContextService.accessContains('performance.bigScreen')}" />
                 
                 <p:menuitem id="um240" value="#{msg.DepartmentTransactionManagement}" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContains('performance.deptMgt')}"/>
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContains('performance.scan')}"/>
