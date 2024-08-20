@@ -587,7 +587,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
     }
 
-    public void exportFile(AdverseEventsFile adverseEventsFile) throws IOException {
+    public void exportFiled(AdverseEventsFile adverseEventsFile) throws IOException {
         InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
