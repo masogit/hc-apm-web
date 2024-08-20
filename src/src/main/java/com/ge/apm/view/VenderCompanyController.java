@@ -138,6 +138,6 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     }
 
     public String getVenderCompanyLoginUrl() {
-        return microServiceUtil.getDownLoadUrl().replace("gateway","") + "/reports/vender/index";
+        return microServiceUtil.getDownLoadUrl().replace("gateway","") + "reports/vender/index";
     }
 }
