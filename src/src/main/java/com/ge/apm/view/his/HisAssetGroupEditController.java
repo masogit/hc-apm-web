@@ -155,7 +155,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     public void sharedEquallyProportion(){
         int size = selectAssetInfos.size();
         if(size>0){
-            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),BigDecimal.ROUND_UNNECESSARY);
+            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),2, BigDecimal.ROUND_DOWN);
             selectAssetInfos.stream().forEach(item->item.setScaleAssessment(divide.doubleValue()));
         }
     }
@@ -318,6 +318,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
 
                 availableAssets = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
+                selectAssetInfos=new ArrayList<>();
             } else {
                 //edit
                 this.selected = (HisAssetGroupAssetMatch)eventObject;
