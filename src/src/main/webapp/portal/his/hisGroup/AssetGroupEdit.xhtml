@@ -96,10 +96,14 @@
                     </p:column>
                 </p:pickList>
 
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <p:commandButton validateClient="true" value="添加已勾选设备"
                                      update="hisTagEditForm:selectAssetInfos"
                                      action="#{hisAssetGroupEditController.addAssetInfo}" />
+
+                    <p:commandButton validateClient="true" value="一键均摊"
+                                     update="hisTagEditForm:selectAssetInfos"
+                                     action="#{hisAssetGroupEditController.sharedEquallyProportion}" style="float:right;" />
                 </p:panelGrid>
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -144,7 +148,7 @@
                     <p:commandButton validateClient="true" value="删除已勾选设备"
                                      update=":tabGroup:hisTagEditForm:selectAssetInfos :tabGroup:hisTagEditForm:HisAssetsPickList"
                                      action="#{hisAssetGroupEditController.removeAssetInfo}" />
-                    <p:commandButton validateClient="true" value="清空"
+                    <p:commandButton  validateClient="true" value="清空"
                                      update=":tabGroup:hisTagEditForm:selectAssetInfos :tabGroup:hisTagEditForm:HisAssetsPickList"
                                      action="#{hisAssetGroupEditController.clearAssetInfo}" />
                 </p:panelGrid>

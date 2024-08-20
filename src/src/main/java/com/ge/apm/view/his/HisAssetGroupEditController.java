@@ -33,6 +33,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     }
     public void addAssetInfo(){
         List<AssetInfo> target = availableAssets.getTarget();
+        selectAssetInfos.clear();
         for (AssetInfo assetInfo : target) {
            if(!selectAssetInfos.contains(assetInfo)){
                selectAssetInfos.add(assetInfo);
@@ -150,6 +152,13 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         availableAssets.setTarget(target);
     }
 
+    public void sharedEquallyProportion(){
+        int size = selectAssetInfos.size();
+        if(size>0){
+            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),BigDecimal.ROUND_UNNECESSARY);
+            selectAssetInfos.stream().forEach(item->item.setScaleAssessment(divide.doubleValue()));
+        }
+    }
     public void updateSelctedAssetList(AjaxBehaviorEvent event) {
         log.debug("updateSelctedAssetList");
         SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
