@@ -203,7 +203,7 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "payment_period")
     private Integer paymentPeriod;
 
-    //付款日期
+    //是否付款
     @Column(name = "paid")
     private Boolean paid = Boolean.FALSE;
 
