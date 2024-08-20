@@ -383,6 +383,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return ;
             }
         }
+        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
+                this.contractError = true;
+                return;
+            }
+        }
         //YHAAO-20623
         //ZKB CCS 2.0 offer 需要区分超声高端机New和old，并实现相关逻辑
 
@@ -393,23 +401,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 WebUtil.addErrorMessage("GEFE维修合同中设备不存在！","");
                 this.contractError = true;
                 return;
-            }
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
-                    WebUtil.addErrorMessage("GEFE维修CCS或Biomed合同类型不能申请内修设备！","");
-                    this.contractError = true;
-                    return;
-                   /* ZkbContractAsset zkbContractAsset = zkbContractAssetList.get(0);
-                    if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
-                        WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
-                        this.contractError = true;
-                        return;
-                    }else if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
-                        WebUtil.addErrorMessage("GEFE维修申请超声depot维修类型需为外修！","");
-                        this.contractError = true;
-                        return;
-                    }*/
-                }
             }
         }
         /**
