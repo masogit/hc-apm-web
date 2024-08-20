@@ -363,6 +363,7 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
+                                                <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeHarmPerformFile(fileitem)}" update="harmPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -373,13 +374,14 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
+                                                <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeTempHarmPerform(fileitem)}" update="injuryPerformance" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">器械故障表现</label>
@@ -388,6 +390,7 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
+                                                <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeDeviceFaultPerformFile(fileitem)}" update="deviceFaultPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -398,13 +401,14 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
+                                                <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeTempDeviceFaultPerform(fileitem)}" update="mechanicalFailure" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempMechanicalFailureFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this mechanicalFailure" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov)$/" fileUploadListener="#{adverseEventManagementController.tempMechanicalFailureFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this mechanicalFailure" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
                         </p:tab>

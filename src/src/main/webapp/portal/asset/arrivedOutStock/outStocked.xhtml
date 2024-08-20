@@ -36,9 +36,9 @@
          <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
             <h:outputText value="#{item.arrivalList.contractNum}"/>
          </p:column>
-         <p:column headerText="#{msg.clinicalDeptName}">
+         <p:column headerText="领用科室">
             <f:facet name="header">
-               <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+               <h:outputText value="领用科室"/><br/>
                <p:autoComplete dropdown="true" value="#{assetOutStockedController.filterClinicalDeptOrg}" appendTo="@(Body)"
                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOutStockedController.autoCompleteDeptName}" size="5">
                   <p:ajax event="itemSelect" listener="#{assetOutStockedController.onClinicalDeptNameFilterChange}" process="@this"  update="assetOutStockTab:assetOutStockedListForm:datalist"/>
@@ -49,7 +49,7 @@
          </p:column>
          <p:column headerText="#{msg.installDate}" sortBy="#{item.installDate}" filterBy="#{item.installDate}" filterMatchMode="GTE" >
             <f:facet name="filter">
-               <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetUnOutStockController.arrivalFormatTime}"/>
+               <p:inputText id="filterArrivalDate2" widgetVar="varFilterArrivalDate2" value="#{assetUnOutStockController.arrivalFormatTime}"/>
             </f:facet>
             <h:outputText value="#{item.installDate}">
                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -99,26 +99,16 @@
       </p:dataTable>
 
    </h:form>
-   <p:overlayPanel id="idPanelFilterArrivalDate2" widgetVar="panelFilterArrivalDate2" for="assetOutStockTab:assetOutStockedListForm:datalist:filterArrivalDate2" dismissable="false">
-      <h:panelGrid columns="2">
-         <p:outputLabel value="#{msg.From}"/>
-         <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
-         <p:outputLabel value="#{msg.To}"/>
-         <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
-      </h:panelGrid>
-      <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArrivalDate2', 'varArrivalDateFrom', 'varArrivalDateTo'); PF('panelFilterArrivalDate2').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-      <p:commandButton onclick="PF('panelFilterArrivalDate2').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-   </p:overlayPanel>
 
-   <p:overlayPanel id="idPanelFilterBusinessAckDate2" widgetVar="panelFilterBusinessAckDate2" for="assetOutStockTab:assetOutStockedListForm:datalist:filterBusinessAckDate2" dismissable="false">
+   <p:overlayPanel id="idPanelFilterArrivalDate2" widgetVar="panelFilterArrivalDate2" for="assetOutStockTab:assetOutStockedListForm:datalist:filterArrivalDate2" dismissable="false">
       <h:panelGrid columns="2">
          <p:outputLabel value="#{msg.From}"/>
          <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateFrom2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
          <p:outputLabel value="#{msg.To}"/>
          <p:calendar timeZone="GMT+8"  widgetVar="varArrivalDateTo2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
       </h:panelGrid>
-      <p:commandButton onclick="setDateFilter('varDataList', 'varFilterBusinessAckDate2', 'varArrivalDateFrom2', 'varArrivalDateTo2'); PF('panelFilterBusinessAckDate2').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-      <p:commandButton onclick="PF('panelFilterBusinessAckDate2').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+      <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArrivalDate2', 'varArrivalDateFrom2', 'varArrivalDateTo2'); PF('panelFilterArrivalDate2').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+      <p:commandButton onclick="PF('panelFilterArrivalDate2').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
    </p:overlayPanel>
 </ui:composition>
 </html>
