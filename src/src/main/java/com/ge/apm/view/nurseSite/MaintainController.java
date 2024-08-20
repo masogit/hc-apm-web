@@ -113,7 +113,8 @@ public class MaintainController implements ServerEventInterface{
 		userDeptScopeOrg=orgInfoRepository.getUserDeptScope(currentUser.getUid());
 		Map<String, Object> param = MapUtil.newHashMap();
 		param.put("tenantUid", currentUser.getTenantUID());
-		param.put("orgUidList", orgUidList);
+//		param.put("orgUidList", orgUidList);
+		param.put("userUid", currentUser.getUid());
 		if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
 			listNurseSiteMaintainConfig = ListUtil.empty();
 		} else {
