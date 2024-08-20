@@ -26,14 +26,16 @@
     </resultMap>
 
     <select id="findJoinAssetList" resultMap="maintainConfigBean">
-        select nsmc.* from nurse_site_maintain_config nsmc left join nurse_site_maintain_config_item nsmci on nsmc.id = nsmci.parent_id left join asset_info ai on ai.uid = nsmci.asset_uid
-        <where>${ew.sqlSegment}</where>
+        select nsmc.* from nurse_site_maintain_config nsmc, nurse_site_maintain_config_item nsmci, asset_info ai, user_org uo, org_info oi
+        where 1 = 1 AND uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid ) AND oi.org_type = 4 AND oi.uid= nsmc.clinical_dept_uid
+          and nsmc.id = nsmci.parent_id and ai.uid = nsmci.asset_uid AND nsmc.deleted = ('FALSE')
+          ${ew.sqlSegment}
     </select>
 
     <select id="searchMaintainConfig" resultMap="maintainConfigBean">
-        select nsmc.* from nurse_site_maintain_config nsmc
+        select nsmc.* from nurse_site_maintain_config nsmc, user_org uo, org_info oi
         <where>
-            nsmc.deleted is false
+            uo.user_uid = #{userUid} AND nsmc.tenant_uid = #{tenantUid} and uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid ) AND oi.org_type = 4 AND oi.uid= nsmc.clinical_dept_uid and nsmc.deleted is false
             <choose>
                 <when test="assetTypes != null and assetTypes.size > 0">
                     <include refid="queryConfigItemIds"/>
@@ -65,7 +67,8 @@
                 </otherwise>
             </choose>
         </where>
-        order by modify_date desc
+        GROUP BY nsmc.id
+        order by nsmc.modify_date desc
     </select>
 
     <sql id="queryConfigItemIds">
