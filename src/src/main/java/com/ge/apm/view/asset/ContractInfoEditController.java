@@ -64,7 +64,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private UserAccountRepository userDao = null;
     private TenantInfoRepository tenantInfoDao;
     private UaaService uaaService;
-    private AssetInfoMgrService aimService;
     private BlobFileService blobService;
     private AssetInfoService assetInfoService;
     private ContractInfoService contractService;
@@ -86,13 +85,17 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private ContractInfoItem selectedContractItem;
 
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
+    private List<V2_BlobObject> uploadedInvoiceFileObjects = new ArrayList();
+    private List<V2_BlobObject> invoiceAttachments = new ArrayList<>();
     private String attachmentType;
 
     private List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> parts = new ArrayList();
     private List<AssetInfo> listSelectedAssetInfo = new ArrayList<AssetInfo>();
 
     private ContractInfoItem paymentInfo;
-    
+
+    private ContractInfoItem invoiceInfo;
+
     private Boolean canBeEdit;
 
     private Boolean terminate;
@@ -114,7 +117,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
-        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
@@ -222,6 +224,15 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         uploadedFileObjects.add(blobService.uploadFile(event.getFile()));
     }
 
+    public void uploadInvoiceDataFile(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event.getFile());
+        blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetContract);
+        blobObject.setBoSubType("payment");
+        blobObject.setBoUuid(invoiceInfo.getId());
+        uploadedInvoiceFileObjects.add(blobObject);
+        invoiceAttachments.add(blobObject);
+    }
+
     public void finishUpload() {
         uploadedFileObjects.stream().forEach(item -> {
             item.setBoSubType(Strings.isNullOrEmpty(attachmentType) ? ContractInfo.AttachmentType.Other.toString() : attachmentType);
@@ -316,6 +327,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         contractItemDao.save(allItemList);
         contractItemDao.delete(removedItemList);*/
         blobService.saveBlobObject(attachements);
+        blobService.saveBlobObject(uploadedInvoiceFileObjects);
 
         removedAttachments.stream().forEach(item -> {
             blobService.deleteBlobFileById(item);
@@ -539,6 +551,22 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
+    public List<ContractInfoItem> getContractInvoiceList() {
+        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.Invoice.toString().equals(item.getItemType())).collect(Collectors.toList());
+    }
+
+    public List<V2_BlobObject> getContractInvoiceAttachList(String id) {
+        if (ObjectUtil.isEmpty(invoiceAttachments)) {
+            invoiceAttachments = blobService.fetchBlobObject(id, V2_BlobObject.BO_TYPE_AssetContract, "payment");
+        }
+        return invoiceAttachments;
+    }
+
+    public void removeContractInvoiceAttachmentById(String blobId) {
+        invoiceAttachments = invoiceAttachments.stream().filter(t -> !t.getId().equals(blobId)).collect(Collectors.toList());
+        blobService.deleteBlobFileById(blobId);
+    }
+
     public List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> getPartsItemsList() {
         if (selected != null && Objects.equals(selected.getContractType(), ContractInfo.ContractType.Parts.toString())) {
             return contractService.getAssetPartsInfo(selected.getContractNum(), selected.getTenantUID());
@@ -587,15 +615,39 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         paymentInfo.setId(UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
+    public void prepareAddInvoiceInfo() {
+        this.invoiceInfo = new ContractInfoItem();
+        invoiceInfo.setItemType(ContractInfoItem.ContractInfoItemType.Invoice.toString());
+        invoiceInfo.setContractId(selected.getId());
+        invoiceInfo.setPaymentDate(new Date());
+        invoiceInfo.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+    }
+
     public void prepareEditPaymentInfo(ContractInfoItem item) {
         paymentInfo = item;
+    }
+
+    public void prepareEditInvoiceInfo(ContractInfoItem item) {
+        invoiceInfo = item;
     }
 
     public void savePaymentItem() {
         if (!allItemList.contains(paymentInfo)) {
             allItemList.add(paymentInfo);
         }
-//        contractItemDao.save(paymentInfo);
+        double sum = allItemList.stream().filter(t -> "paymentRecord".equals(t.getItemType())).mapToDouble(ContractInfoItem::getPaymentPrice).sum();
+        if (sum > (selected.getAmount() + selected.getSupplementaryAmount())) {
+            allItemList.remove(paymentInfo);
+            WebUtil.addErrorMessage("付款金额大于总额！");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        }
+    }
+
+    public void saveInvoiceItem() {
+        if (!allItemList.contains(invoiceInfo)) {
+            allItemList.add(invoiceInfo);
+        }
     }
 
     public Boolean getCanBeEdit() {
@@ -756,4 +808,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         this.paymentInfo = paymentInfo;
     }
 
+    public ContractInfoItem getInvoiceInfo() {
+        return invoiceInfo;
+    }
+
+    public void setInvoiceInfo(ContractInfoItem invoiceInfo) {
+        this.invoiceInfo = invoiceInfo;
+    }
 }
