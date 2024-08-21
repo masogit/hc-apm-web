@@ -9,6 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.service.asset.DataEntryService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
@@ -18,6 +19,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
@@ -200,12 +202,16 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     public void saveAssetEntry(){
         if(CollectionUtils.isEmpty(selectAssets)){
             WebUtil.addWarnMessage("请选择设备才能提交录入数据");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+
             return;
         }
         List<DataEntry> dataEntries = assetDataEntrys.stream().filter(item -> item.getEntryAmount() != null && item.getStartDate() != null && item.getEndDate() != null).collect(Collectors.toList());
 
         if(CollectionUtils.isEmpty(dataEntries)){
             WebUtil.addWarnMessage("数据录入的信息需填写");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+
             return;
         }
         dataEntryService.saveAssetEntry(selectAssets,dataEntries,user);

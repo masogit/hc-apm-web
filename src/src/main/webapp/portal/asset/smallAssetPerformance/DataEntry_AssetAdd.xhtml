@@ -116,7 +116,7 @@
         <br/>
         <h:panelGroup>
             <p:commandButton action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"
-                             update="selectAssetInfos"/>
+                             update="selectAssets"/>
         </h:panelGroup>
         <!--        <h:form id="selectAssetForm">-->
 
@@ -146,7 +146,7 @@
         <!--            </p:panelGrid>-->
 
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-            <p:dataTable id="selectAssetInfos" value="#{dataEntryCreateController.selectAssetInfos}" var="asset"
+            <p:dataTable id="selectAssets" value="#{dataEntryCreateController.selectAssets}" var="asset"
                          selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{asset.uid}" sortMode="single" sortOrder="descending"

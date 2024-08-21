@@ -64,7 +64,7 @@
                     </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryGroupForm" actionListener="#{dataEntryController.prepareCreate}" oncomplete="PF('dataEntryGroupCreateDialog').show()"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryGroupCreate" actionListener="#{dataEntryController.prepareEdit}" oncomplete="PF('dataEntryGroupCreateDialog').show()" />
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryGroupCreate" actionListener="#{dataEntryController.prepareEdit}" oncomplete="PF('dataEntryGroupCreateDialog').show()" disabled="#{empty dataEntryController.selected}" />
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                          actionListener="#{dataEntryController.delete}" update="datalist"
                                          disabled="#{empty dataEntryController.selected}">
