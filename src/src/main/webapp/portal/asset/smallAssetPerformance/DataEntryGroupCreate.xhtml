@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+
+        xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition>
+
+    <p:dialog id="dataEntryGroupCreateDialog" widgetVar="dataEntryGroupCreateDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" header="分组数据录入" width="70%" height="650">
+        <h:form id="dataEntryGroupCreate">
+
+
+            <p:fieldset>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">选择分组<span style="color:red">*</span></label>
+                        <p:selectOneMenu id="assetGroup"
+                                         value="#{dataEntryCreateController.selected.hisAssetGroupAssetMatchUid}"
+                                         required="true"
+                                         requiredMessage="请选择设备所属分组">
+                            <p:ajax event="itemSelect"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{dataEntryCreateController.getHisAssetGroups}" var="item"
+                                           itemLabel="#{item.hisAssetGroup.name}--#{item.clinicalDeptName}"
+                                           itemValue="#{item.uuid}"/>
+                            <p:ajax listener="#{dataEntryCreateController.getGroupMatchAsset}"
+                                    update="dataEntryGroupCreate:selectAssetInfos"></p:ajax>
+
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">录入类型<span style="color:red">*</span></label>
+                        <p:selectOneMenu id="entryType" value="#{dataEntryCreateController.selected.entryType}"
+                                         required="true"
+                                         requiredMessage="请选择录入类型">
+                            <p:ajax event="itemSelect"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">录入金额</label>
+                        <p:inputNumber minValue="0" decimalPlaces="2" id="entryAmount"
+                                       value="#{dataEntryCreateController.selected.entryAmount}" required="true"
+                                       requiredMessage="录入金额必填">
+                            <p:ajax event="change" listener="#{dataEntryCreateController.sharedEntryAmount}"
+                                    update="dataEntryGroupCreate:selectAssetInfos"></p:ajax>
+
+
+                        </p:inputNumber>
+                    </h:panelGroup>
+
+
+                    <h:panelGroup>
+                        <label class="label">生效开始时间</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}" id="startDate"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{dataEntryCreateController.selected.startDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" required="true" requiredMessage="生效开始时间必填"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">生效结束时间</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}" id="endDate"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{dataEntryCreateController.selected.endDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                    mask="true" required="true" requiredMessage="生效结束时间必填"/>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+                    <p:dataTable id="selectAssetInfos" value="#{dataEntryCreateController.selectAssetInfos}" var="asset"
+                                 selectionMode="single"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{asset.uuid}" sortMode="single" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="组名">
+                            <h:outputText value="#{asset.hisAssetGroupAssetMatch.hisAssetGroup.name}"/>
+                        </p:column>
+                        <p:column headerText="设备">
+                            <h:outputText value="#{asset.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="金额">
+                            <h:outputText value="#{asset.amount}"/>
+                        </p:column>
+                        <p:column headerText="分摊比例">
+                            <p:autoComplete value="#{asset.scaleAssessment}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:panelGrid>
+
+            </p:fieldset>
+
+
+            <p:commandButton  actionListener="#{dataEntryCreateController.save}" value="#{msg.Save}" update=":tabDataEntry:dataEntryGroupCreateDialog :tabDataEntry:DataEntryGroupForm:datalist" icon="ui-icon-check" oncomplete="handleSubmitDigital(args, 'dataEntryGroupCreateDialog');"/>
+            &nbsp;&nbsp;
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dataEntryGroupCreateDialog').hide()"/>
+
+
+        </h:form>
+    </p:dialog>
+    <script type="text/javascript">
+        function handleSubmitDigital(args, dialog) {
+            if (args.validationFailed) {
+                PF(dialog).show();
+            } else {
+                PF(dialog).hide();
+            }
+        }
+    </script>
+</ui:composition>
+</html>

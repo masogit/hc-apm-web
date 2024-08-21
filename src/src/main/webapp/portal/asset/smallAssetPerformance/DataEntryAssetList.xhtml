@@ -1,0 +1,88 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <div class="ui-g">
+        <div class="ui-g-12 card">
+            <h:form id="DataEntryAssetForm">
+                <p:dataTable id="datalist" value="#{dataEntryController.lazyModel}"
+                             var="item" filterBy="#{item.groupOrSingle}" filteredValue="2"
+                             lazy="true" paginator="true" paginatorPosition="bottom"
+                             paginatorAlwaysVisible="true"
+                             selectionMode="single" selection="#{dataEntryController.selected}"
+                             rowKey="#{item.uid}" sortMode="single" sortOrder="descending"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+                    <p:ajax event="rowSelect" listener="#{dataEntryController.onSelectDataEntry}" update=" editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{dataEntryController.onFilter}" oncomplete="rc();"/>
+
+                    <p:column headerText="所属科室" sortBy="#{item.assetInfo.clinicalDeptName}">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                    </p:column>
+                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}">
+                        <h:outputText value="#{item.assetInfo.name}"/>
+                    </p:column>
+
+                    <p:column headerText="设备二维码" sortBy="#{item.assetInfo.qrCode}">
+                        <h:outputText value="#{item.assetInfo.qrCode}"/>
+                    </p:column>
+
+                    <p:column headerText="录入类型" sortBy="#{item.entryType}">
+                        <h:outputText value="#{fieldMsg.fieldValue('HisEntryType',item.entryType)}"/>
+                    </p:column>
+
+                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}">
+                        <h:outputText value="#{item.entryAmount}"/>
+                    </p:column>
+
+                    <p:column headerText="生效开始时间">
+                        <h:outputText value="#{item.startDate}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                               locale="#{userContextService.getCalendarLocale()}"
+                                               pattern="#{userContextService.timeFormat()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="生效结束时间">
+                        <h:outputText value="#{item.endDate}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                               locale="#{userContextService.getCalendarLocale()}"
+                                               pattern="#{userContextService.timeFormat()}"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="生效开始操作者">
+                        <h:outputText value="#{item.userAccount.name}"/>
+                    </p:column>
+
+                    <p:column headerText="操作时间">
+                        <h:outputText value="#{item.createdDate}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                               locale="#{userContextService.getCalendarLocale()}"
+                                               pattern="#{userContextService.timeFormat()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()" />
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+                                         actionListener="#{dataEntryController.delete}" update="datalist"
+                                         disabled="#{empty dataEntryController.selected}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                       icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="DataEntryAssetCreate.xhtml"/>
+
+        </div>
+    </div>
+
+</ui:composition>
+
+</html>
