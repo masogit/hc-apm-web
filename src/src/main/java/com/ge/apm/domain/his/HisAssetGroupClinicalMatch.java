@@ -1,5 +1,6 @@
 package com.ge.apm.domain.his;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.domain.AssetInfo;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -50,6 +51,12 @@ public class HisAssetGroupClinicalMatch implements Serializable {
 
     @Column(name = "scale_assessment",columnDefinition = "decimal(11,2)")
     private Double  scaleAssessment;
+
+
+
+    @Transient
+    @TableField(exist = false)
+    private Double  amount;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
