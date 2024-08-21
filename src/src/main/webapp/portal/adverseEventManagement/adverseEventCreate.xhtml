@@ -485,6 +485,7 @@
                                     <label class="label">器械使用日期<span style="color:red">*</span></label>
                                     <p:calendar timeZone="GMT+8"  id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
+
                                 <h:panelGroup id="usePlaceDecHi">
                                     <label class="label">使用场所<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventManagementController.selected.usePlace}" id="usePlace" layout="custom" required="false" requiredMessage="使用场所不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
