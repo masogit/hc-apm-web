@@ -82,4 +82,10 @@ public class DataEntryService {
         dataEntry.setLastModifiedDate(new Date());
         dataEntry.setGroupOrSingle(type);
     }
+
+    @Transactional
+    public void deleteDataEntry(DataEntry dataEntry) {
+        dataEntryRepository.delete(dataEntry);
+        assetCostAmountInfoRepository.deleteByDataEntryUid(dataEntry.getUid());
+    }
 }

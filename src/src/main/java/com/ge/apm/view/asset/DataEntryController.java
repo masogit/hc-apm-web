@@ -9,6 +9,7 @@ import com.ge.apm.domain.DataEntry;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
+import com.ge.apm.service.asset.DataEntryService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.his.HisAssetGroupEditController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -44,6 +45,10 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
     private UserAccount user;
     private UaaService uaaService;
 
+    private DataEntryService dataEntryService;
+
+    public int type=1;
+
 
 
     @Override
@@ -55,6 +60,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
     @Override
     protected void init() {
         dataEntryRepository = WebUtil.getBean(DataEntryRepository.class);
+        dataEntryService = WebUtil.getBean(DataEntryService.class);
 
         hisAssetGroupAssetMatchDao = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
@@ -69,6 +75,13 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
         if (searchFilters == null) {
             searchFilters = new ArrayList();
+        }
+        if(type==1){
+            this.updateSearchFilter(new SearchFilter("groupOrSingle", SearchFilter.Operator.EQ, 1 ));
+
+        }else{
+            this.updateSearchFilter(new SearchFilter("groupOrSingle", SearchFilter.Operator.EQ, 2 ));
+
         }
         this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         if (!this.hasFilterOnField("siteUID")) {
@@ -99,5 +112,15 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
         return selected;
    }
 
+    @Override
+    public void delete() {
 
+        if(selected==null){
+            return;
+        }
+
+        dataEntryService.deleteDataEntry(selected);
+
+
+    }
 }

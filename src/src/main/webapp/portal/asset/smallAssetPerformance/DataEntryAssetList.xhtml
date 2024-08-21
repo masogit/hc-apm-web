@@ -8,18 +8,18 @@
     <div class="ui-g">
         <div class="ui-g-12 card">
             <h:form id="DataEntryAssetForm">
-                <p:dataTable id="datalist" value="#{dataEntryController.lazyModel}"
-                             var="item" filterBy="#{item.groupOrSingle}" filteredValue="2"
+                <p:dataTable id="datalist" value="#{dataEntryAssetController.lazyModel}"
+                             var="item"
                              lazy="true" paginator="true" paginatorPosition="bottom"
                              paginatorAlwaysVisible="true"
-                             selectionMode="single" selection="#{dataEntryController.selected}"
+                             selectionMode="single" selection="#{dataEntryAssetController.selected}"
                              rowKey="#{item.uid}" sortMode="single" sortOrder="descending"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
-                    <p:ajax event="rowSelect" listener="#{dataEntryController.onSelectDataEntry}" update=" editButton deleteButton"/>
-                    <p:ajax event="filter" listener="#{dataEntryController.onFilter}" oncomplete="rc();"/>
+                    <p:ajax event="rowSelect" listener="#{dataEntryAssetController.onSelectDataEntry}" update=" editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{dataEntryAssetController.onFilter}" oncomplete="rc();"/>
 
                     <p:column headerText="所属科室" sortBy="#{item.assetInfo.clinicalDeptName}">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
@@ -67,11 +67,11 @@
                         </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()"   disabled="#{empty dataEntryAssetController.selected}" />
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
-                                         actionListener="#{dataEntryController.delete}" update="datalist"
-                                         disabled="#{empty dataEntryController.selected}">
+                                         actionListener="#{dataEntryAssetController.delete}" update="datalist"
+                                         disabled="#{empty dataEntryAssetController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                        icon="ui-icon-alert"/>
                         </p:commandButton>
