@@ -698,8 +698,8 @@
                     </p:accordionPanel>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="暂存" actionListener="#{adverseEventApproveController.tempSaveAdverseEvent(3)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3}" validateClient="true" update="AdverseEventApproveEditForm "/>
-                            <p:commandButton value="提交" actionListener="#{adverseEventApproveController.tempSaveAdverseEvent(6)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3 }" validateClient="true" update="AdverseEventApproveEditForm "/>
+                            <p:commandButton value="暂存" actionListener="#{adverseEventApproveController.tempSaveAdverseEventApprove(3)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3}" validateClient="true" update="AdverseEventApproveEditForm "/>
+                            <p:commandButton value="提交" actionListener="#{adverseEventApproveController.tempSaveAdverseEventApprove(6)}" icon="ui-icon-check" style="float:left" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3 }" validateClient="true" update="AdverseEventApproveEditForm "/>
                             <p:commandButton value="退回" icon="ui-icon-check" style="float:left" validateClient="true" rendered="#{adverseEventApproveController.selected.status == 2 or adverseEventApproveController.selected.status == 3}" update="returnReasonDisable " oncomplete="PF('returnReasonDisable').show()"/>
                             <p:commandButton value="邮件上报" icon="ui-icon-check" style="float:left" immediate="true" rendered="#{adverseEventApproveController.selected.status == 7 and adverseEventApproveController.selected.adverseEventType != '2'}" update="dlgSendMailDisable " oncomplete="PF('dlgSendMailDisable').show()"/>
                             <p:commandButton value="返回" icon="ui-icon-cancel" action="adverseEventApproveList.xhtml?faces-redirect=true" immediate="true" style="float:left"/>
@@ -724,7 +724,7 @@
                             <p:inputTextarea value="#{adverseEventApproveController.selected.returnReason}" required="true" requiredMessage="退回原因不能为空"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:commandButton action="#{adverseEventApproveController.tempSaveAdverseEvent(4)}" update="AdverseEventApproveEditForm" value="退回" icon="ui-icon-check" validateClient="true" oncomplete="PF('returnReasonDisable').hide()"/>
+                            <p:commandButton action="#{adverseEventApproveController.tempSaveAdverseEventApprove(4)}" update="AdverseEventApproveEditForm" value="退回" icon="ui-icon-check" validateClient="true" oncomplete="PF('returnReasonDisable').hide()"/>
                             <p:commandButton immediate="true" value="#{msg.Canceled}" icon="ui-icon-cancel" onclick="PF('returnReasonDisable').hide()"/>
                         </h:panelGroup>
                     </h:panelGrid>

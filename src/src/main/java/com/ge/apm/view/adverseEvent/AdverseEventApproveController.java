@@ -194,7 +194,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         return adverseEventsRepository;
     }
 
-    public void tempSaveAdverseEvent(Integer status) throws RuntimeException {
+    public void tempSaveAdverseEventApprove(Integer status) throws RuntimeException {
         int oldStatus = selected.getStatus();
         selected.setStatus(status);
         try {
