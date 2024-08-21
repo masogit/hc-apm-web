@@ -417,7 +417,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         return adverseEventsRepository;
     }
 
-    public void tempSaveAdverseEvent(Integer status) throws RuntimeException {
+    public void tempSaveAdverseEventCreate(Integer status) throws RuntimeException {
         if (status == 0) {
             selected.setStatus(0);
             readOnlyCreateForm = false;
