@@ -159,7 +159,7 @@
                            <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ADVERSE_VIEW')}"/>
                            <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_VIEW')}"/>
                            <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}"/>
-                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />
+<!--                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'MAINTAIN'}">
