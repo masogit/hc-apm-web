@@ -1053,6 +1053,12 @@ public class AssetInfo implements ChineseName,Serializable {
     private String assetScrapId; //设备报废id
 
 
+
+    @Transient
+    @TableField(exist = false)
+    private Double  scaleAssessment;
+
+
     public boolean isSpecialAsset() {
         return isSpecialAsset;
     }
@@ -3252,5 +3258,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setAssetScrapId(String assetScrapId) {
         this.assetScrapId = assetScrapId;
+    }
+
+    public Double getScaleAssessment() {
+        return scaleAssessment;
+    }
+
+    public void setScaleAssessment(Double scaleAssessment) {
+        this.scaleAssessment = scaleAssessment;
     }
 }

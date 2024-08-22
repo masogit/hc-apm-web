@@ -222,6 +222,8 @@
                            <p:menuitem id="um51" value="#{msg.EquipmentPerformanceImport}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_IMPORT')}"/>
                            <p:menuitem id="um52" value="#{msg.EquipmentPerformanceReportForm}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_REPORT')}"/>
                            <p:menuitem id="um42" value="#{msg.BIPerformanceAnalysisPlatform}" rendered="#{true and !userContextService.isOnlyAssetStaff() and userContextService.accessContainsFunctionMenu('PERFORMANCE_BI_BOARD')}" url="/geapm/web/bi" target="_new"/>
+                           <p:menuitem id="um382" value="设备综合效益分析"  outcome="/portal/asset/smallAssetPerformance/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_EFFICIENCY_EQUIPMENT')}"/>
+                           <p:menuitem id="um383" value="数据录入"  outcome="/portal/asset/smallAssetPerformance/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_EFFICIENCY_EQUIPMENT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'AUDIT'}">

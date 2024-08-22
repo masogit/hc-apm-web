@@ -7,6 +7,7 @@ import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -49,19 +50,17 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
     }
 
     public void saveHisList(){
-
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         selected.setTenantUid(tenantUID);
-        boolean hasName = checkName(selected.getName(),tenantUID);
+        boolean hasName = checkNameType(selected.getName(),selected.getType(),tenantUID);
         if(hasName){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("分组类型已存在");
             return;
         }
         hisAssetGroupDao.save(selected);
         hisAssetGroupAssetMatchRepository.updateAssetGroupNameByGroupUid(selected.getName(),selected.getUuid());
-
-
         selected = null;
-
         clearAssetGroupCache();
     }
 
@@ -86,6 +85,11 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
 
     private boolean checkName(String name, String tenantUID) {
         HisAssetGroup hisAssetGroup = hisAssetGroupDao.findByNameAndTenantUid(name,tenantUID);
+        return hisAssetGroup != null ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private boolean checkNameType(String name,String type, String tenantUID) {
+        HisAssetGroup hisAssetGroup = hisAssetGroupDao.findByNameAndTypeAndTenantUid(name,type,tenantUID);
         return hisAssetGroup != null ? Boolean.TRUE : Boolean.FALSE;
     }
 

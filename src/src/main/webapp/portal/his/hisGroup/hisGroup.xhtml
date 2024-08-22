@@ -33,6 +33,9 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
+                        <p:column headerText="分组类型" sortBy="#{item.type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.type)}"/>
+                        </p:column>
 
                         <p:column headerText="设备数量">
                             <h:outputText value="#{hisGlobalAssetGroupController.getAssetCountsByGroupUid(item.uuid)}"/>
@@ -61,12 +64,20 @@
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
                                      rendered="true">
                             <h:panelGroup>
-                                <label class="label">#{msg.name}</label>
+                                <label class="label">#{msg.name}<span style="color:red">*</span></label>
                                 <p:inputText id="hisAssetGroupName" name="hisAssetGroupName" readonly="false"
                                              style="width: 220px;"
-                                             value="#{hisGlobalAssetGroupController.selected.name}"/>
+                                             value="#{hisGlobalAssetGroupController.selected.name}"  required="true" requiredMessage="分组名称必填" />
                             </h:panelGroup>
 
+
+                            <h:panelGroup>
+                                <label class="label">类型<span style="color:red">*</span></label>
+                                <p:selectOneMenu  id="assetGroup" value="#{hisGlobalAssetGroupController.selected.type}" required="true" requiredMessage="分组类型必填 "  >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
 
                     </p:fieldset>
@@ -76,14 +87,25 @@
                                 actionListener="#{hisGlobalAssetGroupController.saveHisList()}"
                                 value="#{msg.save}"
                                 update=":tabGroup:hisGlobalGroupListForm:datalist"
-                                icon="ui-icon-check" oncomplete="PF('hisListDialog').hide();"/>
+                                icon="ui-icon-check"  oncomplete="handleSubmitDigital(args, 'hisListDialog')"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('hisListDialog').hide()"
-                                         update=":tabGroup:hisGlobalGroupListForm:datalist"  oncomplete="PF('hisListDialog').hide();"/>
+                                         update=":tabGroup:hisGlobalGroupListForm:datalist"  oncomplete="handleSubmitDigital(args, 'hisListDialog')"/>
                     </h:panelGroup>
                 </h:form>
             </p:dialog>
         </div>
+
+        <script type="text/javascript">
+            function handleSubmitDigital(args, dialog) {
+                if (args.validationFailed) {
+                    PF(dialog).show();
+                } else {
+                    PF(dialog).hide();
+                }
+            }
+        </script>
+
     </ui:composition>
 
 </html>
