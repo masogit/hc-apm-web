@@ -122,6 +122,7 @@ public class HisAssetGroupService {
             hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
             hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
+            hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
             hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
             hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
             hisAssetGroupClinicalMatch.setSiteUid(selectOrg.getSiteUID());

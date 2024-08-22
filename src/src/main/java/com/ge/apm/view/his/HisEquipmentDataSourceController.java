@@ -124,8 +124,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         }
         removeFilterOnField("orgCode");
         removeFilterOnField("siteUid");
-
+        removeFilterOnField("tenantUid");
         OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
         if (selectedOrg != null) {
             searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
