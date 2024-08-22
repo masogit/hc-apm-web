@@ -5,6 +5,7 @@ import com.ge.apm.dao.HisEquipmentMatchRepository;
 import com.ge.apm.domain.his.HisAdjustBusinessJob;
 import com.ge.apm.domain.his.HisEquipmentMatch;
 import com.ge.apm.service.his.HisAssetService;
+import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
@@ -58,7 +59,8 @@ public class HisAssetUnmatchController extends GenericCRUDUUIDController<HisEqui
 
         removeFilterOnField("eqHosid");
         removeFilterOnField("siteUid");
-
+        removeFilterOnField("tenantUid");
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         if (orgComponentController.getSelectedOrg() != null) {
             searchFilters.add(new SearchFilter("eqHosid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
