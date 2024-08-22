@@ -77,6 +77,7 @@ public class DataEntryService {
         dataEntry.setHospitalUid(selectAsset.getHospitalUID());
         dataEntry.setSiteUid(selectAsset.getSiteUID());
         dataEntry.setAssetUid(selectAsset.getUid());
+        dataEntry.setClinicalDeptUid(selectAsset.getClinicalDeptUID());
         dataEntry.setOperationUserUid(user.getUid());
         dataEntry.setCreatedDate(new Date());
         dataEntry.setLastModifiedDate(new Date());
