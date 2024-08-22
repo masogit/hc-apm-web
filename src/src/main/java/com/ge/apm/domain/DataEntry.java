@@ -4,6 +4,8 @@ package com.ge.apm.domain;
 import com.ge.apm.domain.his.HisAssetGroup;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -70,6 +72,7 @@ public class DataEntry implements Serializable {
     private Date lastModifiedDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action= NotFoundAction.IGNORE)
     @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)
     private HisAssetGroup hisAssetGroup;
 
