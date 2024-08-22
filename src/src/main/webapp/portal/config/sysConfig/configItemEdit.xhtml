@@ -72,7 +72,7 @@
                     <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 8}">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:selectManyMenu value="#{systemConfigItemController.multiSelected}" required="true" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
-                            <f:selectItems value="#{systemConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                            <f:selectItems value="#{systemConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"  itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>
                         </p:selectManyMenu>
                     </h:panelGroup>
                 </p:panelGrid>

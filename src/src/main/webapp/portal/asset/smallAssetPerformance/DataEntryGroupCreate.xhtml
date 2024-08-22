@@ -37,13 +37,13 @@
 
                     <h:panelGroup>
                         <label class="label">录入类型<span style="color:red">*</span></label>
-                        <p:selectOneMenu id="entryType" value="#{dataEntryCreateController.selected.entryType}"
+                        <p:selectOneMenu id="entryType"  value="#{dataEntryCreateController.selected.entryType}"
                                          required="true"
-                                         requiredMessage="请选择录入类型">
+                                         requiredMessage="请选择录入类型" collectionType="java.util.ArrayList">
                             <p:ajax event="itemSelect"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item"
-                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{dataEntryCreateController.costType}" var="item"
+                                           itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
 

@@ -1,6 +1,8 @@
 package com.ge.apm.view.asset;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
 import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
@@ -13,7 +15,6 @@ import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
-import com.ge.apm.view.i18n.I18nMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -113,6 +114,9 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Getter
     @Setter
     private Boolean isAllSelected2 = Boolean.FALSE;
+
+
+    private UserContextService userContextService;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -132,6 +136,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         userSiteOrgTreeComponentController.registerController(this);
 
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
 
     }
@@ -185,6 +190,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             selected.setLastModifiedDate(new Date());
             selected.setOperationUserUid(user.getUid());
             selected.setLastModifiedBy(user.getUid());
+            selected.setGroupOrSingle(1);
             selected.setAssetGroupUid(selectHisAssetGroupAssetMatch.getAssetGroupUid());
             selected.setClinicalDeptUid(selectHisAssetGroupAssetMatch.getClinicalDeptUid());
             dataEntryService.save(selected,user,selectAssetInfos);
@@ -238,15 +244,20 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 selectAssetInfos = new ArrayList<>();
 
                 assetDataEntrys=new ArrayList<>();
-                List<I18nMessage> hisEntryType = i18nMessageService.getByMsgType("HisEntryType");
-
-                for (I18nMessage i18nMessage : hisEntryType) {
+//                List<I18nMessage> hisEntryType = i18nMessageService.getByMsgType("HisEntryType");
+//                for (I18nMessage i18nMessage : hisEntryType) {
+//                    DataEntry dataEntry = new DataEntry();
+//                    dataEntry.setEntryType(i18nMessage.getMsgKey());
+//                    assetDataEntrys.add(dataEntry);
+//                }
+                List<Map<String, String>> costTypeList = getCostType();
+                List<String> costTypes = costTypeList.stream().map(i -> i.get("value")).collect(Collectors.toList());
+                for (String  costType : costTypes) {
                     DataEntry dataEntry = new DataEntry();
-                    dataEntry.setEntryType(i18nMessage.getMsgKey());
+                    dataEntry.setEntryType(costType);
                     assetDataEntrys.add(dataEntry);
                 }
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
-
 
             } else {
                 //edit
@@ -341,6 +352,16 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         }
     }
 
+    public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
+//        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+//        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+//        if(box.isSelected()) {
+//            selectAssets.add(asset);
+//        } else {
+//            selectAssets.remove(asset);
+//        }
+    }
+
     public void confirm(){
 //        assetInfos.stream().filter(i->i.getUid().equals())
     }
@@ -372,5 +393,11 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             });
         }
         isAllSelected2 = !isAllSelected2;
+    }
+
+    public List<Map<String,String>> getCostType(){
+        String configItemValue = userContextService.getConfigItemValue("costType");
+        List<Map<String, String>> mapList = JSON.parseObject(configItemValue, new TypeReference<List<Map<String,String>>>(){});
+        return mapList;
     }
 }
