@@ -25,6 +25,10 @@ public class HisAssetGroup implements Serializable {
     private String name;
 
 
+    //设备分组名称
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUid;

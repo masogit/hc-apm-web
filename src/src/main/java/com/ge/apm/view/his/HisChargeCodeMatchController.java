@@ -182,6 +182,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
         List<HisEquipmentSfxm> bySearchFilter = sfxDao.findBySearchFilter(this.searchFilters,pageRequest).getContent();
         if(!targetAssets.isEmpty()){

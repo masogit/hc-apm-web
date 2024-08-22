@@ -123,7 +123,7 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
             searchFiltersAsset.add(new SearchFilter("hosId", SearchFilter.Operator.IsNull, null));
             searchFiltersAsset.add(new SearchFilter("siteUid", SearchFilter.Operator.IsNull, null));
         }
-
+        searchFiltersAsset.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         if (null == connTargetOffices) {
             connTargetOffices = new ArrayList<>();
         }
