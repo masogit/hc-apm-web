@@ -132,4 +132,28 @@ public class AssetInfoProvider {
 		return sb.toString();
 	}
 
+
+	public String getAssetInfoIsNotEfficiencyEquipment(Map<String,Object> param){
+
+		String orgUidList = getSetValue1(param.get("orgList")) ;
+		String tenantUid = (String) param.get("tenantUid");//
+		Integer assetGroup = (Integer) param.get("assetGroup");//
+		Double purchasePrice = (Double) param.get("purchasePrice");//
+		String clinicalDeptUid = (String) param.get("clinicalDeptUid");//
+		StringBuilder sb = new StringBuilder();
+		sb.append("select  ai.* from asset_info ai  left join  efficiency_equipment_info eei on ai.uid=eei.asset_uid  where");
+		sb.append(" ai.tenant_uid = '"+tenantUid+"'");
+		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in  "+orgUidList+")");
+		sb.append(" and ai.clinical_dept_uid = '"+clinicalDeptUid+"'");
+		sb.append(" and eei.uid is null ");
+		if(purchasePrice!=null){
+			sb.append(" and  ai.purchase_price  >= '"+purchasePrice+"'");
+		}
+		if(assetGroup!=null){
+			sb.append(" and ai.asset_group  = '"+assetGroup+"'");
+		}
+		sb.append(" limit 5000 ");
+		return sb.toString();
+
+	}
 }
