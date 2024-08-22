@@ -4,6 +4,7 @@ package com.ge.apm.view.his;
 import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
+import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
@@ -59,10 +60,16 @@ public class HisAssetGroupClinicalMatchController extends GenericCRUDUUIDControl
         }
 
         removeFilterOnField("hisAssetGroupAssetMatch.orgInfoUid");
+        removeFilterOnField("tenantUid");
+
         if (orgComponentController.getSelectedOrg() != null) {
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
             searchFilters.add(new SearchFilter("hisAssetGroupAssetMatch.orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
         }
+
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+
+
         Page<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatches = hisAssetGroupClinicalMatchRepository.findBySearchFilter(this.searchFilters, pageRequest);
         return hisAssetGroupClinicalMatches;
     }
