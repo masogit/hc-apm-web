@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
 
-public interface HisAssetGroupClinicalMatchRepository extends GenericRepository<HisAssetGroupClinicalMatch> {
+public interface HisAssetGroupClinicalMatchRepository extends GenericRepositoryUUID<HisAssetGroupClinicalMatch> {
 
 
     @Query(value = "select asset_uid from his_asset_group_clinical_match where asset_group_clinical_match_id = ?1", nativeQuery = true)
@@ -52,4 +53,9 @@ public interface HisAssetGroupClinicalMatchRepository extends GenericRepository<
 
     @Query(value = "select count(*) from his_asset_group_clinical_match where his_asset_group_uid = ?1", nativeQuery = true)
     Integer countByGroupUid(String assetGroupUid);
+
+
+
+    @Query(value = "select * from his_asset_group_clinical_match where asset_group_clinical_match_id = ?1", nativeQuery = true)
+    List<HisAssetGroupClinicalMatch> findByAssetGroupClinicalId(String uid);
 }
