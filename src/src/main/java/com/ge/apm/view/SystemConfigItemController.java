@@ -167,7 +167,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void saveConfig(){
         if(this.selectSite != null){
-            if(!regularCheck()){
+            if( selected.getValueType()!=8 &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
                 WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
                 return;

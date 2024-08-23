@@ -98,7 +98,7 @@ public class ContractInfo implements Serializable {
     @Column(name = "end_months")
     private Integer endMonths;
 
-    //合同总额
+    //合同金额
     @Basic(optional = true)
     @Column(name = "amount")
     private Double amount;

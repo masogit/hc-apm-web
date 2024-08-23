@@ -109,6 +109,8 @@ public class JobController extends GenericCRUDUUIDController<HisEquipmentDataRes
         removeFilterOnField("siteUid");
 
         OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
+        removeFilterOnField("tenantUid");
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
         if (selectedOrg != null) {
             searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));

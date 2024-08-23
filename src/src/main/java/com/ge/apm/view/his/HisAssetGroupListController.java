@@ -7,6 +7,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.StringUtils;
@@ -56,13 +57,17 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
         }
 
         removeFilterOnField("orgInfoUid");
+        removeFilterOnField("tenantUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
             searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
-        return hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<HisAssetGroupAssetMatch> content = hisAssetGroupAssetMatches.getContent();
+        return hisAssetGroupAssetMatches;
     }
 
     @Override

@@ -105,7 +105,7 @@
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.amount}" >
                             <!-- <h:outputText  value="#{item.contractAmount}"/> -->
-                            <p:inputNumber value="#{item.amount}" readonly="true"> </p:inputNumber>
+                            <p:inputNumber value="#{(item.amount + item.supplementaryAmount) > 0 ? (item.amount + item.supplementaryAmount) : null}" readonly="true"> </p:inputNumber>
                         </p:column>
                         <p:column headerText="#{msg.PaymentProgress}">
                             <h:outputText value="#{item.paymentProgress}"/>
