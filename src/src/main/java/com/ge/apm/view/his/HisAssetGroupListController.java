@@ -113,4 +113,8 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
         return hisAssetGroupClinicalMatchDao.countByGroupUidAndDeptUid(assetGroupUid+clinicalDeptUid);
     }
 
+    public Integer getAssetCountsByGroupUidAndOrgInfoUid(String assetGroupUid,String siteUid){
+        return hisAssetGroupClinicalMatchDao.countByGroupUidAndOrgInfoUid(assetGroupUid,siteUid);
+    }
+
 }

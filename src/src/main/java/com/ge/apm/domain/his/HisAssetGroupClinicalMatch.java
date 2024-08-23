@@ -52,7 +52,13 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     @Column(name = "scale_assessment",columnDefinition = "decimal(11,2)")
     private Double  scaleAssessment;
 
+    //orgInfo表Uid
+    @Column(name = "org_info_uid")
+    private String orgInfoUid;
 
+    //his_asset_group 和 org_info uid 拼接      保存的是分组uid和分组匹配选择的院区   去掉了 assetGroupClinicalId  分组匹配去掉了科室的概念
+    @Column(name = "asset_group_org_info_uid")
+    private String assetGroupOrgInfoUid;
 
     @Transient
     @TableField(exist = false)
@@ -63,14 +69,17 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
 
-
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({
-            @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "clinical_dept_uid", insertable = false,updatable = false),
-            @JoinColumn(name = "his_asset_group_uid", referencedColumnName = "asset_group_uid", insertable = false,updatable = false)
-    })
-    private HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
+    @JoinColumn(name = "his_asset_group_uid", referencedColumnName = "uuid", insertable = false,updatable = false)
+    private HisAssetGroup hisAssetGroup;
+
+
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumns({
+//            @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "clinical_dept_uid", insertable = false,updatable = false),
+//            @JoinColumn(name = "his_asset_group_uid", referencedColumnName = "asset_group_uid", insertable = false,updatable = false)
+//    })
+//    private HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
 
     @Override
     public int hashCode() {

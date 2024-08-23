@@ -42,13 +42,32 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
-                        <p:autoComplete id="clinicalDeptName" required="true" dropdown="true" value="#{hisAssetGroupEditController.filterDeptOrg}"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}" disabled="#{hisAssetGroupEditController.editMode}"
+                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{hisAssetGroupEditController.filterDeptOrg}"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
                             <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList" />
                             <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList" />
                         </p:autoComplete>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetGroup}</label>
+                        <p:selectOneMenu  id="assetTypeGroup" value="#{hisAssetGroupEditController.assetGroup}" >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class='label'>采购金额:(元)</label>
+                        <p:inputNumber id="purchasePrice" value="#{hisAssetGroupEditController.purchasePrice}">
+                        </p:inputNumber>
+                    </h:panelGroup>
+
+                    <p:commandButton actionListener="#{hisAssetGroupEditController.getQueryAssetsList2()}"
+                                     value="查询" update="HisAssetsPickList"
+                                     icon="ui-icon-check"
+                    />
 
                     <h:panelGrid id="filterType" columns="2" >
                         <p:commandButton process="@this" update="HisAssetsPickList filterType" actionListener="#{hisAssetGroupEditController.setSubEquipment(false)}"  rendered="true" disabled="#{!hisAssetGroupEditController.selected.getIsSubEquipment()}" value="主设备"/>
@@ -117,12 +136,12 @@
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:column width="40" id="checkBoxCol">
                             <p:selectBooleanCheckbox value="#{hisAssetGroupEditController.selectedMap[asset.uid]}" class="selectCheckBox2">
-                                <p:ajax event="change" listener="#{hisAssetGroupEditController.updateSelctedAssetList}"  />
+                                <p:ajax event="change" listener="#{hisAssetGroupEditController.updateSelctedAssetList}"   update="@(.selectCheckBoxHeader)"/>
                                 <f:attribute name="assetObj" value="#{asset}"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox value="#{hisAssetGroupEditController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax event="change" listener="#{hisAssetGroupEditController.addAssetsOfCurrentPage}" />
+                                    <p:ajax event="change" listener="#{hisAssetGroupEditController.addAssetsOfCurrentPage}" update="@(.selectCheckBox2)" />
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>

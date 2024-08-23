@@ -64,7 +64,7 @@ public class HisAssetGroupClinicalMatchController extends GenericCRUDUUIDControl
 
         if (orgComponentController.getSelectedOrg() != null) {
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
-            searchFilters.add(new SearchFilter("hisAssetGroupAssetMatch.orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
+            searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
         }
 
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
