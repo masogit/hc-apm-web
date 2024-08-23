@@ -78,7 +78,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">合同金额</label>
-                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{contractInfoEditController.selected.amount}">
+                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{contractInfoEditController.selected.amount}" minValue="0">
                                     <p:ajax process="@this" update="AssetContractEditForm:amount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -138,7 +138,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">补充协议金额</label>
-                                <p:inputNumber decimalPlaces="0" id="supplementaryAmount" value="#{contractInfoEditController.selected.supplementaryAmount}">
+                                <p:inputNumber decimalPlaces="0" id="supplementaryAmount" value="#{contractInfoEditController.selected.supplementaryAmount}" minValue="0">
                                     <p:ajax process="@this" update="AssetContractEditForm:amount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
