@@ -48,4 +48,8 @@ public interface HisEquipmentSfxmMatchRepository extends GenericRepositoryUUID<H
 
     @Query("select o from HisEquipmentSfxmMatch o  where o.sfxmId in ?1 and o.clinicalDeptUid in ?2 ")
     public List<HisEquipmentSfxmMatch> findBySfxmIdsAndClinicalDeptUids(Set<String> sfxmIds, Set<String> clinicalDeptUids);
+
+
+    @Query("select o from HisEquipmentSfxmMatch o  where o.assetGroupUid = ?1  and o.clinicalDeptUid=?2")
+    public List<HisEquipmentSfxmMatch> findByHisGroupUidAndclinicalDeptUid(String hisGroupUid,String clinicalDeptUid);
 }

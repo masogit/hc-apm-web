@@ -14,12 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +54,7 @@ public class HisAssetGroupService {
         hisAssetGroupAssetMatchRepository.save(hisAssetGroupAssetMatch);
     }
 
-    public List<AssetInfo> getAssetListByDept(OrgInfo siteOrg, OrgInfo clinicalDept, boolean isSubEquipment) {
+    public List<AssetInfo> getAssetListByDept(OrgInfo siteOrg, OrgInfo clinicalDept, boolean isSubEquipment,Integer assetGroup,Double purchasePrice) {
         List<String> siteOrgUids = orgInfoRepository.getSiteOrgUidsByParentUid(siteOrg.getUid());
 
         List<SearchFilter> assetFilters = new ArrayList<>();
@@ -73,6 +71,14 @@ public class HisAssetGroupService {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
         }
 
+        if(assetGroup!=null){
+            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup));
+        }
+
+        if(purchasePrice!=null){
+            assetFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, purchasePrice));
+        }
+
         if(isSubEquipment){
             assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNotNull, null));
         } else {
@@ -85,15 +91,28 @@ public class HisAssetGroupService {
 
     @Transactional
     public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg){
-        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
 
-        if (null != hisAssetGroupAssetMatch) {
+//        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+//        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
+        List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatches = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
 
-            addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, clinicalDept, updateStartDate, updateEndDate);
+        if(!CollectionUtils.isEmpty(hisAssetGroupClinicalMatches)){
+
+//        }
+//
+//        if (null != hisAssetGroupAssetMatch) {
+
+            if("Cost".equals(hisAssetGroup.getType())){
+
+                //TODO 成本类型的修改单独处理逻辑  需要吧录入数据的这段时间重新计算
+            }else{
+                addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, selectOrg, updateStartDate, updateEndDate);
+
+            }
 
             //修改前先移除该分组下所有资产
-            hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+//            hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+            hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
             insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         } else {
             saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment,selectOrg);
@@ -103,9 +122,9 @@ public class HisAssetGroupService {
 
     public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment,OrgInfo selectOrg){
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = new HisAssetGroupAssetMatch();
-        hisAssetGroupAssetMatch.setOrgInfoUid(clinicalDept.getSiteUID());
-        hisAssetGroupAssetMatch.setClinicalDeptUid(clinicalDept.getUid());
-        hisAssetGroupAssetMatch.setClinicalDeptName(clinicalDept.getName());
+        hisAssetGroupAssetMatch.setOrgInfoUid(selectOrg.getSiteUID());
+        hisAssetGroupAssetMatch.setClinicalDeptUid(null);
+        hisAssetGroupAssetMatch.setClinicalDeptName(null);
         hisAssetGroupAssetMatch.setAssetGroupUid(hisAssetGroup.getUuid());
         hisAssetGroupAssetMatch.setAssetGroupName(hisAssetGroup.getName());
         hisAssetGroupAssetMatch.setIsSubEquipment(subEquipment);
@@ -116,17 +135,20 @@ public class HisAssetGroupService {
 
     private void insertAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept,OrgInfo selectOrg) {
         String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+        String hisAssetGroupOrgInfoUid = hisAssetGroup.getUuid() + selectOrg.getSiteUID();
 
         targetAssets.stream().forEach(item -> {
             HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
-            hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+//            hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
             hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
             hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
             hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
-            hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
+            hisAssetGroupClinicalMatch.setClinicalDeptUid(item.getClinicalDeptUID());
             hisAssetGroupClinicalMatch.setSiteUid(selectOrg.getSiteUID());
             hisAssetGroupClinicalMatch.setTenantUid(selectOrg.getTenantUID());
+            hisAssetGroupClinicalMatch.setOrgInfoUid(selectOrg.getSiteUID());
+            hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroupOrgInfoUid);
             hisAssetGroupClinicalMatchRepository.save(hisAssetGroupClinicalMatch);
         });
 
@@ -134,62 +156,84 @@ public class HisAssetGroupService {
 
     private void addNewJobIfBoundUpdated(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, Date updateStartDate, Date updateEndDate) {
         String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-        HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
+//        HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
 
-        List<HisAssetGroupClinicalMatch> list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
-        Set<String> uids1 = list.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
-        Set<String> uids2 = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
-        if (!uids1.equals(uids2)) {
+//        List<HisAssetGroupClinicalMatch> list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
 
-            StringBuilder businessId = new StringBuilder();
-            List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupMatchUid(hisAssetGroupAssetMatch.getUuid());
-            if (!listSfxmMatch.isEmpty()) {
-                for (HisEquipmentSfxmMatch hisEquipmentSfxmMatch : listSfxmMatch) {
-                    if (StringUtils.isNotEmpty(hisEquipmentSfxmMatch.getSfxmId())) {
-                        if (businessId.length() > 0) {
-                            businessId.append(",");
+        List<HisAssetGroupClinicalMatch> list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
+        HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
+        Map<String, List<HisAssetGroupClinicalMatch>> clinicalMap = list.stream().collect(Collectors.groupingBy(HisAssetGroupClinicalMatch::getClinicalDeptUid));
+        Map<String, List<AssetInfo>> selectAssetClinicalMap = targetAssets.stream().collect(Collectors.groupingBy(AssetInfo::getClinicalDeptUID));
+
+        for (Map.Entry<String, List<HisAssetGroupClinicalMatch>> clinical : clinicalMap.entrySet()) {
+            List<HisAssetGroupClinicalMatch> value = clinical.getValue();
+            List<AssetInfo> assetInfos = selectAssetClinicalMap.get(clinical.getKey());
+            Set<String> uids1 = value.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
+            Set<String> uids2 = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
+            if (!uids1.equals(uids2)) {
+
+                StringBuilder businessId = new StringBuilder();
+//                List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupMatchUid(hisAssetGroupAssetMatch.getUuid());
+                List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupUidAndclinicalDeptUid(hisAssetGroup.getUuid(), clinical.getKey());
+
+                if (!listSfxmMatch.isEmpty()) {
+                    for (HisEquipmentSfxmMatch hisEquipmentSfxmMatch : listSfxmMatch) {
+                        if (StringUtils.isNotEmpty(hisEquipmentSfxmMatch.getSfxmId())) {
+                            if (businessId.length() > 0) {
+                                businessId.append(",");
+                            }
+                            businessId.append(hisEquipmentSfxmMatch.getSfxmId());
                         }
-                        businessId.append(hisEquipmentSfxmMatch.getSfxmId());
                     }
+
+                    List<HisAssetGroupClinicalMatch> newList = Lists.newArrayList();
+                    assetInfos.stream().forEach(item -> {
+                        HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
+                        hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroup.getUuid()+clinical.getKey());
+                        hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
+                        hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
+                        hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
+                        hisAssetGroupClinicalMatch.setClinicalDeptUid(clinical.getKey());
+                        hisAssetGroupClinicalMatch.setOrgInfoUid(clinicalDept.getSiteUID());
+                        hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroup.getUuid()+clinicalDept.getSiteUID());
+                        newList.add(hisAssetGroupClinicalMatch);
+                    });
+
+                    UserAccount loginUser = UserContextService.getCurrentUserAccount();
+                    HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
+                    hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
+                    hisAdjustBusinessJob.setTaskType(3);
+                    hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
+                    hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSONArray.fromObject(value).toString());
+                    hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
+                    hisAdjustBusinessJob.setDataStartDate(updateStartDate);
+                    hisAdjustBusinessJob.setDataEndDate(updateEndDate);
+                    hisAdjustBusinessJob.setTaskStatus(0);
+                    hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
+                    hisAdjustBusinessJob.setCreatedDate(new Date());
+                    hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
+                    hisAdjustBusinessJob.setSiteUid(listSfxmMatch.get(0).getSiteUid());
+                    hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
                 }
 
-                List<HisAssetGroupClinicalMatch> newList = Lists.newArrayList();
-                targetAssets.stream().forEach(item -> {
-                    HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
-                    hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
-                    hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
-                    hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
-                    hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
-                    hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
-                    newList.add(hisAssetGroupClinicalMatch);
-                });
 
-                UserAccount loginUser = UserContextService.getCurrentUserAccount();
-                HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
-                hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
-                hisAdjustBusinessJob.setTaskType(3);
-                hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
-                hisAdjustBusinessJob.setOldStrJson(list.isEmpty() ? null : JSONArray.fromObject(list).toString());
-                hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
-                hisAdjustBusinessJob.setDataStartDate(updateStartDate);
-                hisAdjustBusinessJob.setDataEndDate(updateEndDate);
-                hisAdjustBusinessJob.setTaskStatus(0);
-                hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
-                hisAdjustBusinessJob.setCreatedDate(new Date());
-                hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
-                hisAdjustBusinessJob.setSiteUid(listSfxmMatch.get(0).getSiteUid());
-                hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
             }
 
-
         }
+
+
+
     }
 
     public boolean needPromptInputDates(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept)
     {
-        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-
-        List<HisAssetGroupClinicalMatch> list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
+        List<HisAssetGroupClinicalMatch> list;
+//        if("Cost".equals(hisAssetGroup.getType())){
+            list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
+//        }else{
+//            String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+//            list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
+//        }
         Set<String> uids1 = list.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
         Set<String> uids2 = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
         if (!uids1.equals(uids2)) {

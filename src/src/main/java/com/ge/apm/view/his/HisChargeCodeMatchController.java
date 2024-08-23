@@ -410,6 +410,13 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             HisAssetGroupAssetMatch hisAssetGroupAssetMatch = startList.get(0);
             String assetGroupName = hisAssetGroupAssetMatch.getAssetGroupName();
             List<SearchFilter> searchFilters=new ArrayList<>();
+            if(orgComponentController.getSelectedOrg() != null){
+                List<String> siteOrgUidsByParentUid = orgInfoDao.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
+                if(!siteOrgUidsByParentUid.isEmpty()){
+                    searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, siteOrgUidsByParentUid));
+                }
+            }
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
             searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.EQ,assetGroupName));
             List<HisAssetGroupAssetMatch> bySearchFilter = groupAssetMatchRepository.findBySearchFilter(searchFilters);
             if(CollectionUtils.isNotEmpty(bySearchFilter)){

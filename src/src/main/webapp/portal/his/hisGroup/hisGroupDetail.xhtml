@@ -43,11 +43,11 @@
                         <h:outputText value="#{item.assetInfo.qrCode}"/>
                     </p:column>
 
-                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}">
-                        <h:outputText value="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}"/>
+                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}">
+                        <h:outputText value="#{item.hisAssetGroup.name}"/>
                     </p:column>
-                    <p:column headerText="分组类型" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.type}">
-                        <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroupAssetMatch.hisAssetGroup.type)}"/>
+                    <p:column headerText="分组类型" sortBy="#{item.hisAssetGroup.type}">
+                        <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroup.type)}"/>
                     </p:column>
 
                     <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
