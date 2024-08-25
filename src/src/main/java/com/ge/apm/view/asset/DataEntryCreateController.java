@@ -181,6 +181,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     @Override
     public void save() {
+        sharedEntryAmount();
         if(selected.getUid()==null){
             selected.setCreatedDate(new Date());
             selected.setTenantUid(user.getTenantUID());
@@ -192,6 +193,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             selected.setLastModifiedBy(user.getUid());
             selected.setGroupOrSingle(1);
             selected.setAssetGroupUid(selectHisAssetGroupAssetMatch.getAssetGroupUid());
+            selected.setAssetGroupOrgInfoUid(selectHisAssetGroupAssetMatch.getOrgInfoUid());
             selected.setClinicalDeptUid(selectHisAssetGroupAssetMatch.getClinicalDeptUid());
             dataEntryService.save(selected,user,selectAssetInfos);
             WebUtil.addSuccessMessage("添加成功");
@@ -262,7 +264,23 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             } else {
                 //edit
                 this.selected = (DataEntry) eventObject;
-                getGroupMatchAsset();
+                if(selected.getGroupOrSingle()==1){
+                    getGroupMatchAsset();
+                }else{
+
+                    AssetInfo byUid = assetInfoRepository.findByUid(selected.getAssetUid());
+                    selectAssets=new ArrayList<>();
+                    selectAssets.add(byUid);
+                    selectedOrg = orgInfoDao.findByUid(byUid.getSiteUID());
+                    userSiteOrgTreeComponentController.setSelectedOrg(selectedOrg);
+
+                    filterDeptOrg=orgInfoDao.findByUid(byUid.getClinicalDeptUID());
+                    assetDataEntrys=new ArrayList<>();
+                    assetDataEntrys.add(selected);
+                    crudActionName = "Edit";
+
+
+                }
 
             }
         }

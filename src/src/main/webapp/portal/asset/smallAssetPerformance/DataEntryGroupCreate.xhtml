@@ -23,7 +23,7 @@
                         <p:selectOneMenu id="assetGroup"
                                          value="#{dataEntryCreateController.selected.hisAssetGroupAssetMatchUid}"
                                          required="true"
-                                         requiredMessage="请选择设备所属分组">
+                                         requiredMessage="请选择设备所属分组" disabled="#{ not empty dataEntryCreateController.selected.uid}">
                             <p:ajax event="itemSelect"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{dataEntryCreateController.getHisAssetGroups}" var="item"
@@ -37,7 +37,7 @@
 
                     <h:panelGroup>
                         <label class="label">录入类型<span style="color:red">*</span></label>
-                        <p:selectOneMenu id="entryType"  value="#{dataEntryCreateController.selected.entryType}"
+                        <p:selectOneMenu id="entryType"  value="#{dataEntryCreateController.selected.entryType}" disabled="#{ not empty dataEntryCreateController.selected.uid}"
                                          required="true"
                                          requiredMessage="请选择录入类型" collectionType="java.util.ArrayList">
                             <p:ajax event="itemSelect"/>
@@ -93,7 +93,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:column headerText="组名">
-                            <h:outputText value="#{asset.hisAssetGroupAssetMatch.hisAssetGroup.name}"/>
+                            <h:outputText value="#{asset.hisAssetGroup.name}"/>
                         </p:column>
                         <p:column headerText="设备">
                             <h:outputText value="#{asset.assetInfo.name}"/>
@@ -102,7 +102,7 @@
                             <h:outputText value="#{asset.amount}"/>
                         </p:column>
                         <p:column headerText="分摊比例">
-                            <p:autoComplete value="#{asset.scaleAssessment}"/>
+                            <h:outputText value="#{asset.scaleAssessment}"/>
                         </p:column>
                     </p:dataTable>
                 </p:panelGrid>

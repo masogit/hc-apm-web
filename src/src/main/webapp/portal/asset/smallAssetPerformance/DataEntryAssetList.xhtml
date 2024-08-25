@@ -67,8 +67,8 @@
                         </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()"   disabled="#{empty dataEntryAssetController.selected}" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate   :tabDataEntry:AssetAddForm" actionListener="#{dataEntryAssetController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate  :tabDataEntry:AssetAddForm" actionListener="#{dataEntryAssetController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()"   disabled="#{empty dataEntryAssetController.selected}" />
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                          actionListener="#{dataEntryAssetController.delete}" update="datalist"
                                          disabled="#{empty dataEntryAssetController.selected}">

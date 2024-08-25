@@ -25,11 +25,12 @@ public class AssetCostAmountInfo implements Serializable {
 
     @Column(name = "cost_Amount")
     private Double  costAmount;
-    @Column(name = "date")
-    private Date date;
+    @Column(name = "statistical_date")
+    @Temporal(TemporalType.DATE)
+    private Date statisticalDate;
 
-    @Column(name = "data_entry_uid")
-    private String dataEntryUid;
+//    @Column(name = "data_entry_uid")
+//    private String dataEntryUid;
 
 
 
