@@ -27,7 +27,7 @@
                             <p:ajax event="itemSelect"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{dataEntryCreateController.getHisAssetGroups}" var="item"
-                                           itemLabel="#{item.hisAssetGroup.name}--#{item.clinicalDeptName}"
+                                           itemLabel="#{item.hisAssetGroup.name}--#{item.orgInfo.name}"
                                            itemValue="#{item.uuid}"/>
                             <p:ajax listener="#{dataEntryCreateController.getGroupMatchAsset}"
                                     update="dataEntryGroupCreate:selectAssetInfos"></p:ajax>

@@ -321,10 +321,18 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
 
         if (isEditMode()) {
-            if (hisAssetGroupService.needPromptInputDates(targetAssets, hisAssetGroup, filterDeptOrg) && (updateStartDate == null || updateEndDate == null || updateEndDate.compareTo(updateStartDate) < 0)) {
-                WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
-                return;
+            if(hisAssetGroup.getType().equals("Cost")){
+                if (hisAssetGroupService.needPromptInputDates(targetAssets, hisAssetGroup, selectedOrg) && (updateStartDate == null || updateEndDate == null || updateEndDate.compareTo(updateStartDate) < 0)) {
+                    WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
+                    return;
+                }
+            }else{
+                if (hisAssetGroupService.needPromptInputDates(targetAssets, hisAssetGroup, filterDeptOrg) && (updateStartDate == null || updateEndDate == null || updateEndDate.compareTo(updateStartDate) < 0)) {
+                    WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
+                    return;
+                }
             }
+
             hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate,selectedOrg);
 
             WebUtil.addSuccessMessage("修改成功");
