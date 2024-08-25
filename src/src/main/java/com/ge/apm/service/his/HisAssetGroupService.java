@@ -5,6 +5,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.his.*;
+import com.ge.apm.service.asset.DataEntryService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import net.sf.json.JSONArray;
@@ -35,6 +36,9 @@ public class HisAssetGroupService {
     private HisEquipmentSfxmMatchRepository sfxmMatchRepository;
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private DataEntryService dataEntryService;
 
     public boolean isAssetGroupAlreadyBoundInOtherGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup) {
         List<String> assetUids = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
@@ -91,28 +95,28 @@ public class HisAssetGroupService {
 
     @Transactional
     public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg){
+                String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
 
-//        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
 //        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
-        List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatches = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
+        HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
+        if("Cost".equals(hisAssetGroup.getType())){
+            hisAssetGroupAssetMatch = hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
+        }else{
+            hisAssetGroupAssetMatch =hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
+        }
 
-        if(!CollectionUtils.isEmpty(hisAssetGroupClinicalMatches)){
-
-//        }
-//
-//        if (null != hisAssetGroupAssetMatch) {
+        if (null != hisAssetGroupAssetMatch) {
 
             if("Cost".equals(hisAssetGroup.getType())){
+                hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
 
+                dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateEndDate,updateEndDate,selectOrg);
                 //TODO 成本类型的修改单独处理逻辑  需要吧录入数据的这段时间重新计算
             }else{
-                addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, selectOrg, updateStartDate, updateEndDate);
-
+                addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, clinicalDept, updateStartDate, updateEndDate);
+                hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             }
-
             //修改前先移除该分组下所有资产
-//            hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
-            hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
             insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         } else {
             saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment,selectOrg);
@@ -123,8 +127,14 @@ public class HisAssetGroupService {
     public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment,OrgInfo selectOrg){
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = new HisAssetGroupAssetMatch();
         hisAssetGroupAssetMatch.setOrgInfoUid(selectOrg.getSiteUID());
-        hisAssetGroupAssetMatch.setClinicalDeptUid(null);
-        hisAssetGroupAssetMatch.setClinicalDeptName(null);
+        if(hisAssetGroup.getType().equals("Income")){
+            hisAssetGroupAssetMatch.setClinicalDeptUid(clinicalDept.getUid());
+            hisAssetGroupAssetMatch.setClinicalDeptName(clinicalDept.getName());
+        }else{
+            hisAssetGroupAssetMatch.setClinicalDeptUid(null);
+            hisAssetGroupAssetMatch.setClinicalDeptName(null);
+        }
+
         hisAssetGroupAssetMatch.setAssetGroupUid(hisAssetGroup.getUuid());
         hisAssetGroupAssetMatch.setAssetGroupName(hisAssetGroup.getName());
         hisAssetGroupAssetMatch.setIsSubEquipment(subEquipment);
@@ -139,7 +149,10 @@ public class HisAssetGroupService {
 
         targetAssets.stream().forEach(item -> {
             HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
-//            hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+            if(hisAssetGroup.getType().equals("Income")){
+                hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+
+            }
             hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
             hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
             hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
@@ -193,16 +206,22 @@ public class HisAssetGroupService {
                         hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
                         hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
                         hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
-                        hisAssetGroupClinicalMatch.setClinicalDeptUid(clinical.getKey());
+                        hisAssetGroupClinicalMatch.setClinicalDeptUid(item.getClinicalDeptUID());
                         hisAssetGroupClinicalMatch.setOrgInfoUid(clinicalDept.getSiteUID());
                         hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroup.getUuid()+clinicalDept.getSiteUID());
+                        hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
                         newList.add(hisAssetGroupClinicalMatch);
                     });
 
                     UserAccount loginUser = UserContextService.getCurrentUserAccount();
                     HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
                     hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
-                    hisAdjustBusinessJob.setTaskType(3);
+                    if(hisAssetGroup.getType().equals("Income")){
+                        hisAdjustBusinessJob.setTaskType(3);
+                    }else{
+                        hisAdjustBusinessJob.setTaskType(0);
+
+                    }
                     hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
                     hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSONArray.fromObject(value).toString());
                     hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
@@ -225,20 +244,116 @@ public class HisAssetGroupService {
 
     }
 
+    private void addNewJobIfBoundUpdated2(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, Date updateStartDate, Date updateEndDate) {
+        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+        HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
+        List<HisAssetGroupClinicalMatch> list;
+        if(hisAssetGroup.getType().equals("Income")){
+            hisAssetGroupAssetMatch= hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
+             list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
+
+        }else{
+            hisAssetGroupAssetMatch= hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
+            list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid( hisAssetGroup.getUuid(),clinicalDept.getSiteUID());
+
+        }
+        Set<String> uids1 = list.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
+        Set<String> uids2 = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
+
+        boolean flag=false;
+
+
+        Map<String, Double> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, Double> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+
+        for (Map.Entry<String, Double> stringDoubleEntry : listMap.entrySet()) {
+            Double aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+            if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
+                flag=true;
+            }
+
+        }
+
+        if ((!uids1.equals(uids2)) ||  flag) {
+
+            StringBuilder businessId = new StringBuilder();
+            List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupMatchUid(hisAssetGroupAssetMatch.getUuid());
+            if (!listSfxmMatch.isEmpty()) {
+                for (HisEquipmentSfxmMatch hisEquipmentSfxmMatch : listSfxmMatch) {
+                    if (StringUtils.isNotEmpty(hisEquipmentSfxmMatch.getSfxmId())) {
+                        if (businessId.length() > 0) {
+                            businessId.append(",");
+                        }
+                        businessId.append(hisEquipmentSfxmMatch.getSfxmId());
+                    }
+                }
+
+                List<HisAssetGroupClinicalMatch> newList = Lists.newArrayList();
+                targetAssets.stream().forEach(item -> {
+                    HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
+                    hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
+                    hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
+                    hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
+                    hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
+                    if(hisAssetGroup.getType().equals("Income")){
+                        hisAssetGroupClinicalMatch.setClinicalDeptUid(item.getClinicalDeptUID());
+                    }else{
+                        hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
+                    }
+                    hisAssetGroupClinicalMatch.setOrgInfoUid(clinicalDept.getSiteUID());
+                    hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroup.getUuid()+clinicalDept.getSiteUID());
+                    hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
+                    newList.add(hisAssetGroupClinicalMatch);
+                });
+
+                UserAccount loginUser = UserContextService.getCurrentUserAccount();
+                HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
+                hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
+                hisAdjustBusinessJob.setTaskType(3);
+                hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
+                hisAdjustBusinessJob.setOldStrJson(list.isEmpty() ? null : JSONArray.fromObject(list).toString());
+                hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
+                hisAdjustBusinessJob.setDataStartDate(updateStartDate);
+                hisAdjustBusinessJob.setDataEndDate(updateEndDate);
+                hisAdjustBusinessJob.setTaskStatus(0);
+                hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
+                hisAdjustBusinessJob.setCreatedDate(new Date());
+                hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
+                hisAdjustBusinessJob.setSiteUid(listSfxmMatch.get(0).getSiteUid());
+                hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
+            }
+
+
+        }
+    }
+
     public boolean needPromptInputDates(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept)
     {
         List<HisAssetGroupClinicalMatch> list;
-//        if("Cost".equals(hisAssetGroup.getType())){
+        if("Cost".equals(hisAssetGroup.getType())){
             list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
-//        }else{
-//            String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-//            list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
-//        }
+        }else{
+            String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+            list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
+        }
         Set<String> uids1 = list.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
         Set<String> uids2 = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
         if (!uids1.equals(uids2)) {
             return Boolean.TRUE;
         }
+
+        Map<String, Double> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, Double> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+
+        for (Map.Entry<String, Double> stringDoubleEntry : listMap.entrySet()) {
+             Double aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+            if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
+                return Boolean.TRUE;
+            }
+
+        }
+
+
 
         return false;
     }

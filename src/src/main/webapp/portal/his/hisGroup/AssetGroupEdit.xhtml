@@ -43,10 +43,10 @@
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
                         <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{hisAssetGroupEditController.filterDeptOrg}"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}"
-                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                            <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList" />
-                            <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList" />
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}" disabled="#{hisAssetGroupEditController.editMode and hisAssetGroupEditController.selected.hisAssetGroup.type eq 'Income'}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange" >
+                            <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" />
+                            <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" />
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -158,7 +158,9 @@
                             <h:outputText value="#{asset.qrCode}"/>
                         </p:column>
                         <p:column headerText="分摊比例">
-                            <p:autoComplete value="#{asset.scaleAssessment}"/>
+                            <p:inputNumber value="#{asset.scaleAssessment}">
+                                <p:ajax event="change"   update="@(form)"/>
+                            </p:inputNumber>
                         </p:column>
                     </p:dataTable>
                 </p:panelGrid>

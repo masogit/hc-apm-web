@@ -203,8 +203,12 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             return false;
         }
         HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
+        if("Cost".equals(hisAssetGroup.getType())){
+          return    hisAssetGroupService.needPromptInputDates(this.selectAssetInfos, hisAssetGroup, selectedOrg);
+        }else{
+           return hisAssetGroupService.needPromptInputDates(this.selectAssetInfos, hisAssetGroup, filterDeptOrg);
 
-        return hisAssetGroupService.needPromptInputDates(this.availableAssets.getTarget(), hisAssetGroup, selectedOrg);
+        }
     }
 
 
@@ -230,6 +234,15 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     public void onClinicalDeptChange() {
 
         getQueryAssetsList();
+        if(selected!=null && selected.getAssetGroupUid()!=null){
+             HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
+             if(!"Cost".equals(hisAssetGroup.getType())){
+                 selectAssetInfos=new ArrayList<>();
+                 selectedAssets= new HashSet<>();
+                 selectedMap=new HashMap<>();
+                 availableAssets.setTarget(new ArrayList<>());
+             }
+        }
     }
 
     public void getQueryAssetsList() {
@@ -288,18 +301,27 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
         HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
         //去掉校验
-//        for(AssetInfo assetInfo : targetAssets){
-//            List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatchList = hisAssetGroupClinicalMatchDao.findByAssetUid(assetInfo.getUid());
-//            List<String> assetGroupUIds = hisAssetGroupClinicalMatchList.stream().map(HisAssetGroupClinicalMatch::getHisAssetGroupUId).collect(Collectors.toList());
-//            if(!hisAssetGroupClinicalMatchList.isEmpty() && !assetGroupUIds.contains(hisAssetGroup.getUuid())){
-//                String assetGroupName = hisAssetGroupRepository.findNameByUuid(hisAssetGroup.getUuid());
-//                WebUtil.addErrorMessage("设备:" + assetInfo.getName() +" 已绑定分组: "+ assetGroupName);
-//                return;
-//            }
-//        }
+        if(hisAssetGroup.getType().equals("Income")){
+             Set<String> collect = targetAssets.stream().map(it -> it.getClinicalDeptUID()).collect(Collectors.toSet());
+            if(collect.size()>1){
+                WebUtil.addErrorMessage("分组收入必须选择同一科室设备");
+                return;
+            }
+
+            for(AssetInfo assetInfo : targetAssets){
+                List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatchList = hisAssetGroupClinicalMatchDao.findByAssetUid(assetInfo.getUid());
+                List<String> assetGroupUIds = hisAssetGroupClinicalMatchList.stream().map(HisAssetGroupClinicalMatch::getHisAssetGroupUId).collect(Collectors.toList());
+                if(!hisAssetGroupClinicalMatchList.isEmpty() && !assetGroupUIds.contains(hisAssetGroup.getUuid())){
+                    String assetGroupName = hisAssetGroupRepository.findNameByUuid(hisAssetGroup.getUuid());
+                    WebUtil.addErrorMessage("设备:" + assetInfo.getName() +" 已绑定分组: "+ assetGroupName);
+                    return;
+                }
+            }
+        }
+
 
         if (isEditMode()) {
-            if (hisAssetGroupService.needPromptInputDates(targetAssets, hisAssetGroup, filterDeptOrg) && (updateStartDate == null || updateEndDate == null || updateEndDate.compareTo(updateStartDate) <= 0)) {
+            if (hisAssetGroupService.needPromptInputDates(targetAssets, hisAssetGroup, filterDeptOrg) && (updateStartDate == null || updateEndDate == null || updateEndDate.compareTo(updateStartDate) < 0)) {
                 WebUtil.addSuccessMessage("更新设备填写开始时间或结束时间错误");
                 return;
             }
@@ -354,23 +376,25 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 String assetGroupUid = selected.getAssetGroupUid();
                 String orgInfoUid = selected.getOrgInfoUid();
 
-                HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getUuid());
+                HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
                 List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId ;
                 List<String> assetIds=null;
-//                if(hisAssetGroup.getType().equals("Cost")){
+                if(hisAssetGroup.getType().equals("Cost")){
                      byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByHisAssetGroupUIdAndOrgInfoUid(assetGroupUid, orgInfoUid);
                      assetIds = byAssetGroupClinicalId.stream().map(item -> item.getAssetUid()).collect(Collectors.toList());
-//                }else{
-//                    String ids = selected.getAssetGroupUid() + filterDeptOrg.getUid();
-//                    assetIds = hisAssetGroupClinicalMatchDao.findAssetIds(ids);
-//                    byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(ids);
-//                }
+                }else{
+                    String ids = selected.getAssetGroupUid() + filterDeptOrg.getUid();
+                    assetIds = hisAssetGroupClinicalMatchDao.findAssetIds(ids);
+                    byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(ids);
+                }
                 Map<String, Double> doubleMap = byAssetGroupClinicalId.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
                 List<AssetInfo> targetAssets = assetInfoRepository.findAllByUidIn(assetIds);
                 availableAssets.setTarget(targetAssets);
                 availableAssets.setSource(new ArrayList<>());
                 loadClinicalDept();
-//                getQueryAssetsList();
+                if(hisAssetGroup.getType().equals("Income")){
+                    getQueryAssetsList();
+                }
                 selectAssetInfos=targetAssets;
                 for (AssetInfo selectAssetInfo : selectAssetInfos) {
                     selectAssetInfo.setScaleAssessment(doubleMap.get(selectAssetInfo.getUid()));
