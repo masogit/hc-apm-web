@@ -90,10 +90,13 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
             return;
         }
 
-        String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
-        hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        if(selected.getHisAssetGroup().getType().equals("Income")){
+            String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
+            hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        }else{
+            hisAssetGroupClinicalMatchDao.deleteAssetByHisAssetGroupAndOrgInfoUid(selected.getAssetGroupUid(),selected.getOrgInfoUid());
+        }
         hisAssetGroupAssetMatchDao.delete(selected);
-
         selected = null;
     }
 
