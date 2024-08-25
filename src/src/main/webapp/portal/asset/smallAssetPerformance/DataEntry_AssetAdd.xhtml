@@ -15,7 +15,7 @@
 
             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                <h:panelGroup>
+                <h:panelGroup >
                     <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
                     <apm:selectSiteOrgByOrgTree update="@(form)"/>
 
@@ -66,7 +66,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true"
                                      actionListener="#{dataEntryCreateController.getQueryAssetsList()}" value="检索"
-                                     update="AssetAddForm:datalist"/>
+                                     update="AssetAddForm:datalist" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
                 </h:panelGroup>
 
 

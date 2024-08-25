@@ -97,6 +97,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
     @Override
     public void prepareCreate(){
+        selected=null;
         dataEntryCreateController.onServerEvent(null, null);
 
     }
