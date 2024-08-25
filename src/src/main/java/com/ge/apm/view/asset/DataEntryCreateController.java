@@ -145,8 +145,9 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         String hisAssetGroupAssetMatchUid = this.selected.getHisAssetGroupAssetMatchUid();
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchDao.findById(hisAssetGroupAssetMatchUid);
         selectHisAssetGroupAssetMatch=hisAssetGroupAssetMatch;
-        String groupUidClinicdepUid = hisAssetGroupAssetMatch.getAssetGroupUid() + hisAssetGroupAssetMatch.getClinicalDeptUid();
-        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(groupUidClinicdepUid);
+        String groupUidClinicdepUid = hisAssetGroupAssetMatch.getAssetGroupUid() + hisAssetGroupAssetMatch.getOrgInfoUid();
+//        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(groupUidClinicdepUid);
+        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
         selectAssetInfos = byAssetGroupClinicalId;
         sharedEntryAmount();
     }
@@ -172,9 +173,8 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         List<SearchFilter> searchFiltersGroup = new ArrayList<>();
 
         searchFiltersGroup.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID()));
-
+        searchFiltersGroup.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Cost"));
         List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters);
-
         return hisAssetGroupAssetMatches;
     }
 

@@ -95,7 +95,6 @@ public class HisAssetGroupService {
 
     @Transactional
     public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg){
-                String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
 
 //        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
@@ -110,9 +109,11 @@ public class HisAssetGroupService {
             if("Cost".equals(hisAssetGroup.getType())){
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
 
-                dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateEndDate,updateEndDate,selectOrg);
+                dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
                 //TODO 成本类型的修改单独处理逻辑  需要吧录入数据的这段时间重新计算
             }else{
+                String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+
                 addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, clinicalDept, updateStartDate, updateEndDate);
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             }
@@ -144,12 +145,13 @@ public class HisAssetGroupService {
     }
 
     private void insertAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept,OrgInfo selectOrg) {
-        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
         String hisAssetGroupOrgInfoUid = hisAssetGroup.getUuid() + selectOrg.getSiteUID();
 
         targetAssets.stream().forEach(item -> {
             HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
             if(hisAssetGroup.getType().equals("Income")){
+                String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
+
                 hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
 
             }

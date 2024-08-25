@@ -7,6 +7,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface DataEntryRepository  extends GenericRepositoryUUID<DataEntry> {
 
@@ -19,4 +20,5 @@ public interface DataEntryRepository  extends GenericRepositoryUUID<DataEntry> {
     List<DataEntry> findByAssetGroupUidAndAssetGroupOrgInfoUidAndDateQuery(String assetGroupUid, String clinicalDeptUid, Date startDate, Date endDate);
 
 
+    List<DataEntry> findByUidIn(Set<String> dataEntryUids);
 }

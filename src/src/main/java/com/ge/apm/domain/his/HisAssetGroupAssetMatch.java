@@ -1,6 +1,7 @@
 package com.ge.apm.domain.his;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -49,9 +50,13 @@ public class HisAssetGroupAssetMatch implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)
     private HisAssetGroup hisAssetGroup;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "org_info_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private OrgInfo orgInfo;
 
 //    @Column(name = "group_rate") //占比
     @Transient
