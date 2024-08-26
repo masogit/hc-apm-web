@@ -145,8 +145,9 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         String hisAssetGroupAssetMatchUid = this.selected.getHisAssetGroupAssetMatchUid();
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchDao.findById(hisAssetGroupAssetMatchUid);
         selectHisAssetGroupAssetMatch=hisAssetGroupAssetMatch;
-        String groupUidClinicdepUid = hisAssetGroupAssetMatch.getAssetGroupUid() + hisAssetGroupAssetMatch.getClinicalDeptUid();
-        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(groupUidClinicdepUid);
+        String groupUidClinicdepUid = hisAssetGroupAssetMatch.getAssetGroupUid() + hisAssetGroupAssetMatch.getOrgInfoUid();
+//        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(groupUidClinicdepUid);
+        List<HisAssetGroupClinicalMatch> byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
         selectAssetInfos = byAssetGroupClinicalId;
         sharedEntryAmount();
     }
@@ -172,15 +173,15 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         List<SearchFilter> searchFiltersGroup = new ArrayList<>();
 
         searchFiltersGroup.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID()));
-
-        List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters);
-
+        searchFiltersGroup.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Cost"));
+        List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(searchFiltersGroup);
         return hisAssetGroupAssetMatches;
     }
 
 
     @Override
     public void save() {
+        sharedEntryAmount();
         if(selected.getUid()==null){
             selected.setCreatedDate(new Date());
             selected.setTenantUid(user.getTenantUID());
@@ -192,6 +193,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             selected.setLastModifiedBy(user.getUid());
             selected.setGroupOrSingle(1);
             selected.setAssetGroupUid(selectHisAssetGroupAssetMatch.getAssetGroupUid());
+            selected.setAssetGroupOrgInfoUid(selectHisAssetGroupAssetMatch.getOrgInfoUid());
             selected.setClinicalDeptUid(selectHisAssetGroupAssetMatch.getClinicalDeptUid());
             dataEntryService.save(selected,user,selectAssetInfos);
             WebUtil.addSuccessMessage("添加成功");
@@ -258,11 +260,31 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                     assetDataEntrys.add(dataEntry);
                 }
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
+                crudActionName = "Create";
+                filterDeptOrg=null;
+                selectAssets=new ArrayList<>();
+
 
             } else {
                 //edit
                 this.selected = (DataEntry) eventObject;
-                getGroupMatchAsset();
+                if(selected.getGroupOrSingle()==1){
+                    getGroupMatchAsset();
+                }else{
+
+                    AssetInfo byUid = assetInfoRepository.findByUid(selected.getAssetUid());
+                    selectAssets=new ArrayList<>();
+                    selectAssets.add(byUid);
+                    selectedOrg = orgInfoDao.findByUid(byUid.getSiteUID());
+                    userSiteOrgTreeComponentController.setSelectedOrg(selectedOrg);
+
+                    filterDeptOrg=orgInfoDao.findByUid(byUid.getClinicalDeptUID());
+                    assetDataEntrys=new ArrayList<>();
+                    assetDataEntrys.add(selected);
+                    crudActionName = "Edit";
+
+
+                }
 
             }
         }

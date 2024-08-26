@@ -90,10 +90,13 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
             return;
         }
 
-        String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
-        hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        if(selected.getHisAssetGroup().getType().equals("Income")){
+            String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
+            hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        }else{
+            hisAssetGroupClinicalMatchDao.deleteAssetByHisAssetGroupAndOrgInfoUid(selected.getAssetGroupUid(),selected.getOrgInfoUid());
+        }
         hisAssetGroupAssetMatchDao.delete(selected);
-
         selected = null;
     }
 
@@ -111,6 +114,18 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
 
     public Integer getAssetCountsByGroupUidAndDeptUid(String assetGroupUid,String clinicalDeptUid){
         return hisAssetGroupClinicalMatchDao.countByGroupUidAndDeptUid(assetGroupUid+clinicalDeptUid);
+    }
+
+    public Integer getAssetCountsByGroupUidAndOrgInfoUid(String assetGroupUid,String siteUid){
+        return hisAssetGroupClinicalMatchDao.countByGroupUidAndOrgInfoUid(assetGroupUid,siteUid);
+    }
+
+    public Integer getAssetCountsByhisAssetGroupAssetMatch(HisAssetGroupAssetMatch hisAssetGroupAssetMatch){
+        if(hisAssetGroupAssetMatch.getHisAssetGroup().getType().equals("Cost")){
+          return    getAssetCountsByGroupUidAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
+        }else{
+            return    getAssetCountsByGroupUidAndDeptUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getClinicalDeptUid());
+        }
     }
 
 }

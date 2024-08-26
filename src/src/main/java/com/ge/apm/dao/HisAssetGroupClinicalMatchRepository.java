@@ -58,4 +58,18 @@ public interface HisAssetGroupClinicalMatchRepository extends GenericRepositoryU
 
     @Query(value = "select * from his_asset_group_clinical_match where asset_group_clinical_match_id = ?1", nativeQuery = true)
     List<HisAssetGroupClinicalMatch> findByAssetGroupClinicalId(String uid);
+
+    List<HisAssetGroupClinicalMatch>  findByHisAssetGroupUIdAndOrgInfoUid(String groupUid, String siteUid);
+
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from his_asset_group_clinical_match where his_asset_group_uid = ?1    and org_info_uid=?2", nativeQuery = true)
+    void deleteAssetByHisAssetGroupAndOrgInfoUid(String groupUid, String siteUid);
+
+
+    @Query(value = "select count(*) from his_asset_group_clinical_match where his_asset_group_uid = ?1    and org_info_uid=?2", nativeQuery = true)
+    Integer countByGroupUidAndOrgInfoUid(String groupUid, String siteUid);
+
 }

@@ -49,7 +49,9 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
     public int type=1;
 
-
+    @Getter
+    @Setter
+    private String filterEntryType;
 
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
@@ -97,6 +99,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
     @Override
     public void prepareCreate(){
+        selected=null;
         dataEntryCreateController.onServerEvent(null, null);
 
     }

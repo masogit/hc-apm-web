@@ -26,7 +26,7 @@ public class HisAssetGroup implements Serializable {
 
 
     //设备分组名称
-    @Column(name = "type")
+    @Column(name = "type",columnDefinition = "VARCHAR(255) DEFAULT 'Income'")
     private String type;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")

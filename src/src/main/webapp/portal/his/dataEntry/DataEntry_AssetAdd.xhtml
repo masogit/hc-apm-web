@@ -8,14 +8,13 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:apm="http://www.ge.com/tags/apm">
 <ui:composition>
-    <!--    <p:dialog id="AssetAddDlg" widgetVar="AssetAddDlg"  width="50%"-->
-    <!--              modal="true" resizable="true" draggable="true" appendTo="@(body)" header="选择设备">-->
+
     <h:form id="AssetAddForm">
         <div style="border: 0px solid ">
 
             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                <h:panelGroup>
+                <h:panelGroup >
                     <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
                     <apm:selectSiteOrgByOrgTree update="@(form)"/>
 
@@ -30,8 +29,6 @@
                                     completeMethod="#{dataEntryCreateController.autoCompleteDept}"
                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"
                                     class="SiteUIDChange">
-                        <!--                        <p:ajax event="itemSelect" listener="#{dataEntryCreateController.onClinicalDeptChange()}"-->
-                        <!--                                update="datalist"/>-->
 
                     </p:autoComplete>
                 </h:panelGroup>
@@ -66,7 +63,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true"
                                      actionListener="#{dataEntryCreateController.getQueryAssetsList()}" value="检索"
-                                     update="AssetAddForm:datalist"/>
+                                     update="AssetAddForm:datalist" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
                 </h:panelGroup>
 
 
@@ -83,14 +80,14 @@
                      rowsPerPageTemplate="20,50,100,500">
 
             <p:column width="36" exportable="false">
-                <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap[item.uid]}"
+                <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap[item.uid]}" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"
                                          class="selectCheckBox1">
                     <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList}"/>
                     <f:attribute name="assetObj" value="#{item}"/>
                 </p:selectBooleanCheckbox>
                 <f:facet name="header">
                     <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected}"
-                                             id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                             id="selectCheckBoxHeader" class="selectCheckBoxHeader" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}">
                         <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage}"
                                 update="@(.selectCheckBox1)"/>
                     </p:selectBooleanCheckbox>
@@ -109,41 +106,13 @@
             <p:column headerText="所属科室">
                 <h:outputText value="#{item.clinicalDeptName}"/>
             </p:column>
-            <!--                    <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}" filterBy="#{item.isSubEquipment}" filterMatchMode="LIKE">-->
-            <!--                        <h:outputText value="#{item.isSubEquipment eq false ? '否' : '是'}"/>-->
-            <!--                    </p:column>-->
+
         </p:dataTable>
         <br/>
         <h:panelGroup>
             <p:commandButton action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"
-                             update="selectAssets"/>
+                             update="selectAssets" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
         </h:panelGroup>
-        <!--        <h:form id="selectAssetForm">-->
-
-        <!--            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
-
-
-        <!--                <h:panelGroup>-->
-        <!--                    <label class='label'>设备名称</label>-->
-        <!--                    <h:outputText value="#{dataEntryCreateController.selectAsset.name}">-->
-        <!--                    </h:outputText>-->
-        <!--                </h:panelGroup>-->
-
-
-        <!--                <h:panelGroup>-->
-        <!--                    <label class='label'>设备二维码</label>-->
-        <!--                    <h:outputText value="#{dataEntryCreateController.selectAsset.qrCode}">-->
-        <!--                    </h:outputText>-->
-        <!--                </h:panelGroup>-->
-
-        <!--                <h:panelGroup>-->
-        <!--                    <label class='label'>设备序列号</label>-->
-        <!--                    <h:outputText value="#{dataEntryCreateController.selectAsset.serialNum}">-->
-        <!--                    </h:outputText>-->
-        <!--                </h:panelGroup>-->
-
-
-        <!--            </p:panelGrid>-->
 
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
             <p:dataTable id="selectAssets" value="#{dataEntryCreateController.selectAssets}" var="asset"
@@ -183,7 +152,6 @@
         </p:panelGrid>
 
 
-        <!--        </h:form>-->
 
     </h:form>
 

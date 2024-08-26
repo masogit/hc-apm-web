@@ -6,37 +6,40 @@
 
 <ui:composition>
     <div class="ui-g">
+
+
         <div class="ui-g-12 card">
-            <h:form id="DataEntryAssetForm">
-                <p:dataTable id="datalist" value="#{dataEntryAssetController.lazyModel}"
-                             var="item"
+
+
+            <h:form id="DataEntryGroupForm">
+                <p:dataTable id="datalist" value="#{dataEntryController.lazyModel}"
+                             var="item" widgetVar="datalist"
                              lazy="true" paginator="true" paginatorPosition="bottom"
                              paginatorAlwaysVisible="true"
-                             selectionMode="single" selection="#{dataEntryAssetController.selected}"
+                             selectionMode="single" selection="#{dataEntryController.selected}"
                              rowKey="#{item.uid}" sortMode="single" sortOrder="descending"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
-                    <p:ajax event="rowSelect" listener="#{dataEntryAssetController.onSelectDataEntry}" update=" editButton deleteButton"/>
-                    <p:ajax event="filter" listener="#{dataEntryAssetController.onFilter}" oncomplete="rc();"/>
-
-                    <p:column headerText="所属科室" sortBy="#{item.assetInfo.clinicalDeptName}">
-                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
-                    </p:column>
-                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}">
-                        <h:outputText value="#{item.assetInfo.name}"/>
+                    <p:ajax event="rowSelect" listener="#{dataEntryController.onSelectDataEntry}" update=" editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{dataEntryController.onFilter}"/>
+                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}">
+                        <h:outputText value="#{item.hisAssetGroup.name}"  filterBy="#{item.hisAssetGroup.name}" filterMatchMode="LIKE"/>
                     </p:column>
 
-                    <p:column headerText="设备二维码" sortBy="#{item.assetInfo.qrCode}">
-                        <h:outputText value="#{item.assetInfo.qrCode}"/>
-                    </p:column>
-
-                    <p:column headerText="录入类型" sortBy="#{item.entryType}">
+                    <p:column  headerText="录入类型" sortBy="#{item.entryType}" filterBy="#{item.entryType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{dataEntryController.filterEntryType}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('HisEntryType',item.entryType)}"/>
+
                     </p:column>
 
-                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}">
+                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}"  filterBy="#{item.entryAmount}" filterMatchMode="GET" >
                         <h:outputText value="#{item.entryAmount}"/>
                     </p:column>
 
@@ -67,18 +70,18 @@
                         </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryAssetForm :tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareCreate}" oncomplete="PF('dataEntryAssetCreateDialog').show()"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:dataEntryAssetCreate" actionListener="#{dataEntryAssetController.prepareEdit}" oncomplete="PF('dataEntryAssetCreateDialog').show()"   disabled="#{empty dataEntryAssetController.selected}" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryGroupForm  :tabDataEntry:dataEntryGroupCreate" actionListener="#{dataEntryController.prepareCreate}" oncomplete="PF('dataEntryGroupCreateDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" update=":tabDataEntry:DataEntryGroupForm :tabDataEntry:dataEntryGroupCreate" actionListener="#{dataEntryController.prepareEdit}" oncomplete="PF('dataEntryGroupCreateDialog').show()" disabled="#{empty dataEntryController.selected}" />
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
-                                         actionListener="#{dataEntryAssetController.delete}" update="datalist"
-                                         disabled="#{empty dataEntryAssetController.selected}">
+                                         actionListener="#{dataEntryController.delete}" update="datalist"
+                                         disabled="#{empty dataEntryController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                        icon="ui-icon-alert"/>
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
             </h:form>
-            <ui:include src="DataEntryAssetCreate.xhtml"/>
+            <ui:include src="DataEntryGroupCreate.xhtml"/>
 
         </div>
     </div>
