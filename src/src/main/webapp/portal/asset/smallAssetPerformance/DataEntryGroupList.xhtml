@@ -13,7 +13,7 @@
 
             <h:form id="DataEntryGroupForm">
                 <p:dataTable id="datalist" value="#{dataEntryController.lazyModel}"
-                             var="item"
+                             var="item" widgetVar="datalist"
                              lazy="true" paginator="true" paginatorPosition="bottom"
                              paginatorAlwaysVisible="true"
                              selectionMode="single" selection="#{dataEntryController.selected}"
@@ -23,16 +23,23 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
                     <p:ajax event="rowSelect" listener="#{dataEntryController.onSelectDataEntry}" update=" editButton deleteButton"/>
-                    <p:ajax event="filter" listener="#{dataEntryController.onFilter}" oncomplete="rc();"/>
+                    <p:ajax event="filter" listener="#{dataEntryController.onFilter}"/>
                     <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}">
-                        <h:outputText value="#{item.hisAssetGroup.name}"/>
+                        <h:outputText value="#{item.hisAssetGroup.name}"  filterBy="#{item.hisAssetGroup.name}" filterMatchMode="LIKE"/>
                     </p:column>
 
-                    <p:column headerText="录入类型" sortBy="#{item.entryType}">
+                    <p:column  headerText="录入类型" sortBy="#{item.entryType}" filterBy="#{item.entryType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{dataEntryController.filterEntryType}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('HisEntryType',item.entryType)}"/>
+
                     </p:column>
 
-                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}">
+                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}"  filterBy="#{item.entryAmount}" filterMatchMode="GET" >
                         <h:outputText value="#{item.entryAmount}"/>
                     </p:column>
 

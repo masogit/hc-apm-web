@@ -9,7 +9,7 @@
         <div class="ui-g-12 card">
             <h:form id="DataEntryAssetForm">
                 <p:dataTable id="datalist" value="#{dataEntryAssetController.lazyModel}"
-                             var="item"
+                             var="item" widgetVar="datalist"
                              lazy="true" paginator="true" paginatorPosition="bottom"
                              paginatorAlwaysVisible="true"
                              selectionMode="single" selection="#{dataEntryAssetController.selected}"
@@ -19,24 +19,31 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
                     <p:ajax event="rowSelect" listener="#{dataEntryAssetController.onSelectDataEntry}" update=" editButton deleteButton"/>
-                    <p:ajax event="filter" listener="#{dataEntryAssetController.onFilter}" oncomplete="rc();"/>
+                    <p:ajax event="filter" listener="#{dataEntryAssetController.onFilter}"/>
 
-                    <p:column headerText="所属科室" sortBy="#{item.assetInfo.clinicalDeptName}">
+                    <p:column headerText="所属科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}">
+                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.name}"/>
                     </p:column>
 
-                    <p:column headerText="设备二维码" sortBy="#{item.assetInfo.qrCode}">
+                    <p:column headerText="设备二维码" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.qrCode}"/>
                     </p:column>
 
-                    <p:column headerText="录入类型" sortBy="#{item.entryType}">
+                    <p:column  headerText="录入类型" sortBy="#{item.entryType}" filterBy="#{item.entryType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{dataEntryController.filterEntryType}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('HisEntryType',item.entryType)}"/>
+
                     </p:column>
 
-                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}">
+                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}"  filterBy="#{item.entryAmount}" filterMatchMode="GET" >
                         <h:outputText value="#{item.entryAmount}"/>
                     </p:column>
 

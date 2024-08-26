@@ -174,7 +174,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
         searchFiltersGroup.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID()));
         searchFiltersGroup.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Cost"));
-        List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters);
+        List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(searchFiltersGroup);
         return hisAssetGroupAssetMatches;
     }
 
