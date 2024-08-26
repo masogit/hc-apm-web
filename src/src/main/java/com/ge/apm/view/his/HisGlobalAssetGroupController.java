@@ -7,7 +7,11 @@ import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.context.RequestContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -15,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean
@@ -25,11 +30,27 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
     private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
     private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchRepository;
 
+
+    @Getter
+    @Setter
+    private String groupType;
+
     @Override
     protected void init() {
         hisAssetGroupDao = WebUtil.getBean(HisAssetGroupRepository.class);
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
         hisAssetGroupAssetMatchRepository = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
+    }
+
+    @Override
+    protected Page<HisAssetGroup> loadData(PageRequest pageRequest) {
+        if(searchFilters==null){
+            searchFilters  = new ArrayList<>();
+        }
+        removeFilterOnField("tenantUid");
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        Page<HisAssetGroup> hisAssetGroups = hisAssetGroupDao.findBySearchFilter(this.searchFilters, pageRequest);
+        return hisAssetGroups;
     }
 
     public HisAssetGroup onSelectHisAssetGroup() {

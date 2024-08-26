@@ -61,7 +61,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private OrgInfo selectSite;
 
     private List<EfficiencyEquipmentInfo> currentPageAssets;
-
+    @Getter
+    @Setter
+    private Integer filterAssetGroup;
     //复选的设备
     @Getter
     @Setter

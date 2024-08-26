@@ -17,7 +17,7 @@
 
             <h:form id="hisAssetListForm2">
                 <p:dataTable id="hisAssetDataList" value="#{hisAssetGroupClinicalMatchController.lazyModel}"
-                             var="item"
+                             var="item" widgetVar="hisAssetDataList"
                              lazy="true" paginator="true" paginatorPosition="bottom"
                              paginatorAlwaysVisible="true"
                              selectionMode="single" selection="#{hisAssetGroupClinicalMatchController.selected}"
@@ -26,8 +26,9 @@
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
+                    <p:ajax event="filter" listener="#{hisAssetGroupClinicalMatchController.onFilter}"/>
 
-                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}">
+                    <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.assetInfo.name}"/>
                     </p:column>
 
@@ -43,11 +44,17 @@
                         <h:outputText value="#{item.assetInfo.qrCode}"/>
                     </p:column>
 
-                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}">
-                        <h:outputText value="#{item.hisAssetGroupAssetMatch.hisAssetGroup.name}"/>
+                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}"  filterBy="#{item.hisAssetGroup.name}" filterMatchMode="LIKE"   >
+                        <h:outputText value="#{item.hisAssetGroup.name}"/>
                     </p:column>
-                    <p:column headerText="分组类型" sortBy="#{item.hisAssetGroupAssetMatch.hisAssetGroup.type}">
-                        <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroupAssetMatch.hisAssetGroup.type)}"/>
+                    <p:column headerText="分组类型" sortBy="#{item.hisAssetGroup.type}"   filterBy="#{item.hisAssetGroup.type}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu  onchange="PF('hisAssetDataList').filter()"   value="#{hisAssetGroupClinicalMatchController.groupType}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroup.type)}"/>
                     </p:column>
 
                     <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
@@ -61,7 +68,7 @@
 
                     </p:column>
 
-                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}"  filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE"    >
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
 
                     </p:column>

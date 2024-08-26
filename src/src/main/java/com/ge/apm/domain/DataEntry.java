@@ -26,6 +26,16 @@ public class DataEntry implements Serializable {
     @Column(name = "asset_group_uid")
     private String  assetGroupUid;
 
+    @Column(name = "asset_group_org_info_uid")
+    private String  assetGroupOrgInfoUid;
+
+
+//    @Column(name = "org_info_uid")
+//    private String  orgInfoUid;
+//
+//    @Column(name = "clinical_dept_uid")
+//    private String  clinicalDeptUid;
+
     @Column(name = "his_asset_group_asset_match_uid")
     private String hisAssetGroupAssetMatchUid;
 
@@ -39,8 +49,10 @@ public class DataEntry implements Serializable {
     private Date createdDate;//创建时间
 
     @Column(name = "start_Date")
+    @Temporal(TemporalType.DATE)
     private Date startDate;
     @Column(name = "end_date")
+    @Temporal(TemporalType.DATE)
     private Date endDate;
     @Column(name = "operation_user_uid")
     private String operationUserUid;
