@@ -33,4 +33,25 @@ public class HisAssetGroup implements Serializable {
     @Size(max = 32)
     private String tenantUid;
 
+
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uuid != null ? uuid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof HisAssetGroup)) {
+            return false;
+        }
+        HisAssetGroup other = (HisAssetGroup) object;
+        if ((this.uuid == null && other.uuid != null) || (this.uuid != null && !this.uuid.equals(other.uuid))) {
+            return false;
+        }
+        return true;
+    }
+
 }

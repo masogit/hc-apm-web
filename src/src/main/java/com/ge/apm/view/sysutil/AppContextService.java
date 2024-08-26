@@ -9,6 +9,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import com.ge.apm.service.common.ConfigCacheService;
 import org.hibernate.Cache;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,10 +26,11 @@ public class AppContextService implements Serializable{
 
     private EntityManager em;
     private static String sqlPagingTemplate;
-
+    private ConfigCacheService configCacheService;
     @PostConstruct
     public void init() {
         em = WebUtil.getBean(EntityManager.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
     }
 
     public static String getSqlPagingTemplate() {
@@ -107,5 +109,9 @@ public class AppContextService implements Serializable{
      
      public Date getCurentDate(){
          return TimeUtil.now();
+     }
+
+     public void clearRedisCache(){
+         configCacheService.cleanCacheNames();
      }
 }
