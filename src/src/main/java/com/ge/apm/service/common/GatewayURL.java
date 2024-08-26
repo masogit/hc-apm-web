@@ -195,6 +195,10 @@ public enum GatewayURL {
     SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
     SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),
     SECONDMENT_GENERATE_NO("/hcapmworkflowservice/api/apm/secondment/getNo"),
+    // clear redis cache
+    CLEAN_ORG_CACHE("/api/apm/configCache/cleanOrgInfoCache/{uid}"),
+    CLEAN_TENANT_CACHE("/api/apm/configCache/cleanTenantCache/{uid}"),
+    CLEAN_CACHE_NAMES("/api/apm/configCache/cleanCacheNames"),
     ;
     private final String url;
 
