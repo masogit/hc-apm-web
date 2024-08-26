@@ -199,6 +199,7 @@ public class OrgInfoService {
                             found.setHospitalUcmid(ucmid);
 
                             orgDao.save(found);
+                            configCacheService.cleanOrgInfoCacheByUid(found.getUid());
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
                             }
@@ -216,6 +217,7 @@ public class OrgInfoService {
                             if (institution == null) {
                                 institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, tenantOrgInfo, institutionName);
                                 orgDao.save(institution);
+                                configCacheService.cleanOrgInfoCacheByUid(institution.getUid());
                                 institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
                                 message = "导入成功";
                             }
@@ -239,6 +241,7 @@ public class OrgInfoService {
                                 }
                                 hospital.setHospitalUcmid(ucmid);
                                 orgDao.save(hospital);
+                                configCacheService.cleanOrgInfoCacheByUid(hospital.getUid());
                                 hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
                                 message = "导入成功";
                             }
@@ -255,6 +258,7 @@ public class OrgInfoService {
                             if (site == null) {
                                 site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
                                 orgDao.save(site);
+                                configCacheService.cleanOrgInfoCacheByUid(site.getUid());
                                 site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
                                 message = "导入成功";
                             }
@@ -273,6 +277,7 @@ public class OrgInfoService {
                                     if (depart == null) {
                                         depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, childDepartName, clinicalParent, clinicalOrgLevel);
                                         orgDao.save(depart);
+                                        configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
                                         message = "导入成功";
                                     }
 
@@ -285,6 +290,7 @@ public class OrgInfoService {
                                 if (depart == null) {
                                     depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
                                     orgDao.save(depart);
+                                    configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
                                     message = "导入成功";
                                 }
                             }
