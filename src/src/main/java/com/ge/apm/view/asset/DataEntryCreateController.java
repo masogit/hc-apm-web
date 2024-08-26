@@ -260,6 +260,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                     assetDataEntrys.add(dataEntry);
                 }
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
+                crudActionName = "Create";
+                filterDeptOrg=null;
+                selectAssets=new ArrayList<>();
+
 
             } else {
                 //edit
