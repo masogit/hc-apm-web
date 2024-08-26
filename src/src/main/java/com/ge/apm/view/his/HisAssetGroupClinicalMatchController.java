@@ -37,6 +37,9 @@ public class HisAssetGroupClinicalMatchController extends GenericCRUDUUIDControl
     @Setter
     private Integer filterAssetGroup;
 
+    @Getter
+    @Setter
+    private String groupType;
     @Override
     protected void init() {
         hisAssetGroupClinicalMatchRepository = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);

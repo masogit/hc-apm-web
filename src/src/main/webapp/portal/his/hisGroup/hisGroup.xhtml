@@ -15,8 +15,8 @@
 
             <div class="ui-g-12 card">
                 <h:form id="hisGlobalGroupListForm">
-                    <p:dataTable id="datalist" value="#{hisGlobalAssetGroupController.getAllHisAssetGroup()}"
-                                 var="item"
+                    <p:dataTable id="datalist" value="#{hisGlobalAssetGroupController.lazyModel}"
+                                 var="item"  widgetVar="datalist"
                                  lazy="true" paginator="true" paginatorPosition="bottom"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single" selection="#{hisGlobalAssetGroupController.selected}"
@@ -28,12 +28,19 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{hisGlobalAssetGroupController.onSelectHisAssetGroup()}" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{hisGlobalAssetGroupController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{hisGlobalAssetGroupController.onFilter}"/>
 
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                        <p:column headerText="#{msg.name}" sortBy="#{item.name}"  filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="分组类型" sortBy="#{item.type}">
+
+                        <p:column headerText="分组类型" sortBy="#{item.type}"  filterBy="#{item.type}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{hisGlobalAssetGroupController.groupType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.type)}"/>
                         </p:column>
 
