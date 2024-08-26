@@ -3,10 +3,11 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.his.HisAssetGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
 
-public interface HisAssetGroupRepository extends JpaRepository<HisAssetGroup,String> {
+public interface HisAssetGroupRepository  extends GenericRepositoryUUID<HisAssetGroup> {
 
     @Query(value = "select * from his_asset_group where name = ?1", nativeQuery = true)
     HisAssetGroup findByName(String assetGroupName);

@@ -130,6 +130,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
                 searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, siteOrgUidsByParentUid));
             }
         }
+        searchFilters.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Income"));
 
         Page<HisAssetGroupAssetMatch> page = groupAssetMatchRepository.findBySearchFilter(searchFilters,pageRequest);
         currentPagePmOrders = page.getContent();
@@ -418,6 +419,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             }
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
             searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.EQ,assetGroupName));
+            searchFilters.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Income"));
             List<HisAssetGroupAssetMatch> bySearchFilter = groupAssetMatchRepository.findBySearchFilter(searchFilters);
             if(CollectionUtils.isNotEmpty(bySearchFilter)){
                 assetGroupByGroupName.addAll(bySearchFilter);
