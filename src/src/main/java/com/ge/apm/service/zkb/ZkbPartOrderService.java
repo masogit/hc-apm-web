@@ -358,10 +358,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             b = zkbContract.getSpareQuotaTotal();
         }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             a = unReturnQty;
-            b = zkbContract.getSpareArtificailTotal();
+            b = zkbContract.getSpareArtificailTotal() + (zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal());
         }else{
             a = unReturnQty;
-            b = zkbContract.getSpareArtificailTotal();
+            b = zkbContract.getSpareQuotaTotal();
         }
         boolean flag = true;
         double d = b * 0.3 ;
@@ -465,7 +465,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
         List<SearchFilter> filters = new ArrayList<>();
-        filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
+        List<String> orderTypes = Arrays.asList("Parts","Probe","Tool");
+        filters.add(new SearchFilter("orderType", SearchFilter.Operator.IN, orderTypes));
         filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
@@ -485,10 +486,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
         int a = 0;
         int b = 0;
-        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-            List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
-            int qty = 0;
-            for(ZkbPartOrder o : zkbPartOrders){
+        b += zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
+        b += zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
+        b += zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
+        b += zkbContract.getSpareQuotaTotal() == null ? 0 :  zkbContract.getSpareQuotaTotal();
+        b += zkbContract.getSpareArtificailTotal() == null ? 0 :  zkbContract.getSpareArtificailTotal();
+        b += zkbContract.getPartHighQuotaTotal() == null ? 0 :  zkbContract.getPartHighQuotaTotal();
+
+        List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
+        int qty = 0;
+        for(ZkbPartOrder o : zkbPartOrders){
+            if(ZkbPartOrder.OrderType.Probe.toString().equals(o.getOrderType())){
                 if(o.getZkbPartOrderCat() != null && ZkbPartOrderCat.ValueType.HighValue.toString().equals(o.getZkbPartOrderCat().getValueType())){
                     continue;
                 }
@@ -508,61 +516,33 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }
                 }
-                //qty++;
+                qty += o.getQty();
+            }if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
                 qty += o.getQty();
             }
-            a = qty ;
-            b = zkbContract.getProbeQuotaTotal() + (zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal())+(zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal());
-        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-
-            List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
-            Integer unReturnQty = 0;
-            for(ZkbPartOrder o : zkbPartOrders){
-                unReturnQty += o.getQty();
-            }
-
-            List<SearchFilter> partFilters = new ArrayList<>();
-            partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
-            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
-            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
-            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
-            List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
-            List<String> partReturnIds = new ArrayList<>();
-            Integer partQty = 0;
-            for(ZkbPartOrder o : partReturnZkbPartOrders){
-                partReturnIds.add(o.getId());
-                partQty += o.getQty();
-            }
-            List<SearchFilter> returnFilters = new ArrayList<>();
-            returnFilters.add(new SearchFilter("partOrderId", SearchFilter.Operator.IN, partReturnIds));
-            returnFilters.add(new SearchFilter("dataStatus", SearchFilter.Operator.EQ, ZkbPartOrderReturn.DataStatusEnum.Accept.toString()));
-            List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findBySearchFilter(returnFilters);
-            Integer partReturnQty  = 0;
-            for(ZkbPartOrderReturn r : zkbPartOrderReturns){
-                partReturnQty += r.getQty();
-            }
-            unReturnQty += (partQty - partReturnQty);
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
-                a = unReturnQty;
-                b = zkbContract.getSpareQuotaTotal();
-            }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-                /*if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    a = unReturnQty;
-                    b = zkbContract.getSpareArtificailTotal();
-                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    a = unReturnQty;
-                    b = zkbContract.getPartHighQuotaTotal();
-                }else{
-//                    a = unReturnQty;
-//                    b = zkbContract.getSpareArtificailTotal();
-                }*/
-                a = unReturnQty;
-                b = (zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal()) + (zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal());
-            }else {
-                a = unReturnQty;
-                b = zkbContract.getSpareArtificailTotal();
-            }
         }
+        List<SearchFilter> partFilters = new ArrayList<>();
+        partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
+        partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
+        partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
+        partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
+        List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
+        List<String> partReturnIds = new ArrayList<>();
+        int partQty = 0;
+        for(ZkbPartOrder o : partReturnZkbPartOrders){
+            partReturnIds.add(o.getId());
+            partQty += o.getQty();
+        }
+        List<SearchFilter> returnFilters = new ArrayList<>();
+        returnFilters.add(new SearchFilter("partOrderId", SearchFilter.Operator.IN, partReturnIds));
+        returnFilters.add(new SearchFilter("dataStatus", SearchFilter.Operator.EQ, ZkbPartOrderReturn.DataStatusEnum.Accept.toString()));
+        List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findBySearchFilter(returnFilters);
+        int partReturnQty  = 0;
+        for(ZkbPartOrderReturn r : zkbPartOrderReturns){
+            partReturnQty += r.getQty();
+        }
+        a += qty + (partQty - partReturnQty);
+
         if(b <= 0){
             return true;
         }
@@ -1845,20 +1825,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
-                if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    Integer total = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
-                    double l = total * 0.7;
-                    Integer molecule = ( zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply()) + (zkbContract.getPartHighQuotaUse() == null ? 0 : zkbContract.getPartHighQuotaUse());
-                    if(molecule > l){
-                        return true;
-                    }
-                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
-                    double l = total * 0.7;
-                    Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
-                    if(molecule > l){
-                        return true;
-                    }
+                int partHighQuotaTotal = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
+                int spareArtificailTotal = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+                int total = partHighQuotaTotal + spareArtificailTotal;
+                double l = total * 0.7;
+                Integer molecule = ( zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply()) + (zkbContract.getPartHighQuotaUse() == null ? 0 : zkbContract.getPartHighQuotaUse());
+                molecule += ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+                if(molecule > l){
+                    return true;
                 }
             }else {
                 int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
