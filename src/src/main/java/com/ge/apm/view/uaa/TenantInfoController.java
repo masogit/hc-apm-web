@@ -433,6 +433,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			return;
 		}
 		super.delete();
+		configCacheService.cleanTenantCacheByUid(uid);
 		log.info("delete tenantInfo successful, uid:{}", uid);
 	}
 
