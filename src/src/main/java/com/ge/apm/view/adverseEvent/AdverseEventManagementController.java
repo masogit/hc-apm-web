@@ -3,6 +3,7 @@ package com.ge.apm.view.adverseEvent;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
@@ -113,7 +114,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private List<TempFileUtil> injuryPerformance;
     @Getter@Setter
     private List<TempFileUtil> mechanicalFailure;
-
+    private AdverseEventsService adverseEventsService;
     private boolean renderedSearchForm = true;
 
     private boolean readOnlyCreateForm = false;
@@ -127,6 +128,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private String[] selectedOptions;
     private ConfigItemMapper configItemMapper;
     ConfigItemValue configItemValue;
+
+    @Getter@Setter
+    private StreamedContent excelFile;
 
     @Override
     protected void init() {
@@ -144,7 +148,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
         configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
-
+        adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
 
         /*属性类*/
@@ -493,6 +497,24 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }
+
+    public void exportExcel(){
+        PageRequest p = new PageRequest(0, 10000);
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), p, eventStatusFilter, queryStr, "report");
+        List<AdverseEvents> adverseEventsList = pageResult.getContent();
+        for(AdverseEvents adverseEvents : adverseEventsList){
+            MultiLevelApproval recentApprove = multiLevelApprovalRepository.getRecentApprove(adverseEvents.getUid());
+            if (recentApprove != null) {
+                adverseEvents.setActualApproverName(recentApprove.getActualApproverName());
+                adverseEvents.setActualApproverDate(recentApprove.getActualApproverDate());
+                adverseEvents.setApprovalOpinion(recentApprove.getApprovalOpinion());
+            }
+        }
+        InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
+
+    }
+
 
     public boolean getCanExport() {
         this.canExport = !selectedMap.values().stream().anyMatch(Boolean::booleanValue);

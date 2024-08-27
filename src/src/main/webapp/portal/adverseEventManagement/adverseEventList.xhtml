@@ -115,6 +115,9 @@
                             <p:commandButton id="batchExportButton" ajax="false" title="批量导出PDF" actionListener="#{adverseEventManagementController.downLoadPdf()}" icon="ui-icon-file-download" disabled="#{adverseEventManagementController.canExport}" validateClient="true">
                                 <p:fileDownload value="#{adverseEventManagementController.exportPdf}"/>
                             </p:commandButton>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{adverseEventManagementController.exportExcel}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{adverseEventManagementController.excelFile}"/>
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
