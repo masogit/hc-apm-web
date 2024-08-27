@@ -327,14 +327,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         if(!fiveNineNine){
             contractError = true;
         }
-        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
-        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-            if(this.zkbAssetInfo.getRepairForm()!=null && 2 != this.zkbAssetInfo.getRepairForm()){
-                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
-                this.contractError = true;
-                return;
-            }
-        }
         //CCS、Biomed类型合同申请超声高端机以及depot只能外修
         if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
             List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
@@ -345,6 +337,27 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 return;
             }
         }
+        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(this.zkbAssetInfo.getRepairForm()!=null && 2 != this.zkbAssetInfo.getRepairForm()){
+                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
+                this.contractError = true;
+                return;
+            }else if(this.zkbAssetInfo.getRepairForm() !=null && 2 == this.zkbAssetInfo.getRepairForm()){
+                if(zkbAssetInfo.getAssetGroup() == 1){
+                    WebUtil.addErrorMessage("GEFE维修外修不允许申请放射类设备！","");
+                    this.contractError = true;
+                    return;
+                }else if(2==zkbAssetInfo.getAssetGroup()){
+                    if(ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
+                        WebUtil.addErrorMessage("GEFE维修外修不允许申请超声低端机设备！","");
+                        this.contractError = true;
+                        return;
+                    }
+                }
+            }
+        }
+
         if(2==zkbAssetInfo.getAssetGroup()//超声
                 &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机
                 &&2 == zkbAssetInfo.getRepairForm()//外修
