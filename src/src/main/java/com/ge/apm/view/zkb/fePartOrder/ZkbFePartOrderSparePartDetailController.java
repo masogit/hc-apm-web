@@ -383,17 +383,9 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return ;
             }
         }
-        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
-        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-            if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
-                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
-                this.contractError = true;
-                return;
-            }
-        }
+
         //YHAAO-20623
         //ZKB CCS 2.0 offer 需要区分超声高端机New和old，并实现相关逻辑
-
         if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
             List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
                     (this.selected.getSystemId().equals(zc.getAssetInfo().getSystemId()))).collect(Collectors.toList());
@@ -410,6 +402,27 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(StringUtils.isNotBlank(this.selected.getAssetId())){
             assetInfo = assetInfoRepository.getByUid(this.selected.getAssetId());;
         }
+        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(this.selected.getRepairForm()!=null && 2 != this.selected.getRepairForm()){
+                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
+                this.contractError = true;
+                return;
+            }else if(this.selected.getRepairForm()!=null && 2 == this.selected.getRepairForm()){
+                if(assetInfo.getAssetGroup() == 1){
+                    WebUtil.addErrorMessage("GEFE维修外修不允许申请放射类设备！","");
+                    this.contractError = true;
+                    return;
+                }else if(assetInfo.getAssetGroup() == 2){
+                    if(ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
+                        WebUtil.addErrorMessage("GEFE维修外修不允许申请超声低端机设备！","");
+                        this.contractError = true;
+                        return;
+                    }
+                }
+            }
+        }
+
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),assetInfo.getUid());
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
