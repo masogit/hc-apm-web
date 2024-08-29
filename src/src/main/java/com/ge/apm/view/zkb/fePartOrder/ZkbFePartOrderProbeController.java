@@ -550,9 +550,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                     this.contractError = true;
                     return;
                 }else if(assetInfo.getAssetGroup() == 2){
-                    if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType()) ||
-                            ZkbContractAsset.AssetTypeEnum.lowMachine.toString().equals(zkbContractAsset.getAssetType()) ){
+                    if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
                         WebUtil.addErrorMessage("GEFE维修探头申请不能申请超声depot设备！","");
+                        this.contractError = true;
+                        return;
+                    }else if(ZkbContractAsset.AssetTypeEnum.lowMachine.toString().equals(zkbContractAsset.getAssetType()) ){
+                        WebUtil.addErrorMessage("GEFE维修探头申请不能申请超声低端机设备！","");
                         this.contractError = true;
                         return;
                     }
