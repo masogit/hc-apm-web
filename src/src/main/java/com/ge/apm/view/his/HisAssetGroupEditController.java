@@ -139,12 +139,15 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                selectedMap.put(assetInfo.getUid(),true);
            }
         }
+        selectedAssets.addAll(selectAssetInfos);
     }
 
     public void clearAssetInfo(){
         selectAssetInfos.clear();
         availableAssets.getSource().addAll(availableAssets.getTarget());
         availableAssets.getTarget().clear();
+        selectedAssets.clear();
+        selectedMap=new HashMap<>();
     }
     public void removeAssetInfo(){
         List<AssetInfo> target = availableAssets.getTarget();
@@ -153,6 +156,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             boolean b = selectAssetInfos.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
             if(b){
                 selectAssetInfos.remove(assetInfo);
+                selectedAssets.remove(assetInfo);
             }
             if(target.contains(assetInfo)){
                 target.remove(assetInfo);
@@ -296,6 +300,12 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
 //        List<AssetInfo> targetAssets = availableAssets.getTarget();
         List<AssetInfo>  targetAssets=selectAssetInfos;
+        double sum = targetAssets.stream().mapToDouble(AssetInfo::getScaleAssessment).sum();
+        if(sum>100){
+            WebUtil.addErrorMessage("均摊比例不能大于100");
+            return;
+        }
+
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
 
@@ -340,6 +350,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null,selectedOrg);
             WebUtil.addSuccessMessage("创建成功");
         }
+        selectedAssets=new HashSet<>();
+        selectAssetInfos=new ArrayList<>();
+        selectedMap=new HashMap<>();
+        isAllSelected=false;
 
     }
 
@@ -403,7 +417,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 if(hisAssetGroup.getType().equals("Income")){
                     getQueryAssetsList();
                 }
-                selectAssetInfos=targetAssets;
+                selectAssetInfos.addAll(targetAssets);
                 for (AssetInfo selectAssetInfo : selectAssetInfos) {
                     selectAssetInfo.setScaleAssessment(doubleMap.get(selectAssetInfo.getUid()));
                 }
