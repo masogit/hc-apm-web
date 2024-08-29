@@ -64,7 +64,7 @@
                         </p:inputNumber>
                     </h:panelGroup>
 
-                    <p:commandButton actionListener="#{hisAssetGroupEditController.getQueryAssetsList2()}"
+                    <p:commandButton  validateClient="false" immediate="true" actionListener="#{hisAssetGroupEditController.getQueryAssetsList2()}"
                                      value="查询" update="HisAssetsPickList"
                                      icon="ui-icon-check"
                     />
@@ -76,9 +76,9 @@
 
                 </p:panelGrid>
 
-                <p:pickList id="HisAssetsPickList" value="#{hisAssetGroupEditController.availableAssets}" var="item"
+                <p:pickList id="HisAssetsPickList" value="#{hisAssetGroupEditController.availableAssets}" var="item" widgetVar="item"
                             itemValue="#{item}" itemLabel="#{item.name}-#{item.departNum}-#{item.serialNum}-#{item.clinicalDeptName}-#{item.functionType}" showCheckbox="false" responsive="true"
-                            showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter">
+                            showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter" immediate="true"  >
                     <f:facet name="sourceCaption">
 
                         <p  style="padding-bottom:-200px">#{msg.EquipmentToBeSelected}
@@ -116,12 +116,12 @@
                 </p:pickList>
 
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <p:commandButton validateClient="true" value="添加已勾选设备"
-                                     update="hisTagEditForm:selectAssetInfos"
+                    <p:commandButton validateClient="false"   immediate="true"  value="添加已勾选设备"
+                                     update="@(form)" process="@this"
                                      action="#{hisAssetGroupEditController.addAssetInfo}" />
 
-                    <p:commandButton validateClient="true" value="一键均摊"
-                                     update="hisTagEditForm:selectAssetInfos"
+                    <p:commandButton validateClient="false"   immediate="true"  value="一键均摊"
+                                     update="@(form)" process="@this"
                                      action="#{hisAssetGroupEditController.sharedEquallyProportion}" style="float:right;" />
                 </p:panelGrid>
 
@@ -166,11 +166,11 @@
                 </p:panelGrid>
 
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <p:commandButton validateClient="true" value="删除已勾选设备"
-                                     update=":tabGroup:hisTagEditForm:selectAssetInfos :tabGroup:hisTagEditForm:HisAssetsPickList"
+                    <p:commandButton validateClient="false" immediate="true" value="删除已勾选设备"
+                                     update="@(form)" process="@this"
                                      action="#{hisAssetGroupEditController.removeAssetInfo}" />
-                    <p:commandButton  validateClient="true" value="清空"
-                                     update=":tabGroup:hisTagEditForm:selectAssetInfos :tabGroup:hisTagEditForm:HisAssetsPickList"
+                    <p:commandButton  validateClient="false"   immediate="true"    value="清空"
+                                      update="@(form)" process="@this"
                                      action="#{hisAssetGroupEditController.clearAssetInfo}" />
                 </p:panelGrid>
 
