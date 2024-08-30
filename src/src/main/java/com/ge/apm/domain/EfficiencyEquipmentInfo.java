@@ -74,7 +74,7 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
-    @Column(name = "report_config")
+    @Column(name = "report_config", columnDefinition = "VARCHAR(1024)")
     private String reportConfig;
 
 
