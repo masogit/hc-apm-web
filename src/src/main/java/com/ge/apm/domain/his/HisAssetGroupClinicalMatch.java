@@ -50,7 +50,7 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
-    @Column(name = "scale_assessment",scale = 6)
+    @Column(name = "scale_assessment", precision = 10, scale = 6)
     private BigDecimal  scaleAssessment;
 
     //orgInfo表Uid
