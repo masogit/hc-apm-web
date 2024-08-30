@@ -350,7 +350,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }
                 }
-                if("High".equals(zkbPartOrder.getProbeQuotaType())){
+                if("High".equals(o.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
                         if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
@@ -359,7 +359,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                 }
                 qty += o.getQty();
-            }if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            }if(ZkbPartOrder.OrderType.Parts.toString().equals(o.getOrderType())){
                 qty += o.getQty();
             }
         }
