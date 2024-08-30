@@ -7,7 +7,21 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
-
+        <style>
+            .warrantyExpireSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .warrantyExpired {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -15,40 +29,8 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
-                    <h:panelGrid id="searchPanel" columns="3">
+                    <h:panelGrid id="searchPanel" columns="3" >
                         <h:panelGroup >
-<!--                            <p:commandButton id="btnOrg"-->
-<!--                                             value="#{empty efficiencyEquipmentInfoController.selectSite? msg.AllHospitals:efficiencyEquipmentInfoController.selectSite.name}"-->
-<!--                                             type="button" icon="fa fa-angle-down" iconPos="right"/>-->
-<!--                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"-->
-<!--                                            modal="false">-->
-<!--                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>-->
-<!--                                <p:commandButton partialSubmit="true" icon="ui-icon-search"-->
-<!--                                                 process=":searchForm:treeNodeNameFilter @this"-->
-<!--                                                 update="searchForm:orgTree"-->
-<!--                                                 actionListener="#{orgTreeController.filterTreeNodeByName()}"-->
-<!--                                                 value="#{msg.Search}"/>-->
-<!--                                <p:scrollPanel style="height:300px;border: 0" mode="native">-->
-<!--                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;"-->
-<!--                                            value="#{orgTreeController.siteOrgTree}"-->
-<!--                                            selection="#{orgTreeController.selectedOrgNode}" var="node"-->
-<!--                                            selectionMode="single" dynamic="true">-->
-<!--                                        <p:ajax process="@this" event="select"-->
-<!--                                                listener="#{efficiencyEquipmentInfoController.onSelectSiteTreeNode}"-->
-<!--                                                update=":EfficiencyEquipmentInfoListForm :searchForm"-->
-<!--                                                oncomplete="PF('varPanelOrg').hide();"/>-->
-<!--                                        <p:ajax process="@this" event="expand"/>-->
-<!--                                        <p:ajax process="@this" event="collapse"/>-->
-<!--                                        <p:treeNode type="org">-->
-<!--                                            <h:outputText value="#{node.name}"/>-->
-<!--                                        </p:treeNode>-->
-<!--                                        <p:treeNode type="hidden" rendered="false"/>-->
-<!--                                    </p:tree>-->
-<!--                                </p:scrollPanel>-->
-<!--                            </p:overlayPanel>-->
-
-
-
                                 <p:commandButton id="btnOrg" value="#{empty efficiencyEquipmentInfoController.selectSite? msg.AllHospitals:efficiencyEquipmentInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                                 <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                     <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -65,11 +47,37 @@
                                         </p:tree>
                                     </p:scrollPanel>
                                 </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
 
+                    <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">开始时间*</label>
+                            <p:calendar timeZone="GMT+8" id="startTime" value="#{efficiencyEquipmentInfoController.startDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                                        >
+                                <p:ajax event="dateSelect"></p:ajax>
+
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">截至时间*</label>
+                            <p:calendar timeZone="GMT+8" id="endTime" value="#{efficiencyEquipmentInfoController.endDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"></p:ajax>
+
+                            </p:calendar>
                         </h:panelGroup>
 
-
-                    </h:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton process="@this"
+                                             value="查询" update="EfficiencyEquipmentInfoListForm"
+                                             icon="ui-icon-check"
+                            />
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </h:form>
 
                 <h:form id="EfficiencyEquipmentInfoListForm">
@@ -159,31 +167,43 @@
 
                         <p:column headerText="采购金额"  filterBy="#{item.assetInfo.purchasePrice}"
                                   filterMatchMode="GET">
-                            <h:outputText value="#{item.assetInfo.purchasePrice}"/>
+                            <h:outputText value="#{item.purchasePrice}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
 
-                        <p:column headerText="使用率" >
-                            <h:outputText value="#{item.usageRate}"/>
-                        </p:column>
+<!--                        <p:column headerText="使用率" >-->
+<!--                            <h:outputText value="#{item.usageRate}"/>-->
+<!--                        </p:column>-->
 
                         <p:column headerText="检查人次" >
-                            <h:outputText value="#{item.checkNumberPeople}"/>
+                            <h:outputText value="#{item.checkNumberPeople}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
 
-                        <p:column headerText="检查时长" >
-                            <h:outputText value="#{item.checkTimeLength}"/>
-                        </p:column>
+<!--                        <p:column headerText="检查时长" >-->
+<!--                            <h:outputText value="#{item.checkTimeLength}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="收入" >
-                            <h:outputText value="#{item.income}"/>
+                            <h:outputText value="#{item.income}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="成本" >
-                            <h:outputText value="#{item.cost}"/>
+                            <h:outputText value="#{item.cost}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="利润" >
-                            <h:outputText value="#{item.profits}"/>
+                            <h:outputText value="#{item.profits}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="利润率" >
-                            <h:outputText value="#{item.profitsRate}"/>
+                            <h:outputText value="#{item.profitsRate}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createBatchButton"  icon="fa fa-cogs"

@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  *
@@ -49,8 +50,8 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
-    @Column(name = "scale_assessment",columnDefinition = "decimal(11,2)")
-    private Double  scaleAssessment;
+    @Column(name = "scale_assessment",scale = 6)
+    private BigDecimal  scaleAssessment;
 
     //orgInfo表Uid
     @Column(name = "org_info_uid")
@@ -62,7 +63,7 @@ public class HisAssetGroupClinicalMatch implements Serializable {
 
     @Transient
     @TableField(exist = false)
-    private Double  amount;
+    private BigDecimal amount;
 
 
     @ManyToOne(fetch = FetchType.EAGER)

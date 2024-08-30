@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -270,11 +271,11 @@ public class HisAssetGroupService {
         boolean flag=false;
 
 
-        Map<String, Double> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
-        Map<String, Double> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+        Map<String, BigDecimal> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
 
-        for (Map.Entry<String, Double> stringDoubleEntry : listMap.entrySet()) {
-            Double aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+        for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
+            BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
             if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
                 flag=true;
             }
@@ -349,11 +350,11 @@ public class HisAssetGroupService {
             return Boolean.TRUE;
         }
 
-        Map<String, Double> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
-        Map<String, Double> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+        Map<String, BigDecimal> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
 
-        for (Map.Entry<String, Double> stringDoubleEntry : listMap.entrySet()) {
-             Double aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+        for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
+            BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
             if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
                 return Boolean.TRUE;
             }

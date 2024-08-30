@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -37,10 +38,10 @@ public class DataEntryAssetDetail implements Serializable {
     private String entryType; //录入类型
 
     @Column(name = "entry_amount")
-    private Double entryAmount;  //录入金额
+    private BigDecimal entryAmount;  //录入金额
 
-    @Column(name = "cost_amount")
-    private Double  costAmount;
+    @Column(name = "cost_amount",scale = 6)
+    private BigDecimal  costAmount;
 
     @Column(name = "created_date")
     private Date createdDate;//创建时间

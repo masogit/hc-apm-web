@@ -1,11 +1,13 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.EfficiencyEquipmentInfoRepository;
+import com.ge.apm.dao.*;
 
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.AssetCostAmountInfoMapper;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.HisEquipmentDataResultMapper;
+import com.ge.apm.dao.mapper.IotPerformanceInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.AssetCostDTO;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.EfficiencyEquipmentInfoService;
 import com.ge.apm.service.uaa.UaaService;
@@ -22,10 +24,12 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DualListModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -33,6 +37,9 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,7 +97,19 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
+
+    private Date startDate=DateUtil.currentMonthFirstDay();
+
+    private Date endDate=new Date();
+
     private UserSiteOrgTreeComponentController userSiteOrgTreeComponentController;
+
+    private HisEquipmentDataResultMapper hisEquipmentDataResultMapper;
+
+
+    private AssetCostAmountInfoMapper assetCostAmountInfoMapper;
+
+    private IotPerformanceInfoMapper iotPerformanceInfoMapper;
 
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
@@ -111,6 +130,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
         userSiteOrgTreeComponentController = WebUtil.getBean(UserSiteOrgTreeComponentController.class);
         userSiteOrgTreeComponentController.registerController(this);
+        hisEquipmentDataResultMapper = WebUtil.getBean(HisEquipmentDataResultMapper.class);
+        assetCostAmountInfoMapper = WebUtil.getBean(AssetCostAmountInfoMapper.class);
+        iotPerformanceInfoMapper = WebUtil.getBean(IotPerformanceInfoMapper.class);
 
         this.selectedMap = new HashMap();
     }
@@ -145,8 +167,41 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
         Page<EfficiencyEquipmentInfo> page = efficiencyEquipmentInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets=page.getContent();
+        if(!CollectionUtils.isEmpty(currentPageAssets)){
+
+            calculationData(currentPageAssets);
+        }
         return page;
     }
+
+    private void calculationData(List<EfficiencyEquipmentInfo> currentPageAssets) {
+        List<String> assetUids = currentPageAssets.stream().map(EfficiencyEquipmentInfo::getAssetUid).collect(Collectors.toList());
+        List<AssetCostDTO> hisResult= hisEquipmentDataResultMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
+        Map<String, AssetCostDTO> hisResultMap = hisResult.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
+        List<AssetCostDTO> assetCost=  assetCostAmountInfoMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
+        Map<String, AssetCostDTO> assetCostMap = assetCost.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
+        List<AssetCostDTO>  iotList= iotPerformanceInfoMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
+        Map<String, AssetCostDTO> iotMap = iotList.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
+        for (EfficiencyEquipmentInfo currentPageAsset : currentPageAssets) {
+            AssetCostDTO hisResultDto= hisResultMap.get(currentPageAsset.getAssetUid());
+            AssetCostDTO iot = iotMap.get(currentPageAsset.getAssetUid());
+            AssetCostDTO assetCostDTO = assetCostMap.get(currentPageAsset.getAssetUid());
+            BigDecimal income=hisResultDto!=null?hisResultDto.getAmount()!=null?hisResultDto.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
+            BigDecimal cost=assetCostDTO!=null?assetCostDTO.getAmount()!=null?assetCostDTO.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
+            BigDecimal checkNumberPeople=iot!=null?iot.getCheckNumberPeople()!=null?iot.getCheckNumberPeople():BigDecimal.ZERO:BigDecimal.ZERO;
+            currentPageAsset.setIncome(income);
+            currentPageAsset.setCost(cost);
+            currentPageAsset.setCheckNumberPeople(checkNumberPeople);
+            currentPageAsset.setProfits(income.subtract(cost));
+            if(!income.equals(BigDecimal.ZERO)){
+                currentPageAsset.setProfitsRate((income.subtract(cost)).divide(income,2));
+            }else{
+                currentPageAsset.setProfitsRate(BigDecimal.ZERO);
+            }
+        }
+
+    }
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
 
         this.searchFilters.clear();
@@ -360,5 +415,21 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     public void setSelectSite(OrgInfo selectSite) {
         this.selectSite = selectSite;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
