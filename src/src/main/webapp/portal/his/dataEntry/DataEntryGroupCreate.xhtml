@@ -99,10 +99,14 @@
                             <h:outputText value="#{asset.assetInfo.name}"/>
                         </p:column>
                         <p:column headerText="金额">
-                            <h:outputText value="#{asset.amount}"/>
+                            <p:inputText  value="#{asset.amount}" readonly="true">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </p:inputText>
                         </p:column>
                         <p:column headerText="分摊比例">
-                            <h:outputText value="#{asset.scaleAssessment}"/>
+                            <p:inputText  value="#{asset.scaleAssessment}" readonly="true">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </p:inputText>
                         </p:column>
                     </p:dataTable>
                 </p:panelGrid>
