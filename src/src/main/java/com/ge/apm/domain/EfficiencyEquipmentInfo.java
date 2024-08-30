@@ -74,6 +74,9 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
+    @Column(name = "report_config")
+    private String reportConfig;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
@@ -225,6 +228,14 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     }
 
 
+    public String getReportConfig() {
+        return reportConfig;
+    }
+
+    public void setReportConfig(String reportConfig) {
+        this.reportConfig = reportConfig;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -241,5 +252,7 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
         EfficiencyEquipmentInfo other = (EfficiencyEquipmentInfo) object;
         return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
     }
+
+
 
 }

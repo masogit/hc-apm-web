@@ -16,7 +16,7 @@
                 <h:form id="secondmentOrderManage">
                     <p:panelGrid columns="1" layout="grid">
                         <h:panelGroup>
-                            <p:dataTable id="datalist" value="#{workOrderESHistoryController.lazyModel}" var="item" widgetVar="secondmentOrderManageList"
+                            <p:dataTable id="datalist" value="#{workOrderESHistoryController.lazyModel}" var="item" widgetVar="varDataList"
                                          selectionMode="single"  selection="#{workOrderESHistoryController.selected}"
                                          lazy="true" paginator="true" paginatorPosition="both"  paginatorAlwaysVisible="true"
                                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -25,15 +25,16 @@
                                          rows="20" emptyMessage="#{msg.noRecordFound}"
                                          rowsPerPageTemplate="10,20,50,100">
 
+                                <p:ajax event="rowSelect" listener="#{workOrderESHistoryController.onSelectOrder}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
                                 <p:ajax event="filter" listener="#{workOrderESHistoryController.onFilter}" update="datalist"/>
-                                <p:column headerText="报修单号"  >
-                                    <h:outputText value="#{item.srNum}" />
+                                <p:column headerText="报修单号" filterBy="#{item.srNum}" filterMatchMode="LIKE" >
+                                    <h:outputText escape="false" value="#{item.srNum}" />
                                 </p:column>
                                 <p:column headerText="报修人" filterBy="#{item.requestorName}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.requestorName}" />
+                                    <h:outputText escape="false" value="#{item.requestorName}" />
                                 </p:column>
                                 <p:column headerText="联系电话" filterBy="#{item.requestorPhone}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.requestorPhone}" />
+                                    <h:outputText escape="false" value="#{item.requestorPhone}" />
                                 </p:column>
                                 <p:column headerText="#{msg.requestTime}"  >
                                     <h:outputText value="#{item.requestTime}">
@@ -45,35 +46,35 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="#{msg.requestReason}" >
-                                    <h:outputText value="#{item.requestReason}"/>
+                                <p:column headerText="#{msg.requestReason}" filterBy="#{item.requestReason}" filterMatchMode="LIKE">
+                                    <h:outputText escape="false"  value="#{item.requestReason}"/>
                                 </p:column>
-                                <p:column headerText="语音" width="20%">
-                                    <h:outputText value="#{item.requestReasonVoice}"/>
+                                <p:column headerText="语音" width="20%" filterBy="#{item.requestReasonVoice}" filterMatchMode="LIKE">
+                                    <h:outputText escape="false" value="#{item.requestReasonVoice}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.assetName}" >
-                                    <h:outputText value="#{item.assetName}"/>
+                                    <h:outputText escape="false" value="#{item.assetName}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.financingNum}" >
-                                    <h:outputText value="#{item.financingNum}"/>
+                                    <h:outputText escape="false" value="#{item.financingNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.qrCode}" >
-                                    <h:outputText value="#{item.qrCode}"/>
+                                    <h:outputText escape="false" value="#{item.qrCode}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.serialNum}" >
-                                    <h:outputText value="#{item.serialNum}"/>
+                                    <h:outputText escape="false" value="#{item.serialNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.departNum}" >
-                                    <h:outputText value="#{item.departNum}"/>
+                                    <h:outputText escape="false" value="#{item.departNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.functionType}" >
-                                    <h:outputText value="#{item.functionType}"/>
+                                    <h:outputText escape="false" value="#{item.functionType}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.clinicalDeptName}" >
-                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                    <h:outputText escape="false" value="#{item.clinicalDeptName}"/>
                                 </p:column>
                                 <p:column headerText="院区名称" >
-                                    <h:outputText value="#{item.siteName}"/>
+                                    <h:outputText escape="false" value="#{item.siteName}"/>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">
@@ -89,5 +90,17 @@
 
              </div>
         </div>
+        <script type="text/javascript">
+            var newWin;
+            function prepareOrderViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openOrderViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+       </script>
     </ui:define>
 </ui:composition>
+

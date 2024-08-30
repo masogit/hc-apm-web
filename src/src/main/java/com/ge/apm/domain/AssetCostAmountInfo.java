@@ -23,7 +23,7 @@ public class AssetCostAmountInfo implements Serializable {
     @Column(name = "asset_uid")
     private String assetUid;
 
-    @Column(name = "cost_Amount")
+    @Column(name = "cost_amount")
     private Double  costAmount;
     @Column(name = "statistical_date")
     @Temporal(TemporalType.DATE)

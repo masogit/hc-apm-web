@@ -66,4 +66,25 @@ public class WorkOrderESHistory {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+
+
+    @Override
+    public int hashCode() {
+        Integer hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof WorkOrderESHistory)) {
+            return false;
+        }
+        WorkOrderESHistory other = (WorkOrderESHistory) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
 }
