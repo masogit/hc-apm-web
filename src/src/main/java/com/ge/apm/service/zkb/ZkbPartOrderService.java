@@ -361,6 +361,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 qty += o.getQty();
             }if(ZkbPartOrder.OrderType.Parts.toString().equals(o.getOrderType())){
                 qty += o.getQty();
+            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(o.getOrderType())){
+                qty += o.getQty();
             }
         }
         List<SearchFilter> partFilters = new ArrayList<>();
