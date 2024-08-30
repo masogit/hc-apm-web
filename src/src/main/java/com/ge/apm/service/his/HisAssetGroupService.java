@@ -350,7 +350,7 @@ public class HisAssetGroupService {
             return Boolean.TRUE;
         }
 
-        Map<String, BigDecimal> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, BigDecimal> listMap = list.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
         Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
 
         for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
