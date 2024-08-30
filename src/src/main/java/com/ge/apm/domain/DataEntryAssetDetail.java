@@ -39,7 +39,7 @@ public class DataEntryAssetDetail implements Serializable {
     @Column(name = "entry_amount")
     private Double entryAmount;  //录入金额
 
-    @Column(name = "cost_Amount")
+    @Column(name = "cost_amount")
     private Double  costAmount;
 
     @Column(name = "created_date")

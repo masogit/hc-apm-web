@@ -7,24 +7,32 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkOrderESHistory;
 import com.ge.apm.service.remote.ElasticService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
-public class WorkOrderESHistoryController extends GenericCRUDUUIDController<WorkOrderESHistory> implements Serializable {
+public class WorkOrderESHistoryController extends GenericCRUDUUIDController<WorkOrderESHistory>  {
 
     private UserAccount currentUser;
 
@@ -32,6 +40,11 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
     private String accessToken ;
 
     private static final String WORK_ORDER_HISTORY_INDEX="work_order_history";
+
+    private Map<String,Field> fieldMap;
+
+    private String preTags = "<span style='background-color: yellow'>";
+    private String postTags = "</span>";
 
     @Override
     protected GenericRepositoryUUID<WorkOrderESHistory> getDAO() {
@@ -44,6 +57,7 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
         currentUser = UserContextService.getCurrentUserAccount();
         accessToken = UserContextService.getAccessToken();
         elasticService = WebUtil.getBean(ElasticService.class);
+        fieldMap = Stream.of(WorkOrderESHistory.class.getDeclaredFields()).collect(Collectors.toMap(Field::getName,item->item));
     }
 
     @Override
@@ -59,9 +73,45 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
                 return JSON.parseObject(JSON.toJSONString(item, config), new TypeReference<WorkOrderESHistory>() {
                 });
             }).collect(Collectors.toList());
+            highlightField(data);
             return new PageImpl<WorkOrderESHistory>(data,pageRequest,result.getTotalElements());
         }
     }
 
+    private void highlightField(List<WorkOrderESHistory> data){
+        if(CollectionUtils.isEmpty(searchFilters)) return;
+        if(CollectionUtils.isEmpty(data)) return;
+        Map<Field, Object> fieldObjectMap = searchFilters.stream().collect(Collectors.toMap(item -> fieldMap.get(item.fieldName), item -> item.value));
+        data.forEach(item->{
+            doHighlight(item,fieldObjectMap);
+        });
+    }
+
+    private void doHighlight(WorkOrderESHistory data,Map<Field, Object> fieldObjectMap){
+
+        for (Map.Entry<Field, Object> fieldObjectEntry : fieldObjectMap.entrySet()) {
+            try {
+                Field field = fieldObjectEntry.getKey();
+                Object search = fieldObjectEntry.getValue();
+                field.setAccessible(true);
+                Object o = field.get(data);
+                if(o instanceof String){
+                    String value =(String) o;
+                    value=value.replaceAll((String) search,preTags + search + postTags);
+                    field.set(data,value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void onSelectOrder() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId().toString()
+                + "&queryIndex=8";
+        url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
 }

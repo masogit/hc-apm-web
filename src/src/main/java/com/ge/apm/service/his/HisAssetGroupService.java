@@ -107,10 +107,12 @@ public class HisAssetGroupService {
         if (null != hisAssetGroupAssetMatch) {
 
             if("Cost".equals(hisAssetGroup.getType())){
+
+                if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg)){
+                    dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
+                }
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
 
-                dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
-                //TODO 成本类型的修改单独处理逻辑  需要吧录入数据的这段时间重新计算
             }else{
                 String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
 
@@ -183,6 +185,9 @@ public class HisAssetGroupService {
         for (Map.Entry<String, List<HisAssetGroupClinicalMatch>> clinical : clinicalMap.entrySet()) {
             List<HisAssetGroupClinicalMatch> value = clinical.getValue();
             List<AssetInfo> assetInfos = selectAssetClinicalMap.get(clinical.getKey());
+            if(CollectionUtils.isEmpty(assetInfos)){
+              continue;
+            }
             Set<String> uids1 = value.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
             Set<String> uids2 = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
             if (!uids1.equals(uids2)) {
@@ -345,7 +350,7 @@ public class HisAssetGroupService {
         }
 
         Map<String, Double> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
-        Map<String, Double> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+        Map<String, Double> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
 
         for (Map.Entry<String, Double> stringDoubleEntry : listMap.entrySet()) {
              Double aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
