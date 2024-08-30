@@ -173,6 +173,7 @@ public class DataEntryService {
                     assetCostAmountInfos.add(assetCostAmountInfo);
                      DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     dataEntryAssetDetail.setDataEntryUid(dataEntry.getUid());
+                    dataEntryAssetDetail.setEntryType(dataEntry.getEntryType());
                     dataEntryAssetDetail.setEntryAmount(dataEntry.getEntryAmount());
                     dataEntryAssetDetail.setCostAmount(divide.doubleValue());
                     dataEntryAssetDetail.setAssetUid(selectAsset.getUid());
