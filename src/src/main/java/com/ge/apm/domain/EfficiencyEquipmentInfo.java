@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -47,25 +48,25 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     private String functionType;//设备型号
 
     @Column(name = "usage_rate")
-    private Double usageRate;  //使用率
+    private BigDecimal usageRate;  //使用率
 
     @Column(name = "check_number_people")
-    private Double checkNumberPeople;  //检查人次
+    private BigDecimal checkNumberPeople;  //检查人次
 
     @Column(name = "checkt_tme_length")
-    private Double checkTimeLength ;  //检查时长
+    private BigDecimal checkTimeLength ;  //检查时长
 
     @Column(name = "income")
-    private Double income;  //收入
+    private BigDecimal income;  //收入
 
     @Column(name = "cost")
-    private Double cost;  //成本
+    private BigDecimal cost;  //成本
 
     @Column(name = "profits")
-    private Double profits;  //利润
+    private BigDecimal profits;  //利润
 
     @Column(name = "profits_rate")
-    private Double profitsRate;  //利润率
+    private BigDecimal profitsRate;  //利润率
 
     @Column(name = "created_by_uid")
     private String createdByUid;
@@ -147,68 +148,61 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
         this.functionType = functionType;
     }
 
-    public Double getUsageRate() {
+
+    public BigDecimal getUsageRate() {
         return usageRate;
     }
 
-    public void setUsageRate(Double usageRate) {
+    public void setUsageRate(BigDecimal usageRate) {
         this.usageRate = usageRate;
     }
 
-    public Double getCheckNumberPeople() {
+    public BigDecimal getCheckNumberPeople() {
         return checkNumberPeople;
     }
 
-    public void setCheckNumberPeople(Double checkNumberPeople) {
+    public void setCheckNumberPeople(BigDecimal checkNumberPeople) {
         this.checkNumberPeople = checkNumberPeople;
     }
 
-    public Double getCheckTimeLength() {
+    public BigDecimal getCheckTimeLength() {
         return checkTimeLength;
     }
 
-    public void setCheckTimeLength(Double checkTimeLength) {
+    public void setCheckTimeLength(BigDecimal checkTimeLength) {
         this.checkTimeLength = checkTimeLength;
     }
 
-    public Double getIncome() {
+    public BigDecimal getIncome() {
         return income;
     }
 
-    public void setIncome(Double income) {
+    public void setIncome(BigDecimal income) {
         this.income = income;
     }
 
-    public Double getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(Double cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 
-    public Double getProfits() {
+    public BigDecimal getProfits() {
         return profits;
     }
 
-    public void setProfits(Double profits) {
+    public void setProfits(BigDecimal profits) {
         this.profits = profits;
     }
 
-    public Double getProfitsRate() {
+    public BigDecimal getProfitsRate() {
         return profitsRate;
     }
 
-    public void setProfitsRate(Double profitsRate) {
+    public void setProfitsRate(BigDecimal profitsRate) {
         this.profitsRate = profitsRate;
-    }
-
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
-    }
-
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
     }
 
     public String getCreatedByUid() {
@@ -227,13 +221,20 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
         this.createdDate = createdDate;
     }
 
-
     public String getReportConfig() {
         return reportConfig;
     }
 
     public void setReportConfig(String reportConfig) {
         this.reportConfig = reportConfig;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -54,12 +55,12 @@ public class DataEntryService {
                 DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
 
                 if(selectAssetInfo.getAmount()!=null){
-                    BigDecimal divide = new BigDecimal(selectAssetInfo.getAmount()).divide(BigDecimal.valueOf(daysBetween), 2, BigDecimal.ROUND_DOWN);
-                    assetCostAmountInfo.setCostAmount(divide.doubleValue());
-                    dataEntryAssetDetail.setCostAmount(divide.doubleValue());
+                    BigDecimal divide = selectAssetInfo.getAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
+                    assetCostAmountInfo.setCostAmount(divide);
+                    dataEntryAssetDetail.setCostAmount(divide);
                 }else{
-                    assetCostAmountInfo.setCostAmount(new Double(0));
-                    dataEntryAssetDetail.setCostAmount(new Double(0));
+                    assetCostAmountInfo.setCostAmount(BigDecimal.ZERO);
+                    dataEntryAssetDetail.setCostAmount(BigDecimal.ZERO);
                 }
                 assetCostAmountInfo.setAssetUid(selectAssetInfo.getAssetUid());
 //                assetCostAmountInfo.setDataEntryUid(dataEntry.getUid());
@@ -98,17 +99,20 @@ public class DataEntryService {
         LocalDate startDate =new Date(oldDataEntry.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate endDate = new Date(oldDataEntry.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         List<String> assetUids = byDataEntryUid.stream().map(DataEntryAssetDetail::getAssetUid).collect(Collectors.toList());
-        List<AssetCostAmountInfo> byAssetUidInAndDateIn = assetCostAmountInfoRepository.getByAssetUidInAndDateIn(assetUids, oldDataEntry.getStartDate(), oldDataEntry.getEndDate());
-        for (AssetCostAmountInfo assetCostAmountInfo : byAssetUidInAndDateIn) {
-            String key = assetCostAmountInfo.getAssetUid() +":"+ DateUtil.formatDate(assetCostAmountInfo.getStatisticalDate());
-            DataEntryAssetDetail dataEntryAssetDetail = dataEntryAssetDetailMap.get(key);
-            if(dataEntryAssetDetail!=null){
-                if(dataEntryAssetDetail.getCostAmount()!=null){
-                    assetCostAmountInfo.setCostAmount(assetCostAmountInfo.getCostAmount()-dataEntryAssetDetail.getCostAmount());
+        if(!CollectionUtils.isEmpty(assetUids)){
+            List<AssetCostAmountInfo> byAssetUidInAndDateIn = assetCostAmountInfoRepository.getByAssetUidInAndDateIn(assetUids, oldDataEntry.getStartDate(), oldDataEntry.getEndDate());
+            for (AssetCostAmountInfo assetCostAmountInfo : byAssetUidInAndDateIn) {
+                String key = assetCostAmountInfo.getAssetUid() +":"+ DateUtil.formatDate(assetCostAmountInfo.getStatisticalDate());
+                DataEntryAssetDetail dataEntryAssetDetail = dataEntryAssetDetailMap.get(key);
+                if(dataEntryAssetDetail!=null){
+                    if(dataEntryAssetDetail.getCostAmount()!=null){
+                        assetCostAmountInfo.setCostAmount(assetCostAmountInfo.getCostAmount().subtract(dataEntryAssetDetail.getCostAmount()));
+                    }
                 }
             }
+            assetCostAmountInfoRepository.save(byAssetUidInAndDateIn);
         }
-        assetCostAmountInfoRepository.save(byAssetUidInAndDateIn);
+
     }
 
     private void saveOrUpdate(List<AssetCostAmountInfo> assetCostAmountInfos, List<String> assetUids , Date startDate, Date endDate) {
@@ -126,7 +130,7 @@ public class DataEntryService {
             if (existingData.containsKey(key)) {
                 toUpdate.add(assetCostAmountInfo);
                 AssetCostAmountInfo assetCostAmountInfo1 = existingData.get(key);
-                assetCostAmountInfo1.setCostAmount(assetCostAmountInfo1.getCostAmount()+assetCostAmountInfo.getCostAmount());
+                assetCostAmountInfo1.setCostAmount(assetCostAmountInfo1.getCostAmount().add(assetCostAmountInfo.getCostAmount()));
                 toInsert.add(assetCostAmountInfo1);
 
             } else {
@@ -165,8 +169,8 @@ public class DataEntryService {
 
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
-                    BigDecimal divide = new BigDecimal(dataEntry.getEntryAmount()).divide(BigDecimal.valueOf(daysBetween), 2, BigDecimal.ROUND_DOWN);
-                    assetCostAmountInfo.setCostAmount(divide.doubleValue());
+                    BigDecimal divide = dataEntry.getEntryAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
+                    assetCostAmountInfo.setCostAmount(divide);
                     assetCostAmountInfo.setAssetUid(dataEntry.getAssetUid());
 //                    assetCostAmountInfo.setDataEntryUid(dataEntry.getUid());
                     assetCostAmountInfo.setStatisticalDate(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -175,7 +179,7 @@ public class DataEntryService {
                     dataEntryAssetDetail.setDataEntryUid(dataEntry.getUid());
                     dataEntryAssetDetail.setEntryType(dataEntry.getEntryType());
                     dataEntryAssetDetail.setEntryAmount(dataEntry.getEntryAmount());
-                    dataEntryAssetDetail.setCostAmount(divide.doubleValue());
+                    dataEntryAssetDetail.setCostAmount(divide);
                     dataEntryAssetDetail.setAssetUid(selectAsset.getUid());
                     dataEntryAssetDetail.setCreatedDate(new Date());
                     dataEntryAssetDetail.setAssetGroupOrgInfoUid(dataEntry.getAssetGroupOrgInfoUid());
@@ -184,7 +188,6 @@ public class DataEntryService {
                     dataEntryAssetDetails.add(dataEntryAssetDetail);
 
                 }
-//                assetCostAmountInfoRepository.save(assetCostAmountInfos);
                 List<String> uids = new ArrayList<>();
                 uids.add(selectAsset.getUid());
                 this.saveOrUpdate(assetCostAmountInfos,uids,dataEntry.getStartDate(),dataEntry.getEndDate());
@@ -252,20 +255,20 @@ public class DataEntryService {
                 DataEntryAssetDetail dataEntryAssetDetail = dataEntryAssetDetailMap.get(key);
                 if(dataEntryAssetDetail!=null){
                     if(dataEntryAssetDetail.getCostAmount()!=null){
-                        assetCostAmountInfo.setCostAmount(assetCostAmountInfo.getCostAmount()-dataEntryAssetDetail.getCostAmount());
+                        assetCostAmountInfo.setCostAmount(assetCostAmountInfo.getCostAmount().subtract(dataEntryAssetDetail.getCostAmount()));
                     }
                 }
             }
             assetCostAmountInfoRepository.save(byAssetUidInAndDateIn);
-            BigDecimal dayAmount = BigDecimal.valueOf(dataEntry.getEntryAmount()).divide(BigDecimal.valueOf(daysBetween), 2, BigDecimal.ROUND_DOWN);
+            BigDecimal dayAmount = dataEntry.getEntryAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
             for (AssetInfo targetAsset : targetAssets) {
                 for (LocalDate date = newStartDate; !date.isAfter(newEndDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
                     DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     if(targetAsset.getScaleAssessment()!=null){
-                        BigDecimal amount = dayAmount.multiply( BigDecimal.valueOf(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100))).setScale(2);
-                        assetCostAmountInfo.setCostAmount(amount.doubleValue());
-                        dataEntryAssetDetail.setCostAmount(amount.doubleValue());
+                        BigDecimal amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100)).setScale(6);
+                        assetCostAmountInfo.setCostAmount(amount);
+                        dataEntryAssetDetail.setCostAmount(amount);
 
                     }
                     assetCostAmountInfo.setAssetUid(targetAsset.getUid());
