@@ -170,8 +170,8 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     public void sharedEquallyProportion(){
         int size = selectAssetInfos.size();
         if(size>0){
-            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),2, BigDecimal.ROUND_DOWN);
-            selectAssetInfos.stream().forEach(item->item.setScaleAssessment(divide.doubleValue()));
+            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),6, BigDecimal.ROUND_DOWN);
+            selectAssetInfos.stream().forEach(item->item.setScaleAssessment(divide));
         }
     }
     public void updateSelctedAssetList(AjaxBehaviorEvent event) {
@@ -300,8 +300,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
 //        List<AssetInfo> targetAssets = availableAssets.getTarget();
         List<AssetInfo>  targetAssets=selectAssetInfos;
-        double sum = targetAssets.stream().mapToDouble(AssetInfo::getScaleAssessment).sum();
-        if(sum>100){
+        BigDecimal sum = targetAssets.stream()
+                .map(AssetInfo::getScaleAssessment)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if(sum.compareTo(BigDecimal.valueOf(100))==1){
             WebUtil.addErrorMessage("均摊比例不能大于100");
             return;
         }
@@ -409,7 +411,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                     assetIds = hisAssetGroupClinicalMatchDao.findAssetIds(ids);
                     byAssetGroupClinicalId = hisAssetGroupClinicalMatchDao.findByAssetGroupClinicalId(ids);
                 }
-                Map<String, Double> doubleMap = byAssetGroupClinicalId.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+                Map<String, BigDecimal> doubleMap = byAssetGroupClinicalId.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
                 List<AssetInfo> targetAssets = assetInfoRepository.findAllByUidIn(assetIds);
                 availableAssets.setTarget(targetAssets);
                 availableAssets.setSource(new ArrayList<>());

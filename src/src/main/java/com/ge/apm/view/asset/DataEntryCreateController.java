@@ -153,14 +153,14 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     }
 
     public void sharedEntryAmount() {
-        Double entryAmount = this.getSelected().getEntryAmount();
+        BigDecimal entryAmount = this.getSelected().getEntryAmount();
         if (entryAmount != null) {
             for (HisAssetGroupClinicalMatch selectAssetInfo : selectAssetInfos) {
-                Double scaleAssessment = selectAssetInfo.getScaleAssessment();
+                BigDecimal scaleAssessment = selectAssetInfo.getScaleAssessment();
                 if (scaleAssessment != null) {
-                    double amount = entryAmount * scaleAssessment;
-                    BigDecimal divide = BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100), 2);
-                    selectAssetInfo.setAmount(divide.doubleValue());
+                    BigDecimal amount = entryAmount.multiply(scaleAssessment);
+                    BigDecimal divide = amount.divide(BigDecimal.valueOf(100), 6);
+                    selectAssetInfo.setAmount(divide);
                 }
 
             }

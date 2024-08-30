@@ -1056,7 +1056,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     @TableField(exist = false)
-    private Double  scaleAssessment;
+    private BigDecimal  scaleAssessment;
 
 
     public boolean isSpecialAsset() {
@@ -3260,11 +3260,11 @@ public class AssetInfo implements ChineseName,Serializable {
         this.assetScrapId = assetScrapId;
     }
 
-    public Double getScaleAssessment() {
+    public BigDecimal getScaleAssessment() {
         return scaleAssessment;
     }
 
-    public void setScaleAssessment(Double scaleAssessment) {
+    public void setScaleAssessment(BigDecimal scaleAssessment) {
         this.scaleAssessment = scaleAssessment;
     }
 }

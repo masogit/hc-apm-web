@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -23,8 +24,8 @@ public class AssetCostAmountInfo implements Serializable {
     @Column(name = "asset_uid")
     private String assetUid;
 
-    @Column(name = "cost_amount")
-    private Double  costAmount;
+    @Column(name = "cost_amount",scale = 6)
+    private BigDecimal costAmount;
     @Column(name = "statistical_date")
     @Temporal(TemporalType.DATE)
     private Date statisticalDate;
