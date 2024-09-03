@@ -195,7 +195,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private boolean countyArea = false;
     private UserAccount user;
 //    private Map<String, UserAccount> createdByMap;
-
+    private List<AssetInfo> resultList = new ArrayList<>();
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -866,7 +866,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void getAssetInfoBatchEdit() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
@@ -875,6 +874,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
+//        String verificationCode = "";
+//        Random random = new Random();
+//        for (int i = 0; i < 6; i++) {
+//            int r = random.nextInt(10); //每次随机出一个数字（0-9）
+//            verificationCode = verificationCode + r;  //把每次随机出的数字拼在一起
+//        }
+//        resultAssetMap = new HashMap<>();
+//
+//        resultAssetMap.put(verificationCode,resultList);
+//        WebUtil.navigateTo("AssetInfoBatchEdit.xhtml?faces-redirect=true&uidList= "+ verificationCode);
+    }
+    public void navigateTo(){
         String verificationCode = "";
         Random random = new Random();
         for (int i = 0; i < 6; i++) {
@@ -1714,5 +1725,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setSpare05Set(Set<String> spare05Set) {
         this.spare05Set = spare05Set;
+    }
+
+    public List<AssetInfo> getResultList() {
+        return resultList;
     }
 }
