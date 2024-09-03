@@ -1,8 +1,8 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
-import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkOrderESHistory;
@@ -15,13 +15,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
     private static final String WORK_ORDER_HISTORY_INDEX="work_order_history";
 
     private Map<String,Field> fieldMap;
+
 
     private String preTags = "<span style='background-color: yellow'>";
     private String postTags = "</span>";
@@ -69,10 +69,7 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
         }else{
             SerializeConfig config = new SerializeConfig();
             config.setPropertyNamingStrategy(PropertyNamingStrategy.SnakeCase);
-            List<WorkOrderESHistory> data = content.stream().map(item -> {
-                return JSON.parseObject(JSON.toJSONString(item, config), new TypeReference<WorkOrderESHistory>() {
-                });
-            }).collect(Collectors.toList());
+            List<WorkOrderESHistory> data = content.stream().map(item ->initObject(item)).collect(Collectors.toList());
             highlightField(data);
             return new PageImpl<WorkOrderESHistory>(data,pageRequest,result.getTotalElements());
         }
@@ -87,6 +84,11 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
         });
     }
 
+    /**
+     *  高亮检索字段
+     * @param data
+     * @param fieldObjectMap
+     */
     private void doHighlight(WorkOrderESHistory data,Map<Field, Object> fieldObjectMap){
 
         for (Map.Entry<Field, Object> fieldObjectEntry : fieldObjectMap.entrySet()) {
@@ -112,6 +114,33 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
         url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+    }
+
+    private WorkOrderESHistory initObject(Object o){
+        JSONObject jsonObjectNew = new JSONObject();
+        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(o));
+        for (Map.Entry<String, Object> stringObjectEntry : jsonObject.entrySet()) {
+            jsonObjectNew.put(underlineToCamel(stringObjectEntry.getKey()),stringObjectEntry.getValue());
+        }
+        WorkOrderESHistory result = JSON.toJavaObject(jsonObjectNew, WorkOrderESHistory.class);
+        return result;
+    }
+
+    private static String underlineToCamel(String underlineName){
+        StringBuilder camelCaseStr = new StringBuilder();
+        String[] split = underlineName.split("_");
+        camelCaseStr.append(split[0].toLowerCase());
+        for (int i = 1; i < split.length; i++) {
+            String s = split[i];
+            if("uid".equalsIgnoreCase(s)){
+                camelCaseStr.append(s.toUpperCase());
+            }else{
+                char[] charArray = s.toCharArray();
+                charArray[0] = Character.toUpperCase(charArray[0]);
+                camelCaseStr.append(charArray);
+            }
+        }
+        return camelCaseStr.toString();
     }
 
 }
