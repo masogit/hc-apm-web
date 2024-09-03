@@ -330,7 +330,12 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             for(AssetInfo assetInfo : targetAssets){
                 List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatchList = hisAssetGroupClinicalMatchDao.findByAssetUid(assetInfo.getUid());
                 List<String> assetGroupUIds = hisAssetGroupClinicalMatchList.stream().map(HisAssetGroupClinicalMatch::getHisAssetGroupUId).collect(Collectors.toList());
-                if(!hisAssetGroupClinicalMatchList.isEmpty() && !assetGroupUIds.contains(hisAssetGroup.getUuid())){
+
+                if(!assetGroupUIds.isEmpty() ){
+                    List<HisAssetGroup> hisAssetGroups = hisAssetGroupRepository.findByUuidIn(assetGroupUIds);
+                    assetGroupUIds = hisAssetGroups.stream().filter(item -> item.getType().equals("Income")).map(HisAssetGroup::getUuid).collect(Collectors.toList());
+                }
+                if(!assetGroupUIds.isEmpty() && !assetGroupUIds.contains(hisAssetGroup.getUuid())){
                     String assetGroupName = hisAssetGroupRepository.findNameByUuid(hisAssetGroup.getUuid());
                     WebUtil.addErrorMessage("设备:" + assetInfo.getName() +" 已绑定分组: "+ assetGroupName);
                     return;
@@ -380,7 +385,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 //            onClinicalDeptChange();
             loadClinicalDept();
         } else {
-
+            availableAssets = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
+            selectAssetInfos=new ArrayList<>();
+            selectedAssets=new HashSet<>();
+            selectedMap=new HashMap<>();
             updateStartDate = null;
             updateEndDate = null;
 
@@ -394,9 +402,9 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
 
-                availableAssets = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
-                selectAssetInfos=new ArrayList<>();
+
             } else {
+
                 //edit
                 this.selected = (HisAssetGroupAssetMatch)eventObject;
 
