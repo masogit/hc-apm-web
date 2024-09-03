@@ -428,8 +428,18 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     public void exportExcel() throws IOException {
         List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<String> orgUidList=null;
+        String orgUid=null;
+        if(CollectionUtils.isEmpty(assetUids)){
+            if(selectSite!=null){
+                orgUid = selectSite.getUid();
+            }else{
+                orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            }
+        }
 
-        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids);
+
+        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList);
 
         List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
         Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));

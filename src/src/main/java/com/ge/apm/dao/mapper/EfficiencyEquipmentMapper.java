@@ -25,6 +25,10 @@ public interface EfficiencyEquipmentMapper {
 //            "check_summary AS ( SELECT asset_uid, SUM(check_number_people) AS checkNumberPeople FROM iot_performance_info WHERE  tenant_uid=#{tenantUid}   and    date  between #{startDate} and #{endDate} GROUP BY asset_uid )"+
 //            "select es.asset_uid assetUid,  COALESCE(isum.income, 0) AS income, COALESCE(esum.cost, 0) AS cost,COALESCE(csum.checkNumberPeople, 0) AS  checkNumberPeople,ai.name as assetName,ai.serial_num  serialNum , ai.qr_code qrCode,ai.function_type functionType ,ai.purchase_price purchasePrice,ai.clinical_dept_name clinicalDeptName ,ai.asset_group assetGroup,brand.name as  brandName    from  efficiency_equipment_info es join asset_info ai on es.asset_uid=ai.uid   left join brand on  ai.brand_id=brand.id " +
 //            "LEFT JOIN income_summary isum ON es.asset_uid = isum.asset_uid LEFT JOIN expense_summary esum ON es.asset_uid = esum.asset_uid LEFT JOIN check_summary csum ON es.asset_uid = csum.asset_uid")
-        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate,@Param("endDate")Date endDate,@Param("tenantUid") String tenantUid,@Param("assetUids") List<String> assetUids);
+//        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate,@Param("endDate")Date endDate,@Param("tenantUid") String tenantUid,@Param("assetUids") List<String> assetUids);
+
+
+
+        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate,@Param("endDate")Date endDate,@Param("tenantUid") String tenantUid,@Param("assetUids") List<String> assetUids,@Param("orgUid") String orgUid,@Param("orgUidList") List<String> orgUidList);
 
 }
