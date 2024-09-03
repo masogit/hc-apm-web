@@ -15,35 +15,41 @@
             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                 <h:panelGroup >
-                    <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+                    <label class="label">#{msg.hospitalId}</label>
                     <apm:selectSiteOrgByOrgTree update="@(form)"/>
 
                 </h:panelGroup>
 
 
                 <h:panelGroup>
-                    <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
+                    <label class="label">#{msg.clinicalDeptName}</label>
                     <p:autoComplete id="clinicalDeptName" required="true" dropdown="true"
                                     value="#{dataEntryCreateController.filterDeptOrg}"
                                     scrollHeight="300" forceSelection="true"
                                     completeMethod="#{dataEntryCreateController.autoCompleteDept}"
                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"
                                     class="SiteUIDChange">
-
+                        <p:ajax event="itemSelect"/>
                     </p:autoComplete>
+
                 </h:panelGroup>
+            </p:panelGrid>
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
                     <label class="label">#{msg.assetGroup}</label>
                     <p:selectOneMenu id="assetGroup" value="#{dataEntryCreateController.assetGroup}">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
                                        itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        <p:ajax event="change"></p:ajax>
                     </p:selectOneMenu>
                 </h:panelGroup>
 
                 <h:panelGroup>
                     <label class='label'>设备名称</label>
                     <p:inputText id="assetName" value="#{dataEntryCreateController.assetName}">
+                        <p:ajax event="change"></p:ajax>
+
                     </p:inputText>
                 </h:panelGroup>
 
@@ -51,17 +57,21 @@
                 <h:panelGroup>
                     <label class='label'>设备二维码</label>
                     <p:inputText id="qrCode" value="#{dataEntryCreateController.qrCode}">
+                        <p:ajax event="change"></p:ajax>
+
                     </p:inputText>
                 </h:panelGroup>
 
                 <h:panelGroup>
                     <label class='label'>设备序列号</label>
                     <p:inputText id="serialNum" value="#{dataEntryCreateController.serialNum}">
+                        <p:ajax event="change"></p:ajax>
+
                     </p:inputText>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <p:commandButton validateClient="true"
+                    <p:commandButton validateClient="false" immediate="true"  process="@this"
                                      actionListener="#{dataEntryCreateController.getQueryAssetsList()}" value="检索"
                                      update="AssetAddForm:datalist" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
                 </h:panelGroup>
