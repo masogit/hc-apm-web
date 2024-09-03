@@ -260,6 +260,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         if (null != blobObject) {
             blobObject.setBoType(V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring);
             blobObject.setBoUuid(id);
+            List<V2_BlobObject> hasList = blobDao.findByBoUuidAndObjectName(id, blobObject.getObjectName());
+            if (ObjectUtil.isNotEmpty(hasList)) {
+                blobDao.delete(hasList);
+            }
             blobDao.save(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
