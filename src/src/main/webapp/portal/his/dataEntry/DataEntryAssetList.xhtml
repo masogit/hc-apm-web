@@ -43,8 +43,10 @@
 
                     </p:column>
 
-                    <p:column headerText="录入金额" sortBy="#{item.entryAmount}"  filterBy="#{item.entryAmount}" filterMatchMode="GET" >
-                        <h:outputText value="#{item.entryAmount}"/>
+                    <p:column headerText="录入金额(元)" sortBy="#{item.entryAmount}"  filterBy="#{item.entryAmount}" filterMatchMode="GET" >
+                        <h:outputText value="#{item.entryAmount}">
+                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                        </h:outputText>
                     </p:column>
 
                     <p:column headerText="生效开始时间">

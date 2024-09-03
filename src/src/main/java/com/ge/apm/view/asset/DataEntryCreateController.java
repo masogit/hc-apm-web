@@ -240,6 +240,12 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             }
 
         }else{
+            qrCode=null;
+            assetName=null;
+            serialNum=null;
+            assetGroup=null;
+            
+
             if (eventObject == null) {
                 //create
                 this.selected = new DataEntry();
@@ -333,17 +339,21 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     }
 
     public void getQueryAssetsList(){
-        if(selectedOrg==null){
+        if((selectedOrg==null ||  filterDeptOrg==null) && (qrCode==null && serialNum==null && assetName==null)){
             return;
         }
-        List<String> siteOrgUids = orgInfoDao.getSiteOrgUidsByParentUid(selectedOrg.getUid());
+
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-        assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
-        assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
+        if(selectedOrg!=null){
+            List<String> siteOrgUids = orgInfoDao.getSiteOrgUidsByParentUid(selectedOrg.getUid());
+            assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
+            assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
+        }
+
         if (null != filterDeptOrg) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filterDeptOrg.getUid()));
         }
