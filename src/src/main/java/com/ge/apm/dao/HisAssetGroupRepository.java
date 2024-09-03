@@ -23,4 +23,8 @@ public interface HisAssetGroupRepository  extends GenericRepositoryUUID<HisAsset
     HisAssetGroup findByUuid(String uuid);
 
     HisAssetGroup findByNameAndTypeAndTenantUid(String name, String type, String tenantUID);
+
+
+    @Query(value = "select * from his_asset_group where uuid in  ?1", nativeQuery = true)
+    List<HisAssetGroup> findByUuidIn(List<String> assetGroupUIds);
 }
