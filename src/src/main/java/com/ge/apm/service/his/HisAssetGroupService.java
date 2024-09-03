@@ -109,7 +109,7 @@ public class HisAssetGroupService {
 
             if("Cost".equals(hisAssetGroup.getType())){
 
-                if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg)){
+                if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg) && updateStartDate!=null && updateEndDate!=null){
                     dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
                 }
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
