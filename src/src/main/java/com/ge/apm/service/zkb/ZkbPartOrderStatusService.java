@@ -104,7 +104,10 @@ public class ZkbPartOrderStatusService {
             if("2".equals(selected.getArtificialType())){
                 // 申请并有权限
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && zkbPartOrderStatusVo.isCanEditFlag()){
-                    if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
+                    if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                        zkbPartOrderStatusVo.setShowManage(true);
+                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                    } else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
                         zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
                     }else{
@@ -112,27 +115,53 @@ public class ZkbPartOrderStatusService {
                         zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(selected.getStatus())){
+                    if(StringUtils.isNotEmpty(selected.getManageAuditer())){
+                        zkbPartOrderStatusVo.setShowManage(true);
+                    }
                     zkbPartOrderStatusVo.setShowCommercial(true);
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         zkbPartOrderStatusVo.setShowOrder(true);
                         zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
+                    if(StringUtils.isNotEmpty(selected.getManageAuditer())){
+                        zkbPartOrderStatusVo.setShowManage(true);
+                    }
                     zkbPartOrderStatusVo.setShowCommercial(true);
                     zkbPartOrderStatusVo.setShowOrder(false);
-                    zkbPartOrderStatusVo.setShowBtn("");;
+                    zkbPartOrderStatusVo.setShowBtn("");
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                    if(StringUtils.isNotEmpty(selected.getManageAuditer())){
+                        zkbPartOrderStatusVo.setShowManage(true);
+                    }
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
                     }
                     zkbPartOrderStatusVo.setShowOrder(true);
-                    zkbPartOrderStatusVo.setShowBtn("");;
+                    zkbPartOrderStatusVo.setShowBtn("");
                 }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    if(StringUtils.isNotEmpty(selected.getManageAuditer())){
+                        zkbPartOrderStatusVo.setShowManage(true);
+                    }
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
                     }
                     zkbPartOrderStatusVo.setShowRejectOrder(true);
-                    zkbPartOrderStatusVo.setShowBtn("");;
+                    zkbPartOrderStatusVo.setShowBtn("");
+                }else if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(selected.getStatus())){
+                    zkbPartOrderStatusVo.setShowManage(true);
+                    if(zkbPartOrderStatusVo.isCanEditFlag()){
+                        if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
+                            zkbPartOrderStatusVo.setShowCommercial(true);
+                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        }else{
+                            zkbPartOrderStatusVo.setShowOrder(true);
+                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        }
+                    }
+                }else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
+                    zkbPartOrderStatusVo.setShowManage(true);
+                    zkbPartOrderStatusVo.setShowBtn("");
                 }
             }else{
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && zkbPartOrderStatusVo.isCanEditFlag()){

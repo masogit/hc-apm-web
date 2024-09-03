@@ -372,6 +372,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public boolean whetherDeductRender(){
+        boolean result = true;
+        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+            result = false;
+        }else if(CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())){
+            if(!ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) && !ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
     public boolean scoreFlagRender(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(CopyByInvok.T.equals(selected.getMaintainFlag())){
