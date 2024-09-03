@@ -24,6 +24,9 @@ public class AssetCostAmountInfo implements Serializable {
     @Column(name = "asset_uid")
     private String assetUid;
 
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
     @Column(name = "cost_amount",precision = 18, scale = 6)
     private BigDecimal costAmount;
     @Column(name = "statistical_date")
