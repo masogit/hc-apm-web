@@ -170,6 +170,7 @@ public class DataEntryService {
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
                     BigDecimal divide = dataEntry.getEntryAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
+                    assetCostAmountInfo.setTenantUid(user.getTenantUID());
                     assetCostAmountInfo.setCostAmount(divide);
                     assetCostAmountInfo.setAssetUid(dataEntry.getAssetUid());
 //                    assetCostAmountInfo.setDataEntryUid(dataEntry.getUid());
