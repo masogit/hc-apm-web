@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.EfficiencyEquipmentMapper">
+
+
+
+    <select id="getEfficiencyEquipmentInfo" resultType="com.ge.apm.domain.EfficiencyEquipmentInfo">
+        WITH income_summary AS ( SELECT asset_uid, SUM(total_amount) AS income FROM his_equipment_data_result WHERE  tenant_uid=#{tenantUid}
+          <if test='assetUids != null and assetUids.size() > 0'>
+            and  asset_uid IN
+                <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+                  #{item}
+                </foreach>
+            </if>
+         and    exec_time  between #{startDate} and #{endDate} GROUP BY asset_uid ),
+            expense_summary AS ( SELECT asset_uid, SUM(cost_amount) AS cost FROM asset_cost_amount_info WHERE  tenant_uid=#{tenantUid}
+        <if test='assetUids != null and assetUids.size() > 0'>
+            and  asset_uid IN
+            <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+            and    statistical_date  between #{startDate} and #{endDate} GROUP BY asset_uid ),
+            check_summary AS ( SELECT asset_uid, SUM(check_number_people) AS checkNumberPeople FROM iot_performance_info WHERE  tenant_uid=#{tenantUid}
+        <if test='assetUids != null and assetUids.size() > 0'>
+            and  asset_uid IN
+            <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+            and    date  between #{startDate} and #{endDate} GROUP BY asset_uid )
+            select es.asset_uid assetUid,  COALESCE(isum.income, 0) AS income, COALESCE(esum.cost, 0) AS cost,COALESCE(csum.checkNumberPeople, 0) AS  checkNumberPeople,ai.name as assetName,ai.serial_num  serialNum , ai.qr_code qrCode,ai.function_type functionType ,ai.purchase_price purchasePrice,ai.clinical_dept_name clinicalDeptName ,ai.asset_group assetGroup,brand.name as  brandName    from  efficiency_equipment_info es join asset_info ai on es.asset_uid=ai.uid   left join brand on  ai.brand_id=brand.id
+            LEFT JOIN income_summary isum ON es.asset_uid = isum.asset_uid LEFT JOIN expense_summary esum ON es.asset_uid = esum.asset_uid LEFT JOIN check_summary csum ON es.asset_uid = csum.asset_uid
+        <if test='assetUids != null and assetUids.size() > 0'>
+        where   es.asset_uid IN
+        <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+            #{item}
+        </foreach>
+    </if>
+
+
+    </select>
+
+
+
+</mapper>
