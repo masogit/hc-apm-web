@@ -854,7 +854,7 @@
                                     <label class="label">GE工程师电话*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{(!(zkbPartOrderAuditController.selected.artificialType eq '2') or zkbPartOrderAuditController.selected.maintainFlag eq 't')}">
+                                <h:panelGroup rendered="#{zkbPartOrderAuditController.whetherDeductRender()}">
                                     <c:choose>
                                         <c:when test="#{zkbPartOrderAuditController.selected.scoreFlag eq 't'}">
                                             <label class="label">是否扣除积分*</label>
