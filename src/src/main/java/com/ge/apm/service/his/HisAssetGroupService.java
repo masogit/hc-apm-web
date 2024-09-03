@@ -109,7 +109,7 @@ public class HisAssetGroupService {
 
             if("Cost".equals(hisAssetGroup.getType())){
 
-                if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg)){
+                if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg) && updateStartDate!=null && updateEndDate!=null){
                     dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
                 }
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
@@ -350,7 +350,7 @@ public class HisAssetGroupService {
             return Boolean.TRUE;
         }
 
-        Map<String, BigDecimal> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, BigDecimal> listMap = list.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
         Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
 
         for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {

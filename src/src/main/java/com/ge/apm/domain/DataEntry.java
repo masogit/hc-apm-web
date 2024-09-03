@@ -43,7 +43,7 @@ public class DataEntry implements Serializable {
     @Column(name = "entry_type")
     private String entryType; //录入类型
 
-    @Column(name = "entry_amount")
+    @Column(name = "entry_amount",precision = 18, scale = 6)
     private BigDecimal entryAmount;  //录入金额
 
     @Column(name = "created_date")

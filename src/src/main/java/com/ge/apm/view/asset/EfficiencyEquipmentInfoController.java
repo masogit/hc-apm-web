@@ -2,20 +2,21 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
 
-import com.ge.apm.dao.mapper.AssetCostAmountInfoMapper;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
-import com.ge.apm.dao.mapper.HisEquipmentDataResultMapper;
-import com.ge.apm.dao.mapper.IotPerformanceInfoMapper;
+import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetCostDTO;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.EfficiencyEquipmentInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DatePattern;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +24,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
@@ -36,6 +40,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -63,6 +69,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private AssetInfoService assetInfoService;
 
     private AssetInfoMapper assetInfoMapper;
+
+    private EfficiencyEquipmentMapper efficiencyEquipmentMapper;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -97,6 +105,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
+    private I18nMessageRepository i18nMessageRepository;
+
 
     private Date startDate=DateUtil.currentMonthFirstDay();
 
@@ -110,6 +120,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private AssetCostAmountInfoMapper assetCostAmountInfoMapper;
 
     private IotPerformanceInfoMapper iotPerformanceInfoMapper;
+
+    private StreamedContent excelFile;
+
 
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
@@ -133,6 +146,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         hisEquipmentDataResultMapper = WebUtil.getBean(HisEquipmentDataResultMapper.class);
         assetCostAmountInfoMapper = WebUtil.getBean(AssetCostAmountInfoMapper.class);
         iotPerformanceInfoMapper = WebUtil.getBean(IotPerformanceInfoMapper.class);
+        efficiencyEquipmentMapper = WebUtil.getBean(EfficiencyEquipmentMapper.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 
         this.selectedMap = new HashMap();
     }
@@ -193,7 +208,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             currentPageAsset.setCost(cost);
             currentPageAsset.setCheckNumberPeople(checkNumberPeople);
             currentPageAsset.setProfits(income.subtract(cost));
-            if(!income.equals(BigDecimal.ZERO)){
+            if(!(income.compareTo(BigDecimal.ZERO)==0)){
                 currentPageAsset.setProfitsRate((income.subtract(cost)).divide(income,2));
             }else{
                 currentPageAsset.setProfitsRate(BigDecimal.ZERO);
@@ -409,6 +424,103 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
     }
 
+    private List<String> fields = ListUtil.newArrayList("设备名称", "设备型号", "品牌", "制造商序列号", "二维码", "所属科室", "设备分类", "采购金额", "检查人次", "收入", "成本", "利润", "利润率");
+
+    public void exportExcel() throws IOException {
+        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<String> orgUidList=null;
+        String orgUid=null;
+        if(CollectionUtils.isEmpty(assetUids)){
+            if(selectSite!=null){
+                orgUid = selectSite.getUid();
+            }else{
+                orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            }
+        }
+
+
+        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList);
+
+        List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
+        Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
+
+        for (EfficiencyEquipmentInfo efficiencyEquipmentInfo : list) {
+            if (efficiencyEquipmentInfo.getAssetGroup() != null) {
+                efficiencyEquipmentInfo.setAssetGroupName(assetGroupMap.get(efficiencyEquipmentInfo.getAssetGroup().toString()));
+            }
+            BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
+            BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
+            efficiencyEquipmentInfo.setProfits(income.subtract(cost));
+            efficiencyEquipmentInfo.setIncome(income);
+            efficiencyEquipmentInfo.setCost(cost);
+            if (!(income.compareTo(BigDecimal.ZERO) == 0)) {
+                efficiencyEquipmentInfo.setProfitsRate((income.subtract(cost)).divide(income, 2));
+            } else {
+                efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
+            }
+        }
+        downloadFile(parseListToMap(list), fields);
+    }
+
+    private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
+        try {//.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx")
+            InputStream stream = EfficiencyEquipmentInfoController.class.getClassLoader().getResourceAsStream("/template/APM_EfficiencyEquipment_export_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = exportData(doc, data, fields);
+            if (Boolean.TRUE.equals(exportFlag)) {
+                excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "EfficiencyEquipmentList.xlsx");
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+    }
+
+
+
+    private Boolean exportData(ExcelDocument doc, List<Map<String, Object>> dataList, List<String> fields) {
+//        for (int index = 0; index < fields.size(); index++) {
+//            doc.writeCellData("datalist", 1, index + 1, fields.get(index));
+//        }
+        int dataRow = 2;
+        for (Map<String, Object> data : dataList) {
+            for (int index = 0; index < fields.size(); index++) {
+                String columnTitle = fields.get(index);
+                if (columnTitle == null || columnTitle.isEmpty()) {
+                    continue;
+                }
+                Object value = data.get(columnTitle);
+                if (value == null) continue;
+
+                doc.writeCellData("datalist", dataRow, index + 1, value);
+            }
+            dataRow++;
+        }
+        return Boolean.TRUE;
+    }
+
+
+    public List<Map<String, Object>> parseListToMap(List<EfficiencyEquipmentInfo> list) {
+        List<Map<String, Object>> listMapResult = new ArrayList<>();
+        for (EfficiencyEquipmentInfo equipmentInfo : list) {
+            Map<String, Object> tempMap = MapUtil.newHashMap();
+            tempMap.put("设备名称", equipmentInfo.getAssetName());
+            tempMap.put("设备型号", equipmentInfo.getFunctionType());
+            tempMap.put("品牌", equipmentInfo.getBrandName());
+            tempMap.put("制造商序列号", equipmentInfo.getSerialNum());
+            tempMap.put("二维码", equipmentInfo.getQrCode());
+            tempMap.put("所属科室", equipmentInfo.getClinicalDeptName());
+            tempMap.put("设备分类", equipmentInfo.getAssetGroupName());
+            tempMap.put("采购金额", equipmentInfo.getPurchasePrice());
+            tempMap.put("检查人次", equipmentInfo.getCheckNumberPeople());
+            tempMap.put("收入", equipmentInfo.getIncome());
+            tempMap.put("成本", equipmentInfo.getCost());
+            tempMap.put("利润", equipmentInfo.getProfits());
+            tempMap.put("利润率",equipmentInfo.getProfitsRate());
+            listMapResult.add(tempMap);
+        }
+        return listMapResult;
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -431,5 +543,14 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
     }
 }

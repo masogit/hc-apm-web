@@ -128,7 +128,7 @@
                 <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContains('repair.adverseEvents')}"/>
                 <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.reportMgt')}"/>
                 <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.commonFaults')}"/>
-<!--                <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
+                <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-plus-square" rendered="#{userContextService.accessContains('maintain')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.accessContains('maintain.workbench')}"/>

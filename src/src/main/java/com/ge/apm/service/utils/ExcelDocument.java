@@ -682,6 +682,12 @@ public class ExcelDocument implements AutoCloseable{
 
             cell.setCellValue((Double) data);
         }
+        if (data instanceof BigDecimal) {
+            cell.setCellType(CellType.NUMERIC);
+//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+
+            cell.setCellValue(((BigDecimal) data).doubleValue());
+        }
 
     }
 
