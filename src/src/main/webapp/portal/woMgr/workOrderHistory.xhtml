@@ -46,10 +46,10 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="#{msg.requestReason}" filterBy="#{item.requestReason}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.requestReason}" filterBy="#{item.requestReason}" filterMatchMode="RETRIEVAL">
                                     <h:outputText escape="false"  value="#{item.requestReason}"/>
                                 </p:column>
-                                <p:column headerText="语音" width="20%" filterBy="#{item.requestReasonVoice}" filterMatchMode="LIKE">
+                                <p:column headerText="语音" width="20%" filterBy="#{item.requestReasonVoice}" filterMatchMode="RETRIEVAL">
                                     <h:outputText escape="false" value="#{item.requestReasonVoice}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.assetName}" >
