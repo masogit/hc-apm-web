@@ -301,7 +301,14 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 //        List<AssetInfo> targetAssets = availableAssets.getTarget();
         List<AssetInfo>  targetAssets=selectAssetInfos;
         BigDecimal sum = targetAssets.stream()
-                .map(AssetInfo::getScaleAssessment)
+                .filter(item -> item != null)
+                .map(item -> {
+                    BigDecimal scaleAssessment = item.getScaleAssessment();
+                    if (scaleAssessment == null) {
+                        return BigDecimal.ZERO;
+                    }
+                    return scaleAssessment;
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if(sum.compareTo(BigDecimal.valueOf(100))==1){
             WebUtil.addErrorMessage("均摊比例不能大于100");

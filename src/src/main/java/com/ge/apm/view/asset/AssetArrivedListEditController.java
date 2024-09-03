@@ -32,8 +32,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.tools.FileObject;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

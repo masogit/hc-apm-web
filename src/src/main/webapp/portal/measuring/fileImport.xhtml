@@ -30,13 +30,16 @@
 
         <div class="ui-g-12 card">
             <h:form id="zipErrListForm">
-                <p:fieldset  legend="导入失败数据">
-                    <p:dataTable id="datalist" rendered="#{not empty measureFromZipController.noFoundList}" value="#{measureFromZipController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                <p:fieldset  legend="导入结果">
+                    <p:dataTable id="datalist" rendered="#{not empty measureFromZipController.resultList}" value="#{measureFromZipController.resultList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:column headerText="证书编号">
                             <h:outputText value="#{item.certificateNo}" />
+                        </p:column>
+                        <p:column headerText="导入状态">
+                            <h:outputText value="#{item.errorInfo.length() > 0 ? '失败' : '成功'}" />
                         </p:column>
                         <p:column headerText="导入失败信息">
                             <h:outputText value="#{item.errorInfo}" />

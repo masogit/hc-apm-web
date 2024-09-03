@@ -7,7 +7,6 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.ContractInfo;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;

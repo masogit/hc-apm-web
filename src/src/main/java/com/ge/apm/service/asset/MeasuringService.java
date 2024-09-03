@@ -401,14 +401,14 @@ public class MeasuringService {
         List<MeasuringCertificateDetail> measuringCertificateDetails = certificateDetailMapper.selectList(wrapper);
         Map<String, List<MeasuringCertificateDetail>> certificateDetailMap = measuringCertificateDetails.stream().filter(detail -> ObjectUtil.isNotEmpty(detail.getCertificateNo())).collect(Collectors.groupingBy(MeasuringCertificateDetail::getCertificateNo));
 
-        List<MeasuringCertificateDetail> noFoundList = Lists.newArrayList();
+        List<MeasuringCertificateDetail> resultList = Lists.newArrayList();
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
         ZipEntry entry;
         while ((entry = zipInputStream.getNextEntry()) != null) {
             String fileName = entry.getName();
             String certificateNo = Lists.newArrayList(fileName.split("\\.")).get(0);
-            MeasuringCertificateDetail noFoundDetail = new MeasuringCertificateDetail();
+            MeasuringCertificateDetail resultDetail = new MeasuringCertificateDetail();
             List<MeasuringCertificateDetail> certificateDetails = certificateDetailMap.get(certificateNo);
             String errInfo = "";
             if (ObjectUtil.isEmpty(certificateDetails)) {
@@ -420,20 +420,22 @@ public class MeasuringService {
                 V2_BlobObject blobObject = blobFileService.uploadFile(zipInputStream, entry.getName());
                 blobObject.setBoType(V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring);
                 blobObject.setBoUuid(certificateDetail.getId());
+                List<V2_BlobObject> hasList = blobDao.findByBoUuidAndObjectName(certificateDetail.getId(), blobObject.getObjectName());
+                if (ObjectUtil.isNotEmpty(hasList)) {
+                    blobDao.delete(hasList);
+                }
                 blobDao.save(blobObject);
             }
 
-            if (errInfo.length() > 0) {
-                noFoundDetail.setCertificateNo(certificateNo);
-                noFoundDetail.setErrorInfo(errInfo);
-                noFoundList.add(noFoundDetail);
-            }
+            resultDetail.setCertificateNo(certificateNo);
+            resultDetail.setErrorInfo(errInfo);
+            resultList.add(resultDetail);
         }
         }catch (Exception e){
             LOGGER.error("handle zip error:{}",e.getMessage());
             throw  new RuntimeException("handleZip error",e);
         }
-        return noFoundList;
+        return resultList;
     }
 
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, OrgInfo selectedOrg) throws IOException, ParseException {

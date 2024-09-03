@@ -1,6 +1,8 @@
 package com.ge.apm.domain;
 
 
+import com.baomidou.mybatisplus.annotations.TableField;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 
+@Data
 @Entity
 @Table(name = "efficiency_equipment_info")
 public class EfficiencyEquipmentInfo  implements  Serializable {
@@ -82,6 +85,18 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
+
+
+    @Transient
+    private String brandName;
+    @Transient
+    private String clinicalDeptName;//所属科室
+
+    @Transient
+    private Integer assetGroup;//设备分类
+
+    @Transient
+    private String assetGroupName;//设备分类名称
 
 
     public String getUid() {
