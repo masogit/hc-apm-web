@@ -53,7 +53,7 @@ public class DataEntryService {
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
                 DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
-
+                assetCostAmountInfo.setTenantUid(user.getTenantUID());
                 if(selectAssetInfo.getAmount()!=null){
                     BigDecimal divide = selectAssetInfo.getAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
                     assetCostAmountInfo.setCostAmount(divide);
@@ -264,6 +264,7 @@ public class DataEntryService {
             for (AssetInfo targetAsset : targetAssets) {
                 for (LocalDate date = newStartDate; !date.isAfter(newEndDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
+                    assetCostAmountInfo.setTenantUid(dataEntry.getTenantUid());
                     DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     if(targetAsset.getScaleAssessment()!=null){
                         BigDecimal amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100)).setScale(6);

@@ -86,7 +86,7 @@
                                  selectionMode="single"
                                  selection="#{efficiencyEquipmentInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.uid}" sortMode="single"
+                                 rowKey="#{item.assetUid}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -96,9 +96,9 @@
                                 oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
                         <p:column width="36" id="checkBoxColumn">
-                            <p:selectBooleanCheckbox value="#{efficiencyEquipmentInfoController.selectedMap[item.uid]}"
+                            <p:selectBooleanCheckbox value="#{efficiencyEquipmentInfoController.selectedMap[item.assetUid]}"
                                                      class="selectCheckBox">
-                                <p:ajax process="@this" update="@this @(.batch-terminated)"
+                                <p:ajax process="@this" update="@this"
                                         oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
@@ -167,7 +167,7 @@
 
                         <p:column headerText="采购金额"  filterBy="#{item.assetInfo.purchasePrice}"
                                   filterMatchMode="GET">
-                            <h:outputText value="#{item.purchasePrice}">
+                            <h:outputText value="#{item.assetInfo.purchasePrice}">
                                 <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
                             </h:outputText>
                         </p:column>
@@ -206,6 +206,15 @@
                             </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">
+<!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">-->
+<!--                                <p:dataExporter type="xls" target="datalist" fileName="EfficiencyEquipment_export"/>-->
+<!--                            </p:commandButton>-->
+
+
+                            <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{efficiencyEquipmentInfoController.excelFile}" />
+                            </p:commandButton>
                             <p:commandButton id="createBatchButton"  icon="fa fa-cogs"
                                              actionListener="#{efficiencyEquipmentInfoController.prepareCreate()}" update="efficiencyEquipmentBatchForm" class="btn btn-sm btn-gray" title="批量添加"  oncomplete="PF('efficiencyEquipmentInfotSettingEditBatch').show()" />
                         </f:facet>
