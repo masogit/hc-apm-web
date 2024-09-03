@@ -10,11 +10,13 @@ import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -72,6 +74,14 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
             List<WorkOrderESHistory> data = content.stream().map(item ->initObject(item)).collect(Collectors.toList());
             highlightField(data);
             return new PageImpl<WorkOrderESHistory>(data,pageRequest,result.getTotalElements());
+        }
+    }
+
+    @Override
+    protected void addFilter(String fieldName, String matchMode, Object filterValue) {
+        super.addFilter(fieldName, matchMode, filterValue);
+        if("RETRIEVAL".equals(matchMode)){
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.RETRIEVAL, filterValue));
         }
     }
 
