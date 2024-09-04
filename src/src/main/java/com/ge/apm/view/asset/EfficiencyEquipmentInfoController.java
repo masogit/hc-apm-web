@@ -10,6 +10,7 @@ import com.ge.apm.service.asset.EfficiencyEquipmentInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -124,6 +125,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private StreamedContent excelFile;
 
 
+    private String url;
+
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
         return efficiencyEquipmentInfoRepository;
@@ -236,9 +239,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getAssetUid()) || !selectedMap.get(item.getAssetUid()));
         for (EfficiencyEquipmentInfo item : currentPageAssets) {
-            selectedMap.put(item.getUid(), !isSelectedAll);
+            selectedMap.put(item.getAssetUid(), !isSelectedAll);
         }
     }
     public void setSelectedAssetsUids() {
@@ -424,6 +427,21 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
     }
 
+    public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+
+       String url= "assetUid=" + selected.getAssetUid();
+         url = "EfficiencyEquipmentAssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
+
+
+
     private List<String> fields = ListUtil.newArrayList("设备名称", "设备型号", "品牌", "制造商序列号", "二维码", "所属科室", "设备分类", "采购金额", "检查人次", "收入", "成本", "利润", "利润率");
 
     public void exportExcel() throws IOException {
@@ -552,5 +570,18 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     public void setExcelFile(StreamedContent excelFile) {
         this.excelFile = excelFile;
+    }
+
+    public String getUrl() {
+        if(selected!=null){
+            String url= "/reports/apm-nurse-home?assetUid="+selected.getAssetUid();
+            return url;
+        }
+
+        return null;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
