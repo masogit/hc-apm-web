@@ -110,8 +110,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         if(!userContextService.isZkbUser()){
             List<String> userConfigs = new ArrayList<>();
             userConfigs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
-            userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-            userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+         /*   userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+            userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());*/
             List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigTypeIsIn(currentUser.getLoginName(),userConfigs);
             if(zkbPartOrderUserConfigs !=null && zkbPartOrderUserConfigs.size() > 0){
                 operateFlag = true;
