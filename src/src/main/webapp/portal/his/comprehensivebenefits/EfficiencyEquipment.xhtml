@@ -86,11 +86,12 @@
                                  selectionMode="single"
                                  selection="#{efficiencyEquipmentInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.assetUid}" sortMode="single"
+                                 rowKey="#{item.uid}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax  event="rowSelect" listener="#{efficiencyEquipmentInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
 
                         <p:ajax event="filter" listener="#{efficiencyEquipmentInfoController.onFilter}"
                                 oncomplete="updateSelectAllCheckBox();"/>
@@ -242,6 +243,15 @@
                 $("div table")[1].style.width = "auto";
                 $("html")[0].style.overflowX = "hidden";
             });
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
 
             //<![CDATA[
             afterPageLoad = function () {
