@@ -2602,7 +2602,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void repairPmOrderBatch() {
 //        保存检查项
        // saveCheckItemDataBatch(orderNumList);
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap, currentPersonIdBatch);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap, currentPersonIdBatch, comments);
         selectedMap = new HashMap<String, Boolean>();
     }
 

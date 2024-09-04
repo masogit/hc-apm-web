@@ -601,7 +601,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder,String currentPersonIdBatch) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder,String currentPersonIdBatch, String comments) {
         String token = UserContextService.getAccessToken();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
@@ -629,6 +629,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             formData.setManHours(Math.round(averageHours*100.0)/100.0);
             formData.setPlanTime(item.getPlanTime().toString());
             formData.setAssignee(currentPersonIdBatch); // 记录验收人
+            formData.setComments(comments);
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
