@@ -159,7 +159,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 BigDecimal scaleAssessment = selectAssetInfo.getScaleAssessment();
                 if (scaleAssessment != null) {
                     BigDecimal amount = entryAmount.multiply(scaleAssessment);
-                    BigDecimal divide = amount.divide(BigDecimal.valueOf(100), 6);
+                    BigDecimal divide = amount.divide(BigDecimal.valueOf(100), 6, BigDecimal.ROUND_DOWN);
                     selectAssetInfo.setAmount(divide);
                 }
 

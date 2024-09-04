@@ -268,7 +268,7 @@ public class DataEntryService {
                     assetCostAmountInfo.setTenantUid(dataEntry.getTenantUid());
                     DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     if(targetAsset.getScaleAssessment()!=null){
-                        BigDecimal amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100)).setScale(6);
+                        BigDecimal amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100)).setScale(6,BigDecimal.ROUND_DOWN);
                         assetCostAmountInfo.setCostAmount(amount);
                         dataEntryAssetDetail.setCostAmount(amount);
 
