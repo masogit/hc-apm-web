@@ -107,6 +107,7 @@ public class UserAccountExportService {
 		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All(orgInfoTenantAll);
 		List<CustomRole> customRoleList = getTenantCustomRole();
 		if (listUserAccount != null && !listUserAccount.isEmpty()) {
+			listUserAccount=listUserAccount.stream().filter(item->!Boolean.TRUE.equals(item.getIsDeleted())).collect(Collectors.toList());
 			setListOrgInfo(listUserAccount,orgInfoTenantAll);
 			Map<Integer, List<UserRole>> userCustomList = getUserCustomList(listUserAccount);
 			for (UserAccount tempUser : listUserAccount) {
@@ -237,8 +238,8 @@ public class UserAccountExportService {
 		userAccounts.forEach(item->{
 			String siteUID = item.getSiteUID();
 			List<OrgInfo> listOrgInfo = orgInfoMap.get(item.getUid()); // 过滤跨院区
-			if(CollectionUtils.isNotEmpty(listOrgInfo)){
-				listOrgInfo=listOrgInfo.stream().filter(org->siteUID.equals(org.getSiteUID()) || siteUID.equals(org.getHospitalUID()) || siteUID.equals(org.getInstitutionUID()) ||  siteUID.equals(org.getTenantUID())).collect(Collectors.toList());
+			if(CollectionUtils.isNotEmpty(listOrgInfo) && StringUtils.isNotEmpty(siteUID)){
+				listOrgInfo=listOrgInfo.stream().filter(Objects::nonNull).filter(org->siteUID.equals(org.getSiteUID()) || siteUID.equals(org.getHospitalUID()) || siteUID.equals(org.getInstitutionUID()) ||  siteUID.equals(org.getTenantUID())).collect(Collectors.toList());
 				item.setListOrgInfo(listOrgInfo);
 			}
 		});

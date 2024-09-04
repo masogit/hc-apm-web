@@ -636,7 +636,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             allItemList.add(paymentInfo);
         }
         double sum = allItemList.stream().filter(t -> "paymentRecord".equals(t.getItemType())).mapToDouble(ContractInfoItem::getPaymentPrice).sum();
-        if (sum > (selected.getAmount() + selected.getSupplementaryAmount())) {
+        Double amount = selected.getAmount() == null ? 0.0 : selected.getAmount();
+        Double supplementaryAmount = selected.getSupplementaryAmount() == null ? 0.0 : selected.getSupplementaryAmount();
+        if (sum > (amount + supplementaryAmount)) {
             allItemList.remove(paymentInfo);
             WebUtil.addErrorMessage("付款金额大于总额！");
             RequestContext requestContext = RequestContext.getCurrentInstance();
