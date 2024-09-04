@@ -224,18 +224,18 @@ public class HisAssetGroupService {
                     UserAccount loginUser = UserContextService.getCurrentUserAccount();
                     HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
                     hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
+                    hisAdjustBusinessJob.setTaskStatus(0);
                     if(hisAssetGroup.getType().equals("Income")){
                         hisAdjustBusinessJob.setTaskType(3);
                     }else{
                         hisAdjustBusinessJob.setTaskType(0);
-
+                        hisAdjustBusinessJob.setTaskStatus(1);
                     }
                     hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
                     hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSONArray.fromObject(value).toString());
                     hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
                     hisAdjustBusinessJob.setDataStartDate(updateStartDate);
                     hisAdjustBusinessJob.setDataEndDate(updateEndDate);
-                    hisAdjustBusinessJob.setTaskStatus(0);
                     hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
                     hisAdjustBusinessJob.setCreatedDate(new Date());
                     hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
