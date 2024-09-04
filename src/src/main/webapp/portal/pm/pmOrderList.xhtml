@@ -312,7 +312,7 @@
         </h:panelGroup>
     </p:dialog >
     <!--批量完成2级保养工单对话框-->
-    <p:dialog class ="pmCompleteDialogBatch" id="pmCompleteDialogBatch" widgetVar="pmCompleteDialogBatch" modal="true" height="#{pmOrderGlobalController.isAutoAck() ? '120' : '180'}" width="500"  resizable="false" draggable="true" appendTo="@this" header="#{msg.BatchComplete}">
+    <p:dialog class ="pmCompleteDialogBatch" id="pmCompleteDialogBatch" widgetVar="pmCompleteDialogBatch" modal="true" height="#{pmOrderGlobalController.isAutoAck() ? '200' : '250'}" width="500"  resizable="false" draggable="true" appendTo="@this" header="#{msg.BatchComplete}">
         <h:form id="pmCompleteDialogFormBatch" class="pmCompleteDialogFormclsBatch" >
             <h:panelGroup  id="display6" style="height:500px">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -325,12 +325,16 @@
                         <p:inputText value="#{v2PmOrderController.totalManHours}" required="true"  requiredMessage="#{msg.TotalManhoursHours}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup rendered="#{!pmOrderGlobalController.isAutoAck()}">
                         <label class="label">验收人*</label>
                         <p:selectOneMenu  value="#{v2PmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.AcknowledgedBy} #{msg.ValidationRequire}">
                             <f:selectItems value="#{pmOrderGlobalController.getAckerForMultiplePmOrders()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">工单备注</label>
+                        <p:inputTextarea  value="#{v2PmOrderController.comments}" rows="2"  cols="30"  queryDelay="550" minQueryLength="4" maxlength="100"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
