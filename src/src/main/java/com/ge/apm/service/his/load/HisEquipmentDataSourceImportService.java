@@ -209,11 +209,11 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "执行时间不能为空");
             isValidateData = false;
         }
-        if(hisEquipmentDataSource.getExecDept() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "执行科室不能为空");
-            isValidateData = false;
-        }
+//        if(hisEquipmentDataSource.getExecDept() == null){
+//            item.put("status", ImportStatus.Failure);
+//            ContractRow.addErrMessage(item, "执行科室不能为空");
+//            isValidateData = false;
+//        }
         if(hisEquipmentDataSource.getSourceCode() != null && hisEquipmentDataSource.getExamBodyPart() == null &&  !"HIS".equals(hisEquipmentDataSource.getSourceCode())  ){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "检查部位不能为空");
