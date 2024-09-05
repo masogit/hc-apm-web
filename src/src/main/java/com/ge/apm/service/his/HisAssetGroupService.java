@@ -1,5 +1,6 @@
 package com.ge.apm.service.his;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
@@ -232,8 +233,8 @@ public class HisAssetGroupService {
                         hisAdjustBusinessJob.setTaskStatus(1);
                     }
                     hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
-                    hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSONArray.fromObject(value).toString());
-                    hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
+                    hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSON.toJSONString(value));
+                    hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSON.toJSONString(newList));
                     hisAdjustBusinessJob.setDataStartDate(updateStartDate);
                     hisAdjustBusinessJob.setDataEndDate(updateEndDate);
                     hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
