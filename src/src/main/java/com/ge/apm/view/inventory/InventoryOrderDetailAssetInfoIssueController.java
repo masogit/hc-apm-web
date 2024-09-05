@@ -113,14 +113,14 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 				orderIdList = ListUtil.newArrayList("-1");
 			}
 			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+			if (currentUser.isEnableAssetTypeGroup()) {
+				searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+			}
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
-		}
-		if (currentUser.isEnableAssetTypeGroup()) {
-			searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
 		}
 		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
