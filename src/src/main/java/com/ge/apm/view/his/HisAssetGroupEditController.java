@@ -185,7 +185,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             selectedAssets.remove(asset);
         }
 
-        isAllSelected=selectAssetInfos.stream().allMatch(item->selectedMap.get(item.getUid()));
+        isAllSelected=selectAssetInfos.stream().allMatch(item-> Optional.ofNullable(selectedMap.get(item.getUid())).orElse(Boolean.FALSE));
 
     }
 
