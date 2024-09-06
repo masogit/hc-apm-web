@@ -100,6 +100,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Setter
     private List<AssetInfo> selectAssets=new ArrayList<>();
 
+    @Getter
+    @Setter
+    private List<AssetInfo> selectAssets2=new ArrayList<>();
+
     //复选的设备
     @Getter
     @Setter
@@ -382,16 +386,22 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         } else {
             selectAssets.remove(asset);
         }
+
+        isAllSelected=assetInfos.stream().allMatch(item-> Optional.ofNullable(selectedMap.get(item.getUid())).orElse(Boolean.FALSE));
+
     }
 
     public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
-//        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
-//        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
-//        if(box.isSelected()) {
-//            selectAssets.add(asset);
-//        } else {
-//            selectAssets.remove(asset);
-//        }
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+        if(box.isSelected()) {
+            selectAssets2.add(asset);
+        } else {
+            selectAssets2.remove(asset);
+        }
+
+        isAllSelected2=selectAssets.stream().allMatch(item-> Optional.ofNullable(selectedMap2.get(item.getUid())).orElse(Boolean.FALSE));
+
     }
 
     public void confirm(){
@@ -402,12 +412,13 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         if(isAllSelected) {
             assetInfos.stream().forEach(t -> {
                 selectedMap.put(t.getUid(), Boolean.TRUE);
+                selectAssets.add(t);
 
             });
         } else {
             assetInfos.stream().forEach(t -> {
                 selectedMap.put(t.getUid(), Boolean.FALSE);
-
+                selectAssets.remove(t);
             });
         }
         isAllSelected = !isAllSelected;
