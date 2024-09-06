@@ -23,7 +23,7 @@
 
                 <h:panelGroup>
                     <label class="label">#{msg.clinicalDeptName}</label>
-                    <p:autoComplete id="clinicalDeptName" required="true" dropdown="true"
+                    <p:autoComplete id="clinicalDeptName" dropdown="true"
                                     value="#{dataEntryCreateController.filterDeptOrg}"
                                     scrollHeight="300" forceSelection="true"
                                     completeMethod="#{dataEntryCreateController.autoCompleteDept}"
@@ -120,7 +120,7 @@
         </p:dataTable>
         <br/>
         <h:panelGroup>
-            <p:commandButton action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"
+            <p:commandButton  validateClient="false" immediate="true"  process="@this"  action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"
                              update="selectAssets" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
         </h:panelGroup>
 
