@@ -196,7 +196,9 @@
                                     pattern="yyyy/MM/dd"
                                     value="#{hisAssetGroupEditController.updateEndDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true"
-                                    navigator="true" mask="true"/>
+                                    navigator="true" mask="true"
+                                 maxdate="#{hisAssetGroupEditController.today}"/>
+
                     </h:panelGroup>
 
                 </p:panelGrid>

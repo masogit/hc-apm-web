@@ -73,6 +73,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     private Date updateEndDate;
 
     @Getter
+    @Setter
+    private Date today=new Date();
+
+    @Getter
     private boolean boundAssetsUpdated;
 
     @Getter
