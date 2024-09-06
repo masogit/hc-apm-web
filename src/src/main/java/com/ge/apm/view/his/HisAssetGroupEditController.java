@@ -156,7 +156,6 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
             boolean b = selectAssetInfos.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
             if(b){
                 selectAssetInfos.remove(assetInfo);
-                selectedAssets.remove(assetInfo);
             }
             if(target.contains(assetInfo)){
                 target.remove(assetInfo);
@@ -165,6 +164,8 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         }
         isAllSelected = Boolean.FALSE;
         availableAssets.setTarget(target);
+        selectedAssets=new HashSet<>();
+
     }
 
     public void sharedEquallyProportion(){
@@ -183,6 +184,9 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         } else {
             selectedAssets.remove(asset);
         }
+
+        isAllSelected=selectAssetInfos.stream().allMatch(item->selectedMap.get(item.getUid()));
+
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
