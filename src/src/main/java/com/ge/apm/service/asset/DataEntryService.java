@@ -146,8 +146,8 @@ public class DataEntryService {
 
 
     @Transactional
-    public void saveAssetEntry(List<AssetInfo> selectAssets, List<DataEntry> dataEntries, UserAccount user ) {
-        for (AssetInfo selectAsset : selectAssets) {
+    public void saveAssetEntry(AssetInfo selectAsset, List<DataEntry> dataEntries, UserAccount user ) {
+//        for (AssetInfo selectAsset : selectAssets) {
             for (DataEntry dataEntry : dataEntries) {
                 if(dataEntry.getUid()!=null){
                     DataEntry byId = dataEntryRepository.findById(dataEntry.getUid());
@@ -194,7 +194,7 @@ public class DataEntryService {
                 this.saveOrUpdate(assetCostAmountInfos,uids,dataEntry.getStartDate(),dataEntry.getEndDate());
                 dataEntryAssetDetailRepository.save(dataEntryAssetDetails);
             }
-        }
+//        }
     }
 
     private void buildDataEntry(DataEntry dataEntry, AssetInfo selectAsset, UserAccount user,int type) {

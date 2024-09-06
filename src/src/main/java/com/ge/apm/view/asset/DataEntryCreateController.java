@@ -3,11 +3,9 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
-import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.service.asset.DataEntryService;
@@ -44,6 +42,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchDao;
     private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
+    private HisAssetGroupRepository hisAssetGroupRepository;
 
     private DataEntryService dataEntryService;
 
@@ -88,6 +87,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     private OrgInfoRepository orgInfoDao;
 
+    @Getter
+    @Setter
+    private AssetInfo onSelectAssetInfo;
+
 
     private UserSiteOrgTreeComponentController userSiteOrgTreeComponentController;
     private AssetInfoRepository assetInfoRepository;
@@ -129,6 +132,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Override
     protected void init() {
         hisAssetGroupAssetMatchDao = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
+        hisAssetGroupRepository = WebUtil.getBean(HisAssetGroupRepository.class);
 
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
         dataEntryService = WebUtil.getBean(DataEntryService.class);
@@ -226,8 +230,19 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
             return;
         }
-        dataEntryService.saveAssetEntry(selectAssets,dataEntries,user);
-        WebUtil.addSuccessMessage("设备录入数据成功");
+        dataEntryService.saveAssetEntry(selectAssets.get(0),dataEntries,user);
+
+        List<String> hisAssetGroupUidByAssetUid = hisAssetGroupClinicalMatchDao.getHisAssetGroupUidByAssetUid(selectAssets.get(0).getUid(), user.getTenantUID());
+        if(CollectionUtils.isEmpty(hisAssetGroupUidByAssetUid)){
+
+            WebUtil.addSuccessMessage("设备录入数据成功");
+            return;
+        }
+        List<HisAssetGroup> byUuidIn = hisAssetGroupRepository.findByUuidIn(hisAssetGroupUidByAssetUid);
+
+        List<String> groupName = byUuidIn.stream().map(HisAssetGroup::getName).collect(Collectors.toList());
+        WebUtil.addWarnMessage("设备录入数据成功;设备已存在 "+ JSON.toJSONString(groupName)+"分组中");
+
     }
 
 
@@ -248,7 +263,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             assetName=null;
             serialNum=null;
             assetGroup=null;
-            
+            assetInfos=new ArrayList<>();
 
             if (eventObject == null) {
                 //create
@@ -442,5 +457,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         String configItemValue = userContextService.getConfigItemValue("costType");
         List<Map<String, String>> mapList = JSON.parseObject(configItemValue, new TypeReference<List<Map<String,String>>>(){});
         return mapList;
+    }
+
+    public void onSelectAsset(){
+        selectAssets.clear();
+        selectAssets.add(onSelectAssetInfo);
     }
 }
