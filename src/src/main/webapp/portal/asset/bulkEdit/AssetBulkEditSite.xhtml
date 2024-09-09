@@ -56,7 +56,7 @@
                                                         scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDeptAsFilter}"
                                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="siteFilterChange">
                                             <p:ajax event="itemSelect" update="@(.pickList)" />
-                                            <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.pickList)" />
+<!--                                            <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.pickList)" />-->
                                         </p:autoComplete>
                                     </h:panelGroup>
 
