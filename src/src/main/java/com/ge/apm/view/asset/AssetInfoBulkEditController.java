@@ -1348,6 +1348,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public DualListModel<AssetInfo> getAssets() {
+        if (assets.getTarget().size() >= 1000) {
+            return assets;
+        }
 
         prepareFilters();
 
