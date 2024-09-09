@@ -245,6 +245,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
+        content.put(MaintenanceTemplate.Maintenance.COMMENTS.toString(), pmOrder.getComments());
         // Coworker List
         if (coWorkerList != null) {
             int count = 0;

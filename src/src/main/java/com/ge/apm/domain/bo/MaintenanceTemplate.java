@@ -441,7 +441,8 @@ public class MaintenanceTemplate {
         COWORKER1_TIME("coworker1_time", Widget.TEXT),
         COWORKER2("coworker2", Widget.TEXT),
         COWORKER2_TIME("coworker2_time", Widget.TEXT),
-        RESULT("result", Widget.TEXT);
+        RESULT("result", Widget.TEXT),
+        COMMENTS("comments", Widget.TEXT);
 
         private final String key;
         private final Widget widget;
