@@ -126,8 +126,11 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private StreamedContent exportPdf;
     @Getter@Setter
     private String[] selectedOptions;
-    private ConfigItemMapper configItemMapper;
-    ConfigItemValue configItemValue;
+
+    private ConfigItemValueRepository configItemValueRepository;
+
+    String configItemValue;
+
 
     @Getter@Setter
     private StreamedContent excelFile;
@@ -147,7 +150,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
-        configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
 
@@ -162,7 +165,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         injuryPerformance = new ArrayList<>();
         mechanicalFailure = new ArrayList<>();
         /*初始化方法*/
-        configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
+        //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
+        configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "setAdverseEventProductType");
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
     }
@@ -177,7 +181,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setOccurredPlace("境内");
             //默认不良事件工单类型
             this.selected.setAdverseEventType("1");
-            if(configItemValue != null && StrUtil.isNotEmpty(configItemValue.getValue()) && "3".equals(configItemValue.getValue())){
+            if(StrUtil.isNotEmpty(configItemValue) && "3".equals(configItemValue)){
                 assetType = 2;
             }
         } else {
@@ -200,21 +204,21 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     public boolean assetTypeDisabledCheck(String type){
         if("1".equals(type)){
-            if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue)){
                 return false;
-            }else if(AdverseEvents.ALL.equals(configItemValue.getValue())){
+            }else if(AdverseEvents.ALL.equals(configItemValue)){
                 return false;
-            }else if(AdverseEvents.EQUIPMENT.equals(configItemValue.getValue())){
+            }else if(AdverseEvents.EQUIPMENT.equals(configItemValue)){
                 return false;
             }else{
                 return true;
             }
         }else{
-            if(configItemValue == null || StrUtil.isEmpty(configItemValue.getValue())){
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue)){
                 return true;
-            }else if(AdverseEvents.ALL.equals(configItemValue.getValue())){
+            }else if(AdverseEvents.ALL.equals(configItemValue)){
                 return false;
-            }else if(AdverseEvents.CONSUMABLES.equals(configItemValue.getValue())){
+            }else if(AdverseEvents.CONSUMABLES.equals(configItemValue)){
                 return false;
             }else{
                 return true;
