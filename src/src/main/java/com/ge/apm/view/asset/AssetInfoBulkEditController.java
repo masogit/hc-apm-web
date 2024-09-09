@@ -61,7 +61,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     static PageRequest pageRequest = new PageRequest(0, 1000);
 
     private AssetInfoRepository dao;
-    private AssetInfoMapper assetInfoMapper;
     private AssetInfoService assetInfoService;
     private UaaService uaaService;
     private UserCommonService ucService;
@@ -195,7 +194,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
-        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
@@ -1331,6 +1329,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         } else {
             clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getUid());
         }
+        logger.error("clinicalDeptListAsFilter size = {}", clinicalDeptListAsFilter.size());
     }
 
     public List<OrgInfo> autoCompleteDeptAsFilter(String query) {
