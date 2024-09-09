@@ -6,7 +6,9 @@
         <result column="id" property="id"/>
         <result column="uid" property="uid"/>
         <result column="name" property="name"/>
+        <result column="status" property="status"/>
         <result column="serial_num" property="serialNum"/>
+        <result column="depart_num" property="departNum"/>
         <result column="financing_num" property="financingNum"/>
         <result column="qr_code" property="qrCode"/>
         <result column="function_type" property="functionType"/>
@@ -22,6 +24,12 @@
         <result column="next_metering_date" property="nextMeteringDate"/>
         <result column="check_date" property="checkDate"/>
         <result column="bo_uuid" property="boUuid"/>
+        <result column="tenant_uid" property="tenantUID"/>
+        <result column="institution_uid" property="institutionUID"/>
+        <result column="hospital_uid" property="hospitalUID"/>
+        <result column="site_uid" property="siteUID"/>
+        <result column="asset_dept_uid" property="assetDeptUID"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUID"/>
     </resultMap>
 
     <select id="selectMeasureResult" resultMap="assetBean">
@@ -74,6 +82,56 @@
         select  count(*) from asset_info ai
         <include refid="queryCondition"/>
 
+    </select>
+
+    <select id="findByParam" resultMap="assetBean">
+        select ai.id, ai.uid, ai.name, ai.status, ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.financing_num, ai.serial_num, ai.depart_num, ai.qr_code, ai.asset_dept_uid, ai.clinical_dept_uid from org_info oi, user_org uo, asset_info ai
+        <where>
+            uo.user_uid = #{userUid}
+            AND ai.tenant_uid = #{tenantUid}
+            AND uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid )
+            AND oi.org_type = 3
+            AND oi.uid= ai.site_uid
+            and ai.is_deleted='false' and ai.is_valid='true'
+            <if test="siteUid != null">
+                and ai.site_uid = #{siteUid}
+            </if>
+            <if test="clinicalDeptUid != null">
+                and ai.clinical_dept_uid = #{clinicalDeptUid}
+            </if>
+            <if test="assetGroup != null">
+                and ai.asset_group = #{assetGroup}
+            </if>
+            <if test="oneSearchStr != null">
+                and (ai.name like concat('%',#{oneSearchStr},'%') or ai.depart_num like concat('%',#{oneSearchStr},'%') or ai.financing_num like concat('%',#{oneSearchStr},'%') or ai.qr_code like concat('%',#{oneSearchStr},'%') or ai.serial_num like concat('%',#{oneSearchStr},'%') )
+            </if>
+        </where>
+        limit 1000 offset 0
+    </select>
+
+    <select id="findByParam1" resultType="map">
+        select ai.id, ai.uid, ai.name, ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.financing_num, ai.serial_num, ai.depart_num, ai.qr_code, ai.asset_dept_uid, ai.clinical_dept_uid from org_info oi, user_org uo, asset_info ai
+        <where>
+            uo.user_uid = #{userUid}
+            AND ai.tenant_uid = #{tenantUid}
+            AND uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid )
+            AND oi.org_type = 3
+            AND oi.uid= ai.site_uid
+            and ai.is_deleted='false' and ai.is_valid='true'
+            <if test="siteUid != null">
+                and ai.site_uid = #{siteUid}
+            </if>
+            <if test="clinicalDeptUid != null">
+                and ai.clinical_dept_uid = #{clinicalDeptUid}
+            </if>
+            <if test="assetGroup != null">
+                and ai.asset_group = #{assetGroup}
+            </if>
+            <if test="oneSearchStr != null">
+                and (ai.name like concat('%',#{oneSearchStr},'%') or ai.depart_num like concat('%',#{oneSearchStr},'%') or ai.financing_num like concat('%',#{oneSearchStr},'%') or ai.qr_code like concat('%',#{oneSearchStr},'%') or ai.serial_num like concat('%',#{oneSearchStr},'%') )
+            </if>
+        </where>
+        limit 1000 offset 0
     </select>
 
     <sql id="queryCondition">

@@ -23,7 +23,7 @@
 
                 <h:panelGroup>
                     <label class="label">#{msg.clinicalDeptName}</label>
-                    <p:autoComplete id="clinicalDeptName" required="true" dropdown="true"
+                    <p:autoComplete id="clinicalDeptName" dropdown="true"
                                     value="#{dataEntryCreateController.filterDeptOrg}"
                                     scrollHeight="300" forceSelection="true"
                                     completeMethod="#{dataEntryCreateController.autoCompleteDept}"
@@ -81,28 +81,29 @@
         </div>
 
         <p:dataTable id="datalist" value="#{dataEntryCreateController.assetInfos}" var="item" widgetVar="varDataList"
-                     selectionMode="single"
+                     selectionMode="single"    selection="#{dataEntryCreateController.onSelectAssetInfo}"
                      lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                      rowKey="#{item.uid}" sortMode="single" sortOrder="descending"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="20" emptyMessage="#{msg.noRecordFound}"
                      rowsPerPageTemplate="20,50,100,500">
+            <p:ajax event="rowSelect" listener="#{dataEntryCreateController.onSelectAsset}"  update="tabDataEntry:AssetAddForm:selectAssets" ></p:ajax>
 
-            <p:column width="36" exportable="false">
-                <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap[item.uid]}" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"
-                                         class="selectCheckBox1">
-                    <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList}"/>
-                    <f:attribute name="assetObj" value="#{item}"/>
-                </p:selectBooleanCheckbox>
-                <f:facet name="header">
-                    <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected}"
-                                             id="selectCheckBoxHeader" class="selectCheckBoxHeader" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}">
-                        <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage}"
-                                update="@(.selectCheckBox1)"/>
-                    </p:selectBooleanCheckbox>
-                </f:facet>
-            </p:column>
+            <!--            <p:column width="36" exportable="false">-->
+<!--                <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap[item.uid]}" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"-->
+<!--                                         class="selectCheckBox1">-->
+<!--                    <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList}" update="@(.selectCheckBoxHeader)"/>-->
+<!--                    <f:attribute name="assetObj" value="#{item}"/>-->
+<!--                </p:selectBooleanCheckbox>-->
+<!--&lt;!&ndash;                <f:facet name="header">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                             id="selectCheckBoxHeader" class="selectCheckBoxHeader" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                update="@(.selectCheckBox1)"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </p:selectBooleanCheckbox>&ndash;&gt;-->
+<!--&lt;!&ndash;                </f:facet>&ndash;&gt;-->
+<!--            </p:column>-->
 
             <p:column headerText="设备名称">
                 <h:outputText value="#{item.name}"/>
@@ -119,10 +120,10 @@
 
         </p:dataTable>
         <br/>
-        <h:panelGroup>
-            <p:commandButton action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"
-                             update="selectAssets" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>
-        </h:panelGroup>
+<!--        <h:panelGroup>-->
+<!--            <p:commandButton  validateClient="false" immediate="true"  process="@this"  action="#{dataEntryCreateController.confirm}" value="选择选中设备" icon="ui-icon-check"-->
+<!--                             update="selectAssets" disabled="#{dataEntryCreateController.CRUDActionName.equals('修改')}"/>-->
+<!--        </h:panelGroup>-->
 
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
             <p:dataTable id="selectAssets" value="#{dataEntryCreateController.selectAssets}" var="asset"
@@ -136,13 +137,13 @@
                 <p:column width="40" id="checkBoxCol">
                     <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap2[asset.uid]}"
                                              class="selectCheckBox2">
-                        <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList2}"/>
+                        <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
                         <f:attribute name="assetObj" value="#{asset}"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected2}"
                                                  id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">
-                            <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage2}"/>
+                            <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>

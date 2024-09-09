@@ -6,11 +6,9 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.AssetInfo;
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 import webapp.framework.web.WebUtil;
 

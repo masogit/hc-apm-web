@@ -1,5 +1,6 @@
 package com.ge.apm.service.his;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
@@ -191,8 +192,22 @@ public class HisAssetGroupService {
             }
             Set<String> uids1 = value.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
             Set<String> uids2 = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
-            if (!uids1.equals(uids2)) {
 
+            Map<String, BigDecimal> listMap = value.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+            Map<String, BigDecimal> targetAssetsMap = assetInfos.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+            boolean flag=false;
+            flag = !uids1.equals(uids2);
+            if(!flag){
+                for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
+                    BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+                    if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
+                        flag=true;
+                        break;
+                    }
+
+                }
+            }
+            if (flag) {
                 StringBuilder businessId = new StringBuilder();
 //                List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupMatchUid(hisAssetGroupAssetMatch.getUuid());
                 List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupUidAndclinicalDeptUid(hisAssetGroup.getUuid(), clinical.getKey());
@@ -224,18 +239,18 @@ public class HisAssetGroupService {
                     UserAccount loginUser = UserContextService.getCurrentUserAccount();
                     HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
                     hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
+                    hisAdjustBusinessJob.setTaskStatus(0);
                     if(hisAssetGroup.getType().equals("Income")){
                         hisAdjustBusinessJob.setTaskType(3);
                     }else{
                         hisAdjustBusinessJob.setTaskType(0);
-
+                        hisAdjustBusinessJob.setTaskStatus(1);
                     }
                     hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
-                    hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSONArray.fromObject(value).toString());
-                    hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
+                    hisAdjustBusinessJob.setOldStrJson(value.isEmpty() ? null : JSON.toJSONString(value));
+                    hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSON.toJSONString(newList));
                     hisAdjustBusinessJob.setDataStartDate(updateStartDate);
                     hisAdjustBusinessJob.setDataEndDate(updateEndDate);
-                    hisAdjustBusinessJob.setTaskStatus(0);
                     hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
                     hisAdjustBusinessJob.setCreatedDate(new Date());
                     hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());

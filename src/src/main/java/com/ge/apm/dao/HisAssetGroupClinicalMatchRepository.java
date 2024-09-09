@@ -72,4 +72,10 @@ public interface HisAssetGroupClinicalMatchRepository extends GenericRepositoryU
     @Query(value = "select count(*) from his_asset_group_clinical_match where his_asset_group_uid = ?1    and org_info_uid=?2", nativeQuery = true)
     Integer countByGroupUidAndOrgInfoUid(String groupUid, String siteUid);
 
+
+
+    @Query(value = "select hag.uuid from his_asset_group_clinical_match hagcm left join   his_asset_group hag   on  hagcm.his_asset_group_uid=hag.uuid   where hag.type='Cost'  and    hagcm.asset_uid=?1  and hagcm.tenant_uid=?2  group by  hag.uuid", nativeQuery = true)
+    List<String> getHisAssetGroupUidByAssetUid(String asset_uid,String tenantUid);
+
+
 }
