@@ -371,9 +371,9 @@ public class InventoryOrderService {
 			Map<String, String> assetTypeMap = assetTypeGroups.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
 			for (InventoryOrder order : listFilterInventoryOrder) {
 				List<Map> clinicalDeptList = JSON.parseArray(order.getAssigneeOrg(), Map.class);
-				StringBuilder clinicalDeptNames = new StringBuilder(assetTypeMap.get(order.getAssetType()));
+				StringBuilder clinicalDeptNames = new StringBuilder(assetTypeMap.get(order.getAssetType()) + " ");
 				for (Map map : clinicalDeptList) {
-					clinicalDeptNames.append(map.get("orgName").toString().replace(assetTypeMap.get(order.getAssetType()) + " / ", " "));
+					clinicalDeptNames.append(map.get("orgName").toString().replace(assetTypeMap.get(order.getAssetType()) + " / ", "")).append(" ");
 				}
 				order.setClinicalDeptLabel(clinicalDeptNames.toString());
 			}

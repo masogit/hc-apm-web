@@ -3,11 +3,9 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
-import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.service.asset.DataEntryService;
@@ -44,6 +42,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchDao;
     private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
+    private HisAssetGroupRepository hisAssetGroupRepository;
 
     private DataEntryService dataEntryService;
 
@@ -88,6 +87,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     private OrgInfoRepository orgInfoDao;
 
+    @Getter
+    @Setter
+    private AssetInfo onSelectAssetInfo;
+
 
     private UserSiteOrgTreeComponentController userSiteOrgTreeComponentController;
     private AssetInfoRepository assetInfoRepository;
@@ -99,6 +102,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Getter
     @Setter
     private List<AssetInfo> selectAssets=new ArrayList<>();
+
+    @Getter
+    @Setter
+    private List<AssetInfo> selectAssets2=new ArrayList<>();
 
     //复选的设备
     @Getter
@@ -125,6 +132,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Override
     protected void init() {
         hisAssetGroupAssetMatchDao = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
+        hisAssetGroupRepository = WebUtil.getBean(HisAssetGroupRepository.class);
 
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
         dataEntryService = WebUtil.getBean(DataEntryService.class);
@@ -159,7 +167,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 BigDecimal scaleAssessment = selectAssetInfo.getScaleAssessment();
                 if (scaleAssessment != null) {
                     BigDecimal amount = entryAmount.multiply(scaleAssessment);
-                    BigDecimal divide = amount.divide(BigDecimal.valueOf(100), 6);
+                    BigDecimal divide = amount.divide(BigDecimal.valueOf(100), 6, BigDecimal.ROUND_DOWN);
                     selectAssetInfo.setAmount(divide);
                 }
 
@@ -222,8 +230,19 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
             return;
         }
-        dataEntryService.saveAssetEntry(selectAssets,dataEntries,user);
-        WebUtil.addSuccessMessage("设备录入数据成功");
+        dataEntryService.saveAssetEntry(selectAssets.get(0),dataEntries,user);
+
+        List<String> hisAssetGroupUidByAssetUid = hisAssetGroupClinicalMatchDao.getHisAssetGroupUidByAssetUid(selectAssets.get(0).getUid(), user.getTenantUID());
+        if(CollectionUtils.isEmpty(hisAssetGroupUidByAssetUid)){
+
+            WebUtil.addSuccessMessage("设备录入数据成功");
+            return;
+        }
+        List<HisAssetGroup> byUuidIn = hisAssetGroupRepository.findByUuidIn(hisAssetGroupUidByAssetUid);
+
+        List<String> groupName = byUuidIn.stream().map(HisAssetGroup::getName).collect(Collectors.toList());
+        WebUtil.addWarnMessage("设备录入数据成功;设备已存在 "+ JSON.toJSONString(groupName)+"分组中");
+
     }
 
 
@@ -244,7 +263,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             assetName=null;
             serialNum=null;
             assetGroup=null;
-            
+            assetInfos=new ArrayList<>();
 
             if (eventObject == null) {
                 //create
@@ -382,16 +401,22 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         } else {
             selectAssets.remove(asset);
         }
+
+        isAllSelected=assetInfos.stream().allMatch(item-> Optional.ofNullable(selectedMap.get(item.getUid())).orElse(Boolean.FALSE));
+
     }
 
     public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
-//        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
-//        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
-//        if(box.isSelected()) {
-//            selectAssets.add(asset);
-//        } else {
-//            selectAssets.remove(asset);
-//        }
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+        if(box.isSelected()) {
+            selectAssets2.add(asset);
+        } else {
+            selectAssets2.remove(asset);
+        }
+
+        isAllSelected2=selectAssets.stream().allMatch(item-> Optional.ofNullable(selectedMap2.get(item.getUid())).orElse(Boolean.FALSE));
+
     }
 
     public void confirm(){
@@ -402,12 +427,13 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         if(isAllSelected) {
             assetInfos.stream().forEach(t -> {
                 selectedMap.put(t.getUid(), Boolean.TRUE);
+                selectAssets.add(t);
 
             });
         } else {
             assetInfos.stream().forEach(t -> {
                 selectedMap.put(t.getUid(), Boolean.FALSE);
-
+                selectAssets.remove(t);
             });
         }
         isAllSelected = !isAllSelected;
@@ -431,5 +457,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         String configItemValue = userContextService.getConfigItemValue("costType");
         List<Map<String, String>> mapList = JSON.parseObject(configItemValue, new TypeReference<List<Map<String,String>>>(){});
         return mapList;
+    }
+
+    public void onSelectAsset(){
+        selectAssets.clear();
+        selectAssets.add(onSelectAssetInfo);
     }
 }

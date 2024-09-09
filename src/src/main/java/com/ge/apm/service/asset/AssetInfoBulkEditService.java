@@ -1,7 +1,9 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,9 @@ public class AssetInfoBulkEditService {
     private Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditService.class);
     @Autowired
     private AssetInfoRepository assetInfoDao;
+
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
 
     @Autowired
     private QrCodeLibRepository qrCodeLibDao;
@@ -490,6 +496,21 @@ public class AssetInfoBulkEditService {
                 assetTagRuleRepository.deleteAssetTagRuleData(ids);
             }
         }
+    }
+
+    public List<AssetInfo> findBathUpdateAssetInfos(Map<String, Object> param) {
+        List<AssetInfo> assetInfos = assetInfoMapper.findByParam(param);
+        bathUpdateAssetInfosMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, asset -> asset));
+        return assetInfoMapper.findByParam(param);
+    }
+
+    Map<Integer, AssetInfo> bathUpdateAssetInfosMap;
+
+    public Map<Integer, AssetInfo> getBathUpdateAssetInfosMap() {
+        if (bathUpdateAssetInfosMap == null) {
+            return MapUtil.newHashMap();
+        }
+        return bathUpdateAssetInfosMap;
     }
 
 

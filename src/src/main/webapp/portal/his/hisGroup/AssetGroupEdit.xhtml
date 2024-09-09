@@ -158,7 +158,7 @@
                             <h:outputText value="#{asset.qrCode}"/>
                         </p:column>
                         <p:column headerText="分摊比例">
-                            <p:inputNumber value="#{asset.scaleAssessment}">
+                            <p:inputNumber   minValue="0" decimalPlaces="2"  roundMethod="ROUND_DOWN"	 value="#{asset.scaleAssessment}">
                                 <p:ajax event="change"   update="@(form)"/>
                             </p:inputNumber>
                         </p:column>
@@ -196,7 +196,9 @@
                                     pattern="yyyy/MM/dd"
                                     value="#{hisAssetGroupEditController.updateEndDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true"
-                                    navigator="true" mask="true"/>
+                                    navigator="true" mask="true"
+                                 maxdate="#{hisAssetGroupEditController.today}"/>
+
                     </h:panelGroup>
 
                 </p:panelGrid>
