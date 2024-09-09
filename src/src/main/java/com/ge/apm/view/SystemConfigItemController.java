@@ -175,10 +175,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             ConfigItemValue configItemValue;
             // 如果不为空，并且siteUid相等，说明已经有配置，直接更新
             // 如果siteUid不相等，说明使用的是上级配置，需要新增数据
-            if(this.selected.getConfigItemValue() != null
-                    && this.selected.getConfigItemValue().getSiteUid().equals(this.selectSite.getSiteUID())){
-                configItemValue = this.selected.getConfigItemValue();
-            }else{
+            configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(this.selected.getKey(), this.selectSite.getSiteUID());
+            if(configItemValue == null){
                 configItemValue = new ConfigItemValue();
                 configItemValue.setTenantUid(selectSite.getTenantUID());
                 configItemValue.setInstitutionUid(selectSite.getInstitutionUID());
