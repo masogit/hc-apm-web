@@ -7,3 +7,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 10, '8', '当前工作时长', 'currentWorkingHours', '当前工作时长', 'f', 't', 2 where not exists (select * from config_item where key = 'currentWorkingHours');
 --YHAAO-22699 云南阜外历史盘点工单增加资产分类
 update inventory_order set asset_type = '01' where tenant_uid = '97ab517f3ead4f9c9b85dec27a006e6f' and is_finished is true and asset_type is null
+
+-- YHAAO-22847 配置项重复添加
+delete from config_item_value where uid in (select uid from (SELECT *,ROW_NUMBER() OVER (PARTITION BY key,site_uid ) as row_num FROM config_item_value) a where a.row_num>1 );
