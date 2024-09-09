@@ -1522,7 +1522,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanBorrow() {
         Boolean rst = Boolean.FALSE;
-        if(this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
+        if(this.clinicalDeptUID != null && this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
             rst = Boolean.TRUE;
         }
         return rst;
@@ -1530,7 +1530,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanReturn() {
         Boolean rst = Boolean.FALSE;
-        if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+        if(this.clinicalDeptUID != null && !this.clinicalDeptUID.equals(this.assetDeptUID)) {
             rst = Boolean.TRUE;
             if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
                 rst = Boolean.FALSE;
