@@ -58,8 +58,8 @@
 <!--                        </p:column>-->
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show()"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisAssetGroupListController.prepareEdit}" update=":tabGroup:hisTagEditForm" oncomplete="PF('hisTagEditDialog').show()" disabled="#{empty hisAssetGroupListController.selected}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show();buttonComplete(xhr, status, args)"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisAssetGroupListController.prepareEdit}" update=":tabGroup:hisTagEditForm" oncomplete="PF('hisTagEditDialog').show();buttonComplete(xhr, status, args)" disabled="#{empty hisAssetGroupListController.selected}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{hisAssetGroupListController.delete}" update="datalist" disabled="#{empty hisAssetGroupListController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -73,7 +73,23 @@
                 <ui:include src="AssetGroupEdit.xhtml"/>
             </div>
         </div>
+        <script type="text/javascript">
 
+            afterPageLoad = function() {
+                var obj=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+                var obj2=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+
+            };
+
+            function buttonComplete(xhr, status, args){
+                var obj=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+                var obj2=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+            }
+        </script>
     </ui:composition>
 
 </html>
