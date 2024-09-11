@@ -20,7 +20,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
-                            <apm:selectSiteOrgByOrgTree update="@(form)" />
+                            <apm:selectSiteOrgByOrgTree update="@(form)" oncomplete=";buttonComplete(xhr, status, args)"/>
 
                         </h:panelGroup>
 
@@ -30,7 +30,7 @@
                             <p:autoComplete id="clinicalDeptName" required="true" dropdown="true" value="#{efficiencyEquipmentInfoController.filterDeptOrg}"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{efficiencyEquipmentInfoController.autoCompleteDept}"
                                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                                <p:ajax event="itemSelect" listener="#{efficiencyEquipmentInfoController.onClinicalDeptChange()}"  update="pickList" />
+                                <p:ajax event="itemSelect" listener="#{efficiencyEquipmentInfoController.onClinicalDeptChange()}"  update="pickList" oncomplete="buttonComplete(xhr, status, args)"/>
 
                             </p:autoComplete>
                         </h:panelGroup>
@@ -43,7 +43,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class='label'>采购金额:(元)</label>
+                            <label class='label'>采购金额下限:(元)</label>
                             <p:inputNumber id="purchasePrice" value="#{efficiencyEquipmentInfoController.purchasePrice}">
                             </p:inputNumber>
                         </h:panelGroup>
@@ -52,13 +52,21 @@
 
                     </p:panelGrid>
                 <p:commandButton actionListener="#{efficiencyEquipmentInfoController.getQueryAssetsList()}"
-                                 value="查询" update="pickList"
-                                 icon="ui-icon-check"
+                                 value="查询" update="pickList" immediate="true" validateClient="false"
+                                 icon="ui-icon-check"  oncomplete="buttonComplete(xhr, status, args)"
                                  />
 
-                <p:pickList id="pickList" value="#{efficiencyEquipmentInfoController.assets}" var="asset"
-                            itemValue="#{asset}" itemLabel="#{asset}" showCheckbox="false" responsive="true" immediate="true"
-                            showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter">
+<!--                <p:pickList id="pickList" value="#{efficiencyEquipmentInfoController.assets}" var="asset"-->
+<!--                            itemValue="#{asset}" itemLabel="#{asset}" showCheckbox="false" responsive="true" immediate="true"-->
+<!--                            showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter">-->
+
+
+
+                <p:pickList  id="pickList" widgetVar="varPickList" value="#{efficiencyEquipmentInfoController.assets}" var="asset" immediate="true"
+                            itemValue="#{asset}" itemLabel="#{asset.name}-#{asset.departNum}-#{asset.serialNum}-#{asset.clinicalDeptName}-#{asset.functionType}" showCheckbox="false" responsive="true"
+                            showSourceFilter="true" showTargetFilter="true" converter="assetInfoConverter" showSourceControls="ssss"
+                            requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}"
+                            filterMatchMode="contains">
                     <f:facet name="sourceCaption"><p style="padding-bottom:-200px">待选设备
                         <br/>
                         <br/>
