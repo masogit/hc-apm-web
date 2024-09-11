@@ -36,8 +36,8 @@
                         <h:outputText value="#{item.assetInfo.serialNum}"/>
                     </p:column>
 
-                    <p:column headerText="#{msg.functionGroup}" >
-                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.assetInfo.functionGroup)}"/>
+                    <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.assetInfo.functionType}"/>
                     </p:column>
 
                     <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
