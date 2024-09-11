@@ -157,8 +157,8 @@
                         <p:column headerText="二维码编号">
                             <h:outputText value="#{asset.qrCode}"/>
                         </p:column>
-                        <p:column headerText="分摊比例">
-                            <p:inputNumber   minValue="0" decimalPlaces="2"  roundMethod="ROUND_DOWN"	 value="#{asset.scaleAssessment}">
+                        <p:column headerText="分摊比例(%)">
+                            <p:inputNumber    minValue="0" decimalPlaces="2"  roundMethod="ROUND_DOWN"	 value="#{asset.scaleAssessment}" inputStyle="text-align: center">
                                 <p:ajax event="change"   update="@(form)"/>
                             </p:inputNumber>
                         </p:column>
