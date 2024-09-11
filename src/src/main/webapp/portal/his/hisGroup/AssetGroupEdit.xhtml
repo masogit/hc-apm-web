@@ -31,7 +31,7 @@
 
                     <h:panelGroup rendered="#{!hisAssetGroupEditController.editMode}">
                         <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
-                        <apm:selectSiteOrgByOrgTree update="@(form)" />
+                        <apm:selectSiteOrgByOrgTree update="@(form)" oncomplete=";buttonComplete(xhr, status, args)" />
 
                     </h:panelGroup>
 
@@ -45,8 +45,8 @@
                         <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{hisAssetGroupEditController.filterDeptOrg}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}" disabled="#{hisAssetGroupEditController.editMode and hisAssetGroupEditController.selected.hisAssetGroup.type eq 'Income'}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange" >
-                            <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" />
-                            <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" />
+                            <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos"  oncomplete="buttonComplete(xhr, status, args)"/>
+                            <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" oncomplete="buttonComplete(xhr, status, args)" />
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -65,7 +65,7 @@
                     </h:panelGroup>
 
                     <p:commandButton  validateClient="false" immediate="true" actionListener="#{hisAssetGroupEditController.getQueryAssetsList2()}"
-                                     value="查询" update="HisAssetsPickList"
+                                     value="查询" update="HisAssetsPickList" oncomplete="buttonComplete(xhr, status, args)"
                                      icon="ui-icon-check"
                     />
 
@@ -77,7 +77,7 @@
                 </p:panelGrid>
 
                 <p:pickList id="HisAssetsPickList" value="#{hisAssetGroupEditController.availableAssets}" var="item" widgetVar="item"
-                            itemValue="#{item}" itemLabel="#{item.name}-#{item.departNum}-#{item.serialNum}-#{item.clinicalDeptName}-#{item.functionType}" showCheckbox="false" responsive="true"
+                            itemValue="#{item}" itemLabel="#{item.name}-#{item.departNum}-#{item.serialNum}-#{item.clinicalDeptName}-#{item.functionType}-#{item.qrCode}" showCheckbox="false" responsive="true"
                             showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter" immediate="true"  >
                     <f:facet name="sourceCaption">
 
@@ -100,7 +100,7 @@
                             <br/>
                         </p>
                     </f:facet>
-                    <p:ajax event="transfer" update="@(form)" listener="#{hisAssetGroupEditController.onAssetsTransfer}" />
+                    <p:ajax event="transfer" update="@(form)" listener="#{hisAssetGroupEditController.onAssetsTransfer}" oncomplete="buttonComplete(xhr, status, args)"/>
                     <p:column style="width:20%;">
                         <h:outputText value="#{item.name}" />
                     </p:column>
@@ -117,11 +117,11 @@
 
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <p:commandButton validateClient="false"   immediate="true"  value="添加已勾选设备"
-                                     update="@(form)" process="@this"
+                                     update="@(form)" process="@this" oncomplete="buttonComplete(xhr, status, args)"
                                      action="#{hisAssetGroupEditController.addAssetInfo}" />
 
                     <p:commandButton validateClient="false"   immediate="true"  value="一键均摊"
-                                     update="@(form)" process="@this"
+                                     update="@(form)" process="@this" oncomplete="buttonComplete(xhr, status, args)"
                                      action="#{hisAssetGroupEditController.sharedEquallyProportion}" style="float:right;" />
                 </p:panelGrid>
 
@@ -167,10 +167,10 @@
 
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <p:commandButton validateClient="false" immediate="true" value="删除已勾选设备"
-                                     update="@(form)" process="@this"
+                                     update="@(form)" process="@this" oncomplete="buttonComplete(xhr, status, args)"
                                      action="#{hisAssetGroupEditController.removeAssetInfo}" />
                     <p:commandButton  validateClient="false"   immediate="true"    value="清空"
-                                      update="@(form)" process="@this"
+                                      update="@(form)" process="@this" oncomplete="buttonComplete(xhr, status, args)"
                                      action="#{hisAssetGroupEditController.clearAssetInfo}" />
                 </p:panelGrid>
 
@@ -224,21 +224,6 @@
             } else {
                 $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
             }
-        }
-
-        afterPageLoad = function() {
-            var obj=document.getElementById('hisTagEditForm:HisAssetsPickList_source_filter');
-            obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
-            var obj2=document.getElementById('hisTagEditForm:HisAssetsPickList_target_filter');
-            obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
-
-        };
-
-        function clinicalDeptNameComplete(xhr, status, args){
-            var obj=document.getElementById('hisTagEditForm:HisAssetsPickList_source_filter');
-            obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
-            var obj2=document.getElementById('hisTagEditForm:HisAssetsPickList_target_filter');
-            obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
         }
     </script>
 
