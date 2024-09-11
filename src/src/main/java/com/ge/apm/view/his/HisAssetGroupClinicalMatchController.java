@@ -64,10 +64,13 @@ public class HisAssetGroupClinicalMatchController extends GenericCRUDUUIDControl
 
         removeFilterOnField("hisAssetGroupAssetMatch.orgInfoUid");
         removeFilterOnField("tenantUid");
+        removeFilterOnField("siteUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
-            searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
+//            searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
+
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgInfoUids));
         }
 
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
