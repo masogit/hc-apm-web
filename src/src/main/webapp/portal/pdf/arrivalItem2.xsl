@@ -241,7 +241,7 @@
 						<fo:table-row line-height="50px" height="50px">
 							<fo:table-cell number-columns-spanned="6" padding-left="0.8cm" >
 								<fo:block font-weight="bold"  margin-left="-1.1cm" margin-right="-1.1cm" font-size="12px" >
-									设备管理部门代表：___________   采购员：___________   日期：___________
+									设备管理部门代表：___________     日期：___________
 								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
