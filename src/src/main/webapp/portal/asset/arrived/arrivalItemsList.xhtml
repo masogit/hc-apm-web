@@ -84,6 +84,9 @@
                     <p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.financingNum}"/>
                     </p:column>
+                    <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serialNum}"/>
+                    </p:column>
                     <p:column headerText="#{msg.status}" filterBy="#{item.installStatus}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" >
