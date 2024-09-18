@@ -1152,10 +1152,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         initExternalTempUser();
     }
 
-    public void onSelectOrder() throws IOException {
+    public void onSelectOrder(String selectedId) throws IOException {
+        if (ObjectUtil.isNotEmpty(selectedId)) {
+            List<V2_WorkOrder> orders = dao.findBySrId(selectedId);
+            selected = orders.get(0);
+        }
         onSelectWorkOrder();
         String url = "actionName=View&selectedid="
-                + selected.getId().toString()
+                + selected.getId()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);

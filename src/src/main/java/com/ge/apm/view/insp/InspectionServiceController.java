@@ -11,20 +11,23 @@ import com.ge.apm.domain.pure.ServiceRequestProjection;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
-public class InspectionServiceController {
+public class InspectionServiceController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable {
 
     InspectionOrderRepository inspectionDao = WebUtil.getBean(InspectionOrderRepository.class);
     ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
@@ -124,9 +127,10 @@ public class InspectionServiceController {
     public List<OrgInfo> getOwnerOrgList(Integer hospitalId){
         return uuaService.getOrgListByHospitalId(hospitalId);
     }
-    
-    
-    
-    
-    
+
+
+    @Override
+    protected GenericRepositoryUUID<V2_WorkOrder> getDAO() {
+        return null;
+    }
 }

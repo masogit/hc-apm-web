@@ -47,7 +47,7 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
 
-                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" update=" woTab:ServiceRequestCreateForm manHoursManageButton "/>
+                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder(null)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" update=" woTab:ServiceRequestCreateForm manHoursManageButton "/>
                 <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist   " oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
