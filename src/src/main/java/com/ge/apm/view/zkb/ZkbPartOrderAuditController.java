@@ -667,14 +667,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 return "";
             }
             zkbPartOrderService.batchesReturnNext(selected,currentZkbPartOrderReturns,currentUser);
-        } else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && zkbPartOrderStatusVo.isChoseAdmin()){
+        } else if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())) && zkbPartOrderStatusVo.isChoseAdmin()){
             if(ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
-                List<ZkbPartOrderReturn> auditReturnList = new ArrayList<>();
-                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+                List<ZkbPartOrderReturn> auditReturnList = zkbPartOrderReturnList.stream().filter(t -> ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(t.getModifyFlag())).collect(Collectors.toList());
+               /* for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(r.getModifyFlag())){
                         auditReturnList.add(r);
                     }
-                }
+                }*/
                 if(auditReturnList.size() == 0){
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";
@@ -825,6 +825,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnModifyList.remove(zkbPartOrderReturn);
         goodReturnBlobObjectList = new ArrayList<>();
         zkbPartOrderReturn = null;
+    }
+
+    public boolean resizeReturnHeight(){
+        if(CopyByInvok.T.equals(selected.getNotGeAsset()) && "goodReturn".equals(zkbPartOrderReturn.getReturnType())){
+            return true;
+        }
+        return false;
     }
 
     public void initPartList(){

@@ -48,7 +48,7 @@ public class ZkbPartOrderStatusService {
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
                 zkbPartOrderStatusVo.setCanEditFlag(true);
             }else{
-                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
                     if(zkbPartOrderUserConfigs.size() > 0){
                         boolean matchAny = zkbPartOrderUserConfigs.stream().anyMatch(t -> currentUser.getLoginName().equals(t.getLoginName()));

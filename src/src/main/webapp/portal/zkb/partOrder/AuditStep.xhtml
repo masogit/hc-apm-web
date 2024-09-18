@@ -1146,10 +1146,10 @@
                         <p:column headerText="备注">
                             <h:outputText value="#{it.remark}"/>
                         </p:column>
-                        <p:column headerText="状态" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and !zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
+                        <p:column headerText="状态" rendered="#{!zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnDataStatus',it.dataStatus)}"/>
                         </p:column>
-                        <p:column headerText="状态" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}" >
+                        <p:column headerText="状态" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}" >
                             <p:cellEditor>
                                 <f:facet name="output"><h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnDataStatus',it.dataStatus)}" /></f:facet>
                                 <f:facet name="input">
@@ -1189,7 +1189,7 @@
                       <!--  <p:column headerText="编辑" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
                             <p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />
                         </p:column>-->
-                        <p:column headerText="操作" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
+                        <p:column headerText="操作" style="width:80px" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
                             <!--<p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />-->
                             <p:commandLink title="查看" update="zkbPartOrderReturnEditDlg" action="#{zkbPartOrderAuditController.prepareReturnAudit(it)}" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" >
                                 <p:graphicImage name="icons/edit.png" style="width: 20px; height: 20px;"/>
