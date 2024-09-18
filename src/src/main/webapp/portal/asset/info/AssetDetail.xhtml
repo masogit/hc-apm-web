@@ -221,9 +221,11 @@
                                         <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.requestTime}" >
-                                        <h:outputText value="#{item.requestTime}">
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                        </h:outputText>
+                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryIndex=12&amp;actionName=View&amp;selectedid='.concat(assetInfoDetailController.getWorkOrderId(item.id)))}" styleClass="p-mr-2">
+                                            <h:outputText value="#{item.requestTime}">
+                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                            </h:outputText>
+                                        </p:commandLink>
                                     </p:column>
                                     <p:column headerText="#{msg.requestReason}" >
                                         <h:outputText value="#{item.requestReason}"/>
@@ -272,7 +274,9 @@
                                         <h:outputText value="#{item.creatorName}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.MaintenanceID}" >
-                                        <h:outputText value="#{item.pmNum}"/>
+                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id))}" styleClass="p-mr-2">
+                                            <h:outputText value="#{item.pmNum}"/>
+                                        </p:commandLink>
                                     </p:column>
                                     <p:column headerText="#{msg.currentStep}" >
                                         <h:outputText value="#{item.currentStepName}"/>

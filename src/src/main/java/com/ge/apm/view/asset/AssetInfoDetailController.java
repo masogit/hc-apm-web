@@ -95,12 +95,14 @@ public class AssetInfoDetailController {
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private SpecialAssetInfoService specialAssetInfoService;
+    private V2_WorkOrderRepository workOrderRepository;
 
 
     private SpecialAssetInfo specialAssetInfo;
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        workOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
         aeMapper = WebUtil.getBean(AeMapper.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
@@ -501,5 +503,10 @@ public class AssetInfoDetailController {
             return true;
         }
         return false;
+    }
+
+    public String getWorkOrderId(String srId) {
+        List<V2_WorkOrder> orders = workOrderRepository.findBySrId(srId);
+        return orders.get(0).getId();
     }
 }
