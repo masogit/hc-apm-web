@@ -259,6 +259,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmReportService pmReportService;
     private MultiLevelApprovalService multiLevelApprovalService;
     private String queryAssetUid;
+    private String orderId;
     private ConfigService configService;
     private SimplePartsConfigService partsConfigService;
     //tab Title
@@ -1721,6 +1722,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
             if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
                 query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
             }
@@ -1935,6 +1937,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterOutPm(filterArrayList);
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 filterArrayList.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+            }
+            if (!Strings.isNullOrEmpty(orderId)) {
+                filterArrayList.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId, "1*"));
             }
         }
         if(queryIndex==10){
