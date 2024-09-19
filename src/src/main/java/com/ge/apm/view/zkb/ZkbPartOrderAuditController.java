@@ -51,7 +51,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     @Getter@Setter
     private ZkbPartOrderStatusVo zkbPartOrderStatusVo;
     private List<ZkbPartOrderCat> zkbPartOrderCatList ;
-    private ZkbPartOrderReturn zkbPartOrderReturn;
+    private ZkbPartOrderReturn zkbPartOrderReturn = new ZkbPartOrderReturn();
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
     private String actionReturnName;
     private String returnFormFlag = "edit"; //edit  audit
@@ -824,7 +824,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void deleteReturnModify(){
         zkbPartOrderReturnModifyList.remove(zkbPartOrderReturn);
         goodReturnBlobObjectList = new ArrayList<>();
-        zkbPartOrderReturn = null;
+        zkbPartOrderReturn = new ZkbPartOrderReturn();
     }
 
     public boolean resizeReturnHeight(){
