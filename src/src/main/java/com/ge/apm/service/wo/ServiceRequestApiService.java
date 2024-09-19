@@ -257,6 +257,13 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         return response.getBody();
     }
 
+    public List<String> getVisableMvsAssetUidSystemId(String token) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_STR);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
     public List<Integer> getVisableMvsAssetSystemIdBySite(String token,String siteUID) {
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_BYSITE);

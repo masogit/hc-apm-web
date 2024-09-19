@@ -14,6 +14,7 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -122,6 +123,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private OrgInfoRepository orgDao;
 
     private  QrCodeLibRepository qrCodeLibRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
     @Override
     protected void init() {
@@ -155,6 +157,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         deptInfoList = uaaService.getClinicalDeptListBySiteUID(currentUser.getSiteUID());
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         qrCodeLibRepository = WebUtil.getBean(QrCodeLibRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
 
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -437,6 +440,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void saveEasyItem() {
+        if (enableArrivalListRequired()) {
+            List<V2_BlobObject> asset4 = attachList.stream().filter(t -> "asset4".equals(t.getBoSubType())).collect(Collectors.toList());
+            if (ObjectUtil.isEmpty(asset4)) {
+                WebUtil.addSuccessMessage("验收材料必填");
+                return;
+            }
+        }
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
         saveList.forEach(item -> {
@@ -1387,6 +1397,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setQrCodePrefix(String qrCodePrefix) {
         this.qrCodePrefix = qrCodePrefix;
+    }
+
+    public boolean enableArrivalListRequired() {
+        return Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("enableArrivalListRequired", currentUser.getSiteUID())).
+                map(ConfigItemValue::getValue).map(Boolean::parseBoolean).orElse(false);
     }
 
 }
