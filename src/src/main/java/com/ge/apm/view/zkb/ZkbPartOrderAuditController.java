@@ -828,7 +828,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean resizeReturnHeight(){
-        if(CopyByInvok.T.equals(selected.getNotGeAsset()) && "goodReturn".equals(zkbPartOrderReturn.getReturnType())){
+        if(CopyByInvok.T.equals(selected.getNotGeAsset()) && "DOA".equals(zkbPartOrderReturn.getReturnType())){
             return true;
         }
         return false;
