@@ -34,6 +34,8 @@ public enum GatewayURL {
     UPDATE_WODETAIL_PRICE("/hcapmassetservice/api/apm/asset/workOrderDetails"),
     //租户的mvs的设备uid获取
     GET_MVSASSECT_UID("/hcapmassetservice/api/apm/asset/mvsassetinfos/byUserVisibleScope"),
+    GET_MVSASSECT_UID_STR("/hcapmassetservice/api/apm/asset/mvsassetinfos/byUserVisibleScopeStr"),
+
     //租户的mvs的设备uid获取
     GET_MVSASSECT_UID_BYSITE("/hcapmassetservice/api/apm/asset/mvsassetinfos/bySite"),
     //租户的mvs的设备uid获取
