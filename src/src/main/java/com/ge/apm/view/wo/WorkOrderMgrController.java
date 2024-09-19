@@ -1006,13 +1006,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
-        List<Integer> assetIds = serviceRequestApiService.getVisableMvsAssetSystemId(UserContextService.getAccessToken());
-        if (CollectionUtils.isEmpty(assetIds)) {
-            assetIds = new ArrayList<>();
-            assetIds.add(0);
-            filters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
+        List<String> assetUIds = serviceRequestApiService.getVisableMvsAssetUidSystemId(UserContextService.getAccessToken());
+        if (CollectionUtils.isEmpty(assetUIds)) {
+            assetUIds = new ArrayList<>();
+            assetUIds.add("-------");
+            filters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, assetUIds));
         } else {
-            filters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
+            filters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, assetUIds));
         }
         if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
