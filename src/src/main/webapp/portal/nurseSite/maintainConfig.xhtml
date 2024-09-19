@@ -6,6 +6,12 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+        <style>
+             .ui-state-highlight {
+                background-color: #5180ce !important;
+                color: #ffffff;
+            }
+        </style>
         <h:outputScript name="js/nurseSiteMaintain.js"></h:outputScript>
         <ui:include src="maintainConfigEdit.xhtml" />
         <ui:include src="maintainConfigCreate.xhtml" />
