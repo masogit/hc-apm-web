@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface EfficiencyEquipmentMapper {
 
@@ -29,6 +30,9 @@ public interface EfficiencyEquipmentMapper {
 
 
 
-        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate,@Param("endDate")Date endDate,@Param("tenantUid") String tenantUid,@Param("assetUids") List<String> assetUids,@Param("orgUid") String orgUid,@Param("orgUidList") List<String> orgUidList);
+//        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate,@Param("endDate")Date endDate,@Param("tenantUid") String tenantUid,@Param("assetUids") List<String> assetUids,@Param("orgUid") String orgUid,@Param("orgUidList") List<String> orgUidList);
+
+        List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate, @Param("endDate")Date endDate, @Param("tenantUid") String tenantUid, @Param("assetUids") Set<String> assetUids, @Param("orgUid") String orgUid, @Param("orgUidList") List<String> orgUidList, @Param("qrCodes") List<String> qrCodes);
+
 
 }

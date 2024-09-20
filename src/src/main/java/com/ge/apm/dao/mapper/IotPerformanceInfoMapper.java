@@ -21,5 +21,14 @@ public interface IotPerformanceInfoMapper {
                     "</script>"})
     List<AssetCostDTO> findByAssetUidAndDateInSunAmount(@Param("assetUids")  List<String> assetUids, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+    @Select({
+            "<script>" +
+                    "select  sum(check_number_people) as checkNumberPeople  ,qr_code as qrCode  from  iot_performance_info   where date between #{startDate} and #{endDate} and qr_code  in " +
+                    "<foreach item = 'item' index = 'index' collection = 'qrCodes' open='(' separator=',' close=')'>" +
+                    "#{item}" +
+                    "</foreach>"+
+                    "group by qr_code"+
+                    "</script>"})
+    List<AssetCostDTO> findByQrCodeAndDateInSunAmount(@Param("qrCodes")  List<String> qrCodes, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }
