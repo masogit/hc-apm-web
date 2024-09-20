@@ -1,5 +1,6 @@
 package com.ge.apm.service.his;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.HisAdjustBusinessJobRepository;
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 import com.ge.apm.dao.HisEquipmentMatchRepository;

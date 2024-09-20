@@ -96,7 +96,7 @@ public class HisAssetGroupService {
     }
 
     @Transactional
-    public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg){
+    public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg,UserAccount userAccount){
 
 //        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
@@ -122,14 +122,17 @@ public class HisAssetGroupService {
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             }
             //修改前先移除该分组下所有资产
+            hisAssetGroupAssetMatch.setLastModifiedDate(new Date());
+            hisAssetGroupAssetMatch.setLastModifiedBy(userAccount.getUid());
+            hisAssetGroupAssetMatchRepository.save(hisAssetGroupAssetMatch);
             insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         } else {
-            saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment,selectOrg);
+            saveHisAssetGroupAssetMatch(clinicalDept, hisAssetGroup, subEquipment,selectOrg,userAccount);
             insertAssetsToGroup(targetAssets, hisAssetGroup, clinicalDept,selectOrg);
         }
     }
 
-    public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment,OrgInfo selectOrg){
+    public void saveHisAssetGroupAssetMatch(OrgInfo clinicalDept, HisAssetGroup hisAssetGroup, Boolean subEquipment,OrgInfo selectOrg,UserAccount userAccount){
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = new HisAssetGroupAssetMatch();
         hisAssetGroupAssetMatch.setOrgInfoUid(selectOrg.getSiteUID());
         if(hisAssetGroup.getType().equals("Income")){
@@ -145,6 +148,10 @@ public class HisAssetGroupService {
         hisAssetGroupAssetMatch.setIsSubEquipment(subEquipment);
         hisAssetGroupAssetMatch.setSiteUid(selectOrg.getSiteUID());
         hisAssetGroupAssetMatch.setTenantUid(selectOrg.getTenantUID());
+        hisAssetGroupAssetMatch.setCreatedDate(new Date());
+        hisAssetGroupAssetMatch.setLastModifiedDate(new Date());
+        hisAssetGroupAssetMatch.setCreatedBy(userAccount.getUid());
+        hisAssetGroupAssetMatch.setLastModifiedBy(userAccount.getUid());
         hisAssetGroupAssetMatchRepository.save(hisAssetGroupAssetMatch);
     }
 

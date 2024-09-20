@@ -10,6 +10,7 @@ import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -65,6 +66,9 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
         }
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
+        Sort.Order orders = new Sort.Order(Sort.Direction.DESC, "lastModifiedDate", Sort.NullHandling.NULLS_LAST);
+        Sort sort = new Sort(orders);
+        pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(),sort);
         Page<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
         List<HisAssetGroupAssetMatch> content = hisAssetGroupAssetMatches.getContent();
         return hisAssetGroupAssetMatches;

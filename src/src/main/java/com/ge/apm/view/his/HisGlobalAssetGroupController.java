@@ -3,6 +3,7 @@ package com.ge.apm.view.his;
 import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
 import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
 import com.ge.apm.dao.HisAssetGroupRepository;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
@@ -12,6 +13,7 @@ import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -20,6 +22,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @ManagedBean
@@ -30,6 +33,7 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
     private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
     private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchRepository;
 
+    private UserAccount userAccount;
 
     @Getter
     @Setter
@@ -40,6 +44,7 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
         hisAssetGroupDao = WebUtil.getBean(HisAssetGroupRepository.class);
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
         hisAssetGroupAssetMatchRepository = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
+        userAccount = UserContextService.getCurrentUserAccount();
     }
 
     @Override
@@ -49,6 +54,10 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
         }
         removeFilterOnField("tenantUid");
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+
+        Sort.Order orders = new Sort.Order(Sort.Direction.DESC, "lastModifiedDate", Sort.NullHandling.NULLS_LAST);
+        Sort sort = new Sort(orders);
+        pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         Page<HisAssetGroup> hisAssetGroups = hisAssetGroupDao.findBySearchFilter(this.searchFilters, pageRequest);
         return hisAssetGroups;
     }
@@ -79,6 +88,12 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
             WebUtil.addErrorMessage("分组类型已存在");
             return;
         }
+        if(selected.getUuid()==null){
+            selected.setCreatedBy(userAccount.getUid());
+            selected.setCreatedDate(new Date());
+        }
+        selected.setLastModifiedBy(userAccount.getUid());
+        selected.setLastModifiedDate(new Date());
         hisAssetGroupDao.save(selected);
         hisAssetGroupAssetMatchRepository.updateAssetGroupNameByGroupUid(selected.getName(),selected.getUuid());
         selected = null;

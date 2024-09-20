@@ -32,6 +32,10 @@
                               filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetName}"/>
                     </p:column>
+                    <p:column headerText="二维码" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.qrCode}"/>
+                    </p:column>
                     <p:column headerText="预置值" sortBy="#{item.eqLb}"
                               filterBy="#{item.eqLb}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.eqLb}"/>

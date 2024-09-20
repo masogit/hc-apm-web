@@ -1,5 +1,6 @@
 package com.ge.apm.domain.his;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.domain.AssetInfo;
 import lombok.Data;
@@ -66,10 +67,12 @@ public class HisAssetGroupClinicalMatch implements Serializable {
     private BigDecimal amount;
 
 
+    @JSONField(serialize = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
 
+    @JSONField(serialize = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "his_asset_group_uid", referencedColumnName = "uuid", insertable = false,updatable = false)
     private HisAssetGroup hisAssetGroup;
