@@ -24,8 +24,8 @@
                              rowsPerPageTemplate="20,50,100,500">
                     <p:ajax event="rowSelect" listener="#{dataEntryController.onSelectDataEntry}" update=" editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{dataEntryController.onFilter}"/>
-                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}">
-                        <h:outputText value="#{item.hisAssetGroup.name}"  filterBy="#{item.hisAssetGroup.name}" filterMatchMode="LIKE"/>
+                    <p:column headerText="分组名称" sortBy="#{item.hisAssetGroup.name}"  filterBy="#{item.hisAssetGroup.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.hisAssetGroup.name}" />
                     </p:column>
 
                     <p:column  headerText="录入类型" sortBy="#{item.entryType}" filterBy="#{item.entryType}" filterMatchMode="EQ">
@@ -43,31 +43,33 @@
                         <h:outputText value="#{item.entryAmount}"/>
                     </p:column>
 
-                    <p:column headerText="生效开始时间">
+                    <p:column  headerText="生效开始时间" sortBy="#{item.startDate}" filterBy="#{item.startDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterStartDate" widgetVar="varFilterStartDate" value="#{dataEntryController.selectedObject['startDate']}"/>
+                        </f:facet>
                         <h:outputText value="#{item.startDate}">
-                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
-                                               locale="#{userContextService.getCalendarLocale()}"
-                                               pattern="#{userContextService.timeFormat()}"/>
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="生效结束时间">
+                    <p:column  headerText="生效结束时间" sortBy="#{item.endDate}" filterBy="#{item.endDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterEndDate" widgetVar="varFilterEndDate" value="#{dataEntryController.selectedObject['endDate']}"/>
+                        </f:facet>
                         <h:outputText value="#{item.endDate}">
-                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
-                                               locale="#{userContextService.getCalendarLocale()}"
-                                               pattern="#{userContextService.timeFormat()}"/>
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                         </h:outputText>
                     </p:column>
-
-                    <p:column headerText="生效开始操作者">
+                    <p:column headerText="生效开始操作者"   filterBy="#{item.userAccount.name}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.userAccount.name}"/>
                     </p:column>
 
-                    <p:column headerText="操作时间">
-                        <h:outputText value="#{item.createdDate}">
-                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
-                                               locale="#{userContextService.getCalendarLocale()}"
-                                               pattern="#{userContextService.timeFormat()}"/>
-                        </h:outputText>
+                    <p:column  headerText="操作时间" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{assetInfoListController.selectedObject['createdDate']}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabDataEntry:DataEntryGroupForm  :tabDataEntry:dataEntryGroupCreate" actionListener="#{dataEntryController.prepareCreate}" oncomplete="PF('dataEntryGroupCreateDialog').show()"/>
@@ -80,6 +82,40 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
+
+                <p:overlayPanel widgetVar="panelFilterStartDate" for="tabDataEntry:DataEntryGroupForm:datalist:filterStartDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varStartDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varStartDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('datalist', 'varFilterStartDate', 'varStartDateFrom', 'varStartDateTo'); PF('panelFilterStartDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+
+
+                <p:overlayPanel widgetVar="panelFilterEndDate" for="tabDataEntry:DataEntryGroupForm:datalist:filterEndDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varEndDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varEndDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('datalist', 'varFilterEndDate', 'varEndDateFrom', 'varEndDateTo'); PF('panelFilterEndDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+
+                <p:overlayPanel widgetVar="panelFilterCreatedDate" for="tabDataEntry:DataEntryGroupForm:datalist:filterCreatedDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('datalist', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); PF('panelFilterCreatedDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
             </h:form>
             <ui:include src="DataEntryGroupCreate.xhtml"/>
 
