@@ -49,7 +49,7 @@ public class DataEntry implements Serializable {
     @Column(name = "created_date")
     private Date createdDate;//创建时间
 
-    @Column(name = "start_Date")
+    @Column(name = "start_date")
     @Temporal(TemporalType.DATE)
     private Date startDate;
     @Column(name = "end_date")
