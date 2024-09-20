@@ -27,7 +27,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -53,6 +55,9 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
     @Setter
     private String filterEntryType;
 
+    @Getter
+    @Setter
+    public Map<String, Object> selectedObject;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -70,6 +75,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
         user = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
+        this.selectedObject = new HashMap<>();
     }
 
     @Override
