@@ -103,6 +103,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
 
 
+    private UserAccount userAccount;
 
     @Override
     protected GenericRepository<HisAssetGroupAssetMatch> getDAO() {
@@ -120,6 +121,9 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         userSiteOrgTreeComponentController.registerController(this);
         selectedMap=new HashMap<>(32);
         selectedAssets=new HashSet<>();
+
+        userAccount = UserContextService.getCurrentUserAccount();
+
     }
 
     public void onAssetsTransfer(TransferEvent event) {
@@ -365,11 +369,11 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                 }
             }
 
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate,selectedOrg);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), updateStartDate, updateEndDate,selectedOrg,userAccount);
 
             WebUtil.addSuccessMessage("修改成功");
         } else {
-            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null,selectedOrg);
+            hisAssetGroupService.bindAssetsToGroup(targetAssets, hisAssetGroup, filterDeptOrg, this.selected.getIsSubEquipment(), null, null,selectedOrg,userAccount);
             WebUtil.addSuccessMessage("创建成功");
         }
         selectedAssets=new HashSet<>();

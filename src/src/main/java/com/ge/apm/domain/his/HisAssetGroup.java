@@ -2,10 +2,15 @@ package com.ge.apm.domain.his;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "his_asset_group")
@@ -33,7 +38,21 @@ public class HisAssetGroup implements Serializable {
     @Size(max = 32)
     private String tenantUid;
 
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
 
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
 
     @Override
     public int hashCode() {
