@@ -97,7 +97,8 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     @Transient
     private String assetGroupName;//设备分类名称
-
+    @Transient
+    private Integer assetId;//设备分类名称
 
     public String getUid() {
         return uid;
@@ -250,6 +251,14 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
     }
 
     @Override

@@ -5,20 +5,13 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetCostDTO;
-import com.ge.apm.service.asset.AssetInfoService;
-import com.ge.apm.service.asset.EfficiencyEquipmentInfoService;
+import com.ge.apm.domain.dto.DepreciationResultData;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
-import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,10 +21,8 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.StreamedContent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
@@ -45,7 +36,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +49,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController<EfficiencyEquipmentInfo> implements Serializable, ServerEventInterface {
 
-    private EfficiencyEquipmentInfoService efficiencyEquipmentInfoService;
+
 
     private EfficiencyEquipmentInfoRepository efficiencyEquipmentInfoRepository;
 
@@ -65,11 +60,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     private AssetInfoRepository assetInfoRepository;
 
-    private OrgInfoRepository orgInfoDao;
 
-    private AssetInfoService assetInfoService;
-
-    private AssetInfoMapper assetInfoMapper;
 
     private EfficiencyEquipmentMapper efficiencyEquipmentMapper;
 
@@ -106,6 +97,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
+    private AssetDepreciationMapper assetDepreciationMapper;
+
     private I18nMessageRepository i18nMessageRepository;
 
 
@@ -113,7 +106,6 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     private Date endDate=new Date();
 
-    private UserSiteOrgTreeComponentController userSiteOrgTreeComponentController;
 
     private HisEquipmentDataResultMapper hisEquipmentDataResultMapper;
 
@@ -125,6 +117,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private StreamedContent excelFile;
 
 
+    @Setter
     private String url;
 
     @Override
@@ -134,25 +127,20 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     @Override
     protected void init() {
-        efficiencyEquipmentInfoService = WebUtil.getBean(EfficiencyEquipmentInfoService.class);
         efficiencyEquipmentInfoRepository = WebUtil.getBean(EfficiencyEquipmentInfoRepository.class);
         user = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-        assetInfoService = WebUtil.getBean(AssetInfoService.class);
-        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
 
-        userSiteOrgTreeComponentController = WebUtil.getBean(UserSiteOrgTreeComponentController.class);
-        userSiteOrgTreeComponentController.registerController(this);
         hisEquipmentDataResultMapper = WebUtil.getBean(HisEquipmentDataResultMapper.class);
         assetCostAmountInfoMapper = WebUtil.getBean(AssetCostAmountInfoMapper.class);
         iotPerformanceInfoMapper = WebUtil.getBean(IotPerformanceInfoMapper.class);
         efficiencyEquipmentMapper = WebUtil.getBean(EfficiencyEquipmentMapper.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        assetDepreciationMapper = WebUtil.getBean(AssetDepreciationMapper.class);
 
-        this.selectedMap = new HashMap();
+        this.selectedMap = new HashMap<>();
     }
 
 
@@ -161,7 +149,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     protected Page<EfficiencyEquipmentInfo> loadData(PageRequest pageRequest) {
 
         if (searchFilters == null) {
-            searchFilters = new ArrayList();
+            searchFilters = new ArrayList<>();
         }
         this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
 
@@ -187,22 +175,28 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         currentPageAssets=page.getContent();
         if(!CollectionUtils.isEmpty(currentPageAssets)){
 
-            calculationData(currentPageAssets);
+            calculationData(currentPageAssets,startDate,endDate);
         }
         return page;
     }
 
-    private void calculationData(List<EfficiencyEquipmentInfo> currentPageAssets) {
+    private void calculationData(List<EfficiencyEquipmentInfo> currentPageAssets,Date startDate,Date endDate) {
         List<String> assetUids = currentPageAssets.stream().map(EfficiencyEquipmentInfo::getAssetUid).collect(Collectors.toList());
         List<AssetCostDTO> hisResult= hisEquipmentDataResultMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
         Map<String, AssetCostDTO> hisResultMap = hisResult.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
         List<AssetCostDTO> assetCost=  assetCostAmountInfoMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
         Map<String, AssetCostDTO> assetCostMap = assetCost.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
-        List<AssetCostDTO>  iotList= iotPerformanceInfoMapper.findByAssetUidAndDateInSunAmount(assetUids,startDate,endDate);
-        Map<String, AssetCostDTO> iotMap = iotList.stream().collect(Collectors.toMap(data -> data.getAssetUid(), data -> data));
+        List<String> qrCodes = currentPageAssets.stream().map(EfficiencyEquipmentInfo::getAssetInfo).map(AssetInfo::getQrCode).filter(Objects::nonNull).collect(Collectors.toList());
+
+        List<Integer> assetIds = currentPageAssets.stream().map(EfficiencyEquipmentInfo::getAssetInfo).map(AssetInfo::getId).filter(Objects::nonNull).collect(Collectors.toList());
+
+        List<AssetCostDTO>  iotList= iotPerformanceInfoMapper.findByQrCodeAndDateInSunAmount(qrCodes,startDate,endDate);
+        Map<String, AssetCostDTO> iotMap = iotList.stream().collect(Collectors.toMap(AssetCostDTO::getQrCode, data -> data));
+
+        Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
         for (EfficiencyEquipmentInfo currentPageAsset : currentPageAssets) {
             AssetCostDTO hisResultDto= hisResultMap.get(currentPageAsset.getAssetUid());
-            AssetCostDTO iot = iotMap.get(currentPageAsset.getAssetUid());
+            AssetCostDTO iot = currentPageAsset.getAssetInfo().getQrCode()!=null?iotMap.get(currentPageAsset.getAssetInfo().getQrCode()):null;
             AssetCostDTO assetCostDTO = assetCostMap.get(currentPageAsset.getAssetUid());
             BigDecimal income=hisResultDto!=null?hisResultDto.getAmount()!=null?hisResultDto.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
             BigDecimal cost=assetCostDTO!=null?assetCostDTO.getAmount()!=null?assetCostDTO.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
@@ -210,15 +204,21 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             currentPageAsset.setIncome(income);
             currentPageAsset.setCost(cost);
             currentPageAsset.setCheckNumberPeople(checkNumberPeople);
-            currentPageAsset.setProfits(income.subtract(cost));
+            Integer id = currentPageAsset.getAssetInfo().getId();
+            BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
+            BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
+            currentPageAsset.setProfits(profits);
             if(!(income.compareTo(BigDecimal.ZERO)==0)){
-                currentPageAsset.setProfitsRate((income.subtract(cost)).divide(income,2));
+                currentPageAsset.setProfitsRate((income.subtract(profits)).multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
             }else{
                 currentPageAsset.setProfitsRate(BigDecimal.ZERO);
             }
         }
 
     }
+
+
+
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
 
@@ -237,6 +237,71 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     }
 
+    private Map<Integer,BigDecimal> getAssetDepreciationAmount(Date startDate, Date endDate, List<Integer> assetIds) {
+
+        LocalDate localDateStart = startDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate localDateEnd = endDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        List<DepreciationResultData> list = assetDepreciationList(localDateStart, localDateEnd, assetIds);
+        if(org.springframework.util.CollectionUtils.isEmpty(list)){
+            return null;
+        }
+        return list.stream()
+                .collect(Collectors.groupingBy(
+                        DepreciationResultData::getAssetId,
+                        Collectors.mapping(DepreciationResultData::getDepreciationEquipment,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add)
+                        )));
+
+    }
+    private  List<DepreciationResultData>  assetDepreciationList(LocalDate startDate, LocalDate endDate, List<Integer> assetIds) {
+        //折旧
+        LocalDate localDate = startDate.withDayOfMonth(1);//开始日期月份第一天
+        LocalDate lastDateEnd = startDate.with(TemporalAdjusters.lastDayOfMonth());  //开始日期月底
+
+        int daysMonth = startDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth(); //月天数
+        long daysDifferenceStart = ChronoUnit.DAYS.between(startDate, lastDateEnd)+1;  //相差天数
+
+
+        LocalDate localEndDate = endDate.withDayOfMonth(1);
+        long daysDifferenceEnd = ChronoUnit.DAYS.between(localEndDate, endDate)+1;
+        int daysMonthEnd = localEndDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+
+
+        List<DepreciationResultData> assetDepreciationList = assetDepreciationMapper.findAssetDepreciationGroupMonthByAssetIds(assetIds, localDate, endDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String startString = startDate.format(formatter);
+        String endString = endDate.format(formatter);
+
+        long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+        for (DepreciationResultData performanceResultData : assetDepreciationList) {
+            if(!startString.equals(endString)){
+                if(startString.equals(performanceResultData.getDate())){
+                    BigDecimal depreciationEquipment = performanceResultData.getDepreciationEquipment()!=null?performanceResultData.getDepreciationEquipment():BigDecimal.ZERO;
+                    BigDecimal divide = depreciationEquipment.multiply(BigDecimal.valueOf(daysDifferenceStart)).divide(BigDecimal.valueOf(daysMonth), 2, RoundingMode.HALF_UP);
+                    performanceResultData.setDepreciationEquipment(divide);
+                }
+                if(endString.equals(performanceResultData.getDate())){
+                    BigDecimal depreciationEquipment = performanceResultData.getDepreciationEquipment()!=null?performanceResultData.getDepreciationEquipment():BigDecimal.ZERO;
+                    BigDecimal divide = depreciationEquipment.multiply(BigDecimal.valueOf(daysDifferenceEnd)).divide(BigDecimal.valueOf(daysMonthEnd), 2, RoundingMode.HALF_UP);
+                    performanceResultData.setDepreciationEquipment(divide);
+                }
+            }else{
+                BigDecimal depreciationEquipment = performanceResultData.getDepreciationEquipment()!=null?performanceResultData.getDepreciationEquipment():BigDecimal.ZERO;
+                BigDecimal divide = depreciationEquipment.multiply(BigDecimal.valueOf(days)).divide(BigDecimal.valueOf(daysMonth), 2, RoundingMode.HALF_UP);
+                performanceResultData.setDepreciationEquipment(divide);
+            }
+
+        }
+
+
+        return assetDepreciationList;
+    }
 
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getAssetUid()) || !selectedMap.get(item.getAssetUid()));
@@ -244,11 +309,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             selectedMap.put(item.getAssetUid(), !isSelectedAll);
         }
     }
-    public void setSelectedAssetsUids() {
-        List<String> selectedAssetUids = new ArrayList<>();
-        selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
-        RelRuleAssetController.assetInfoUids = selectedAssetUids;
-    }
+
     @Override
     public void onFilter(FilterEvent event) {
         super.onFilter(event);
@@ -264,84 +325,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         efficiencyEquipmentInfoRepository.delete(efficiencyEquipmentInfo);
     }
 
-
-    @Override
-    public void save() {
-        try {
-            List<AssetInfo> target = assets.getTarget();
-            if(CollectionUtils.isEmpty(target)){
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage("请选择添加效益设备");
-                return;
-            }
-            List<EfficiencyEquipmentInfo> efficiencyEquipmentInfos = initializationEfficiencyEquipmentInfo(target, user);
-            efficiencyEquipmentInfoRepository.save(efficiencyEquipmentInfos);
-            clearSelectedInPickList();
-            assets.setSource(new ArrayList<>());
-            assets.setTarget(new ArrayList<>());
-            WebUtil.addErrorMessage("新增效益设备成功");
-            crudActionName=null;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<EfficiencyEquipmentInfo> initializationEfficiencyEquipmentInfo(List<AssetInfo> assetInfos, UserAccount user) {
-
-        if (CollectionUtils.isEmpty(assetInfos)) return ListUtil.empty();
-        return  assetInfos.stream().map(item->{
-            item.setSpecialAsset(Boolean.TRUE);
-            EfficiencyEquipmentInfo efficiencyEquipmentInfo= new EfficiencyEquipmentInfo();
-            efficiencyEquipmentInfo.setAssetUid(item.getUid());
-            efficiencyEquipmentInfo.setCreatedByUid(user.getUid());
-            efficiencyEquipmentInfo.setCreatedDate(new Date());
-            efficiencyEquipmentInfo.setAssetName(item.getName());
-            efficiencyEquipmentInfo.setQrCode(item.getQrCode());
-            efficiencyEquipmentInfo.setSerialNum(item.getSerialNum());
-            efficiencyEquipmentInfo.setFunctionType(item.getFunctionType());
-            return efficiencyEquipmentInfo;
-        }).collect(Collectors.toList());
-    }
-
-
-    private void clearSelectedInPickList() {
-
-        assets.getTarget().clear();
-
-    }
-
-    public List<OrgInfo> autoCompleteDept(String query) {
-        if (clinicalDeptList == null) {
-            return Collections.emptyList();
-        }
-        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? Boolean.FALSE : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
-    }
-
-    public void onClinicalDeptChange() {
-
-        getQueryAssetsList();
-    }
-
-    public void getQueryAssetsList() {
-        List<AssetInfo> sourceAssets;
-        if(selectedOrg != null){
-            sourceAssets = getAssetListByDept(selectedOrg, filterDeptOrg);
-            sourceAssets = new ArrayList<>(sourceAssets);
-            sourceAssets.removeAll(assets.getTarget());
-        }else{
-            sourceAssets = new ArrayList<>();
-        }
-
-        assets.setSource(sourceAssets);
-    }
-
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         selectedOrg=null;
-        userSiteOrgTreeComponentController.setSelectedOrg(null);
         filterDeptOrg=null;
         assetGroup=null;
         purchasePrice=null;
@@ -350,82 +336,6 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     }
 
 
-    public List<AssetInfo> getAssetListByDept(OrgInfo siteOrg, OrgInfo clinicalDept) {
-        if (null == clinicalDept) {
-            return new ArrayList<>();
-        }
-        List<String> siteOrgUids = orgInfoDao.getSiteOrgUidsByParentUid(siteOrg.getUid());
-//
-//        List<SearchFilter> assetFilters = new ArrayList<>();
-//
-//        assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
-//        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
-//        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, siteOrg.getTenantUID()));
-//
-//        assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
-//        assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
-//        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteOrgUids, "1*2+"));
-//
-//        if (null != clinicalDept) {
-//            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
-//        }
-//
-//        if(assetGroup!=null){
-//            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup));
-//        }
-//
-//        if(purchasePrice!=null){
-//            assetFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, purchasePrice));
-//        }
-//
-//        assetFilters.add(new SearchFilter("efficiencyEquipmentInfo.uid", SearchFilter.Operator.IsNull,null));
-//
-//        Pageable pageable =  new PageRequest(0, 5000); //PageRequest.of(0, 5000);
-//        return assetInfoRepository.findBySearchFilter(assetFilters, pageable).getContent();
-
-        List<AssetInfo> assetInfoIsNotEfficiencyEquipment = assetInfoMapper.getAssetInfoIsNotEfficiencyEquipment(siteOrg.getTenantUID(), siteOrgUids, clinicalDept.getUid(),assetGroup,purchasePrice);
-        return assetInfoIsNotEfficiencyEquipment;
-
-
-    }
-
-
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
-
-        if (UserSiteOrgTreeComponentController.ORG_CHANGE.equals(eventName)) {
-            //his org code changes
-            this.selectedOrg = (OrgInfo)eventObject;
-
-            loadClinicalDept();
-            if(crudActionName==null|| !crudActionName.equals("Create")){
-                onSelectSiteTreeNode((OrgInfo)eventObject);
-            }
-
-        }
-
-    }
-
-    public void onSelectSiteTreeNode(OrgInfo selectSite) {
-
-        this.searchFilters.clear();
-
-        if (null != selectSite) {
-            this.selectSite = selectSite;
-        } else {
-            this.selectSite = null;
-        }
-
-
-    }
-
-    private void loadClinicalDept(){
-        if(null == selectedOrg){
-            clinicalDeptList = Collections.emptyList();
-        }else{
-            clinicalDeptList = orgInfoDao.getUserAccessibleClinicalDeptsBySelectedSite(selectedOrg.getUid(), UserContextService.getCurrentUserAccount().getUid());
-        }
-    }
 
     public void onSelectAsset() throws IOException {
         if (null == selected) {
@@ -445,22 +355,31 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private List<String> fields = ListUtil.newArrayList("设备名称", "设备型号", "品牌", "制造商序列号", "二维码", "所属科室", "设备分类", "采购金额", "检查人次", "收入", "成本", "利润", "利润率");
 
     public void exportExcel() throws IOException {
-        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
         List<String> orgUidList=null;
+
+        List<String> qrCodes=null;
+
         String orgUid=null;
         if(CollectionUtils.isEmpty(assetUids)){
             if(selectSite!=null){
                 orgUid = selectSite.getUid();
             }else{
-                orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
             }
+            List<AssetInfo> byUids = assetInfoRepository.getByUids(assetUids);
+            qrCodes=  byUids.stream().map(AssetInfo::getQrCode).filter(Objects::nonNull).collect(Collectors.toList());
         }
 
 
-        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList);
+        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
 
         List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
         Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
+
+        List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
+        Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
+
 
         for (EfficiencyEquipmentInfo efficiencyEquipmentInfo : list) {
             if (efficiencyEquipmentInfo.getAssetGroup() != null) {
@@ -468,12 +387,15 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             }
             BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
             BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
-            efficiencyEquipmentInfo.setProfits(income.subtract(cost));
             efficiencyEquipmentInfo.setIncome(income);
             efficiencyEquipmentInfo.setCost(cost);
-            if (!(income.compareTo(BigDecimal.ZERO) == 0)) {
-                efficiencyEquipmentInfo.setProfitsRate((income.subtract(cost)).divide(income, 2));
-            } else {
+            Integer id = efficiencyEquipmentInfo.getAssetId();
+            BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
+            BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
+            efficiencyEquipmentInfo.setProfits(profits);
+            if(!(income.compareTo(BigDecimal.ZERO)==0)){
+                efficiencyEquipmentInfo.setProfitsRate((income.subtract(profits)).multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
+            }else{
                 efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
             }
         }
@@ -496,9 +418,6 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
 
     private Boolean exportData(ExcelDocument doc, List<Map<String, Object>> dataList, List<String> fields) {
-//        for (int index = 0; index < fields.size(); index++) {
-//            doc.writeCellData("datalist", 1, index + 1, fields.get(index));
-//        }
         int dataRow = 2;
         for (Map<String, Object> data : dataList) {
             for (int index = 0; index < fields.size(); index++) {
@@ -581,7 +500,4 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         return null;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
 }

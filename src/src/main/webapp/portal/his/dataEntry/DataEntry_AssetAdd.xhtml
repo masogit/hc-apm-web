@@ -134,19 +134,19 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:column width="40" id="checkBoxCol">
-                    <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap2[asset.uid]}"
-                                             class="selectCheckBox2">
-                        <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
-                        <f:attribute name="assetObj" value="#{asset}"/>
-                    </p:selectBooleanCheckbox>
-                    <f:facet name="header">
-                        <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected2}"
-                                                 id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">
-                            <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>
-                        </p:selectBooleanCheckbox>
-                    </f:facet>
-                </p:column>
+<!--                <p:column width="40" id="checkBoxCol">-->
+<!--                    <p:selectBooleanCheckbox value="#{dataEntryCreateController.selectedMap2[asset.uid]}"-->
+<!--                                             class="selectCheckBox2">-->
+<!--                        <p:ajax event="change" listener="#{dataEntryCreateController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>-->
+<!--                        <f:attribute name="assetObj" value="#{asset}"/>-->
+<!--                    </p:selectBooleanCheckbox>-->
+<!--                    <f:facet name="header">-->
+<!--                        <p:selectBooleanCheckbox value="#{dataEntryCreateController.isAllSelected2}"-->
+<!--                                                 id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">-->
+<!--                            <p:ajax event="change" listener="#{dataEntryCreateController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>-->
+<!--                        </p:selectBooleanCheckbox>-->
+<!--                    </f:facet>-->
+<!--                </p:column>-->
                 <p:column headerText="设备名称">
                     <h:outputText value="#{asset.name}"/>
                 </p:column>
