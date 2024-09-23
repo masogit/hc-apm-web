@@ -741,6 +741,7 @@ public class AssetFileImportBaseService {
         }
 
         String clinicalDeptName = newAsset.getClinicalDeptName();
+        String siteUID = siteOrg.getSiteUID();
         if (StringUtils.isEmpty(clinicalDeptName)) {
             if (StringUtils.isEmpty(newAsset.getUid())) {
                 importData.setImportStatus(ImportStatus.Failure);
@@ -750,12 +751,12 @@ public class AssetFileImportBaseService {
 
         } else {
 
-            OrgInfo clinicalDept = orgCache.get(clinicalDeptName);
+            OrgInfo clinicalDept = orgCache.get(siteUID + clinicalDeptName);
             if (Objects.isNull(clinicalDept)) {
                 clinicalDept = supportingService.findOrgOnly(siteOrg, clinicalDeptName);
             }
             if (clinicalDept != null) {
-                orgCache.put(clinicalDeptName, clinicalDept);
+                orgCache.put(siteUID + clinicalDeptName, clinicalDept);
                 //new child clinical will reach here
                 newAsset.setClinicalDeptId(clinicalDept.getId());
                 newAsset.setClinicalDeptUID(clinicalDept.getUid());
@@ -764,12 +765,12 @@ public class AssetFileImportBaseService {
 
         String assetDeptName = newAsset.getAssetDeptName();
         if (!StringUtils.isEmpty(assetDeptName)) {
-            OrgInfo assetDept = orgCache.get(assetDeptName);
+            OrgInfo assetDept = orgCache.get(siteUID + assetDeptName);
             if (Objects.isNull(assetDept)) {
                 assetDept = supportingService.findOrgOnly(siteOrg, assetDeptName);
             }
             if (assetDept != null) {
-                orgCache.put(assetDeptName, assetDept);
+                orgCache.put(siteUID + assetDeptName, assetDept);
                 newAsset.setAssetDeptId(assetDept.getId());
                 newAsset.setAssetDeptUID(assetDept.getUid());
             } else {
