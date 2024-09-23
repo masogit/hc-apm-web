@@ -57,7 +57,7 @@
             </foreach>
         </if>
         and    statistical_date  between #{startDate} and #{endDate} GROUP BY asset_uid ),
-        check_summary AS ( SELECT asset_uid, SUM(check_number_people) AS checkNumberPeople FROM iot_performance_info WHERE  tenant_uid=#{tenantUid}
+        check_summary AS ( SELECT qr_code, SUM(check_number_people) AS checkNumberPeople FROM iot_performance_info WHERE  tenant_uid=#{tenantUid}
         <if test='qrCodes != null and qrCodes.size() > 0'>
             and  qr_code IN
             <foreach item='item' index='index' collection='qrCodes' open='(' separator=',' close=')'>
