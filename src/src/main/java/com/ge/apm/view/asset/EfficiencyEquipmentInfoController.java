@@ -209,7 +209,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
             currentPageAsset.setProfits(profits);
             if(!(income.compareTo(BigDecimal.ZERO)==0)){
-                currentPageAsset.setProfitsRate((income.subtract(profits)).multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
+                currentPageAsset.setProfitsRate(profits.multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
             }else{
                 currentPageAsset.setProfitsRate(BigDecimal.ZERO);
             }
@@ -394,7 +394,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
             efficiencyEquipmentInfo.setProfits(profits);
             if(!(income.compareTo(BigDecimal.ZERO)==0)){
-                efficiencyEquipmentInfo.setProfitsRate((income.subtract(profits)).multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
+                efficiencyEquipmentInfo.setProfitsRate(profits.multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
             }else{
                 efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
             }
@@ -403,7 +403,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     }
 
     private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
-        try {//.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx")
+        try {
             InputStream stream = EfficiencyEquipmentInfoController.class.getClassLoader().getResourceAsStream("/template/APM_EfficiencyEquipment_export_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = exportData(doc, data, fields);

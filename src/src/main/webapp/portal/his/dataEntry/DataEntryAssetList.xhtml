@@ -10,7 +10,7 @@
             <h:form id="DataEntryAssetForm">
                 <p:dataTable id="datalist" value="#{dataEntryAssetController.lazyModel}"
                              var="item" widgetVar="datalist"
-                             lazy="true" paginator="true" paginatorPosition="bottom"
+                             lazy="true" paginator="true" paginatorPosition="both"
                              paginatorAlwaysVisible="true"
                              selectionMode="single" selection="#{dataEntryAssetController.selected}"
                              rowKey="#{item.uid}" sortMode="single" sortOrder="descending"

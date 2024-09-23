@@ -80,10 +80,10 @@
                                      paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     rows="5" emptyMessage="#{msg.noRecordFound}"
+                                     rows="10" emptyMessage="#{msg.noRecordFound}"
                                      rowsPerPageTemplate="5,10,20,50">
                             <p:ajax event="filter" listener="#{efficiencyEquipmentCreateBatchController.onFilter}" update="datalist"/>
-                            <p:ajax event="page"  listener="#{efficiencyEquipmentCreateBatchController.setAllSelected1(false)}"  oncomplete="updateSelectAllCheckBox2('selectCheckBox1','selectCheckBoxHeader1');"/>
+                            <p:ajax event="page" />
                             <p:column width="40" id="checkBoxCol">
                                 <p:selectBooleanCheckbox value="#{efficiencyEquipmentCreateBatchController.selectedAssetUidTable1[item.uid]}" class="selectCheckBox1">
                                     <p:ajax event="change" listener="#{efficiencyEquipmentCreateBatchController.updateSelctedAssetList1}" update="@(.selectCheckBoxHeader1)"/>
@@ -140,9 +140,9 @@
                                      paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     rows="5" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
+                                     rows="10" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
                                      rowsPerPageTemplate="5,10,20,50">
-                            <p:ajax event="page"  listener="#{efficiencyEquipmentCreateBatchController.setAllSelected2(false)}" oncomplete="updateSelectAllCheckBox2('selectCheckBox2','selectCheckBoxHeader2');"/>
+                            <p:ajax event="page" />
                             <p:column width="40" id="checkBoxCol1">
                                 <p:selectBooleanCheckbox value="#{efficiencyEquipmentCreateBatchController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
                                     <p:ajax event="change" listener="#{efficiencyEquipmentCreateBatchController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
