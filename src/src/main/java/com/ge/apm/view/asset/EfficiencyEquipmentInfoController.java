@@ -190,20 +190,20 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
         List<Integer> assetIds = currentPageAssets.stream().map(EfficiencyEquipmentInfo::getAssetInfo).map(AssetInfo::getId).filter(Objects::nonNull).collect(Collectors.toList());
 
-        List<AssetCostDTO>  iotList= iotPerformanceInfoMapper.findByQrCodeAndDateInSunAmount(qrCodes,startDate,endDate);
-        Map<String, AssetCostDTO> iotMap = iotList.stream().collect(Collectors.toMap(AssetCostDTO::getQrCode, data -> data));
+//        List<AssetCostDTO>  iotList= iotPerformanceInfoMapper.findByQrCodeAndDateInSunAmount(qrCodes,startDate,endDate);
+//        Map<String, AssetCostDTO> iotMap = iotList.stream().collect(Collectors.toMap(AssetCostDTO::getQrCode, data -> data));
 
         Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
         for (EfficiencyEquipmentInfo currentPageAsset : currentPageAssets) {
             AssetCostDTO hisResultDto= hisResultMap.get(currentPageAsset.getAssetUid());
-            AssetCostDTO iot = currentPageAsset.getAssetInfo().getQrCode()!=null?iotMap.get(currentPageAsset.getAssetInfo().getQrCode()):null;
+//            AssetCostDTO iot = currentPageAsset.getAssetInfo().getQrCode()!=null?iotMap.get(currentPageAsset.getAssetInfo().getQrCode()):null;
             AssetCostDTO assetCostDTO = assetCostMap.get(currentPageAsset.getAssetUid());
             BigDecimal income=hisResultDto!=null?hisResultDto.getAmount()!=null?hisResultDto.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
             BigDecimal cost=assetCostDTO!=null?assetCostDTO.getAmount()!=null?assetCostDTO.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
-            BigDecimal checkNumberPeople=iot!=null?iot.getCheckNumberPeople()!=null?iot.getCheckNumberPeople():BigDecimal.ZERO:BigDecimal.ZERO;
+//            BigDecimal checkNumberPeople=iot!=null?iot.getCheckNumberPeople()!=null?iot.getCheckNumberPeople():BigDecimal.ZERO:BigDecimal.ZERO;
             currentPageAsset.setIncome(income);
             currentPageAsset.setCost(cost);
-            currentPageAsset.setCheckNumberPeople(checkNumberPeople);
+//            currentPageAsset.setCheckNumberPeople(checkNumberPeople);
             Integer id = currentPageAsset.getAssetInfo().getId();
             BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
             BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
@@ -352,54 +352,60 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
 
 
-    private List<String> fields = ListUtil.newArrayList("设备名称", "设备型号", "品牌", "制造商序列号", "二维码", "所属科室", "设备分类", "采购金额", "检查人次", "收入", "成本", "利润", "利润率");
+    private List<String> fields = ListUtil.newArrayList("设备名称", "设备型号", "品牌", "制造商序列号", "二维码", "所属科室", "设备分类", "采购金额", "收入", "成本", "利润", "利润率");
 
-    public void exportExcel() throws IOException {
-        Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        List<String> orgUidList=null;
+    public void exportExcel()  {
+        try {
+            Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
+            List<String> orgUidList=null;
 
-        List<String> qrCodes=null;
+            List<String> qrCodes=null;
 
-        String orgUid=null;
-        if(CollectionUtils.isEmpty(assetUids)){
+            String orgUid=null;
             if(selectSite!=null){
                 orgUid = selectSite.getUid();
             }else{
                 orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
             }
-            List<AssetInfo> byUids = assetInfoRepository.getByUids(assetUids);
-            qrCodes=  byUids.stream().map(AssetInfo::getQrCode).filter(Objects::nonNull).collect(Collectors.toList());
+            if(!assetUids.isEmpty()){
+
+                List<AssetInfo> byUids = assetInfoRepository.getByUids(assetUids);
+                qrCodes=  byUids.stream().map(AssetInfo::getQrCode).filter(Objects::nonNull).collect(Collectors.toList());
+            }
+
+
+            List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
+
+            List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
+            Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
+
+            List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
+            Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
+
+
+            for (EfficiencyEquipmentInfo efficiencyEquipmentInfo : list) {
+                if (efficiencyEquipmentInfo.getAssetGroup() != null) {
+                    efficiencyEquipmentInfo.setAssetGroupName(assetGroupMap.get(efficiencyEquipmentInfo.getAssetGroup().toString()));
+                }
+                BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
+                BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
+                efficiencyEquipmentInfo.setIncome(income);
+                efficiencyEquipmentInfo.setCost(cost);
+                Integer id = efficiencyEquipmentInfo.getAssetId();
+                BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
+                BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
+                efficiencyEquipmentInfo.setProfits(profits);
+                if(!(income.compareTo(BigDecimal.ZERO)==0)){
+                    efficiencyEquipmentInfo.setProfitsRate(profits.multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
+                }else{
+                    efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
+                }
+            }
+            downloadFile(parseListToMap(list), fields);
+        }catch (Exception e){
+            logger.error("导出效益设备异常 e:",e);
         }
 
-
-        List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
-
-        List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
-        Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
-
-        List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
-        Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
-
-
-        for (EfficiencyEquipmentInfo efficiencyEquipmentInfo : list) {
-            if (efficiencyEquipmentInfo.getAssetGroup() != null) {
-                efficiencyEquipmentInfo.setAssetGroupName(assetGroupMap.get(efficiencyEquipmentInfo.getAssetGroup().toString()));
-            }
-            BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
-            BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
-            efficiencyEquipmentInfo.setIncome(income);
-            efficiencyEquipmentInfo.setCost(cost);
-            Integer id = efficiencyEquipmentInfo.getAssetId();
-            BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
-            BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
-            efficiencyEquipmentInfo.setProfits(profits);
-            if(!(income.compareTo(BigDecimal.ZERO)==0)){
-                efficiencyEquipmentInfo.setProfitsRate(profits.multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
-            }else{
-                efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
-            }
-        }
-        downloadFile(parseListToMap(list), fields);
     }
 
     private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
@@ -448,7 +454,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             tempMap.put("所属科室", equipmentInfo.getClinicalDeptName());
             tempMap.put("设备分类", equipmentInfo.getAssetGroupName());
             tempMap.put("采购金额", equipmentInfo.getPurchasePrice());
-            tempMap.put("检查人次", equipmentInfo.getCheckNumberPeople());
+//            tempMap.put("检查人次", equipmentInfo.getCheckNumberPeople());
             tempMap.put("收入", equipmentInfo.getIncome());
             tempMap.put("成本", equipmentInfo.getCost());
             tempMap.put("利润", equipmentInfo.getProfits());

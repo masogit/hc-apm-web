@@ -175,11 +175,11 @@
 <!--                            <h:outputText value="#{item.usageRate}"/>-->
 <!--                        </p:column>-->
 
-                        <p:column headerText="检查人次" >
-                            <h:outputText value="#{item.checkNumberPeople}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
+<!--                        <p:column headerText="检查人次" >-->
+<!--                            <h:outputText value="#{item.checkNumberPeople}">-->
+<!--                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />-->
+<!--                            </h:outputText>-->
+<!--                        </p:column>-->
 
 <!--                        <p:column headerText="检查时长" >-->
 <!--                            <h:outputText value="#{item.checkTimeLength}"/>-->
@@ -205,10 +205,6 @@
                             </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">
-<!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">-->
-<!--                                <p:dataExporter type="xls" target="datalist" fileName="EfficiencyEquipment_export"/>-->
-<!--                            </p:commandButton>-->
-
 
                             <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >

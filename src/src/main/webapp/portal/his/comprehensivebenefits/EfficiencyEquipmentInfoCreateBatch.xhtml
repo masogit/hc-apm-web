@@ -95,13 +95,13 @@
                                     </p:selectBooleanCheckbox>
                                 </f:facet>
                             </p:column>
-                            <p:column headerText="#{msg.assetName}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <p:column headerText="#{msg.assetName}">
                                 <h:outputText value="#{item.name}" />
                             </p:column>
-                            <p:column headerText="#{msg.functionType}"  filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <p:column headerText="#{msg.functionType}" >
                                 <h:outputText value="#{item.functionType}"/>
                             </p:column>
-                            <p:column headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <p:column headerText="#{msg.assetGroup}">
 <!--                                <f:facet name="filter" >-->
 <!--                                    <p:selectOneMenu onchange="PF('configEditList1').filter()" >-->
 <!--                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>-->
@@ -110,13 +110,13 @@
 <!--                                </f:facet>-->
                                 <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup',item.assetGroup)}"/>
                             </p:column>
-                            <p:column headerText="#{msg.departNum}" filterBy="#{item.departNum}" filterMatchMode="EQ">
+                            <p:column headerText="#{msg.departNum}">
                                 <h:outputText value="#{item.departNum}"/>
                             </p:column>
-                            <p:column headerText="#{msg.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="EQ" >
+                            <p:column headerText="#{msg.qrCode}" >
                                 <h:outputText value="#{item.qrCode}"/>
                             </p:column>
-                            <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ" >
+                            <p:column headerText="#{msg.clinicalDeptName}">
 <!--                                <f:facet name="filter" >-->
 <!--                                    <p:selectOneMenu onchange="PF('configEditList1').filter()" >-->
 <!--                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>-->
