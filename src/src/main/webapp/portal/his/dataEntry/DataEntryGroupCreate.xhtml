@@ -85,7 +85,6 @@
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
                     <p:dataTable id="selectAssetInfos" value="#{dataEntryCreateController.selectAssetInfos}" var="asset"
-                                 selectionMode="single"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{asset.uuid}" sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
