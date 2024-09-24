@@ -9,7 +9,7 @@
         <div class="ui-g-12 card">
             <h:form id="DataEntryAssetForm">
                 <p:dataTable id="datalist" value="#{dataEntryAssetController.lazyModel}"
-                             var="item" widgetVar="datalist"
+                             var="item" widgetVar="datalist" sortField="lastModifiedDate" sortBy="lastModifiedDate"
                              lazy="true" paginator="true" paginatorPosition="both"
                              paginatorAlwaysVisible="true"
                              selectionMode="single" selection="#{dataEntryAssetController.selected}"
@@ -66,16 +66,16 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="生效开始操作者"  filterBy="#{item.userAccount.name}" filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.userAccount.name}"/>
+                    <p:column headerText="修改人"  filterBy="#{item.lastModifiedUserAccount.name}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.lastModifiedUserAccount.name}"/>
                     </p:column>
 
-                    <p:column  headerText="操作时间" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                    <p:column  headerText="修改时间" sortBy="#{item.lastModifiedDate}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
-                            <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{assetInfoListController.selectedObject['createdDate']}"/>
+                            <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{dataEntryController.selectedObject['lastModifiedDate']}"/>
                         </f:facet>
                         <h:outputText value="#{item.createdDate}">
-                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
                         </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">

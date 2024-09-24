@@ -54,6 +54,7 @@
                             <p:selectOneMenu  id="assetGroup" value="#{efficiencyEquipmentCreateBatchController.assetGroup}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <p:ajax />
                             </p:selectOneMenu>
                         </h:panelGroup>
 

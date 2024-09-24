@@ -206,6 +206,7 @@ public class DataEntryService {
         dataEntry.setClinicalDeptUid(selectAsset.getClinicalDeptUID());
         dataEntry.setOperationUserUid(user.getUid());
         dataEntry.setCreatedDate(new Date());
+        dataEntry.setLastModifiedBy(user.getUid());
         dataEntry.setLastModifiedDate(new Date());
         dataEntry.setGroupOrSingle(type);
     }
