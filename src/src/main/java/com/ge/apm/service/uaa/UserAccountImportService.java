@@ -576,9 +576,6 @@ public class UserAccountImportService {
         return sysRoleMap;
     }
     private Map<String, CustomRole> getCustomRoleNameMap() {
-        if (customRoleMap != null) {
-            return customRoleMap;
-        }
         customRoleMap = new HashMap<>();
         List<CustomRole> customRoles = customRoleRepository.findByTenantUID(currentUser.getTenantUID());
         if (CollectionUtils.isEmpty(customRoles)) return customRoleMap;

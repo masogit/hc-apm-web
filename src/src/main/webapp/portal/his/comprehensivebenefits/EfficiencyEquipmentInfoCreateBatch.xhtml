@@ -60,11 +60,12 @@
                         <h:panelGroup>
                             <label class='label'>采购金额下限(元)</label>
                             <p:inputNumber id="purchasePrice" value="#{efficiencyEquipmentCreateBatchController.purchasePrice}">
+                                <p:ajax/>
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <p:commandButton actionListener="#{efficiencyEquipmentCreateBatchController.getQueryAssetsList()}"
-                                             value="查询" update="datalist" immediate="true" validateClient="false"
+                                             value="查询" update="datalist" immediate="true" validateClient="false" process="@this"
                                              icon="ui-icon-check"
                             />
                         </h:panelGroup>
