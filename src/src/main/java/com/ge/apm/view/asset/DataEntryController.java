@@ -15,6 +15,7 @@ import com.ge.apm.view.his.HisAssetGroupEditController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -92,7 +93,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
         }
         this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
-        if (!this.hasFilterOnField("siteUID")) {
+        if (!this.hasFilterOnField("siteUid")) {
             List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -130,6 +131,19 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
         dataEntryService.deleteDataEntry(selected);
 
+
+    }
+
+    public void onTabChange(TabChangeEvent event) {
+//        FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
+//
+//        selected=null;
+//        this.selectedObject = new HashMap<>();
+//        filterEntryType=null;
+//        this.removeFilterOnField("entryType");
+//        this.removeFilterOnField("endDate");
+//        this.removeFilterOnField("startDate");
+//        this.removeFilterOnField("lastModifiedDate");
 
     }
 }
