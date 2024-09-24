@@ -55,17 +55,18 @@
                         <p:selectOneMenu  id="assetTypeGroup" value="#{hisAssetGroupEditController.assetGroup}" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup>
                         <label class='label'>采购金额:(元)</label>
                         <p:inputNumber id="purchasePrice" value="#{hisAssetGroupEditController.purchasePrice}">
+                            <p:ajax/>
                         </p:inputNumber>
                     </h:panelGroup>
 
                     <p:commandButton  validateClient="false" immediate="true" actionListener="#{hisAssetGroupEditController.getQueryAssetsList2()}"
-                                     value="查询" update="HisAssetsPickList" oncomplete="buttonComplete(xhr, status, args)"
+                                     value="查询" update="HisAssetsPickList" oncomplete="buttonComplete(xhr, status, args)" process="@this"
                                      icon="ui-icon-check"
                     />
 
@@ -127,7 +128,6 @@
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
                     <p:dataTable id="selectAssetInfos" value="#{hisAssetGroupEditController.selectAssetInfos}" var="asset"
-                                 selectionMode="single"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"

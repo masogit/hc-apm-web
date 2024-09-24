@@ -119,7 +119,7 @@ public class FileDownloadService {
                  cell.setCellValue(customRoles.get(i).getName());
                 cell.setCellStyle(cellStyle);
             }
-            XSSFRow row = explanation.createRow(lastRowNum + customRoles.size() - 1);
+            XSSFRow row = explanation.createRow(lastRowNum + customRoles.size());
             XSSFCell cell = row.createCell(0);
             cell.setCellValue(lastRow);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
