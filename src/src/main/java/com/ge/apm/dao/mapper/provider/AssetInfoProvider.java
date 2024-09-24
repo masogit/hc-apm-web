@@ -78,7 +78,7 @@ public class AssetInfoProvider {
 		String orgUidList = getSetValue(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select id from v2_pm_order where asset_id in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
+		sb.append(" select id from v2_pm_order where asset_uid in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
 		return sb.toString();
 	}
 
