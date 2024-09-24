@@ -83,7 +83,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 	 * @return
 	 */
 	@SelectProvider(type = AssetInfoProvider.class,method="getMvsPmOrders")
-	List<String> getMvsPmOrders(@Param("orgList")List<Integer> orgList,@Param("tenantUid")String tenantUid);
+	List<String> getMvsPmOrders(@Param("orgList")List<String> orgList,@Param("tenantUid")String tenantUid);
 
 	@SelectProvider(type = AssetInfoProvider.class,method="countAssetWithQRcode")
 	Integer countAssetWithQRcode(@Param("uidList")List<String> uidList,@Param("tenantUid")String tenantUid);
