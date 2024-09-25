@@ -8,6 +8,8 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,6 +35,10 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
     private HisEquipmentSfxmMatchRepository hisEquipmentSfxmMatchDao;
     private HisOrgComponentController orgComponentController;
     private HisAssetGroupEditController hisAssetGroupEditController;
+
+    @Getter
+    @Setter
+    private String groupType;
 
     @Override
     protected void init(){

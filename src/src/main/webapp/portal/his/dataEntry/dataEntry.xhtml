@@ -15,7 +15,8 @@
             </div>
             <div class="ui-g-12 card">
 
-                <p:tabView  dynamic="true" id="tabDataEntry" >
+                <p:tabView  dynamic="true" cache="false"  id="tabDataEntry"   activeIndex="0">
+                    <p:ajax event="tabChange" listener="#{dataEntryController.onTabChange}" />
                     <p:tab title="分组录入记录">
 
                         <ui:include src="DataEntryGroupList.xhtml"></ui:include>
