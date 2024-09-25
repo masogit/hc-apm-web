@@ -158,7 +158,7 @@
                                         </h:panelGroup>
                                         <h:panelGroup id="showPanel">
                                             <h:panelGroup>
-                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pmTab:pmrepairCompleteDialogForm:pictureList"     disabled="#{v2PmOrderController.fileTypeName == null}"         auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"  oncomplete="PF('addImag').hide()"/>
+                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pmTab:pmrepairCompleteDialogForm:pictureList"     disabled="#{v2PmOrderController.fileTypeName == null}"         auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"  oncomplete="PF('addImag').hide()"/>
                                             </h:panelGroup>
                                         </h:panelGroup>
                                     </p:panelGrid>
@@ -182,7 +182,7 @@
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>
-                        <p:fileUpload id="beforePic" disabled="#{v2PmOrderController.disableUploadButton('before')}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureBeforeList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:fileUpload id="beforePic" disabled="#{v2PmOrderController.disableUploadButton('before')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureBeforeList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                         <p:dataGrid id="pictureAfterList" var="fileitem" value="#{v2PmOrderController.picAfterList}" columns="5" layout="grid">
                             <f:facet name="header">保养后照片</f:facet>
                             <p:panel  style="text-align:center">
@@ -194,7 +194,7 @@
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>
-                        <p:fileUpload id="afterPic" disabled="#{v2PmOrderController.disableUploadButton('after')}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadAfter}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureAfterList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:fileUpload id="afterPic" disabled="#{v2PmOrderController.disableUploadButton('after')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadAfter}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureAfterList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     </p:fieldset>
 
                     <p:growl id="msgs" showDetail="true" />
