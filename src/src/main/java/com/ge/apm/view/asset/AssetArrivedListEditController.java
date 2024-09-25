@@ -443,7 +443,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (enableArrivalListRequired()) {
             List<V2_BlobObject> asset4 = attachList.stream().filter(t -> "asset4".equals(t.getBoSubType())).collect(Collectors.toList());
             if (ObjectUtil.isEmpty(asset4)) {
-                WebUtil.addSuccessMessage("验收材料必填");
+                WebUtil.addSuccessMessage("验收及其他材料必填");
                 return;
             }
         }
@@ -1397,6 +1397,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setQrCodePrefix(String qrCodePrefix) {
         this.qrCodePrefix = qrCodePrefix;
+    }
+
+    public String getInstallUrl(String itemId,String srcPage){
+        if (enableArrivalListRequired()) {
+            List<V2_BlobObject> asset4 = attachList.stream().filter(t -> "asset4".equals(t.getBoSubType())).collect(Collectors.toList());
+            if (ObjectUtil.isEmpty(asset4)) {
+                return "";
+            }
+        }
+        return UrlEncryptController.encodeUrlParam("ItemEdit?faces-redirect=true&src=".concat(srcPage).concat("&itemId=").concat(itemId));
     }
 
     public boolean enableArrivalListRequired() {

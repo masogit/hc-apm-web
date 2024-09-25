@@ -562,7 +562,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload required="#{assetArrivedListEditController.enableArrivalListRequired()}" requiredMessage="验收材料必填" disabled="#{userContextService.activeSupplier()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload disabled="#{userContextService.activeSupplier()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <c:if test="#{assetArrivedListEditController.selected.status eq 2}">
@@ -823,7 +823,7 @@
                                     <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
-                                    <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                                    <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedListEditController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">
