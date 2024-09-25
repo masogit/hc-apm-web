@@ -124,6 +124,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
         selectedMap = new HashMap<>();
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
+        arrivalFormatTime = null;
     }
 
     @Override
@@ -233,6 +234,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
     public String getArrivalFormatTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         if (varArrivalDateTo == null) {
+            System.out.println(this.getClass());
             return arrivalFormatTime;
         } else {
             return "~" + sdf.format(varArrivalDateTo);
