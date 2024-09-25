@@ -344,11 +344,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 this.contractError = true;
                 return;
             }else if(this.zkbAssetInfo.getRepairForm() !=null && 2 == this.zkbAssetInfo.getRepairForm()){
-                if(zkbAssetInfo.getAssetGroup() == 1){
+                /*if(zkbAssetInfo.getAssetGroup() == 1){
                     WebUtil.addErrorMessage("GEFE维修外修不允许申请放射类设备！","");
                     this.contractError = true;
                     return;
-                }else if(2==zkbAssetInfo.getAssetGroup()){
+                }else */
+                if (2 == zkbAssetInfo.getAssetGroup()) {
                     if(ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
                         WebUtil.addErrorMessage("GEFE维修外修不允许申请超声低端机设备！","");
                         this.contractError = true;
