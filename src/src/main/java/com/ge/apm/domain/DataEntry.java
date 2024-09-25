@@ -93,9 +93,13 @@ public class DataEntry implements Serializable {
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
 
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "operation_user_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+//    private UserAccount userAccount;
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "operation_user_uid",referencedColumnName = "uid", insertable = false,updatable = false)
-    private UserAccount userAccount;
+    @JoinColumn(name = "last_modified_by",referencedColumnName = "uid", insertable = false,updatable = false)
+    private UserAccount lastModifiedUserAccount;
 
 
     @Override

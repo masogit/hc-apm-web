@@ -19,7 +19,7 @@
 
                 <h:form id="hisListForm">
                     <p:dataTable id="datalist" value="#{hisAssetGroupListController.lazyModel}"
-                                 var="item"
+                                 var="item" widgetVar="datalist"
                                  lazy="true" paginator="true" paginatorPosition="bottom"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single" selection="#{hisAssetGroupListController.selected}"
@@ -30,22 +30,30 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{hisAssetGroupListController.onSelectAssetGroupAssetMatch}" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{hisAssetGroupListController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{hisAssetGroupListController.onFilter}"/>
 
-                        <p:column headerText="所属业务单元" sortBy="#{item.orgInfoUid}">
-                            <h:outputText value="#{hisAssetGroupListController.getOrgNameByUid(item.orgInfoUid)}"/>
+                        <p:column headerText="所属业务单元" sortBy="#{item.orgInfo.name}"   filterBy="#{item.orgInfo.name}" filterMatchMode="LIKE" >
+<!--                            <h:outputText value="#{hisAssetGroupListController.getOrgNameByUid(item.orgInfoUid)}"/>-->
+                            <h:outputText value="#{item.orgInfo.name}"/>
                         </p:column>
 
-                        <p:column headerText="设备分组名称" sortBy="#{item.assetGroupName}">
+                        <p:column headerText="设备分组名称" sortBy="#{item.assetGroupName}"   filterBy="#{item.assetGroupName}" filterMatchMode="LIKE"  >
                             <h:outputText value="#{item.assetGroupName}"/>
                         </p:column>
 
 
-                        <p:column headerText="设备分组类型" sortBy="#{item.hisAssetGroup.type}">
+                        <p:column headerText="设备分组类型" sortBy="#{item.hisAssetGroup.type}"  filterBy="#{item.hisAssetGroup.type}" filterMatchMode="EQ"    >
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{hisAssetGroupListController.groupType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroup.type)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}"  filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE"   >
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
 

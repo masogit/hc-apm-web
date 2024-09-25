@@ -380,7 +380,7 @@ public class HisAssetGroupService {
             BigDecimal bigDecimal = listMap.get(hisAssetGroupClinicalMatch.getAssetUid());
 //        for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
             BigDecimal aDouble = targetAssetsMap.get(hisAssetGroupClinicalMatch.getAssetUid());
-            if((bigDecimal==null && aDouble!=null)   ||  (bigDecimal!=null && aDouble==null)   || (bigDecimal!=null && aDouble!=null &&  bigDecimal.compareTo(aDouble)==0 )  ){
+            if((bigDecimal == null && aDouble != null)   ||  (bigDecimal!=null && aDouble==null)   || (bigDecimal!=null && aDouble!=null &&  bigDecimal.compareTo(aDouble)!=0 )  ){
                 return Boolean.TRUE;
             }
 
