@@ -2162,7 +2162,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
         List<String> orgUidList = pmOrderService.getMvsAssectUidsStr(token);
         if (CollectionUtils.isEmpty(orgUidList)) {
-            orgUidList.add("'1++1'");
+            orgUidList.add("1++1");
         }
         return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
     }
