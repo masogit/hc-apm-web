@@ -124,6 +124,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
 
     private UserContextService userContextService;
+    List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -146,7 +147,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
 
-
+        getGetHisAssetGroups();
     }
 
     public void getGroupMatchAsset() {
@@ -182,8 +183,18 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
         searchFiltersGroup.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, user.getTenantUID()));
         searchFiltersGroup.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Cost"));
-        List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(searchFiltersGroup);
+        hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(searchFiltersGroup);
         return hisAssetGroupAssetMatches;
+    }
+
+
+    public List<HisAssetGroupAssetMatch> hisAssetGroupsString(String query) {
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(hisAssetGroupAssetMatches)){
+            List<HisAssetGroupAssetMatch> list = hisAssetGroupAssetMatches.stream().filter(item->item.getHisAssetGroup().getName().contains(query)).collect(Collectors.toList());
+            return list;
+        }
+        return new ArrayList<>();
+
     }
 
 
@@ -203,6 +214,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             selected.setAssetGroupUid(selectHisAssetGroupAssetMatch.getAssetGroupUid());
             selected.setAssetGroupOrgInfoUid(selectHisAssetGroupAssetMatch.getOrgInfoUid());
             selected.setClinicalDeptUid(selectHisAssetGroupAssetMatch.getClinicalDeptUid());
+            selected.setHisAssetGroupAssetMatchUid(selectHisAssetGroupAssetMatch.getUuid());
             dataEntryService.save(selected,user,selectAssetInfos);
             WebUtil.addSuccessMessage("添加成功");
         }else{
@@ -295,6 +307,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 this.selected = (DataEntry) eventObject;
                 if(selected.getGroupOrSingle()==1){
                     getGroupMatchAsset();
+//                    getGetHisAssetGroups();
                 }else{
 
                     AssetInfo byUid = assetInfoRepository.findByUid(selected.getAssetUid());
