@@ -21,7 +21,7 @@
                     <p:dataTable id="datalist" value="#{hisAssetGroupListController.lazyModel}"
                                  var="item" widgetVar="datalist"
                                  lazy="true" paginator="true" paginatorPosition="bottom"
-                                 paginatorAlwaysVisible="true"
+                                 paginatorAlwaysVisible="true" sortBy="lastModifiedDate" sortField="lastModifiedDate"
                                  selectionMode="single" selection="#{hisAssetGroupListController.selected}"
                                  rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"

@@ -85,6 +85,9 @@ public class HisAssetGroupAssetMatch implements Serializable {
     @Transient
     private Double groupRate;
 
+    @Transient
+    private String  groupNameOrgName;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -104,5 +107,12 @@ public class HisAssetGroupAssetMatch implements Serializable {
         return true;
     }
 
+    public String getGroupNameOrgName() {
+        return hisAssetGroup.getName()+"---"+orgInfo.getName();
+    }
+
+    public void setGroupNameOrgName(String groupNameOrgName) {
+        this.groupNameOrgName = groupNameOrgName;
+    }
 }
 

@@ -34,7 +34,7 @@
                                         value="#{inventoryOrderController.selectedOrgs}"
                                         panelStyle="width:280px" style="width:100%"
                                         converter="orgInfoConverter" multiple="true" filter="true"
-                                        filterMatchMode="contains" required="true" requiredMessage="盘点科室不能为空">
+                                        filterMatchMode="contains">
                                    <f:selectItems value="#{inventoryOrderController.orgsForSelected}" var="item"
                                                    itemLabel="#{item.orgName}" itemValue="#{item}"/>
                                     <p:ajax process="@this"/>
