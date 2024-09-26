@@ -33,7 +33,7 @@
                                 <p:selectCheckboxMenu
                                         value="#{inventoryOrderController.selectedOrgs}"
                                         panelStyle="width:280px" style="width:100%"
-                                        converter="orgInfoConverter" multiple="true" filter="true"
+                                        multiple="true" filter="true" updateLabel="true"
                                         filterMatchMode="contains">
                                    <f:selectItems value="#{inventoryOrderController.orgsForSelected}" var="item"
                                                    itemLabel="#{item.orgName}" itemValue="#{item}"/>
