@@ -8,4 +8,4 @@ update his_asset_group set created_date= now(),last_modified_date=now()  where c
 update his_asset_group_asset_match set created_date= now(),last_modified_date=now() where created_date is null;
 
 -- YHAAO-22813 处理历史数据
-update  asset_info  set institution_uid = tenant_uid,hospital_uid = tenant_uid,site_uid = tenant_uid,clinical_dept_uid = reverse(clinical_dept_uid),asset_dept_uid = reverse(asset_dept_uid),patrol_inspection_owner_uid=reverse(patrol_inspection_owner_uid) where is_deleted = true and institution_uid != tenant_uid and hospital_uid != tenant_uid and site_uid != tenant_uid;
+update  asset_info  set institution_uid = tenant_uid,hospital_uid = tenant_uid,site_uid = tenant_uid,clinical_dept_uid = reverse(clinical_dept_uid),asset_dept_uid = reverse(asset_dept_uid),patrol_inspection_owner_uid=reverse(patrol_inspection_owner_uid),last_modified_date=now() where is_deleted = true;
