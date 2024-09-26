@@ -130,9 +130,9 @@
                                   filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.functionType}"/>
                         </p:column>
-                        <p:column headerText="#{msg.brand}" filterBy="#{item.assetInfo.brand.name}"
+                        <p:column headerText="#{msg.makerShortName}" filterBy="#{item.assetInfo.makerShortName}"
                                   filterMatchMode="LIKE" >
-                            <h:outputText value="#{item.assetInfo.brand.name}"/>
+                            <h:outputText value="#{item.assetInfo.makerShortName}"/>
                         </p:column>
 
                         <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}"

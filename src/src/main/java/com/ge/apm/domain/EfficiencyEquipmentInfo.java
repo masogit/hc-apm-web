@@ -88,7 +88,7 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
 
     @Transient
-    private String brandName;
+    private String makerShortName;
     @Transient
     private String clinicalDeptName;//所属科室
 

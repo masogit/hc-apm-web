@@ -448,7 +448,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             Map<String, Object> tempMap = MapUtil.newHashMap();
             tempMap.put("设备名称", equipmentInfo.getAssetName());
             tempMap.put("设备型号", equipmentInfo.getFunctionType());
-            tempMap.put("品牌", equipmentInfo.getBrandName());
+            tempMap.put("品牌", equipmentInfo.getMakerShortName());
             tempMap.put("制造商序列号", equipmentInfo.getSerialNum());
             tempMap.put("二维码", equipmentInfo.getQrCode());
             tempMap.put("所属科室", equipmentInfo.getClinicalDeptName());

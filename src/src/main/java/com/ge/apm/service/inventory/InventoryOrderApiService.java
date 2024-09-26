@@ -48,22 +48,21 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	//初始化创建工单科室列表
-	public List<OrgInfo> onCreateInventory(){
+	public List<Map<String,Object>> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
 		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
-		ArrayList<Map<String,Object>> data = (ArrayList)response.getBody().get("data");
-		return data.stream().map(item -> orgDao.findByUid((String) item.get("uid"))).collect(Collectors.toList());
+		return (ArrayList)response.getBody().get("data");
 	}
 
 	// 创建盘点工单
-	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgInfo> selectedOrgs){
+	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<Map<String,Object>> selectedOrgs){
 		Map map =new HashMap<String,Object>();
 		map.put("planStartTime",format.format(selected.getPlanStartTime()));
 		map.put("planEndTime",format.format(selected.getPlanEndTime()));
 
-		List<Map> list = new ArrayList<>();
+		/*List<Map> list = new ArrayList<>();
 		selectedOrgs.stream().forEach(org -> {
 			Map p =new HashMap<String,Object>();
 			p.put("uid",org.getUid());
@@ -71,8 +70,8 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 			p.put("id",org.getId());
 			p.put("selected", true);
 			list.add(p);
-		});
-		map.put("orgSelections",list);
+		});*/
+		map.put("orgSelections", selectedOrgs);
 		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
 		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
 		return template.exchange(url,HttpMethod.POST,requestEntity,LinkedHashMap.class);
