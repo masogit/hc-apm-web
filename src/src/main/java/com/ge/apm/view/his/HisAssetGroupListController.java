@@ -72,9 +72,6 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
         }
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
-        Sort.Order orders = new Sort.Order(Sort.Direction.DESC, "lastModifiedDate", Sort.NullHandling.NULLS_LAST);
-        Sort sort = new Sort(orders);
-        pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(),sort);
         Page<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
         List<HisAssetGroupAssetMatch> content = hisAssetGroupAssetMatches.getContent();
         return hisAssetGroupAssetMatches;

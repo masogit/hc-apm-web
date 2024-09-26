@@ -75,12 +75,33 @@ public class AssetInfoProvider {
 
 
 	public String getMvsPmOrders(Map<String,Object> param){
-		String orgUidList = getSetValue(param.get("orgList")) ;
+		String orgUidList = getSetValueUid(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
 		sb.append(" select id from v2_pm_order where asset_uid in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
 		return sb.toString();
 	}
+
+	private String getSetValueUid(Object value) {
+		StringBuilder sb = new StringBuilder();
+		Collection<Integer> set = (Collection<Integer>) value;
+		if (set != null) {
+			Iterator<Integer> it = set.iterator();
+			sb.append("(");
+			while (it.hasNext()) {
+				sb.append("'");
+				sb.append(it.next());
+				sb.append("'");
+				sb.append(",");
+			}
+//			sb.append("'");
+//			sb.append("'");
+			sb.deleteCharAt(sb.length()-1);
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+
 
 	private String getSetValue(Object value) {
 		StringBuilder sb = new StringBuilder();
