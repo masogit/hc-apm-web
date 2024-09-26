@@ -279,8 +279,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 ||ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 confirmMessage += "本次申请不扣除名额！";
                 thisDeductionMessage = "本次申请不扣除名额！";
-            }else if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType()) &&
-                    (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))){
+            }else if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
                 Integer spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota():new Integer(0);
                 Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchDepotQty(this.selected.getId(), SPECIAL_PART);
                 beforeAdjustQty = beforeAdjustQty == null ? 0 : beforeAdjustQty;
@@ -616,8 +615,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 && !ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
             boolean isDepot = false;
             Map<String,String> depotMap = new HashMap<>();
-            if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())
-                && (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))){
+            if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
                 isDepot = true;
                 List<ZkbPartOrderCat> zkbPartOrderCatList = zkbPartOrderCatRepository.queryByCatType(SPECIAL_PART);
                 if(CollectionUtils.isNotEmpty(zkbPartOrderCatList)){
@@ -684,8 +682,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public boolean checkDepot(ZkbContract zkbContract){
         boolean isDepot = false;
-        if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())
-                && (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))){
+        if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
             isDepot = true;
         }
         return isDepot;
@@ -954,12 +951,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         boolean isDepot = false;
         Map<String, String> depotMap = new HashMap<>();
         if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                isDepot = true;
-                List<ZkbPartOrderCat> zkbPartOrderCatList = zkbPartOrderCatRepository.queryByCatType(SPECIAL_PART);
-                if(CollectionUtils.isNotEmpty(zkbPartOrderCatList)){
-                    depotMap = zkbPartOrderCatList.stream().collect(Collectors.toMap(ZkbPartOrderCat::getCatNo,ZkbPartOrderCat::getCatNo));
-                }
+            isDepot = true;
+            List<ZkbPartOrderCat> zkbPartOrderCatList = zkbPartOrderCatRepository.queryByCatType(SPECIAL_PART);
+            if(CollectionUtils.isNotEmpty(zkbPartOrderCatList)){
+                depotMap = zkbPartOrderCatList.stream().collect(Collectors.toMap(ZkbPartOrderCat::getCatNo,ZkbPartOrderCat::getCatNo));
             }
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList) {
