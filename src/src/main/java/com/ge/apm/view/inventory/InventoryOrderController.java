@@ -10,6 +10,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.inventory.InventoryOrderApiService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
@@ -79,12 +80,16 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        if(selected.getPlanStartTime().before(now)){
+        if (selected.getPlanStartTime().before(now)) {
             WebUtil.addErrorMessage("计划开始时间不得早于当前日期");
             return "";
         }
-        if(selected.getPlanStartTime().after(selected.getPlanEndTime())){
+        if (selected.getPlanStartTime().after(selected.getPlanEndTime())) {
             WebUtil.addErrorMessage("计划结束时间不得早于开始时间");
+            return "";
+        }
+        if (ObjectUtil.isEmpty(selectedOrgs)) {
+            WebUtil.addErrorMessage("盘点科室不能为空");
             return "";
         }
 	    try{
