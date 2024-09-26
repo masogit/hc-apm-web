@@ -42,9 +42,9 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     private InventoryOrderService service;
     private InventoryOrderApiService apiService;
     @Getter @Setter
-    List<OrgInfo> orgsForSelected = new ArrayList<>(); //待选科室
+    List<Map<String,Object>> orgsForSelected = new ArrayList<>(); //待选科室
     @Setter @Getter
-    List<OrgInfo> selectedOrgs; //勾选盘点科室
+    List<Map<String,Object>> selectedOrgs; //勾选盘点科室
     @Setter @Getter
     private InventoryOrder inventoryOrder;
 	@Override
