@@ -118,7 +118,11 @@
                 <h:form id="AdverseEventCreateForm">
                     <p:accordionPanel id="accordionCreate" multiple="true" activeIndex="0,1,2,3,4,5,6,7">
                         <p:tab title="报告人基本情况" closable="false">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup rendered="#{not empty adverseEventManagementController.selected.id}">
+                                    <label class="label">工单编号</label>
+                                    <p:inputText id="workOrderNum" value="#{adverseEventManagementController.selected.workOrderNum}"  disabled="true"/>
+                                </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告人姓名<span style="color:red">*</span></label>
                                     <p:inputText id="serialNum" value="#{adverseEventManagementController.selected.reporterName}" required="false" requiredMessage="报告人姓名不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
