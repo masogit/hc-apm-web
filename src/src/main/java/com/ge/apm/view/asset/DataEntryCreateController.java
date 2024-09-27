@@ -151,6 +151,9 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     }
 
     public void getGroupMatchAsset() {
+        if(selectHisAssetGroupAssetMatch!=null){
+            selected.setHisAssetGroupAssetMatchUid(selectHisAssetGroupAssetMatch.getUuid());
+        }
         String hisAssetGroupAssetMatchUid = this.selected.getHisAssetGroupAssetMatchUid();
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch = hisAssetGroupAssetMatchDao.findById(hisAssetGroupAssetMatchUid);
         selectHisAssetGroupAssetMatch=hisAssetGroupAssetMatch;

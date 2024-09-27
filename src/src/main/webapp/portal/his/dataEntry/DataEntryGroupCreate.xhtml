@@ -22,7 +22,7 @@
                         <label class="label">选择分组<span style="color:red">*</span></label>
                             <p:autoComplete dropdown="true" value="#{dataEntryCreateController.selectHisAssetGroupAssetMatch}"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{dataEntryCreateController.hisAssetGroupsString}"
-                                            class="groupNameChange" id="groupNameChange" var="item"  itemValue="#{item}"  itemLabel="#{item.groupNameOrgName}"  disabled="#{ not empty dataEntryCreateController.selected.uid}" >
+                                            class="groupNameChange" id="groupNameChange" var="item"  itemValue="#{item}"  itemLabel="#{item.groupNameOrgName}"  converter="hisAssetGroupConverter"  disabled="#{ not empty dataEntryCreateController.selected.uid}" >
                                 <p:ajax event="itemSelect"  listener="#{dataEntryCreateController.getGroupMatchAsset}" update="dataEntryGroupCreate:selectAssetInfos"/>
                             </p:autoComplete>
                     </h:panelGroup>
