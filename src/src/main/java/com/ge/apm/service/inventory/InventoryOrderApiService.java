@@ -54,6 +54,7 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 			p.put("orgName", org.getOrgName());
 			p.put("id", org.getId());
 			p.put("selected", true);
+			p.put("assetType", org.getAssetType());
 			list.add(p);
 		});
 		map.put("orgSelections", list);
