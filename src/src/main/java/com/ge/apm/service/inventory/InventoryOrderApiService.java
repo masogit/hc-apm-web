@@ -36,8 +36,7 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	public List<OrgDto> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
-//		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
-		String url = "http://localhost:8094/api/apm/asset/inventoryorders/orgSelection";
+		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
 		return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgDto>>() {});
 	}
@@ -59,8 +58,7 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 		});
 		map.put("orgSelections", list);
 		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
-//		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
-		String url = "http://localhost:8094/api/apm/asset/inventoryorders";
+		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
 		return template.exchange(url,HttpMethod.POST,requestEntity,LinkedHashMap.class);
 	}
 
