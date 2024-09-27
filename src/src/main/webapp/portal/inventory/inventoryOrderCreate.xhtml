@@ -31,12 +31,12 @@
                             <h:panelGroup id="approveuser">
                                 <label class="label"> 选择科室 </label>
                                 <p:selectCheckboxMenu
-                                        value="#{inventoryOrderController.selectedOrgs}"
+                                        value="#{inventoryOrderController.selectedOrgUid}"
                                         panelStyle="width:280px" style="width:100%"
                                         multiple="true" filter="true" updateLabel="true"
                                         filterMatchMode="contains">
                                    <f:selectItems value="#{inventoryOrderController.orgsForSelected}" var="item"
-                                                   itemLabel="#{item.orgName}" itemValue="#{item}"/>
+                                                   itemLabel="#{item.orgName}" itemValue="#{item.uid}"/>
                                     <p:ajax process="@this"/>
                                 </p:selectCheckboxMenu>
                             </h:panelGroup>
