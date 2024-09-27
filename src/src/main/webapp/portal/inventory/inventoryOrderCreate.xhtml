@@ -36,7 +36,7 @@
                                         multiple="true" filter="true" updateLabel="true"
                                         filterMatchMode="contains">
                                    <f:selectItems value="#{inventoryOrderController.orgsForSelected}" var="item"
-                                                   itemLabel="#{item.orgName}" itemValue="#{item.uid}"/>
+                                                   itemLabel="#{item.orgName}" itemValue="#{item.uid}#assetType=#{item.assetType}"/>
                                     <p:ajax process="@this"/>
                                 </p:selectCheckboxMenu>
                             </h:panelGroup>

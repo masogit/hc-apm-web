@@ -12,4 +12,8 @@ public class OrgDto implements Serializable {
     private Boolean selected;
     private String assetType;
 
+    public String getAssetType() {
+        return assetType == null ? "" : assetType;
+    }
+
 }
