@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.service.inventory.InventoryOrderApiService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -95,7 +96,14 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
             return "";
         }
 	    try{
-            List<OrgDto> selectedOrgs = orgsForSelected.stream().filter(t -> selectedOrgUid.contains(t.getUid())).collect(Collectors.toList());
+            List<OrgDto> selectedOrgs = ListUtil.newArrayList();
+            for (OrgDto orgDto : orgsForSelected) {
+                for (String string : selectedOrgUid) {
+                    if (string.contains(orgDto.getUid()) && string.contains("#assetType=" + orgDto.getAssetType())) {
+                        selectedOrgs.add(orgDto);
+                    }
+                }
+            }
             apiService.doCreate(selected, selectedOrgs);
             selectedOrgUid.clear();
         }catch(Exception e){
