@@ -118,9 +118,9 @@ public class WordReportExportService {
                     for (NurseSiteMaintainData nurseSiteMaintainData : listData) {
                         Boolean checkValue = nurseSiteMaintainData.getCheckValue();
                         if (Boolean.TRUE.equals(checkValue)) {
-                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "√");
+                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "√"+(nurseSiteMaintainData.getVariableText()!=null?" "+nurseSiteMaintainData.getVariableText():""));
                         } else if (Boolean.FALSE.equals(checkValue)) {
-                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "x");
+                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "x"+(nurseSiteMaintainData.getVariableText()!=null?" "+nurseSiteMaintainData.getVariableText():""));
                         } else {
                             itemMap.put(nurseSiteMaintainData.getCheckItem(), null);
                         }
