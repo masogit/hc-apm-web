@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.service.inventory.InventoryOrderApiService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -43,9 +45,9 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     private InventoryOrderService service;
     private InventoryOrderApiService apiService;
     @Getter @Setter
-    List<Map<String,Object>> orgsForSelected = new ArrayList<>(); //待选科室
+    List<OrgDto> orgsForSelected = new ArrayList<>(); //待选科室
     @Setter @Getter
-    List<Map<String,Object>> selectedOrgs; //勾选盘点科室
+    List<String> selectedOrgUid; //勾选盘点科室
     @Setter @Getter
     private InventoryOrder inventoryOrder;
 	@Override
@@ -88,13 +90,14 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
             WebUtil.addErrorMessage("计划结束时间不得早于开始时间");
             return "";
         }
-        if (ObjectUtil.isEmpty(selectedOrgs)) {
+        if (ObjectUtil.isEmpty(selectedOrgUid)) {
             WebUtil.addErrorMessage("盘点科室不能为空");
             return "";
         }
 	    try{
+            List<OrgDto> selectedOrgs = orgsForSelected.stream().filter(t -> selectedOrgUid.contains(t.getUid())).collect(Collectors.toList());
             apiService.doCreate(selected, selectedOrgs);
-            selectedOrgs.clear();
+            selectedOrgUid.clear();
         }catch(Exception e){
             WebUtil.addErrorMessage("盘点工单新建失败");
             return "";

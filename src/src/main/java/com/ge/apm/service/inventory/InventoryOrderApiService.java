@@ -1,9 +1,11 @@
 package com.ge.apm.service.inventory;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -31,32 +33,34 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	//初始化创建工单科室列表
-	public List<Map<String,Object>> onCreateInventory(){
+	public List<OrgDto> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
-		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
+//		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
+		String url = "http://localhost:8094/api/apm/asset/inventoryorders/orgSelection";
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
-		return (ArrayList)response.getBody().get("data");
+		return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgDto>>() {});
 	}
 
 	// 创建盘点工单
-	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<Map<String,Object>> selectedOrgs){
+	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgDto> selectedOrgs){
 		Map map =new HashMap<String,Object>();
 		map.put("planStartTime",format.format(selected.getPlanStartTime()));
 		map.put("planEndTime",format.format(selected.getPlanEndTime()));
 
-		/*List<Map> list = new ArrayList<>();
+		List<Map> list = new ArrayList<>();
 		selectedOrgs.stream().forEach(org -> {
 			Map p =new HashMap<String,Object>();
-			p.put("uid",org.getUid());
-			p.put("orgName",getNameWithParent(org));
-			p.put("id",org.getId());
+			p.put("uid", org.getUid());
+			p.put("orgName", org.getOrgName());
+			p.put("id", org.getId());
 			p.put("selected", true);
 			list.add(p);
-		});*/
-		map.put("orgSelections", selectedOrgs);
+		});
+		map.put("orgSelections", list);
 		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
-		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
+//		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
+		String url = "http://localhost:8094/api/apm/asset/inventoryorders";
 		return template.exchange(url,HttpMethod.POST,requestEntity,LinkedHashMap.class);
 	}
 
