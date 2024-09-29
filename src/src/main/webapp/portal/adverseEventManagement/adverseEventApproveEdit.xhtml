@@ -34,7 +34,7 @@
                 <h:form id="AdverseEventApproveEditForm">
                     <p:accordionPanel id="accordionCreate" multiple="true" activeIndex="0,1,2,3,4,5,6">
                         <p:tab title="报告人基本情况" closable="false">
-                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">不良事件工单类型<span style="color:red">*</span></label>
                                     <p:selectOneRadio value="#{adverseEventApproveController.selected.adverseEventType}" id="adverseEventType" layout="custom" required="true" requiredMessage="不良事件工单类型不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}">
