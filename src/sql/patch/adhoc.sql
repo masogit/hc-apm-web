@@ -6,6 +6,10 @@ insert into public.config_item (uid, category, default_value, description, key, 
 --his分组添加创建时间
 update his_asset_group set created_date= now(),last_modified_date=now()  where created_date is null;
 update his_asset_group_asset_match set created_date= now(),last_modified_date=now() where created_date is null;
+--his处理历史数据值
+update  his_asset_group_asset_match set org_info_uid=site_uid  where org_info_uid is null;
+update  his_asset_group_clinical_match set org_info_uid=site_uid  where org_info_uid is null;
+
 
 -- YHAAO-22813 处理历史数据
 update  asset_info  set institution_uid = tenant_uid,hospital_uid = tenant_uid,site_uid = tenant_uid,clinical_dept_uid = reverse(clinical_dept_uid),asset_dept_uid = reverse(asset_dept_uid),patrol_inspection_owner_uid=reverse(patrol_inspection_owner_uid),last_modified_date=now() where is_deleted = true and institution_uid != tenant_uid and hospital_uid != tenant_uid and site_uid != tenant_uid;
