@@ -62,11 +62,13 @@ public class MaintenanceTemplate {
 
             this.content.put(Component.ACCESSORY_INFORMATION.toString(), Component.ACCESSORY_INFORMATION.value());
             this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
+            this.content.put(Component.PM_PRE_PICTURE_TABLE.toString(), Component.PM_PRE_PICTURE_TABLE.value());
             this.content.put(Component.PM_PRE_PICTURE0.toString(), Component.PM_PRE_PICTURE0.value());
             this.content.put(Component.PM_PRE_PICTURE1.toString(), Component.PM_PRE_PICTURE1.value());
             this.content.put(Component.PM_PRE_PICTURE2.toString(), Component.PM_PRE_PICTURE2.value());
             this.content.put(Component.PM_PRE_PICTURE3.toString(), Component.PM_PRE_PICTURE3.value());
             this.content.put(Component.PM_PRE_PICTURE4.toString(), Component.PM_PRE_PICTURE4.value());
+            this.content.put(Component.PM_AFTER_PICTURE_TABLE.toString(), Component.PM_AFTER_PICTURE_TABLE.value());
             this.content.put(Component.PM_AFTER_PICTURE0.toString(), Component.PM_AFTER_PICTURE0.value());
             this.content.put(Component.PM_AFTER_PICTURE1.toString(), Component.PM_AFTER_PICTURE1.value());
             this.content.put(Component.PM_AFTER_PICTURE2.toString(), Component.PM_AFTER_PICTURE2.value());
@@ -305,13 +307,13 @@ public class MaintenanceTemplate {
         PM_PICTURE27("pm_picture27",Widget.PICTURE),
         PM_PICTURE28("pm_picture28",Widget.PICTURE),
         PM_PICTURE29("pm_picture29",Widget.PICTURE),
-
+        PM_PRE_PICTURE_TABLE("pm_pre_picture_table",Widget.TEXT),
         PM_PRE_PICTURE0("pm_pre_picture0",Widget.PICTURE),
         PM_PRE_PICTURE1("pm_pre_picture1",Widget.PICTURE),
         PM_PRE_PICTURE2("pm_pre_picture2",Widget.PICTURE),
         PM_PRE_PICTURE3("pm_pre_picture3",Widget.PICTURE),
         PM_PRE_PICTURE4("pm_pre_picture4",Widget.PICTURE),
-
+        PM_AFTER_PICTURE_TABLE("pm_after_picture_table",Widget.TEXT),
         PM_AFTER_PICTURE0("pm_after_picture0",Widget.PICTURE),
         PM_AFTER_PICTURE1("pm_after_picture1",Widget.PICTURE),
         PM_AFTER_PICTURE2("pm_after_picture2",Widget.PICTURE),
