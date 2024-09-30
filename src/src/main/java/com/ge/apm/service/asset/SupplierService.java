@@ -270,6 +270,11 @@ public class SupplierService {
         return userContextService.canRender("ASSET_SUPPLIER_APPLICATION");
     }
 
+    public boolean activeVender(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.canRender("ASSET_VENDER");
+    }
+
     public boolean validateSupplierCode(Supplier supplier){
 
         UserAccount user = UserContextService.getCurrentUserAccount();
