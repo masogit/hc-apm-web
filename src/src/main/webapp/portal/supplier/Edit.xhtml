@@ -88,7 +88,8 @@
                                       multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset legend="供应商基本信息" rendered="#{supplierController.activeSupplier()}">
+<!--                <p:fieldset legend="供应商基本信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="供应商基本信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">供应商编码</label>
@@ -115,7 +116,8 @@
                         </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset legend="营业执照信息" rendered="#{supplierController.activeSupplier()}">
+<!--                <p:fieldset legend="营业执照信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="营业执照信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">营业执照编码</label>
@@ -148,7 +150,8 @@
                                       multiple="true"  sizeLimit="100000000"  update="licenseAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset legend="营业许可证信息" rendered="#{supplierController.activeSupplier()}">
+<!--                <p:fieldset legend="营业许可证信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="营业许可证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">营业许可证编码</label>
@@ -213,7 +216,8 @@
                                       multiple="true"  sizeLimit="100000000"  update="authorizationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">
+<!--                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="生产许可证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">生产许可证编码</label>
@@ -242,7 +246,8 @@
                                       multiple="true"  sizeLimit="100000000"  update="manufacturingPermitAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset legend="产品注册证信息" rendered="#{supplierController.activeSupplier()}">
+<!--                <p:fieldset legend="产品注册证信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="产品注册证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">产品注册证编号</label>

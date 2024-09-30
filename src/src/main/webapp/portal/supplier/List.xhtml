@@ -26,6 +26,8 @@
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
                     <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                </h:form>
+                <h:form rendered="#{supplierController.activeVender()}">
                     <h:panelGrid id="filterType" columns="2" style="float: right">
                         <h:panelGroup style="float: right">
                             <span >#{msg.Legend}：</span>
@@ -85,6 +87,16 @@
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
+                        </p:column>
+                        <p:column headerText="来源" filterBy="#{item.source}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{supplierController.source}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                    <f:selectItem itemLabel="院方维护" itemValue="1" />
+                                    <f:selectItem itemLabel="供应商维护" itemValue="2" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.venderCompanyId == null ? '院方维护' : '供应商维护'}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
