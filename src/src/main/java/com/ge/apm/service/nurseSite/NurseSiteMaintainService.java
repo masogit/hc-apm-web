@@ -1969,7 +1969,7 @@ public class NurseSiteMaintainService {
 									keyName.append(",");
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempData.getStrValue()+(tempData.getVariableText()!=null?" "+tempData.getVariableText():""));
+								doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempData.getStrValue()+(tempData.getVariableText()!=null&&!tempData.getVariableText().equals("false")&&!tempData.getVariableText().equals("true")?" "+tempData.getVariableText():""));
 								doc.writeRowData(SHEET_Maintain, header, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
 								doc.writeRowData(SHEET_Maintain, header, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, header, checkNameRow, keyName.toString(), tempData.getCheckItem());
