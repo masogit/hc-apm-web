@@ -118,6 +118,24 @@
                 <h:form id="AdverseEventCreateForm">
                     <p:accordionPanel id="accordionCreate" multiple="true" activeIndex="0,1,2,3,4,5,6,7">
                         <p:tab title="报告人基本情况" closable="false">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup style="margin-left: 30px;">
+                                    <label class="label">不良事件工单类型<span style="color:red">*</span></label>
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.adverseEventType}" id="adverseEventType" layout="custom" required="true" requiredMessage="不良事件工单类型不能为空"  disabled="true">
+                                        <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:repairReportSendPlaceGroup" />
+                                        <f:selectItem itemValue="1" />
+                                        <f:selectItem itemValue="2" />
+                                    </p:selectOneRadio>
+                                    <h:panelGroup>
+                                        <p:radioButton for="adverseEventType" itemIndex="0"/>
+                                        <h:outputLabel value="医疗器械不良事件" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:radioButton for="adverseEventType" itemIndex="1"/>
+                                        <h:outputLabel value="医疗器械不良事件哨点监测" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </p:panelGrid>
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup rendered="#{not empty adverseEventManagementController.selected.id}">
                                     <label class="label">工单编号</label>
@@ -152,23 +170,6 @@
                                 <h:panelGroup>
                                     <label class="label">发生地</label>
                                     <p:inputText id="occurredPlace" value="#{adverseEventManagementController.selected.occurredPlace}"  disabled="true"/>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <label class="label">不良事件工单类型<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.adverseEventType}" id="adverseEventType" layout="custom" required="true" requiredMessage="不良事件工单类型不能为空"  disabled="true">
-                                        <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:repairReportSendPlaceGroup" />
-                                        <f:selectItem itemValue="1" />
-                                        <f:selectItem itemValue="2" />
-                                    </p:selectOneRadio>
-                                    <h:panelGroup>
-                                        <p:radioButton for="adverseEventType" itemIndex="0"/>
-                                        <h:outputLabel value="医疗器械不良事件" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:radioButton for="adverseEventType" itemIndex="1"/>
-                                        <h:outputLabel value="医疗器械不良事件哨点监测" styleClass="radiolabelPF"/>
-                                    </h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup id="repairReportSendPlaceGroup" rendered="#{adverseEventManagementController.selected.adverseEventType eq '2'}">
                                     <label class="label">设备报修发生场地<span style="color:red">#{adverseEventManagementController.selected.adverseEventType eq '2' ? '*' : ''}</span></label>

@@ -883,10 +883,12 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
     }
     public void selectClinicalDeptCheck(){
-        selectClinicalDept = deptInfoList.size() == selected.getSelectAssetClinicalDeptUids().size();
+        selectClinicalDept = Optional.ofNullable(selected.getSelectAssetClinicalDeptUids())
+                .map(assetClinicalDeptUids -> deptInfoList.size() == assetClinicalDeptUids.size())
+                .orElse(false);
     }
     public void setSelectAssetGroupCheck(){
-        selectAssetGroup = assetGroup.size() == selected.getSelectAssetGroups().size();
+        selectAssetGroup= Optional.ofNullable(selected.getSelectAssetGroups()).map(selectAssetGroups->assetGroup.size() ==selectAssetGroups.size()).orElse(false);
     }
 
     public boolean getApprovalRoleAssetHead() {
