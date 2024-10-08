@@ -13,3 +13,7 @@ update  his_asset_group_clinical_match set org_info_uid=site_uid  where org_info
 
 -- YHAAO-22813 处理历史数据
 update  asset_info  set institution_uid = tenant_uid,hospital_uid = tenant_uid,site_uid = tenant_uid,clinical_dept_uid = reverse(clinical_dept_uid),asset_dept_uid = reverse(asset_dept_uid),patrol_inspection_owner_uid=reverse(patrol_inspection_owner_uid),last_modified_date=now() where is_deleted = true and institution_uid != tenant_uid and hospital_uid != tenant_uid and site_uid != tenant_uid;
+
+
+update shared_asset_req_detail sard set clinical_dept_name = oi.name from org_info oi,shared_asset_request sar where sard.clinical_dept_uid = oi.uid and sard.clinical_dept_name != oi.name and sar.id in (sard.borrow_id,sard.return_id) and  sar.state in (1,2,3,4,5,6,7,8,9,11) and sar.tenant_uid = (select  uid  from  tenant_info  where name ='云南省阜外心血管病医院');
+update shared_asset_req_detail sard  set  clinical_dept_name = oi.name  from  shared_asset_request sar left join org_info oi on oi.uid = sar.clinical_dept_uid where oi.id is not null and sar.id in (sard.borrow_id,sard.return_id) and sard.clinical_dept_uid = oi.uid  and oi.name != sard.clinical_dept_name and sar.state in (1,2,3,4,5,6,7,8,9,11) and sar.tenant_uid = (select  uid  from  tenant_info  where name ='云南省阜外心血管病医院');
