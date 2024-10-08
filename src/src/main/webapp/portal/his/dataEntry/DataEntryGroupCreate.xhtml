@@ -90,14 +90,13 @@
                             <h:outputText value="#{asset.assetInfo.name}"/>
                         </p:column>
                         <p:column headerText="金额(元)">
-                            <p:inputText  value="#{asset.amount}" readonly="true">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </p:inputText>
+
+                            <p:inputNumber    minValue="0" decimalPlaces="2"   readonly="true"  roundMethod="ROUND_DOWN"	 value="#{asset.amount}" inputStyle="text-align: center">
+                            </p:inputNumber>
                         </p:column>
                         <p:column headerText="分摊比例">
-                            <p:inputText  value="#{asset.scaleAssessment}" readonly="true">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </p:inputText>
+                            <p:inputNumber    minValue="0" decimalPlaces="2"   readonly="true"  roundMethod="ROUND_DOWN"	 value="#{asset.scaleAssessment}" inputStyle="text-align: center">
+                            </p:inputNumber>
                         </p:column>
                     </p:dataTable>
                 </p:panelGrid>
