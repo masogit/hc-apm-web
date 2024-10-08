@@ -258,13 +258,15 @@ public class DataEntryService {
             List<DataEntryAssetDetail> dataEntryAssetDetails= new ArrayList<>();
             LocalDate startDate =    new Date(dataEntry.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate endDate =new Date(dataEntry.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+//            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
             LocalDate startDate1 = updateStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate endDate1= updateEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate newStartDate= !startDate.isAfter(startDate1)?startDate1:startDate;
             LocalDate newEndDate= !endDate.isAfter(endDate1)?  endDate:endDate1;
             Date starDate = Date.from(newStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             Date enDate = Date.from(newEndDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            long daysBetween = ChronoUnit.DAYS.between(newStartDate, newEndDate) + 1;
+
             List<DataEntryAssetDetail> dataEntryAssetDetails1 = dataEntryUidMap.get(dataEntry.getUid());
 
             Map<String, DataEntryAssetDetail> dataEntryAssetDetailMap = dataEntryAssetDetails1.stream()
