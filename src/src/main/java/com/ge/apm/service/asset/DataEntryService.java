@@ -340,4 +340,8 @@ public class DataEntryService {
         }
 
     }
+
+    public DataEntry getByDataEntryUid(String uid){
+        return dataEntryRepository.findById(uid);
+    }
 }
