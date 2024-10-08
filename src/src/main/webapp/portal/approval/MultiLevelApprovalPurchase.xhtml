@@ -362,10 +362,10 @@
                 <p:commandButton validateClient="false" actionListener="#{multiLevelApprovalController.purchaseInfoSave()}"
                                  rendered="#{multiLevelApprovalController.approvaLevelPurchase() eq 2}"
                                  value="保存" id="saveButton" style="width: 80px" disabled="#{multiLevelApprovalController.budgetConfirmArg}"
-                                 update=":approvalList :ItemDetailViewForm :growl"/>
+                                 update=":approvalForm:approvalList :ItemDetailViewForm :growl"/>
                 <p:commandButton validateClient="true" actionListener="#{multiLevelApprovalController.purchaseInfoSubmit()}"
                                  value="提交" id="submitButton" style="width: 80px" disabled="#{multiLevelApprovalController.budgetConfirmArg}"
-                                 update=":approvalList :ItemDetailViewForm :growl"
+                                 update=":approvalForm:approvalList :ItemDetailViewForm :growl"
                                  oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimPurDialog');"/>
                 <p:commandButton value="取消"   style="width: 80px" immediate="true" icon="ui-icon-arrow-back" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimPurDialog');" />
             </h:panelGroup>
