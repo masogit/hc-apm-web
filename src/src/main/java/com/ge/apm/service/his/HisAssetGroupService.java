@@ -98,7 +98,6 @@ public class HisAssetGroupService {
     @Transactional
     public void bindAssetsToGroup(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, boolean subEquipment, Date updateStartDate, Date updateEndDate,OrgInfo selectOrg,UserAccount userAccount){
 
-//        HisAssetGroupAssetMatch hisAssetGroupAssetMatch =  hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
         HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
         if("Cost".equals(hisAssetGroup.getType())){
             hisAssetGroupAssetMatch = hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
@@ -113,11 +112,11 @@ public class HisAssetGroupService {
                 if(needPromptInputDates(targetAssets,hisAssetGroup,selectOrg) && updateStartDate!=null && updateEndDate!=null){
                     dataEntryService.updateAssetGroup(hisAssetGroup,targetAssets,updateStartDate,updateEndDate,selectOrg);
                 }
+                addNewJobIfBoundUpdated2(targetAssets, hisAssetGroup, selectOrg, updateStartDate, updateEndDate);
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupAndOrgInfoUid(hisAssetGroup.getUuid(),selectOrg.getSiteUID());
 
             }else{
                 String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-
                 addNewJobIfBoundUpdated(targetAssets, hisAssetGroup, clinicalDept, updateStartDate, updateEndDate);
                 hisAssetGroupClinicalMatchRepository.deleteAssetByHisAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
             }
@@ -207,7 +206,7 @@ public class HisAssetGroupService {
             if(!flag){
                 for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
                     BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
-                    if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
+                    if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  stringDoubleEntry.getValue().compareTo(aDouble)!=0 )  ){
                         flag=true;
                         break;
                     }
@@ -275,86 +274,65 @@ public class HisAssetGroupService {
     }
 
     private void addNewJobIfBoundUpdated2(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept, Date updateStartDate, Date updateEndDate) {
-        String hisAssetGroupClinicalMatchUid = hisAssetGroup.getUuid() + clinicalDept.getUid();
-        HisAssetGroupAssetMatch hisAssetGroupAssetMatch;
-        List<HisAssetGroupClinicalMatch> list;
-        if(hisAssetGroup.getType().equals("Income")){
-            hisAssetGroupAssetMatch= hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndClinicalDeptUid(hisAssetGroup.getUuid(), clinicalDept.getUid());
-             list = hisAssetGroupClinicalMatchRepository.findByAssetGroupClinicalMatchId(hisAssetGroupClinicalMatchUid);
 
-        }else{
-            hisAssetGroupAssetMatch= hisAssetGroupAssetMatchRepository.findByAssetGroupUidAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
-            list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid( hisAssetGroup.getUuid(),clinicalDept.getSiteUID());
+        List<HisAssetGroupClinicalMatch> list = hisAssetGroupClinicalMatchRepository.findByHisAssetGroupUIdAndOrgInfoUid(hisAssetGroup.getUuid(), clinicalDept.getSiteUID());
 
-        }
+
         Set<String> uids1 = list.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
         Set<String> uids2 = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
 
-        boolean flag=false;
-
-
-        Map<String, BigDecimal> listMap = list.stream().collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
-        Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
-
-        for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
-            BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
-            if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  !stringDoubleEntry.getValue().equals(aDouble )  )  ){
-                flag=true;
-            }
-
-        }
-
-        if ((!uids1.equals(uids2)) ||  flag) {
-
-            StringBuilder businessId = new StringBuilder();
-            List<HisEquipmentSfxmMatch> listSfxmMatch = sfxmMatchRepository.findByHisGroupMatchUid(hisAssetGroupAssetMatch.getUuid());
-            if (!listSfxmMatch.isEmpty()) {
-                for (HisEquipmentSfxmMatch hisEquipmentSfxmMatch : listSfxmMatch) {
-                    if (StringUtils.isNotEmpty(hisEquipmentSfxmMatch.getSfxmId())) {
-                        if (businessId.length() > 0) {
-                            businessId.append(",");
-                        }
-                        businessId.append(hisEquipmentSfxmMatch.getSfxmId());
-                    }
+        Map<String, BigDecimal> listMap = list.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(HisAssetGroupClinicalMatch::getAssetUid, HisAssetGroupClinicalMatch::getScaleAssessment));
+        Map<String, BigDecimal> targetAssetsMap = targetAssets.stream().filter(match -> match.getScaleAssessment() != null).collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getScaleAssessment));
+        boolean flag = false;
+        flag = !uids1.equals(uids2);
+        if (!flag) {
+            for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
+                BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
+                if ((stringDoubleEntry.getValue() == null && aDouble != null) || (stringDoubleEntry.getValue() != null && aDouble == null) || (stringDoubleEntry.getValue() != null && aDouble != null && stringDoubleEntry.getValue().compareTo(aDouble) != 0)) {
+                    flag = true;
+                    break;
                 }
 
-                List<HisAssetGroupClinicalMatch> newList = Lists.newArrayList();
-                targetAssets.stream().forEach(item -> {
-                    HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
-                    hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroupClinicalMatchUid);
-                    hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
-                    hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
-                    hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
-                    if(hisAssetGroup.getType().equals("Income")){
-                        hisAssetGroupClinicalMatch.setClinicalDeptUid(item.getClinicalDeptUID());
-                    }else{
-                        hisAssetGroupClinicalMatch.setClinicalDeptUid(clinicalDept.getUid());
-                    }
-                    hisAssetGroupClinicalMatch.setOrgInfoUid(clinicalDept.getSiteUID());
-                    hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroup.getUuid()+clinicalDept.getSiteUID());
-                    hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
-                    newList.add(hisAssetGroupClinicalMatch);
-                });
-
-                UserAccount loginUser = UserContextService.getCurrentUserAccount();
-                HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
-                hisAdjustBusinessJob.setOrgCode(listSfxmMatch.get(0).getHosId());
-                hisAdjustBusinessJob.setTaskType(3);
-                hisAdjustBusinessJob.setBusinessId(businessId.toString());//收费项目ids
-                hisAdjustBusinessJob.setOldStrJson(list.isEmpty() ? null : JSONArray.fromObject(list).toString());
-                hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSONArray.fromObject(newList).toString());
-                hisAdjustBusinessJob.setDataStartDate(updateStartDate);
-                hisAdjustBusinessJob.setDataEndDate(updateEndDate);
-                hisAdjustBusinessJob.setTaskStatus(0);
-                hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
-                hisAdjustBusinessJob.setCreatedDate(new Date());
-                hisAdjustBusinessJob.setTenantUid(listSfxmMatch.get(0).getTenantUid());
-                hisAdjustBusinessJob.setSiteUid(listSfxmMatch.get(0).getSiteUid());
-                hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
             }
-
-
         }
+        if (flag) {
+            List<HisAssetGroupClinicalMatch> newList = Lists.newArrayList();
+            targetAssets.stream().forEach(item -> {
+                HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch = new HisAssetGroupClinicalMatch();
+                hisAssetGroupClinicalMatch.setAssetGroupClinicalId(hisAssetGroup.getUuid() +clinicalDept.getSiteUID());
+                hisAssetGroupClinicalMatch.setAssetUid(item.getUid());
+                hisAssetGroupClinicalMatch.setDepartNum(item.getDepartNum());
+                hisAssetGroupClinicalMatch.setHisAssetGroupUId(hisAssetGroup.getUuid());
+                hisAssetGroupClinicalMatch.setClinicalDeptUid(item.getClinicalDeptUID());
+                hisAssetGroupClinicalMatch.setOrgInfoUid(clinicalDept.getSiteUID());
+                hisAssetGroupClinicalMatch.setAssetGroupOrgInfoUid(hisAssetGroup.getUuid() + clinicalDept.getSiteUID());
+                hisAssetGroupClinicalMatch.setScaleAssessment(item.getScaleAssessment());
+                newList.add(hisAssetGroupClinicalMatch);
+            });
+
+            UserAccount loginUser = UserContextService.getCurrentUserAccount();
+            HisAdjustBusinessJob hisAdjustBusinessJob = new HisAdjustBusinessJob();
+            hisAdjustBusinessJob.setOrgCode(null);
+            hisAdjustBusinessJob.setTaskStatus(0);
+            if (hisAssetGroup.getType().equals("Income")) {
+                hisAdjustBusinessJob.setTaskType(3);
+            } else {
+                hisAdjustBusinessJob.setTaskType(0);
+                hisAdjustBusinessJob.setTaskStatus(1);
+            }
+            hisAdjustBusinessJob.setBusinessId(null);
+            hisAdjustBusinessJob.setOldStrJson(list.isEmpty() ? null : JSON.toJSONString(list));
+            hisAdjustBusinessJob.setNewStrJson(newList.isEmpty() ? null : JSON.toJSONString(newList));
+            hisAdjustBusinessJob.setDataStartDate(updateStartDate);
+            hisAdjustBusinessJob.setDataEndDate(updateEndDate);
+            hisAdjustBusinessJob.setCreatedBy(loginUser.getLoginName());
+            hisAdjustBusinessJob.setCreatedDate(new Date());
+            hisAdjustBusinessJob.setTenantUid(clinicalDept.getTenantUID());
+            hisAdjustBusinessJob.setSiteUid(clinicalDept.getSiteUID());
+            hisAdjustBusinessJobRepository.save(hisAdjustBusinessJob);
+        }
+
+
     }
 
     public boolean needPromptInputDates(List<AssetInfo> targetAssets, HisAssetGroup hisAssetGroup, OrgInfo clinicalDept)
