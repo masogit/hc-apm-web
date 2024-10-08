@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -125,6 +126,11 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     private UserContextService userContextService;
     List<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches;
+
+    private HisGroupDataEntryHistoryRepository hisGroupDataEntryHistoryRepository;
+    @Getter
+    @Setter
+    private List<HisGroupDataEntryHistory> hisGroupDataEntryHistories;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -146,6 +152,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        hisGroupDataEntryHistoryRepository = WebUtil.getBean(HisGroupDataEntryHistoryRepository.class);
 
         getGetHisAssetGroups();
     }
@@ -283,6 +290,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             if (eventObject == null) {
                 //create
                 this.selected = new DataEntry();
+                selectHisAssetGroupAssetMatch=null;
                 selectAssetInfos = new ArrayList<>();
 
                 assetDataEntrys=new ArrayList<>();
@@ -310,7 +318,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 this.selected = (DataEntry) eventObject;
                 if(selected.getGroupOrSingle()==1){
                     getGroupMatchAsset();
-//                    getGetHisAssetGroups();
+                    getDataEntryAssetHistory();
+                    for (HisAssetGroupClinicalMatch selectAssetInfo : selectAssetInfos) {
+                            selectAssetInfo.setAmount(null);
+                    }
                 }else{
 
                     AssetInfo byUid = assetInfoRepository.findByUid(selected.getAssetUid());
@@ -330,6 +341,24 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             }
         }
 
+    }
+
+    private void getDataEntryAssetHistory() {
+        hisGroupDataEntryHistories= hisGroupDataEntryHistoryRepository.findByDataEntryUid(selected.getUid());
+        for (HisGroupDataEntryHistory hisGroupDataEntryHistory : hisGroupDataEntryHistories) {
+            List<HisGroupDataEntryHistory.AssetGroupDetail> assetGroupDetails = JSONObject.parseObject(hisGroupDataEntryHistory.getJsonString(), new TypeReference<List<HisGroupDataEntryHistory.AssetGroupDetail>>() {});
+            List<String> assetUids = assetGroupDetails.stream().map(HisGroupDataEntryHistory.AssetGroupDetail::getAssetUid).collect(Collectors.toList());
+            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
+
+            Map<String, String> assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getName, (existing, replacement) -> existing));
+            assetGroupDetails.forEach(i->{
+                i.setGroupName(selectHisAssetGroupAssetMatch.getHisAssetGroup().getName());
+                i.setAssetName(assetMap.get(i.getAssetUid()));
+
+            });
+            hisGroupDataEntryHistory.setAssetGroupDetailList(assetGroupDetails);
+
+        }
     }
 
     public boolean isEditMode() {
