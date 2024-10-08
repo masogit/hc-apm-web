@@ -21,14 +21,18 @@
         <h:panelGroup>
             <label class="label">#{msg.name}<span style="color:red">*</span></label>
             <p:autoComplete id="name" value="#{assetInfoEditController.selected.name}" readonly="#{!assetInfoEditController.needEdit('name')}"
-                            completeMethod="#{assetInfoEditController.completeAssetName}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            completeMethod="#{assetInfoEditController.completeAssetName}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                <p:ajax/>
+            </p:autoComplete>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'aliasName')}" >
         <h:panelGroup>
             <label class="label">#{msg.aliasName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['aliasName'].required? '*':''}</span></label>
             <p:inputText  id="aliasName" value="#{assetInfoEditController.selected.aliasName}" required="#{assetInfoEditController.customConfig.assetFields['aliasName'].required}"
-                          requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" />
+                          requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" >
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
@@ -47,6 +51,7 @@
             <p:selectOneMenu id="assetDisposalResults" value="#{assetInfoEditController.selected.assetDisposalResults}"  disabled="#{!assetInfoEditController.needEdit('assetDisposalResults')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetDisposalResultsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                 <p:ajax/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -56,6 +61,7 @@
             <p:selectOneMenu id="assetClass" value="#{assetInfoEditController.selected.assetClass}" requiredMessage="#{msg.assetClass} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetClass')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -67,6 +73,7 @@
                              class="assetGroupChange">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{assetInfoEditController.assetGroupSecondaryList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -101,7 +108,9 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerTel'].required? '*':''}</span></label>
             <p:inputText id="assetOwnerTel" value="#{assetInfoEditController.selected.assetOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel'].required}"
-                         requiredMessage="#{msg.assetOwnerTel} #{msg.ValidationRequire}" readonly="true" class="assetOwnerNameChange"/>
+                         requiredMessage="#{msg.assetOwnerTel} #{msg.ValidationRequire}" readonly="true" class="assetOwnerNameChange">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetOwnerName2')}" >
@@ -125,7 +134,9 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel2}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerTel2'].required? '*':''}</span></label>
             <p:inputText id="assetOwnerTel2" value="#{assetInfoEditController.selected.assetOwnerTel2}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel2'].required}"
-                         requiredMessage="#{msg.assetOwnerTel2} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName2Change"/>
+                         requiredMessage="#{msg.assetOwnerTel2} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName2Change">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetOwnerName3')}" >
@@ -150,7 +161,9 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel3}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerTel3'].required? '*':''}</span></label>
             <p:inputText id="assetOwnerTel3" value="#{assetInfoEditController.selected.assetOwnerTel3}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel3'].required}"
-                         requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
+                         requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <!--保养负责人-->
@@ -216,7 +229,9 @@
         <h:panelGroup >
             <label class="label">#{msg.patrolInspectionOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerTel'].required? '*':''}</span></label>
             <p:inputText id="patrolInspectionOwnerTel" value="#{assetInfoEditController.selected.patrolInspectionOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerTel'].required}"
-                         requiredMessage="#{msg.patrolInspectionOwnerTel} #{msg.ValidationRequire}" readonly="true" class="patrolInspectionOwnerName"/>
+                         requiredMessage="#{msg.patrolInspectionOwnerTel} #{msg.ValidationRequire}" readonly="true" class="patrolInspectionOwnerName">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <!--负责人-->
@@ -243,7 +258,9 @@
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required? '*':''}</span></label>
             <p:inputText id="pmOwnerTel" value="#{assetInfoEditController.selected.pmOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required}"
-                         requiredMessage="#{msg.pmOwnerTel} #{msg.ValidationRequire}" readonly="true" class="pmOwnerNameChange"/>
+                         requiredMessage="#{msg.pmOwnerTel} #{msg.ValidationRequire}" readonly="true" class="pmOwnerNameChange">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'siteUID')}" >
@@ -311,7 +328,9 @@
         <h:panelGroup>
             <label class="label">设备modality</label>
             <p:autoComplete id="modalityType" value="#{assetInfoEditController.selected.modalityType}" readonly="#{!assetInfoEditController.needEdit('modalityType')}"
-                            required="#{assetInfoEditController.customConfig.assetFields['modalityType'].required}" />
+                            required="#{assetInfoEditController.customConfig.assetFields['modalityType'].required}" >
+                 <p:ajax event="itemSelect" />
+            </p:autoComplete>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'clinicalOwnerName')}" >
@@ -337,7 +356,9 @@
         <h:panelGroup>
             <label class="label">#{msg.clinicalOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required? '*':''}</span></label>
             <p:inputText id="clinicalOwnerTel" value="#{assetInfoEditController.selected.clinicalOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required}"
-                         requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
+                         requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange">
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>  <!--制造商 下拉 assetInfoEditController.needEdit('manufacture') 这里不能用"manufacturer"-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
@@ -355,14 +376,18 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactureTel')}" >
         <h:panelGroup>
             <label class="label">#{msg.manufactureTel}</label>
-            <p:inputText id="manufactureTel" value="#{assetInfoEditController.selected.manufactureTel}" class="manufacturerChange" readonly="true" />
+            <p:inputText id="manufactureTel" value="#{assetInfoEditController.selected.manufactureTel}" class="manufacturerChange" readonly="true" >
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
         <h:panelGroup>
             <label class="label">#{msg.makerShortName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['makerShortName'].required? '*':''}</span></label>
             <p:inputText id="makerShortName" value="#{assetInfoEditController.selected.makerShortName}" required="#{assetInfoEditController.customConfig.assetFields['makerShortName'].required}"
-                         requiredMessage="#{msg.makerShortName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('makerShortName')}" />
+                         requiredMessage="#{msg.makerShortName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('makerShortName')}" >
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'vendor')}" >
@@ -381,7 +406,9 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'vendorTel')}" >
         <h:panelGroup>
             <label class="label">#{msg.vendorTel}</label>
-            <p:inputText id="vendorTel" value="#{assetInfoEditController.selected.vendorTel}" class="vendorChange" readonly="true" />
+            <p:inputText id="vendorTel" value="#{assetInfoEditController.selected.vendorTel}" class="vendorChange" readonly="true" >
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <!--维修商下拉-->
@@ -432,7 +459,9 @@
         <h:panelGroup >
             <label class="label">#{msg.UCMID}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['UCMID'].required? '*':''}</span></label>
             <p:inputText id="UCMID" value="#{assetInfoEditController.selected.UCMID}" required="#{assetInfoEditController.customConfig.assetFields['UCMID'].required}"
-                         requiredMessage="#{msg.UCMID} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('UCMID')}"/>
+                         requiredMessage="#{msg.UCMID} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('UCMID')}">
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
 
@@ -443,7 +472,9 @@
         <h:panelGroup>
             <label class="label">#{msg.powerOnThreshold}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required? '*':''}</span></label>
             <p:inputText  id="powerOnThreshold" value="#{assetInfoEditController.selected.powerOnThreshold}" required="#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required}"
-                          readonly="#{!assetInfoEditController.needEdit('powerOnThreshold')}" />
+                          readonly="#{!assetInfoEditController.needEdit('powerOnThreshold')}" >
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <!--    射频码-->
@@ -451,7 +482,9 @@
         <h:panelGroup>
             <label class="label">#{msg.rfId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfId'].required? '*':''}</span></label>
             <p:inputText  id="rfId" value="#{assetInfoEditController.selected.rfId}" required="#{assetInfoEditController.customConfig.assetFields['rfId'].required}"
-                          readonly="#{!assetInfoEditController.needEdit('rfId')}" />
+                          readonly="#{!assetInfoEditController.needEdit('rfId')}" >
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <!--    射频码分组-->
@@ -459,7 +492,9 @@
         <h:panelGroup>
             <label class="label">#{msg.rfGroup}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfGroup'].required? '*':''}</span></label>
             <p:inputText  id="rfGroup" value="#{assetInfoEditController.selected.rfGroup}" required="#{assetInfoEditController.customConfig.assetFields['rfGroup'].required}"
-                          readonly="#{!assetInfoEditController.needEdit('rfGroup')}" />
+                          readonly="#{!assetInfoEditController.needEdit('rfGroup')}" >
+                <p:ajax/>
+            </p:inputText>
         </h:panelGroup>
     </c:if>
 
@@ -468,7 +503,9 @@
         <h:panelGroup>
             <label class="label">#{msg.currentId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['currentId'].required? '*':''}</span></label>
             <p:inputText  id="currentId" value="#{assetInfoEditController.selected.currentId}" required="#{assetInfoEditController.customConfig.assetFields['currentId'].required}"
-                          readonly="#{!assetInfoEditController.needEdit('currentId')}" />
+                          readonly="#{!assetInfoEditController.needEdit('currentId')}" >
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
 
@@ -487,56 +524,72 @@
         <h:panelGroup>
             <label class="label">#{msg.deviceName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['deviceName'].required? '*':''}</span></label>
             <p:inputText id="deviceName" value="#{assetInfoEditController.selected.deviceName}" required="#{assetInfoEditController.customConfig.assetFields['deviceName'].required}"
-                         requiredMessage="#{msg.deviceName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('deviceName')}" />
+                         requiredMessage="#{msg.deviceName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('deviceName')}" >
+                 <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'subjectProject')}" >
         <h:panelGroup>
             <label class="label">#{msg.subjectProject}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['subjectProject'].required? '*':''}</span></label>
             <p:inputText  value="#{assetInfoEditController.selected.subjectProject}" required="#{assetInfoEditController.customConfig.assetFields['subjectProject'].required}"
-                          requiredMessage="#{msg.subjectProject} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('subjectProject')}" />
+                          requiredMessage="#{msg.subjectProject} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('subjectProject')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemId')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemId'].required? '*':''}</span></label>
             <p:inputText id="systemId" value="#{assetInfoEditController.selected.systemId}" required="#{assetInfoEditController.customConfig.assetFields['systemId'].required}"
-                         requiredMessage="#{msg.systemId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemId')}" />
+                         requiredMessage="#{msg.systemId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemId')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum1')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemNum1}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum1'].required? '*':''}</span></label>
             <p:inputText id="systemNum1" value="#{assetInfoEditController.selected.systemNum1}" required="#{assetInfoEditController.customConfig.assetFields['systemNum1'].required}"
-                         requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum1')}" />
+                         requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum1')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum2')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemNum2}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum2'].required? '*':''}</span></label>
             <p:inputText id="systemNum2" value="#{assetInfoEditController.selected.systemNum2}" required="#{assetInfoEditController.customConfig.assetFields['systemNum2'].required}"
-                         requiredMessage="#{msg.systemNum2} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum2')}" />
+                         requiredMessage="#{msg.systemNum2} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum2')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum3')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemNum3}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum3'].required? '*':''}</span></label>
             <p:inputText id="systemNum3" value="#{assetInfoEditController.selected.systemNum3}" required="#{assetInfoEditController.customConfig.assetFields['systemNum3'].required}"
-                         requiredMessage="#{msg.systemNum3} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum3')}" />
+                         requiredMessage="#{msg.systemNum3} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum3')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum4')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemNum4}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum4'].required? '*':''}</span></label>
             <p:inputText id="systemNum4" value="#{assetInfoEditController.selected.systemNum4}" required="#{assetInfoEditController.customConfig.assetFields['systemNum4'].required}"
-                         requiredMessage="#{msg.systemNum4} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum4')}" />
+                         requiredMessage="#{msg.systemNum4} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum4')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum5')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemNum5}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum5'].required? '*':''}</span></label>
             <p:inputText id="systemNum5" value="#{assetInfoEditController.selected.systemNum5}" required="#{assetInfoEditController.customConfig.assetFields['systemNum5'].required}"
-                         requiredMessage="#{msg.systemNum5} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum5')}" />
+                         requiredMessage="#{msg.systemNum5} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum5')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'financingNum')}" >
@@ -564,21 +617,27 @@
         <h:panelGroup>
             <label class="label">#{msg.barcode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['barcode'].required? '*':''}</span></label>
             <p:inputText id="barcode" value="#{assetInfoEditController.selected.barcode}" required="#{assetInfoEditController.customConfig.assetFields['barcode'].required}"
-                         requiredMessage="#{msg.barcode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('barcode')}" />
+                         requiredMessage="#{msg.barcode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('barcode')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'registrationNo')}" >
         <h:panelGroup>
             <label class="label">#{msg.registrationNo}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['registrationNo'].required? '*':''}</span></label>
             <p:inputText id="registrationNo" value="#{assetInfoEditController.selected.registrationNo}" required="#{assetInfoEditController.customConfig.assetFields['registrationNo'].required}"
-                         requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('registrationNo')}" />
+                         requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('registrationNo')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'modalityId')}" >
         <h:panelGroup>
             <label class="label">#{msg.modalityId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['modalityId'].required? '*':''}</span></label>
             <p:inputText id="modalityId" value="#{assetInfoEditController.selected.modalityId}" required="#{assetInfoEditController.customConfig.assetFields['modalityId'].required}"
-                         requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('modalityId')}" />
+                         requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('modalityId')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'qrCode')}" >
@@ -596,7 +655,9 @@
         <h:panelGroup>
             <label class="label">#{msg.functionType}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['functionType'].required? '*':''}</span></label>
             <p:inputText id="functionType" value="#{assetInfoEditController.selected.functionType}" required="#{assetInfoEditController.customConfig.assetFields['functionType'].required}"
-                         requiredMessage="#{msg.functionType} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('functionType')}" />
+                         requiredMessage="#{msg.functionType} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('functionType')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'functionGroup')}" >
@@ -617,6 +678,7 @@
                              requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetCode68')}" class="functionGroupChange">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{assetInfoEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -639,6 +701,7 @@
                              requiredMessage="#{msg.functionGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('functionGrade')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -649,6 +712,7 @@
                              requiredMessage="#{msg.proprietaryClass} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('proprietaryClass')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -658,13 +722,16 @@
             <p:selectOneMenu id="repairForm" value="#{assetInfoEditController.selected.repairForm}" required="#{assetInfoEditController.customConfig.assetFields['repairForm'].required}"
                              requiredMessage="#{msg.repairForm} #{msg.ValidationRequire}"  >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.locationCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationCode'].required? '*':''}</span></label>
-            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" class="locationCode"/>
+            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" class="locationCode">
+                <p:ajax />
+            </p:inputText>
 
         </h:panelGroup>
     </c:if>
@@ -687,7 +754,9 @@
         <h:panelGroup>
             <label class="label">#{msg.assetLocation}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetLocation'].required? '*':''}</span></label>
             <p:inputText id="assetLocation" value="#{assetInfoEditController.selected.assetLocation}" required="#{assetInfoEditController.customConfig.assetFields['assetLocation'].required}"
-                         requiredMessage="#{msg.assetLocation} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('assetLocation')}" />
+                         requiredMessage="#{msg.assetLocation} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('assetLocation')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'status')}" >
@@ -695,6 +764,7 @@
             <label class="label">#{msg.status}<span style="color:red">*</span></label>
             <p:selectOneRadio id="status" value="#{assetInfoEditController.selected.status}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('status')}" >
                 <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -703,6 +773,7 @@
             <label class="label">#{msg.deviceStatus}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required? '*':''}</span></label>
             <p:selectOneRadio id="deviceStatus" value="#{assetInfoEditController.selected.deviceStatus}" required="#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required}" requiredMessage="#{msg.deviceStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('deviceStatus')}" >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
 
             </p:selectOneRadio>
         </h:panelGroup>
@@ -712,6 +783,7 @@
             <label class="label">#{msg.networkingStatus}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['networkingStatus'].required? '*':''}</span></label>
             <p:selectOneRadio id="networkingStatus" value="#{assetInfoEditController.selected.networkingStatus}" required="#{assetInfoEditController.customConfig.assetFields['networkingStatus'].required}" requiredMessage="#{msg.networkingStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('networkingStatus')}" >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
 
             </p:selectOneRadio>
         </h:panelGroup>
@@ -723,6 +795,7 @@
                               requiredMessage="#{msg.isUseRegistration} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isUseRegistration')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -733,6 +806,7 @@
                               requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isPm')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -743,6 +817,7 @@
                               requiredMessage="#{msg.isFixed} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isFixed')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -753,6 +828,7 @@
                               requiredMessage="#{msg.isChecked} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isChecked')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -760,7 +836,9 @@
         <h:panelGroup >
             <label class="label">#{msg.comments}<span style="color:#ff0000">#{assetInfoEditController.customConfig.assetFields['comments'].required? '*':''}</span></label>
             <p:inputTextarea value="#{assetInfoEditController.selected.comments}" required="#{assetInfoEditController.customConfig.assetFields['comments'].required}"
-                             requiredMessage="#{msg.comments} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('comments')}"  maxlength="256"/>
+                             requiredMessage="#{msg.comments} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('comments')}"  maxlength="256">
+                <p:ajax />
+            </p:inputTextarea>
         </h:panelGroup>
 
     </c:if>
@@ -768,7 +846,9 @@
         <h:panelGroup>
             <label class="label">#{msg.locationNotes}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationNotes'].required? '*':''}</span></label>
             <p:inputText id="locationNotes" value="#{assetInfoEditController.selected.locationNotes}" required="#{assetInfoEditController.customConfig.assetFields['locationNotes'].required}"
-                         requiredMessage="#{msg.locationNotes} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationNotes')}" />
+                         requiredMessage="#{msg.locationNotes} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationNotes')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetUsage')}" >
@@ -778,6 +858,7 @@
                              requiredMessage="#{msg.assetUsage} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetUsage')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -788,6 +869,7 @@
                              requiredMessage="#{msg.assetValueCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetValueCategory')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetValueCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -798,6 +880,7 @@
                              requiredMessage="#{msg.capitalSource} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('capitalSource')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -808,6 +891,7 @@
                              requiredMessage="#{msg.capitalSource2} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('capitalSource2')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -818,6 +902,7 @@
                              requiredMessage="#{msg.measureGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measureGrade')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -828,6 +913,7 @@
                              requiredMessage="#{msg.riskGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('riskGrade')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -838,6 +924,7 @@
                              requiredMessage="#{msg.emergencyEquipment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('emergencyEquipment')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -848,6 +935,7 @@
                              requiredMessage="#{msg.importEquipment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('importEquipment')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -858,6 +946,7 @@
                              requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measuringItemCategory')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -868,6 +957,7 @@
                              requiredMessage="#{msg.accountingCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('accountingCategory')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -878,6 +968,7 @@
                         requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufactDate')}"
                         maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
                 <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
+                <p:ajax event="dateSelect"/>
             </p:calendar>
         </h:panelGroup>
     </c:if>
@@ -885,7 +976,9 @@
         <h:panelGroup>
             <label class="label">#{msg.purchaseDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="purchaseDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" class="manufactDateChange"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'arriveDate')}" >
@@ -893,7 +986,9 @@
             <label class="label">#{msg.arriveDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['arriveDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="arriveDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}"
                         requiredMessage="#{msg.arriveDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('arriveDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'acceptDate')}" >
@@ -901,21 +996,27 @@
             <label class="label">#{msg.acceptDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['acceptDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}"
                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('acceptDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+               <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyMonth')}" >
         <h:panelGroup>
             <label class="label">#{msg.warrantyMonth}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required? '*':''}</span></label>
             <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.warrantyMonth}" required="#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required}"
-                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('warrantyMonth')}" />
+                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('warrantyMonth')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.installDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="installDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.installDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'factoryWarrantyDate')}" >
@@ -923,7 +1024,9 @@
             <label class="label">#{msg.factoryWarrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="factoryWarrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}"
                         requiredMessage="#{msg.factoryWarrantyDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('factoryWarrantyDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyDate')}" >
@@ -931,14 +1034,18 @@
             <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="warrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}"
                         requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonly="#{!assetInfoEditController.needEdit('warrantyDate')}"
-                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'terminateDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.terminateDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['terminateDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="terminateDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" required="#{assetInfoEditController.customConfig.assetFields['terminateDate'].required}"
-                        requiredMessage="#{msg.terminateDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        requiredMessage="#{msg.terminateDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+               <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warranty')}" >
@@ -948,6 +1055,7 @@
                               requiredMessage="#{msg.warranty} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('warranty')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -955,42 +1063,54 @@
         <h:panelGroup>
             <label class="label">#{msg.purchasePrice}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['purchasePrice'].required? '*':''}</span></label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoEditController.selected.purchasePrice}" required="#{assetInfoEditController.customConfig.assetFields['purchasePrice'].required}"
-                           requiredMessage="#{msg.purchasePrice} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('purchasePrice')}" />
+                           requiredMessage="#{msg.purchasePrice} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('purchasePrice')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'salvageValue')}" >
         <h:panelGroup>
             <label class="label">#{msg.salvageValue}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['salvageValue'].required? '*':''}</span></label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoEditController.selected.salvageValue}" required="#{assetInfoEditController.customConfig.assetFields['salvageValue'].required}"
-                           requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('salvageValue')}" />
+                           requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('salvageValue')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}" >
         <h:panelGroup>
             <label class="label">#{msg.monitorRate}(W)</label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="monitorRate" value="#{assetInfoEditController.selected.monitorRate}" required="#{assetInfoEditController.customConfig.assetFields['monitorRate'].required}"
-                            readonly="#{!assetInfoEditController.needEdit('monitorRate')}" />
+                            readonly="#{!assetInfoEditController.needEdit('monitorRate')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
         <h:panelGroup>
             <label class="label">#{msg.otherPower}(W)</label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="otherPower" value="#{assetInfoEditController.selected.otherPower}" required="#{assetInfoEditController.customConfig.assetFields['otherPower'].required}"
-                            readonly="#{!assetInfoEditController.needEdit('otherPower')}" />
+                            readonly="#{!assetInfoEditController.needEdit('otherPower')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
         <h:panelGroup>
             <label class="label">#{msg.unitPriceElectricity}(元)</label>
             <p:inputNumber minValue="0.00" decimalPlaces="2" id="unitPriceElectricity" value="#{assetInfoEditController.selected.unitPriceElectricity}" required="#{assetInfoEditController.customConfig.assetFields['unitPriceElectricity'].required}"
-                            readonly="#{!assetInfoEditController.needEdit('unitPriceElectricity')}" />
+                            readonly="#{!assetInfoEditController.needEdit('unitPriceElectricity')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lifecycle')}" >
         <h:panelGroup>
             <label class="label">#{msg.lifecycle}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['lifecycle'].required? '*':''}</span></label>
             <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1" id="lifecycle" value="#{assetInfoEditController.selected.lifecycleInYear}" required="#{assetInfoEditController.customConfig.assetFields['lifecycle'].required}"
-                           requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('lifecycle')}" />
+                           requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('lifecycle')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'depreciationMethod')}" >
@@ -1000,6 +1120,7 @@
                              requiredMessage="#{msg.depreciationMethod} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('depreciationMethod')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1008,13 +1129,17 @@
         <h:panelGroup>
             <label class="label">#{msg.assetTags}</label>
             <p:autoComplete id="tags" multiple="true" value="#{assetInfoEditController.selected.tags}" completeMethod="#{assetInfoEditController.autoCompleteTags}"
-                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags"/>
+                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags">
+                <p:ajax/>
+            </p:autoComplete>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'createdBy')}" >
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
-            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selected.createdBy}"  readonly="true"/>
+            <p:autoComplete id="createdBy" value="#{assetInfoEditController.selected.createdBy}"  readonly="true">
+                <p:ajax />
+            </p:autoComplete>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->
@@ -1022,13 +1147,16 @@
             <label class="label">#{msg.assetQuality}</label>
             <p:selectOneMenu id="assetQuality" value="#{assetInfoEditController.selected.assetQuality}" requiredMessage="#{msg.assetQuality} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetQuality')}">
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetUsedLifecycle')}">
         <h:panelGroup >
             <label class="label">#{msg.assetUsedLifecycle}</label>
-            <p:inputText id="assetUsedLifecycle" value="#{assetInfoEditController.selected.assetUsedLifecycle}" readonly="true"/>
+            <p:inputText id="assetUsedLifecycle" value="#{assetInfoEditController.selected.assetUsedLifecycle}" readonly="true">
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetLifecycleDeadline')}">
@@ -1036,6 +1164,7 @@
             <label class="label">#{msg.assetLifecycleDeadline}</label>
             <p:inputText id="assetLifecycleDeadline" value="#{assetInfoEditController.selected.assetLifecycleDeadline}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                <p:ajax />
             </p:inputText>
         </h:panelGroup>
     </c:if>
@@ -1045,7 +1174,9 @@
             <p:inputNumber minValue="0" decimalPlaces="0" id="assetQuantity"
                 required="#{assetInfoEditController.customConfig.assetFields['assetQuantity'].required}"
                 requiredMessage="#{msg.assetQuantity} #{msg.ValidationRequire}"
-                value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}"/>
+                value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}">
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'productFamily')}">
@@ -1054,7 +1185,9 @@
             <p:inputText id="productFamily" value="#{assetInfoEditController.selected.productFamily}"
                  required="#{assetInfoEditController.customConfig.assetFields['productFamily'].required}"
                  requiredMessage="#{msg.productFamily} #{msg.ValidationRequire}"
-                 readonly="#{!assetInfoEditController.needEdit('productFamily')}" />
+                 readonly="#{!assetInfoEditController.needEdit('productFamily')}" >
+                <p:ajax />
+            </p:inputText>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'productSegment')}">
@@ -1064,6 +1197,7 @@
                          requiredMessage="#{msg.productSegment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('productSegment')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('productSegment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1076,7 +1210,9 @@
                         required="#{assetInfoEditController.customConfig.assetFields['mvsContractStartDate'].required}"
                         requiredMessage="#{msg.MVSContractStartDate} #{msg.ValidationRequire}"
                         readonly="#{!assetInfoEditController.needEdit('mvsContractStartDate')}"
-                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'mvsContractEndDate')}">
@@ -1088,7 +1224,9 @@
                         required="#{assetInfoEditController.customConfig.assetFields['mvsContractEndDate'].required}"
                         requiredMessage="#{msg.MVSContractEndDate} #{msg.ValidationRequire}"
                         readonly="#{!assetInfoEditController.needEdit('mvsContractEndDate')}"
-                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
         </h:panelGroup>
     </c:if>
 
@@ -1099,6 +1237,7 @@
             <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1108,6 +1247,7 @@
             <p:selectOneMenu id="spare02" value="#{assetInfoEditController.selected.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare02')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1117,6 +1257,7 @@
             <p:selectOneMenu id="spare03" value="#{assetInfoEditController.selected.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare03')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1126,6 +1267,7 @@
             <p:selectOneMenu id="spare04" value="#{assetInfoEditController.selected.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare04')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -1135,6 +1277,7 @@
             <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
