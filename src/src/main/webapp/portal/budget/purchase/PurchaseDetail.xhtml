@@ -211,11 +211,11 @@
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">招标编号</label>
-                <p:inputText value="#{purchaseOrderController.selected.tenderNo}"/>
+                <p:inputText value="#{purchaseOrderController.selected.tenderNo}" disabled="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备最终采购数量</label>
-                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" value="#{purchaseOrderController.selected.assetPurchaseCount}" required="false"  requiredMessage="设备最终采购数量#{msg.Blank}#{msg.ValidationRequire}">
+                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" disabled="true" value="#{purchaseOrderController.selected.assetPurchaseCount}" required="false"  requiredMessage="设备最终采购数量#{msg.Blank}#{msg.ValidationRequire}">
                 </p:inputNumber>
             </h:panelGroup>
         </p:panelGrid>
