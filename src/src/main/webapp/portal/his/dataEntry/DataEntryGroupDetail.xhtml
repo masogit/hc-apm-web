@@ -42,9 +42,8 @@
                         <p:inputNumber minValue="0" decimalPlaces="2" id="entryAmount"
                                        value="#{dataEntryCreateController.selected.entryAmount}" required="true"
                                        requiredMessage="录入金额必填">
-                            <p:ajax event="change" listener="#{dataEntryCreateController.sharedEntryAmount}"
-                                    update="dataEntryGroupCreateDetail:selectAssetInfos"  ></p:ajax>
-
+                            <p:ajax event="change" listener="#{dataEntryCreateController.sharedEntryAmount}" update="dataEntryGroupCreateDetail:selectAssetInfos"  />
+                            <p:ajax event="change"  listener="#{dataEntryCreateController.checkDataEntryUpdate}" update="dataEntryGroupCreateDetail:saveButtonId"  />
 
                         </p:inputNumber>
                     </h:panelGroup>
@@ -57,7 +56,9 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{dataEntryCreateController.selected.startDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" required="true" requiredMessage="生效开始时间必填"/>
+                                    mask="true" required="true" requiredMessage="生效开始时间必填">
+                            <p:ajax event="dateSelect"   listener="#{dataEntryCreateController.checkDataEntryUpdate}" update="dataEntryGroupCreateDetail:saveButtonId" />
+                        </p:calendar>
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -67,7 +68,10 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{dataEntryCreateController.selected.endDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" required="true" requiredMessage="生效结束时间必填"/>
+                                    mask="true" required="true" requiredMessage="生效结束时间必填">
+                            <p:ajax event="dateSelect"   listener="#{dataEntryCreateController.checkDataEntryUpdate}" update="dataEntryGroupCreateDetail:saveButtonId" />
+
+                        </p:calendar>
                     </h:panelGroup>
                 </p:panelGrid>
 
@@ -138,7 +142,7 @@
             </p:fieldset>
 
 
-            <p:commandButton  actionListener="#{dataEntryCreateController.save}" value="#{msg.Save}" update=":tabDataEntry:DataEntryGroupForm:datalist" icon="ui-icon-check" oncomplete="handleSubmitDigital(args, 'dataEntryGroupDetailDialog');"/>
+            <p:commandButton  id="saveButtonId"  actionListener="#{dataEntryCreateController.save}" value="#{msg.Save}" update=":tabDataEntry:DataEntryGroupForm:datalist" icon="ui-icon-check" oncomplete="handleSubmitDigital(args, 'dataEntryGroupDetailDialog');"  disabled="#{dataEntryCreateController.saveDisable}"/>
             &nbsp;&nbsp;
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dataEntryGroupDetailDialog').hide()"/>
 

@@ -33,6 +33,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -131,6 +133,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Getter
     @Setter
     private List<HisGroupDataEntryHistory> hisGroupDataEntryHistories;
+
+    @Getter
+    @Setter
+    private boolean isSaveDisable=true;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -229,6 +235,19 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             WebUtil.addSuccessMessage("添加成功");
         }else{
 
+            DataEntry dataEntry = dataEntryService.getByDataEntryUid(selected.getUid());
+
+            LocalDate startDate = new Date(dataEntry.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endDate = new Date(dataEntry.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            LocalDate startDate1 = new Date(selected.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endDate1 =  new Date(selected.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if(dataEntry.getEntryAmount().compareTo(selected.getEntryAmount())==0   &&  startDate.equals(startDate1) && endDate.equals(endDate1) ){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addSuccessMessage("修改的信息没变");
+                return;
+            }
             selected.setLastModifiedDate(new Date());
             selected.setLastModifiedBy(user.getUid());
 
@@ -507,5 +526,20 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     public void onSelectAsset(){
         selectAssets.clear();
         selectAssets.add(onSelectAssetInfo);
+    }
+
+    public void checkDataEntryUpdate(){
+        DataEntry dataEntry = dataEntryService.getByDataEntryUid(selected.getUid());
+
+        LocalDate startDate = new Date(dataEntry.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate = new Date(dataEntry.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        LocalDate startDate1 = new Date(selected.getStartDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate1 =  new Date(selected.getEndDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        if(dataEntry.getEntryAmount().compareTo(selected.getEntryAmount())!=0   ||  !startDate.equals(startDate1) || !endDate.equals(endDate1) ){
+            isSaveDisable=false;
+
+        }
     }
 }
