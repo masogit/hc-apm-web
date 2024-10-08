@@ -67,7 +67,7 @@
                 sard.hospital_uid,
                 sard.site_uid,
                 sard.clinical_dept_uid,
-                sard.clinical_dept_name,
+                oi.name as clinical_dept_name,
                 sard.starting_price,
                 sard.starting_duration,
                 sard.gratis_duration,
@@ -100,6 +100,7 @@
                 left join asset_info ai on ai.uid=sard.asset_info_id
                 left join shared_asset_type  sat on ai.shared_asset_type=sat.id
                 left join shared_asset_request bsarr on bsarr.id=sard.return_id
+                left join org_info oi on sard.clinical_dept_uid = oi.uid
     </sql>
     <select id="getTotalRowCount" resultType="int">
             select count(distinct id) from (
