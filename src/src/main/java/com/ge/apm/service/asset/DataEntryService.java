@@ -56,14 +56,22 @@ public class DataEntryService {
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate)+1;
         ArrayList<HisGroupDataEntryHistory.AssetGroupDetail> assetGroupDetails = new ArrayList<>();
         for (HisAssetGroupClinicalMatch selectAssetInfo : selectAssetInfos) {
+            BigDecimal divide = selectAssetInfo.getAmount().divide(BigDecimal.valueOf(daysBetween), 2, RoundingMode.DOWN);
+            BigDecimal subtract = selectAssetInfo.getAmount().subtract((divide.multiply(BigDecimal.valueOf(daysBetween))));
+
+            boolean flag=true;
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
                 DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                 assetCostAmountInfo.setTenantUid(user.getTenantUID());
                 if(selectAssetInfo.getAmount()!=null){
-                    BigDecimal divide = selectAssetInfo.getAmount().divide(BigDecimal.valueOf(daysBetween), 6, RoundingMode.DOWN);
                     assetCostAmountInfo.setCostAmount(divide);
                     dataEntryAssetDetail.setCostAmount(divide);
+                    if(flag && subtract.compareTo(BigDecimal.ZERO)!=0){
+                        assetCostAmountInfo.setCostAmount(divide.add(subtract));
+                        dataEntryAssetDetail.setCostAmount(divide.add(subtract));
+                        flag=false;
+                    }
                 }else{
                     assetCostAmountInfo.setCostAmount(BigDecimal.ZERO);
                     dataEntryAssetDetail.setCostAmount(BigDecimal.ZERO);
@@ -188,21 +196,27 @@ public class DataEntryService {
                 List<AssetCostAmountInfo> assetCostAmountInfos = new ArrayList<>();
 
                 List<DataEntryAssetDetail> dataEntryAssetDetails= new ArrayList<>();
+                BigDecimal divide = dataEntry.getEntryAmount().divide(BigDecimal.valueOf(daysBetween), 2, RoundingMode.DOWN);
+                BigDecimal subtract = dataEntry.getEntryAmount().subtract((divide.multiply(BigDecimal.valueOf(daysBetween))));
 
+                boolean flag=true;
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
-                    BigDecimal divide = dataEntry.getEntryAmount().divide(BigDecimal.valueOf(daysBetween), 6, BigDecimal.ROUND_DOWN);
+                    DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     assetCostAmountInfo.setTenantUid(user.getTenantUID());
                     assetCostAmountInfo.setCostAmount(divide);
+                    dataEntryAssetDetail.setCostAmount(divide);
+                    if(flag && subtract.compareTo(BigDecimal.ZERO)!=0){
+                        assetCostAmountInfo.setCostAmount(divide.add(subtract));
+                        dataEntryAssetDetail.setCostAmount(divide.add(subtract));
+                        flag=false;
+                    }
                     assetCostAmountInfo.setAssetUid(dataEntry.getAssetUid());
-//                    assetCostAmountInfo.setDataEntryUid(dataEntry.getUid());
                     assetCostAmountInfo.setStatisticalDate(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
                     assetCostAmountInfos.add(assetCostAmountInfo);
-                     DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     dataEntryAssetDetail.setDataEntryUid(dataEntry.getUid());
                     dataEntryAssetDetail.setEntryType(dataEntry.getEntryType());
                     dataEntryAssetDetail.setEntryAmount(dataEntry.getEntryAmount());
-                    dataEntryAssetDetail.setCostAmount(divide);
                     dataEntryAssetDetail.setAssetUid(selectAsset.getUid());
                     dataEntryAssetDetail.setCreatedDate(new Date());
                     dataEntryAssetDetail.setAssetGroupOrgInfoUid(dataEntry.getAssetGroupOrgInfoUid());
@@ -287,15 +301,23 @@ public class DataEntryService {
             }
             assetCostAmountInfoRepository.save(byAssetUidInAndDateIn);
             BigDecimal sum = dataEntryAssetDetails1.stream().filter(Objects::nonNull).map(item -> {BigDecimal costAmount = item.getCostAmount();if (costAmount == null) {return BigDecimal.ZERO;}return costAmount;}).reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal dayAmount = sum.divide(BigDecimal.valueOf(daysBetween), 6, RoundingMode.DOWN);
+            BigDecimal dayAmount = sum.divide(BigDecimal.valueOf(daysBetween), 2, RoundingMode.DOWN);
+            BigDecimal subtract = sum.subtract((dayAmount.multiply(BigDecimal.valueOf(daysBetween))));
+            boolean flag=true;
             ArrayList<HisGroupDataEntryHistory.AssetGroupDetail> assetGroupDetails = new ArrayList<>();
             for (AssetInfo targetAsset : targetAssets) {
+                BigDecimal amount ;
+                if(flag && subtract.compareTo(BigDecimal.ZERO)!=0){
+                    amount =( dayAmount.add(subtract)).multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100), 6, RoundingMode.DOWN);
+                    flag=false;
+                }else{
+                    amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100), 6, RoundingMode.DOWN);
+                }
                 for (LocalDate date = newStartDate; !date.isAfter(newEndDate); date = date.plusDays(1)) {
                     AssetCostAmountInfo assetCostAmountInfo = new AssetCostAmountInfo();
                     assetCostAmountInfo.setTenantUid(dataEntry.getTenantUid());
                     DataEntryAssetDetail dataEntryAssetDetail = new DataEntryAssetDetail();
                     if(targetAsset.getScaleAssessment()!=null){
-                        BigDecimal amount = dayAmount.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100), 6, RoundingMode.DOWN);
                         assetCostAmountInfo.setCostAmount(amount);
                         dataEntryAssetDetail.setCostAmount(amount);
                     }
@@ -313,12 +335,11 @@ public class DataEntryService {
                     assetCostAmountInfos.add(assetCostAmountInfo);
                     dataEntryAssetDetails.add(dataEntryAssetDetail);
                 }
-
                 HisGroupDataEntryHistory.AssetGroupDetail assetGroupDetail = new HisGroupDataEntryHistory.AssetGroupDetail();
                 assetGroupDetail.setAssetUid(targetAsset.getUid());
                 assetGroupDetail.setScaleAssessment(targetAsset.getScaleAssessment());
-                BigDecimal amount = sum.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100), 6, RoundingMode.DOWN);
-                assetGroupDetail.setAmount(amount);
+                BigDecimal amountDetail = sum.multiply(targetAsset.getScaleAssessment()).divide(BigDecimal.valueOf(100), 6, RoundingMode.DOWN);
+                assetGroupDetail.setAmount(amountDetail);
                 assetGroupDetails.add(assetGroupDetail);
             }
             Set<String> assetUids = targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet());
@@ -337,7 +358,6 @@ public class DataEntryService {
             hisGroupDataEntryHistory.setLastModifiedDate(new Date());
             hisGroupDataEntryHistory.setJsonString(JSON.toJSONString(assetGroupDetails));
             hisGroupDataEntryHistoryRepository.save(hisGroupDataEntryHistory);
-
 
         }
 
