@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/9/23
+ * 人工申请
  */
 @ManagedBean
 @ViewScoped
@@ -256,7 +257,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public String genConfirmMessage(){
         String confirmMessage = new String();
         ZkbContract zct = this.contractList.get(0);
-        ZkbFePartOrder zfpo = this.selected;
         if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
             if("false".equals(this.selected.getSubtractTotalStatus())){
                 confirmMessage += "本次申请不扣除名额！";
@@ -327,17 +327,38 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         if(!fiveNineNine){
             contractError = true;
         }
+        //CCS、Biomed类型合同申请超声高端机以及depot只能外修
         if(CollectionUtils.isNotEmpty(zkbContract.getZkbContractAssets())){
             List<ZkbContractAsset> zkbContractAssetList = zkbContract.getZkbContractAssets().stream().filter(zc ->
-                    (this.selected.getSystemId().equals(zc.getAssetInfo().getSystemId()) && "highMachine".equals(zc.getAssetType()))).collect(Collectors.toList());
-            if((ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()))
-                    && CollectionUtils.isNotEmpty(zkbContractAssetList) && this.zkbAssetInfo.getRepairForm()!=null && 2 != this.zkbAssetInfo.getRepairForm()){
-                //gefe 合同类型 ccs/biomed 超声高端机只能申请 申请外修 内修在  zkbfe
-                WebUtil.addErrorMessage("GEFE维修申请超声高端机维修类型需为外修！","");
+                    (this.selected.getSystemId().equals(zc.getAssetInfo().getSystemId()))).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(zkbContractAssetList)){
+                WebUtil.addErrorMessage("GEFE维修合同中设备不存在！","");
                 this.contractError = true;
                 return;
             }
         }
+        //2024-08-20内修不允许申请GEFE（包括depot、高、低、放射）
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(this.zkbAssetInfo.getRepairForm()!=null && 2 != this.zkbAssetInfo.getRepairForm()){
+                WebUtil.addErrorMessage("GEFE维修不能申请内修设备！","");
+                this.contractError = true;
+                return;
+            }else if(this.zkbAssetInfo.getRepairForm() !=null && 2 == this.zkbAssetInfo.getRepairForm()){
+                /*if(zkbAssetInfo.getAssetGroup() == 1){
+                    WebUtil.addErrorMessage("GEFE维修外修不允许申请放射类设备！","");
+                    this.contractError = true;
+                    return;
+                }else */
+                if (2 == zkbAssetInfo.getAssetGroup()) {
+                    if(ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
+                        WebUtil.addErrorMessage("GEFE维修外修不允许申请超声低端机设备！","");
+                        this.contractError = true;
+                        return;
+                    }
+                }
+            }
+        }
+
         if(2==zkbAssetInfo.getAssetGroup()//超声
                 &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机
                 &&2 == zkbAssetInfo.getRepairForm()//外修
@@ -648,7 +669,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
     public void handSubtractStatus(ValueChangeEvent event){
-        if("highMachine".equals(this.selected.getAssetType())&&"f".equals(this.selected.getNotGeAsset())){
+        if(("highMachine".equals(this.selected.getAssetType()) || "depot".equals(this.selected.getAssetType())) && "f".equals(this.selected.getNotGeAsset())){
             this.selected.setSubtractTotalStatus("false");
             if("t".equals(event.getNewValue())){
                 this.selected.setSubtractTotalStatus("true");

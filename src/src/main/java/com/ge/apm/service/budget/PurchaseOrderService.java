@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -216,7 +217,7 @@ public class PurchaseOrderService {
         return arg;
     }
 
-    public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException {
+    public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException, ParseException {
         String base = "采购单" + purchaseOrderInfo.getPurchaseNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);

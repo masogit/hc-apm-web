@@ -143,7 +143,9 @@
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputText>
                         </p:column>
-
+                        <p:column headerText="备注"  >
+                            <h:outputText value="#{asset.sharedAssetReqDetail.remark}" title="#{asset.sharedAssetReqDetail.remark}"/>
+                        </p:column>
                         <p:column headerText="#{msg.Actions}" width="16%">
                             <p:commandButton value="借出"
                                              rendered="#{asset.canBorrow}"

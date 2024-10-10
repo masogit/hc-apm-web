@@ -245,6 +245,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
+        content.put(MaintenanceTemplate.Maintenance.COMMENTS.toString(), pmOrder.getComments());
         // Coworker List
         if (coWorkerList != null) {
             int count = 0;
@@ -331,6 +332,7 @@ public class PmReportService {
 
         List pictureBeforeStorageIds = blobObjectRepository.fetchBlobObjectByUuidAndType(pmOrder.getId(), "PrePmOrder").stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toList());
         empty = false;
+        List<byte[]>  pmPrePicture = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             if (i >= pictureBeforeStorageIds.size()) empty = true; //实际图片少于5个
             byte[] pictureBytes = null;
@@ -338,14 +340,17 @@ public class PmReportService {
                 pictureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             } else {
                 pictureBytes = this.pmOrderReportTemplateService.getSignatureBytes((String) pictureBeforeStorageIds.get(i));
+                pmPrePicture.add(pictureBytes);
             }
             if (pictureBytes != null) {
                 content.put("pm_pre_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
             }
         }
+        content.put("pm_pre_picture_table",pmPrePicture);
 
         List pictureAfterStorageIds = blobObjectRepository.fetchBlobObjectByUuidAndType(pmOrder.getId(), "PmOrder").stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toList());
         empty = false;
+        List<byte[]>  pmAfterPicture = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             if (i >= pictureAfterStorageIds.size()) empty = true; //实际图片少于5个
             byte[] pictureBytes = null;
@@ -353,12 +358,13 @@ public class PmReportService {
                 pictureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             } else {
                 pictureBytes = this.pmOrderReportTemplateService.getSignatureBytes((String) pictureAfterStorageIds.get(i));
+                pmAfterPicture.add(pictureBytes);
             }
             if (pictureBytes != null) {
                 content.put("pm_after_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
             }
         }
-
+        content.put("pm_after_picture_table",pmAfterPicture);
         empty = false;
         List pictureStorageIds = blobObjectRepository.findByBoUuid(pmOrder.getId()).stream().map(blob -> {
             if (".jpg,.jpeg,.png".contains(blob.getObjectName().substring(blob.getObjectName().lastIndexOf(".") + 1).toLowerCase())) {
@@ -608,6 +614,8 @@ public class PmReportService {
         template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
         // render policy for audit record
         template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
+        template.registerPolicy(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
+        template.registerPolicy(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
         template.render(datas);
         template.write(out);
         return out.toByteArray();

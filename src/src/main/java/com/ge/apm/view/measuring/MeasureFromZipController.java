@@ -25,7 +25,7 @@ public class MeasureFromZipController {
     private MeasuringService measuringService;
     private UserAccount currentUser;
     private UploadedFile file;
-    private List<MeasuringCertificateDetail> noFoundList;
+    private List<MeasuringCertificateDetail> resultList;
     private UserAuth customRoleAuth;
 
     @PostConstruct
@@ -38,7 +38,7 @@ public class MeasureFromZipController {
 
     public void handleZipFileUpload(FileUploadEvent event) throws IOException {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
-        noFoundList = measuringService.handleZip(event.getFile(), currentUser);
+        resultList = measuringService.handleZip(event.getFile(), currentUser);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
@@ -50,12 +50,12 @@ public class MeasureFromZipController {
         this.file = file;
     }
 
-    public List<MeasuringCertificateDetail> getNoFoundList() {
-        return noFoundList;
+    public List<MeasuringCertificateDetail> getResultList() {
+        return resultList;
     }
 
-    public void setNoFoundList(List<MeasuringCertificateDetail> noFoundList) {
-        this.noFoundList = noFoundList;
+    public void setNoFoundList(List<MeasuringCertificateDetail> resultList) {
+        this.resultList = resultList;
     }
 
     public UserAuth getCustomRoleAuth() {

@@ -101,9 +101,6 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
-        if (user.isEnableAssetTypeGroup()) {
-            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
-        }
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
@@ -111,6 +108,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
                 orderIdList = ListUtil.newArrayList("-1");
             }
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            if (user.isEnableAssetTypeGroup()) {
+                searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            }
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }

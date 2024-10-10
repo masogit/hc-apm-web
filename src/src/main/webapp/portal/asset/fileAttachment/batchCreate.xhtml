@@ -13,7 +13,7 @@
             z-index: 1010!important
         }
     </style>
-    <p:dialog id="FileEditDlg" widgetVar="FileEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量创建" width="70%" height="550">
+    <p:dialog id="FileEditDlg" widgetVar="FileEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量创建" width="75%" height="550">
         <h:form id="FileSearchForm">
             <p:fieldset legend="#{msg.assetSearchingConditions}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -86,16 +86,16 @@
                         <span style="width:25%;float: left">#{msg.functionType}</span></p>
                     </f:facet>
                     <p:ajax event="transfer" listener="#{assetFileAttachmentController.onAssetsTransfer}" />
-                    <p:column style="width:25%; left: auto;">
+                    <p:column style="float: left;width:25%">
                         <h:outputText value="#{item.name}"/>
                     </p:column>
-                    <p:column style="width:25%; left: auto;">
+                    <p:column style="float: left;width:25%;">
                         <h:outputText value="#{item.serialNum}" />
                     </p:column>
-                    <p:column style="width:25%; left: auto;">
+                    <p:column style="float: left;width:25%;">
                         <h:outputText value="#{item.departNum}" />
                     </p:column>
-                    <p:column style="width:25%; left: auto;">
+                    <p:column style="float: left;width:25%;">
                         <h:outputText value="#{item.functionType}" />
                     </p:column>
                 </p:pickList>
@@ -156,6 +156,19 @@
                             </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchMeasurementDocument}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                           sizeLimit="500000000" update="ObjectUpload4" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+
+                        </p:panel>
+                        <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
+                            <p:dataList id="ObjectUpload5" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(4)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
+                                <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload5" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchVerification}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          sizeLimit="500000000" update="ObjectUpload5" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
 
                         </p:panel>
 

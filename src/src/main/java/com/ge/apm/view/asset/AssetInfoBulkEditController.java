@@ -1,6 +1,8 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -20,6 +22,7 @@ import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,6 +94,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     @Getter @Setter
     private DualListModel<AssetInfo> assets = new DualListModel<>(null, new ArrayList<>());
+    @Getter @Setter
+    private DualListModel<Map<String, Object>> assets1 = new DualListModel<>(null, new ArrayList<>());
     @Getter @Setter
     private TreeNode orgTree;
 
@@ -184,6 +189,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Getter
     private List<AssetInfo> assetInfoList = null;
     public Set<AssetInfo> assetInfos = null;
+    private UserAccount loginUser;
 
     @Override
     protected void init() {
@@ -220,10 +226,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         selected = new AssetInfo();
         selected.clearDefaultValue();
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        loginUser = UserContextService.getCurrentUserAccount();
+        customConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
@@ -233,7 +239,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
         }
         ownerList = ucService.getWorkerList(selected.getId(), "");
-        selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+        selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
         changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
         manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
         supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
@@ -242,11 +248,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         qrCode = WebUtil.getRequestParameter("qrCode");
         updateAssetStatusList();
         mqUtils = WebUtil.getBean(MqUtils.class);
-
+        getTenantOrgTreeOther();
 
     }
     public void saveNewSupplier() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
         this.newSupplier.setTenantUID(loginUser.getTenantUID());
@@ -631,7 +636,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetInfoBulkEditController");
         mqContext.setMethodName("verifyIfRequiredBeforeApplyChange");
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        UserAccount currentUserAccount = loginUser;
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
         mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
@@ -702,7 +707,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return false;
     }
     public boolean getIsSelect46Account() {
-        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+        if (loginUser.getSiteId()==46&&loginUser.getTenantUID().equals(loginUser.getSiteUID())) {
             return true;
         }
         return false;
@@ -789,7 +794,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public List<String> completeAssetName(String prefix) {
-        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        String tenantUID = loginUser.getTenantUID();
         List<String> names = null;
         if (StringUtils.isEmpty(prefix)) {
             names = dao.findDistinctAssetNames(tenantUID);
@@ -1235,7 +1240,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             this.assetGroupSecondaryList = Collections.emptyList();
         } else {
             String msgType = "assetGroupSecondary_" + this.selected.getAssetGroup();
-            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, UserContextService.getCurrentUserAccount().getSiteId());
+            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, loginUser.getSiteId());
         }
 
     }
@@ -1245,8 +1250,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void initOrgTree() {
-
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
@@ -1258,6 +1261,57 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             rootNode.getChildren().add(treeNode);
         }
         rootNode.setExpanded(true);
+    }
+
+    private TreeNode tenantOrgTreeOtherPage;
+
+    public TreeNode getTenantOrgTreeOther() {
+        if (null == tenantOrgTreeOtherPage) {
+            tenantOrgTreeOtherPage = createTenantOrgTreeOther();
+        }
+        return tenantOrgTreeOtherPage;
+    }
+
+    public TreeNode createTenantOrgTreeOther() {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+
+        List<OrgInfo> orgInfoList;
+        orgInfoList = orgDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
+        filter.setSiteOrg(orgInfoList.get(0));
+        clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getUid());
+        TreeNode siteTree = buildTree(orgInfoList);
+        expandedByOrgType(siteTree, 2);
+        rootNode.getChildren().addAll(siteTree.getChildren());
+        return rootNode;
+    }
+
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+
+    }
+
+    private TreeNode buildTree(List<OrgInfo> orgList) {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
     }
 
     public void onSelectTreeNodeAsFilter(NodeSelectEvent event) {
@@ -1273,8 +1327,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (null == filterSiteOrg) {
             clinicalDeptListAsFilter = Collections.emptyList();
         } else {
-            clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getSiteUID());
+            clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getUid());
         }
+        logger.error("clinicalDeptListAsFilter size = {}", clinicalDeptListAsFilter.size());
     }
 
     public List<OrgInfo> autoCompleteDeptAsFilter(String query) {
@@ -1293,6 +1348,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public DualListModel<AssetInfo> getAssets() {
+        if (assets.getTarget().size() >= 1000) {
+            return assets;
+        }
 
         prepareFilters();
 
@@ -1304,24 +1362,60 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return assets;
     }
 
+    public DualListModel<AssetInfo> getAssets1() {
+
+//        prepareFilters();
+
+        Map<String, Object> param = MapUtil.newHashMap();
+        param.put("tenantUid", loginUser.getTenantUID());
+        param.put("userUid", loginUser.getUid());
+        if (!assets.getTarget().isEmpty()) {
+            List<String> assetUids = assets.getTarget().stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            param.put("assetUids", assetUids);
+        }
+        if (null != filter.getSiteOrg() && null != filter.getSiteOrg().getUid()) {
+            param.put("siteUid", filter.getSiteOrg().getUid());
+        }
+        if (null != filter.getClinicalDeptOrg() && null != filter.getClinicalDeptOrg().getUid()) {
+            param.put("clinicalDeptUid", filter.getClinicalDeptOrg().getUid());
+        }
+        if (null != this.filter.getAssetGroup()) {
+            param.put("assetGroup", filter.getAssetGroup());
+        }
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            param.put("oneSearchStr", oneSearchStr);
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+//        Page<AssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<AssetInfo> source = new ArrayList<>(assetInfoBulkEditService.findBathUpdateAssetInfos(param));
+        source.removeAll(assets.getTarget());
+        assets.setSource(source);
+
+        return assets;
+    }
+
     private void prepareFilters() {
         searchFilters = new ArrayList<>();
 
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
 
-        if (assets.getTarget().size() > 0) {
+        /*if (assets.getTarget().size() > 0) {
             List<String> assetUids = assets.getTarget().stream().map(AssetInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, assetUids));
-        }
+        }*/
 
         List<String> orgUidList;
 
         if (null != filter.getSiteOrg() && null != filter.getSiteOrg().getUid()) {
             orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(filter.getSiteOrg().getUid());
         }else {
-            UserAccount user = UserContextService.getCurrentUserAccount();
+            UserAccount user = loginUser;
             orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         }
 

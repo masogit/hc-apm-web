@@ -321,6 +321,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','locationCode','安装位置编码','Installation Location Code',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetValueCategory','资产价值分类','Asset Value Category',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','locationName','安装位置','Installation Location',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','warrantyStatus','维保状态','Warranty Status',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','locationNotes','位置备注1(科室)','Installation Location Notes',NULL,-1);
 --     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','maitananceTel','维修商电话','Maintainer Telephone',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','maitananceTel','维修商联系方式','Maintainer Telephone',NULL,-1);
@@ -1743,8 +1744,31 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractInfoType','Other','其它','Other',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractType','13','智享保','Intelligent Maintenance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractInfoType','ZXB','智享保','Intelligent Maintenance',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','Contract','合同文件','Contract',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','WinningBidNotice','中标通知','Notification of winning bid',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','Tenders','招投标文件','Tenders',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','Contract','合同文件','Contract',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','SupplementaryAgreement','补充协议书','Supplementary Agreement',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','SupplierBusinessLicense','供应商营业执照','Supplier Business License',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','ProductionOperationLicense','医疗器械生产/经营许可证','Medical Device Production/Operation License',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','TaxCertificate','税务证','Tax Certificate',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','SupplierAuthorization','供应商产品授权书','Supplier Product Authorization Letter',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','MedicalDeviceRegistrationCertificate','产品医疗器械注册证','Product Medical Device Registration Certificate',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','ProductConfigurationList','产品配置清单','Product Configuration List',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','CustomsDeclaration','报关单（进口商品需提供）','Import Commodity Customs Declaration Form',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','InspectionForm','商检单（进口商品若有需提供）','Import Commodity Inspection Form',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','ProductArrivalReceiptForm','产品到货接收表（物流单或到货单或器械科工程师/使用科室人员收货确认签字单）','Product Arrival Receipt Form',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','ProductQualificationCertificateInformation','产品合格证明资料','Product Qualification Certificate Information',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','SpecificationsParameters','产品技术指标参数','Product technical specifications and parameters',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','InstallationAcceptanceReport','使用前临床安装验收报告','Clinical installation acceptance report before use',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','InspectionTestingReport','使用前产品检验检测报告或证书','Product inspection and testing report or certificate before use',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','UseTrainingMaterials','使用前临床培训资料、维修培训资料、培训表纸质、课件图片','Use Training Materials',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','AcceptanceForm','验收单','Acceptance Form',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','AcceptanceFormList','验收清单','Acceptance Form List',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','UserManual','使用说明书（操作规程）','User Manual (Operating Procedures)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','MaintenanceManual','维修作业指导材料（维修手册）','Maintenance Operation Guidance Material (Maintenance Manual)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','AfterServiceCommitment','售后服务承诺（电子版）','After sales Service Commitment (Electronic Version)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','LossesList','易损易耗件清单（电子版）','List of vulnerable and consumable parts (electronic version)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','AfterServiceNetwork','售后服务网点资料（电子版）','After sales service network information (electronic version)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractAttachmentType','Other','其它','Other',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','8','其它','Other',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('contractPriceType','LT1','1万元以下','Less than 10,000 RMB',NULL,-1);
@@ -3259,6 +3283,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence15', '1.5 进行其他任何违法以及侵犯其他个人、公司、社会团体、组织的合法权益的行为或者法律、行政法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他行为。', '1.5 Have any other act that violates the laws and infringes the lawful rights and interests of other individuals, companies, social groups or organizations, or are restricted or prohibited by the laws, administrative regulations, rules, regulations, and any legally binding norms.', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WelcomeToAPMManagementPlatform', '欢迎登陆APM管理平台！', 'Welcome to APM Management Platform!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CheckAndStore', '核对入库', 'Check and Store', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetOutStock', '资产出库', 'Asset Out Stock', NULL, '-1');
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'srNum_xlsx', '报修单号', 'RequestWorkorderNumber', NULL, '-1');
@@ -5405,3 +5430,17 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('importTemplateType','ToBeTerminated','待报废模板','ToBeTerminated',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('importTemplateType','Terminated','报废模板','Terminated',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisAssetGroupType','Cost','成本','Cost',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisAssetGroupType','Income','收入','Income',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','LaborCosts','人工费','LaborCosts',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','DepreciationHouse','房屋折旧费','DepreciationHouse',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','MaintenanceFee','维修费','MaintenanceFee',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','WarrantyFee','维保费','WarrantyFee',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','MedicalSupplies','药物耗材费','MedicalSupplies',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','Utilities','水电费','Utilities',NULL,-1);

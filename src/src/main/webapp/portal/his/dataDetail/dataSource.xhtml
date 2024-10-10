@@ -131,8 +131,17 @@
                                         </p:column>
                                         <p:column headerText="是否匹配" sortBy="#{item.isMatched}"
                                                   filterBy="#{item.isMatched}"
-                                                  filterMatchMode="LIKE">
-                                            <h:outputText value="#{item.isMatched}"/>
+                                                  filterMatchMode="EQ">
+                                            <f:facet name="filter">
+                                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                                    <f:converter converterId="javax.faces.Boolean" />
+                                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                                </p:selectOneMenu>
+                                            </f:facet>
+                                            <h:outputText value="#{item.isMatched?msg.True2Yes:msg.False2No}"/>
+<!--                                            <h:outputText value="#{item.isMatched}"/>-->
                                         </p:column>
                                         <p:column headerText="执行时间" sortBy="#{item.execTime}"
                                                   filterBy="#{item.execTime}"

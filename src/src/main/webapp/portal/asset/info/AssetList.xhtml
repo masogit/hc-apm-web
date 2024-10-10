@@ -344,6 +344,11 @@
                                     </h:outputText>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'warrantyStatus'}">
+                                <p:column headerText="#{msg.warrantyStatus}" exportable="true">
+                                    <h:outputText value="#{item.warrantyStatus}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'createdDate'}">
                                 <p:column  headerText="#{msg.createdDate}" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE">
                                     <f:facet name="filter">
@@ -977,7 +982,8 @@
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_PM')}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
-                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>
+<!--                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>-->
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" update="batchEditBeforeForm" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" oncomplete="PF('batchEditBeforeDialog').show()"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportAssetExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
@@ -1107,6 +1113,7 @@
             </div>
         </div>
         <ui:include src="RelRuleAsset.xhtml"/>
+        <ui:include src="BatchEditBefore.xhtml"/>
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >

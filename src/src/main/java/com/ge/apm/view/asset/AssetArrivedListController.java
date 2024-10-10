@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -22,6 +23,7 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -274,6 +276,13 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + selected.getId());
+    }
+
+    public void editActionOpen() {
+        String url = "action=Edit&listId=" + selected.getId();
+        url = "arrivalListEdit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public String batchDistribute() {

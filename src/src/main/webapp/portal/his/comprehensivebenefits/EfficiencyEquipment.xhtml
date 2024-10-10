@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            .warrantyExpireSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .warrantyExpired {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="效益设备管理页面"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3" >
+                        <h:panelGroup >
+                                <p:commandButton id="btnOrg" value="#{empty efficiencyEquipmentInfoController.selectSite? msg.AllHospitals:efficiencyEquipmentInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                    <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                            <p:ajax process="@this" event="select" listener="#{efficiencyEquipmentInfoController.onSelectSiteTreeNode}" update=":EfficiencyEquipmentInfoListForm :searchForm" oncomplete="PF('varPanelOrg').hide()"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">开始时间*</label>
+                            <p:calendar timeZone="GMT+8" id="startTime" value="#{efficiencyEquipmentInfoController.startDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                                        >
+                                <p:ajax event="dateSelect"></p:ajax>
+
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">截至时间*</label>
+                            <p:calendar timeZone="GMT+8" id="endTime" value="#{efficiencyEquipmentInfoController.endDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"></p:ajax>
+
+                            </p:calendar>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <p:commandButton process="@this"
+                                             value="查询" update="EfficiencyEquipmentInfoListForm"
+                                              />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+
+                <h:form id="EfficiencyEquipmentInfoListForm">
+                    <p:dataTable id="datalist" value="#{efficiencyEquipmentInfoController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single"
+                                 selection="#{efficiencyEquipmentInfoController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.uid}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax  event="rowSelect" listener="#{efficiencyEquipmentInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+
+                        <p:ajax event="filter" listener="#{efficiencyEquipmentInfoController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:column width="36" id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{efficiencyEquipmentInfoController.selectedMap[item.assetUid]}"
+                                                     class="selectCheckBox">
+                                <p:ajax process="@this" update="@this"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{efficiencyEquipmentInfoController.onSelectAllOfPage}"
+                                            update="@(.selectCheckBox) :EfficiencyEquipmentInfoListForm:datalist"
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操 作" exportable="false"
+                                  width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                            <h:panelGroup>
+                                <p:commandLink
+                                        id="deleteButton" title="#{msg.Delete}"
+                                        actionListener="#{efficiencyEquipmentInfoController.deleteAsset(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                               icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
+                                  sortBy="#{item.assetInfo.namePyCode}" filterBy="#{item.assetInfo.name}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}"
+                                  filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.makerShortName}" filterBy="#{item.assetInfo.makerShortName}"
+                                  filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.assetInfo.makerShortName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}"
+                                  filterBy="#{item.assetInfo.serialNum}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" filterBy="#{item.assetInfo.qrCode}"
+                                  filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+                                  filterMatchMode="LIKE"  >
+<!--                            <f:facet name="header">-->
+<!--                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>-->
+<!--                                <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>-->
+<!--                            </f:facet>-->
+                            <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                        </p:column>
+
+                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('varDataList').filter()"   value="#{efficiencyEquipmentInfoController.filterAssetGroup}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+
+                        </p:column>
+
+                        <p:column headerText="采购金额"  filterBy="#{item.assetInfo.purchasePrice}"
+                                  filterMatchMode="GET">
+                            <h:outputText value="#{item.assetInfo.purchasePrice}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
+
+<!--                        <p:column headerText="使用率" >-->
+<!--                            <h:outputText value="#{item.usageRate}"/>-->
+<!--                        </p:column>-->
+
+<!--                        <p:column headerText="检查人次" >-->
+<!--                            <h:outputText value="#{item.checkNumberPeople}">-->
+<!--                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />-->
+<!--                            </h:outputText>-->
+<!--                        </p:column>-->
+
+<!--                        <p:column headerText="检查时长" >-->
+<!--                            <h:outputText value="#{item.checkTimeLength}"/>-->
+<!--                        </p:column>-->
+                        <p:column headerText="收入(元)" >
+                            <h:outputText value="#{item.income}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="成本(元)" >
+                            <h:outputText value="#{item.cost}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="利润(元)" >
+                            <h:outputText value="#{item.profits}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="利润率(%)" >
+                            <h:outputText value="#{item.profitsRate}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+
+                            <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{efficiencyEquipmentInfoController.excelFile}" />
+                            </p:commandButton>
+                            <p:commandButton id="createBatchButton"  icon="fa fa-cogs"
+                                              update="efficiencyEquipmentBatchForm" class="btn btn-sm btn-gray" title="批量添加"  oncomplete="PF('efficiencyEquipmentInfotSettingEditBatch').show()"/>
+                        </f:facet>
+                    </p:dataTable>
+
+                </h:form>
+                <ui:include src="EfficiencyEquipmentInfoCreateBatch.xhtml"/>
+
+            </div>
+
+        </div>
+
+        <script>
+
+            function afterLoadRender() {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX = "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX = "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX = "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX = "hidden";
+            });
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+
+
+
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#EfficiencyEquipmentInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            // afterPageLoad = function() {
+            //     var obj=document.getElementById('efficiencyEquipmentBatchForm:pickList_source_filter');
+            //
+            //     obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
+            //     var obj2=document.getElementById('efficiencyEquipmentBatchForm:pickList_target_filter');
+            //     obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
+            //
+            // };
+
+            // function buttonComplete(xhr, status, args){
+            //     var obj=document.getElementById('efficiencyEquipmentBatchForm:pickList_source_filter');
+            //     obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
+            //     var obj2=document.getElementById('efficiencyEquipmentBatchForm:pickList_target_filter');
+            //     obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号');
+            // }
+
+
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

@@ -130,6 +130,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
                 searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, siteOrgUidsByParentUid));
             }
         }
+        searchFilters.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Income"));
 
         Page<HisAssetGroupAssetMatch> page = groupAssetMatchRepository.findBySearchFilter(searchFilters,pageRequest);
         currentPagePmOrders = page.getContent();
@@ -182,6 +183,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
         List<HisEquipmentSfxm> bySearchFilter = sfxDao.findBySearchFilter(this.searchFilters,pageRequest).getContent();
         if(!targetAssets.isEmpty()){
@@ -409,7 +411,15 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             HisAssetGroupAssetMatch hisAssetGroupAssetMatch = startList.get(0);
             String assetGroupName = hisAssetGroupAssetMatch.getAssetGroupName();
             List<SearchFilter> searchFilters=new ArrayList<>();
+            if(orgComponentController.getSelectedOrg() != null){
+                List<String> siteOrgUidsByParentUid = orgInfoDao.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
+                if(!siteOrgUidsByParentUid.isEmpty()){
+                    searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, siteOrgUidsByParentUid));
+                }
+            }
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
             searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.EQ,assetGroupName));
+            searchFilters.add(new SearchFilter("hisAssetGroup.type", SearchFilter.Operator.EQ, "Income"));
             List<HisAssetGroupAssetMatch> bySearchFilter = groupAssetMatchRepository.findBySearchFilter(searchFilters);
             if(CollectionUtils.isNotEmpty(bySearchFilter)){
                 assetGroupByGroupName.addAll(bySearchFilter);

@@ -55,6 +55,7 @@ public class QrcodeConfigConstant {
             FieldsMap.put("emergencyEquipment", WebUtil.getMessage("EmergencyEquipment"));    //是否急救设备 AssetInfo.EmergencyEquipment
             FieldsMap.put("measureGrade", WebUtil.getMessage("measureGrade"));    //计量等级 AssetInfo.measureGrade
             FieldsMap.put("measuringItemCategory", WebUtil.getMessage("measuringItemCategory"));    //出厂日期  AssetInfo.measuringItemCategory
+            FieldsMap.put("lifecycle", WebUtil.getMessage("lifecycle"));    //使用年限  AssetInfo.lifecycle
         }
         return FieldsMap;
     }

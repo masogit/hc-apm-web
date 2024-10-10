@@ -67,6 +67,11 @@
                     <f:selectItems value="#{fieldMsg.getFieldValueList('purchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                 </p:selectOneMenu>
             </h:panelGroup>
+            <h:panelGroup >
+                <label class="label">合同金额(元）</label>
+                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" value="#{multiLevelApprovalController.purchaseOrderInfo.contractTotal}" required="false"  requiredMessage="合同金额#{msg.Blank}#{msg.ValidationRequire}">
+                </p:inputNumber>
+            </h:panelGroup>
             <h:panelGroup>
                 <p:outputLabel class="label">合同开始时间</p:outputLabel>
                 <p:calendar mode="popup" showOn="button"
@@ -90,6 +95,15 @@
                             navigator="true" mask="true">
                     <p:ajax event="dateSelect" update="@this"/>
                 </p:calendar>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">招标编号</label>
+                <p:inputText value="#{multiLevelApprovalController.purchaseOrderInfo.tenderNo}"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">设备最终采购数量</label>
+                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" value="#{multiLevelApprovalController.purchaseOrderInfo.assetPurchaseCount}" required="false"  requiredMessage="设备最终采购数量#{msg.Blank}#{msg.ValidationRequire}">
+                </p:inputNumber>
             </h:panelGroup>
             <h:panelGroup >
                 <p:outputLabel class="label">过会日期<span style="color: red">*</span></p:outputLabel>

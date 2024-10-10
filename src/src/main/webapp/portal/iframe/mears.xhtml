@@ -11,8 +11,15 @@
             <div class="ui-g-12 card cardTitle">
             </div>
             <div class="ui-g-12 card cardTitle">
-                <a onclick="window.open('https://maers.adrs.org.cn').location.href = 'https://maers.adrs.org.cn'">点击跳转到新页面，如果显示异常，请点击浏览器上方的刷新按钮</a>
+                <a target="_blank" onclick="redirectWindow('https://maers.adrs.org.cn')" >点击跳转到新页面，如果显示异常，请点击浏览器上方的刷新按钮</a>
             </div>
         </div>
+        <script type="text/javascript">
+            function redirectWindow(url){
+                const parm = '\u003cscript\u003elocation.replace("' + url + '")\u003c/script\u003e';
+                const str = 'javascript:window.name;'
+                window.open(str, parm);
+            }
+        </script>
     </ui:define>
 </ui:composition>

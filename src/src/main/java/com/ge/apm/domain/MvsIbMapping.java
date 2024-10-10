@@ -51,4 +51,10 @@ public class MvsIbMapping implements Serializable {
     @Column(name = "created_by")
     private String createdBy;
 
+    @Column(name = "mvs_ib_uid")
+    private String mvsIbUid;
+
+    @Column(name = "ib_uid")
+    private String ibUid;
+
 }

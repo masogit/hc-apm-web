@@ -418,6 +418,27 @@ public class ArrivalListItem implements Serializable {
     // 资产分类 encoded
     @Column(name = "encoded")
     private String encoded;
+    //调拨单号
+    @Column(name = "out_stock_no")
+    private String outStockNo;
+    //领用日期
+    @Column(name = "out_stock_date")
+    private Date outStocDate;
+    //单位
+    @Column(name = "unit")
+    private String unit;
+
+    //数量
+    @Column(name = "qty")
+    private Integer qty;
+
+    //领用人
+    @Column(name = "recruiter")
+    private String recruiter;
+
+    //领用科室
+    @Column(name = "recruite_dept_uid")
+    private String recruiteDeptUid;
 
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;

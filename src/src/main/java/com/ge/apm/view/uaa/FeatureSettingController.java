@@ -221,6 +221,11 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                     tenantFeatureMap.put("INSTALL_CHECK", false);
                 }
                 break;
+            case "INSTALL_OUT_STOCK":
+                if (!tenantFeatureMap.get("INSTALL")) {
+                    tenantFeatureMap.put("INSTALL_OUT_STOCK", false);
+                }
+                break;
             case "NURSESITE_RECORD":
                 if (tenantFeatureMap.get("NURSESITE_RECORD")) {
                     tenantFeatureMap.put("NURSESITE_USING", false);

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.HisAdministrativeOfficesMatchRepository;
 import com.ge.apm.domain.his.HisAdministrativeOfficesMatch;
 import com.ge.apm.service.his.HisClinicalService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -42,11 +43,13 @@ public class HisClinicalUnmatchController extends GenericCRUDUUIDController<HisA
 
         removeFilterOnField("hosId");
         removeFilterOnField("siteUid");
+        removeFilterOnField("tenantUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }

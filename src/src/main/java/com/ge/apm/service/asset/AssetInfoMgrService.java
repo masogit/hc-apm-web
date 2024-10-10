@@ -104,11 +104,31 @@ public class AssetInfoMgrService {
         asset.setQrCode(null);
         asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
         asset.setLastModifiedDate(new Date());
+        clearAssetLinkUid(asset);
         assetDao.save(asset);
         updateNurseSiteMaintain(asset.getUid());
         logger.info("delete asset info successful. assetName: {}", asset.getName());
     }
-    
+
+    /**
+     *  YHAAO-22813
+     * @param asset
+     */
+    private void clearAssetLinkUid(AssetInfo asset) {
+        String tenantUID = asset.getTenantUID();
+        asset.setInstitutionUID(tenantUID);
+        asset.setHospitalUID(tenantUID);
+        asset.setSiteUID(tenantUID);
+        asset.setClinicalDeptUID(reverse(asset.getClinicalDeptUID()));
+        asset.setAssetDeptUID(reverse(asset.getAssetDeptUID()));
+        asset.setPatrolInspectionOwnerUID(reverse(asset.getPatrolInspectionOwnerUID()));
+    }
+    public static String reverse(String source){
+        if(StringUtils.isEmpty(source)) return source;
+        StringBuilder builder = new StringBuilder(source);
+        builder.reverse();
+        return builder.toString();
+    }
     public void updateNurseSiteMaintain(String assetUid){
     	nurseSiteMaintainService.deleteAssetUid(assetUid);
     }

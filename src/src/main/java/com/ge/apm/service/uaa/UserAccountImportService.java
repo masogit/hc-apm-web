@@ -68,6 +68,7 @@ public class UserAccountImportService {
 
     private static final String ROLE_GUEST = "仅报修权限账号";
     private static Map<String, SysRole> sysRoleMap;
+    private static Map<String, CustomRole> customRoleMap;
     private Map<String, OrgInfo> mapOrgInfo = new HashMap<>();
     private Map<String, OrgInfo> mapUidOrgInfo = new HashMap<>();
     private Map<String, TenantInfo> mapUidTenantInfo = new HashMap<>();
@@ -121,6 +122,9 @@ public class UserAccountImportService {
 
     @Autowired
     UserAssetGroupRepository userAssetGroupDao;
+
+    @Autowired
+    CustomRoleRepository customRoleRepository;
 
     EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -515,6 +519,13 @@ public class UserAccountImportService {
                     newRole.setUserId(user.getId());
                     newRole.setRole(sysRole);
                     listRole.add(newRole);
+                } else if(customRoleMap.containsKey(tempRoleName)){
+                    CustomRole customRole = customRoleMap.get(tempRoleName);
+                    UserRole newRole = new UserRole();
+                    newRole.setRoleId(customRole.getId());
+                    newRole.setUserId(user.getId());
+                    newRole.setRoleType(1);
+                    listRole.add(newRole);
                 } else {
                     user.setStatusDisplay(UploadFileErrorTypeEnum.ROLE_NOT_EXISTS, "角色不存在;");
                     return false;
@@ -563,6 +574,13 @@ public class UserAccountImportService {
             }
         }
         return sysRoleMap;
+    }
+    private Map<String, CustomRole> getCustomRoleNameMap() {
+        customRoleMap = new HashMap<>();
+        List<CustomRole> customRoles = customRoleRepository.findByTenantUID(currentUser.getTenantUID());
+        if (CollectionUtils.isEmpty(customRoles)) return customRoleMap;
+        customRoleMap = customRoles.stream().collect(Collectors.toMap(CustomRole::getName,item->item));
+        return customRoleMap;
     }
 
     private boolean addUserAccessScope(UserAccount user, OrgInfo tempOrgInfo, boolean showError) {
@@ -665,30 +683,37 @@ public class UserAccountImportService {
                 }
             }
             for (String tempStr : setAccessScope) {
+                int level;
                 String key = tempStr + user.getSiteUID();
                 if (StringUtils.isNotEmpty(user.getSiteName())) {
                     // 院区不为空
+                    level = 3;
                     key = tempStr + user.getSiteUID();
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoByDepartmentKey(setAccessScope, new OrgInfo(user.getSiteUID(), user.getSiteName(), null, mapOrgInfo.get(user.getSiteName() + user.getHospitalUID()).getParentUID()));
                     }
                 } else if (StringUtils.isNotEmpty(user.getHospitalName())) {
                     // 医院不为空
+                    level = 2;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoBySiteKey(setAccessScope, new OrgInfo(user.getHospitalUID(), user.getHospitalName(), null, mapOrgInfo.get(user.getHospitalName() + user.getInstitutionUID()).getParentUID()));
                     }
                 } else if (StringUtils.isNotEmpty(user.getInstitutionName())) {
                     // 集团不为空
+                    level = 1;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInfoByHospitalKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, mapOrgInfo.get(user.getInstitutionName() + user.getTenantUID()).getParentUID()));
                     }
                 } else {
                     // 都为空 租户层级
+                    level = 0;
                     if (!mapOrgInfo.containsKey(key)) {
                         getOrgInstitutionKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, null));
                     }
                 }
-                OrgInfo tempOrgInfo = mapOrgInfo.get(key);
+                OrgInfo tempOrgInfo =  mapOrgInfo.computeIfAbsent(key,key1->{
+                    return level == 3 ? mapOrgInfo.get(tempStr + user.getHospitalUID()):(level == 2 ? mapOrgInfo.get(tempStr + user.getHospitalUID()):(level == 1 ? mapOrgInfo.get(tempStr + user.getInstitutionUID()):(level == 0 ? mapOrgInfo.get(tempStr + user.getTenantUID()):null)));
+                });
                 if (key.equals(defaultName + user.getSiteUID())) {
                     if (!addUserAccessScope(user, tempOrgInfo, false)) {
                         return false;
@@ -858,6 +883,7 @@ public class UserAccountImportService {
         initParam();
         getRoleNameMap();
         currentUser = user;
+        getCustomRoleNameMap();
         affiliatedDepartments=orgInfoRepository.getHospitalChildrenByUids(Collections.singletonList(currentUser.getOrgInfoUID()));
         affiliatedDepartmentsUid=affiliatedDepartments.stream().map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());

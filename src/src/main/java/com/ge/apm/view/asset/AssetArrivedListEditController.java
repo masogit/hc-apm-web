@@ -13,6 +13,8 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,8 +33,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.tools.FileObject;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -123,6 +123,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private OrgInfoRepository orgDao;
 
     private  QrCodeLibRepository qrCodeLibRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
     @Override
     protected void init() {
@@ -156,6 +157,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         deptInfoList = uaaService.getClinicalDeptListBySiteUID(currentUser.getSiteUID());
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         qrCodeLibRepository = WebUtil.getBean(QrCodeLibRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
 
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -415,7 +417,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public List<UserAccount> getClinicalOwnerList() {
         if (null != easyInstallItem) {
-            return aiService.getClinicalOwnerList(easyInstallItem.getClinicalDeptUID());
+            return aiService.getClinicalOwnerList(ListUtil.newArrayList(easyInstallItem.getClinicalDeptUID()));
         }
         return null;
     }
@@ -438,6 +440,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void saveEasyItem() {
+        if (enableArrivalListRequired()) {
+            List<V2_BlobObject> asset4 = attachList.stream().filter(t -> "asset4".equals(t.getBoSubType())).collect(Collectors.toList());
+            if (ObjectUtil.isEmpty(asset4)) {
+                WebUtil.addSuccessMessage("验收及其他材料必填");
+                return;
+            }
+        }
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
         saveList.forEach(item -> {
@@ -1388,6 +1397,21 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setQrCodePrefix(String qrCodePrefix) {
         this.qrCodePrefix = qrCodePrefix;
+    }
+
+    public String getInstallUrl(String itemId,String srcPage){
+        if (enableArrivalListRequired()) {
+            List<V2_BlobObject> asset4 = attachList.stream().filter(t -> "asset4".equals(t.getBoSubType())).collect(Collectors.toList());
+            if (ObjectUtil.isEmpty(asset4)) {
+                return "";
+            }
+        }
+        return UrlEncryptController.encodeUrlParam("ItemEdit?faces-redirect=true&src=".concat(srcPage).concat("&itemId=").concat(itemId));
+    }
+
+    public boolean enableArrivalListRequired() {
+        return Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("enableArrivalListRequired", currentUser.getSiteUID())).
+                map(ConfigItemValue::getValue).map(Boolean::parseBoolean).orElse(false);
     }
 
 }

@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
 
-public interface HisAssetGroupClinicalMatchRepository extends GenericRepository<HisAssetGroupClinicalMatch> {
+public interface HisAssetGroupClinicalMatchRepository extends GenericRepositoryUUID<HisAssetGroupClinicalMatch> {
 
 
     @Query(value = "select asset_uid from his_asset_group_clinical_match where asset_group_clinical_match_id = ?1", nativeQuery = true)
@@ -52,4 +53,29 @@ public interface HisAssetGroupClinicalMatchRepository extends GenericRepository<
 
     @Query(value = "select count(*) from his_asset_group_clinical_match where his_asset_group_uid = ?1", nativeQuery = true)
     Integer countByGroupUid(String assetGroupUid);
+
+
+
+    @Query(value = "select * from his_asset_group_clinical_match where asset_group_clinical_match_id = ?1", nativeQuery = true)
+    List<HisAssetGroupClinicalMatch> findByAssetGroupClinicalId(String uid);
+
+    List<HisAssetGroupClinicalMatch>  findByHisAssetGroupUIdAndOrgInfoUid(String groupUid, String siteUid);
+
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from his_asset_group_clinical_match where his_asset_group_uid = ?1    and org_info_uid=?2", nativeQuery = true)
+    void deleteAssetByHisAssetGroupAndOrgInfoUid(String groupUid, String siteUid);
+
+
+    @Query(value = "select count(*) from his_asset_group_clinical_match where his_asset_group_uid = ?1    and org_info_uid=?2", nativeQuery = true)
+    Integer countByGroupUidAndOrgInfoUid(String groupUid, String siteUid);
+
+
+
+    @Query(value = "select hag.uuid from his_asset_group_clinical_match hagcm left join   his_asset_group hag   on  hagcm.his_asset_group_uid=hag.uuid   where hag.type='Cost'  and    hagcm.asset_uid=?1  and hagcm.tenant_uid=?2  group by  hag.uuid", nativeQuery = true)
+    List<String> getHisAssetGroupUidByAssetUid(String asset_uid,String tenantUid);
+
+
 }

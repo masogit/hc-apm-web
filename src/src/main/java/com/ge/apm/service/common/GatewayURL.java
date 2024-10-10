@@ -34,6 +34,8 @@ public enum GatewayURL {
     UPDATE_WODETAIL_PRICE("/hcapmassetservice/api/apm/asset/workOrderDetails"),
     //租户的mvs的设备uid获取
     GET_MVSASSECT_UID("/hcapmassetservice/api/apm/asset/mvsassetinfos/byUserVisibleScope"),
+    GET_MVSASSECT_UID_STR("/hcapmassetservice/api/apm/asset/mvsassetinfos/byUserVisibleScopeStr"),
+
     //租户的mvs的设备uid获取
     GET_MVSASSECT_UID_BYSITE("/hcapmassetservice/api/apm/asset/mvsassetinfos/bySite"),
     //租户的mvs的设备uid获取
@@ -159,6 +161,9 @@ public enum GatewayURL {
     ADVERSE_EVENTS_INVALID("/hcapmassetservice/api/apm/asset/adverse/events/invalidAdverseEvent"),
     // 不良事件暂存上报
     ADD_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/addAdverseEvent"),
+
+    ADVERSE_EVENTS_WITHDRAWN("/hcapmassetservice/api/apm/asset/adverse/events/adverseEventWithdrawn"),
+
     // 审核人不良事件列表
     APPROVE_ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/approveList"),
     // 审核暂存
@@ -192,6 +197,10 @@ public enum GatewayURL {
     SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
     SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),
     SECONDMENT_GENERATE_NO("/hcapmworkflowservice/api/apm/secondment/getNo"),
+    // clear redis cache
+    CLEAN_ORG_CACHE("/api/apm/configCache/cleanOrgInfoCache/{uid}"),
+    CLEAN_TENANT_CACHE("/api/apm/configCache/cleanTenantCache/{uid}"),
+    CLEAN_CACHE_NAMES("/api/apm/configCache/cleanCacheNames"),
     ;
     private final String url;
 

@@ -70,7 +70,7 @@
                                     item.status == 3?'审核中':
                                     item.status == 4?'已退回':
                                     item.status == 5?'已作废':
-                                    item.status == 6?'审核完成':
+                                    item.status == 6?'不同意上报':
                                     item.status == 7?'同意上报':
                                     item.status == 8?'上报完成':
                                     item.status == 9?'买方填写':
@@ -116,6 +116,9 @@
                             <p:commandButton id="batchSendButton" title="批量发送"  icon="ui-icon-check" disabled="#{adverseEventApproveController.canSendMail}" rendered="#{adverseEventApproveController.eventStatusFilter eq 6 or adverseEventApproveController.eventStatusFilter eq 7}" update="dlgSendMailDisable " oncomplete="PF('dlgSendMailDisable').show()"/>
                             <p:commandButton id="batchExportButton" ajax="false" title="批量导出PDF" actionListener="#{adverseEventApproveController.downLoadPdf()}" icon="ui-icon-file-download" disabled="#{adverseEventApproveController.canSendMail}" validateClient="true" update=":growl" >
                                 <p:fileDownload value="#{adverseEventApproveController.exportPdf}"/>
+                            </p:commandButton>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{adverseEventApproveController.exportExcel}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{adverseEventApproveController.excelFile}"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>

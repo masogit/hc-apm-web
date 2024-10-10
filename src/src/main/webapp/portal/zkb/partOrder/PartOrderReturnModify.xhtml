@@ -9,7 +9,7 @@
     <p:dialog id="zkbPartOrderReturnModifyDlg" widgetVar="zkbPartOrderReturnModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细修改" width="70%" height="620">
         <h:form id="zkbPartOrderReturnModifyForm">
 
-            <p:fieldset rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}" style="margin-top: 5px;">
+            <p:fieldset rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}" style="margin-top: 5px;">
                 <p:dataTable id="zkbPoReturnModifyList" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModifyList}" var="item"
                              widgetVar="zkbPoReturnModifyList" selectionMode="single"  selection="#{zkbPartOrderAuditController.zkbPartOrderReturn}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
@@ -135,6 +135,8 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
+
+
             <p:commandButton validateClient="true" value="提交" actionListener="#{zkbPartOrderAuditController.submitCloseReturn}" update=":growl :zkbPartOrderEditForm"
                              icon="ui-icon-check" oncomplete="PF('zkbPartOrderReturnModifyDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-cancel" onclick="PF('zkbPartOrderReturnModifyDlg').hide()"/>

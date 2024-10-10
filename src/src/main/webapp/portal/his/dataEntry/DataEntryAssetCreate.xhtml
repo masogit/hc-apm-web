@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition>
+
+    <p:dialog id="dataEntryAssetCreateDialog" widgetVar="dataEntryAssetCreateDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" header="单台数据录入" width="70%" height="650">
+        <ui:include src="DataEntry_AssetAdd.xhtml"/>
+
+        <h:form id="dataEntryAssetCreate">
+
+            <p:growl autoUpdate="true" life="10000"/>
+            <p:fieldset>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label  style="font-weight:bold;color: #212121">录入数据类型</label>
+
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label  style="font-weight:bold;color: #212121">录入金额(元)</label>
+
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label  style="font-weight:bold;color: #212121">生效开始时间</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label  style="font-weight:bold;color: #212121">生效结束时间</label>
+
+                    </h:panelGroup>
+                    <c:forEach items="#{dataEntryCreateController.assetDataEntrys}" var="dataentry">
+
+                        <h:panelGroup>
+                            <label style="color: #212121">#{fieldMsg.fieldValue('HisEntryType',dataentry.entryType)}</label>
+                        </h:panelGroup>
+                        <h:panelGroup>
+
+                            <p:inputNumber minValue="0" decimalPlaces="2"
+                                           value="#{dataentry.entryAmount}">
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                        locale="#{userContextService.getCalendarLocale()}"
+                                        pattern="#{userContextService.timeFormat()}"
+                                        value="#{dataentry.startDate}"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                        mask="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                        locale="#{userContextService.getCalendarLocale()}"
+                                        pattern="#{userContextService.timeFormat()}"
+                                        value="#{dataentry.endDate}"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
+                                        mask="true"/>
+                        </h:panelGroup>
+                    </c:forEach>
+
+
+                </p:panelGrid>
+
+            </p:fieldset>
+            <p:commandButton actionListener="#{dataEntryCreateController.saveAssetEntry}" value="#{msg.Save}"
+                             update=":tabDataEntry:dataEntryAssetCreateDialog :tabDataEntry:DataEntryAssetForm:datalist"
+                             icon="ui-icon-check"
+                             oncomplete="handleSubmitDigital(args, 'dataEntryAssetCreateDialog');"/>
+            &nbsp;&nbsp;
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                             onclick="PF('dataEntryAssetCreateDialog').hide()"/>
+
+
+        </h:form>
+    </p:dialog>
+    <script type="text/javascript">
+        function handleSubmitDigital(args, dialog) {
+            if (args.validationFailed) {
+                PF(dialog).show();
+            } else {
+                PF(dialog).hide();
+            }
+        }
+    </script>
+</ui:composition>
+</html>

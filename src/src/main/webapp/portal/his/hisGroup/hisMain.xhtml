@@ -5,8 +5,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:his="http://www.ge.com/tags/his">
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -14,13 +14,20 @@
             </div>
 
             <div class="ui-g-12 card ">
-
-                <p:tabView id="tabGroup">
-                    <p:tab title="设备分组">
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
+                <p:tabView dynamic="true" cache="false"  id="tabGroup">
+                    <p:tab  title="设备分组">
                         <ui:include src="AssetGroupList.xhtml"/>
                     </p:tab>
-                    <p:tab title="全局分组">
+                    <p:tab title="组别管理">
                         <ui:include src="hisGroup.xhtml"/>
+                    </p:tab>
+                    <p:tab title="设备分组详情">
+                        <ui:include src="hisGroupDetail.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>

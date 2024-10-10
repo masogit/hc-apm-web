@@ -150,6 +150,22 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
 
+    public List<String> getMvsAssectUidsStr(String token) {
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_STR);
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, ArrayList.class);
+        if (response.getBody() != null && response.getStatusCode().equals(HttpStatus.OK)) {
+            ArrayList<String> mvsAssetUidsByVisibleScope = (ArrayList<String>) response.getBody();
+            if(mvsAssetUidsByVisibleScope.isEmpty()){
+                return new ArrayList<String>();
+            }
+            return mvsAssetUidsByVisibleScope;
+        } else {
+            return new ArrayList<String>();
+        }
+    }
+
 
     public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
         String token = UserContextService.getAccessToken();
@@ -601,7 +617,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder,String currentPersonIdBatch) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder,String currentPersonIdBatch, String comments) {
         String token = UserContextService.getAccessToken();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
@@ -629,6 +645,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             formData.setManHours(Math.round(averageHours*100.0)/100.0);
             formData.setPlanTime(item.getPlanTime().toString());
             formData.setAssignee(currentPersonIdBatch); // 记录验收人
+            formData.setComments(comments);
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });

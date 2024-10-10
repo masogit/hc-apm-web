@@ -253,6 +253,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setApprovalLevelNow(level);
                         multiLevelApproval.setWorkflowConfigApproveUid(multiLevelApprovalConfig.getId());
                         multiLevelApproval.setInitiateApproverUid(userAccount.getUid());
+                        multiLevelApproval.setApplicationUid(userAccount.getUid());
                         multiLevelApproval.setCreatedDate(TimeUtils.localDateTimeConverterToDate(LocalDateTime.now()));
                         multiLevelApproval.setCreatedBy(userAccount.getName());
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
@@ -1239,6 +1240,34 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 break;
         }
         return null;
+    }
+
+
+    public Integer getBusinessType(String businessType) {
+        if (null == businessType) {
+            return -1;
+        }
+        switch (businessType) {
+            case ApprovalConstant.APPROVAL_ASSET_REPAIR:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT;
+            case ApprovalConstant.APPROVAL_ASSET_MAINTAIN:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT;
+            case ApprovalConstant.APPROVAL_ADVERSE_EVENTS:
+                return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS;
+            case ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT:
+                return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT;
+            case ApprovalConstant.APPROVAL_PURCHASE_MANAGEMENT:
+                return ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT;
+            case ApprovalConstant.APPROVAL_ASSET_SCRAP:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP;
+            case ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT;
+            case ApprovalConstant.APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT:
+                return ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT;
+            default:
+                break;
+        }
+        return -1;
     }
 
     /*

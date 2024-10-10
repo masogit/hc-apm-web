@@ -23,6 +23,7 @@ public interface HisAssetGroupAssetMatchRepository extends GenericRepositoryUUID
     public List<HisAssetGroupAssetMatch> findByIds(List<String> ids);
 
     HisAssetGroupAssetMatch findByAssetGroupUidAndClinicalDeptUid(String assetGroupUid, String clinicalDeptUid);
+    HisAssetGroupAssetMatch findByAssetGroupUidAndOrgInfoUid(String assetGroupUid, String orgInfoUid);
 
     @Transactional
     @Modifying

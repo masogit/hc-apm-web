@@ -13,6 +13,8 @@ import javax.validation.constraints.Size;
 
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -96,7 +98,7 @@ public class ContractInfo implements Serializable {
     @Column(name = "end_months")
     private Integer endMonths;
 
-    //合同总额
+    //合同金额
     @Basic(optional = true)
     @Column(name = "amount")
     private Double amount;
@@ -1008,6 +1010,11 @@ public class ContractInfo implements Serializable {
     @Transient
     @TableField(exist = false)
     private String contractAlertStatus = null;
+
+    @Transient
+    @TableField(exist = false)
+    @Getter @Setter
+    private String assetUid = null;
 
     public String getCompletion() {
         return completion;

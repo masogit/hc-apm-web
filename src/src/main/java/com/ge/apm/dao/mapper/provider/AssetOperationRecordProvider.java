@@ -13,8 +13,8 @@ import java.util.Set;
  */
 public class AssetOperationRecordProvider {
 	private static final String ROW_NUM_STR = " row_number() over ( PARTITION BY a.asset_info_uid ORDER BY a.create_date DESC ) AS rownum,";
-	private static final String SELECT_STR = " a.id as id,a.asset_info_uid as assetInfoUid,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate";
-	private static final String TABLE_STR = " from ((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f' and b.is_valid='t' and b.status!=4) join user_account d on a.operation_by=d.uid) where 1=1";
+	private static final String SELECT_STR = " a.id as id,a.asset_info_uid as assetInfoUid,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate,a.description";
+	private static final String TABLE_STR = " from ((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f') join user_account d on a.operation_by=d.uid) where 1=1";
 	public String getAll(Map<String, Object> param) {
 		StringBuilder sb = new StringBuilder();
 		@SuppressWarnings("unchecked")
@@ -22,6 +22,7 @@ public class AssetOperationRecordProvider {
 		String sortField = (String) param.get("sortField");
 		boolean isAscending = (boolean) param.get("isAscending");
 		boolean assetFlag = (boolean) param.get("assetFlag");
+		boolean scrapStatus = (boolean) param.get("scrapStatus");
 		int limit = (int) param.get("limit");
 		int offset = (int) param.get("offset");
 		if (assetFlag) {
@@ -45,6 +46,11 @@ public class AssetOperationRecordProvider {
 			for (SearchFilter searchFilter : columns) {
 				addFilter(sb, searchFilter);
 			}
+			if(scrapStatus){
+//				sb.append(" b.is_valid='t' and b.status!=4   and");
+			}else{
+				sb.append(" b.is_valid='t'  and");
+			}
 			sb.append(" 1=1 ");
 			sb.append(")");
 		}
@@ -59,6 +65,8 @@ public class AssetOperationRecordProvider {
 		@SuppressWarnings("unchecked")
 		Set<SearchFilter> columns = (Set<SearchFilter>) param.get("filters");
 		boolean assetFlag = (boolean) param.get("assetFlag");
+		boolean scrapStatus = (boolean) param.get("scrapStatus");
+
 		if (assetFlag) {
 			sb.append("select count(*) from ( select");
 			sb.append(ROW_NUM_STR);
@@ -79,6 +87,11 @@ public class AssetOperationRecordProvider {
 			sb.append(" and (");
 			for (SearchFilter searchFilter : columns) {
 				addFilter(sb, searchFilter);
+			}
+			if(scrapStatus){
+//				sb.append(" b.is_valid='t' and b.status!=4   and");
+			}else{
+				sb.append(" b.is_valid='t'  and");
 			}
 			sb.append(" 1=1 ");
 			sb.append(")");

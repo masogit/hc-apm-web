@@ -79,6 +79,9 @@ public class HisChargeCodeUnmatchController extends GenericCRUDUUIDController<Hi
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getSiteUID()));
         }
+
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+
         Page<HisEquipmentSfxmMatch> page = sfxmMatchRepository.findBySearchFilter(this.searchFilters, pageRequest);
         currentPages = page.getContent();
         return page;

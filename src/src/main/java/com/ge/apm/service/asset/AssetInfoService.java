@@ -5,8 +5,10 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.service.uaa.UaaService;
@@ -44,6 +46,7 @@ public class AssetInfoService {
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     V2_WorkOrderService woService = WebUtil.getBean(V2_WorkOrderService.class);
+    ContractInfoMapper contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
 
     public String getAssetInfoName(Integer id) {
         if (null == id || id == 0) {
@@ -261,6 +264,26 @@ public class AssetInfoService {
             asset.setVendorTel(supplierMap.get(asset.getSupplierId()));
             asset.setManufactureTel(supplierMap.get(Optional.ofNullable(asset.getManufactureId()).map(Integer::parseInt).orElse(null)));
             asset.setMaitananceTel(supplierMap.get(Optional.ofNullable(asset.getMaitananceId()).map(Integer::parseInt).orElse(null)));
+        }
+    }
+
+    public void setWarrantyStatus(List<AssetInfo> assets){
+        List<String> assetUidList = ObjectUtil.isEmpty(assets) ? ListUtil.newArrayList("-1") : assets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+        List<Map<String, Object>> assetDateList = contractInfoMapper.findDateByAssetUidList(assetUidList);
+        Map<String, List<Map<String, Object>>> assetDateMap = assetDateList.stream().collect(Collectors.groupingBy(map -> (String) map.get("assetuid")));
+        Date now = DateUtil.now();
+        for (AssetInfo asset : assets) {
+            List<Map<String, Object>> dateList = assetDateMap.get(asset.getUid());
+            if (ObjectUtil.isNotEmpty(dateList)) {
+                long count = dateList.stream().filter(map -> ((Date) map.get("startdate")).before(now) && ((Date) map.get("enddate")).after(now)).count();
+                if (count > 0) {
+                    asset.setWarrantyStatus("在保");
+                } else {
+                    asset.setWarrantyStatus("出保");
+                }
+            } else {
+                asset.setWarrantyStatus("不确定");
+            }
         }
     }
 }

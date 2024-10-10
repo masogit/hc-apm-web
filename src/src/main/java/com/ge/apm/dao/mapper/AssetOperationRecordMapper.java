@@ -16,9 +16,9 @@ import java.util.Set;
 public interface AssetOperationRecordMapper extends BaseMapper<AssetOperationRecord> {
     @SelectProvider(type = AssetOperationRecordProvider.class, method = "getAll")
     List<AssetOperationRecord> getAll(@Param("filters") Set<SearchFilter> filters, @Param("sortField") String sortField, @Param("isAscending") boolean isAscending,
-                                             @Param("limit") int limit, @Param("offset") int offset, @Param("assetFlag") boolean assetFlag);
+                                             @Param("limit") int limit, @Param("offset") int offset, @Param("assetFlag") boolean assetFlag, @Param("scrapStatus") boolean scrapStatus);
 
     @SelectProvider(type = AssetOperationRecordProvider.class, method = "getAllCount")
-    Integer getAllCount(@Param("filters") Set<SearchFilter> filters, @Param("assetFlag") boolean assetFlag);
+    Integer getAllCount(@Param("filters") Set<SearchFilter> filters, @Param("assetFlag") boolean assetFlag,@Param("scrapStatus") boolean scrapStatus);
 
 }

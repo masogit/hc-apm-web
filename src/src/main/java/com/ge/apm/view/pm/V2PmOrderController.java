@@ -259,6 +259,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmReportService pmReportService;
     private MultiLevelApprovalService multiLevelApprovalService;
     private String queryAssetUid;
+    private String orderId;
     private ConfigService configService;
     private SimplePartsConfigService partsConfigService;
     //tab Title
@@ -1721,6 +1722,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
             if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
                 query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
             }
@@ -1935,6 +1937,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterOutPm(filterArrayList);
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 filterArrayList.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+            }
+            if (!Strings.isNullOrEmpty(orderId)) {
+                filterArrayList.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId, "1*"));
             }
         }
         if(queryIndex==10){
@@ -2155,9 +2160,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         /*根据登录进来的租户获取到该租户绑定的设备的uid*/
         String token = UserContextService.getAccessToken();
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
-        List<Integer> orgUidList = pmOrderService.getMvsAssectUids(token);
+        List<String> orgUidList = pmOrderService.getMvsAssectUidsStr(token);
         if (CollectionUtils.isEmpty(orgUidList)) {
-            orgUidList.add(0);
+            orgUidList.add("1++1");
         }
         return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
     }
@@ -2602,7 +2607,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void repairPmOrderBatch() {
 //        保存检查项
        // saveCheckItemDataBatch(orderNumList);
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap, currentPersonIdBatch);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap, currentPersonIdBatch, comments);
         selectedMap = new HashMap<String, Boolean>();
     }
 

@@ -20,6 +20,8 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     
     public List<V2_BlobObject> findByBoUuid(String boUid);
 
+    public List<V2_BlobObject> findByBoUuidAndObjectName(String boUid, String objectName);
+
     public List<V2_BlobObject> findAllByObjectStorageId(String objectId);
     
     @Query(value="select o.* from v2_blob_object o where o.bo_uuid=?1 and o.bo_type=?2 and o.bo_sub_type=?3",nativeQuery=true)

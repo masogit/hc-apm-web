@@ -1,0 +1,24 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AssetArrivalListItemMgmt}"/>
+            </div>
+            <div class="ui-g-12">
+                <p:tabView id="arrivalItemsTab">
+                    <p:ajax event="tabChange"/>
+                    <p:tab title="#{msg.Search}" id="showList">
+                        <ui:include src="arrivalItemsList.xhtml"/>
+                    </p:tab>
+                    <p:tab title="#{msg.Import}" id="userAccountImport">
+                        <ui:include src="arrivalItemsImport.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

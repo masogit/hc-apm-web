@@ -131,7 +131,9 @@ public class MeasuringCertificateDetail implements Serializable {
     //二维码
     @Column(name = "qr_code")
     private String qrCode;
-
+    // 记录人
+    @Column(name = "operator")
+    private String operator;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUID;
@@ -449,6 +451,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 
     public List<V2_BlobObject> getMeasuringAttachList() {

@@ -172,7 +172,7 @@ public class WorkOrderReportProvider {
                 "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
                 "(select string_agg(to_char(woc.man_hours,'9999990.99'),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
                 "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, " +
-                "ua.telephone as telephone," +
+                "(case when sr.requestor_phone is not null then sr.requestor_phone else ua.telephone end) as telephone," +
                 "aft.fault_name as caseTypeName, " +
                 "ai.status as assetStatus, " +
                 "wo.external_quotation as externalQuotation," +

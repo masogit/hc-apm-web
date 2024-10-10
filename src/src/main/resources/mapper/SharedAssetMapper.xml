@@ -58,6 +58,7 @@
         <result column="discount_start_date" property="discountStartDate"/>
         <result column="discount_end_date" property="discountEndDate"/>
         <result column="discount" property="discount"/>
+        <result column="remark" property="remark"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -146,6 +147,7 @@
             sard.discount_start_date,
             sard.discount_end_date,
             sard.discount,
+            sard.remark,
             sasi.swap_index  as shared_asset_swap_index
             from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
             left join org_info oi on ai.asset_dept_uid=oi.uid

@@ -221,9 +221,11 @@
                                         <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.requestTime}" >
-                                        <h:outputText value="#{item.requestTime}">
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                        </h:outputText>
+                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryIndex=12&amp;actionName=View&amp;selectedid='.concat(assetInfoDetailController.getWorkOrderId(item.id)))}" styleClass="p-mr-2">
+                                            <h:outputText value="#{item.requestTime}">
+                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                            </h:outputText>
+                                        </p:commandLink>
                                     </p:column>
                                     <p:column headerText="#{msg.requestReason}" >
                                         <h:outputText value="#{item.requestReason}"/>
@@ -272,7 +274,9 @@
                                         <h:outputText value="#{item.creatorName}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.MaintenanceID}" >
-                                        <h:outputText value="#{item.pmNum}"/>
+                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id))}" styleClass="p-mr-2">
+                                            <h:outputText value="#{item.pmNum}"/>
+                                        </p:commandLink>
                                     </p:column>
                                     <p:column headerText="#{msg.currentStep}" >
                                         <h:outputText value="#{item.currentStepName}"/>
@@ -459,6 +463,50 @@
                                     </p:panel>
                                 </c:otherwise>
                             </c:choose>
+
+                            <p:panel  header="不良事件记录" >
+
+                                <p:dataTable id="approvalList" value="#{assetAdverseEventsController.lazyModel}"
+                                             var="item"
+                                             widgetVar="assetAdverseEvents"
+                                             lazy="true" paginator="true" paginatorPosition="bottom"
+                                             paginatorAlwaysVisible="true"
+                                             selectionMode="single"
+                                             rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown} {Exporters}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                             rows="5" emptyMessage="#{msg.noRecordFound}"
+                                             >
+
+                                    <p:column headerText="工单编号" >
+                                        <h:outputText value="#{item.workOrderNum}"/>
+                                    </p:column>
+
+                                    <p:column headerText="状态" >
+                                        <h:outputText
+                                                value="#{item.status == 1?'暂存':
+                                    item.status == 2?'待审核':
+                                    item.status == 3?'审核中':
+                                    item.status == 4?'已退回':
+                                    item.status == 5?'已作废':
+                                    item.status == 6?'审核完成':
+                                    item.status == 7?'待上报':
+                                    item.status == 8?'上报完成':
+                                    item.status == 9?'买方填写':
+                                    '未知'  }"/>
+                                    </p:column>
+
+                                    <p:column headerText="报告人" >
+                                        <h:outputText value="#{item.reporterName}"/>
+                                    </p:column>
+
+                                    <p:column styleClass="textCenter"  headerText="报告时间" >
+                                        <h:outputText value="#{item.reportDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panel>
                         </p:panelGrid>
                     </h:form>
                     <p:panel  id="approvale"
