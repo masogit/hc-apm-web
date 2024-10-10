@@ -1236,8 +1236,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
-            int oldReturnCount = getModifyReturnCount(oldZkbFePartOrderReturnList);
-            int returnCount = getModifyReturnCount(zkbFePartOrderReturnList);
+            List<ZkbPartOrderCat> zkbPartOrderCatList = zkbPartOrderCatRepository.queryByCatType(SPECIAL_PART);
+            List<String> depotMap = zkbPartOrderCatList.stream().map(ZkbPartOrderCat::getCatNo).collect(Collectors.toList());
+            int oldReturnCount = getModifyReturnCount(oldZkbFePartOrderReturnList, depotMap);
+            int returnCount = getModifyReturnCount(zkbFePartOrderReturnList, depotMap);
             if(returnCount > oldReturnCount){
                 this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount-oldReturnCount,this.currentUser,this.selected,"GE FE备件已归还信息修改【返还名额】");
             }else if(returnCount < oldReturnCount){//当前归还数量小于修改前原数量=好还变坏还,则需要补扣名额。
@@ -1261,12 +1263,17 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * @param zkbFePartOrderReturnList 归还列表
      * @return
      */
-    public int getModifyReturnCount(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList) {
+    public int getModifyReturnCount(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList, List<String> specialParts) {
         int qty = 0;
-        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
-        {
-            if(!badReturnValue.equals(item.getReturnType())){
-                qty += item.getQty();
+        for (ZkbFePartOrderReturn item : zkbFePartOrderReturnList) {
+            if (!badReturnValue.equals(item.getReturnType())) {
+                if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
+                    if(specialParts.contains(item.getAssetNo())){
+                        qty += item.getQty();
+                    }
+                }else{
+                    qty += item.getQty();
+                }
             }
         }
         return qty;
