@@ -126,6 +126,13 @@ public class QrCodeLib implements Serializable {
     @Column(name = "asset_type")
     private String assetType;
 
+    //是否急救设备[1:急救类,2:非急救类]
+    @Column(name = "emergency_equipment")
+    private Integer emergencyEquipment;
+    // 使用期限
+    @Column(name = "lifecycle")
+    private Double lifecycleInYear;
+
     public String getDepartNum() {
         return departNum;
     }
@@ -418,5 +425,21 @@ public class QrCodeLib implements Serializable {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public Integer getEmergencyEquipment() {
+        return emergencyEquipment;
+    }
+
+    public void setEmergencyEquipment(Integer emergencyEquipment) {
+        this.emergencyEquipment = emergencyEquipment;
+    }
+
+    public Double getLifecycleInYear() {
+        return lifecycleInYear;
+    }
+
+    public void setLifecycleInYear(Double lifecycleInYear) {
+        this.lifecycleInYear = lifecycleInYear;
     }
 }

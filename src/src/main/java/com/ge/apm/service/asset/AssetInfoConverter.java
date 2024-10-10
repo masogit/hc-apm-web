@@ -6,12 +6,13 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.AssetInfo;
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -20,7 +21,7 @@ import webapp.framework.web.WebUtil;
  */
 @FacesConverter("assetInfoConverter")
 public class AssetInfoConverter implements Converter{
-
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoConverter.class);
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {
@@ -28,6 +29,7 @@ public class AssetInfoConverter implements Converter{
                 AssetInfoService service = (AssetInfoService) WebUtil.getBean(AssetInfoService.class);
                 return service.getAssetInfo(Integer.parseInt(value));
             } catch(NumberFormatException e) {
+                logger.error("not find asset id = {}", value);
 //                throw new ConverterException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Conversion Error", "Not a valid theme."));
             	return null;
             }

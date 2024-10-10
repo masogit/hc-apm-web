@@ -105,7 +105,7 @@
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.amount}" >
                             <!-- <h:outputText  value="#{item.contractAmount}"/> -->
-                            <p:inputNumber value="#{item.amount}" readonly="true"> </p:inputNumber>
+                            <p:inputNumber value="#{(item.amount + item.supplementaryAmount) > 0 ? (item.amount + item.supplementaryAmount) : null}" readonly="true"> </p:inputNumber>
                         </p:column>
                         <p:column headerText="#{msg.PaymentProgress}">
                             <h:outputText value="#{item.paymentProgress}"/>
@@ -118,7 +118,9 @@
                                              rendered="#{item.contractType == 'Equipment' and (item.status == null or item.status == 4)}"
                                              disabled="#{item.isContractComplete()}"
                                              update=":AssetContractListForm:datalist"
-                                             action="#{contractInfoController.completeContract(item)}"/>
+                                             actionListener="#{contractInfoController.completeContract(item)}">
+                                <p:confirm  header="验收提示"  message="当前合同内的设备未安装验收完成，请确认是否验收完成合同！" disabled="#{contractInfoEditController.acceptTip(item)}" icon="ui-icon-alert"/>
+                            </p:commandButton>
                             <p:commandButton id="audit" value="#{msg.Approval}" process="@this" update="ContractAuditDlg" actionListener="#{contractInfoEditController.prepareApproval(item)}" rendered="#{item.status == 2}" oncomplete="PF('ContractAuditDialog').show()"/>
                         </p:column>
                         <f:facet name="{Toolbar}">

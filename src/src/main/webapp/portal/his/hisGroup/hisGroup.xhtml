@@ -15,23 +15,32 @@
 
             <div class="ui-g-12 card">
                 <h:form id="hisGlobalGroupListForm">
-                    <p:dataTable id="datalist" value="#{hisGlobalAssetGroupController.getAllHisAssetGroup()}"
-                                 var="item"
+                    <p:dataTable id="datalist" value="#{hisGlobalAssetGroupController.lazyModel}"
+                                 var="item"  widgetVar="datalist"
                                  lazy="true" paginator="true" paginatorPosition="bottom"
                                  paginatorAlwaysVisible="true"
                                  selectionMode="single" selection="#{hisGlobalAssetGroupController.selected}"
-                                 rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
-                                 sortBy="#{item.name}"
+                                 rowKey="#{item.uuid}" sortMode="single" sortOrder="descending" sortBy="lastModifiedDate" sortField="lastModifiedDate"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{hisGlobalAssetGroupController.onSelectHisAssetGroup()}" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{hisGlobalAssetGroupController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{hisGlobalAssetGroupController.onFilter}"/>
 
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                        <p:column headerText="#{msg.name}" sortBy="#{item.name}"  filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="分组类型" sortBy="#{item.type}"  filterBy="#{item.type}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{hisGlobalAssetGroupController.groupType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.type)}"/>
                         </p:column>
 
                         <p:column headerText="设备数量">
@@ -61,12 +70,20 @@
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
                                      rendered="true">
                             <h:panelGroup>
-                                <label class="label">#{msg.name}</label>
+                                <label class="label">#{msg.name}<span style="color:red">*</span></label>
                                 <p:inputText id="hisAssetGroupName" name="hisAssetGroupName" readonly="false"
                                              style="width: 220px;"
-                                             value="#{hisGlobalAssetGroupController.selected.name}"/>
+                                             value="#{hisGlobalAssetGroupController.selected.name}"  required="true" requiredMessage="分组名称必填" />
                             </h:panelGroup>
 
+
+                            <h:panelGroup>
+                                <label class="label">类型<span style="color:red">*</span></label>
+                                <p:selectOneMenu  id="assetGroup" value="#{hisGlobalAssetGroupController.selected.type}" required="true" requiredMessage="分组类型必填 "  >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
 
                     </p:fieldset>
@@ -76,14 +93,25 @@
                                 actionListener="#{hisGlobalAssetGroupController.saveHisList()}"
                                 value="#{msg.save}"
                                 update=":tabGroup:hisGlobalGroupListForm:datalist"
-                                icon="ui-icon-check" oncomplete="PF('hisListDialog').hide();"/>
+                                icon="ui-icon-check"  oncomplete="handleSubmitDigital(args, 'hisListDialog')"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('hisListDialog').hide()"
-                                         update=":tabGroup:hisGlobalGroupListForm:datalist"  oncomplete="PF('hisListDialog').hide();"/>
+                                         update=":tabGroup:hisGlobalGroupListForm:datalist"  oncomplete="handleSubmitDigital(args, 'hisListDialog')"/>
                     </h:panelGroup>
                 </h:form>
             </p:dialog>
         </div>
+
+        <script type="text/javascript">
+            function handleSubmitDigital(args, dialog) {
+                if (args.validationFailed) {
+                    PF(dialog).show();
+                } else {
+                    PF(dialog).hide();
+                }
+            }
+        </script>
+
     </ui:composition>
 
 </html>

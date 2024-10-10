@@ -55,7 +55,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     UserAccount currentUser;
 
-    AssetInfo selectedAsset;
+    //AssetInfo selectedAsset;
 
     private AssetInfoService assetService;
     private BlobFileService blobService;
@@ -67,7 +67,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private DualListModel<AssetInfo> availableAssets;
     private List<AssetInfo> sourceAssets;
-    private List<AssetInfo> targetAssets;
+    private List<AssetInfo> targetAssets = new ArrayList<>();
     private AssetInfo queryAsset;
 
     private List<String> orgUidList;
@@ -79,7 +79,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private List<OrgInfo> clinicalDeptList;
     private V2_BlobObject batchBlobObject;
+    @Getter@Setter
     private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
+
+    List<V2_BlobObject> v2BlobObjects = new ArrayList<>();
     private Set<V2_BlobObject> repeatBlobObjectSet;
     private Set<AssetInfo> repeatAssets;
     private List<AssetInfo> assetInfoList;
@@ -166,12 +169,12 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     @Override
     public void onBeforeNewObject(V2_BlobObject object) {
-        this.selectedAsset = null;
+        this.targetAssets = new ArrayList<>();
     }
 
     @Override
     public void save() {
-        if (null == selectedAsset) {
+        if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
         } else if (null == selected.getBoSubType() || selected.getBoSubType().isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("fileType") + WebUtil.getMessage("ValidationRequire"));
@@ -190,22 +193,52 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
                 return;
             }
-            selected.setBoId(selectedAsset.getId());
-            selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-            selected.setBoUuid(selectedAsset.getUid());
-            selected.setObjectName(vlinkTitle);
-            dao.save(selected);
+
+            for(AssetInfo a : targetAssets){
+                V2_BlobObject object = new V2_BlobObject();
+                object.setBoSubType(selected.getBoSubType());
+                object.setBoId(a.getId());
+                object.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                object.setBoUuid(a.getUid());
+                object.setObjectName(vlinkTitle);
+                object.setExtLink(parsedLink);
+                dao.save(object);
+            }
             cancel();
-            return;
-        } else if (null == selected.getObjectName() || selected.getObjectName().isEmpty()) {
+        } else if (batchBlobObjectList.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-        } else if (selected.getBoSubType().equals("1") && !selected.getObjectName().toLowerCase().matches("^.*?\\.(jpg|jpeg|bmp|gif|png)$")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("InvalidPictureFileType"));
         } else {
-            selected.setBoId(selectedAsset.getId());
-            selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-            selected.setBoUuid(selectedAsset.getUid());
-            dao.save(selected);
+            if (selected.getBoSubType().equals("1")) {
+                boolean r = false;
+                for(V2_BlobObject b : batchBlobObjectList){
+                    if(b.getObjectName().toLowerCase().matches("^.*?\\.(jpg|jpeg|bmp|gif|png)$")){
+                        r = true;
+                        break;
+                    }
+                }
+                if(!r){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("InvalidPictureFileType"));
+                    return;
+                }
+            }
+
+            for(V2_BlobObject blobObject : batchBlobObjectList) {
+                for(AssetInfo a : targetAssets){
+                    V2_BlobObject object = new V2_BlobObject();
+                    object.setBoSubType(selected.getBoSubType());
+                    object.setBoId(a.getId());
+                    object.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                    object.setBoUuid(a.getUid());
+                    object.setObjectStorageId(blobObject.getObjectStorageId());
+                    object.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                    object.setObjectName(blobObject.getObjectName());
+                    object.setObjectStorageId(blobObject.getObjectStorageId());
+                    object.setObjectSize(blobObject.getObjectSize());
+                    object.setObjectType(blobObject.getObjectType());
+                    dao.save(object);
+                }
+            }
+
             cancel();
         }
     }
@@ -214,7 +247,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         this.selected = null;
         this.vlink = null;
         this.vlinkTitle = null;
-        this.selectedAsset = null;
+        this.targetAssets = new ArrayList<>();
+        this.batchBlobObjectList = new ArrayList<>();
     }
 
     private void getAllAttachmentCategories() {
@@ -251,7 +285,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
-            selected = blobObject;
+            batchBlobObjectList.add(blobObject);
+            v2BlobObjects.add(blobObject);
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
@@ -272,7 +307,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        AssetInfo asset = (AssetInfo) eventObject;
+        List<AssetInfo> asset = (List<AssetInfo>) eventObject;
         if (asset == null) {
             return;
         }
@@ -280,13 +315,22 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         if (this.selected == null) {
             return;
         }
-        this.selected.setBoId(asset.getId());
-        this.selected.setBoUuid(asset.getUid());
-        this.selectedAsset = asset;
+
+        List<AssetInfo> addAsset = asset.stream().filter(t -> {
+            boolean r = true;
+            for (AssetInfo a : targetAssets){
+                if(a.getUid().equals(t.getUid())){
+                    r = false;
+                    break;
+                }
+            }
+            return r;
+        }).collect(Collectors.toList());
+        this.targetAssets.addAll(addAsset);
     }
 
     public void onSelectedChange() {
-        selectedAsset = assetService.getAssetInfo(selected.getBoId());
+        //selectedAsset = assetService.getAssetInfo(selected.getBoId());
         crudActionName = "Edit";
     }
 
@@ -416,6 +460,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void handleFileUploadBatchMeasurementDocument(FileUploadEvent event) {
         handleFileUploadBatch(event,"Measuring");
+    }
+
+    public void handleFileUploadBatchVerification(FileUploadEvent event) {
+        handleFileUploadBatch(event,"4");
     }
 
     public void handleFileUploadBatchVideoLink(FileUploadEvent event) {
@@ -629,13 +677,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         return "Create".equals(crudActionName);
     }
 
-    public AssetInfo getSelectedAsset() {
-        return selectedAsset;
-    }
-
-    public void setSelectedAsset(AssetInfo selectedAsset) {
-        this.selectedAsset = selectedAsset;
-    }
 
     public TreeNode getOrgTree() {
         return orgTree;

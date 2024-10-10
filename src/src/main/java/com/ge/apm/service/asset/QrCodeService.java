@@ -418,6 +418,9 @@ public class QrCodeService {
                     case "measuringItemCategory":
                         itemObject.put("TextShowValue", textValue.concat(asset.getMeasuringItemCategory() == null ? "" :FieldValueMessageController.fieldValue("measuringItemCategory", asset.getMeasuringItemCategory().toString())));
                         break;
+                    case "lifecycle":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getLifecycle() == null ? "" : asset.getLifecycleInYear().toString()));
+                        break;
                     case "capitalSource2":
                         Integer capitalSource2 = asset.getCapitalSource2();
                         I18nMessage capitalSourceI18n=null;

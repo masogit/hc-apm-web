@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
@@ -82,7 +83,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 	 * @return
 	 */
 	@SelectProvider(type = AssetInfoProvider.class,method="getMvsPmOrders")
-	List<String> getMvsPmOrders(@Param("orgList")List<Integer> orgList,@Param("tenantUid")String tenantUid);
+	List<String> getMvsPmOrders(@Param("orgList")List<String> orgList,@Param("tenantUid")String tenantUid);
 
 	@SelectProvider(type = AssetInfoProvider.class,method="countAssetWithQRcode")
 	Integer countAssetWithQRcode(@Param("uidList")List<String> uidList,@Param("tenantUid")String tenantUid);
@@ -95,6 +96,10 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
 	List<AssetInfo> findAssetByMaintainConfigJNParentId(@Param("ew") Wrapper<AssetInfo> wrapper);
 
+	List<AssetInfo> findByParam(Map<String, Object> param);
+
+	List<Map<String, Object>> findByParam1(Map<String, Object> param);
+
 	@Select("select  ai.id,ua.name as userName  from asset_info  ai left join user_account ua on ai.created_by=ua.login_name  where ua.id is not null and ua.login_name!=ua.name order by ai.id desc limit 2000")
 	List<AssetDto> findByCreatedByIsLoginName();
 
@@ -104,4 +109,10 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
 	@Select("select distinct mvs.id from asset_info ai, asset_info mvs where ai.id = #{assetId} and not mvs.is_deleted and mvs.is_valid and ai.is_valid  AND NOT ai.is_deleted and (mvs.qr_code = SUBSTRING(ai.system_id,5) and ai.system_id like 'MVS-%'  or mvs.qr_code = SUBSTRING(ai.system_num1,5) and ai.system_num1 like 'MVS-%')")
     List<Integer> findMvsAssetIds(@Param("assetId") Integer assetId);
+
+
+
+
+	@SelectProvider(type = AssetInfoProvider.class,method="getAssetInfoIsNotEfficiencyEquipment")
+	List<AssetInfo> getAssetInfoIsNotEfficiencyEquipment(@Param("tenantUid")  String tenantUid, @Param("orgList")  List<String> orgList, @Param("clinicalDeptUid")  String clinicalDeptUid,@Param("assetGroup")  Integer assetGroup, @Param("purchasePrice")   Double purchasePrice);
 }

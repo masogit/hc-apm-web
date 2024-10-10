@@ -561,6 +561,13 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyStatus')}">
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyStatus}</label>
+            <p:inputText id="warrantyStatus" value="#{assetInfoDetailController.selected.warrantyStatus}" readonly="true">
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'terminateDate')}">
         <h:panelGroup>
             <label class="label">#{msg.terminateDate}</label>

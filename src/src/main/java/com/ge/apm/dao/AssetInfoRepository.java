@@ -126,6 +126,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
     public void updateClinicalName(String name, String uid);
 
+    @Query(value = "select distinct a.uid from asset_info a where a.clinical_dept_uid=?1 and a.site_uid = ?2 ", nativeQuery = true)
+    List<String> findByClinicalUidAndSiteUid(String clinicalUid,String siteUid);
+
 
     @Modifying
     @Transactional
@@ -200,10 +203,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
     public List<AssetInfo> getByUids(Set<String> setUids);
 
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid in ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid in ?1 ")
     public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
 
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid = ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.id in ?1 ")
+    public List<AssetInfo> getSimpleDataByIds(Set<Integer> ids);
+
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid = ?1 ")
     public AssetInfo getSimpleDataByUids(String uid);
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
@@ -384,4 +390,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Query(value= "UPDATE asset_info  set is_special_asset=?2 where id=?1",nativeQuery = true)
     void updateSpecialAsset(Integer assetId, boolean b);
+
+    @Query(value = "select  ai.* from asset_info ai  left join  efficiency_equipment_info eei on ai.uid=eei.asset_uid   where ai.tenant_uid=?1 and ai.is_valid =true and ai.is_deleted=false   and (ai.institution_uid in (?2) or ai.hospital_uid in (?2) or ai.site_uid in (?2))  and ai.clinical_dept_uid=?3      and eei.uid is null limit 5000 ",nativeQuery = true)
+    List<AssetInfo> getAssetInfoIsNotEfficiencyEquipment(String tenantUID, List<String> siteOrgUids, String clinicalDeptUid);
 }

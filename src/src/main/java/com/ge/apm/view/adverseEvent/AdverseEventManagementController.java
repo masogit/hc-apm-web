@@ -1,27 +1,24 @@
 package com.ge.apm.view.adverseEvent;
 
-import com.ge.apm.dao.AdverseEventsRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TempFileUtil;
-import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.ArrayUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -36,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -44,9 +42,13 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -68,7 +70,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private BlobFileService blobService;
     private AdverseEventServiceClient adverseEventServiceClient;
     private ConfigCacheService configCacheService;
-
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
     /*属性类*/
     static PageRequest pageRequest = new PageRequest(0, 1000);
     @Getter@Setter
@@ -112,7 +114,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private List<TempFileUtil> injuryPerformance;
     @Getter@Setter
     private List<TempFileUtil> mechanicalFailure;
-
+    private AdverseEventsService adverseEventsService;
     private boolean renderedSearchForm = true;
 
     private boolean readOnlyCreateForm = false;
@@ -125,6 +127,13 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     @Getter@Setter
     private String[] selectedOptions;
 
+    private ConfigItemValueRepository configItemValueRepository;
+
+    String configItemValue;
+
+
+    @Getter@Setter
+    private StreamedContent excelFile;
 
     @Override
     protected void init() {
@@ -141,6 +150,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
+        multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
+
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         if (selectSite.getOrgType() == 4) {
@@ -152,6 +165,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         injuryPerformance = new ArrayList<>();
         mechanicalFailure = new ArrayList<>();
         /*初始化方法*/
+        //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
+        configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "setAdverseEventProductType");
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
     }
@@ -166,6 +181,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             this.selected.setOccurredPlace("境内");
             //默认不良事件工单类型
             this.selected.setAdverseEventType("1");
+            if(StrUtil.isNotEmpty(configItemValue) && "3".equals(configItemValue)){
+                assetType = 2;
+            }
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
@@ -180,6 +198,30 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             //事件原因分析由字符串转为数组
             if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
+            }
+        }
+    }
+
+    public boolean assetTypeDisabledCheck(String type){
+        if("1".equals(type)){
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue)){
+                return false;
+            }else if(AdverseEvents.ALL.equals(configItemValue)){
+                return false;
+            }else if(AdverseEvents.EQUIPMENT.equals(configItemValue)){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(configItemValue == null || StrUtil.isEmpty(configItemValue)){
+                return true;
+            }else if(AdverseEvents.ALL.equals(configItemValue)){
+                return false;
+            }else if(AdverseEvents.CONSUMABLES.equals(configItemValue)){
+                return false;
+            }else{
+                return true;
             }
         }
     }
@@ -383,34 +425,14 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         return adverseEventsRepository;
     }
 
-
-    /**
-     * 增加保存前检验
-     * @return
-     */
-    public boolean checkSave(){
-        boolean isValid = true;
-        if(selected.getEventDiscoverDate().getTime() < selected.getEventOccurredDate().getTime()){
-            isValid = false;
-            MessageUtil.outPutReturnFacesMessage("发现或获知日期不得早于事件发生日期！", FacesMessage.SEVERITY_ERROR);
-        }
-        if(selected.getDeviceUsedDate().getTime() > selected.getEventOccurredDate().getTime()){
-            isValid = false;
-            MessageUtil.outPutReturnFacesMessage("器械使用日期不得晚于事件发生日期！", FacesMessage.SEVERITY_ERROR);
-        }
-        return isValid;
-    }
-
-    public void tempSaveAdverseEvent(Integer status) throws RuntimeException{
+    public void tempSaveAdverseEventCreate(Integer status) throws RuntimeException {
         if (status == 0) {
             selected.setStatus(0);
             readOnlyCreateForm = false;
             renderedSearchForm = true;
             return;
         }
-        if(status != 1 &&!checkSave()){
-            return;
-        }
+
         Integer oldStatus = selected.getStatus();
         processFile();
         selected.setStatus(status);
@@ -439,7 +461,15 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             }
         } catch (Exception e) {
             selected.setStatus(oldStatus);
-            MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+            String result = e.getMessage();
+            if(result.indexOf(";") > -1){
+                List<String> r = Arrays.asList(result.split(";"));
+                for(String s : r){
+                    MessageUtil.outPutReturnFacesMessage(s, FacesMessage.SEVERITY_INFO);
+                }
+            }else{
+                MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
+            }
         }
     }
 
@@ -471,6 +501,24 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
     }
+
+    public void exportExcel(){
+        PageRequest p = new PageRequest(0, 10000);
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), p, eventStatusFilter, queryStr, "report");
+        List<AdverseEvents> adverseEventsList = pageResult.getContent();
+        for(AdverseEvents adverseEvents : adverseEventsList){
+            MultiLevelApproval recentApprove = multiLevelApprovalRepository.getRecentApprove(adverseEvents.getUid());
+            if (recentApprove != null) {
+                adverseEvents.setActualApproverName(recentApprove.getActualApproverName());
+                adverseEvents.setActualApproverDate(recentApprove.getActualApproverDate());
+                adverseEvents.setApprovalOpinion(recentApprove.getApprovalOpinion());
+            }
+        }
+        InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
+
+    }
+
 
     public boolean getCanExport() {
         this.canExport = !selectedMap.values().stream().anyMatch(Boolean::booleanValue);
@@ -529,4 +577,50 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     public boolean getReadOnlyCreateForm() {
         return this.readOnlyCreateForm;
     }
+
+    public boolean isWithdrawnButton(){
+        String createUserUid = selected.getCreateUserUID();
+        String uid = UserContextService.getCurrentUserAccount().getUid();
+        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUidAndApprovalStatus(ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, selected.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+        if(createUserUid.equals(uid)  &&  !CollectionUtils.isEmpty(multiLevelApprovals)  &&  multiLevelApprovals.size()==1 && multiLevelApprovals.get(0).getApprovalLevelNow()==1   && multiLevelApprovals.get(0).getInitiateApproverUid().equals(selected.getCreateUserUID()) ){
+            return true;
+        }
+        return false;
+    }
+
+    public  void  adverseEventWithdrawn(){
+        AdverseEvents result = adverseEventServiceClient.adverseEventWithdrawn(UserContextService.getAccessToken(), selected);
+
+        if(result!=null && result.getStatus()==1){
+            MessageUtil.outPutReturnFacesMessage("撤回成功", FacesMessage.SEVERITY_INFO);
+
+        }
+
+
+    }
+
+    public void exportFile(TempFileUtil tempFileUtil) {
+        try {
+            InputStream inputStream = tempFileUtil.getInputStream();
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.setHeader("Content-Disposition", "attachment;filename=" + tempFileUtil.getFileName());
+            StreamUtils.copy(inputStream, response.getOutputStream());
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void exportFiled(AdverseEventsFile adverseEventsFile) throws IOException {
+        InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        response.setHeader("Content-Disposition", "attachment;filename=" + adverseEventsFile.getObjectName());
+        StreamUtils.copy(inputStream, response.getOutputStream());
+        facesContext.responseComplete();
+        facesContext.renderResponse();
+    }
+
 }

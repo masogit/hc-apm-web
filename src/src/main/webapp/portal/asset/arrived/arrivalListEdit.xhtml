@@ -105,8 +105,8 @@
                                         <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.arrivalListContractNum}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.isReadOnly()}" />
+                                        <label class="label">#{msg.arrivalListContractNum}#{assetArrivedListEditController.enableArrivalListRequired()?'*':''}</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.isReadOnly()}" required="#{assetArrivedListEditController.enableArrivalListRequired()}" requiredMessage="合同号必填"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
@@ -823,7 +823,7 @@
                                     <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
-                                    <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                                    <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedListEditController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">

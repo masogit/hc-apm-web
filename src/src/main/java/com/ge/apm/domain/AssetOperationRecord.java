@@ -109,6 +109,9 @@ public class AssetOperationRecord implements Serializable {
 	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
 	private String siteUID;
 
+	@Column(name = "description",columnDefinition = "text")
+	private String description;
+
 	@Override
 	public int hashCode() {
 		int hash = 0;

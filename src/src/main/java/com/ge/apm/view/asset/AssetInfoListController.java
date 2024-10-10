@@ -1,10 +1,10 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
-import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
@@ -37,7 +37,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -82,6 +81,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
+    private ContractInfoMapper contractInfoMapper;
     //选定的院区
     private OrgInfo selectSite;
 
@@ -195,7 +195,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private boolean countyArea = false;
     private UserAccount user;
 //    private Map<String, UserAccount> createdByMap;
-
+    private List<AssetInfo> resultList = new ArrayList<>();
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -227,6 +227,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -334,6 +335,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         addMisingClinicalDeptOrg(currentPageAssets);
         setWarrantyAlerts(currentPageAssets);
         assetInfoService.setSupplier(currentPageAssets);
+        assetInfoService.setWarrantyStatus(currentPageAssets);
 
 //        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 //        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
@@ -363,7 +365,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){
-        assets.forEach(item -> item.setWarrantyExpireAlertDays(warrantyAlertDays));
+        assets.forEach(asset -> asset.setWarrantyExpireAlertDays(warrantyAlertDays));
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -727,6 +729,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                     assetList =  orderByForParentAndChildren(assetList);
                 }
+                assetInfoService.setWarrantyStatus(currentPageAssets);
                 startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
             }
         } else {
@@ -734,6 +737,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                 assetList =  orderByForParentAndChildren(assetList);
             }
+            assetInfoService.setWarrantyStatus(currentPageAssets);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
             template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
         }
@@ -862,7 +866,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void getAssetInfoBatchEdit() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
@@ -871,6 +874,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
+//        String verificationCode = "";
+//        Random random = new Random();
+//        for (int i = 0; i < 6; i++) {
+//            int r = random.nextInt(10); //每次随机出一个数字（0-9）
+//            verificationCode = verificationCode + r;  //把每次随机出的数字拼在一起
+//        }
+//        resultAssetMap = new HashMap<>();
+//
+//        resultAssetMap.put(verificationCode,resultList);
+//        WebUtil.navigateTo("AssetInfoBatchEdit.xhtml?faces-redirect=true&uidList= "+ verificationCode);
+    }
+    public void navigateTo(){
         String verificationCode = "";
         Random random = new Random();
         for (int i = 0; i < 6; i++) {
@@ -1710,5 +1725,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setSpare05Set(Set<String> spare05Set) {
         this.spare05Set = spare05Set;
+    }
+
+    public List<AssetInfo> getResultList() {
+        return resultList;
     }
 }

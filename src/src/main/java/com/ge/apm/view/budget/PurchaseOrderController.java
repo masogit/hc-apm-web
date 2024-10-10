@@ -41,6 +41,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -548,6 +549,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
             exportFile = purchaseOrderService.exportPurchaseZip(selected);
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(PurchaseOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 

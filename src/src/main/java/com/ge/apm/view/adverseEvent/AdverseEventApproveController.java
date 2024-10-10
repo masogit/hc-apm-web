@@ -2,8 +2,10 @@ package com.ge.apm.view.adverseEvent;
 
 import com.ge.apm.dao.AdverseEventsRepository;
 import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
@@ -27,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -35,6 +38,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -44,17 +48,12 @@ import java.util.stream.Collectors;
 public class AdverseEventApproveController extends JpaCRUDController<AdverseEvents> {
     private Logger log = Logger.getLogger(AdverseEventApproveController.class.getName());
     /*接口类*/
-    private OrgInfoRepository orgInfoRepository;
-    private I18nMessageRepository i18nDao;
     private UserContextService userContextService;
-    private UaaService uaaService;
-    private CustomConfigService ccService;
-    private WordReportExportService exportService;
     private AdverseEventsRepository adverseEventsRepository;
-    private BlobFileService blobService;
     private AdverseEventServiceClient adverseEventServiceClient;
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private ConfigCacheService configCacheService;
-
+    private AdverseEventsService adverseEventsService;
     /*属性类*/
     @Getter@Setter
     private OrgInfo selectSite; //选定的所属院区
@@ -88,6 +87,8 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     private boolean canSendMail;
     @Getter@Setter
     private StreamedContent exportPdf;
+    @Getter@Setter
+    private StreamedContent excelFile;
 
     @Getter@Setter
     private String[] selectedOptions;
@@ -96,15 +97,11 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     protected void init() {
         /*接口类*/
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
-        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
-        uaaService = WebUtil.getBean(UaaService.class);
-        ccService = WebUtil.getBean(CustomConfigService.class);
-        exportService = WebUtil.getBean(WordReportExportService.class);
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
-        blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
+        adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
+        multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         String selectedId = WebUtil.getRequestParameter("selectedId");
@@ -194,7 +191,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         return adverseEventsRepository;
     }
 
-    public void tempSaveAdverseEvent(Integer status) throws RuntimeException {
+    public void tempSaveAdverseEventApprove(Integer status) throws RuntimeException {
         int oldStatus = selected.getStatus();
         selected.setStatus(status);
         try {
@@ -256,6 +253,26 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         } catch (Exception e) {
             MessageUtil.outPutReturnFacesMessage(e.getMessage(), FacesMessage.SEVERITY_INFO);
         }
+    }
+
+    public void exportExcel(){
+        if (StringUtils.isEmpty(eventStatusFilter)) {
+            eventStatusFilter = "2,3,4,6,7,8";
+        }
+        PageRequest p = new PageRequest(0, 10000);
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), p, eventStatusFilter, queryStr, "approve");
+        List<AdverseEvents> adverseEventsList = pageResult.getContent();
+        for(AdverseEvents adverseEvents : adverseEventsList){
+            MultiLevelApproval recentApprove = multiLevelApprovalRepository.getRecentApprove(adverseEvents.getUid());
+            if (recentApprove != null) {
+                adverseEvents.setActualApproverName(recentApprove.getActualApproverName());
+                adverseEvents.setActualApproverDate(recentApprove.getActualApproverDate());
+                adverseEvents.setApprovalOpinion(recentApprove.getApprovalOpinion());
+            }
+        }
+        InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
+
     }
 
     public void removeTempHarmPerform(TempFileUtil file) {

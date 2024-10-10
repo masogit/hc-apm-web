@@ -867,6 +867,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String assetUsedLifecycle;
 
+    @Transient
+    @TableField(exist = false)
+    @Getter @Setter
+    private String warrantyStatus;
+
     @Getter
     @Setter
     @Column(name = "offline_update_date")
@@ -1046,6 +1051,12 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_scrap_id")
     private String assetScrapId; //设备报废id
+
+
+
+    @Transient
+    @TableField(exist = false)
+    private BigDecimal  scaleAssessment;
 
 
     public boolean isSpecialAsset() {
@@ -1511,7 +1522,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanBorrow() {
         Boolean rst = Boolean.FALSE;
-        if(this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
+        if(this.clinicalDeptUID != null && this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
             rst = Boolean.TRUE;
         }
         return rst;
@@ -1519,7 +1530,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanReturn() {
         Boolean rst = Boolean.FALSE;
-        if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+        if(this.clinicalDeptUID != null && !this.clinicalDeptUID.equals(this.assetDeptUID)) {
             rst = Boolean.TRUE;
             if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
                 rst = Boolean.FALSE;
@@ -2873,7 +2884,8 @@ public class AssetInfo implements ChineseName,Serializable {
 		return getNamePyCode();
 	}
     
-    public AssetInfo(String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        this.id = id;
         this.name = name;
         this.uid = uid;
         this.departNum = departNum;
@@ -3246,5 +3258,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setAssetScrapId(String assetScrapId) {
         this.assetScrapId = assetScrapId;
+    }
+
+    public BigDecimal getScaleAssessment() {
+        return scaleAssessment;
+    }
+
+    public void setScaleAssessment(BigDecimal scaleAssessment) {
+        this.scaleAssessment = scaleAssessment;
     }
 }

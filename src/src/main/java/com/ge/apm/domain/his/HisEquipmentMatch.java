@@ -1,5 +1,7 @@
 package com.ge.apm.domain.his;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.ge.apm.domain.AssetInfo;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -77,6 +79,13 @@ public class HisEquipmentMatch implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
+
+
+    @JSONField(serialize = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
+    private AssetInfo assetInfo;
+
 
     public HisEquipmentMatch() {
     }

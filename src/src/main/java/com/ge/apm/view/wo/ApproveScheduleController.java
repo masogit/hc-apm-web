@@ -23,6 +23,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ManagedBean
@@ -41,7 +42,7 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
     @Setter
     @Getter
     private List<AuditGroupConfigurationDetail>auditGroupConfigurationDetails;
-
+    private List<String> uids;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ApproveScheduleRepository.class);
@@ -49,7 +50,7 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
         userAccount = UserContextService.getCurrentUserAccount();
-
+        uids = Arrays.asList(userAccount.getTenantUID(),userAccount.getInstitutionUID(),userAccount.getHospitalUID(),userAccount.getSiteUID());
     }
 
     @Override
@@ -63,11 +64,10 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
             searchFilters = new ArrayList<>();
         }
         selected=null;
-        String siteUID = userAccount.getSiteUID();
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,siteUID,"1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN,uids,"1*2+"));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN,uids,"1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN,uids,"1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN,uids,"1*2+"));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
     public void onRowSelect(SelectEvent event) {

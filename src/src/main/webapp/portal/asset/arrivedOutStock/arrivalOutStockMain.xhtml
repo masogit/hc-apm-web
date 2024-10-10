@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AssetOutStock}"/>
+            </div>
+            <div class="ui-g-12">
+                <p:tabView id="assetOutStockTab"  dynamic="true" cache="false" activeIndex="0">
+                    <p:ajax event="tabChange"/>
+                    <p:tab title="未出库" id="showList">
+                        <ui:include src="unOutStock.xhtml"/>
+                    </p:tab>
+                    <p:tab title="已出库">
+                        <ui:include src="outStocked.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+
+
+    </ui:define>
+</ui:composition>

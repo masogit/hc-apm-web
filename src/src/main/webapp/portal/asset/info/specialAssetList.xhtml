@@ -332,7 +332,11 @@
                                              rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}"
                                              actionListener="#{specialAssetController.prepareCreate}"
                                              action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create&amp;type=SpecialAsset')}"
+
                             />
+                            <p:commandButton id="createBatchButton" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_INFO_EDIT')}" icon="fa fa-cogs"
+                                             actionListener="#{specialAssetBatchController.prepareCreate()}" class="btn btn-sm btn-gray" title="批量添加" update=":specialAssetSettingEditBatch :specialAssetSettingBatchFrom" oncomplete="PF('specialAssetSettingEditBatch').show()" />
+
                             <!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"-->
                             <!--                                             class="btn btn-sm btn-gray"-->
                             <!--                                             actionListener="#{assetInfoListController.exportExcel}" update=":growl"-->
@@ -364,6 +368,7 @@
                                      update=":SpecialAssetInfoListForm:datalist datalist:createButton datalist:deleteButton "
                                      immediate="true"/>
                 </h:form>
+                <ui:include src="SpecialAssetCreateBatch.xhtml"/>
             </div>
         </div>
         <!--        <ui:include src="RelRuleAsset.xhtml"/>-->

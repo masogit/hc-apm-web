@@ -199,11 +199,19 @@ public class AssetImportDataCheckService {
                 }
             }
             //对默认值和组织机构进行处理
+            OrgInfo site;
             if (crossSite) {
                 SiteOrgWithDeptOrg siteOrgInAsset = findSiteOrgInAssetExcelRow(assetImport, orgNamesUriCache);
                 markDefautValue(assetImport, siteOrgInAsset.getSiteOrg(), false);
+                site = siteOrgInAsset.getSiteOrg();
             } else {
                 markDefautValue(assetImport, selectedOrgToImport, isNeedAudit);
+                site = selectedOrgToImport;
+            }
+            if (ObjectUtil.isNotEmpty(assetImport.getUid()) && !assetImport.getSiteUID().equals(site.getUid())) {
+                assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                result.put("canBeImport", Boolean.FALSE);
+                assetImport.addErrMsg("错误: 院区不支持修改");
             }
             if (CollectionUtils.isNotEmpty(assetImport.getErrMsg())) {
                 result.put("canBeImport", Boolean.FALSE);
@@ -272,6 +280,7 @@ public class AssetImportDataCheckService {
                 }
             } else {
                 OrgInfo clinicalDept = null;
+                // todu:add site
                 //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
                 if (supportingService.isLongName(clinicalDeptName)) {
                     clinicalDept = orgDao.findFirstBySiteUIDAndNameAndOrgType(assetImport.getSiteUID(), clinicalDeptName, 4);

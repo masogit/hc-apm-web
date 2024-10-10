@@ -7,8 +7,12 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
+import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -31,6 +35,10 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
     private HisEquipmentSfxmMatchRepository hisEquipmentSfxmMatchDao;
     private HisOrgComponentController orgComponentController;
     private HisAssetGroupEditController hisAssetGroupEditController;
+
+    @Getter
+    @Setter
+    private String groupType;
 
     @Override
     protected void init(){
@@ -56,13 +64,17 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
         }
 
         removeFilterOnField("orgInfoUid");
+        removeFilterOnField("tenantUid");
 
         if (orgComponentController.getSelectedOrg() != null) {
             List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
             searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
 
-        return hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<HisAssetGroupAssetMatch> hisAssetGroupAssetMatches = hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<HisAssetGroupAssetMatch> content = hisAssetGroupAssetMatches.getContent();
+        return hisAssetGroupAssetMatches;
     }
 
     @Override
@@ -85,10 +97,13 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
             return;
         }
 
-        String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
-        hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        if(selected.getHisAssetGroup().getType().equals("Income")){
+            String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
+            hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        }else{
+            hisAssetGroupClinicalMatchDao.deleteAssetByHisAssetGroupAndOrgInfoUid(selected.getAssetGroupUid(),selected.getOrgInfoUid());
+        }
         hisAssetGroupAssetMatchDao.delete(selected);
-
         selected = null;
     }
 
@@ -106,6 +121,18 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
 
     public Integer getAssetCountsByGroupUidAndDeptUid(String assetGroupUid,String clinicalDeptUid){
         return hisAssetGroupClinicalMatchDao.countByGroupUidAndDeptUid(assetGroupUid+clinicalDeptUid);
+    }
+
+    public Integer getAssetCountsByGroupUidAndOrgInfoUid(String assetGroupUid,String siteUid){
+        return hisAssetGroupClinicalMatchDao.countByGroupUidAndOrgInfoUid(assetGroupUid,siteUid);
+    }
+
+    public Integer getAssetCountsByhisAssetGroupAssetMatch(HisAssetGroupAssetMatch hisAssetGroupAssetMatch){
+        if(hisAssetGroupAssetMatch.getHisAssetGroup().getType().equals("Cost")){
+          return    getAssetCountsByGroupUidAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
+        }else{
+            return    getAssetCountsByGroupUidAndDeptUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getClinicalDeptUid());
+        }
     }
 
 }

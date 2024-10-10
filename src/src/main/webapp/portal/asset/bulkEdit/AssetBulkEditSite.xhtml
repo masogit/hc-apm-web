@@ -31,13 +31,13 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup>
-                                        <label class="label">#{msg.hospitalId}</label>
+                                        <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
                                         <p:inputText value="#{assetInfoBulkEditController.filter.siteOrg}" readonly="true" class="siteFilterChange"/>
                                         <p:commandButton id="btnOrgFilter" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
                                         <p:overlayPanel widgetVar="varPanelOrgFilter" for="btnOrgFilter" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
 
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                                <p:tree class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTreeOther}" var="node" selectionMode="single">
+                                                <p:tree class="tree" style="width:98%;border:0;" value="#{assetInfoBulkEditController.tenantOrgTreeOther}" var="node" selectionMode="single">
                                                     <p:ajax process="@this" event="select" update="@(.siteFilterChange) @(.pickList)"
                                                             listener="#{assetInfoBulkEditController.onSelectTreeNodeAsFilter}" oncomplete="PF('varPanelOrgFilter').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
@@ -56,7 +56,7 @@
                                                         scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDeptAsFilter}"
                                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="siteFilterChange">
                                             <p:ajax event="itemSelect" update="@(.pickList)" />
-                                            <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.pickList)" />
+<!--                                            <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.pickList)" />-->
                                         </p:autoComplete>
                                     </h:panelGroup>
 
@@ -78,7 +78,7 @@
 
                                 </p:panelGrid>
                             </p:fieldset>
-
+                            <span style="color:red">每次最多操作1000条数据，如数据量大请分批操作！</span>
                             <p:pickList id="pickList" value="#{assetInfoBulkEditController.assets}"
                                         var="asset" itemLabel="#{asset}" itemValue="#{asset}"
                                         showSourceFilter="false" showTargetFilter="false" responsive="true"
@@ -90,7 +90,7 @@
                                     <span style="width:20%;float: left">#{msg.financingNum}</span>
                                     <span style="width:18%;float: left">#{msg.serialNum}</span>
                                     <span style="width:21%;float: left">#{msg.departNum}</span>
-                                    <span style="width:21%;float: left">#{msg.qrCode}</span></p>
+                                    <span style="width:23%;float: left">#{msg.qrCode}</span></p>
                                 </f:facet>
                                 <f:facet name="targetCaption"><p  style="padding-bottom:-200px">已选设备
                                     <br/>
@@ -102,19 +102,19 @@
                                     <span style="width:23%;float: left">#{msg.qrCode}</span></p>
                                 </f:facet>
                                 <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite pickList"/>
-                                <p:column style="width:18%; left: auto;">
+                                <p:column style="width:18%;float: left; ">
                                     <h:outputText value="#{asset.name}" />
                                 </p:column>
-                                <p:column style="width:20%;left: auto;" >
+                                <p:column style="width:20%;float: left;" >
                                     <h:outputText value="#{asset.financingNum}" />
                                 </p:column>
-                                <p:column style="width:18%;left: auto;" >
+                                <p:column style="width:18%;float: left;" >
                                     <h:outputText value="#{asset.serialNum}" />
                                 </p:column>
-                                <p:column style="width:21%;left: auto;" >
+                                <p:column style="width:21%;float: left;" >
                                     <h:outputText value="#{asset.departNum}" />
                                 </p:column>
-                                <p:column style="width:23%;left: auto;" >
+                                <p:column style="width:23%;float: left;" >
                                     <h:outputText value="#{asset.qrCode}" />
                                 </p:column>
                             </p:pickList>

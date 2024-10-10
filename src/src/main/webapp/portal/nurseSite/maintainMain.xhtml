@@ -38,7 +38,7 @@
 				<h:form id="maintainForm">
 					<h:panelGrid columnClasses="value">
 
-						<p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title"
+						<p:schedule style="overflow: auto" id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title"
 							rightHeaderTemplate="" tooltip="true" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_VIEW')}">
 							<p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();" disabled="#{!userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
 							<p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();"/>

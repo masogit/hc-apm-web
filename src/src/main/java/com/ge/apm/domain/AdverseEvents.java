@@ -33,6 +33,15 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
 
+    @Transient
+    public static String ALL = "1";
+
+    @Transient
+    public static String EQUIPMENT = "2";
+
+    @Transient
+    public static String CONSUMABLES = "3";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -97,7 +106,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 设备编号
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "device_num")
     private String deviceNum;
@@ -106,7 +114,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 产品名称
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "product_name")
     private String productName;
@@ -115,7 +122,6 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 注册证编号
      */
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "registration_number")
     private String registrationNum;

@@ -129,13 +129,16 @@
                        <!-- 到货安装 -->
                        <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-truck fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('INSTALL_')}">
                            <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_VIEW')}"/>
-                           <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_STORE_VIEW')}"/>
+                           <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_STORE_VIEW')}"/>
                            <p:menuitem value="#{msg.CheckAndStore}" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.needInstorageCheck() and userContextService.accessContainsFunctionMenu('INSTALL_CHECK_EDIT')}"/>
+                           <p:menuitem value="#{msg.AssetOutStock}" outcome="/portal/asset/arrivedOutStock/arrivalOutStockMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_ASSET_OUT_STOCK_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'HISPERFORMANCE'}">
                        <!-- his绩效分析 -->
                        <p:submenu label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')}">
+                           <p:menuitem id="his009" value="设备综合效益分析"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
+                           <p:menuitem id="his010" value="数据录入"  outcome="/portal/his/dataEntry/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DATA_ENTRY')}"/>
                            <p:menuitem id="his001" value="#{msg.deviceMatching}" outcome="/portal/his/hisAsset/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEVICE_MATCHING')}"/>
                            <p:menuitem id="his002" value="#{msg.deptMatching}" outcome="/portal/his/hisClinical/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEPT_MATCHING')}"/>
                            <p:menuitem id="his003" value="#{msg.deviceGrouping}" outcome="/portal/his/hisGroup/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEVICE_GROUP_EDIT')}"/>
@@ -158,6 +161,7 @@
                            <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ADVERSE_VIEW')}"/>
                            <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_VIEW')}"/>
                            <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}"/>
+<!--                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'MAINTAIN'}">
@@ -211,7 +215,7 @@
                    <c:when test="#{item eq 'PERFORMANCE'}">
                        <!-- 绩效分析 -->
                        <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('PERFORMANCE_')}">
-                           <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DASHBOARD_SCREEN')}" />
+                           <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="/dashboard/#/dashboard2" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DASHBOARD_SCREEN')}" />
                            <p:menuitem id="um240" value="#{msg.DepartmentTransactionManagement}" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DEPT_MANAGE_EDIT')}"/>
                            <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_STATUS_MONITOR')}"/>
                            <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}" url="/geapm/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.loginUserSiteId eq 112 and userContextService.accessContainsFunctionMenu('PERFORMANCE_SCAN_STATISTIC')}"/>
@@ -224,7 +228,7 @@
                    </c:when>
                    <c:when test="#{item eq 'AUDIT'}">
                        <!-- 质控评审 -->
-                       <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
+<!--                       <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>-->
                        <p:menuitem id="um445" value="#{msg.review}2.0" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT2_VIEW') and userContextService.canRender('AUDIT')}"  url="/auditV2/#/mainPage/" target="_blank"></p:menuitem>
                    </c:when>
                    <c:when test="#{item eq 'CONFIG'}">

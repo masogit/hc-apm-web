@@ -3,7 +3,7 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:his="http://www.ge.com/tags/his">
+      xmlns:his="http://www.ge.com/tags/his" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
     <ui:composition>
         <div class="ui-g">
@@ -12,16 +12,16 @@
             <div class="ui-g-12 card">
 
                 <h:form id="HisOrgInfoListForm">
-                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
-                        <his:selectOrg update=":tabGroup:hisListForm:datalist :tabGroup:HisOrgInfoListForm"></his:selectOrg>
-                    </div>
+<!--                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">-->
+<!--                        <his:selectOrg update=":tabGroup:hisListForm:datalist :tabGroup:HisOrgInfoListForm"></his:selectOrg>-->
+<!--                    </div>-->
                 </h:form>
 
                 <h:form id="hisListForm">
                     <p:dataTable id="datalist" value="#{hisAssetGroupListController.lazyModel}"
-                                 var="item"
+                                 var="item" widgetVar="datalist"
                                  lazy="true" paginator="true" paginatorPosition="bottom"
-                                 paginatorAlwaysVisible="true"
+                                 paginatorAlwaysVisible="true" sortBy="lastModifiedDate" sortField="lastModifiedDate"
                                  selectionMode="single" selection="#{hisAssetGroupListController.selected}"
                                  rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
@@ -30,22 +30,35 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{hisAssetGroupListController.onSelectAssetGroupAssetMatch}" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{hisAssetGroupListController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{hisAssetGroupListController.onFilter}"/>
 
-                        <p:column headerText="所属业务单元" sortBy="#{item.orgInfoUid}">
-                            <h:outputText value="#{hisAssetGroupListController.getOrgNameByUid(item.orgInfoUid)}"/>
+                        <p:column headerText="所属业务单元" sortBy="#{item.orgInfo.name}"   filterBy="#{item.orgInfo.name}" filterMatchMode="LIKE" >
+<!--                            <h:outputText value="#{hisAssetGroupListController.getOrgNameByUid(item.orgInfoUid)}"/>-->
+                            <h:outputText value="#{item.orgInfo.name}"/>
                         </p:column>
 
-                        <p:column headerText="设备分组名称" sortBy="#{item.assetGroupName}">
+                        <p:column headerText="设备分组名称" sortBy="#{item.assetGroupName}"   filterBy="#{item.assetGroupName}" filterMatchMode="LIKE"  >
                             <h:outputText value="#{item.assetGroupName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+
+                        <p:column headerText="设备分组类型" sortBy="#{item.hisAssetGroup.type}"  filterBy="#{item.hisAssetGroup.type}" filterMatchMode="EQ"    >
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{hisAssetGroupListController.groupType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('HisAssetGroupType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('HisAssetGroupType',item.hisAssetGroup.type)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}"  filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE"   >
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
 
                         <p:column headerText="设备数量" >
-                            <h:outputText value="#{hisAssetGroupListController.getAssetCountsByGroupUidAndDeptUid(item.assetGroupUid,item.clinicalDeptUid)}"/>
+                            <h:outputText value="#{hisAssetGroupListController.getAssetCountsByhisAssetGroupAssetMatch(item)}"/>
                         </p:column>
 
 <!--                        <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}">-->
@@ -53,8 +66,8 @@
 <!--                        </p:column>-->
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show()"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisAssetGroupListController.prepareEdit}" update=":tabGroup:hisTagEditForm" oncomplete="PF('hisTagEditDialog').show()" disabled="#{empty hisAssetGroupListController.selected}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show();buttonComplete(xhr, status, args)"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisAssetGroupListController.prepareEdit}" update=":tabGroup:hisTagEditForm" oncomplete="PF('hisTagEditDialog').show();buttonComplete(xhr, status, args)" disabled="#{empty hisAssetGroupListController.selected}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{hisAssetGroupListController.delete}" update="datalist" disabled="#{empty hisAssetGroupListController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -68,7 +81,23 @@
                 <ui:include src="AssetGroupEdit.xhtml"/>
             </div>
         </div>
+        <script type="text/javascript">
 
+            afterPageLoad = function() {
+                var obj=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+                var obj2=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+
+            };
+
+            function buttonComplete(xhr, status, args){
+                var obj=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_source_filter');
+                obj.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+                var obj2=document.getElementById('tabGroup:hisTagEditForm:HisAssetsPickList_target_filter');
+                obj2.setAttribute('placeholder','名称/设备编号(院方)/制造商序列号/所属科室/型号/二维码编号');
+            }
+        </script>
     </ui:composition>
 
 </html>

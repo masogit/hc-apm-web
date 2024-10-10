@@ -1,24 +1,28 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.excel.util.ListUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.dao.SearchFilter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,13 +95,21 @@ public class UserAccountExportService {
 	@Autowired
 	private AssetTypeGroupRepository assetTypeGroupRepository;
 
+	@Autowired
+	private CustomRoleRepository customRoleRepository;
+
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 
 	public List<Map<String, Object>> parseUserAccountToMap(List<UserAccount> listUserAccount) {
 		List<Map<String, Object>> listMapResult = new ArrayList<>();
-		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All();
+		List<OrgInfo> orgInfoTenantAll = tenantOrgInfoAll();
+		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All(orgInfoTenantAll);
+		List<CustomRole> customRoleList = getTenantCustomRole();
 		if (listUserAccount != null && !listUserAccount.isEmpty()) {
+			listUserAccount=listUserAccount.stream().filter(item->!Boolean.TRUE.equals(item.getIsDeleted())).collect(Collectors.toList());
+			setListOrgInfo(listUserAccount,orgInfoTenantAll);
+			Map<Integer, List<UserRole>> userCustomList = getUserCustomList(listUserAccount);
 			for (UserAccount tempUser : listUserAccount) {
 				Map<String, Object> tempMap = new HashMap<>();
 				setDepartNames(tempMap, tempUser,orgInfos);
@@ -117,7 +129,7 @@ public class UserAccountExportService {
 				tempMap.put(HEADER_ISACTIVE, Boolean.TRUE.equals(tempUser.getIsActive()) ? "是" : "否");
 				tempMap.put(HEADER_ISLOCKED, Boolean.TRUE.equals(tempUser.getIsLocked()) ? "是" : "否");
 				tempMap.put(HEADER_ISDISABLE, Boolean.TRUE.equals(tempUser.getIsDisable()) ? "是" : "否");
-				tempMap.put(HEADER_ROLENAME, tempUser.getUserRoleNames());
+				tempMap.put(HEADER_ROLENAME, getUserRoleNames(userCustomList,customRoleList,tempUser));
 				tempMap.put(HEADER_POSITION, convertPositionIdToLabel(tempUser.getPosition()));
 				tempMap.put(HEADER_TAGS, joinTags(tempUser));
 				tempMap.put(HEADER_ACCESSSCOPE, getOrgInfoName(tempUser.getListOrgInfo()));
@@ -129,6 +141,39 @@ public class UserAccountExportService {
 			}
 		}
 		return listMapResult;
+	}
+	private String  getUserRoleNames(Map<Integer, List<UserRole>> userCustomList,List<CustomRole> customRoleList,UserAccount tempUser){
+		String userRoleNames = tempUser.getUserRoleNames();
+		if(StringUtils.isEmpty(userRoleNames)){
+			userRoleNames = "";
+		}
+		if(userCustomList == null){
+			return userRoleNames;
+		}
+	    List<UserRole> userRoleList = userCustomList.get(tempUser.getId());
+		if(CollectionUtils.isNotEmpty(userRoleList)){
+			List<Integer> collect = userRoleList.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+			List<String> customName = customRoleList.stream().filter(item -> collect.contains(item.getId())).map(CustomRole::getName).collect(Collectors.toList());
+			if(CollectionUtils.isNotEmpty(customName)){
+				userRoleNames += String.join(" ", customName);
+			}
+		}
+		return userRoleNames;
+	}
+	private Map<Integer, List<UserRole>> getUserCustomList(List<UserAccount> listUserAccount){
+		if(CollectionUtils.isEmpty(listUserAccount)) return null;
+		List<Integer> ids = listUserAccount.stream().map(UserAccount::getId).collect(Collectors.toList());
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("userId", SearchFilter.Operator.IN,ids));
+		searchFilters.add(new SearchFilter("roleType", SearchFilter.Operator.EQ,1));
+		List<UserRole> userRoleList = userRoleRepository.findBySearchFilter(searchFilters);
+		if(CollectionUtils.isEmpty(userRoleList)) return null;
+		Map<Integer, List<UserRole>> collect = userRoleList.stream().collect(Collectors.groupingBy(UserRole::getUserId));
+		return collect;
+	}
+	private List<CustomRole> getTenantCustomRole(){
+		String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+		return  customRoleRepository.findByTenantUID(tenantUID);
 	}
 	private void setDepartNames(Map<String, Object> tempMap,UserAccount tempUser,List<OrgInfo> orgInfos){
 		String siteUID = tempUser.getSiteUID();
@@ -181,10 +226,32 @@ public class UserAccountExportService {
 		}).findFirst();
 		return first.isPresent()?first.get():null;
 	}
-	private List<OrgInfo> tenantOrgInfoTypeOf4All(){
-			UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-			String tenantUID = currentUserAccount.getTenantUID();
-			return orgInfoRepository.findByTenantUIDAndOrgType(tenantUID, 4);
+	private void setListOrgInfo(List<UserAccount> userAccounts,List<OrgInfo> orgInfos){
+		if(CollectionUtils.isEmpty(userAccounts)) return;
+		if(CollectionUtils.isEmpty(orgInfos)) return;
+		Set<String> collect = userAccounts.stream().map(UserAccount::getUid).collect(Collectors.toSet());
+		List<UserOrgInfo> userOrgList = userOrgDao.findOrgUidListByUserUid(collect);
+		if(CollectionUtils.isEmpty(userOrgList)) return;
+		Map<String, OrgInfo> ogInfoMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> item));
+		Map<String, List<OrgInfo>> orgInfoMap = userOrgList.stream().collect(Collectors.groupingBy(UserOrgInfo::getUserUid,
+				Collectors.mapping(item -> ogInfoMap.get(item.getOrgUid()), Collectors.toCollection(ArrayList::new))));
+		userAccounts.forEach(item->{
+			String siteUID = item.getSiteUID();
+			List<OrgInfo> listOrgInfo = orgInfoMap.get(item.getUid()); // 过滤跨院区
+			if(CollectionUtils.isNotEmpty(listOrgInfo) && StringUtils.isNotEmpty(siteUID)){
+				listOrgInfo=listOrgInfo.stream().filter(Objects::nonNull).filter(org->siteUID.equals(org.getSiteUID()) || siteUID.equals(org.getHospitalUID()) || siteUID.equals(org.getInstitutionUID()) ||  siteUID.equals(org.getTenantUID())).collect(Collectors.toList());
+				item.setListOrgInfo(listOrgInfo);
+			}
+		});
+	}
+	private List<OrgInfo> tenantOrgInfoAll(){
+		UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+		String tenantUID = currentUserAccount.getTenantUID();
+		return orgInfoRepository.findByTenantUID(tenantUID);
+	}
+	private List<OrgInfo> tenantOrgInfoTypeOf4All(List<OrgInfo> orgInfos){
+		if(CollectionUtils.isEmpty(orgInfos)) return ListUtils.newArrayList();
+		return  orgInfos.stream().filter(item->item.getOrgType() != null && item.getOrgType() == 4).collect(Collectors.toList());
 	}
 	/**
 	 * use space as delimiter to group tags to export
@@ -262,5 +329,35 @@ public class UserAccountExportService {
 		}
 
 		return null;
+	}
+	public InputStream processorTemplateFile(InputStream inputStream)  {
+		return getCustomRole(inputStream);
+	}
+
+	private InputStream getCustomRole(InputStream inputStream) {
+		UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+		String tenantUID = currentUserAccount.getTenantUID();
+		List<CustomRole> customRoles = customRoleRepository.findByTenantUID(tenantUID);
+		if(org.springframework.util.CollectionUtils.isEmpty(customRoles)){
+			return inputStream;
+		}
+		try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)){
+//			String lastRow="资产分类非必填(租户开启资产分类值为资产分类的编码例如    ：01-01,01-02多项用,号分割 )";
+			XSSFSheet explanation = workbook.getSheetAt(1);
+			int lastRowNum = explanation.getLastRowNum();
+			XSSFCellStyle cellStyle = explanation.getRow(lastRowNum-1).getCell(0).getCellStyle();
+			for (int i = 0; i < customRoles.size(); i++) {
+				XSSFRow row = explanation.createRow(lastRowNum + i);
+				XSSFCell cell = row.createCell(0);
+				cell.setCellValue(customRoles.get(i).getName());
+				cell.setCellStyle(cellStyle);
+			}
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			workbook.write(outputStream);
+			return new ByteArrayInputStream(outputStream.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return inputStream;
+		}
 	}
 }

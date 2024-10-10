@@ -22,6 +22,8 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     public List<ArrivalListItem> findByArrivalListId(String arrivalListId);
 
+    List<ArrivalListItem> findByIdIn(Collection<String> ids);
+
     List<ArrivalListItem> findByArrivalListIdIn(Collection<String> arrivalListIds);
 
     @Query(value = "select listItem.* from arrival_list list,arrival_list_item listItem where list.id=listItem.arrival_list_id and list.contract_num=?1 and listItem.clinical_dept_uid=?2 and listItem.install_status=?3 order by listItem.function_type",nativeQuery=true)
@@ -48,4 +50,8 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     ArrivalListItem findByQrCode(String qrCode);
 
+
+    @Query(value = "select max(out_stock_no) from arrival_list_item ali where ali.out_stock_no like ?1",nativeQuery = true)
+    String queryStockNo(String stockNo);
+    List<ArrivalListItem> findBySiteUidAndOutStockNoAndOutStockNoNotNull(String siteUid, String outStockNo);
 }

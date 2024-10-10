@@ -20,6 +20,10 @@ public interface ZkbPartOrderCatRepository extends GenericRepositoryUUID<ZkbPart
     @Query("select c from ZkbPartOrderCat c where c.isVaild <> ?1 ")
     List<ZkbPartOrderCat> queryByIsVaild(String isVaild);
 
+
+    @Query("select c from ZkbPartOrderCat c where c.catType = ?1 and c.isVaild = 'N' ")
+    List<ZkbPartOrderCat> queryByCatType(String catType);
+
     @Query("select c from ZkbPartOrderCat c where c.startDate <=?1 and c.endDate >= ?2  ")
     List<ZkbPartOrderCat> queryByDate(Date startDate,Date endDate);
 

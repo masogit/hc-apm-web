@@ -75,12 +75,33 @@ public class AssetInfoProvider {
 
 
 	public String getMvsPmOrders(Map<String,Object> param){
-		String orgUidList = getSetValue(param.get("orgList")) ;
+		String orgUidList = getSetValueUid(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select id from v2_pm_order where asset_id in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
+		sb.append(" select id from v2_pm_order where asset_uid in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
 		return sb.toString();
 	}
+
+	private String getSetValueUid(Object value) {
+		StringBuilder sb = new StringBuilder();
+		Collection<Integer> set = (Collection<Integer>) value;
+		if (set != null) {
+			Iterator<Integer> it = set.iterator();
+			sb.append("(");
+			while (it.hasNext()) {
+				sb.append("'");
+				sb.append(it.next());
+				sb.append("'");
+				sb.append(",");
+			}
+//			sb.append("'");
+//			sb.append("'");
+			sb.deleteCharAt(sb.length()-1);
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+
 
 	private String getSetValue(Object value) {
 		StringBuilder sb = new StringBuilder();
@@ -132,4 +153,28 @@ public class AssetInfoProvider {
 		return sb.toString();
 	}
 
+
+	public String getAssetInfoIsNotEfficiencyEquipment(Map<String,Object> param){
+
+		String orgUidList = getSetValue1(param.get("orgList")) ;
+		String tenantUid = (String) param.get("tenantUid");//
+		Integer assetGroup = (Integer) param.get("assetGroup");//
+		Double purchasePrice = (Double) param.get("purchasePrice");//
+		String clinicalDeptUid = (String) param.get("clinicalDeptUid");//
+		StringBuilder sb = new StringBuilder();
+		sb.append("select  ai.* from asset_info ai  left join  efficiency_equipment_info eei on ai.uid=eei.asset_uid  where");
+		sb.append(" ai.tenant_uid = '"+tenantUid+"'");
+		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in  "+orgUidList+")");
+		sb.append(" and ai.clinical_dept_uid = '"+clinicalDeptUid+"'");
+		sb.append(" and eei.uid is null ");
+		if(purchasePrice!=null){
+			sb.append(" and  ai.purchase_price  >= '"+purchasePrice+"'");
+		}
+		if(assetGroup!=null){
+			sb.append(" and ai.asset_group  = '"+assetGroup+"'");
+		}
+		sb.append(" limit 5000 ");
+		return sb.toString();
+
+	}
 }

@@ -9,11 +9,14 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.TenantOptionConfig;
 import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +40,8 @@ public class ConfigCacheService {
     @Autowired
     private TenantOptionConfigRepository tenantOptionConfigRepository;
 
+    @Autowired
+    private SharedAssetService remoteService;
 
     @Cacheable(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
     public OrgInfo findOrgByUid(String uid){
@@ -87,14 +92,20 @@ public class ConfigCacheService {
 
     @CacheEvict(cacheNames = "springCache", key = "'TenantInfo_Uid.'+#uid")
     public void  cleanTenantCacheByUid (String uid){
+        remoteService.asynRemoteCall(GatewayURL.CLEAN_TENANT_CACHE, HttpMethod.POST,new HashMap<>(),(url)->url.replace("{uid}",uid));
     }
 
     @CacheEvict(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
     public void  cleanOrgInfoCacheByUid (String uid){
+        remoteService.asynRemoteCall(GatewayURL.CLEAN_ORG_CACHE, HttpMethod.POST,new HashMap<>(),(url)->url.replace("{uid}",uid));
     }
 
     @CacheEvict(cacheNames = "springCache", key = "'TenantOptionConfig_Uid.'+#uid")
     public void  cleanTenantOptionConfigByUid (String uid){
     }
 
+    @CacheEvict(cacheNames = "springCache", allEntries = true)
+    public void cleanCacheNames(){
+        remoteService.asynRemoteCall(GatewayURL.CLEAN_CACHE_NAMES, HttpMethod.POST,new HashMap<>(),(url)->url);
+    }
 }

@@ -51,7 +51,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     @Getter@Setter
     private ZkbPartOrderStatusVo zkbPartOrderStatusVo;
     private List<ZkbPartOrderCat> zkbPartOrderCatList ;
-    private ZkbPartOrderReturn zkbPartOrderReturn;
+    private ZkbPartOrderReturn zkbPartOrderReturn = new ZkbPartOrderReturn();
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
     private String actionReturnName;
     private String returnFormFlag = "edit"; //edit  audit
@@ -372,6 +372,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public boolean whetherDeductRender(){
+        boolean result = true;
+        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+            result = false;
+        }else if(CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())){
+            if(!ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) && !ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
     public boolean scoreFlagRender(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(CopyByInvok.T.equals(selected.getMaintainFlag())){
@@ -456,7 +469,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public Boolean isCanModifyClose(){
-        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        //if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ){
             if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.CloseCommited.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.ReturnCompleted.toString().equals(selected.getStatus()) ||
@@ -467,7 +480,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return Boolean.TRUE;
                 }
             }
-        }
+        //}
         return Boolean.FALSE;
     }
 
@@ -654,14 +667,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 return "";
             }
             zkbPartOrderService.batchesReturnNext(selected,currentZkbPartOrderReturns,currentUser);
-        } else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && zkbPartOrderStatusVo.isChoseAdmin()){
+        } else if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())) && zkbPartOrderStatusVo.isChoseAdmin()){
             if(ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
-                List<ZkbPartOrderReturn> auditReturnList = new ArrayList<>();
-                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+                List<ZkbPartOrderReturn> auditReturnList = zkbPartOrderReturnList.stream().filter(t -> ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(t.getModifyFlag())).collect(Collectors.toList());
+               /* for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(r.getModifyFlag())){
                         auditReturnList.add(r);
                     }
-                }
+                }*/
                 if(auditReturnList.size() == 0){
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";
@@ -811,7 +824,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void deleteReturnModify(){
         zkbPartOrderReturnModifyList.remove(zkbPartOrderReturn);
         goodReturnBlobObjectList = new ArrayList<>();
-        zkbPartOrderReturn = null;
+        zkbPartOrderReturn = new ZkbPartOrderReturn();
+    }
+
+    public boolean resizeReturnHeight(){
+        if(CopyByInvok.T.equals(selected.getNotGeAsset()) && "DOA".equals(zkbPartOrderReturn.getReturnType())){
+            return true;
+        }
+        return false;
     }
 
     public void initPartList(){
@@ -1002,7 +1022,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         actionReturnName = "ModifyEdit";
         zkbPartOrderReturn = null;
 
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             zkbPartOrderReturnModifyList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
             partNoList = new ArrayList<>();
             orderNoList = new ArrayList<>();
@@ -1046,7 +1066,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void submitCloseReturn(){
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
             for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
                 if(returnMap.containsKey(r.getPartNo())){

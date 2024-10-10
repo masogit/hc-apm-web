@@ -86,8 +86,21 @@ public class MultiLevelApprovalGlobalController {
 
     public String getBusinessType(MultiLevelApproval approval){
         if (StringUtils.isNotEmpty(approval.getBusinessTypeName())) {
+            if(ApprovalConstant.APPROVAL_ADVERSE_EVENTS.equals(approval.getBusinessTypeName())){
+                return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS_NAME;
+            }
             return approval.getBusinessTypeName();
         }
         return multiLevelApprovalService.getBusinessType(approval.getBusinessType());
+    }
+
+    public String getBusinessType(Integer approval){
+
+        return multiLevelApprovalService.getBusinessType(approval);
+    }
+
+    public Integer getBusinessType(String businessType){
+
+        return multiLevelApprovalService.getBusinessType(businessType);
     }
 }

@@ -317,14 +317,19 @@ public class TableCreateController extends TieWebSheetBean {
         }*/
        //修改的时候校验key是否重复
         if (templateService.hasDuplicatedKey(table)) {
+            boolean error = false;
             if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
-                    WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
+                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
                 editTableItem.setKey(null);
-                return;
+                error = true;
             }
             if (null != editTableItem.getResKey()) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("ResultKeyHasBeenUsed"));
                 editTableItem.setResKey(null);
+                error = true;
+            }
+            if (!error) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("Failed"));
             }
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);

@@ -166,7 +166,7 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
             searchFiltersAsset.add(new SearchFilter(FIELD_NAME_EQ_HOSID, SearchFilter.Operator.IsNull, null));
             searchFiltersAsset.add(new SearchFilter(FIELD_NAME_SITE_UID, SearchFilter.Operator.IsNull, null));
         }
-
+        searchFiltersAsset.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         List<HisEquipmentConnect> conns = connDao.findBySearchFilter(searchFiltersAsset,pageRequest).getContent();
 
         List<HisEquipmentConnect> targets = connAvailableAssets.getTarget();

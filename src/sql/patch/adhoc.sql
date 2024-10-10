@@ -1,35 +1,19 @@
+-- YHAAO-22800 巡检工单是否自动添加性能检测报告
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启巡检工单自动添加性能检测报告', 'enablePerformanceReportAutoAdd', '保养单是否自动添加报告', 'f', 't', 3 where not exists (select * from config_item where key = 'enablePerformanceReportAutoAdd');
+-- YHAAO-22643 到货清单界面增加必填项
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '到货清单合同号和验收材料是否必填', 'enableArrivalListRequired', '到货清单必填项', 'f', 't', 3 where not exists (select * from config_item where key = 'enableArrivalListRequired');
 
-CREATE index IF NOT exists asset_operation_record_asset_info_uid_idx ON public.asset_operation_record (asset_info_uid);
-CREATE INDEX IF NOT exists asset_operation_record_create_date_idx ON public.asset_operation_record (create_date);
-CREATE INDEX IF NOT exists asset_operation_record_tenant_uid_idx ON public.asset_operation_record (tenant_uid);
-
-
--- his 结果数据清空重新汇总
-delete from his_equipment_data_result;
-update his_equipment_data_source_split set is_sum = false;
-
-
--- YHAAO-21097 积水潭名称判断改为配置项
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '启用审核（核心）组配置', 'enableAuditGroupConfiguration', '审核（核心）组配置', 'f', 't', 3 where not exists (select * from config_item where key = 'enableAuditGroupConfiguration');
--- 同步北京积水潭医院租户下的配置 enableAuditGroupConfiguration
-insert into config_item_value (uid,key,value,tenant_uid,institution_uid,hospital_uid,site_uid)select  replace(uuid_generate_v4()::text,'-',''),'enableAuditGroupConfiguration',true,tenant_uid,institution_uid,hospital_uid,site_uid from  org_info oi where site_id=(select  id  from  tenant_info where name='北京积水潭医院') and org_type < 4 and  not exists(select * from config_item_value where key='enableAuditGroupConfiguration' and oi.site_uid=site_uid);
-
-ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS tenant_uid char(32);
-ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS institution_uid char(32);
-ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS hospital_uid char(32);
-ALTER TABLE approve_schedule ADD COLUMN IF NOT EXISTS site_uid char(32);
-
-update approve_schedule apc set tenant_uid=wo.tenant_uid,institution_uid=wo.institution_uid,hospital_uid=wo.hospital_uid,site_uid=wo.site_uid  from v2_work_order wo   where wo.id = apc.business_uid;
+--his分组添加创建时间
+update his_asset_group set created_date= now(),last_modified_date=now()  where created_date is null;
+update his_asset_group_asset_match set created_date= now(),last_modified_date=now() where created_date is null;
+--his处理历史数据值
+update  his_asset_group_asset_match set org_info_uid=site_uid  where org_info_uid is null;
+update  his_asset_group_clinical_match set org_info_uid=site_uid  where org_info_uid is null;
 
 
+-- YHAAO-22813 处理历史数据
+update  asset_info  set institution_uid = tenant_uid,hospital_uid = tenant_uid,site_uid = tenant_uid,clinical_dept_uid = reverse(clinical_dept_uid),asset_dept_uid = reverse(asset_dept_uid),patrol_inspection_owner_uid=reverse(patrol_inspection_owner_uid),last_modified_date=now() where is_deleted = true and institution_uid != tenant_uid and hospital_uid != tenant_uid and site_uid != tenant_uid;
 
-
-
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养工单是否执行复检流程', 'verifyPmOrderReExaminationMode', '保养工单是否执行复检流程', 'f','t',3 where not exists(select * from config_item where key = 'verifyPmOrderReExaminationMode');
-
-
--- 删除asset_info 表site_uid 外键  hospital_id
-ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fk17q6mwntmk31s9vi7knjeredk;
-ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fk_7c02aj6ayfx4ynsr1wkh7lyd2;
-ALTER TABLE asset_info DROP CONSTRAINT IF EXISTS fka50mkcw3uygg5h57jge9gj8tm;
+-- YHAAO-23051 云南阜外调剂中心科室名称刷数据
+update shared_asset_request sar set  clinical_dept_name = oi.name from  org_info oi where  oi.id is not null and sar.clinical_dept_uid = oi.uid and oi.name != sar.clinical_dept_name and sar.state in (1,2,3,4,5,6,7,8,9,11) and sar.tenant_uid = (select  uid  from  tenant_info  where name ='云南省阜外心血管病医院');
+update shared_asset_req_detail sard set clinical_dept_name = oi.name from org_info oi,shared_asset_request sar where oi.id is not null and sard.clinical_dept_uid = oi.uid and sard.clinical_dept_name != oi.name and sar.id in (sard.borrow_id,sard.return_id) and  sar.state in (1,2,3,4,5,6,7,8,9,11) and sar.tenant_uid = (select  uid  from  tenant_info  where name ='云南省阜外心血管病医院');

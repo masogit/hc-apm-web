@@ -39,6 +39,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return super.baseURL;
     }
 
+    public String getDownLoadUrl() {
+        return super.downLoadURL;
+    }
+
     public String getWebContextUrl() {
         return super.webContextUrl;
     }

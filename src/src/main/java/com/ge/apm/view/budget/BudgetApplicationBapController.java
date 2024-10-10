@@ -1,10 +1,7 @@
 package com.ge.apm.view.budget;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.BudgetAssetInfo;
-import com.ge.apm.domain.budget.PurchaseBudgetConfig;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
@@ -22,6 +19,7 @@ import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -50,8 +48,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.FacesEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
@@ -310,7 +313,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         requestContext.addCallbackParam("url", url);
     }
 
-    public void saveApplication() {
+    public void saveApplication() throws InvocationTargetException, IllegalAccessException {
+
         persistService.handleCommonField(selected,1,BudgetApplication.APPLICATIONSTEP.ToSubmitted.toString(),
                 account,crudActionName,this.curSelectBudgetAssetInfo);
         boolean isOk = persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
@@ -328,6 +332,9 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
         if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
+            if(!checkSubmit()){
+                return "";
+            }
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
             if(!resultMultiLevelApproval){
@@ -343,6 +350,30 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             persistService.saveApplication(selected,this.attachList,this.removeFileBlobId);
         }
         return this.backList();
+    }
+
+    public boolean checkSubmit(){
+        boolean result = true;
+        try{
+            BudgetApplicationAssetVo budgetApplicationAssetVo = new BudgetApplicationAssetVo();
+            BeanUtils.copyProperties(budgetApplicationAssetVo, curSelectApplicationBudgetAsset);
+            budgetApplicationAssetVo.setApplicationDeptName(selected.getApplicationDeptName());
+            budgetApplicationAssetVo.setWardCode(selected.getWardCode());
+            ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+            Validator validator = validatorFactory.getValidator();
+            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo);
+
+            if(CollectionUtils.isNotEmpty(checkSet)){
+                for (ConstraintViolation<BudgetApplicationAssetVo> c : checkSet){
+                    WebUtil.addSuccessMessage(c.getMessage());
+                }
+                result = false;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return result;
     }
 
     public String backList() {
@@ -661,6 +692,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
 
         }catch (IOException ex) {
             java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
