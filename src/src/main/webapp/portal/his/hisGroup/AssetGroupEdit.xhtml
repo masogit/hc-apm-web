@@ -204,7 +204,7 @@
                 </p:panelGrid>
             </p:fieldset>
 
-            <p:commandButton validateClient="true" actionListener="#{hisAssetGroupEditController.checkSaveGroup()}" value="#{msg.Save}" update=":tabGroup:hisTagEditDlg :tabGroup:hisListForm:datalist" icon="ui-icon-check"  oncomplete="handleComplete(xhr, status, args);"/>
+            <p:commandButton validateClient="true" actionListener="#{hisAssetGroupEditController.checkSaveGroup()}" value="#{msg.Save}" update=":tabGroup:hisTagEditDlg :tabGroup:hisListForm:datalist" icon="ui-icon-check"  oncomplete="handleComplete(xhr, status, args,'hisTagEditDialog');"/>
             &nbsp;&nbsp;
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('hisTagEditDialog').hide()"/>
         </h:form>
@@ -234,10 +234,11 @@
             }
         }
 
-        function handleComplete(xhr, status, args) {
+        function handleComplete(xhr, status, args,dialog) {
             var isCheckScaleAssessment = args.isCheckScaleAssessment;
 
             if(isCheckScaleAssessment==true ) {
+                PF(dialog).show();
                 PF('checkScaleAssessment').show()
             }
         }
