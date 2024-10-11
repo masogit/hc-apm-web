@@ -336,6 +336,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                 //edit
                 this.selected = (DataEntry) eventObject;
                 if(selected.getGroupOrSingle()==1){
+                    selectHisAssetGroupAssetMatch=null;
                     getGroupMatchAsset();
                     getDataEntryAssetHistory();
                     for (HisAssetGroupClinicalMatch selectAssetInfo : selectAssetInfos) {

@@ -3,13 +3,18 @@ package com.ge.apm.service.nurseSite;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
@@ -1906,6 +1911,9 @@ public class NurseSiteMaintainService {
 		Map<String, AssetInfo> assetMap = assetList.stream().collect(Collectors.toMap(AssetInfo::getUid, t -> t));
 		List<UserAccount> userList = nurseSiteMaintainItemMapper.findUserList(userUidList);
 		Map<String, String> userMap = userList.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
+		List<NurseSiteMaintainConfig> configs = nurseSiteMaintainConfigRepository.fetchListByIds(listMaintain.stream().map(NurseSiteMaintain::getConfigId).collect(Collectors.toSet()));
+		Map<String, List<NurseSiteMaintainConfig>> configMap = configs.stream().collect(Collectors.groupingBy(NurseSiteMaintainConfig::getId));
+
 		int headerColumnIndex = 1;
 		int columnIndex = 1;
 		int keyRow = 1;
@@ -1944,6 +1952,14 @@ public class NurseSiteMaintainService {
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex, assetInfo.getFunctionType());
 					StringBuilder keyName = new StringBuilder();
 					for (NurseSiteMaintainItem nurseSiteMaintainItem : tempListItem) {
+						Map<Long, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId())).map(
+								nurseSiteMaintainConfigs -> {
+									NurseSiteMaintainConfig nurseSiteMaintainConfig = nurseSiteMaintainConfigs.get(0);
+									String checkItemsDetail = nurseSiteMaintainConfig.getCheckItemsDetail();
+									List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems = JSONObject.parseObject(checkItemsDetail, new TypeReference<List<NurseSiteMaintainCheckItem>>() {});
+									return nurseSiteMaintainCheckItems.stream().collect(Collectors.groupingBy(NurseSiteMaintainCheckItem::getKey));
+								}
+						).orElse(new HashMap<>());
 						mapCheckItemSequence.clear();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
 						keyName.delete(0, keyName.length());
@@ -1969,7 +1985,32 @@ public class NurseSiteMaintainService {
 									keyName.append(",");
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempData.getStrValue()+(tempData.getVariableText()!=null&&!tempData.getVariableText().equals("false")&&!tempData.getVariableText().equals("true")?" "+tempData.getVariableText():""));
+								List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(tempData.getIndex());
+								NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1.get(0)).orElse(new NurseSiteMaintainCheckItem());
+								String description="";
+								if(tempData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
+									switch (nurseSiteMaintainCheckItem.getFieldType()){
+										case "Select":
+											String options = nurseSiteMaintainCheckItem.getOptions();
+			                                JSONArray objects = JSONArray.parseArray(options);
+			                                List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+											Optional<TableOption> first = tableOptions.stream().filter(item -> item.getKey().equals(tempData.getVariableText())).findFirst();
+											if(first.isPresent()){
+												description=" "+first.get().getValue();
+											}
+											break;
+										case "Date":
+											Instant instant = Instant.ofEpochMilli(Long.parseLong(tempData.getVariableText()));
+											LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+											DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+											description = " "+localDateTime.format(formatter);
+											break;
+										default:
+											description=" "+tempData.getVariableText();
+											break;
+									}
+								}
+								doc.writeRowData(SHEET_Maintain, header, rowIndex, keyName.toString(), tempData.getStrValue()+description);
 								doc.writeRowData(SHEET_Maintain, header, modifyByRow, keyName.toString(), userMap.get(nurseSiteMaintainItem.getModifyByUid()));
 								doc.writeRowData(SHEET_Maintain, header, checkDateRow, keyName.toString(), nurseSiteMaintainItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, header, checkNameRow, keyName.toString(), tempData.getCheckItem());

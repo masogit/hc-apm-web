@@ -74,7 +74,7 @@
                         <f:facet name="filter">
                             <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{dataEntryController.selectedObject['lastModifiedDate']}"/>
                         </f:facet>
-                        <h:outputText value="#{item.createdDate}">
+                        <h:outputText value="#{item.lastModifiedDate}">
                             <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
                         </h:outputText>
                     </p:column>

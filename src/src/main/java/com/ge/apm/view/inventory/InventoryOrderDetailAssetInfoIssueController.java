@@ -164,6 +164,10 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		covSearchFilters(searchFilters, orgUidList);
 		List<InventoryIssue> assetInventoryIssues = dao.findBySearchFilter(searchFilters);
 		List<InventoryOrderDetail> assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
+		if (ObjectUtil.isEmpty(assetInventoryOrderDetails)) {
+			WebUtil.addErrorMessage("当前设备无盘点工单，无法转入已盘点！");
+			return;
+		}
 		InventoryOrderDetail inventoryOrderDetail = assetInventoryOrderDetails.get(0);
 		inventoryOrderDetail.setLastModifiedBy(user.getLoginName());
 		inventoryOrderDetail.setLastModifiedDate(DateUtil.now());
