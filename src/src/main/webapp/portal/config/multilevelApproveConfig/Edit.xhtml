@@ -230,6 +230,12 @@
                                 <p:ajax process="@this" listener="#{multiLevelApprovalConfigController.changeApprovalStrategy}" update="approverInfoEditForm" />
                             </p:selectBooleanCheckbox>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{'budgetManagement'.equals(multiLevelApprovalConfigController.selected.businessType) }">
+                        <label class="label">是否在手术室使用</label>
+                        <p:selectBooleanCheckbox id="usedOperatingRoom" value="#{multiLevelApprovalConfigController.approvalNode.usedOperatingRoom}">
+                            <p:ajax process="@this" />
+                        </p:selectBooleanCheckbox>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label" style="font-size: medium">是否通过组织机构筛选</label>
                         <p:selectBooleanCheckbox id="selectByOrg" value="#{multiLevelApprovalConfigController.approvalNode.selectByOrg}"
