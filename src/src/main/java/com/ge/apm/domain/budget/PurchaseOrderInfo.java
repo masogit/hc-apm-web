@@ -251,6 +251,39 @@ public class PurchaseOrderInfo implements ApprovableTarget,Serializable {
     @Column(name = "company_id")
     private String companyId;
 
+    @Column(name = "tender_no")
+    private String tenderNo;
+
+    @Column(name = "asset_purchase_count")
+    private Integer assetPurchaseCount;
+
+    @Column(name = "contract_total", scale = 2)
+    private BigDecimal contractTotal;
+
+    public String getTenderNo() {
+        return tenderNo;
+    }
+
+    public void setTenderNo(String tenderNo) {
+        this.tenderNo = tenderNo;
+    }
+
+    public Integer getAssetPurchaseCount() {
+        return assetPurchaseCount;
+    }
+
+    public void setAssetPurchaseCount(Integer assetPurchaseCount) {
+        this.assetPurchaseCount = assetPurchaseCount;
+    }
+
+    public BigDecimal getContractTotal() {
+        return contractTotal;
+    }
+
+    public void setContractTotal(BigDecimal contractTotal) {
+        this.contractTotal = contractTotal;
+    }
+
     public Date getMeetingApproveDate() {
         return meetingApproveDate;
     }

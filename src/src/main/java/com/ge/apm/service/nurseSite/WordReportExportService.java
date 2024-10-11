@@ -3,11 +3,13 @@ package com.ge.apm.service.nurseSite;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -28,6 +30,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -112,15 +118,48 @@ public class WordReportExportService {
                 Map<String,String> commentMap = new HashMap<>();
                 Map<String,String> updateByMap = new HashMap<>();
                 for (NurseSiteMaintainItem nurseSiteMaintainItem : items) {
+                    Map<Long, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId())).map(
+                            checkItemsDetail -> {
+                                List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems = JSONObject.parseObject(checkItemsDetail, new TypeReference<List<NurseSiteMaintainCheckItem>>() {});
+                                return nurseSiteMaintainCheckItems.stream().collect(Collectors.groupingBy(NurseSiteMaintainCheckItem::getKey));
+                            }
+                    ).orElse(new HashMap<>());
                     AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
                     List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
                     Map<String, String> itemMap = new HashMap<>();
                     for (NurseSiteMaintainData nurseSiteMaintainData : listData) {
+
+                        List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(nurseSiteMaintainData.getIndex());
+                        NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1.get(0)).orElse(new NurseSiteMaintainCheckItem());
+                        String description="";
+                        if(nurseSiteMaintainData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
+                            switch (nurseSiteMaintainCheckItem.getFieldType()){
+                                case "Select":
+                                    String options = nurseSiteMaintainCheckItem.getOptions();
+                                    JSONArray objects = JSONArray.parseArray(options);
+                                    List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+                                    Optional<TableOption> first = tableOptions.stream().filter(item -> item.getKey().equals(nurseSiteMaintainData.getVariableText())).findFirst();
+                                    if(first.isPresent()){
+                                        description=" "+first.get().getValue();
+                                    }
+                                    break;
+                                case "Date":
+                                    Instant instant = Instant.ofEpochMilli(Long.parseLong(nurseSiteMaintainData.getVariableText()));
+                                    LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                    description =" "+ localDateTime.format(formatter);
+                                    break;
+                                default:
+                                    description=" "+nurseSiteMaintainData.getVariableText();
+                                    break;
+                            }
+                        }
+
                         Boolean checkValue = nurseSiteMaintainData.getCheckValue();
                         if (Boolean.TRUE.equals(checkValue)) {
-                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "√"+(nurseSiteMaintainData.getVariableText()!=null?" "+nurseSiteMaintainData.getVariableText():""));
+                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "√"+description);
                         } else if (Boolean.FALSE.equals(checkValue)) {
-                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "x"+(nurseSiteMaintainData.getVariableText()!=null?" "+nurseSiteMaintainData.getVariableText():""));
+                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "x"+description);
                         } else {
                             itemMap.put(nurseSiteMaintainData.getCheckItem(), null);
                         }

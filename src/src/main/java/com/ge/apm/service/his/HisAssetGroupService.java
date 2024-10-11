@@ -204,13 +204,13 @@ public class HisAssetGroupService {
             boolean flag=false;
             flag = !uids1.equals(uids2);
             if(!flag){
-                for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
-                    BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
-                    if((stringDoubleEntry.getValue()==null && aDouble!=null)   ||  (stringDoubleEntry.getValue()!=null && aDouble==null)   || (stringDoubleEntry.getValue()!=null && aDouble!=null &&  stringDoubleEntry.getValue().compareTo(aDouble)!=0 )  ){
+                for (HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch : value) {
+                    BigDecimal bigDecimal = listMap.get(hisAssetGroupClinicalMatch.getAssetUid());
+                    BigDecimal aDouble = targetAssetsMap.get(hisAssetGroupClinicalMatch.getAssetUid());
+                    if((bigDecimal == null && aDouble != null)   ||  (bigDecimal!=null && aDouble==null)   || (bigDecimal!=null && aDouble!=null &&  bigDecimal.compareTo(aDouble)!=0 )  ){
                         flag=true;
                         break;
                     }
-
                 }
             }
             if (flag) {
@@ -286,13 +286,13 @@ public class HisAssetGroupService {
         boolean flag = false;
         flag = !uids1.equals(uids2);
         if (!flag) {
-            for (Map.Entry<String, BigDecimal> stringDoubleEntry : listMap.entrySet()) {
-                BigDecimal aDouble = targetAssetsMap.get(stringDoubleEntry.getKey());
-                if ((stringDoubleEntry.getValue() == null && aDouble != null) || (stringDoubleEntry.getValue() != null && aDouble == null) || (stringDoubleEntry.getValue() != null && aDouble != null && stringDoubleEntry.getValue().compareTo(aDouble) != 0)) {
-                    flag = true;
+            for (HisAssetGroupClinicalMatch hisAssetGroupClinicalMatch : list) {
+                BigDecimal bigDecimal = listMap.get(hisAssetGroupClinicalMatch.getAssetUid());
+                BigDecimal aDouble = targetAssetsMap.get(hisAssetGroupClinicalMatch.getAssetUid());
+                if((bigDecimal == null && aDouble != null)   ||  (bigDecimal!=null && aDouble==null)   || (bigDecimal!=null && aDouble!=null &&  bigDecimal.compareTo(aDouble)!=0 )  ){
+                    flag=true;
                     break;
                 }
-
             }
         }
         if (flag) {
