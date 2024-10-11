@@ -204,10 +204,18 @@
                 </p:panelGrid>
             </p:fieldset>
 
-            <p:commandButton validateClient="true" actionListener="#{hisAssetGroupEditController.save}" value="#{msg.Save}" update=":tabGroup:hisTagEditDlg :tabGroup:hisListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'hisTagEditDialog');"/>
+            <p:commandButton validateClient="true" actionListener="#{hisAssetGroupEditController.checkSaveGroup()}" value="#{msg.Save}" update=":tabGroup:hisTagEditDlg :tabGroup:hisListForm:datalist" icon="ui-icon-check"  oncomplete="handleComplete(xhr, status, args,'hisTagEditDialog');"/>
             &nbsp;&nbsp;
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('hisTagEditDialog').hide()"/>
         </h:form>
+    </p:dialog>
+
+    <p:dialog  widgetVar="checkScaleAssessment"  modal="true" class="checkScaleAssessment" draggable="false" closable="false" resizable="false" showHeader="false">
+        <p:fieldset legend="分组中有设备分摊比列为空,确定保存吗？">
+            <p:commandButton validateClient="true" actionListener="#{hisAssetGroupEditController.save()}" value="是" icon="ui-icon-check"
+                       oncomplete="handleSubmit(args, 'hisTagEditDialog'); handleSubmit(args, 'checkScaleAssessment');" />
+            <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('checkScaleAssessment').hide()"  update=":growl"/>
+        </p:fieldset>
     </p:dialog>
 
     <script type="text/javascript">
@@ -223,6 +231,15 @@
                 $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
             } else {
                 $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+            }
+        }
+
+        function handleComplete(xhr, status, args,dialog) {
+            var isCheckScaleAssessment = args.isCheckScaleAssessment;
+
+            if(isCheckScaleAssessment==true ) {
+                PF(dialog).show();
+                PF('checkScaleAssessment').show()
             }
         }
     </script>

@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
@@ -312,6 +313,17 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         }
 
         return Boolean.TRUE;
+    }
+
+
+    public void checkSaveGroup(){
+        boolean check = selectAssetInfos.stream().anyMatch(tem -> tem.getScaleAssessment() == null);
+        if(check){
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("isCheckScaleAssessment", true);
+            return;
+        }
+        save();
     }
 
     @Override

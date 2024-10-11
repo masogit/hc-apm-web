@@ -39,12 +39,9 @@ public class  ApprovalNode implements Serializable {
     private List<RoleApproveCondition> roleApproveConditions;
 
     private String approvalStrategy;
-//
-//    @JSONField(serialize = false)
-//    private List<UserAccount> multiLevelApprovalUsers; //多级审核人
-//    private List<String> multiLevelApprovalUids; //审核人
-//    @JSONField(serialize = false)
-//    private List<UserAccount> clinicalDepartmentDirectorUsers; //临床科室主任
+
+    private Boolean usedOperatingRoom;
+
 
     public boolean getSelectByOrg() {
         return selectByOrg;
@@ -96,5 +93,13 @@ public class  ApprovalNode implements Serializable {
 
     public void setApprovalStrategy(String approvalStrategy) {
         this.approvalStrategy = approvalStrategy;
+    }
+
+    public Boolean isUsedOperatingRoom() {
+        return usedOperatingRoom;
+    }
+
+    public void setUsedOperatingRoom(Boolean usedOperatingRoom) {
+        this.usedOperatingRoom = usedOperatingRoom;
     }
 }

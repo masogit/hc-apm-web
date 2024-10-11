@@ -857,6 +857,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
                     } else {
                         com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel);
+                        if(ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT==multiLevelApproval.getBusinessType()   &&  approvalLevel==1 && node.getUsedOperatingRoom()!=null && node.getUsedOperatingRoom()){
+                            BudgetApplicationAsset byApplicationId = budgetApplicationAssetRepository.findByApplicationId(multiLevelApproval.getBusinessUid());
+                            if("F".equals(byApplicationId.getUsedOperatingRoom())){
+                                node= approvalNodes.get(approvalLevel+1);
+                                level+=1;
+                            }
+                        }
                         if (node != null) {
                             boolean usingRole = node.getUsingRole();
                             if (usingRole) {//角色审批，根据角色拉取用户进行审批
