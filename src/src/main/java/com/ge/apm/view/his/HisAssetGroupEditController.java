@@ -34,6 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,8 +180,14 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     public void sharedEquallyProportion(){
         int size = selectAssetInfos.size();
         if(size>0){
-            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),6, BigDecimal.ROUND_DOWN);
-            selectAssetInfos.stream().forEach(item->item.setScaleAssessment(divide));
+            BigDecimal divide = BigDecimal.valueOf(100).divide(BigDecimal.valueOf(size),2, RoundingMode.DOWN);
+            selectAssetInfos.forEach(item->item.setScaleAssessment(divide));
+            BigDecimal subtract = BigDecimal.valueOf(100).subtract((divide.multiply(BigDecimal.valueOf(size))));
+            if(subtract.compareTo(BigDecimal.ZERO)!=0){
+                selectAssetInfos.get(0).setScaleAssessment(divide.add(subtract));
+            }
+
+
         }
     }
     public void updateSelctedAssetList(AjaxBehaviorEvent event) {
