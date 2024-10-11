@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="zkbZoneEditDlg" widgetVar="zkbZoneEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbZoneController.CRUDActionName} 课程" height="370">
+        <h:form id="zkbZoneEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbZoneController.selected != null}">
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbContract_region}*</label>
+                    <p:selectOneMenu id="region" value="#{zkbZoneController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">zone*</label>
+                    <p:inputText id="zone" value="#{zkbZoneController.selected.zone}" required="true" requiredMessage="zone #{msg.ValidationRequire}" />
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbZoneController.saveData}" oncomplete="PF('zkbZoneEditDialog').hide()" update=":growl :zkbZoneListForm" icon="ui-icon-check" />
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbZoneEditDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>
