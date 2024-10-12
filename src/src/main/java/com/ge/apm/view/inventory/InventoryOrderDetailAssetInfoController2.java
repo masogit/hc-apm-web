@@ -120,7 +120,6 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-        if(UserContextService.hasCurrentTenantName("")){}
         String configValue = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),"enableHasIssueShownInTheInventory");
         if(Boolean.TRUE.toString().equalsIgnoreCase(configValue)){
             List<SearchFilter> inventoryIssueSearchFilters = new ArrayList<>();
