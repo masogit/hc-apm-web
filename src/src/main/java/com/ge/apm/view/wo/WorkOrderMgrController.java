@@ -61,6 +61,7 @@ import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -465,12 +466,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
-            if(userContextService.isCountyArea()){
+            if(userContextService.isCountyArea() || partsConfigService.isEnableTenantLocal()){
                 itemDetail.setPartsPrice(null);
                 if(partsItem.getUnitPrice() != null){
                     itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
                 }
                 itemDetail.setPartsDescription(partsItem.getPartsDescription());
+                itemDetail.setCurrentQuantity(partsRequestService.getTenantTotalStockNum(partsItem.getId()));
             }
         }
     }
@@ -489,11 +491,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public List<SimplePartsItem> autosparePartName(String name) {
         List<SimplePartsItem> all = null;
-        if(userContextService.isCountyArea()){
+        if(userContextService.isCountyArea() || partsConfigService.isEnableTenantLocal()){
             all = initSparePartsMaster(name);
         }else{
             all = partsInventoryService.findAllByName(name);
         }
+
+        for (SimplePartsItem simplePartsItem : all) {
+            if(StringUtils.isNotEmpty(simplePartsItem.getName()) && StringUtils.isNotEmpty(simplePartsItem.getSpecification())){
+                simplePartsItem.setName(simplePartsItem.getName() + "(" + simplePartsItem.getSpecification() + ")");
+            }
+        }
+
         return all;
     }
     public List<SimplePartsItem> initSparePartsMaster(String name) {

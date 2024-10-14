@@ -566,4 +566,15 @@ public class SimplePartsRequestService {
         partsRequestLineItemRepository.deleteByPartsRequestId(id);
         partsRequestRepository.delete(id);
     }
+
+    public int getTenantTotalStockNum(String partsItemId){
+        List<SimplePartsInventory> partsInventoryList = partsInventoryRepository.findByPartsItemId(partsItemId);
+
+        int totalQty = 0;
+        for (SimplePartsInventory partsInventory : partsInventoryList) {
+            totalQty += partsInventory.getOnhandQty();
+        }
+
+        return totalQty;
+    }
 }
