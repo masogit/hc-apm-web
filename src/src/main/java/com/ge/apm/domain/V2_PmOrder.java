@@ -275,6 +275,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Transient
     private String partApproveSignature;
 
+    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private MvsIbMapping mvsIbMapping;
+
+
     @Transient
     private String businessDigest;
 
@@ -841,5 +846,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setOriginalPmNum(String originalPmNum) {
         this.originalPmNum = originalPmNum;
+    }
+
+    public MvsIbMapping getMvsIbMapping() {
+        return mvsIbMapping;
+    }
+
+    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
+        this.mvsIbMapping = mvsIbMapping;
     }
 }
