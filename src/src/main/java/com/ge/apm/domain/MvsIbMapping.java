@@ -57,4 +57,9 @@ public class MvsIbMapping implements Serializable {
     @Column(name = "ib_uid")
     private String ibUid;
 
+    @JoinColumn(name = "ib_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
+
 }
