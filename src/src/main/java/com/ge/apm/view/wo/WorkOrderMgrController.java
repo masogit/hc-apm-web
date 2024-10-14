@@ -3781,9 +3781,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                         .stream()
                         .map(val -> cacheService.findOrgByUid(val))
                         .collect(Collectors.toList());
-                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                    orgListMVS = Collections.emptyList();
-                }
             }
             if (!CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3820,9 +3817,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                             .stream()
                             .map(val -> cacheService.findOrgByUid(val))
                             .collect(Collectors.toList());
-                    if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                        clinicalDeptListMVS = Collections.emptyList();
-                    }
                 }
             }
         } catch (Exception e) {
