@@ -1,7 +1,8 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
-
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.NotFound;
 import javax.persistence.*;
 import java.io.Serializable;  
 import java.util.Date;  
@@ -58,6 +59,7 @@ public class MvsIbMapping implements Serializable {
     private String ibUid;
 
     @JoinColumn(name = "ib_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
