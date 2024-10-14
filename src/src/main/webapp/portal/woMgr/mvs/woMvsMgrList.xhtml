@@ -57,25 +57,26 @@
                     <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.name}"/>
+                <p:column headerText="#{msg.assetName}" sortBy="#{item.mvsIbMapping.assetInfo.name}" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.mvsIbMapping.assetInfo.name}"/>
                 </p:column>
-                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.mvsIbMapping.assetInfo.serialNum}" filterBy="#{item.mvsIbMapping.assetInfo.serialNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.mvsIbMapping.assetInfo.serialNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.departNum}"/>
+                <p:column headerText="#{msg.departNum}" sortBy="#{item.mvsIbMapping.assetInfo.departNum}" filterBy="#{item.mvsIbMapping.assetInfo.departNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.mvsIbMapping.assetInfo.departNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.functionType}"/>
+                <p:column headerText="#{msg.functionType}" sortBy="#{item.mvsIbMapping.assetInfo.functionType}" filterBy="#{item.mvsIbMapping.assetInfo.functionType}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.mvsIbMapping.assetInfo.functionType}"/>
                 </p:column>
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilterMVS}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{workOrderMgrController.LoadSiteNameListMVS()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
+                    <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.mvsIbMapping.assetInfo.siteUID)}"/>
                 </p:column>
                 <!--所属科室-->
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
@@ -89,7 +90,7 @@
 
                         </p:autoComplete>
                     </f:facet>
-                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                    <h:outputText value="#{item.mvsIbMapping.assetInfo.clinicalDeptName}"/>
                 </p:column>
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
                     <f:facet name="header">

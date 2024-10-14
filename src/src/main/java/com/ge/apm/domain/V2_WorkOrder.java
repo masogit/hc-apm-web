@@ -66,6 +66,10 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
+    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private MvsIbMapping mvsIbMapping;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "current_person_id")
@@ -338,6 +342,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private Integer repairPersonId;
+
+    public MvsIbMapping getMvsIbMapping() {
+        return mvsIbMapping;
+    }
+
+    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
+        this.mvsIbMapping = mvsIbMapping;
+    }
 
     public Integer getRepairPersonId() {
         return repairPersonId;
