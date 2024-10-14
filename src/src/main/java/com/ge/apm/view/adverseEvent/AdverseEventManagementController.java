@@ -167,6 +167,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         /*初始化方法*/
         //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
         configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "setAdverseEventProductType");
+        configItemValue = StrUtil.isEmpty(configItemValue) ? "1" : configItemValue;
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
     }
