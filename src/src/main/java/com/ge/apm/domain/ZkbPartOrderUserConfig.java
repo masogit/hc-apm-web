@@ -113,6 +113,17 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "test_status")
     private String testStatus;
 
+    @Column(name = "zone")
+    private String zone;
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
+
     public String getUsBackUpId() {
         return usBackUpId;
     }
