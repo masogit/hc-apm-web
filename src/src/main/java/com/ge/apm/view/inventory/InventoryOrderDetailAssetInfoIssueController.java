@@ -15,6 +15,7 @@ import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -163,6 +164,12 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		covSearchFilters(searchFilters, orgUidList);
 		List<InventoryIssue> assetInventoryIssues = dao.findBySearchFilter(searchFilters);
+		String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+		List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), ListUtil.newArrayList(clinicalDeptUID),false);
+		if(CollectionUtils.isNotEmpty(orderIdList)){
+			searchFilters.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
+			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderIdList.get(0),"1*"));
+		}
 		List<InventoryOrderDetail> assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
 		if (ObjectUtil.isEmpty(assetInventoryOrderDetails)) {
 			WebUtil.addErrorMessage("当前设备无盘点工单，无法转入已盘点！");
@@ -171,6 +178,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		InventoryOrderDetail inventoryOrderDetail = assetInventoryOrderDetails.get(0);
 		inventoryOrderDetail.setLastModifiedBy(user.getLoginName());
 		inventoryOrderDetail.setLastModifiedDate(DateUtil.now());
+		inventoryOrderDetail.setStatus(1);
 		inventoryOrderDetailDao.updateIsLastByAssetIds(ListUtil.newArrayList(assetInfo.getId()));
 		inventoryOrderDetail.setIsLast(true);
 		inventoryOrderDetailDao.save(inventoryOrderDetail);
