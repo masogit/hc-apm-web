@@ -1018,10 +1018,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
         }
         if (!StringUtils.isEmpty(siteUidFilterMVS)) {
-            filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
+            filters.add(new SearchFilter("mvsIbMapping.assetInfo.siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if (("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType" +
+            if (("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType" +
                     ",serviceRequest.srNum,serviceRequest.casePriority").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
@@ -3769,8 +3769,21 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<OrgInfo> LoadSiteNameListMVS() {
         if (CollectionUtils.isEmpty(orgListMVS)) {
             if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream()
-                        .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
+                orgListMVS = bySearchFilterMVS.stream()
+                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                        .map(info -> Optional.ofNullable(info.getSiteUID())
+                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                        .orElse(null))
+                                .orElse(null))
+                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                        .stream()
+                        .map(val -> cacheService.findOrgByUid(val))
+                        .collect(Collectors.toList());
+                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                    orgListMVS = Collections.emptyList();
+                }
             }
             if (!CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
@@ -3796,8 +3809,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
                 if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
                     clinicalDeptListMVS = bySearchFilterMVS.stream()
-                            .map(item -> item.getServiceRequest().getFromDeptUID()).collect(Collectors.toSet()).stream()
-                            .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
+                            .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                    .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                            .map(info -> Optional.ofNullable(info.getSiteUID())
+                                                    .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                            .orElse(null))
+                                    .orElse(null))
+                            .filter(Objects::nonNull) // 过滤掉所有 null 值
+                            .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                            .stream()
+                            .map(val -> cacheService.findOrgByUid(val))
+                            .collect(Collectors.toList());
+                    if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                        clinicalDeptListMVS = Collections.emptyList();
+                    }
                 }
             }
         } catch (Exception e) {
