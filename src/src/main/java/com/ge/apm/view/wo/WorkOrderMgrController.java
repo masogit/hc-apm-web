@@ -1005,7 +1005,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
-
+        filters.add(new SearchFilter("mvsIbMapping.ibTenantUid", SearchFilter.Operator.IN, loginUser.getTenantUID()));
         List<String> assetUIds = serviceRequestApiService.getVisableMvsAssetUidSystemId(UserContextService.getAccessToken());
         if (CollectionUtils.isEmpty(assetUIds)) {
             assetUIds = new ArrayList<>();
