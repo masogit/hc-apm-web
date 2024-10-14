@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Entity
 @Data
-@Table(name = "zkb_unreal")
+@Table(name = "zkb_zone")
 public class ZkbZone  implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
