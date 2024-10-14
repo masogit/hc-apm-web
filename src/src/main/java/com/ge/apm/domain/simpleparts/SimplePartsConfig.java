@@ -31,6 +31,10 @@ public class SimplePartsConfig implements Serializable {
     @Column(name = "enable_integration_with_multi_level_auditing")
     private Boolean enableIntegrationWithMultiLevelAuditing;
 
+    //配置备件是从外部系统同步过来整个租户公用的情况(适用于维修中的增加备件时选择“库房领用”的场景)
+    @Column(name = "enable_tenant_local")
+    private Boolean enableTenantLocal;
+
     @Column(name = "tenant_uid")
     private String tenantUid;
 
@@ -64,5 +68,13 @@ public class SimplePartsConfig implements Serializable {
 
     public void setEnableIntegrationWithMultiLevelAuditing(boolean enableIntegrationWithMultiLevelAuditing) {
         this.enableIntegrationWithMultiLevelAuditing = enableIntegrationWithMultiLevelAuditing;
+    }
+
+    public boolean isEnableTenantLocal() {
+        return BooleanUtils.getFalseIfNull(enableTenantLocal);
+    }
+
+    public void setEnableTenantLocal(boolean enableTenantLocal) {
+        this.enableTenantLocal = enableTenantLocal;
     }
 }
