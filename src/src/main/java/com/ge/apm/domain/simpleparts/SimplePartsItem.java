@@ -58,6 +58,12 @@ public class SimplePartsItem implements Serializable {
     @Column(name = "parts_description")
     private String partsDescription;
 
+    @Column(name = "maximum_quantity")
+    private Long maximumQuantity;
+
+    @Column(name = "minimum_quantity")
+    private Long minimumQuantity;
+
     @Override
     public int hashCode() {
         int hash = 0;
