@@ -2140,9 +2140,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             orderIds.add("0");
         }
         filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-
+        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
         for (SearchFilter searchFilter : filterArrayList) {
-            if (("clinicalDeptId,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
+            if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
                     ",mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
@@ -2523,7 +2523,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchFilters.add((new SearchFilter("mvsIbMapping.assetInfo.siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
             }
             if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
-                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
+                filterArrayList.add((new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
             }
         } else {
             if (StringUtils.isNotEmpty(siteUidFilter)) {
@@ -3211,7 +3211,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     clinicalDeptListMVS = bySearchFilterMVS.stream()
                             .map(item -> Optional.ofNullable(item.getMvsIbMapping())
                                     .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getSiteUID())
+                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
                                                     .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
                                             .orElse(null))
                                     .orElse(null))
