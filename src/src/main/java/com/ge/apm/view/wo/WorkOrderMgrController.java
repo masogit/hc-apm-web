@@ -1035,6 +1035,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         filters.add(new SearchFilter("mvsIbMapping.ibTenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
+        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+
         return filters;
     }
 
@@ -3817,7 +3819,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     clinicalDeptListMVS = bySearchFilterMVS.stream()
                             .map(item -> Optional.ofNullable(item.getMvsIbMapping())
                                     .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getSiteUID())
+                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
                                                     .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
                                             .orElse(null))
                                     .orElse(null))
