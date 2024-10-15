@@ -1023,7 +1023,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, assetUIds));
         }
         if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
-            filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
+            filters.add(new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
         }
         if (!StringUtils.isEmpty(siteUidFilterMVS)) {
             filters.add(new SearchFilter("mvsIbMapping.assetInfo.siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
