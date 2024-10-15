@@ -51,7 +51,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect"  update="createButton deleteButton editButton"/>
+                        <p:ajax event="rowSelect"  update="createButton deleteButton editButton renewalButton"/>
                         <p:ajax event="filter" listener="#{contractInfoController.onFilter}" oncomplete="rc();"/>
                         <p:column headerText="#{msg.contractNum}" sortBy="#{item.contractNum}" filterBy="#{item.contractNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.contractNum}"/>
@@ -130,6 +130,10 @@
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" action="#{contractInfoController.exportAction}"/>
+                            <p:commandButton id="renewalButton" icon="ui-icon-content-copy" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" title="续约" action="#{contractInfoController.renewalAction}" disabled="#{empty contractInfoController.selected or !(contractInfoController.selected.contractType eq 'Full' or contractInfoController.selected.contractType eq 'Artificial')}" >
+                                <p:confirm header="提示" message="确定要一键续约吗？" icon="ui-icon-info"/>
+                            </p:commandButton>
+
                         </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton" immediate="true"/>
