@@ -3211,7 +3211,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     clinicalDeptListMVS = bySearchFilterMVS.stream()
                             .map(item -> Optional.ofNullable(item.getMvsIbMapping())
                                     .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getSiteUID())
+                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
                                                     .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
                                             .orElse(null))
                                     .orElse(null))
