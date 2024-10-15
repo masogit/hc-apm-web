@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SimplePartsInventoryMapper {
 
@@ -21,4 +22,71 @@ public interface SimplePartsInventoryMapper {
 
 	@Select(value = "select * from simple_parts_inventory where  parts_warehouse_id = #{partsWareHouseId}")
 	List<SimplePartsInventory> findPartsInventory(@Param("partsWareHouseId") String partsWareHouseId);
+
+
+
+
+
+	@Select("<script>"
+			+ "SELECT spi.*"
+			+ "FROM simple_parts_inventory spi "
+			+ "LEFT JOIN simple_parts_item spitem ON spi.parts_item_id = spitem.id "
+			+ "<where>"
+			+ "  <if test='partsWarehouseIds != null and partsWarehouseIds.size > 0'>"
+			+ "    AND spi.parts_warehouse_id IN "
+			+ "    <foreach item='item' index='index' collection='partsWarehouseIds' open='(' separator=',' close=')'>"
+			+ "      #{item}"
+			+ "    </foreach>"
+			+ "  </if>"
+			+ "  <if test='queryType == 1'>"
+			+ "    AND ("
+			+ "      spitem.maximum_quantity IS NOT NULL AND spitem.maximum_quantity &gt; 0 AND "
+			+ "      spi.onhand_qty &gt;= spitem.maximum_quantity * 0.9"
+			+ "    )"
+			+ "  </if>"
+			+ "  <if test='queryType == 2'>"
+			+ "    AND ("
+			+ "      spitem.minimum_quantity IS NOT NULL AND spitem.minimum_quantity &gt; 0 AND "
+			+ "      spi.onhand_qty &gt;= spitem.minimum_quantity * 1.2"
+			+ "    )"
+			+ "  </if>"
+			+ "  <if test='name != null'>"
+			+ "   AND spi.name LIKE CONCAT('%', #{name}, '%')"
+			+ "  </if>"
+			+ "</where>"
+			+ "<if test='pageSize != null and offset != null'>"
+			+ " LIMIT #{pageSize} OFFSET #{offset}"
+			+ "</if>"
+			+ "</script>")
+	List<SimplePartsInventory> findPartsInventoryList(Map<String, Object> params   );
+
+	@Select("<script>"
+			+ "SELECT count(*) "
+			+ "FROM simple_parts_inventory spi "
+			+ "LEFT JOIN simple_parts_item spitem ON spi.parts_item_id = spitem.id "
+			+ "<where>"
+			+ "  <if test='partsWarehouseIds != null and partsWarehouseIds.size > 0'>"
+			+ "    AND spi.parts_warehouse_id IN "
+			+ "    <foreach item='item' index='index' collection='partsWarehouseIds' open='(' separator=',' close=')'>"
+			+ "      #{item}"
+			+ "    </foreach>"
+			+ "  </if>"
+			+ "  <if test='queryType == 1'>"
+			+ "    AND ("
+			+ "      spitem.maximum_quantity IS NOT NULL AND spitem.maximum_quantity &gt; 0 AND "
+			+ "      spi.onhand_qty &gt;= spitem.maximum_quantity * 0.9"
+			+ "    )"
+			+ "  </if>"
+			+ "  <if test='queryType == 2'>"
+			+ "    AND ("
+			+ "      spitem.minimum_quantity IS NOT NULL AND spitem.minimum_quantity &gt; 0 AND "
+			+ "      spi.onhand_qty &gt;= spitem.minimum_quantity * 1.2"
+			+ "    )"
+			+ "  </if>"
+			+ "  <if test='name != null'>"
+			+ "   AND spi.name LIKE CONCAT('%', #{name}, '%')"
+			+ "  </if>"
+			+ "</where>"
+			+ "</script>")
+	int findPartsInventoryCount(Map<String, Object> map);
 }

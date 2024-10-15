@@ -6,11 +6,40 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+        <style>
+            .warrantyCeiling {
+                background-color: #ec7a06 !important;
+                color: #000000!important;
+            }
+            .warrantyFloor {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="备件库存"/>
             </div>
+
+
+
             <div class="ui-g-12 card ">
+                <h:form >
+                    <h:panelGrid id="filterType" >
+                        <h:panelGroup>
+                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(0)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 0}" value="全部" />
+                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(1)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 1}" value="临界上限"/>
+                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(2)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 2}" value="临界下限"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+
+                <br/>
                 <p:fieldset legend="备件库存">
                     <h:form id="searchFormSPInfo">
                         <h:panelGrid id="searchPanel" columns="3">
@@ -38,6 +67,7 @@
                     <h:form id="sparePartsClaimForm">
                         <p:dataTable id="datalist1" value="#{simplePartsInventoryController.lazyModel}" var="item"
                                      widgetVar="varDataList"
+                                     rowStyleClass="#{item.warningStatus}"
                                      lazy="true" paginator="true" paginatorPosition="bottom"
                                      paginatorAlwaysVisible="true"
                                      rowKey="#{item.id}" sortMode="single" sortOrder="descending"
