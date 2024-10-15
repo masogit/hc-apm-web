@@ -105,7 +105,7 @@
                                     <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
                                 </p:autoComplete>
                             </f:facet>
-                            <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
+                            <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.mvsIbMapping.assetInfo.clinicalDeptUID).name}"/>
                         </p:column>
                         <p:column>
                             <f:facet name="header">
