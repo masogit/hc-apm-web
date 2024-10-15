@@ -274,7 +274,7 @@
                                         <h:outputText value="#{item.creatorName}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.MaintenanceID}" >
-                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id))}" styleClass="p-mr-2">
+                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id).concat('&amp;queryTab=' .concat(assetInfoDetailController.getQueryTabValue(item))))}" styleClass="p-mr-2">
                                             <h:outputText value="#{item.pmNum}"/>
                                         </p:commandLink>
                                     </p:column>

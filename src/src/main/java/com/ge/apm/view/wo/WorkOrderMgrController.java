@@ -61,6 +61,7 @@ import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -465,12 +466,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
-            if(userContextService.isCountyArea()){
+            if(userContextService.isCountyArea() || partsConfigService.isEnableTenantLocal()){
                 itemDetail.setPartsPrice(null);
                 if(partsItem.getUnitPrice() != null){
                     itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
                 }
                 itemDetail.setPartsDescription(partsItem.getPartsDescription());
+                itemDetail.setCurrentQuantity(partsRequestService.getTenantTotalStockNum(partsItem.getId()));
             }
         }
     }
@@ -489,11 +491,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public List<SimplePartsItem> autosparePartName(String name) {
         List<SimplePartsItem> all = null;
-        if(userContextService.isCountyArea()){
+        if(userContextService.isCountyArea() || partsConfigService.isEnableTenantLocal()){
             all = initSparePartsMaster(name);
         }else{
             all = partsInventoryService.findAllByName(name);
         }
+
+        for (SimplePartsItem simplePartsItem : all) {
+            if(StringUtils.isNotEmpty(simplePartsItem.getName()) && StringUtils.isNotEmpty(simplePartsItem.getSpecification())){
+                simplePartsItem.setName(simplePartsItem.getName() + "(" + simplePartsItem.getSpecification() + ")");
+            }
+        }
+
         return all;
     }
     public List<SimplePartsItem> initSparePartsMaster(String name) {
@@ -1005,7 +1014,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
-
         List<String> assetUIds = serviceRequestApiService.getVisableMvsAssetUidSystemId(UserContextService.getAccessToken());
         if (CollectionUtils.isEmpty(assetUIds)) {
             assetUIds = new ArrayList<>();
@@ -1015,7 +1023,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, assetUIds));
         }
         if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
-            filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
+            filters.add(new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
         }
         if (!StringUtils.isEmpty(siteUidFilterMVS)) {
             filters.add(new SearchFilter("mvsIbMapping.assetInfo.siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
@@ -1026,6 +1034,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 filters.add(searchFilter);
             }
         }
+        filters.add(new SearchFilter("mvsIbMapping.ibTenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
+        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+
         return filters;
     }
 
@@ -3808,7 +3819,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     clinicalDeptListMVS = bySearchFilterMVS.stream()
                             .map(item -> Optional.ofNullable(item.getMvsIbMapping())
                                     .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getSiteUID())
+                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
                                                     .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
                                             .orElse(null))
                                     .orElse(null))

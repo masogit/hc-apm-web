@@ -509,4 +509,14 @@ public class AssetInfoDetailController {
         List<V2_WorkOrder> orders = workOrderRepository.findBySrId(srId);
         return orders.get(0).getId();
     }
+
+    public String getQueryTabValue(V2_PmOrder item) {
+        boolean isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
+        boolean selectedIdMatches = selected.getId().equals(item.getAssetId());
+        if (isYiMaiYangGuangTenant || selectedIdMatches) {
+            return "0";
+        } else {
+            return "1";
+        }
+    }
 }

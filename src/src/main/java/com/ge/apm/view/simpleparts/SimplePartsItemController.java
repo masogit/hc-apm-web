@@ -8,6 +8,7 @@ import com.ge.apm.service.simpleparts.SimplePartsItemService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -146,7 +147,15 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
             selected.setCategoryName(null);
         }
         selected.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        if(selected.getMaximumQuantity()!=null && selected.getMinimumQuantity()!=null && selected.getMinimumQuantity()>=selected.getMaximumQuantity()) {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("checkQuantity", true);
+            WebUtil.addWarnMessage("数量上限和下限值输入不合理，请重新输入，保证数量上限>数量下限!");
+            return;
+        }
         partsItemService.save(selected);
+        WebUtil.addSuccessMessage("备件信息添加成功！");
+
         selected = null;
     }
 
