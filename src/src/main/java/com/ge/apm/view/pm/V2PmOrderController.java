@@ -2523,7 +2523,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchFilters.add((new SearchFilter("mvsIbMapping.assetInfo.siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
             }
             if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
-                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
+                filterArrayList.add((new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
             }
         } else {
             if (StringUtils.isNotEmpty(siteUidFilter)) {
