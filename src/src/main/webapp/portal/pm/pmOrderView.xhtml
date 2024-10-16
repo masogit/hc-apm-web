@@ -12,84 +12,93 @@
 
             <h:form id="pmOrderDetailForm" class="pmOrderDetailFormCls">
                 <p:fieldset legend="#{msg.MaintenanceWorkorder}" rendered="#{not empty v2PmOrderController.selected}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
-                            <label class="label">#{msg.AssetName}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.assetName}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.EquipmentID}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.departNum}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.MeasurementGrade2}</label>
-                            <p:outputLabel value="#{v2PmOrderController.getRuleLevelName(v2PmOrderController.selected.ruleLevel)}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.MaintenanceType}</label>
-                            <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{!userContextService.hasCurrentTenantName('') }">
-                            <label class="label">#{msg.clinicalDeptName}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('') }">
-                            <label class="label">#{msg.clinicalDeptName}</label>
-                            <p:outputLabel value="#{v2PmOrderController.getOrgInfoByUid(v2PmOrderController.selected.clinicalDeptId).name}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.MaintenanceNumber}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.pmNum}" ></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.Creator}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.creatorName}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.CurrentProcessingStep}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.currentStepName}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.ManhoursHours}</label>
-                            <h:outputText value="#{v2PmOrderController.selected.manHours}">
-                                <f:convertNumber pattern="0.00" minFractionDigits="2"></f:convertNumber>
-                            </h:outputText>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.PlannedCompletionTime}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.planTime}">
-                                <f:convertDateTime pattern="yyyy-MM-dd"/>
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.ActualCompletionTime}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.endTime}">
-                                <f:convertDateTime pattern="yyyy-MM-dd"/>
-                            </p:outputLabel>
-                        </h:panelGroup>
+                    <div class="ui-g">
+                        <div class="ui-g-10 ui-g-nopad">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.AssetName}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.assetName}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.EquipmentID}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.departNum}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.MeasurementGrade2}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.getRuleLevelName(v2PmOrderController.selected.ruleLevel)}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.MaintenanceType}</label>
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!userContextService.hasCurrentTenantName('') }">
+                                    <label class="label">#{msg.clinicalDeptName}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('') }">
+                                    <label class="label">#{msg.clinicalDeptName}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.getOrgInfoByUid(v2PmOrderController.selected.clinicalDeptId).name}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.MaintenanceNumber}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.pmNum}" ></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.Creator}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.creatorName}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.CurrentProcessingStep}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.currentStepName}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.ManhoursHours}</label>
+                                    <h:outputText value="#{v2PmOrderController.selected.manHours}">
+                                        <f:convertNumber pattern="0.00" minFractionDigits="2"></f:convertNumber>
+                                    </h:outputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.PlannedCompletionTime}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.planTime}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                    </p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.ActualCompletionTime}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.endTime}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                    </p:outputLabel>
+                                </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.MaintenanceResult}</label>
-                            <p:outputLabel value="#{fieldMsg.fieldValue('qualityChecking',v2PmOrderController.selected.qualityChecking)}"></p:outputLabel>
-                        </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.MaintenanceResult}</label>
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('qualityChecking',v2PmOrderController.selected.qualityChecking)}"></p:outputLabel>
+                                </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.Cancelor}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.cancelPerson}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.CancellationReason}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.cancelReason}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.pmComment}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.comments}"></p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{v2PmOrderController.selected.pmType eq 4}">
-                            <label class="label">#{msg.originalPmNum}</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.originalPmNum}"></p:outputLabel>
-                        </h:panelGroup>
-                    </p:panelGrid>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.Cancelor}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.cancelPerson}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.CancellationReason}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.cancelReason}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.pmComment}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.comments}"></p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{v2PmOrderController.selected.pmType eq 4}">
+                                    <label class="label">#{msg.originalPmNum}</label>
+                                    <p:outputLabel value="#{v2PmOrderController.selected.originalPmNum}"></p:outputLabel>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <div class="ui-g-2">
+                            <div class="container-fluid" style="height: 200px; width: 200px;">
+                                <p:graphicImage value="#{fileDownloadService.getFile(v2PmOrderController.selected.ackSignature)}" stream="false" style="max-width: 100%;height: auto"/>
+                            </div>
+                        </div>
+                    </div>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
