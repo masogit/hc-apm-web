@@ -137,14 +137,13 @@
                                         readonly="false"
                                         forceSelection="true"
                                         completeMethod="#{workOrderMgrController.autosparePartName}"
-                                        var="item" itemLabel="#{item.name}"
+                                        var="item" itemLabel="#{item.partsNameAndSpecification}"
                                         itemValue="#{item}"
                                         converter="simplePartsItemConverter">
                             <p:ajax event="itemSelect"
                                     listener="#{workOrderMgrController.onSparePartsValueChange}"
                                     update="moreAccDialogForm"/>
                         </p:autoComplete>
-
                     </h:panelGroup>
                     <h:panelGroup  rendered="#{workOrderMgrController.statusFlag==3}">
                         <label class="label">#{msg.PartName}*</label>
@@ -187,7 +186,6 @@
                         <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
                             </p:ajax>
-
                         </p:inputNumber>
                     </h:panelGroup>
 

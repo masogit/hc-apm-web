@@ -1,6 +1,7 @@
 package com.ge.apm.domain.simpleparts;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -63,6 +64,17 @@ public class SimplePartsItem implements Serializable {
 
     @Column(name = "minimum_quantity")
     private Long minimumQuantity;
+
+    @Transient
+    private String partsNameAndSpecification;
+
+    public String getPartsNameAndSpecification(){
+        String partsNameAndSpecification = this.name;
+        if(StringUtils.isNotEmpty(this.specification)){
+            partsNameAndSpecification = this.name + "(" + this.specification + ")";
+        }
+        return partsNameAndSpecification;
+    }
 
     @Override
     public int hashCode() {
