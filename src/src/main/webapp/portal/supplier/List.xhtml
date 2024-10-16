@@ -24,9 +24,9 @@
         </style>
 
             <div class="ui-g-12 card">
-                <h:form rendered="#{supplierController.activeSupplier()}">
-                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
-                </h:form>
+<!--                <h:form rendered="#{supplierController.activeSupplier()}">-->
+<!--                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>-->
+<!--                </h:form>-->
                 <h:form rendered="#{supplierController.activeVender()}">
                     <h:panelGrid id="filterType" columns="2" style="float: right">
                         <h:panelGroup style="float: right">
@@ -101,7 +101,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update="supplierTab:SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected or supplierController.selected.source eq 'VenderCompany'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
+<!--                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>-->
                             <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
