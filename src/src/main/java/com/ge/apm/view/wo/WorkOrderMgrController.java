@@ -460,12 +460,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
         if (null != object) {
             partsItem = (SimplePartsItem) object;
-            itemDetail.setParts(partsItem.getName());
+            itemDetail.setParts(partsItem.getPartsNameAndSpecification());
             SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
             itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
+            itemDetail.setApartsQuantity(null);
             if(userContextService.isCountyArea() || partsConfigService.isEnableTenantLocal()){
                 itemDetail.setPartsPrice(null);
                 if(partsItem.getUnitPrice() != null){
@@ -497,11 +498,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             all = partsInventoryService.findAllByName(name);
         }
 
-        for (SimplePartsItem simplePartsItem : all) {
+        /*for (SimplePartsItem simplePartsItem : all) {
             if(StringUtils.isNotEmpty(simplePartsItem.getName()) && StringUtils.isNotEmpty(simplePartsItem.getSpecification())){
                 simplePartsItem.setName(simplePartsItem.getName() + "(" + simplePartsItem.getSpecification() + ")");
             }
-        }
+        }*/
 
         return all;
     }
