@@ -183,122 +183,132 @@
                     </p:dataGrid>
                     <c:forEach items="#{workOrderMgrController.selectedWorkOrderList}" var="woItem" varStatus="rowIndex" >
                         <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? msg.CurrentWorkorder:msg.WorkOrder}" toggleable="false" >
-                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <div class="ui-g">
+                                <div class="ui-g-10 ui-g-nopad">
+                                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                                <h:panelGroup>
-                                    <label class="label">#{msg.status}</label>
-                                    <p:outputLabel value="#{fieldMsg.fieldValue('woSteps', woItem.currentStepId)}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.totalManHour}</label>
-                                    <p:outputLabel value="#{woItem.totalManHour}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.totalPrice}</label>
-<!--                                    <p:outputLabel value="#{woItem.totalPrice}"/>-->
-                                    <p:outputLabel value="#{woItem.totalPrice}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.CheckInTime}</label>
-                                    <p:outputLabel value="#{woItem.checkinTime}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.intExtType}</label>
-                                    <p:outputLabel value="#{fieldMsg.fieldValue('intExtType', woItem.intExtType)}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.caseType}</label>
-                                    <c:choose>
-                                        <c:when test="#{userContextService.isCountyArea()}">
-                                            <p:outputLabel value="#{fieldMsg.fieldValue('faultTypeCountyAreaMore', woItem.caseType)}"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
-                                        </c:otherwise>
-                                    </c:choose>
-                            </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patProblems}</label>
-                                    <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patActions}</label>
-                                    <p:outputLabel value="#{woItem.patActions}" style="word-wrap: break-word;"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patTests}</label>
-                                    <p:outputLabel value="#{woItem.patTests}" style="word-wrap: break-word;"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.entryType}</label>
-                                    <p:outputLabel value="#{fieldMsg.fieldValue('hoursEntryType', woItem.entryType == null ? 0 : woItem.entryType)}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.manHours}</label>
-                                    <p:outputLabel value="#{woItem.manHours}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.otherExpense}</label>
-                                    <p:outputLabel value="#{woItem.otherExpense}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.ExternalExpenses}</label>
-                                    <p:outputLabel value="#{woItem.externalExpense}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.currentPersonName}</label>
-                                    <p:outputLabel value="#{woItem.currentStepId ==5 ? woItem.ackName:woItem.currentPersonName}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackRating}</label>
-                                    <p:outputLabel value="#{woItem.feedbackRating}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackComment}</label>
-                                    <p:outputLabel value="#{woItem.feedbackComment}" style="word-wrap: break-word;"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.endTime}</label>
-                                    <p:outputLabel value="#{woItem.closeTime}">
-                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                                    </p:outputLabel>
-                                </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.status}</label>
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('woSteps', woItem.currentStepId)}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.totalManHour}</label>
+                                            <p:outputLabel value="#{woItem.totalManHour}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.totalPrice}</label>
+                                            <!--                                    <p:outputLabel value="#{woItem.totalPrice}"/>-->
+                                            <p:outputLabel value="#{woItem.totalPrice}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.CheckInTime}</label>
+                                            <p:outputLabel value="#{woItem.checkinTime}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.intExtType}</label>
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('intExtType', woItem.intExtType)}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.caseType}</label>
+                                            <c:choose>
+                                                <c:when test="#{userContextService.isCountyArea()}">
+                                                    <p:outputLabel value="#{fieldMsg.fieldValue('faultTypeCountyAreaMore', woItem.caseType)}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.patProblems}</label>
+                                            <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.patActions}</label>
+                                            <p:outputLabel value="#{woItem.patActions}" style="word-wrap: break-word;"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.patTests}</label>
+                                            <p:outputLabel value="#{woItem.patTests}" style="word-wrap: break-word;"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.entryType}</label>
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('hoursEntryType', woItem.entryType == null ? 0 : woItem.entryType)}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.manHours}</label>
+                                            <p:outputLabel value="#{woItem.manHours}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.otherExpense}</label>
+                                            <p:outputLabel value="#{woItem.otherExpense}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.ExternalExpenses}</label>
+                                            <p:outputLabel value="#{woItem.externalExpense}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.currentPersonName}</label>
+                                            <p:outputLabel value="#{woItem.currentStepId ==5 ? woItem.ackName:woItem.currentPersonName}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.feedbackRating}</label>
+                                            <p:outputLabel value="#{woItem.feedbackRating}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.feedbackComment}</label>
+                                            <p:outputLabel value="#{woItem.feedbackComment}" style="word-wrap: break-word;"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.endTime}</label>
+                                            <p:outputLabel value="#{woItem.closeTime}">
+                                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                            </p:outputLabel>
+                                        </h:panelGroup>
 
 
-                                <h:panelGroup>
-                                    <label class="label">#{msg.MaintenanceSubStatus}</label>
-                                    <p:outputLabel value="#{fieldMsg.fieldValue('subStatus',woItem.subStatus)}" style="word-wrap: break-word;"/>
-                                </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.MaintenanceSubStatus}</label>
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('subStatus',woItem.subStatus)}" style="word-wrap: break-word;"/>
+                                        </h:panelGroup>
 
-                                <h:panelGroup>
-                                    <label class="label">#{msg.maintenanceValue}</label>
-                                    <p:outputLabel value="#{woItem.maintenanceValue}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">外部报价</label>
-                                    <p:outputLabel value="#{woItem.externalQuotation}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.LatestDevelopments}</label>
-                                    <p:outputLabel value="#{woItem.comment}"/>
-                                </h:panelGroup>
-                                <c:if test="#{userContextService.countyArea}">
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.siebleNumber}</label>
-                                        <p:outputLabel value="#{woItem.siebleNumber}" />
-                                    </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.maintenanceValue}</label>
+                                            <p:outputLabel value="#{woItem.maintenanceValue}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">外部报价</label>
+                                            <p:outputLabel value="#{woItem.externalQuotation}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.LatestDevelopments}</label>
+                                            <p:outputLabel value="#{woItem.comment}"/>
+                                        </h:panelGroup>
+                                        <c:if test="#{userContextService.countyArea}">
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.siebleNumber}</label>
+                                                <p:outputLabel value="#{woItem.siebleNumber}" />
+                                            </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.callCenterNumber}</label>
-                                        <p:outputLabel value="#{woItem.callCenterNumber}" />
-                                    </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.callCenterNumber}</label>
+                                                <p:outputLabel value="#{woItem.callCenterNumber}" />
+                                            </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.countyAreaOrderType}</label>
-                                        <p:outputLabel value="#{fieldMsg.fieldValue('countyAreaOrderType',woItem.orderType)}" rendered="#{not empty woItem.orderType}"/>
-                                    </h:panelGroup>
-                                </c:if>
-                            </p:panelGrid>
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.countyAreaOrderType}</label>
+                                                <p:outputLabel value="#{fieldMsg.fieldValue('countyAreaOrderType',woItem.orderType)}" rendered="#{not empty woItem.orderType}"/>
+                                            </h:panelGroup>
+                                        </c:if>
+                                    </p:panelGrid>
+                                </div>
+                                <div class="ui-g-2">
+                                    <div class="container-fluid" style="height: 200px; width: 200px;">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(workOrderMgrController.selected.ackSignature)}" stream="false" style="max-width: 100%;height: auto"/>
+                                    </div>
+
+                                </div>
+                            </div>
 
 
                             <p:dataTable value="#{workOrderMgrController.getWOrkOrderStep(woItem.id)}" var="stepItem">
@@ -474,6 +484,14 @@
                                     </h:panelGrid>
                                 </p:panel>
                             </h:panelGroup>
+                           <!-- <h:panelGroup rendered="#{not empty workOrderMgrController.selected.ackSignature}">
+                                <label class="label">验收签名</label>
+                                <p:panel  style="text-align:center">
+                                    <h:panelGrid columns="1" style="width:100%" >
+                                        <p:graphicImage value="#{fileDownloadService.getFile(workOrderMgrController.selected.ackSignature)}" stream="false" height="80"  width="100"/>
+                                    </h:panelGrid>
+                                </p:panel>
+                            </h:panelGroup>-->
                             <c:choose>
                                 <c:when test="#{userContextService.isCountyArea()}">
                                     <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHours(woItem.id)}">
