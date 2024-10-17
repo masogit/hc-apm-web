@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -63,6 +64,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private String assetUid;
 
     @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
@@ -529,6 +531,12 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
+        if(mvsIbMapping != null){
+            if(StringUtils.isNotEmpty(this.tenantUID)
+                    && !this.tenantUID.equals(mvsIbMapping.getIbTenantUid())){
+                return mvsIbMapping.getAssetInfo();
+            }
+        }
         return assetInfo;
     }
 
