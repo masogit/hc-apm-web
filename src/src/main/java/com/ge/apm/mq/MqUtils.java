@@ -153,7 +153,9 @@ public class MqUtils {
             log.error("sendApprovalMessage error :",e);
         }
     }
-    public void sendWxMsgToMq(WechatMsgEvent wechatMsgEvent,String exChange,String routingKey) {
+    public void sendWxMsgToMq(WechatMsgEvent wechatMsgEvent,String exChange,String routingKey1) {
+        String routingKey = RabbitConfig.WX_MSG_ROUTING_KEY_PREFIX
+                + wechatMsgEvent.getMsgEvent().name().replace("_", ".").toLowerCase();
         rabbitTemplate.convertAndSend(exChange, routingKey, wechatMsgEvent);
     }
 
