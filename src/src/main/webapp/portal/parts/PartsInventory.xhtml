@@ -33,8 +33,8 @@
                     <h:panelGrid id="filterType" >
                         <h:panelGroup>
                             <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(0)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 0}" value="全部" />
-                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(1)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 1}" value="临界上限"/>
-                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(2)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 2}" value="临界下限"/>
+                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(1)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 1}" value="临界上限" styleClass="warrantyCeiling"/>
+                            <p:commandButton process="@this" update="sparePartsClaimForm filterType" actionListener="#{simplePartsInventoryController.setQueryType(2)}"  rendered="true" disabled="#{simplePartsInventoryController.queryType == 2}" value="临界下限" styleClass="warrantyFloor"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
