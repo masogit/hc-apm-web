@@ -89,7 +89,7 @@
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
                                  action="#{budgetBayController.intoActionModel('Create')}"/>
-                <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                <p:commandButton id="editButton" icon="#{(budgetController.tabIndex eq 0) ? 'ui-icon-pencil' : 'ui-icon-web'}" class="btn btn-sm btn-gray"
                                  title="#{msg.Edit}"
                                  action="#{budgetBayController.intoActionModel('Edit')}"
                                  disabled="#{empty budgetBayController.selected }"/>
