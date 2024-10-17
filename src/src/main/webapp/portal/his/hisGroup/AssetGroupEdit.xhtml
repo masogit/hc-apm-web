@@ -235,11 +235,15 @@
         }
 
         function handleComplete(xhr, status, args,dialog) {
-            var isCheckScaleAssessment = args.isCheckScaleAssessment;
+            var isScaleNull = args.isScaleNull;
+            var scaleTooBig = args.scaleTooBig;
 
-            if(isCheckScaleAssessment==true ) {
+            if(isScaleNull==true ) {
                 PF(dialog).show();
                 PF('checkScaleAssessment').show()
+            }
+            if(scaleTooBig==true ) {
+                PF(dialog).show();
             }
         }
     </script>

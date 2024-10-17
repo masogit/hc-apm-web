@@ -35,10 +35,8 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Where;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -146,6 +144,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     private AssetInfo assetInfo;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -721,6 +720,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public AssetInfo getAssetInfo() {
+        if(mvsIbMapping != null){
+            if(StringUtils.isNotEmpty(this.tenantUID)
+                    && !this.tenantUID.equals(mvsIbMapping.getIbTenantUid())){
+                return mvsIbMapping.getAssetInfo();
+            }
+        }
         return assetInfo;
     }
 
