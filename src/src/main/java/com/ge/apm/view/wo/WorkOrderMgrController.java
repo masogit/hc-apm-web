@@ -3855,6 +3855,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
+        logger.info("needTwoSubStatusBatch"+JSONObject.toJSONString(workOrders));
         workOrders.forEach(workOrder -> {
             logger.info("needTwoSubStatusBatch"+JSONObject.toJSONString(workOrder));
             V2_WorkOrder_Step workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
