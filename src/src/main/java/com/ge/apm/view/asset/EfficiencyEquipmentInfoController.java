@@ -120,6 +120,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Setter
     private String url;
 
+    @Getter
+    @Setter
+    private BigDecimal positiveRate;
+
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
         return efficiencyEquipmentInfoRepository;
@@ -504,6 +508,22 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
 
         return null;
+    }
+
+    public void  editBatch(){
+        if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
+            WebUtil.addErrorMessage("阳性率不能大于100");
+            return;
+        }
+        Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
+        int count=efficiencyEquipmentInfoRepository.updateBatchPositiveRate(assetUids,positiveRate);
+        if(count>0){
+            WebUtil.addErrorMessage("修改阳性率成功");
+        }else{
+            WebUtil.addErrorMessage("修改阳性率失败");
+        }
+        this.selectedMap = new HashMap<>();
+        positiveRate=null;
     }
 
 }
