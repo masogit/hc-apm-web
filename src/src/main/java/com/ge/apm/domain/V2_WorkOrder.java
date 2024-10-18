@@ -533,7 +533,8 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public AssetInfo getAssetInfo() {
         if(mvsIbMapping != null){
             if(StringUtils.isNotEmpty(this.tenantUID)
-                    && !this.tenantUID.equals(mvsIbMapping.getIbTenantUid())){
+                    && !this.tenantUID.equals(mvsIbMapping.getIbTenantUid())
+                    && mvsIbMapping.getAssetInfo() != null){
                 return mvsIbMapping.getAssetInfo();
             }
         }
