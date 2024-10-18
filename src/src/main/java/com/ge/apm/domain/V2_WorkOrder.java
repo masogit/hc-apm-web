@@ -68,7 +68,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
-    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.EAGER)
     private MvsIbMapping mvsIbMapping;
 
