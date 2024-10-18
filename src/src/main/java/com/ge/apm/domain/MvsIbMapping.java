@@ -58,7 +58,7 @@ public class MvsIbMapping implements Serializable {
     @Column(name = "ib_uid")
     private String ibUid;
 
-    @JoinColumn(name = "ib_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "ib_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
