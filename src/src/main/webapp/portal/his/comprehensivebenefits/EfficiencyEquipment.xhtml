@@ -206,11 +206,11 @@
                         </p:column>
                         <p:column headerText="阳性率(%)" >
                             <h:outputText value="#{item.positiveRate}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="1" />
                             </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" oncomplete="PF('efficiencyEquipmentInfoEditBatch').show()"  disabled="#{not efficiencyEquipmentInfoController.isChecked()}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"   actionListener="#{efficiencyEquipmentInfoController.editBatch1}" oncomplete="PF('efficiencyEquipmentInfoEditBatch').show()"  disabled="#{not efficiencyEquipmentInfoController.isChecked()}"/>
                             <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                                 <p:fileDownload value="#{efficiencyEquipmentInfoController.excelFile}" />
@@ -237,12 +237,12 @@
                 $("html")[0].style.overflowX = "hidden";
             }
 
-            $(function () {
-                $(".ui-datatable-tablewrapper").css('width', '100%');
-                $("div table")[1].style.overflowX = "scroll";
-                $("div table")[1].style.width = "auto";
-                $("html")[0].style.overflowX = "hidden";
-            });
+            // $(function () {
+            //     $(".ui-datatable-tablewrapper").css('width', '100%');
+            //     $("div table")[1].style.overflowX = "scroll";
+            //     $("div table")[1].style.width = "auto";
+            //     $("html")[0].style.overflowX = "hidden";
+            // });
 
             var newWin;
             function prepareAssetViewWindow() {
@@ -254,17 +254,17 @@
             }
 
             //<![CDATA[
-            afterPageLoad = function () {
-                $("#searchForm\\:searchText").keypress(function (e) {
-                    if (e.keyCode == 13) {
-                        e.preventDefault();
-                    }
-                })
-                var isActive = "#{userContextService.isActive()}";
-                if (isActive == '1') {
-                    PF('ActiveDlg').show();
-                }
-            }
+            // afterPageLoad = function () {
+            //     $("#searchForm\\:searchText").keypress(function (e) {
+            //         if (e.keyCode == 13) {
+            //             e.preventDefault();
+            //         }
+            //     })
+            //     var isActive = "#{userContextService.isActive()}";
+            //     if (isActive == '1') {
+            //         PF('ActiveDlg').show();
+            //     }
+            // }
 
 
 

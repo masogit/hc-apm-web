@@ -6,6 +6,7 @@ import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetCostDTO;
 import com.ge.apm.domain.dto.DepreciationResultData;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -116,6 +117,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     private StreamedContent excelFile;
 
+    private I18nMessageService i18nMessageService;
+
 
     @Setter
     private String url;
@@ -143,6 +146,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         efficiencyEquipmentMapper = WebUtil.getBean(EfficiencyEquipmentMapper.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         assetDepreciationMapper = WebUtil.getBean(AssetDepreciationMapper.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
 
         this.selectedMap = new HashMap<>();
     }
@@ -379,10 +383,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
 
             List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
-
-            List<I18nMessage> assetGroup = i18nMessageRepository.findI18nByType("assetGroup");
-            Map<String, String> assetGroupMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
-
+            List<I18nMessage> assetGroup = i18nMessageService.getByMsgType("assetGroup");
+            Map<String, String> assetGroupMap  = assetGroup.parallelStream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue, (value1, value2) -> value1));
             List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
             Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
 
@@ -509,7 +511,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
         return null;
     }
-
+    public void  editBatch1(){
+        this.positiveRate=null;
+    }
     public void  editBatch(){
         if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
             WebUtil.addErrorMessage("阳性率不能大于100");
@@ -523,7 +527,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             WebUtil.addErrorMessage("修改阳性率失败");
         }
         this.selectedMap = new HashMap<>();
-        positiveRate=null;
+        this.positiveRate=null;
     }
 
 }
