@@ -18,8 +18,8 @@
                 <p:fieldset legend="效益设备信息" style="margin-bottom:20px"  >
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                        <label class="label">阳性率<span style="color:red">*</span></label>
-                        <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{efficiencyEquipmentInfoController.positiveRate}"
+                        <label class="label">阳性率(%)<span style="color:red">*</span></label>
+                        <p:inputNumber minValue="0" decimalPlaces="1" id="positiveRate" value="#{efficiencyEquipmentInfoController.positiveRate}"
                                        requiredMessage="阳性率必填" >
                             <p:ajax />
                         </p:inputNumber>
@@ -28,7 +28,7 @@
                 </p:fieldset>
 
                 <p:commandButton validateClient="true" actionListener="#{efficiencyEquipmentInfoController.editBatch}"
-                                 value="更新" update=":EfficiencyEquipmentInfoListForm:datalist :growl"
+                                 value="保存" update=":EfficiencyEquipmentInfoListForm:datalist :growl :efficiencyEquipmentEditBatchForm"
                                  icon="ui-icon-check"
                                  oncomplete="handleSubmitDigital(args, 'efficiencyEquipmentInfoEditBatch')"/>
 
