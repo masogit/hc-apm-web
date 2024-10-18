@@ -3206,23 +3206,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private void loadMVSClinicalDeptList() {
         try {
-            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                    clinicalDeptListMVS = bySearchFilterMVS.stream()
-                            .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                    .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
-                                                    .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                            .orElse(null))
-                                    .orElse(null))
-                            .filter(Objects::nonNull) // 过滤掉所有 null 值
-                            .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                            .stream()
-                            .map(val -> configCacheService.findOrgByUid(val))
-                            .collect(Collectors.toList());
-                    if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                        clinicalDeptListMVS = Collections.emptyList();
-                    }                }
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                clinicalDeptListMVS = bySearchFilterMVS.stream()
+                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                        .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
+                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                        .orElse(null))
+                                .orElse(null))
+                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                        .stream()
+                        .map(val -> configCacheService.findOrgByUid(val))
+                        .collect(Collectors.toList());
+                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                    clinicalDeptListMVS = Collections.emptyList();
+                }
             }
         } catch (Exception e) {
             logger.info("暂无MVS列表");
