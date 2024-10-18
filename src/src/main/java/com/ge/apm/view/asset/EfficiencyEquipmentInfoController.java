@@ -516,6 +516,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     }
     public void  editBatch(){
         if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
+            this.positiveRate=null;
             WebUtil.addErrorMessage("阳性率不能大于100");
             return;
         }

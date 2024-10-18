@@ -109,6 +109,7 @@
         </where>
 
 
+        order by es.uid desc
         limit 5000
 
     </select>
