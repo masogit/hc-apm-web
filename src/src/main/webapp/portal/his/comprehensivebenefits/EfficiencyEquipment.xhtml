@@ -81,7 +81,7 @@
                 <h:form id="EfficiencyEquipmentInfoListForm">
                     <p:dataTable id="datalist" value="#{efficiencyEquipmentInfoController.lazyModel}" var="item"
                                  widgetVar="varDataList"
-                                 selectionMode="single"  sortBy="createdDate" sortField="createdDate" sortOrder="descending"
+                                 selectionMode="single"  sortBy="uid" sortField="uid" sortOrder="descending"
                                  selection="#{efficiencyEquipmentInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.uid}" sortMode="single"
