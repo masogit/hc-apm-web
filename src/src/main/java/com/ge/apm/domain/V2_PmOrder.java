@@ -142,7 +142,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date originPlanTime;  //原计划时间
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.EAGER)
     @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     private AssetInfo assetInfo;

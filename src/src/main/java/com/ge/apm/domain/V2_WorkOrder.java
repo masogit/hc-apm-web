@@ -63,7 +63,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="asset_uid",columnDefinition = "CHAR(32)")
     private String assetUid;
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
