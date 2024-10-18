@@ -61,7 +61,7 @@ public class HisAssetService {
         hisAdjustBusinessJob.setOrgCode(equipmentMatch.getEqHosid());
         hisAdjustBusinessJob.setTaskType(2);//2 取消联机匹配
         hisAdjustBusinessJob.setBusinessId(equipmentMatch.getEqId());//LIS、RIS/PACS设备唯一识别编号
-        hisAdjustBusinessJob.setOldStrJson(JSONObject.fromObject(equipmentMatch).toString());
+        hisAdjustBusinessJob.setOldStrJson(JSON.toJSONString(equipmentMatch));
         hisAdjustBusinessJob.setTaskStatus(0);
         hisAdjustBusinessJob.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
         hisAdjustBusinessJob.setCreatedDate(new Date());
