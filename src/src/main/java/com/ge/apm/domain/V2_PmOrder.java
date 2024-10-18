@@ -720,6 +720,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public AssetInfo getAssetInfo() {
+        if(assetInfo == null
+                && mvsIbMapping != null
+                && mvsIbMapping.getAssetInfo() != null){
+            return mvsIbMapping.getAssetInfo();
+        }
         return assetInfo;
     }
 

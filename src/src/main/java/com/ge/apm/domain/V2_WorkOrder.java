@@ -531,9 +531,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
+        if(assetInfo == null
+                && mvsIbMapping != null
+                && mvsIbMapping.getAssetInfo() != null){
+            return mvsIbMapping.getAssetInfo();
+        }
         return assetInfo;
     }
-
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
     }
