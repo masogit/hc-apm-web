@@ -278,6 +278,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 }
             }
         }
+        this.confirmMessage = confirmMessage.toString();
         return confirmMessage.toString();
     }
 
