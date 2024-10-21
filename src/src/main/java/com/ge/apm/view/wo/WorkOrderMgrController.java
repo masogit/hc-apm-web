@@ -6,6 +6,7 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
@@ -3815,21 +3816,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private void loadMVSClinicalDeptList() {
         try {
-            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                    clinicalDeptListMVS = bySearchFilterMVS.stream()
-                            .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                    .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                            .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
-                                                    .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                            .orElse(null))
-                                    .orElse(null))
-                            .filter(Objects::nonNull) // 过滤掉所有 null 值
-                            .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                            .stream()
-                            .map(val -> cacheService.findOrgByUid(val))
-                            .collect(Collectors.toList());
-                }
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                clinicalDeptListMVS = bySearchFilterMVS.stream()
+                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                        .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
+                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                        .orElse(null))
+                                .orElse(null))
+                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                        .stream()
+                        .map(val -> cacheService.findOrgByUid(val))
+                        .collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.info("暂无MVS列表");
@@ -3855,7 +3854,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
         workOrders.forEach(workOrder -> {
-            V2_WorkOrder_Step workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            V2_WorkOrder_Step workOrder_step = new V2_WorkOrder_Step();
+            String tenantUID = loginUser.getTenantUID();
+            if(StringUtils.isNotBlank(tenantUID) && tenantUID.equals(workOrder.getTenantUID())){
+                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            }else if(StringUtils.isNotBlank(tenantUID) && !tenantUID.equals(workOrder.getTenantUID())){
+                if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
+                    workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getMvsIbMapping().getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+                }
+            }
             workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
             workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());
         });

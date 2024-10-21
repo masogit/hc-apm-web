@@ -81,6 +81,9 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "report_config", columnDefinition = "VARCHAR(1024)")
     private String reportConfig;
 
+    @Column(name = "positive_rate")
+    private BigDecimal positiveRate;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
@@ -259,6 +262,46 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     public void setAssetId(Integer assetId) {
         this.assetId = assetId;
+    }
+
+    public BigDecimal getPositiveRate() {
+        return positiveRate;
+    }
+
+    public void setPositiveRate(BigDecimal positiveRate) {
+        this.positiveRate = positiveRate;
+    }
+
+    public String getMakerShortName() {
+        return makerShortName;
+    }
+
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public String getAssetGroupName() {
+        return assetGroupName;
+    }
+
+    public void setAssetGroupName(String assetGroupName) {
+        this.assetGroupName = assetGroupName;
     }
 
     @Override

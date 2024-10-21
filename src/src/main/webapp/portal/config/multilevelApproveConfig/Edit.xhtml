@@ -176,10 +176,11 @@
                         <h:outputText value="#{item.nodeName}"/>
                     </p:column>
                     <p:column headerText="审核人姓名">
-                        <ui:repeat value="#{item.approveUsers}" var="user" varStatus="status">
-                            <h:outputText value="#{user.name}"
+                        <ui:repeat value="#{multiLevelApprovalConfigController.getNodeApprovalUser(item)}" var="user" varStatus="status">
+                            <h:outputText value="#{user}"
                                           style="display:block; margin-bottom: #{status.last ? '0' : '7px'};"/>
                         </ui:repeat>
+
                     </p:column>
                     <p:column headerText="操作">
                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"

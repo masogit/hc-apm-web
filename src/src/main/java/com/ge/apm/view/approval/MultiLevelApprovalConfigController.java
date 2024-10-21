@@ -14,6 +14,7 @@ import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class MultiLevelApprovalConfigController extends GenericCRUDUUIDController<MultiLevelApprovalConfig> {
+    private static final Logger logger = LoggerFactory.getLogger(MultiLevelApprovalConfigController.class);
 
     private MultiLevelApprovalConfigRepository configDao;
     private UserAccountRepository userAccountDao;
@@ -530,6 +534,49 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         nodesList.add(node);
         return nodesList;
+    }
+    public List<String> getNodeApprovalUser(ApprovalNode approvalNode) {
+        List<String> approvalUsers = new ArrayList<>();
+        if (approvalNode == null || approvalNode.getNodeId() == null) {
+            return approvalUsers; // 如果审批节点为空或没有节点ID，直接返回空列表
+        }
+        ApprovalNode matchedNode = nodesList.stream()
+                .filter(ite -> Objects.equals(ite.getNodeId(), approvalNode.getNodeId()))
+                .findFirst()
+                .orElse(null);
+        if (matchedNode == null) {
+            return approvalUsers;
+        }
+        addApproveUsers(approvalUsers, matchedNode);
+        addRoleByApprovalStrategy(approvalUsers, matchedNode);
+        addRoleByRoleApproveCondition(approvalUsers, matchedNode);
+        return approvalUsers;
+    }
+
+    private void addApproveUsers(List<String> approvalUsers, ApprovalNode node) {
+        if (CollectionUtils.isNotEmpty(node.getApproveUsers())) {
+            approvalUsers.addAll(node.getApproveUsers().stream()
+                    .map(UserAccount::getName)
+                    .collect(Collectors.toList()));
+        }
+    }
+
+    private void addRoleByApprovalStrategy(List<String> approvalUsers, ApprovalNode node) {
+        if (node.getApprovalStrategy() != null) {
+            approvalUsers.add(ApmSystemRole.DeptHead.getRoleName());
+        }
+    }
+
+    private void addRoleByRoleApproveCondition(List<String> approvalUsers, ApprovalNode node) {
+        RoleApproveCondition roleApproveCondition = node.getRoleApproveCondition();
+        if (roleApproveCondition != null && roleApproveCondition.getApproveRole() != null && roleApproveCondition.getCondition() != null) {
+            try {
+                ApmSystemRole role = ApmSystemRole.valueOf(roleApproveCondition.getApproveRole());
+                approvalUsers.add(role.getRoleName());
+            } catch (Exception e) {
+                logger.error("审核角色不存在 ApproveRole:{}",roleApproveCondition.getApproveRole());
+            }
+        }
     }
 
     public void onAddNode() {
