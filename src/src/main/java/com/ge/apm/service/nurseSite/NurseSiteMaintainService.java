@@ -1952,14 +1952,22 @@ public class NurseSiteMaintainService {
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex, assetInfo.getFunctionType());
 					StringBuilder keyName = new StringBuilder();
 					for (NurseSiteMaintainItem nurseSiteMaintainItem : tempListItem) {
-						Map<Long, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId())).map(
-								nurseSiteMaintainConfigs -> {
+						Map<String, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId()))
+								.map(nurseSiteMaintainConfigs -> {
+									if (nurseSiteMaintainConfigs.isEmpty()) {
+										return new  HashMap<String, List<NurseSiteMaintainCheckItem>>();
+									}
 									NurseSiteMaintainConfig nurseSiteMaintainConfig = nurseSiteMaintainConfigs.get(0);
 									String checkItemsDetail = nurseSiteMaintainConfig.getCheckItemsDetail();
+									if (StringUtils.isBlank(checkItemsDetail)){
+										return new  HashMap<String, List<NurseSiteMaintainCheckItem>>();
+									}
 									List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems = JSONObject.parseObject(checkItemsDetail, new TypeReference<List<NurseSiteMaintainCheckItem>>() {});
-									return nurseSiteMaintainCheckItems.stream().collect(Collectors.groupingBy(NurseSiteMaintainCheckItem::getKey));
-								}
-						).orElse(new HashMap<>());
+                                    return nurseSiteMaintainCheckItems.stream()
+											.filter(i -> i.getName() != null || i.getKey() != null)
+											.collect(Collectors.groupingBy(item -> item.getKey() != null ? item.getKey().toString() : item.getName()));
+								})
+								.orElse(new HashMap<>());
 						mapCheckItemSequence.clear();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
 						keyName.delete(0, keyName.length());
@@ -1985,8 +1993,10 @@ public class NurseSiteMaintainService {
 									keyName.append(",");
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName.toString(), doc, headerColumnIndex, keyRow, false);
-								List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(tempData.getIndex());
-								NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1.get(0)).orElse(new NurseSiteMaintainCheckItem());
+								List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(tempData.getIndex()!=null?tempData.getIndex().toString():tempData.getCheckItem());
+								NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1)
+										.map(list -> list.isEmpty() ? null : list.get(0))
+										.orElse(new NurseSiteMaintainCheckItem());
 								String description="";
 								if(tempData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
 									switch (nurseSiteMaintainCheckItem.getFieldType()){
