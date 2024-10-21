@@ -293,7 +293,7 @@
                 </p:fieldset>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <h:outputText id="thisDeductionMessage"  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.genConfirmMessage('messageTwo')}" />
+                        <h:outputText id="thisDeductionMessage"  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.thisDeductionMessage}" />
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -519,15 +519,15 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" style="float:left"/>
-                <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
-                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
-                </p:commandButton>
+            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm :zkbConfirmProbeDlg" actionListener="#{zkbFePartOrderProbeController.preSave()}" oncomplete="PF('zkbConfirmProbeDlg').show()" style="float:left"/>
+            <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
+                <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.confirmMessage}" icon="ui-icon-alert"/>
+            </p:commandButton>
 <!--
                 <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left"/>
 -->
 
-                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.supplierReject(param['zkbFePartOrderProbeEditForm:comment'])}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.supplierReject(param['zkbFePartOrderProbeEditForm:comment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.commercialAccept()}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.commercialReject(param['zkbFePartOrderProbeEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  validateClient="true" action="#{zkbFePartOrderProbeController.fullApmInfo}" style="float:left"/>
@@ -537,7 +537,22 @@
             </h:form>
         </h:panelGroup>
     </h:panelGroup>
+    <p:dialog id="zkbConfirmProbeDlg" widgetVar="zkbConfirmProbeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="确认" height="150">
+        <h:form id="zkbConfirmProbeForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label style="color: red">#{zkbFePartOrderProbeController.confirmMessage}</label>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <div style="text-align: center">
+                <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderProbeController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" oncomplete="PF('zkbConfirmProbeDlg').hide()" update=":growl" icon="ui-icon-check" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmProbeDlg').hide()" style="margin-left: 30px"/>
+            </div>
 
+        </h:form>
+
+    </p:dialog>
     <p:dialog id="zkbCancelReasonPbDlg" widgetVar="zkbCancelReasonPbDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
         <h:form id="zkbConfigPbForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
