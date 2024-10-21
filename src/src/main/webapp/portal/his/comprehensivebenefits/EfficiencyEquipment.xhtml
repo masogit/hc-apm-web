@@ -81,7 +81,7 @@
                 <h:form id="EfficiencyEquipmentInfoListForm">
                     <p:dataTable id="datalist" value="#{efficiencyEquipmentInfoController.lazyModel}" var="item"
                                  widgetVar="varDataList"
-                                 selectionMode="single"
+                                 selectionMode="single"  sortBy="uid" sortField="uid" sortOrder="descending"
                                  selection="#{efficiencyEquipmentInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.uid}" sortMode="single"
@@ -97,13 +97,13 @@
                         <p:column width="36" id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{efficiencyEquipmentInfoController.selectedMap[item.assetUid]}"
                                                      class="selectCheckBox">
-                                <p:ajax process="@this" update="@this"
+                                <p:ajax process="@this" update="@this ;@(.selectCheckBox) :EfficiencyEquipmentInfoListForm:datalist editButton"
                                         oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
                                     <p:ajax listener="#{efficiencyEquipmentInfoController.onSelectAllOfPage}"
-                                            update="@(.selectCheckBox) :EfficiencyEquipmentInfoListForm:datalist"
+                                            update="@(.selectCheckBox) :EfficiencyEquipmentInfoListForm:datalist editButton"
                                             oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
@@ -204,8 +204,13 @@
                                 <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="阳性率(%)" >
+                            <h:outputText value="#{item.positiveRate}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="1" />
+                            </h:outputText>
+                        </p:column>
                         <f:facet name="{Toolbar}">
-
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"   actionListener="#{efficiencyEquipmentInfoController.editBatch1}" oncomplete="PF('efficiencyEquipmentInfoEditBatch').show()"  disabled="#{not efficiencyEquipmentInfoController.isChecked()}"/>
                             <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                                 <p:fileDownload value="#{efficiencyEquipmentInfoController.excelFile}" />
@@ -217,6 +222,7 @@
 
                 </h:form>
                 <ui:include src="EfficiencyEquipmentInfoCreateBatch.xhtml"/>
+                <ui:include src="EfficiencyEquipmentInfoEditBatch.xhtml"/>
 
             </div>
 
@@ -231,12 +237,12 @@
                 $("html")[0].style.overflowX = "hidden";
             }
 
-            $(function () {
-                $(".ui-datatable-tablewrapper").css('width', '100%');
-                $("div table")[1].style.overflowX = "scroll";
-                $("div table")[1].style.width = "auto";
-                $("html")[0].style.overflowX = "hidden";
-            });
+            // $(function () {
+            //     $(".ui-datatable-tablewrapper").css('width', '100%');
+            //     $("div table")[1].style.overflowX = "scroll";
+            //     $("div table")[1].style.width = "auto";
+            //     $("html")[0].style.overflowX = "hidden";
+            // });
 
             var newWin;
             function prepareAssetViewWindow() {
@@ -248,17 +254,17 @@
             }
 
             //<![CDATA[
-            afterPageLoad = function () {
-                $("#searchForm\\:searchText").keypress(function (e) {
-                    if (e.keyCode == 13) {
-                        e.preventDefault();
-                    }
-                })
-                var isActive = "#{userContextService.isActive()}";
-                if (isActive == '1') {
-                    PF('ActiveDlg').show();
-                }
-            }
+            // afterPageLoad = function () {
+            //     $("#searchForm\\:searchText").keypress(function (e) {
+            //         if (e.keyCode == 13) {
+            //             e.preventDefault();
+            //         }
+            //     })
+            //     var isActive = "#{userContextService.isActive()}";
+            //     if (isActive == '1') {
+            //         PF('ActiveDlg').show();
+            //     }
+            // }
 
 
 

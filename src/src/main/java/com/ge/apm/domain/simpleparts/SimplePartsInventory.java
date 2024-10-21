@@ -74,7 +74,7 @@ public class SimplePartsInventory implements Serializable {
         if(this.getOnhandQty()>= simplePartsItem.getMaximumQuantity()*0.9 ){
             warningStatus = "warrantyCeiling";
         }
-        if(this.getOnhandQty()>= simplePartsItem.getMinimumQuantity()*1.2 ){
+        if(this.getOnhandQty()<= simplePartsItem.getMinimumQuantity()*1.2 ){
             warningStatus = "warrantyFloor";
         }
         if(this.getOnhandQty()== simplePartsItem.getMinimumQuantity()*1.2  && this.getOnhandQty()== simplePartsItem.getMaximumQuantity()*0.9){
