@@ -169,6 +169,9 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		if(CollectionUtils.isNotEmpty(orderIdList)){
 			searchFilters.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
 			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderIdList.get(0),"1*"));
+			if (user.isEnableAssetTypeGroup()) {
+				searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.EQ, assetInfo.getAssetType(),"1*"));
+			}
 		}
 		List<InventoryOrderDetail> assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
 		if (ObjectUtil.isEmpty(assetInventoryOrderDetails)) {
