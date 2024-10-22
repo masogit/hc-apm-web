@@ -727,7 +727,7 @@
                     <h:panelGrid columns="1" cellpadding="5">
                         <h:panelGroup>
                             <label class="label">退回原因:</label>
-                            <p:inputTextarea value="#{adverseEventApproveController.selected.returnReason}" required="true" requiredMessage="退回原因不能为空"/>
+                            <p:inputTextarea  rows="8" cols="50" value="#{adverseEventApproveController.selected.returnReason}" required="true" requiredMessage="退回原因不能为空"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <p:commandButton action="#{adverseEventApproveController.tempSaveAdverseEventApprove(4)}" update="AdverseEventApproveEditForm" value="退回" icon="ui-icon-check" validateClient="true" oncomplete="PF('returnReasonDisable').hide()"/>

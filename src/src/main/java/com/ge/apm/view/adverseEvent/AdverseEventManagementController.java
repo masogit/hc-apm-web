@@ -135,6 +135,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     @Getter@Setter
     private StreamedContent excelFile;
 
+    @Setter
+    @Getter
+    private List<MultiLevelApproval> multiLevelApprovals;
+
     @Override
     protected void init() {
         /*接口类*/
@@ -200,6 +204,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
             }
+            multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getUid());
         }
     }
 
