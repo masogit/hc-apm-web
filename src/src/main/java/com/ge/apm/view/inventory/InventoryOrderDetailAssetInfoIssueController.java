@@ -185,6 +185,10 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		dao.delete(assetInventoryIssues);
 	}
 
+	public void delete(InventoryIssue inventoryIssue) {
+		dao.delete(inventoryIssue);
+	}
+
 	static void covSearchFilters(List<SearchFilter> searchFilters, List<String> orgUidList) {
 		searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 		searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
