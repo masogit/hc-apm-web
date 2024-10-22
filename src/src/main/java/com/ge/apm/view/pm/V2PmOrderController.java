@@ -2132,22 +2132,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<SearchFilter> buildMvsSearchFilter(){
-        List<SearchFilter> filters = new ArrayList<>();
 
-        List<String> orderIds = getVisableMvsAssetSystemId();
-        if (CollectionUtils.isEmpty(orderIds)) {
-            orderIds = new ArrayList<>();
-            orderIds.add("0");
-        }
-        filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
-        for (SearchFilter searchFilter : filterArrayList) {
-            if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
-                    ",mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
-                filters.add(searchFilter);
+        List<SearchFilter> filters = new ArrayList<>();
+        if (!Strings.isNullOrEmpty(orderId)) {
+            filters.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId, "1*"));
+        }else{
+            List<String> orderIds = getVisableMvsAssetSystemId();
+            if (CollectionUtils.isEmpty(orderIds)) {
+                orderIds = new ArrayList<>();
+                orderIds.add("0");
+            }
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
+            filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+            for (SearchFilter searchFilter : filterArrayList) {
+                if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
+                        ",mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
+                    filters.add(searchFilter);
+                }
             }
         }
-
         return filters;
     }
 
