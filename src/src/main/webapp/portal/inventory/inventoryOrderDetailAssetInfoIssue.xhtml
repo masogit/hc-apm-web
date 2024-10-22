@@ -96,6 +96,12 @@
 							 process="@this" disabled="#{item.isSolved eq false}">
 				<p:confirm header="转入已盘点确认" message="您确定要将本台设备转入已盘点么？" icon="ui-icon-warning"/>
 			</p:commandButton>
+			<br/>
+			<p:commandButton id="deleteButton" value="删除" actionListener="#{inventoryOrderDetailAssetInfoIssueController.delete(item)}"
+							 update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm"
+							 process="@this">
+				<p:confirm header="删除确认" message="您确定要删除么？" icon="ui-icon-warning"/>
+			</p:commandButton>
 		</p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" rendered="#{!inventoryOrderDetailAssetInfoController.finished}" actionListener="#{inventoryOrderDetailAssetInfoIssueController.prepareEdit}" update=":inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg" process="@this" oncomplete="PF('OrderIssueEditDlg').show()" disabled="#{empty inventoryOrderDetailAssetInfoIssueController.selected}"/>
