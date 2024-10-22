@@ -56,6 +56,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private OrgInfo selectedDept;
 
     @Getter @Setter
+    private TreeNode queryOrgTree;
+    @Getter @Setter
+    private OrgInfo dept;
+    @Getter @Setter
     private String assetName;
     @Getter @Setter
     private String assetGroup;
@@ -115,6 +119,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
+        queryOrgTree = initQueryOrgTree(treeNode);
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
@@ -270,7 +275,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             return;
         }
         if(null == this.selected.getClinicalDept()){
-            WebUtil.addErrorMessage("请选择科室并选择设备!");
+            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+//            WebUtil.addErrorMessage("请选择科室并选择设备!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
@@ -374,11 +380,36 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         return orgTree;
     }
 
+    public TreeNode initQueryOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode queryOrgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, queryOrgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(true);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return queryOrgTree;
+    }
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedDept = (OrgInfo) node.getData();
         this.selected.setClinicalDept(selectedDept);
         this.selected.setDeptId(selectedDept.getId());
+    }
+
+    public void onSelectDeptNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        dept = (OrgInfo) node.getData();
     }
 
     public void resetSelectAssetPage(){
@@ -394,16 +425,15 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetGroup = "";
         functionType = "";
         departNum = "";
-        assetName = this.selected.getAssetName();
     }
 
     public void findAssetList(){
         List<SearchFilter> assetSearchFilter = new ArrayList<>();
         //assetSearchFilter.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
-        assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedDept.getInstitutionUID(), "1*"));
-        assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedDept.getHospitalUID(), "1*"));
-        assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedDept.getSiteUID(), "1*"));
-        assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectedDept.getUid(), "1*"));
+        assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
+        assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
+        assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
+        assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         assetSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
 

@@ -38,7 +38,7 @@
                                     showOn="button" showButtonPanel="true" navigator="true" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.clinicaldepart}</label>
+                        <label class="label">#{msg.clinicaldepart}*</label>
                         <p:inputText id="dept" readonly="true" style="width: 80%"
                                      value="#{keyAssetReportController.selectedDept.name}"/>
                         <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
@@ -60,7 +60,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.selectAssetChoose}*</label>
-                        <p:commandButton id="selectAssetBtn" value="#{msg.selectAssetChoose}" disabled="#{empty keyAssetReportController.selectedDept}"
+                        <p:commandButton id="selectAssetBtn" value="#{msg.selectAssetChoose}"
                             actionListener="#{keyAssetReportController.resetSelectAssetPage}" update=":keyAssetSelectDlg" oncomplete="PF('keyAssetSelectDialog').show()"/>
                     </h:panelGroup>
                 </p:panelGrid>
