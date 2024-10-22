@@ -359,7 +359,13 @@
                             </h:panelGroup>
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
-                                <label class="label">#{msg.UsedPart}</label>
+                                <p:panelGrid columns="2" layout="grid" style="padding-left: 0" styleClass="ui-panelgrid-blank">
+                                    <h:panelGroup style="float: left;margin-left: -16px"><label class="label" style="margin-top: 25px">#{msg.UsedPart}</label></h:panelGroup>
+                                    <h:panelGroup style="float: right;margin-right: -18px;margin-top: 10px">
+                                        <p:commandButton id="printBtn" value="打印备件单" icon="ui-icon-print" action="#{workOrderMgrController.openNewWindowView(workOrderMgrController.selected.srId)}" >
+                                        </p:commandButton>
+                                    </h:panelGroup>
+                                </p:panelGrid>
                                 <p:dataTable id="x3" class="cl3" value="#{workOrderMgrController.getWorkOrderDetail(woItem.id)}" var="detailItem">
                                     <p:column headerText="#{msg.accessory}#{msg.Name}">
                                         <h:outputText value="#{detailItem.parts}" />
