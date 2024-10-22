@@ -164,16 +164,19 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		covSearchFilters(searchFilters, orgUidList);
 		List<InventoryIssue> assetInventoryIssues = dao.findBySearchFilter(searchFilters);
-		String clinicalDeptUID = assetInfo.getClinicalDeptUID();
-		List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), ListUtil.newArrayList(clinicalDeptUID),false);
-		if(CollectionUtils.isNotEmpty(orderIdList)){
-			searchFilters.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
-			searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderIdList.get(0),"1*"));
-			if (user.isEnableAssetTypeGroup()) {
-				searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.EQ, assetInfo.getAssetType(),"1*"));
-			}
-		}
 		List<InventoryOrderDetail> assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
+		if (ObjectUtil.isEmpty(assetInventoryOrderDetails)) {
+			String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+			List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), ListUtil.newArrayList(clinicalDeptUID),false);
+			if(CollectionUtils.isNotEmpty(orderIdList)){
+				searchFilters.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
+				searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList,"1*"));
+				if (user.isEnableAssetTypeGroup()) {
+					searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.EQ, assetInfo.getAssetType(),"1*"));
+				}
+			}
+			assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
+		}
 		if (ObjectUtil.isEmpty(assetInventoryOrderDetails)) {
 			WebUtil.addErrorMessage("当前设备无盘点工单，无法转入已盘点！");
 			return;
