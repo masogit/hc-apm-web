@@ -3991,5 +3991,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
        return enableAuditGroupConfiguration;
     }
+    public String openNewWindowView(String srId) {
+        return "/portal/woMgr/woPartsJmPrintReportView.xhtml?faces-redirect=true&amp;sr_id=" +  srId ;
+    }
 }
 

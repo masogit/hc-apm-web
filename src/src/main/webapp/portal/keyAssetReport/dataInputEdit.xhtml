@@ -46,7 +46,7 @@
                             <p:scrollPanel style="height:300px; border: 0" mode="native">
                                 <p:tree id="orgTree" value="#{keyAssetReportController.orgTree}" var="node"
                                         selectionMode="single" class="tree" style="width:98%; border:0">
-                                    <p:ajax process="@this" event="select" update="editForm:dept selectForm:deptName editForm:selectAssetBtn"
+                                    <p:ajax process="@this" event="select" update="editForm:dept editForm:selectAssetBtn"
                                             listener="#{keyAssetReportController.onSelectTreeNode}"
                                             oncomplete="PF('varOrg').hide();"/>
                                     <p:ajax process="@this" event="expand"/>
