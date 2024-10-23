@@ -1,8 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.apache.poi.xwpf.usermodel.*;
 
 import java.util.List;
 import java.util.Map;
@@ -26,5 +25,17 @@ public class DepartmentConvertRenderPolicy extends AbstractWoTableRenderPolicy {
         }
         table.removeRow(1);
 
+    }
+
+    @Override
+    protected void addCell(XWPFTableRow row, String textValue) {
+        XWPFTableCell xwpfTableCell = row.addNewTableCell();
+        xwpfTableCell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
+        XWPFParagraph paragraph = xwpfTableCell.getParagraphs().get(0);
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun run = paragraph.createRun();
+        run.setFontFamily("Calibri");
+        run.setFontSize(11);
+        run.setText(textValue);
     }
 }
