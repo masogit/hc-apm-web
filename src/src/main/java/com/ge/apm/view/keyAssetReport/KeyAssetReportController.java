@@ -432,7 +432,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
-        assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+        if (dept.getOrgLevel() == 4) {
+            assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+        }
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         assetSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
 
