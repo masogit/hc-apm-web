@@ -117,16 +117,17 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
         UserAccount account = UserContextService.getCurrentUserAccount();
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
-        orgTree = initOrgTree(treeNode);
-        queryOrgTree = initQueryOrgTree(treeNode);
+//        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4));
+        queryOrgTree = initQueryOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
-
-        previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        previewUrl = "";
+//        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+//                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        previewUrlForYear = "";
+//        previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+//                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
 
     @Override
