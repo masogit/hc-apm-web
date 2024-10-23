@@ -122,12 +122,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         queryOrgTree = initQueryOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        previewUrl = "";
-//        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-//                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
-        previewUrlForYear = "";
-//        previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-//                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
 
     @Override
