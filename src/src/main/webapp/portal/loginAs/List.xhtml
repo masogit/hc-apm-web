@@ -105,7 +105,7 @@
                         </p:column>
                         <p:column headerText="#{msg.roleId}" filterBy="#{item.userRoleList.roleId}" filterMatchMode="EQ" rendered="#{userAccountController.isShowButton()}">
                             <f:facet name="filter">
-                                <p:selectOneMenu value="#{userAccountController.userRoleType}" onchange="PF('varDataList').filter()" >
+                                <p:selectOneMenu filter="true" filterMatchMode="contains" filterNormalize="true" value="#{userAccountController.userRoleType}" onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
                                     <f:selectItems value="#{userAccountController.roles}" var="item" itemLabel="#{userContextService.isLocale() ? item.roleDesc : item.roleDescEn}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
