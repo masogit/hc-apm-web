@@ -32,10 +32,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -105,7 +102,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     List<ZkbZone> zkbZoneList = new ArrayList<>();
 
     @Getter@Setter
-    private String[] selectedOptions;
+    private List<String> selectedZoneStr = new ArrayList<>();
 
     private ZkbZoneRepository zkbZoneRepository;
 
@@ -162,7 +159,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         if("ManagePending".equals(selected.getConfigType())){
             zkbZoneList = zkbZoneRepository.findByRegion(selected.getRegion());
             if(StringUtils.isNotEmpty(selected.getZone())){
-                selectedOptions = selected.getZone().split(",");
+                selectedZoneStr = Arrays.asList(selected.getZone().split(","));
             }
         }
     }
@@ -288,11 +285,11 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             this.selected.setTestStatus("f");
         }
         if ("ManagePending".equals(this.selected.getConfigType())) {
-            if (selectedOptions.length == 0) {
+            if (selectedZoneStr.size() == 0) {
                 WebUtil.addErrorMessage("zone不能为空！");
                 return;
             }else {
-                selected.setZone(StringUtils.join(selectedOptions, ","));
+                selected.setZone(StringUtils.join(selectedZoneStr, ","));
             }
         }
         if (backUpUser != null && StringUtils.isNotEmpty(backUpUser.getId())) {
@@ -437,4 +434,6 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     public void setSynGeFeConfigFlag(Boolean synGeFeConfigFlag) {
         this.synGeFeConfigFlag = synGeFeConfigFlag;
     }
+
+
 }
