@@ -53,21 +53,14 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
-                        <label class="label">#{msg.zkbKeyUserConfig_region}*</label>
-                        <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="true" requiredMessage="区域#{msg.ValidationRequire}">
-                            <p:ajax  event="change" update=":zkbPartOrderUserConfigEditForm:zonePandlGroup" listener="#{zkbPartOrderUserConfigController.regionChange()}" />
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup id="zonePandlGroup" rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
+
+                  <!--  <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
                         <label class="label">zone</label>
                         <p:selectManyCheckbox  value="#{zkbPartOrderUserConfigController.selectedOptions}" widgetVar="blub" columns="2" required="false" requiredMessage="不真实选择#{msg.ValidationRequire}"
                                                styleClass="grid-checkbox" layout="grid" style="width: 100%">
                             <f:selectItems value="#{zkbPartOrderUserConfigController.zkbZoneList}" var="item" itemLabel="#{item.zone}" itemValue="#{item.zone}"  />
                         </p:selectManyCheckbox>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup rendered="#{zkbPartOrderUserConfigController.isGeFeConfigType()}">
                         <label class="label">是否同步创建或更新GE FE USER CONFIG</label>
                         <p:selectBooleanCheckbox value="#{zkbPartOrderUserConfigController.synGeFeConfigFlag}">
@@ -108,6 +101,25 @@
                             <f:selectItem itemLabel="是" itemValue="t"/>
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
+                        <label class="label">#{msg.zkbKeyUserConfig_region}*</label>
+                        <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="true" requiredMessage="区域#{msg.ValidationRequire}">
+                            <p:ajax  event="change" update=":zkbPartOrderUserConfigEditForm:zonePandlGroup" listener="#{zkbPartOrderUserConfigController.regionChange()}" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid style="width:300px;" id="zonePandlGroup" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}" >
+                    <h:panelGroup>
+                        <label class="label">zone*</label>
+                        <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbPartOrderUserConfigController.selectedZoneStr}"   var="t" style="width:99%"  filter="true"   filterMatchMode="contains" showCheckbox="true"   >
+                            <f:selectItems value="#{zkbPartOrderUserConfigController.zkbZoneList}" var="it" itemLabel="#{it.zone}" itemValue="#{it.zone}"     />
+                            <p:column>
+                                <h:outputText value="#{t}" />
+                            </p:column>
+                        </p:selectManyMenu>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
