@@ -176,6 +176,7 @@ public class CustomConfigController {
                 break;
             case "MobileFilterFields":
                 addFieldsList = customConfigObject.defaultAssetsMobilepageFilterFields().stream().filter(item -> !customConfigObject.getAssetsMobilepageFilterFields().contains(item)).collect(Collectors.toList());
+                addFieldsList = addFieldsList.stream().filter(item-> !"assetTypeGroup".equals(item) || userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")).collect(Collectors.toList());
                 break;
             case "MobileHeaderFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
