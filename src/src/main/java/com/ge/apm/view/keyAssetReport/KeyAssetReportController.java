@@ -117,14 +117,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
         UserAccount account = UserContextService.getCurrentUserAccount();
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
-        orgTree = initOrgTree(treeNode);
-        queryOrgTree = initQueryOrgTree(treeNode);
+//        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4));
+        queryOrgTree = initQueryOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
                 "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
-
         previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
                 "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
@@ -433,7 +432,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
-        assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+        if (dept.getOrgLevel() == 4) {
+            assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+        }
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         assetSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
 
