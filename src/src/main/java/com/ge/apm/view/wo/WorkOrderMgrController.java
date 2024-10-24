@@ -555,7 +555,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public String getStepImg(V2_WorkOrder v2_workOrder){
         Integer stepId =v2_workOrder.getCurrentStepId();
-        int mode =v2_workOrder.getDispatchMode();
+        int mode =v2_workOrder.getDispatchMode()!=null?v2_workOrder.getDispatchMode().intValue():0;
         switch(stepId){
             case 7: //待评价
                 return "icons/5.png";
