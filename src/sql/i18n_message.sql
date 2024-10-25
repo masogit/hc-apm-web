@@ -5444,3 +5444,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','WarrantyFee','维保费','WarrantyFee',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','MedicalSupplies','药物耗材费','MedicalSupplies',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HisEntryType','Utilities','水电费','Utilities',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'nextMeteringDate', '下次计量日期', 'Next Metering Date', NULL, '-1');
