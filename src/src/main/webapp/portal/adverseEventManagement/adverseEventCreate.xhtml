@@ -694,7 +694,7 @@
                             </p:panelGrid>
                         </p:tab>
 
-                        <p:tab title="审批记录" rendered="#{adverseEventManagementController.selected.status eq 4}">
+                        <p:tab title="审批记录" rendered="#{adverseEventManagementController.selected.status ne 1}">
                             <p:dataTable id="accessList" class="accessList" value="#{adverseEventManagementController.multiLevelApprovals}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="审批单号">
                                     <h:outputText value="#{item.approvalNumber}"/>
