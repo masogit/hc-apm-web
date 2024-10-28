@@ -88,7 +88,7 @@
                             </f:facet>
                             <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
                         </p:column>
-                        <p:column headerText="来源" filterBy="#{item.source}" filterMatchMode="EQ">
+                        <p:column headerText="来源" filterBy="#{item.source}" filterMatchMode="EQ" rendered="#{supplierController.activeVender()}">
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{supplierController.source}" onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
