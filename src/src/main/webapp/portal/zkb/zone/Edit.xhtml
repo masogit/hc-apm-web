@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="zkbZoneEditDlg" widgetVar="zkbZoneEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbZoneController.CRUDActionName} 课程" height="370">
+    <p:dialog id="zkbZoneEditDlg" widgetVar="zkbZoneEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbZoneController.CRUDActionName} Zone" height="370">
         <h:form id="zkbZoneEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbZoneController.selected != null}">
                 <h:panelGroup>
