@@ -23,8 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -34,13 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -108,6 +101,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     @Setter
     private String newSupplierType;
 
+    private List<I18nMessage> contractAttachmentTypeList;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
@@ -169,6 +164,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         supplierList = supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
         manufactureList = supplierDao.findByManufacturerTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
         initOrgTree();
+        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("contractAttachmentType");
+        contractAttachmentTypeList =contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
     }
 
     @Override
@@ -816,5 +813,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public void setInvoiceInfo(ContractInfoItem invoiceInfo) {
         this.invoiceInfo = invoiceInfo;
+    }
+
+
+    public List<I18nMessage> getContractAttachmentTypeList() {
+        return contractAttachmentTypeList;
+    }
+
+    public void setContractAttachmentTypeList(List<I18nMessage> contractAttachmentTypeList) {
+        this.contractAttachmentTypeList = contractAttachmentTypeList;
     }
 }
