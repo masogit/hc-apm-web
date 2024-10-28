@@ -690,7 +690,7 @@
                             <p:selectOneMenu id="functionGroup" value="#{contractInfoEditController.attachmentType}" autoWidth="false" style="width: 100%">
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractAttachmentType')}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                                <f:selectItems value="#{contractInfoEditController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
