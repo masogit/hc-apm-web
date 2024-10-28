@@ -4,3 +4,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 INSERT INTO public.config_item_value("uid", "hospital_uid", "institution_uid", "key", "site_uid", "tenant_uid", "value") SELECT replace(uuid_generate_v4()::text, '-', ''), t.uid, t.uid, 'enableHasIssueShownInTheInventory', t.uid, t.uid, 'false' FROM tenant_info t WHERE t.name = '云南省阜外心血管病医院' AND NOT EXISTS ( SELECT 1 FROM config_item_value civ WHERE civ.key = 'enableHasIssueShownInTheInventory' AND civ.site_uid = t.uid );
 -- YHAAO-23044  扫码盘点点开后资产属性增加字段：使用年限、下次计量日期、备注
 update  config_item set validation='[{"key":"设备型号","value":"functionType"},{"key":"设备序列号","value":"serialNum"},{"key":"出厂日期","value":"manufactDate"},{"key":"注册证号","value":"registrationNo"},{"key":"安装位置","value":"locationName"},{"key":"二维码","value":"qrCode"},{"key":"制造商","value":"manufacture"},{"key":"使用年限","value":"lifecycle"},{"key":"下次计量日期","value":"nextMeteringDate"},{"key":"备注","value":"comments"}]' where key='scanInventoryField';
+
+
+--不良事件退回回写多级审批意见
+update multi_level_approval ap set approval_opinion = (SELECT e.return_reason from adverse_events e where e.uid = ap.business_uid) where ap.business_type = 13 and ap.approval_status = 3 and approval_opinion is null and ap.id in (select p.id from multi_level_approval p inner join (SELECT business_uid,max(actual_approver_date) actual_approver_date from multi_level_approval where business_type = 13 and approval_status = 3 group by business_uid ) t on p.business_uid = t.business_uid and t.actual_approver_date = p.actual_approver_date);
