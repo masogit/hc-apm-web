@@ -40,9 +40,9 @@
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbZoneController.deleteData}" update=":zkbZoneListForm" disabled="#{empty zkbZoneController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton id="importButton" ajax="false" title="课程导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
+                           <!-- <p:commandButton id="importButton" ajax="false" title="Zone导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
 
-                            </p:commandButton>
+                            </p:commandButton>-->
                         </f:facet>
 
                     </p:dataTable>

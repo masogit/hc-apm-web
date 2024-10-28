@@ -400,8 +400,8 @@
                             <p:column headerText="维修类型" >
                                 <h:outputText value="#{zkbContractEditController.getRepairForm(zkbContractAssetItem.assetInfo.repairForm)}" />
                             </p:column>
-                            <p:column headerText="品牌" >
-                                <h:outputText value="#{zkbContractAssetItem.assetInfo.makerShortName}" />
+                            <p:column headerText="Zone" >
+                                <h:outputText value="#{zkbContractAssetItem.zone}" />
                             </p:column>
                             <p:column headerText="是否超声高低机" >
                                 <h:outputText value="#{fieldMsg.fieldValue('zkbContractAssetType',zkbContractAssetItem.assetType)}" />
