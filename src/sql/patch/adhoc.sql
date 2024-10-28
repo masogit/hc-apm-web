@@ -8,3 +8,6 @@ update  config_item set validation='[{"key":"设备型号","value":"functionType
 
 --不良事件退回回写多级审批意见
 update multi_level_approval ap set approval_opinion = (SELECT e.return_reason from adverse_events e where e.uid = ap.business_uid) where ap.business_type = 13 and ap.approval_status = 3 and approval_opinion is null and ap.id in (select p.id from multi_level_approval p inner join (SELECT business_uid,max(actual_approver_date) actual_approver_date from multi_level_approval where business_type = 13 and approval_status = 3 group by business_uid ) t on p.business_uid = t.business_uid and t.actual_approver_date = p.actual_approver_date);
+-- 删除重复数据
+delete from shared_asset_req_detail where id in (select  sard.id  from   shared_asset_req_detail  sard left join asset_info  ai on sard.asset_info_id = ai.uid where sard.charging_end_time is null and ai.clinical_dept_uid = ai.asset_dept_uid);
+delete from shared_asset_req_detail  where id in (select id  from (select  row_number() over( partition by asset_info_id order by charging_begin_time desc) as rn,id from  shared_asset_req_detail where  charging_end_time is null) as t where  t.rn > 1);
