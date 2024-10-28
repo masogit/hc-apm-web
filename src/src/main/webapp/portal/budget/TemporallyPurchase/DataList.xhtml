@@ -89,8 +89,8 @@
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                  title="#{msg.Create}"
                                  action="#{budgetBayController.intoActionModel('Create')}"/>
-                <p:commandButton id="editButton" icon="#{(budgetController.tabIndex eq 0) ? 'ui-icon-pencil' : 'ui-icon-web'}" class="btn btn-sm btn-gray"
-                                 title="#{msg.Edit}"
+                <p:commandButton id="editButton" icon="#{(budgetBayController.tabIndex eq 0  or budgetBayController.tabIndex eq 2 or budgetBayController.tabIndex eq 4 ) ? 'ui-icon-pencil' : 'ui-icon-web'}" class="btn btn-sm btn-gray"
+                                 title="#{(budgetBayController.tabIndex eq 0  or budgetBayController.tabIndex eq 2 or budgetBayController.tabIndex eq 4 ) ? '修改' : '查看'}"
                                  action="#{budgetBayController.intoActionModel('Edit')}"
                                  disabled="#{empty budgetBayController.selected }"/>
                 <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
