@@ -272,6 +272,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         node.setNodeName(approvalNode.getNodeName());
         node.setUsingRole(approvalNode.getUsingRole());
         node.setApprovalStrategy(approvalNode.getApprovalStrategy());
+        node.setUsedOperatingRoom(approvalNode.getUsedOperatingRoom());
         if (approvalNode.getUsingRole()) {
             node.setApproveRoles(approvalNode.getApproveRoles());
         } else {
