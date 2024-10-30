@@ -321,14 +321,14 @@ public class AssetInstallationService {
         }
         List<SearchFilter> departNumFilters = new ArrayList<>();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
-        departNumFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        departNumFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, item.getArrivalList().getTenantUID()));
         List<AssetInfo> assetList = assetDao.findBySearchFilter(departNumFilters);
         if (null != assetList && assetList.size() > 0) {
             return new Tuple2(false, "设备编号已经使用");
         }
         departNumFilters.clear();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
-        departNumFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        departNumFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.EQ, item.getArrivalList().getTenantUID()));
         List<ArrivalListItem> itemList = itemDao.findBySearchFilter(departNumFilters);
         if (null == itemList || itemList.isEmpty()) {
             return new Tuple2(true, "");
