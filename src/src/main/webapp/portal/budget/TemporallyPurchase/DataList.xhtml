@@ -93,9 +93,8 @@
                                  title="#{(budgetBayController.tabIndex eq 0  or budgetBayController.tabIndex eq 2 or budgetBayController.tabIndex eq 4 ) ? '修改' : '查看'}"
                                  action="#{budgetBayController.intoActionModel('Edit')}"
                                  disabled="#{empty budgetBayController.selected }"/>
-                <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
-                                  ajax="false">
-                    <p:dataExporter type="xls" target="datalist" fileName="Budget_Application_Export"/>
+                <p:commandButton  title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{budgetBayController.exportExcel('BAY')}" ajax="false">
+                    <p:fileDownload value="#{budgetBayController.exportFile}"/>
                 </p:commandButton>
                 <!-- <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" class="btn btn-sm btn-gray" actionListener="#{budgetBayController.exportExcel('BAY')}" icon="ui-icon-arrowstop-1-s">
                     <p:fileDownload value="#{budgetBayController.exportFile}"/>

@@ -50,6 +50,7 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     public I18nMessage findByMsgTypeAndMsgKeyOrderById(String msgType, String msgKey);
 
     public I18nMessage findFirstByMsgTypeAndValueZhAndSiteId(String msgType, String msgValue, int siteId);
+    public I18nMessage findFirstByMsgTypeAndValueZh(String msgType, String msgValue);
 
     @Query(value = "select max(to_number(msg_key, '999')) from i18n_message where msg_type = ?1 and site_id = ?2",nativeQuery = true)
     public List<BigDecimal> getMaxMsgKeyByMsgTypeAndSiteId(String msgType, int siteId);
