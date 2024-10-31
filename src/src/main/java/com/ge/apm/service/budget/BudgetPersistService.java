@@ -19,6 +19,7 @@ import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -56,22 +57,22 @@ public class BudgetPersistService {
 
     private static Logger logger = LoggerFactory.getLogger(BudgetPersistService.class);
     //主表字段
-    private final String[] BUDGET_HEADER_FIELD = {"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate"};  //主表字段名
+    private final String[] BUDGET_HEADER_FIELD = {"applicationYear","applicationDeptName","wardCode","applicantLoginName","applicationDate"};  //主表字段名
     //设备明细字段
     private final String[] ASSET_HEADER_FIELD = {"applicationAssetName","applicationAssetCategory","recommendedBrand","standards","model","applicationQuantity","unit",
-            "applicationPrice","sourceFunding","similarDevicesNumber","similarDevicesUse","importedOr","majorFunction","deviceConfiguration",
+            "applicationPrice","applicationAmount","sourceFunding","similarDevicesNumber","similarDevicesUse","importedOr","majorFunction","deviceConfiguration",
             "technicalParameter","equipmentUtilization","benefitAnalysis","productComparison","serviceLife","chargingStandards","yearIncome","usage",
             "placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","description","offlineApprovalComplete","offlineApprovalDate","offlineApprovalOpinions","offlineApprovalConclusion",
-            "offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice","offlineApprovalRemark"};  //明细字段名
-    private final String[] ASSET_HEADER_FIELD_BIGDECIMAL_TYPE = {"applicationPrice","chargingStandards","yearIncome","offlineApplicationPrice"}; //bigdecima数字类型字段
+            "offlineApprovalRecorder","offlineApplicationQuantity","offlineApplicationPrice", "offlineApplicationAmount","offlineApprovalRemark"};  //明细字段名
+    private final String[] ASSET_HEADER_FIELD_BIGDECIMAL_TYPE = {"applicationPrice", "applicationAmount","chargingStandards","yearIncome","offlineApplicationPrice","offlineApplicationAmount"}; //bigdecima数字类型字段
     private final String[] ASSET_HEADER_FIELD_INTEGER_TYPE = {"applicationQuantity","similarDevicesNumber","offlineApplicationQuantity"}; //integer类型字段
     //日期类型
     private final String[] HEADER_FIELD_DATE_TYPE = {"applicationDate","offlineApprovalDate"}; //日期类型字段
     //下拉字段名  ，需value  和中文转换
     private final String[] ASSET_HEADER_FIELD_DROP_INDEX = {"sourceFunding","importedOr","placeSite","usedOperatingRoom","signatureNurse","systemDocking","connectNetwork","offlineApprovalComplete"}; //下拉字段
     //主表必填字段
-    private final String[][] BUDGET_FIELD_REQUIRE = {{"applicationNum","applicationDeptName","wardCode","applicantLoginName","applicationDate"},
-                                                     {"申请编号"       ,"申请科室"             ,"病区代码"  ,"申请人登录账号"      ,"申请日期(YYYY/MM/DD)"}}; //主表必填字段名称，和中文名
+    private final String[][] BUDGET_FIELD_REQUIRE = {{"applicationNum","applicationDeptName","wardCode"},
+                                                     {"申请编号"       ,"申请科室"             ,"病区代码"  }}; //主表必填字段名称，和中文名
     //明细必填字段
     private final String[][] ASSET_FIELD_REQUIRE = {{"applicationAssetName","applicationAssetCategory","applicationQuantity","unit","applicationPrice","usedOperatingRoom","offlineApprovalComplete"},
                                                     {"设备名称"              ,"设备分类"                  ,"数量"                ,"单位" ,"预算单价"         ,"是否在手术室使用"    ,"线下审批是否完成"  }}; //明细必填字段
@@ -103,6 +104,8 @@ public class BudgetPersistService {
     private OrgInfoRepository orgDao;
     @Autowired
     private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
+    @Autowired
+    private I18nMessageRepository i18nMessageRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -407,7 +410,8 @@ public class BudgetPersistService {
             budgetApplication = budgetApplicationDao.findById(budgetApplication.getId());
             BudgetApplicationAsset budgetApplicationAsset = budgetApplication.getBudgetAssets().iterator().next();
             Map<String, Object> budgetApplicationMap = new HashMap<>();
-            budgetApplicationMap.put("编号",budgetApplication.getApplicationNum());
+            budgetApplicationMap.put("申请编号",budgetApplication.getApplicationNum());
+            budgetApplicationMap.put("年份",budgetApplication.getApplicationYear());
             budgetApplicationMap.put("院区",budgetApplication.getCourtyardArea());
             budgetApplicationMap.put("病区代码",budgetApplication.getWardCode());
             budgetApplicationMap.put("申请科室",budgetApplication.getApplicationDept()==null?"":budgetApplication.getApplicationDept().getName());
@@ -458,8 +462,8 @@ public class BudgetPersistService {
     }
 
     public void exportData(ExcelDocument doc, List<Map<String, Object>> budgetApplicationData,String orderType) {
-        Integer keyRow_budget = 1;
-        Integer dataRow_budget = 2;
+        Integer keyRow_budget = 2;
+        Integer dataRow_budget = 3;
         if(BudgetApplication.OrderType.BAY.toString().equals(orderType)){
             for (Map<String, Object> item : budgetApplicationData) {
                 doc.writeRowData("临时采购申请", keyRow_budget, dataRow_budget++, item);
@@ -478,7 +482,7 @@ public class BudgetPersistService {
         if (sheet == null) {
             return null;
         }
-        for(int j = 1 ; j < sheet.getLastRowNum(); j ++){
+        for(int j = 2 ; j < sheet.getLastRowNum(); j ++){
             Row row = sheet.getRow(j+1);
             if(row==null){
                 continue;
@@ -551,18 +555,23 @@ public class BudgetPersistService {
             }
             budgetApplicationAsset.setApplicationNum(budgetApplication.getApplicationNum());
             BudgetApplicationAsset budgetApplicationAssetCur = budgetApplication.getBudgetAssets().iterator().next();
-            if(budgetApplicationAssetCur.getApplicationPrice()!= null && budgetApplicationAssetCur.getApplicationQuantity()!= null){
-                budgetApplicationAssetCur.setApplicationAmount(budgetApplicationAssetCur.getApplicationPrice()
-                        .multiply(new BigDecimal(budgetApplicationAssetCur.getApplicationQuantity()))
-                        .setScale(2, RoundingMode.HALF_UP));
+            if(budgetApplicationAssetCur.getApplicationAmount() == null || budgetApplicationAssetCur.getApplicationAmount().compareTo(BigDecimal.ZERO) == 0){
+                if(budgetApplicationAssetCur.getApplicationPrice()!= null && budgetApplicationAssetCur.getApplicationQuantity()!= null){
+                    budgetApplicationAssetCur.setApplicationAmount(budgetApplicationAssetCur.getApplicationPrice()
+                            .multiply(new BigDecimal(budgetApplicationAssetCur.getApplicationQuantity()))
+                            .setScale(2, RoundingMode.HALF_UP));
+                }
             }
-            if(budgetApplicationAssetCur.getOfflineApplicationPrice()!= null && budgetApplicationAssetCur.getOfflineApplicationQuantity()!= null){
-                budgetApplicationAssetCur.setOfflineApplicationAmount(budgetApplicationAssetCur.getOfflineApplicationPrice()
-                        .multiply(new BigDecimal(budgetApplicationAssetCur.getOfflineApplicationQuantity()))
-                        .setScale(2, RoundingMode.HALF_UP));
-                //budgetApplicationAssetCur.setConfirmPrice(budgetApplicationAssetCur.getOfflineApplicationPrice());
-                //budgetApplicationAssetCur.setConfirmQuantity(budgetApplicationAssetCur.getOfflineApplicationQuantity());
+            if(budgetApplicationAssetCur.getOfflineApplicationAmount() == null || budgetApplicationAssetCur.getOfflineApplicationAmount().compareTo(BigDecimal.ZERO) == 0){
+                if(budgetApplicationAssetCur.getOfflineApplicationPrice()!= null && budgetApplicationAssetCur.getOfflineApplicationQuantity()!= null){
+                    budgetApplicationAssetCur.setOfflineApplicationAmount(budgetApplicationAssetCur.getOfflineApplicationPrice()
+                            .multiply(new BigDecimal(budgetApplicationAssetCur.getOfflineApplicationQuantity()))
+                            .setScale(2, RoundingMode.HALF_UP));
+                    //budgetApplicationAssetCur.setConfirmPrice(budgetApplicationAssetCur.getOfflineApplicationPrice());
+                    //budgetApplicationAssetCur.setConfirmQuantity(budgetApplicationAssetCur.getOfflineApplicationQuantity());
+                }
             }
+
             budgetApplicationDao.save(budgetApplication);
         }
         return tempBudgetList;
@@ -575,7 +584,7 @@ public class BudgetPersistService {
         budgetApplicationAssetSet.add(budgetApplicationAsset);
         budgetApplication.setBudgetAssets(budgetApplicationAssetSet);
         budgetApplication.setApplicationStep(BudgetApplication.APPLICATIONSTEP.Complete.toString());
-        budgetApplication.setApplicationDate(new Date());
+        //budgetApplication.setApplicationDate(new Date());
         budgetApplication.setApplicationStatus(6);
         budgetApplication.setBudgetApprovals(new HashSet<>());
         budgetApplication.setCreatedBy(user.getLoginName());
@@ -601,17 +610,18 @@ public class BudgetPersistService {
         budgetApplicationAsset.setInstitutionUID(selectOrgInfo.getInstitutionUID());
         budgetApplicationAsset.setHospitalUID(selectOrgInfo.getHospitalUID());
         budgetApplicationAsset.setSiteUID(selectOrgInfo.getSiteUID());
+        this.genApplicationNum(budgetApplication,budgetApplication.getOrderType());
         return budgetApplication;
     }
 
 
 
     public String checkRequiredAndDataVerification(BudgetApplication budgetApplication,OrgInfo selectOrgInfo,String errorInfo) throws NoSuchFieldException, IllegalAccessException {
-        BudgetApplication budgetApplicationExist = budgetApplicationDao.findByApplicationNum(budgetApplication.getApplicationNum());
-        if(budgetApplicationExist != null ){
+        //BudgetApplication budgetApplicationExist = budgetApplicationDao.findByApplicationNum(budgetApplication.getApplicationNum());
+        //if(budgetApplicationExist != null ){
             //为空  只有这个是等于
-            errorInfo = "[数据已存在，请检查后重试]";
-        }else{
+        //    errorInfo = "[数据已存在，请检查后重试]";
+        //}else{
             for (int i = 0; i < BUDGET_FIELD_REQUIRE[0].length; i++) {
                 String fieldName = BUDGET_FIELD_REQUIRE[0][i];
                 Field field = budgetApplication.getClass().getDeclaredField(fieldName);
@@ -665,7 +675,23 @@ public class BudgetPersistService {
                 budgetApplication.setApplicationDept(orgInfoDept);
                 budgetApplicationAsset.setApplicationDeptId(orgInfoDept.getId());
             }
-        }
+           /* OrgInfo orgInfoSite = orgDao.getSiteByName(budgetApplication.getCourtyardArea(),selectOrgInfo.getHospitalUID());
+            if(orgInfoSite==null){
+                errorInfo += "[院区有误，请检查后重试！]";
+            }else{
+                budgetApplication.setCourtyardArea(orgInfoSite.getName());
+                budgetApplication.setCourtyardAreaId(orgInfoSite.getId());
+            }*/
+
+            if(StrUtil.isNotEmpty(budgetApplicationAsset.getApplicationAssetCategory())){
+                I18nMessage i = i18nMessageRepository.findFirstByMsgTypeAndValueZh("assetGroup", budgetApplicationAsset.getApplicationAssetCategory());
+                if(i == null){
+                    errorInfo += "[设备分类不存在，请检查后重试！]";
+                }else{
+                    budgetApplicationAsset.setApplicationAssetCategory(i.getMsgKey());
+                }
+            }
+        //}
         return errorInfo;
     }
 
@@ -682,13 +708,10 @@ public class BudgetPersistService {
                     value = "T";
                 }else if("否".equals(value)){
                     value = "F";
-
-                }else if("横向专项经费(科研))".equals(value)){
+                }else if("横向专项经费(科研)".equals(value)){
                     value = "HorizontalSpecial";
-
                 }else if("拨款资金".equals(value)){
                     value = "Appropriation";
-
                 }else if("自筹资金".equals(value)){
                     value = "SelfRaised";
                 }
