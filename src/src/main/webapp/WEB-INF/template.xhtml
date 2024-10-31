@@ -44,6 +44,11 @@
     <h:outputStylesheet name="css/main3.css"/>
     <h:outputScript name="js/main.js"/>
     <ui:insert name="head"/>
+    <style>
+        .pageTitle {
+            font-weight: bolder;
+        }
+    </style>
 </h:head>
 
 <h:body styleClass="main-body #{guestPreferences.compact ? 'layout-compact' : null}">
