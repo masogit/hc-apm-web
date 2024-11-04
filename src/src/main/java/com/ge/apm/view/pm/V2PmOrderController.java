@@ -2132,22 +2132,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<SearchFilter> buildMvsSearchFilter(){
+
         List<SearchFilter> filters = new ArrayList<>();
-
-        List<String> orderIds = getVisableMvsAssetSystemId();
-        if (CollectionUtils.isEmpty(orderIds)) {
-            orderIds = new ArrayList<>();
-            orderIds.add("0");
-        }
-        filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-
-        for (SearchFilter searchFilter : filterArrayList) {
-            if (("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
-                    ",assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
-                filters.add(searchFilter);
+        if (!Strings.isNullOrEmpty(orderId)) {
+            filters.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId, "1*"));
+        }else{
+            List<String> orderIds = getVisableMvsAssetSystemId();
+            if (CollectionUtils.isEmpty(orderIds)) {
+                orderIds = new ArrayList<>();
+                orderIds.add("0");
+            }
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
+            filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+            for (SearchFilter searchFilter : filterArrayList) {
+                if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
+                        ",mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
+                    filters.add(searchFilter);
+                }
             }
         }
-
         return filters;
     }
 
@@ -2520,10 +2523,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
             if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
-                searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
+                searchFilters.add((new SearchFilter("mvsIbMapping.assetInfo.siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
             }
             if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
-                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
+                filterArrayList.add((new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
             }
         } else {
             if (StringUtils.isNotEmpty(siteUidFilter)) {
@@ -2542,7 +2545,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
           //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
            // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
 
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID") && !"MVS保养".equals(tabTitle)) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -3135,9 +3138,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public List<OrgInfo> LoadSiteNameListMVS() {
         if (CollectionUtils.isEmpty(orgListMVS)) {
-            List<OrgInfo> orgInfos = uaaService.getUserAccessibleSiteList(loginUser.getUid());
-            if (!CollectionUtils.isEmpty(orgInfos)) {
-                orgListMVS = orgInfos.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                orgListMVS = bySearchFilterMVS.stream()
+                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                        .map(info -> Optional.ofNullable(info.getSiteUID())
+                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                        .orElse(null))
+                                .orElse(null))
+                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                        .stream()
+                        .map(val -> configCacheService.findOrgByUid(val))
+                        .collect(Collectors.toList());
+                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                    orgListMVS = Collections.emptyList();
+                }
+            }
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
         return orgListMVS;
@@ -3190,9 +3209,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private void loadMVSClinicalDeptList() {
         try {
-            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getClinicalDeptId()).collect(Collectors.toSet()).stream().map(val -> configCacheService.findOrgByUid(val)).collect(Collectors.toList());
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                clinicalDeptListMVS = bySearchFilterMVS.stream()
+                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
+                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
+                                        .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
+                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
+                                        .orElse(null))
+                                .orElse(null))
+                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+                        .stream()
+                        .map(val -> configCacheService.findOrgByUid(val))
+                        .collect(Collectors.toList());
+                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                    clinicalDeptListMVS = Collections.emptyList();
                 }
             }
         } catch (Exception e) {

@@ -18,7 +18,7 @@
                     <p:tab title="供应商导入" id="supplierImport" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
                         <ui:include src="import.xhtml"/>
                     </p:tab>
-                    <p:tab title="供应商关联" id="supplierRelation" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}">
+                    <p:tab title="供应商关联" id="supplierRelation" rendered="#{userContextService.canRender('ASSET_VENDER') and userContextService.accessContainsFunctionMenu('ASSET_VENDER')   }">
                         <ui:include src="relation.xhtml"/>
                     </p:tab>
                 </p:tabView>

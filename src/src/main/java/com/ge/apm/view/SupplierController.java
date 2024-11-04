@@ -53,6 +53,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private SupplierService supplierService;
 
     private String supplierType;
+    private String source;
     private List<SupplierUser> approvedUserList;
     private List<SupplierUser> pendingApprovalUserList;
     private String queryStrPending;
@@ -72,6 +73,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Getter @Setter
     private Boolean isSelectedCurrentPage = false;
     private boolean activeSupplier;
+    private boolean activeVender;
 
     @Override
     protected void init() {
@@ -83,6 +85,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         blobService = WebUtil.getBean(BlobFileService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         activeSupplier = supplierService.activeSupplier();
+        activeVender = supplierService.activeVender();
         this.filterBySite = false;
         this.selectedMapPending = new HashMap();
         this.selectedMapApproved = new HashMap();
@@ -122,6 +125,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             }
             this.removeFilterOnField("supplierType");
 
+        }
+        if(this.hasFilterOnField("source")){
+            switch (source){
+                case "1": searchFilters.add(new SearchFilter("venderCompanyId", SearchFilter.Operator.IsNull,null));break;
+                case "2": searchFilters.add(new SearchFilter("venderCompanyId", SearchFilter.Operator.IsNotNull,null));break;
+            }
+            this.removeFilterOnField("source");
         }
         Page<Supplier> res;
         if (this.searchFilters == null) {
@@ -548,6 +558,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         return activeSupplier;
     }
 
+    public boolean activeVender(){
+        return activeVender;
+    }
+
     public boolean activeSupplierCertificateManage(){
         if(isShowSupplierCertificate == null){
             isShowSupplierCertificate = supplierService.activeSupplierCertificateManage();
@@ -565,6 +579,14 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public void setSupplierType(String supplierType) {
         this.supplierType = supplierType;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public List<SupplierUser> getPendingApprovalUserList() {

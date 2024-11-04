@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
@@ -314,13 +315,17 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
         return Boolean.TRUE;
     }
 
-    @Override
-    public void save(){
 
-//        List<AssetInfo> targetAssets = availableAssets.getTarget();
-        List<AssetInfo>  targetAssets=selectAssetInfos;
-        BigDecimal sum = targetAssets.stream()
-                .filter(item -> item != null)
+    public void checkSaveGroup(){
+        boolean check = selectAssetInfos.stream().anyMatch(tem -> tem.getScaleAssessment() == null);
+        if(check){
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("isScaleNull", true);
+            return;
+        }
+
+        BigDecimal sum = selectAssetInfos.stream()
+                .filter(Objects::nonNull)
                 .map(item -> {
                     BigDecimal scaleAssessment = item.getScaleAssessment();
                     if (scaleAssessment == null) {
@@ -329,14 +334,22 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
                     return scaleAssessment;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if(sum.compareTo(BigDecimal.valueOf(100))==1){
+        if(sum.compareTo(BigDecimal.valueOf(100))>0){
             WebUtil.addErrorMessage("均摊比例不能大于100");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("scaleTooBig", true);
             return;
         }
 
+        save();
+    }
+
+    @Override
+    public void save(){
+
+//        List<AssetInfo> targetAssets = availableAssets.getTarget();
+        List<AssetInfo>  targetAssets=selectAssetInfos;
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-
-
         HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByUuid(selected.getAssetGroupUid());
         //去掉校验
         if(hisAssetGroup.getType().equals("Income")){

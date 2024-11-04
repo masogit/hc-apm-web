@@ -1,9 +1,6 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.ZkbContractCatRepository;
-import com.ge.apm.dao.ZkbContractRepository;
-import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.CopyByInvok;
@@ -64,6 +61,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractCatRepository zkbContractCatRepository;
     private TenantInfo tenantInfo;
 
+    private ZkbZoneRepository zkbZoneRepository;
+
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
         return dao;
@@ -80,6 +79,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         zkbContractCatRepository = WebUtil.getBean(ZkbContractCatRepository.class);
+        zkbZoneRepository = WebUtil.getBean(ZkbZoneRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -408,6 +408,10 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                 targetAssets.remove((AssetInfo) item);
             }
         }
+    }
+
+    public List<ZkbZone> queryZoneByRegion(){
+        return zkbZoneRepository.findByRegion(selected.getRegion());
     }
 
     public void saveAsset(){

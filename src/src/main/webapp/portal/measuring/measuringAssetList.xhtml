@@ -110,7 +110,7 @@
                     </p:column>
                     <p:column headerText="下次计量日期" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
-                            <p:inputText id="filterNextMeteringDate" widgetVar="varFilterNextMeteringDate" />
+                            <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
                         <h:outputText value="#{item.nextMeteringDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -161,7 +161,7 @@
                 </h:form>
             </p:dialog>
             <ui:include src="BatchSrCreate.xhtml"/>
-            <p:overlayPanel widgetVar="panelFilterCheckDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterCheckDate" dismissable="false">
+            <p:overlayPanel id="idPanelFilterCheckDate" widgetVar="panelFilterCheckDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterCheckDate" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_CheckDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
@@ -172,15 +172,15 @@
                 <p:commandButton onclick="PF('panelFilterCheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>
 
-            <p:overlayPanel widgetVar="panelFilterNextMeteringDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterNextMeteringDate" dismissable="false">
+            <p:overlayPanel id="idPanelFilterNextMeteringDate1" widgetVar="panelFilterNextMeteringDate1" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterNextMeteringDate1" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                     <p:outputLabel value="#{msg.To}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 </h:panelGrid>
-                <p:commandButton onclick="setDateFilter('varDataList_measuringAsset','varFilterNextMeteringDate','varStartTimeFrom_NextMeteringDate','varStartTimeTo_NextMeteringDate'); PF('panelFilterNextMeteringDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-                <p:commandButton onclick="PF('panelFilterNextMeteringDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                <p:commandButton onclick="setDateFilter('varDataList_measuringAsset','varFilterNextMeteringDate1','varStartTimeFrom_NextMeteringDate1','varStartTimeTo_NextMeteringDate1'); PF('panelFilterNextMeteringDate1').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterNextMeteringDate1').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>
 
             <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:clinicalDept" dismissable="true" style="text-align: left;">

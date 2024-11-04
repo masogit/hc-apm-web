@@ -26,6 +26,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -144,7 +145,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private String userRoleType;
 
-    private List<SysRole> roles;
+    private List<SysRoleVO> roles;
 
     private String retrieval;//查询树的关键字
 
@@ -325,13 +326,38 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     private void updateRoleList() {
-        roles = Lists.newArrayList(sysRoleRepository.findAll());
-        roles.sort(Comparator.comparingInt(SysRole::getId));
+        roles = new ArrayList<>();
+        List<SysRole> sysRoles = Lists.newArrayList(sysRoleRepository.findAll());
+        List<SysRoleVO> collect = sysRoles.stream().sorted(Comparator.comparingInt(SysRole::getId)).map(item -> {
+            SysRoleVO sysRoleVO = new SysRoleVO();
+            sysRoleVO.setId(item.getId());
+            sysRoleVO.setName(item.getName());
+            sysRoleVO.setRoleType(0);
+            sysRoleVO.setRoleDescEn(item.getRoleDescEn());
+            sysRoleVO.setRoleDesc(item.getRoleDesc());
+            return sysRoleVO;
+        }).collect(Collectors.toList());
+        roles.addAll(collect);
         if (selectedTenant != null) {
             if (selectedTenant.getInsulate() == null || !selectedTenant.getInsulate()) {
                 roles.removeIf(i -> "LocalITAdmin".equals(i.getName()));
             }
         }
+        List<CustomRole> customRoles = customRoleRepository.findByTenantUID(loginUser.getTenantUID());
+        List<SysRoleVO> customRolesCollect = customRoles.stream().sorted(Comparator.comparingInt(CustomRole::getId)).map(item -> {
+            SysRoleVO sysRoleVO = new SysRoleVO();
+            sysRoleVO.setId(Math.negateExact(item.getId()));
+            sysRoleVO.setName(item.getName());
+            sysRoleVO.setRoleType(1);
+            String roleDesc = item.getRoleDesc();
+            if(StringUtils.isEmpty(roleDesc)){
+                roleDesc = item.getName();
+            }
+            sysRoleVO.setRoleDesc(roleDesc);
+            sysRoleVO.setRoleDescEn(roleDesc);
+            return sysRoleVO;
+        }).collect(Collectors.toList());
+        roles.addAll(customRolesCollect);
     }
 
     public String getTenantUid() {
@@ -1859,11 +1885,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.userRoleType = userRoleType;
     }
 
-    public List<SysRole> getRoles() {
+    public List<SysRoleVO> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<SysRole> roles) {
+    public void setRoles(List<SysRoleVO> roles) {
         this.roles = roles;
     }
 
@@ -2075,4 +2101,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         return assetTypeGroupDto;
     }
 
+    @Override
+    public void onFilter(FilterEvent event) {
+        super.onFilter(event);
+        Optional<SearchFilter> first = searchFilters.stream().filter(item -> "userRoleList.roleId".equals(item.fieldName)).findFirst();
+        if(first.isPresent()){
+            SearchFilter searchFilter = first.get();
+            Object value = searchFilter.value;
+            if(value instanceof String){
+                 Integer roleId =  Integer.valueOf((String) value);
+                 if(roleId > 0){
+                     addFilter("userRoleList.roleType",SearchFilter.Operator.EQ.name(),0);
+                 }else{
+                     searchFilter.value = Math.negateExact(roleId);
+                     addFilter("userRoleList.roleType",SearchFilter.Operator.EQ.name(),1);
+                 }
+            }
+
+        }
+    }
 }

@@ -51,6 +51,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 1;
     private List<String> listAccessClinical;
+    private ConfigItemValueRepository configItemValueRepository;
 
 	@Override
 	protected void init() {
@@ -60,7 +61,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-		currentUser = UserContextService.getCurrentUserAccount();
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+
+        currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
         isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
@@ -117,7 +120,8 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-        if(UserContextService.hasCurrentTenantName("")){
+        String configValue = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),"enableHasIssueShownInTheInventory");
+        if(Boolean.FALSE.toString().equalsIgnoreCase(configValue)){
             List<SearchFilter> inventoryIssueSearchFilters = new ArrayList<>();
             inventoryIssueSearchFilters.addAll(searchFilterList);
             inventoryIssueSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));

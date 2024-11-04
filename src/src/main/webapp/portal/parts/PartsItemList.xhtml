@@ -168,6 +168,18 @@
                                         </p:overlayPanel>
 
                                     </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">数量上限</label>
+                                        <p:inputNumber  name="maximumQuantity"
+                                                        style="width: 220px;"
+                                                        value="#{simplePartsItemController.selected.maximumQuantity}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">数量下限</label>
+                                        <p:inputNumber  name="minimumQuantity"
+                                                        style="width: 220px;"
+                                                        value="#{simplePartsItemController.selected.minimumQuantity}"/>
+                                    </h:panelGroup>
                                 </p:panelGrid>
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.countyArea}">
                             <h:panelGroup>
@@ -183,12 +195,27 @@
                                 actionListener="#{simplePartsItemController.savePartsItem()}"
                                 value="#{msg.save}"
                                 update=":basicListForm:datalist"
-                                icon="ui-icon-check" oncomplete="PF('basicEditDialog').hide();"/>
+                                icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args,'basicEditDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('basicEditDialog').hide()" />
                     </h:panelGroup>
                 </h:form>
+
+                <script type="text/javascript">
+
+                    function handleComplete(xhr, status, args,dialog) {
+                        var checkQuantity = args.checkQuantity;
+                        if(checkQuantity==true) {
+                            PF(dialog).show();
+                        }else{
+                            PF(dialog).hide();
+                        }
+                    }
+                </script>
             </p:dialog>
         </div>
     </ui:define>
+
+
+
 </ui:composition>

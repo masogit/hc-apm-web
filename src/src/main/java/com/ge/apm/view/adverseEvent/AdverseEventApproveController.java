@@ -93,6 +93,10 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     @Getter@Setter
     private String[] selectedOptions;
 
+    @Setter
+    @Getter
+    private List<MultiLevelApproval> multiLevelApprovals;
+
     @Override
     protected void init() {
         /*接口类*/
@@ -127,6 +131,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
             if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
             }
+            multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getUid());
         }
     }
 

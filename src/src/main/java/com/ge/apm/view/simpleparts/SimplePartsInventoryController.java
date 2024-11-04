@@ -2,6 +2,7 @@ package com.ge.apm.view.simpleparts;
 
 import com.ge.apm.dao.mapper.simpleparts.SimplePartsInventoryMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsItemRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
@@ -15,6 +16,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,10 @@ import java.util.stream.Collectors;
 @ViewScoped
 @SuppressWarnings("all")
 public class SimplePartsInventoryController extends GenericCRUDUUIDController<SimplePartsInventory> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimplePartsInventoryController.class);
+
+
     private static final long serialVersionUID = 3721577362709407159L;
 
     private SimplePartsInventoryService partsInventoryService;
@@ -52,6 +59,14 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private SimplePartsConfigService partsConfigService;
     private UserContextService userContextService;
     private SimplePartsItemService partsItemService;
+
+    private SimplePartsInventoryMapper simplePartsInventoryMapper;
+
+    private SimplePartsItemRepository simplePartsItemRepository;
+
+    @Getter
+    @Setter
+    private int queryType=0; // 0全部  1临界上 2 临界下限
     /**
      * @author csh
      * @createTime 2020/6/11 15:00
@@ -72,6 +87,8 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         partsWarehouseUserService = WebUtil.getBean(SimplePartsWarehouseUserService.class);
+        simplePartsInventoryMapper = WebUtil.getBean(SimplePartsInventoryMapper.class);
+        simplePartsItemRepository = WebUtil.getBean(SimplePartsItemRepository.class);
     }
 
     /**
@@ -126,27 +143,53 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
 //
 //        Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
 //        return res;
-        Boolean bool = userContextService.isPartsAdmin();
-        if(bool==true){
-            String userUid = currentUserAccount.getUid();
-            List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(userUid);
-            Set<String> warehouses = new HashSet<>(partsWarehouses);
-            if(warehouses.size() == 0){
-                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
-                Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
-                return res;
-            }
-            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, partsWarehouses));
-//          List<SimplePartsInventory> res= partsInventoryRepository.findByPartsWarehouseIds(warehouses);
-//            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses, ""));
-            Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
-            return res;
-        }else{
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
-            Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
-            return res;
+        Boolean isPartsAdmin = userContextService.isPartsAdmin();
+        String currentUserUid = currentUserAccount.getUid();
+        Map<String, Object> map = new HashMap<>();
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            map.put("name",oneSearchStr);
         }
+        if (isPartsAdmin) {
+            List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(currentUserUid);
+            Set<String> warehouses = new HashSet<>(partsWarehouses);
 
+            if (!warehouses.isEmpty()) {
+                searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, partsWarehouses));
+                map.put("partsWarehouseIds",partsWarehouses);
+            } else {
+                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+                map.put("id",null);
+            }
+        } else {
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+            map.put("id",null);
+        }
+        try {
+//            Page<SimplePartsInventory> resultPage = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+
+            map.put("queryType",queryType);
+
+            map.put("pageSize",pageRequest.getPageSize());
+            map.put("offset",pageRequest.getPageNumber()*pageRequest.getPageSize());
+
+            List<SimplePartsInventory> partsInventoryList = simplePartsInventoryMapper.findPartsInventoryList(map);
+            int count = simplePartsInventoryMapper.findPartsInventoryCount(map);
+            List<String> partsItemIds = partsInventoryList.stream().map(SimplePartsInventory::getPartsItemId).collect(Collectors.toList());
+            List<SimplePartsItem> simplePartsItems = simplePartsItemRepository.findByIdIn(partsItemIds);
+            Map<String, List<SimplePartsItem>> temMap = simplePartsItems.stream().collect(Collectors.groupingBy(SimplePartsItem::getId));
+            partsInventoryList.forEach(item->item.setSimplePartsItem(temMap.get(item.getPartsItemId()).get(0)));
+            setWarningStatus(partsInventoryList);
+            Page<SimplePartsInventory> page = new PageImpl<>(partsInventoryList, pageRequest,count);
+            return page;
+        } catch (Exception e) {
+            logger.error("SimplePartsInventoryController loadData error :",e);
+            throw new RuntimeException("Failed to fetch parts inventory");
+        }
+    }
+
+    private void setWarningStatus(List<SimplePartsInventory> simplePartsInventories){
+        simplePartsInventories.forEach(item -> item.setWarningStatus());
     }
 
     @Override

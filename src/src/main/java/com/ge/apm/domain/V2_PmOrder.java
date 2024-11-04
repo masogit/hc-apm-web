@@ -35,10 +35,8 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Where;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -144,8 +142,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date originPlanTime;  //原计划时间
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     private AssetInfo assetInfo;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -274,6 +273,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @Transient
     private String partApproveSignature;
+
+    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.EAGER)
+    private MvsIbMapping mvsIbMapping;
+
 
     @Transient
     private String businessDigest;
@@ -716,6 +720,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public AssetInfo getAssetInfo() {
+        if(assetInfo == null
+                && mvsIbMapping != null
+                && mvsIbMapping.getAssetInfo() != null){
+            return mvsIbMapping.getAssetInfo();
+        }
         return assetInfo;
     }
 
@@ -841,5 +850,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setOriginalPmNum(String originalPmNum) {
         this.originalPmNum = originalPmNum;
+    }
+
+    public MvsIbMapping getMvsIbMapping() {
+        return mvsIbMapping;
+    }
+
+    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
+        this.mvsIbMapping = mvsIbMapping;
     }
 }

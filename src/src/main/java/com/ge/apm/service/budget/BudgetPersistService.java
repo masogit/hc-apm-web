@@ -331,6 +331,7 @@ public class BudgetPersistService {
                 approval.get().setApprovalLevelNow(1);
                 approval.get().setWorkflowConfigApproveUid(approvalConfig.getId());
                 approval.get().setInitiateApproverUid(account.getUid());
+                approval.get().setApplicationUid(account.getUid());
                 approval.get().setCreatedDate(new Date());
                 approval.get().setCreatedBy(account.getLoginName());
 

@@ -581,7 +581,7 @@
                         </p:tab>
 
                     </p:accordionPanel>
-                    <p:accordionPanel id="accordionApprove" multiple="true" activeIndex="5">
+                    <p:accordionPanel id="accordionApprove" multiple="true" activeIndex="6">
                         <p:tab title="事件调查">
                             <h:panelGroup>
                                 <label class="label">是否开展了调查</label>
@@ -680,6 +680,41 @@
                                 <p:inputText id="reportMergeCode" maxlength="100" value="#{adverseEventApproveController.selected.reportMergeCode}" disabled="#{adverseEventApproveController.readOnlyEditForm}"/>
                             </h:panelGroup>
                         </p:tab>
+                        <p:tab title="审批记录" rendered="#{adverseEventApproveController.selected.status ne 1}">
+                            <p:dataTable id="accessList" class="accessList" value="#{adverseEventApproveController.multiLevelApprovals}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                <p:column headerText="审批单号">
+                                    <h:outputText value="#{item.approvalNumber}"/>
+                                </p:column>
+                                <p:column headerText="业务单号">
+                                    <h:outputText value="#{item.businessNumber}"/>
+                                </p:column>
+                                <p:column headerText="业务类型" >
+                                    <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
+                                </p:column>
+                                <p:column headerText="实际审批人">
+                                    <h:outputText value="#{item.actualApproverName}"/>
+                                </p:column>
+                                <p:column headerText="审批级别">
+                                    <h:outputText value="#{item.approvalLevel}级审批人"/>
+                                </p:column>
+                                <!--采购管理不用显示审批意见-->
+                                <p:column headerText="审批意见" rendered="#{multiLevelApprovalController.selected.businessType ne 17}">
+                                    <h:outputText value="#{item.approvalOpinion}"/>
+                                </p:column>
+                                <p:column headerText="审批状态">
+                                    <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalStatus(item.approvalStatus)}"/>
+                                </p:column>
+                                <p:column headerText="审批节点状态">
+                                    <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalNodeStatus(item.approvalNodeStatus)}"/>
+                                </p:column>
+                                <p:column headerText="审批时间"  >
+                                    <h:outputText value="#{item.actualApproverDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:tab>
                         <p:tab title="报告审核情况">
                             <h:panelGroup>
                                 <label class="label">审核结果<span style="color:red">*</span></label>
@@ -726,8 +761,8 @@
                 <h:form id="returnForm">
                     <h:panelGrid columns="1" cellpadding="5">
                         <h:panelGroup>
-                            <label class="label">退回原因:</label>
-                            <p:inputTextarea value="#{adverseEventApproveController.selected.returnReason}" required="true" requiredMessage="退回原因不能为空"/>
+                            <label class="label"><b>退回原因:</b></label>
+                            <p:inputTextarea  rows="8" cols="50" value="#{adverseEventApproveController.selected.returnReason}" required="true" requiredMessage="退回原因不能为空"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <p:commandButton action="#{adverseEventApproveController.tempSaveAdverseEventApprove(4)}" update="AdverseEventApproveEditForm" value="退回" icon="ui-icon-check" validateClient="true" oncomplete="PF('returnReasonDisable').hide()"/>

@@ -58,4 +58,27 @@ public class SimplePartsInventory implements Serializable {
 
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
+
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "parts_item_id",referencedColumnName = "id", insertable = false,updatable = false)
+    private SimplePartsItem simplePartsItem;
+
+    @Transient
+    private String warningStatus = null;
+
+    public void setWarningStatus(){
+        if(simplePartsItem==null || (simplePartsItem.getMaximumQuantity()==null ||simplePartsItem.getMaximumQuantity()==0 ) ||   (simplePartsItem.getMinimumQuantity()==null ||simplePartsItem.getMinimumQuantity()==0  )    ){
+            return;
+        }
+        if(this.getOnhandQty()>= simplePartsItem.getMaximumQuantity()*0.9 ){
+            warningStatus = "warrantyCeiling";
+        }
+        if(this.getOnhandQty()<= simplePartsItem.getMinimumQuantity()*1.2 ){
+            warningStatus = "warrantyFloor";
+        }
+        if(this.getOnhandQty()== simplePartsItem.getMinimumQuantity()*1.2  && this.getOnhandQty()== simplePartsItem.getMaximumQuantity()*0.9){
+            warningStatus = "warrantyFloor";
+        }
+    }
 }

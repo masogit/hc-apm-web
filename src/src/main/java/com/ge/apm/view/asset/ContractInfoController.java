@@ -8,9 +8,11 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -236,6 +238,46 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("ContractEdit?action=Edit&selectedid=".concat(selected.getId()));
     }
+
+    public String renewalAction(){
+        ContractInfo c = copyContract();
+        return UrlEncryptController.encodeUrlParam("ContractEdit?action=Edit&selectedid=".concat(c.getId()));
+    }
+
+    public ContractInfo copyContract(){
+        ContractInfo contractInfo = new ContractInfo();
+        BeanUtils.copyProperties(this.selected, contractInfo);
+        contractInfo.setContractNum(null);
+        contractInfo.setStartDate(null);
+        contractInfo.setEndDate(null);
+        contractInfo.setAmount(null);
+        contractInfo.setEndMonths(null);
+        contractInfo.setId(null);
+        contractInfo.setLastModifiedBy(null);
+        contractInfo.setLastModifiedDate(null);
+        contractInfo.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+        contractInfo.setCreatedDate(new Date());
+        //contractInfo.set
+        dao.save(contractInfo);
+
+        List<ContractInfoItem> oldItem = contractService.getContractItems(selected.getId());
+        List<ContractInfoItem> newContractItem = new ArrayList<>();
+        for(ContractInfoItem i : oldItem){
+            if(ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(i.getItemType())){
+                ContractInfoItem newItem = new ContractInfoItem();
+                BeanUtils.copyProperties(i, newItem);
+                newItem.setId(null);
+                newItem.setContractId(contractInfo.getId());
+                newContractItem.add(newItem);
+            }
+        }
+        if(newContractItem.size() > 0 ){
+            contractInfoItemRepository.save(newContractItem);
+        }
+
+        return contractInfo;
+    }
+
     public String importAction() {
         return "contractImport/ContractImport?faces-redirect=true";
     }

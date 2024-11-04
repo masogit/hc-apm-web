@@ -24,8 +24,10 @@
         </style>
 
             <div class="ui-g-12 card">
-                <h:form rendered="#{supplierController.activeSupplier()}">
+                <h:form rendered="#{(supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION') )  or( supplierController.activeVender() and userContextService.accessContainsFunctionMenu('ASSET_VENDER') )}">
                     <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                </h:form>
+                <h:form rendered="#{supplierController.activeVender()}">
                     <h:panelGrid id="filterType" columns="2" style="float: right">
                         <h:panelGroup style="float: right">
                             <span >#{msg.Legend}：</span>
@@ -46,7 +48,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" update="createButton editButton editSupplierUserButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton "/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36" id="checkBox" exportable="false">
@@ -86,10 +88,20 @@
                             </f:facet>
                             <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
                         </p:column>
+                        <p:column headerText="来源" filterBy="#{item.source}" filterMatchMode="EQ" rendered="#{supplierController.activeVender()}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{supplierController.source}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                    <f:selectItem itemLabel="院方维护" itemValue="1" />
+                                    <f:selectItem itemLabel="供应商维护" itemValue="2" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.venderCompanyId == null ? '院方维护' : '供应商维护'}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update="supplierTab:SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected or supplierController.selected.source eq 'VenderCompany'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
+                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION')    }"/>
                             <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -102,7 +114,7 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:editSupplierUserButton datalist:deleteButton" immediate="true"/>
+                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton  datalist:deleteButton" immediate="true"/>
                 </h:form>
 
                 <ui:include src="Edit.xhtml"/>

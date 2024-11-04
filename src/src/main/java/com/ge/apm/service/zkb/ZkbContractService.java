@@ -299,6 +299,7 @@ public class ZkbContractService {
                 zkbContractAssetDataMap.put("是否由GE FE提供年度1次现场保养", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getSupportMaintainFlag()));
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
+            zkbContractAssetDataMap.put("zone", zkbContractAsset.getZone());
             zkbContractAssetDataMap.put("ID", zkbContractAsset.getId());
             zkbContractAssetDataList.add(zkbContractAssetDataMap);
         }

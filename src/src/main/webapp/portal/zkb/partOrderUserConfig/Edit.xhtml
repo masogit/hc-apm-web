@@ -7,76 +7,81 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://java.sun.com/jsp/jstl/core">
-
 <ui:composition>
 
     <h:form id="zkbPartOrderUserConfigEditForm">
         <p:fieldset id="zkbFiledSet" legend="#{zkbPartOrderUserConfigController.CRUDActionName}" style="margin-bottom:20px" rendered="#{zkbPartOrderUserConfigController.selected != null}">
             <h:panelGroup>
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid id="panelGrid" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_apm}</label>
-                        <p:inputText id="loginName" value="#{zkbPartOrderUserConfigController.selected.loginName}" required="true" requiredMessage="APM用户名#{msg.ValidationRequire}" />
+                        <p:inputText id="loginName" value="#{zkbPartOrderUserConfigController.selected.loginName}" required="true" requiredMessage="APM用户名#{msg.ValidationRequire}" >
+                            <p:ajax />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_name}</label>
-                        <p:inputText id="name" value="#{zkbPartOrderUserConfigController.selected.name}"  required="false" requiredMessage="名称#{msg.ValidationRequire}" />
+                        <p:inputText id="name" value="#{zkbPartOrderUserConfigController.selected.name}"  required="false" requiredMessage="名称#{msg.ValidationRequire}" >
+                            <p:ajax />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_email}</label>
                         <p:inputText id="email" value="#{zkbPartOrderUserConfigController.selected.email}" validatorMessage="请输入正确的邮箱格式" required="false" requiredMessage="邮箱#{msg.ValidationRequire}" >
-                            <f:validateRegex
-                                    pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                            <p:ajax />
+                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_phone}</label>
-                        <p:inputText id="phone" value="#{zkbPartOrderUserConfigController.selected.phone}"  required="false" requiredMessage="电话#{msg.ValidationRequire}" />
+                        <p:inputText id="phone" value="#{zkbPartOrderUserConfigController.selected.phone}"  required="false" requiredMessage="电话#{msg.ValidationRequire}" >
+                            <p:ajax />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_sso}</label>
-                        <p:inputText id="sso" value="#{zkbPartOrderUserConfigController.selected.sso}"  required="false" requiredMessage="用户sso#{msg.ValidationRequire}" />
+                        <p:inputText id="sso" value="#{zkbPartOrderUserConfigController.selected.sso}"  required="false" requiredMessage="用户sso#{msg.ValidationRequire}">
+                            <p:ajax />
+                        </p:inputText>
                     </h:panelGroup>
+
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbKeyUserConfig_region}</label>
-                        <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="false" requiredMessage="区域#{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.zkbKeyUserConfig_type}</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_type}*</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="类型#{msg.ValidationRequire}">
-                            <p:ajax event="change" update="checkboxConfigType" listener="#{zkbPartOrderUserConfigController.configTypeChange()}" />
+                            <p:ajax event="change" update="panelGrid" listener="#{zkbPartOrderUserConfigController.configTypeChange()}" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup id="checkboxConfigType">
-                        <h:panelGroup rendered="#{zkbPartOrderUserConfigController.isGeFeConfigType()}">
-                            <label class="label">是否同步创建或更新GE FE USER CONFIG</label>
-                            <p:selectBooleanCheckbox value="#{zkbPartOrderUserConfigController.synGeFeConfigFlag}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup>
+
+                  <!--  <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
+                        <label class="label">zone</label>
+                        <p:selectManyCheckbox  value="#{zkbPartOrderUserConfigController.selectedOptions}" widgetVar="blub" columns="2" required="false" requiredMessage="不真实选择#{msg.ValidationRequire}"
+                                               styleClass="grid-checkbox" layout="grid" style="width: 100%">
+                            <f:selectItems value="#{zkbPartOrderUserConfigController.zkbZoneList}" var="item" itemLabel="#{item.zone}" itemValue="#{item.zone}"  />
+                        </p:selectManyCheckbox>
+                    </h:panelGroup>-->
+                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.isGeFeConfigType()}">
+                        <label class="label">是否同步创建或更新GE FE USER CONFIG</label>
+                        <p:selectBooleanCheckbox value="#{zkbPartOrderUserConfigController.synGeFeConfigFlag}">
+                            <p:ajax process="@this" />
+                        </p:selectBooleanCheckbox>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'TsePending' or zkbPartOrderUserConfigController.selected.configType eq 'TechnicalPending'}">
                         <label class="label">#{msg.zkbKeyUserConfig_propertyType}</label>
                         <p:selectOneMenu id="assetType" value="#{zkbPartOrderUserConfigController.selected.assetType}" required="false" requiredMessage="资产类型#{msg.ValidationRequire}">
-                            <p:ajax  update="backUpGroup" />
+                            <p:ajax  update="panelGrid" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="US" itemValue="US"/>
                             <f:selectItem itemLabel="CT" itemValue="CT"/>
                             <f:selectItem itemLabel="XR" itemValue="XR"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup id="backUpGroup">
-                        <h:panelGroup  rendered="#{zkbPartOrderUserConfigController.selected.assetType eq 'US'}">
-                            <label class="label">#{msg.zkbKeyUserConfig_usBackUp}</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderUserConfigController.backUpUser}"  scrollHeight="300" forceSelection="true"
-                                            completeMethod="#{zkbPartOrderUserConfigController.autoCompleteBackUpList}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbPartOrderUserConfigConverter">
-                            </p:autoComplete>
-                        </h:panelGroup>
+                    <h:panelGroup  rendered="#{zkbPartOrderUserConfigController.selected.assetType eq 'US'}">
+                        <label class="label">#{msg.zkbKeyUserConfig_usBackUp}*</label>
+                        <p:autoComplete dropdown="true" value="#{zkbPartOrderUserConfigController.backUpUser}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.zkbKeyUserConfig_usBackUp}#{msg.ValidationRequire}"
+                                        completeMethod="#{zkbPartOrderUserConfigController.autoCompleteBackUpList}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbPartOrderUserConfigConverter">
+                        </p:autoComplete>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_remark}</label>
@@ -97,8 +102,25 @@
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
-
+                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
+                        <label class="label">#{msg.zkbKeyUserConfig_region}*</label>
+                        <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="true" requiredMessage="区域#{msg.ValidationRequire}">
+                            <p:ajax  event="change" update=":zkbPartOrderUserConfigEditForm:zonePandlGroup" listener="#{zkbPartOrderUserConfigController.regionChange()}" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid style="width:300px;" id="zonePandlGroup" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}" >
+                    <h:panelGroup>
+                        <label class="label">zone*</label>
+                        <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbPartOrderUserConfigController.selectedZoneStr}"   var="t" style="width:99%"  filter="true"   filterMatchMode="contains" showCheckbox="true"   >
+                            <f:selectItems value="#{zkbPartOrderUserConfigController.zkbZoneList}" var="it" itemLabel="#{it.zone}" itemValue="#{it.zone}"     />
+                            <p:column>
+                                <h:outputText value="#{t}" />
+                            </p:column>
+                        </p:selectManyMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{zkbPartOrderUserConfigController.save}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" value="#{msg.Save}" icon="ui-icon-check"/>

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -62,9 +63,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="asset_uid",columnDefinition = "CHAR(32)")
     private String assetUid;
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
+
+    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.EAGER)
+    private MvsIbMapping mvsIbMapping;
 
     @Basic(optional = false)
     @NotNull
@@ -339,6 +345,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private Integer repairPersonId;
 
+    public MvsIbMapping getMvsIbMapping() {
+        return mvsIbMapping;
+    }
+
+    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
+        this.mvsIbMapping = mvsIbMapping;
+    }
+
     public Integer getRepairPersonId() {
         return repairPersonId;
     }
@@ -517,9 +531,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
+        if(assetInfo == null
+                && mvsIbMapping != null
+                && mvsIbMapping.getAssetInfo() != null){
+            return mvsIbMapping.getAssetInfo();
+        }
         return assetInfo;
     }
-
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
     }

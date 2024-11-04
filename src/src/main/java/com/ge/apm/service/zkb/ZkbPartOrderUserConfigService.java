@@ -112,6 +112,7 @@ public class ZkbPartOrderUserConfigService {
             zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_orderType"), "setOrderType");
             zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_holiday"), "setIsVacation");
             zkbPartOrderUserConfigRow.setFieldStringValue("是否删除", "setDelFlag");
+            zkbPartOrderUserConfigRow.setFieldStringValue("zone", "setZone");
             if(zkbPartOrderUserConfigVO.isNull()){
                 break;
             }
@@ -217,6 +218,7 @@ public class ZkbPartOrderUserConfigService {
                 orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_holiday"),"否");
             }
             orderHistoryMap.put("是否删除","否");
+            orderHistoryMap.put("zone", zkbPartOrderUserConfig.getZone());
             zkbPartOrderList.add(orderHistoryMap);
         }
         return zkbPartOrderList;
