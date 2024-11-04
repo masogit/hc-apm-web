@@ -302,7 +302,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
         }
         selected = null;
-        TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(user.getTenantUID());
+        /*TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(user.getTenantUID());
             if (tenantOptionConfig.getOrderByCreateTimeByDefault()) {
                 if(pageRequest.getSort() !=null){
                     Sort sortCreatedDate = new Sort(Sort.Direction.DESC, "createdDate");
@@ -317,8 +317,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 }else {
                     pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
                 }
-            }
-            pageRequest =addRequiredSortById(pageRequest);
+            }*/
+//        pageRequest = addRequiredSortById(new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));
+        pageRequest = addSort(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
         if (this.hasFilterOnField("assetUsedLifecycle")) {
@@ -346,8 +347,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return res;
     }
 
-    private PageRequest addRequiredSortById(PageRequest pageRequest) {
-        Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
+    private PageRequest addSort(PageRequest pageRequest) {
+        Sort sort = pageRequest.getSort();
+        JSONObject assetListSort = customConfig.getAssetListSort();
+        Boolean namePyCodeSort = assetListSort.getBoolean("namePyCode");
+        Boolean createdDateSort = assetListSort.getBoolean("createdDate");
+        Boolean lastModifiedDateSort = assetListSort.getBoolean("lastModifiedDate");
+        if (ObjectUtil.isNotEmpty(namePyCodeSort)) {
+            Sort sortNamePyCode = new Sort(namePyCodeSort ? Sort.Direction.ASC : Sort.Direction.DESC, "namePyCode");
+            sort = sort != null ? sort.and(sortNamePyCode) : sortNamePyCode;
+        }
+        if (ObjectUtil.isNotEmpty(createdDateSort)) {
+            Sort sortCreatedDate = new Sort(createdDateSort ? Sort.Direction.ASC : Sort.Direction.DESC, "createdDate");
+            sort = sort != null ? sort.and(sortCreatedDate) : sortCreatedDate;
+        }
+        if (ObjectUtil.isNotEmpty(lastModifiedDateSort)) {
+            Sort sortLastModifiedDate = new Sort(lastModifiedDateSort ? Sort.Direction.ASC : Sort.Direction.DESC, "lastModifiedDate");
+            sort = sort != null ? sort.and(sortLastModifiedDate) : sortLastModifiedDate;
+        }
+        Iterator<Sort.Order> orders = sort.iterator();
         boolean exists = false;
         while(orders.hasNext()){
             if(orders.next().getProperty().equals("id")){
@@ -355,13 +373,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 break;
             }
         }
-        if (exists) {
-            return pageRequest;
-        } else {
+        if (!exists) {
             Sort sortWithId = new Sort(Sort.Direction.ASC, "id");
-            pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
+            sort = sort.and(sortWithId);
         }
-        return pageRequest;
+        return new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){

@@ -106,6 +106,34 @@
                                     <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.removeListPageField(item)}" update="assetListPageTable "/>
                                 </p:column>
                             </p:dataTable>
+                            <p:fieldset legend="排序规则">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="nameSort">
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.EquipmentName}</label>
+                                        <p:selectOneMenu value="#{customConfigController.customConfigObject.assetListSort.namePyCode}" >
+                                            <f:selectItem   itemLabel="请选择" itemValue=""/>
+                                            <f:selectItem   itemLabel="正序" itemValue="true"/>
+                                            <f:selectItem   itemLabel="倒序" itemValue="false"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.createTime}</label>
+                                        <p:selectOneMenu value="#{customConfigController.customConfigObject.assetListSort.createdDate}" >
+                                            <f:selectItem   itemLabel="请选择" itemValue=""/>
+                                            <f:selectItem   itemLabel="正序" itemValue="true"/>
+                                            <f:selectItem   itemLabel="倒序" itemValue="false"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.modifiedTime}</label>
+                                        <p:selectOneMenu value="#{customConfigController.customConfigObject.assetListSort.lastModifiedDate}" >
+                                            <f:selectItem   itemLabel="请选择" itemValue=""/>
+                                            <f:selectItem   itemLabel="正序" itemValue="true"/>
+                                            <f:selectItem   itemLabel="倒序" itemValue="false"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
                         </p:tab>
                         <p:tab title="#{msg.AssetDetailPage}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >

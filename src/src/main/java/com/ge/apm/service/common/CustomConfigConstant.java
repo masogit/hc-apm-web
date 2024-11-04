@@ -28,6 +28,8 @@ public class CustomConfigConstant {
 
     public static final String DEFAULT_MOBILE_BUILD_ASSET_PAGE_JSON = "{\"pageBuildAsset\":{\"group\":[{\"type\":\"buildAsset\",\"show\":true,\"assetInfoFields\":[\"name\",\"departNum\",\"financingNum\",\"serialNum\",\"functionType\",\"assetGroup\",\"manufactDate\",\"installDate\",\"acceptDate\",\"factoryWarrantyDate\",\"vendor\",\"vendorTel\",\"purchasePrice\",\"registrationNo\",\"assetClass\",\"lifecycle\",\"emergencyEquipment\",\"makerShortName\",\"parentAssetId\",\"locationName\",\"comments\"]}]}}";
 
+    public static final String DEFAULT_ASSET_LIST_SORT_JSON = "{\"namePyCode\":true}";
+
     //默认不使用的字段
     static public List<String> getExtFields() {
         return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup","spare01","spare02","spare03","spare04","spare05");

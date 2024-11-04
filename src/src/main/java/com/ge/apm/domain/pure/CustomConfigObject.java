@@ -53,6 +53,7 @@ public class CustomConfigObject {
 
     JSONObject mobilePage;
     JSONObject mobileMaintainPage;
+    JSONObject assetListSort;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -298,6 +299,17 @@ public class CustomConfigObject {
             mobileMaintainPage = JSON.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
         return mobileMaintainPage;
+    }
+
+    public JSONObject getAssetListSort() {
+        if (assetListSort == null) {
+            assetListSort = JSON.parseObject(CustomConfigConstant.DEFAULT_ASSET_LIST_SORT_JSON);
+        }
+        return assetListSort;
+    }
+
+    public void setAssetListSort(JSONObject assetListSort) {
+        this.assetListSort = assetListSort;
     }
 
     public void setMobileMaintainPage(JSONObject mobileMaintainPage) {
