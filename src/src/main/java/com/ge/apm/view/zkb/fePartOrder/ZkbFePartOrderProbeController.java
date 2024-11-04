@@ -11,7 +11,7 @@ import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import jdk.nashorn.internal.objects.annotations.Getter;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -228,6 +228,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private String thisDeductionMessage = "";
 
+
+    @Getter@Setter
+    private String applyConfirmMessage = "";
+
     @Override
     protected void init() {
         super.init();
@@ -257,7 +261,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 this.prepareCreate();
             } else if (ZkbFePartOrderController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
-                this.genConfirmMessage();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -326,7 +329,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setManufacture(assetInfo.getManufacture());
     }
 
-    public void preSave(){
+    public void preSave(String notGeAsset){
         if("t".equals(selected.getNotGeAsset())){
             this.selected.setNotGeAsset("t");
             if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
@@ -387,13 +390,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
             if (!this.checkShowSN()) {
                 this.selected.setContractCatId(null);
-                if ("f".equals(selected.getNotGeAsset())) {
+                if(this.selected.getZkbPartOrderCat() != null){
+                    this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+                }else if (!"f".equals(notGeAsset)) {
                     this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                 }
             }
         }
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-        genConfirmMessage();
+        applyConfirmMessage = genConfirmMessage("messageOne");
     }
 
 
@@ -402,7 +407,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * @date 2021/12/21
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
-    public void genConfirmMessage(){
+    public String genConfirmMessage(String type){
         ZkbContract zct = this.contractList.get(0);
         int qyt ="t".equals(this.selected.getNotGeAsset())?this.selected.getQty():this.handerQty(zct);
         Integer probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota():new Integer(0);
@@ -492,7 +497,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
         }
 
-        //return ZkbFePartOrderProbeController.MESSAGE_TYPE.equals(type)?confirmMessage:thisDeductionMessage;
+        return ZkbFePartOrderProbeController.MESSAGE_TYPE.equals(type)?confirmMessage:thisDeductionMessage;
     }
 
 
