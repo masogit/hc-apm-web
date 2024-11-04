@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MvsIbMappingMapper extends BaseMapper<MvsIbMapping> {
 
-    @Select("select distinct mvs.mvs_ib_id from mvs_ib_mapping mvs where mvs.ib_id = #{assetId} ")
+    @Select("select distinct mvs.mvs_ib_id from mvs_ib_mapping mvs where mvs.ib_id = #{assetId} and mvs.mvs_ib_id is not null")
     List<Integer> findMvsAssetIds(@Param("assetId") Integer assetId);
 
     @Insert("INSERT INTO mvs_ib_mapping(" +
