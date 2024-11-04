@@ -314,10 +314,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
     public String genConfirmMessage(String typeArge){
-        Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
         List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
-        Integer adjustApplyCount = new Integer(0);
-        adjustApplyCount = afterAdjustAssetInfoList.stream().mapToInt(ZkbFePartOrderAssetInfo ::getAssetQty).sum();
         String confirmMessage = new String();
         String thisDeductionMessage = new String();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
@@ -330,8 +327,41 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                     ||ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 confirmMessage += "本次申请不扣除名额！";
                 thisDeductionMessage = "本次申请不扣除名额！";
-
+            }else if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
+                Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchDepotQty(this.selected.getId(), SPECIAL_PART);
+                beforeAdjustQty = beforeAdjustQty == null ? 0 : beforeAdjustQty;
+                int curApplyCount = this.calcDepotQty();
+                int applyCount = beforeAdjustQty - curApplyCount;
+                if(curApplyCount == 0){
+                    confirmMessage += "本次申请不扣除名额！";
+                    thisDeductionMessage = "本次申请不扣除名额！";
+                }else{
+                    List<String> cts = Arrays.asList("DI", "PCB", "PCB MVS");
+                    List<String> cts2 = Arrays.asList("CCS", "CCSB", "Biomed");
+                    if(cts.contains(zkbContract.getContractType())) {
+                        Integer spareArtificail = zkbContract.getSpareArtificail()!= null?zkbContract.getSpareArtificail():new Integer(0);
+                        if(curApplyCount<beforeAdjustQty){
+                            applyCount = beforeAdjustQty-curApplyCount;
+                            spareArtificail = spareArtificail + applyCount;
+                        }
+                        confirmMessage += "本次扣除"+curApplyCount+"个备件+人工+保养名额；";
+                        confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
+                        thisDeductionMessage = "本次扣除"+curApplyCount+"个备件+人工+保养名额。";
+                    }else if(cts2.contains(zkbContract.getContractType())) {
+                        Integer spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota():new Integer(0);
+                        if(curApplyCount<beforeAdjustQty){
+                            applyCount = beforeAdjustQty-curApplyCount;
+                            spareQuota =spareQuota + applyCount;
+                        }
+                        confirmMessage += "本次扣除"+curApplyCount+"个备件名额；";
+                        confirmMessage += "备件剩余名额为"+spareQuota+"。";
+                        thisDeductionMessage = "本次扣除"+curApplyCount+"个备件名额。";
+                    }
+                }
             }else {
+                Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
+                Integer adjustApplyCount = new Integer(0);
+                adjustApplyCount = afterAdjustAssetInfoList.stream().mapToInt(ZkbFePartOrderAssetInfo ::getAssetQty).sum();
                 int applyCount = new Integer(0);
                 int curApplyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
                 if("DI".equals(zkbContract.getContractType())
