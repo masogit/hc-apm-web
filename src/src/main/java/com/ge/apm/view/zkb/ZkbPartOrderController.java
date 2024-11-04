@@ -291,7 +291,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    mm.put("region", zkbPartOrderUserConfig.getRegion());
+                    mm.put("zone", zkbPartOrderUserConfig.getZone());
                     mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                 }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     List<String> currentSteps = new ArrayList<>();
@@ -464,17 +464,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             tseMap.put(ZkbPartOrderStep.PartOrderStep.TsePending.toString(), ZkbPartOrderStep.PartOrderStep.TsePending.toString());
                         }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if(StringUtils.isEmpty(queryStatus)){
-                                Predicate pre1 = builder.equal(root.get("region"), zkbPartOrderUserConfig.getRegion());
+                                Predicate pre1 = builder.equal(root.get("zone"), zkbPartOrderUserConfig.getZone());
                                 Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                                 Predicate pre3 = builder.and(pre1, pre2);
                                 userConfigPredicates.add(pre3);
                             }else if("all".equals(queryStatus)){
-                                Predicate pre1 = builder.equal(root.get("region"), zkbPartOrderUserConfig.getRegion());
+                                /*Predicate pre1 = builder.equal(root.get("zone"), zkbPartOrderUserConfig.getZone());
                                 Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                                 Predicate pre3 = builder.equal(root.get("manageAuditerUid"), currentUser.getUid());
                                 Predicate pre4 = builder.and(pre1, pre2);
                                 Predicate pre5 = builder.or(pre4, pre3);
-                                userConfigPredicates.add(pre5);
+                                userConfigPredicates.add(pre5);*/
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if (StringUtils.isEmpty(queryStatus)) {

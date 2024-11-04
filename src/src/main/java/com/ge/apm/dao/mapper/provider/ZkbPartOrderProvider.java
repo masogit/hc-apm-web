@@ -162,9 +162,9 @@ public class ZkbPartOrderProvider {
         if(StrUtil.isNotEmpty(assetTypeDi)){
             sql.append(" and asset_type_di = '" + assetTypeDi + "'");
         }
-        String region = param.get("region") == null ? "" : (String)param.get("region");
-        if(StrUtil.isNotEmpty(region)){
-            sql.append(" and region = '" + region + "'");
+        String zone = param.get("zone") == null ? "" : (String)param.get("zone");
+        if(StrUtil.isNotEmpty(zone)){
+            sql.append(" and zone = '" + zone + "'");
         }
         String orderType = param.get("orderType") == null ? "" : (String)param.get("orderType");
         if(StrUtil.isNotEmpty(orderType)){

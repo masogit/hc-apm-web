@@ -345,6 +345,10 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">zone*</label>
+                            <p:inputText value="#{zkbPartOrderEditController.selected.zone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="true" />
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.workStationRender()}">
                             <label class="label">是否工作站*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.workStationFlag}" required="true" requiredMessage="是否工作站 #{msg.ValidationRequire}" >
