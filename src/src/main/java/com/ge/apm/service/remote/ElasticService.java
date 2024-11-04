@@ -39,8 +39,11 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("list",searchFilters);
         map.put("pageNum",pageNum);
         map.put("pageSize",pageSize);
+        map.put("sortField","created_date");
+        map.put("esIndex","asset_history");
+
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.SEARCH_ASSET_HISTORY);
+        String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
         try {
             ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
             if (isOkay(response)) {
