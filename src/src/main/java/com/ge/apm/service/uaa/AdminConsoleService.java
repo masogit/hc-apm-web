@@ -12,6 +12,7 @@ import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.dto.AssetDto;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
@@ -195,6 +196,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private MvsIbMappingMapper mvsIbMappingMapper;
+
+	@Autowired
+	private CustomConfigRepository customConfigDao;
 
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
 	private String baseURL;
@@ -1589,5 +1593,19 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	public void initMvsMapping() {
 		mvsIbMappingMapper.initMvsMapping();
+	}
+
+	public void initAssetListSort() {
+		List<TenantOptionConfig> assetListSortConfigs = tenantOptionConfigRepository.findAssetListSort();
+		Set<String> tenantUids = assetListSortConfigs.stream().map(TenantOptionConfig::getTenantUid).collect(Collectors.toSet());
+		List<CustomConfig> configs = customConfigDao.findByTenantUIDIn(tenantUids);
+		for (CustomConfig config : configs) {
+			CustomConfigObject customConfigObject = JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
+			JSONObject assetListSort = new JSONObject();
+			assetListSort.put("createdDate", false);
+			customConfigObject.setAssetListSort(assetListSort);
+			config.setConfig(JSON.toJSONString(customConfigObject));
+		}
+		customConfigDao.save(configs);
 	}
 }

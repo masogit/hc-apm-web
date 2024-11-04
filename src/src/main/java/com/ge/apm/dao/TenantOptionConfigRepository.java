@@ -14,4 +14,7 @@ public interface TenantOptionConfigRepository extends GenericRepositoryUUID<Tena
 
     @Query("select w from TenantOptionConfig w where w.activeSupplier = true ")
     public List<TenantOptionConfig> findIsActiveSupplier();
+
+    @Query("select w from TenantOptionConfig w where w.orderByCreateTimeByDefault = true and w.tenantUid is not null ")
+    public List<TenantOptionConfig> findAssetListSort();
 }
