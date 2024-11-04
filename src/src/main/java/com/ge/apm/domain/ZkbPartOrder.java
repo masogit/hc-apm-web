@@ -737,6 +737,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "external_packaging")
     private String externalPackaging;
 
+    @Column(name = "zone")
+    private String zone;
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
+
     public String getExternalPackaging() {
         return externalPackaging;
     }

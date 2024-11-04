@@ -13,4 +13,5 @@ public interface ZkbZoneRepository extends GenericRepositoryUUID<ZkbZone> {
 
 
     List<ZkbZone> findByRegion(String region);
+    List<ZkbZone> findByZone(String zone);
 }

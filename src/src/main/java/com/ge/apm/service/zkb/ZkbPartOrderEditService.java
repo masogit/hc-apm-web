@@ -37,6 +37,9 @@ public class ZkbPartOrderEditService {
     @Autowired
     private ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
 
+    @Autowired
+    private ZkbZoneRepository zkbZoneRepository;
+
     public String workFlowCheck(ZkbPartOrder selected, List<ZkbContract> contractList, AssetInfo assetInfo, String notGeAsset, String orderType){
         if(contractList.size() == 0){
             return "未查询出合同数据！";
@@ -50,6 +53,18 @@ public class ZkbPartOrderEditService {
                     return "非GE设备申请只能申请低端机！";
                 }
             }
+
+            if(zkbContractAsset != null){
+                if(StrUtil.isEmpty(zkbContractAsset.getZone())){
+                    return "设备Zone为空，请检查！";
+                }else {
+                    List<ZkbZone> zkbZoneList = zkbZoneRepository.findByZone(zkbContractAsset.getZone());
+                    if(zkbZoneList.isEmpty()){
+                        return "设备Zone不存在，请检查！";
+                    }
+                }
+            }
+
             //判断合同是否是CCSB
             if (ZkbContract.ContractType.CCSB.toString().equals(ct.getContractType())) {
                 if (!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)) {
@@ -264,6 +279,9 @@ public class ZkbPartOrderEditService {
             selected.setFaultDescription(selectedWorkFlow.get("faultDescription").toString());
         } else {
             selected.setFaultDescription("");
+        }
+        if(zkbContractAsset != null){
+            selected.setZone(zkbContractAsset.getZone());
         }
 
         //区域经理块显示
@@ -480,7 +498,7 @@ public class ZkbPartOrderEditService {
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                errorLog.append("附件不能为空！");
+                //errorLog.append("附件不能为空！");
             }
         }else{
             if("t".equals(selected.getScoreFlag())){
