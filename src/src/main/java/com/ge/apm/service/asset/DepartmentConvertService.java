@@ -7,6 +7,8 @@ import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.StreamedContent;
@@ -93,6 +95,7 @@ public class DepartmentConvertService {
         Map<String, Object> datas = getData(assetDepartmentConvert);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
         template.render(datas);
         try {
             template.write(out);
@@ -132,6 +135,7 @@ public class DepartmentConvertService {
         });
 
         List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
+        List<Map<String, Object>> list = new ArrayList<>();
         for (int i=1;i<=levelApprovals.size();i++){
             if(i>3){
                 logger.info("审批节点大于三");
@@ -143,7 +147,37 @@ public class DepartmentConvertService {
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
             map.put(signature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
         }
+
+        for(MultiLevelApproval multiLevelApproval : multiLevelApprovals){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("approvalNumber", multiLevelApproval.getApprovalNumber());
+            mm.put("businessNumber", multiLevelApproval.getBusinessNumber());
+            mm.put("businessType", ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI);
+            mm.put("approvalLevel", multiLevelApproval.getApprovalLevel() + "级审批人");
+            mm.put("actualApproverName", multiLevelApproval.getActualApproverName());
+            mm.put("approvalNodeStatus", getApprovalNodeStatus(multiLevelApproval.getApprovalNodeStatus()));
+            mm.put("actualApproverDate", DateUtil.format(multiLevelApproval.getActualApproverDate(), "yyyy-MM-dd HH:mm:ss"));
+            list.add(mm);
+        }
+        map.put("list", list);
         return map;
+    }
+
+    public String getApprovalNodeStatus(Integer approvalNodeStatus){
+        if(null == approvalNodeStatus){
+            return null;
+        }
+        switch (approvalNodeStatus){
+            case 0:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING_NAME;
+            case 2:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE_NAME;
+            case 3:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE_NAME;
+            case 4:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN_NAME;
+        }
+        return null;
     }
 
     public static String getStatusName(String fieldName, String msgKey) {

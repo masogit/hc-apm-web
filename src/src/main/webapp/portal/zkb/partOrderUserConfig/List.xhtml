@@ -47,6 +47,10 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+
+                        <p:column headerText="Zone" filterBy="#{item.zone}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.zone}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbKeyUserConfig_type}" filterBy="#{item.configType}" filterMatchMode="LIKE">
                             <h:outputText  value="#{fieldMsg.fieldValue('zkbPoStepsRole', item.configType)}" />
                             <f:facet name="filter">

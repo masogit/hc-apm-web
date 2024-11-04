@@ -118,10 +118,13 @@ public class WordReportExportService {
                 Map<String,String> commentMap = new HashMap<>();
                 Map<String,String> updateByMap = new HashMap<>();
                 for (NurseSiteMaintainItem nurseSiteMaintainItem : items) {
-                    Map<Long, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId())).map(
+                    Map<String, List<NurseSiteMaintainCheckItem>> checkItemMap = Optional.ofNullable(configMap.get(nurseSiteMaintainItem.getConfigId())).map(
                             checkItemsDetail -> {
+                                if(StringUtils.isBlank(checkItemsDetail)){
+                                    return new  HashMap<String, List<NurseSiteMaintainCheckItem>>();
+                                }
                                 List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems = JSONObject.parseObject(checkItemsDetail, new TypeReference<List<NurseSiteMaintainCheckItem>>() {});
-                                return nurseSiteMaintainCheckItems.stream().collect(Collectors.groupingBy(NurseSiteMaintainCheckItem::getKey));
+                                return nurseSiteMaintainCheckItems.stream().filter(i->i.getName()!=null || i.getKey()!=null).collect(Collectors.groupingBy(item->item.getKey()!=null?item.getKey().toString():item.getName()));
                             }
                     ).orElse(new HashMap<>());
                     AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
@@ -129,8 +132,10 @@ public class WordReportExportService {
                     Map<String, String> itemMap = new HashMap<>();
                     for (NurseSiteMaintainData nurseSiteMaintainData : listData) {
 
-                        List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(nurseSiteMaintainData.getIndex());
-                        NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1.get(0)).orElse(new NurseSiteMaintainCheckItem());
+                        List<NurseSiteMaintainCheckItem> nurseSiteMaintainCheckItems1 = checkItemMap.get(nurseSiteMaintainData.getIndex()!=null?nurseSiteMaintainData.getIndex().toString():nurseSiteMaintainData.getCheckItem());
+                        NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = Optional.ofNullable(nurseSiteMaintainCheckItems1)
+                                .map(list -> list.isEmpty() ? null : list.get(0))
+                                .orElse(new NurseSiteMaintainCheckItem());
                         String description="";
                         if(nurseSiteMaintainData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
                             switch (nurseSiteMaintainCheckItem.getFieldType()){

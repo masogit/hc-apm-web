@@ -247,7 +247,7 @@
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
-        <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested')}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.saveAndToListPage}" style="float:left"/>
+        <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested')}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm :zkbConfirmDlg"  style="float:left" actionListener="#{zkbFePartOrderDetailController.genConfirmMessage()}" oncomplete="PF('zkbConfirmDlg').show()" />
        <p:commandButton value="同意派工" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" process="@this"  action="#{zkbFePartOrderDetailController.supplierAccept(param['zkbFePartOrderEditForm:comment'])}" style="float:left">
             <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
         </p:commandButton>
@@ -262,7 +262,22 @@
         <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderDetailController.backList}" />
         </h:panelGroup>
     </h:form>
+    <p:dialog id="zkbConfirmDlg" widgetVar="zkbConfirmDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="确认" height="150">
+        <h:form id="zkbConfirmForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label style="color: red">#{zkbFePartOrderDetailController.confirmMessage}</label>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <div style="text-align: center">
+                <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderDetailController.saveAndToListPage}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmDlg').hide()" style="margin-left: 30px"/>
+            </div>
 
+        </h:form>
+
+    </p:dialog>
     <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
         <h:form id="zkbConfigForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >

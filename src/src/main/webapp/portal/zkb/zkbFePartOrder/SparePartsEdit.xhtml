@@ -334,7 +334,7 @@
                     </f:facet>
                 </p:dataTable>
             </p:fieldset>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm :zkbConfirmPartDlg" actionListener="#{zkbFePartOrderSparePartDetailController.genApplyConfirmMessage()}" oncomplete="PF('zkbConfirmPartDlg').show()" style="float:left"/>
             <p:commandButton id="waitingAssignment" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
                 <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderSparePartDetailController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
             </p:commandButton>
@@ -362,6 +362,22 @@
             <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderSparePartDetailController.fullApmRejectInfo}" oncomplete="PF('zkbCancelReasonSpDlg').hide()" update=":growl" icon="ui-icon-check" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonSpDlg').hide()"/>
         </h:form>
+    </p:dialog>
+    <p:dialog id="zkbConfirmPartDlg" widgetVar="zkbConfirmPartDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="确认" height="150">
+        <h:form id="zkbConfirmPartForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label style="color: red">#{zkbFePartOrderSparePartDetailController.confirmMessage}</label>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <div style="text-align: center">
+                <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" oncomplete="PF('zkbConfirmPartDlg').hide()" update=":growl" icon="ui-icon-check" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmPartDlg').hide()" style="margin-left: 30px"/>
+            </div>
+
+        </h:form>
+
     </p:dialog>
     <ui:include src="ZkbFePartOrderAssetEdit.xhtml"/>
     <ui:include src="returnZkbFePartOrderAssetEdit.xhtml"/>

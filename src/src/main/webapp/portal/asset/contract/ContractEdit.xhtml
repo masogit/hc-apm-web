@@ -142,6 +142,12 @@
                                     <p:ajax process="@this" update="AssetContractEditForm:amount"/>
                                 </p:inputNumber>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">招标编号</label>
+                                <p:inputText value="#{contractInfoEditController.selected.bidNum}" >
+                                    <p:ajax process="@this" />
+                                </p:inputText>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
                             <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
@@ -684,7 +690,7 @@
                             <p:selectOneMenu id="functionGroup" value="#{contractInfoEditController.attachmentType}" autoWidth="false" style="width: 100%">
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractAttachmentType')}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                                <f:selectItems value="#{contractInfoEditController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>

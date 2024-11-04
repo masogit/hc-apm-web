@@ -49,4 +49,15 @@ public class SimplePartsConfigService {
 
         return partsConfigOptional.get().isEnableIntegrationWithWorkOrder();
     }
+
+    public boolean isEnableTenantLocal() {
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Optional<SimplePartsConfig> partsConfigOptional = partsConfigRepository.findByTenantUid(currentUserAccount.getTenantUID());
+
+        if (!partsConfigOptional.isPresent()) {
+            return false;
+        }
+
+        return partsConfigOptional.get().isEnableTenantLocal();
+    }
 }

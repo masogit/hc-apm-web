@@ -53,6 +53,7 @@ public class SimplePartsConfigController extends GenericCRUDUUIDController<Simpl
             selected.setEnableWarehouseSelectionInRequest(false);
             selected.setEnableIntegrationWithMultiLevelAuditing(false);
             selected.setEnableIntegrationWithWorkOrder(false);
+            selected.setEnableTenantLocal(false);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }

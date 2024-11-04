@@ -13,6 +13,8 @@ import java.util.Set;
 public interface SimplePartsItemRepository extends GenericRepositoryUUID<SimplePartsItem>, JpaRepository<SimplePartsItem, String> {
 
     SimplePartsItem findById(String id);
+    List<SimplePartsItem> findByIdIn(List<String> id);
+
 
 //    Optional<SimplePartsItem> findByName(String name);
 

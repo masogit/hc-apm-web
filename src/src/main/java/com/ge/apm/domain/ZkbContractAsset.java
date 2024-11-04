@@ -56,6 +56,9 @@ public class ZkbContractAsset {
     @Column(name = "ka")
     private String ka;
 
+    @Column(name = "zone")
+    private String zone;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "asset_id", referencedColumnName = "uid")
     private AssetInfo assetInfo;
@@ -273,6 +276,14 @@ public class ZkbContractAsset {
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     @Override

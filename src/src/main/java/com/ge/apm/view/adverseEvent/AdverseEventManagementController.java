@@ -135,6 +135,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     @Getter@Setter
     private StreamedContent excelFile;
 
+    @Setter
+    @Getter
+    private List<MultiLevelApproval> multiLevelApprovals;
+
     @Override
     protected void init() {
         /*接口类*/
@@ -167,6 +171,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         /*初始化方法*/
         //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
         configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "setAdverseEventProductType");
+        configItemValue = StrUtil.isEmpty(configItemValue) ? "1" : configItemValue;
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
     }
@@ -199,6 +204,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             if(StrUtil.isNotEmpty(selected.getEventCauseAnalyze())){
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
             }
+            multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getUid());
         }
     }
 

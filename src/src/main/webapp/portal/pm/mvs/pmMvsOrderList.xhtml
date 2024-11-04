@@ -60,19 +60,19 @@
                     </f:facet>
                 </p:column>
                 <p:column headerText="#{msg.hospitalId}">
-                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
+                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.mvsIbMapping.assetInfo.siteUID)}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
+                <p:column headerText="#{msg.assetName}" sortBy="#{item.mvsIbMapping.assetInfo.name}" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.mvsIbMapping.assetInfo.name}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.mvsIbMapping.assetInfo.serialNum}" filterBy="#{item.mvsIbMapping.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.mvsIbMapping.assetInfo.serialNum}"/>
                 </p:column>
 
-                        <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.mvsIbMapping.assetInfo.departNum}" filterBy="#{item.mvsIbMapping.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.mvsIbMapping.assetInfo.departNum}"/>
                         </p:column>
-                <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.functionType}"/>
+                <p:column headerText="#{msg.functionType}" sortBy="#{item.mvsIbMapping.assetInfo.functionType}" filterBy="#{item.mvsIbMapping.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.mvsIbMapping.assetInfo.functionType}"/>
                 </p:column>
                         <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
                             <h:outputText value="#{item.ruleLevel}"/>
@@ -86,14 +86,14 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilterMVS}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{v2PmOrderController.LoadSiteNameListMVS()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
+                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.mvsIbMapping.assetInfo.siteUID)}"/>
                 </p:column>
                         <!--所属科室-->
                         <p:column headerText="#{msg.clinicalDeptName}"  width="100">
@@ -105,7 +105,7 @@
                                     <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
                                 </p:autoComplete>
                             </f:facet>
-                            <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
+                            <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.mvsIbMapping.assetInfo.clinicalDeptUID).name}"/>
                         </p:column>
                         <p:column>
                             <f:facet name="header">
