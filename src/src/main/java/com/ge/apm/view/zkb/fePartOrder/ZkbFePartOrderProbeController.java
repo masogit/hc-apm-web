@@ -224,11 +224,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private AssetInfoRepository assetInfoRepository;
 
-    private String confirmMessage = "";
-
-    private String thisDeductionMessage = "";
-
-
     @Getter@Setter
     private String applyConfirmMessage = "";
 
@@ -408,6 +403,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
     public String genConfirmMessage(String type){
+        String confirmMessage = "";
+        String thisDeductionMessage = "";
         ZkbContract zct = this.contractList.get(0);
         int qyt ="t".equals(this.selected.getNotGeAsset())?this.selected.getQty():this.handerQty(zct);
         Integer probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota():new Integer(0);
@@ -1385,22 +1382,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public void setNotGeAssetBox(String notGeAssetBox) {
         this.notGeAssetBox = notGeAssetBox;
-    }
-
-    public String getConfirmMessage() {
-        return confirmMessage;
-    }
-
-    public void setConfirmMessage(String confirmMessage) {
-        this.confirmMessage = confirmMessage;
-    }
-
-    public String getThisDeductionMessage() {
-        return thisDeductionMessage;
-    }
-
-    public void setThisDeductionMessage(String thisDeductionMessage) {
-        this.thisDeductionMessage = thisDeductionMessage;
     }
 
     public void initProvideNewContract(){
