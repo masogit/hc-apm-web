@@ -10,7 +10,6 @@
     <http pattern="/login*.xhtml" security="none"/>
     <http pattern="/restful/*" security="none"/>
     <http pattern="/ws/*" security="none"/>
-    <http pattern="/soap/*" security="none"/>
     <http pattern="/favicon.ico" security="none"/>
     <http pattern="/resources/*" security="none"/>
     <http pattern="/javax.*/**" security="none"/>
@@ -32,7 +31,7 @@
         <form-login login-page="/login.xhtml" default-target-url="/home.xhtml" login-processing-url="/logincheck" always-use-default-target="true" authentication-failure-url="/login?login_error=1"/>
         <logout logout-url="/logout.xhtml" success-handler-ref="logoutHandler"/>
         <intercept-url pattern="/web/**" access="permitAll"/>
-
+        <intercept-url pattern="/soap/clinicalDataService" access="denyAll"/>
         <intercept-url pattern="/**/wechat/asset/createInfoDetail.xhtml**" access="permitAll"/>
         <intercept-url pattern="/**/wechat/**" access="permitAll"/>
 
