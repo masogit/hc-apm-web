@@ -519,7 +519,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm :zkbConfirmProbeDlg" actionListener="#{zkbFePartOrderProbeController.preSave(zkbFePartOrderDetailController.selected.notGeAsset)}" oncomplete="PF('zkbConfirmProbeDlg').show()" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}"  style="float:left"/>
             <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
                 <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
             </p:commandButton>

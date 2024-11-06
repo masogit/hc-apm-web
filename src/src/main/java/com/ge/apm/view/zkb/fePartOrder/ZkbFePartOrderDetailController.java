@@ -213,17 +213,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbFePartOrderService.initTestStatus(this.loginName, this.selected);
     }
 
-
-
-
     public void notGeAssetChangeEditPage(ValueChangeEvent event){
         String url = "Edit.xhtml?str=" + encodeStr + "&notGeAsset=" + (event.getNewValue()==null?"":event.getNewValue().toString());
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
-
-
-
 
     /**
      * 编辑数据前,初始化
@@ -281,22 +275,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.confirmMessage = confirmMessage.toString();
         return confirmMessage.toString();
     }
-
-    /**
-     * 选择设备
-     */
-    /*public void selectedWorkFlow(){
-        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
-        this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
-        ZkbContract zkbContract =  contractList.get(0);
-        AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
-        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),assetInfo.getUid());
-        if(!fiveNineNine){
-            this.selected.setFatherPartOrderNo(null);
-        }
-    }*/
-
-
 
     /**
      * 选择设备
