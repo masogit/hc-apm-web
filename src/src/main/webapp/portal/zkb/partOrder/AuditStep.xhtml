@@ -282,6 +282,10 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">zone*</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.zone}"  disabled="true" />
+                        </h:panelGroup>
                         <h:panelGroup rendered="false">
                             <label class="label">是否工作站*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.workStationFlag}" disabled="true">
