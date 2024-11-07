@@ -416,6 +416,16 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         return this.zkbFePartOrderService.backList(this.queryStatus,this.notGeAssetBox);
     }
 
+    public boolean isDepotAsset(){
+        boolean rs = false;
+        if(this.contractList != null){
+            if(ZkbFePartOrderService.assetTypeDepot.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
+                rs = true;
+            }
+        }
+        return rs;
+    }
+
     public String saveAndToListPage() {
         if (StringUtils.isBlank(this.selected.getContractId())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractCannotBeNull"));
