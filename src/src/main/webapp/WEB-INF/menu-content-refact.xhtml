@@ -337,7 +337,7 @@
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
-
+            <p:menuitem id="biReport" value="BI报表" icon="fa fa-tachometer fa-fw"  url="/davinci#/projects"   target="_blank"  rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW')}" />
             <!-- 我的账号 -->
             <p:menuitem id="um53" value="#{msg.profile}" icon="fa fa-user-circle fa-fw" outcome="/portal/profile.xhtml"/>
             <!-- 注销 -->
