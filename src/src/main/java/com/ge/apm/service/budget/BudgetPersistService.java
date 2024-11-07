@@ -456,9 +456,28 @@ public class BudgetPersistService {
             budgetApplicationMap.put("审批结论", budgetApplicationAsset.getOfflineApprovalConclusion());
             budgetApplicationMap.put("备注", budgetApplicationAsset.getOfflineApprovalRemark());
             budgetApplicationMap.put("记录人", budgetApplicationAsset.getOfflineApprovalRecorder());
+            budgetApplicationMap.put("步骤", stepCodeToName(budgetApplication.getApplicationStep()));
             budgeApplicationDataList.add(budgetApplicationMap);
         }
         return budgeApplicationDataList;
+    }
+
+    public String stepCodeToName(String v){
+        if(StrUtil.isEmpty(v)){
+            return "";
+        }
+        switch (v){
+            case "ToSubmitted":
+                return "待提交";
+            case "PendingApproval":
+                return "待审核";
+            case "PendingComplete":
+                return "待完成";
+            case "Complete":
+                return "已完成";
+            default:
+                return "";
+        }
     }
 
     public void exportData(ExcelDocument doc, List<Map<String, Object>> budgetApplicationData,String orderType) {
