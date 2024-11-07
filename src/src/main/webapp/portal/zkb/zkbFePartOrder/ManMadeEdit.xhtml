@@ -26,7 +26,7 @@
                              selection="#{zkbFePartOrderDetailController.zkbAssetInfo}"
                              lazy="false" paginator="true" rowKey="#{item.uid}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderDetailController.selectedWorkFlow}"  update="zkbFePartOrderEditForm zkbFePartOrderEditForm:zkbContractDatalist zkbFePartOrderEditForm:zkbFiledSet" />
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderDetailController.selectedWorkFlow}"  update="zkbFePartOrderEditForm zkbFePartOrderEditForm:zkbContractDatalist zkbFePartOrderEditForm:zkbFiledSet zkbFePartOrderEditForm:submitDepot zkbFePartOrderEditForm:submitNotDepot" />
                     <p:column headerText="租户名称">
                         <h:outputText value="#{item.comments}"/>
                     </p:column>
@@ -192,7 +192,7 @@
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
-            <p:fieldset id="commercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingCommercial')}">
+        <p:fieldset id="commercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingCommercial')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingCommercial')}">
                         <label class="label">#{msg.zkbFePartOrder_commercialAssignUser}*：</label>
@@ -247,8 +247,10 @@
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
-        <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested')}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm :zkbConfirmDlg"  style="float:left" actionListener="#{zkbFePartOrderDetailController.genConfirmMessage()}" oncomplete="PF('zkbConfirmDlg').show()" />
-       <p:commandButton value="同意派工" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" process="@this"  action="#{zkbFePartOrderDetailController.supplierAccept(param['zkbFePartOrderEditForm:comment'])}" style="float:left">
+        <!-- 按钮 -->
+        <p:commandButton id="submitDepot" value="#{msg.submit}2" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested') and zkbFePartOrderDetailController.isDepotAsset()}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm :zkbConfirmDlg"  style="float:left" actionListener="#{zkbFePartOrderDetailController.genConfirmMessage()}" oncomplete="PF('zkbConfirmDlg').show()" />
+        <p:commandButton id="submitNotDepot" value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested') and !zkbFePartOrderDetailController.isDepotAsset()}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm"  style="float:left" actionListener="#{zkbFePartOrderDetailController.saveAndToListPage()}"  />
+        <p:commandButton value="同意派工" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" process="@this"  action="#{zkbFePartOrderDetailController.supplierAccept(param['zkbFePartOrderEditForm:comment'])}" style="float:left">
             <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
         </p:commandButton>
         <p:commandButton value="暂不派工" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.supplierReject}" style="float:left"/>
