@@ -40,6 +40,7 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("pageNum",pageNum);
         map.put("pageSize",pageSize);
         map.put("sortField","created_date");
+        map.put("sortValue","DESC");
         map.put("esIndex","asset_history");
 
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
@@ -74,6 +75,8 @@ public class ElasticService extends MicroServiceInvoker {
             map.put("pageNum", pageNum);
             map.put("pageSize", pageSize);
             map.put("esIndex", esIndex);
+            map.put("sortField","created_date");
+            map.put("sortValue","DESC");
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
             String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
             ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
