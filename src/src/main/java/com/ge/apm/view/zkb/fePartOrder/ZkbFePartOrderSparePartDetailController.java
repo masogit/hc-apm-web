@@ -1028,6 +1028,16 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.stepAndRoles);
     }
 
+    public boolean isDepotAsset(){
+        boolean rs = false;
+        if(this.contractList != null){
+            if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
+                rs = true;
+            }
+        }
+        return rs;
+    }
+
     /**
      * 判断当前流程是否在第一步
      * @return
