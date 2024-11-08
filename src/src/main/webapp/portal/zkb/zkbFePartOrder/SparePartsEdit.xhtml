@@ -30,7 +30,7 @@
                              widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                        <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow(zkbFePartOrderDetailController.selected.notGeAsset)}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages" />
+                        <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow(zkbFePartOrderDetailController.selected.notGeAsset)}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages zkbFePartOrderSparePartsEditForm:submitDepot zkbFePartOrderSparePartsEditForm:submitNotDepot" />
                         <p:column headerText="报修单号">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
@@ -334,7 +334,8 @@
                     </f:facet>
                 </p:dataTable>
             </p:fieldset>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm :zkbConfirmPartDlg" actionListener="#{zkbFePartOrderSparePartDetailController.genApplyConfirmMessage()}" oncomplete="PF('zkbConfirmPartDlg').show()" style="float:left"/>
+            <p:commandButton id="submitDepot" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested') and zkbFePartOrderSparePartDetailController.isDepotAsset()}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm :zkbConfirmPartDlg" actionListener="#{zkbFePartOrderSparePartDetailController.genApplyConfirmMessage()}" oncomplete="PF('zkbConfirmPartDlg').show()" style="float:left"/>
+            <p:commandButton id="submitNotDepot" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested') and !zkbFePartOrderSparePartDetailController.isDepotAsset()}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm :zkbConfirmPartDlg" actionListener="#{zkbFePartOrderSparePartDetailController.saveAndToListPage(zkbFePartOrderDetailController.selected.notGeAsset)}" style="float:left"/>
             <p:commandButton id="waitingAssignment" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
                 <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderSparePartDetailController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
             </p:commandButton>
