@@ -114,11 +114,11 @@
                 <h:outputText value="#{item.arrivalList.invoiceDate}"/>
             </p:column>
             <p:column headerText="状态">
-                <h:outputText value="#{item.stockStatus == 2 ? '已审核' : '已入库'}" style="color: #989898"/>
+                <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}" style="color: #989898"/>
             </p:column>
             <f:facet name="{Toolbar}">
-                <p:commandButton value="生成入库单" validateClient="true" oncomplete="PF('GeneratedInStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
-                <p:commandButton value="打印入库单"/>
+                <p:commandButton value="生成入库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" validateClient="true" oncomplete="PF('GeneratedInStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
+                <p:commandButton value="打印入库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}"/>
             </f:facet>
         </p:dataTable>
     </h:form>
@@ -162,14 +162,14 @@
                     <h:outputText value="#{item.arrivalList.invoiceDate}"/>
                 </p:column>
                 <p:column headerText="状态">
-                    <h:outputText value="#{item.stockStatus == 2 ? '已审核' : '已入库'}" style="color: #989898"/>
+                    <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}" style="color: #989898"/>
                 </p:column>
             </p:dataTable>
             <p:commandButton validateClient="true" actionListener="#{assetStockedController.generatedInStockDoc()}"
                              value="#{msg.Confirm}" update=":growl :assetOutStockTab:AssetInStockedListForm :assetOutStockTab:AssetInStockedListForm:datalist" icon="ui-icon-check"
                              onclick="PF('GeneratedInStockDocDialog').hide()"/>
 
-            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+            <p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl :assetOutStockTab:AssetInStockedListForm :assetOutStockTab:AssetInStockedListForm:datalist" icon="ui-icon-cancel"
                              onclick="PF('GeneratedInStockDocDialog').hide()"/>
         </h:form>
     </p:dialog>
