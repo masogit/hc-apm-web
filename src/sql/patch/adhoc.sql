@@ -7,3 +7,7 @@ update config_item set description = '资产出入库科室设置，请输入科
 
 --智康宝 zone刷新ZKB FE数据
 update zkb_part_order p set zone = (select a.zone from zkb_contract_asset a where a.contract_id = p.contract_id and a.asset_id = p.asset_id)  where zone is null and current_step in ('TechnicalPending','ProductPending','ManagePending');
+
+-- YHAAO-23014  新增资产出入库管理员
+INSERT INTO sys_role ( "name", "role_desc", "role_desc_en")  select 'StockedManager', '出入库管理员',  'Stocked Manager'
+where not exists (select 1 from sys_role where name='StockedManager');

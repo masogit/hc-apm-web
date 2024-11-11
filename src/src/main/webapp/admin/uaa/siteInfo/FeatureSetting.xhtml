@@ -237,11 +237,11 @@
                                 <p:outputLabel></p:outputLabel>
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['INSTALL_OUT_STOCK']}"
-                                        itemLabel="资产出库">
+                                        itemLabel="资产出入库">
                                     <p:ajax update="install"
                                             listener="#{featureSettingController.featureChange('INSTALL_OUT_STOCK')}"/>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产出库菜单</p:outputLabel>
+                                <p:outputLabel>资产出入库菜单</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>

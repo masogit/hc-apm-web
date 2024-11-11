@@ -10,6 +10,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.io.IOUtils;
@@ -138,16 +139,31 @@ public class AssetOutStockService {
         return bytes;
     }
 
-    public String queryStockNo(){
-        String preStr = "CK002" + DateUtil.format(new Date(), "yyyyMMdd") ;
-        String oldMax = arrivalListItemRepository.queryStockNo(preStr+ "%");
-        if(StrUtil.isEmpty(oldMax)){
-            return preStr + "001";
+    public String queryInStockNo(String preStr){
+        preStr = queryPre(preStr);
+        String oldMax = arrivalListItemRepository.queryInStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
+        return preStr + querySerialNumber(oldMax);
+    }
+
+    public String queryOutStockNo(String preStr){
+        preStr = queryPre(preStr);
+        String oldMax = arrivalListItemRepository.queryOutStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
+        return preStr + querySerialNumber(oldMax);
+    }
+
+    public String queryPre(String preStr){
+        OrgInfo hospitalOrg = orgInfoRepository.getOrgInfoUIDByUid(UserContextService.getCurrentUserAccount().getHospitalUID());
+        String orgCode = hospitalOrg.getOrgCode() == null ? "000" : hospitalOrg.getOrgCode();
+        return preStr + orgCode + DateUtil.format(new Date(), "yyyyMMdd");
+    }
+
+    private String querySerialNumber(String serialNumber){
+        if(StrUtil.isEmpty(serialNumber)){
+            return "001";
         }else{
-            String ls = oldMax.replace(preStr, "");
-            int index = Integer.parseInt(ls);
+            int index = Integer.parseInt(serialNumber);
             index++;
-            return preStr + String.format("%03d",index);
+            return String.format("%03d",index);
         }
     }
 }

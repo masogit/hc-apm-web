@@ -59,6 +59,7 @@ public enum GatewayURL {
     // Asset Installation process
     SUBMIT_ARRIVAL_LIST("/hcapmworkflowservice/api/apm/installation/{arrivalListId}/arrived"),
     SUBMIT_ARRIVAL_LIST_ITEM("/hcapmworkflowservice/api/apm/installation/{arrivalListItemId}/install"),
+    AUDIT_IN_STOCKED("/hcapmworkflowservice/api/apm/installation/{arrivalListItemId}/auditInStocked"),
     REASSIGN_ARRIVAL_LIST_ITEM_OWNER("/hcapmworkflowservice/api/apm/installation/{arrivalListItemId}/reAssign"),
     // PM Order URL
     PM_ORDER_ACTION("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/action"),
@@ -192,6 +193,9 @@ public enum GatewayURL {
 
     // davinci
     DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),
+
+    // davinci
+    DAVINCI_GET_TOKEN("/davinci/tokenToToken"),
     // 科室间调剂
     SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
     SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),

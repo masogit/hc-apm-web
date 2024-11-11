@@ -214,7 +214,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         uid=selected.getUid();
         classificationCode=selected.getClassificationCode();
         encoded=selected.getEncoded()==null ? "" : selected.getEncoded().trim();
-        List<AssetInfo> assetInfos=assetInfoRepository.findByAssetType(encoded);
+        List<AssetInfo> assetInfos=assetInfoRepository.findByAssetTypeAndTenantUID(encoded,selected.getTenantUid());
         if(assetInfos.size()>=1){
             WebUtil.addErrorMessage(name + "已绑定资产");
             return;

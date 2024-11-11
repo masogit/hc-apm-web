@@ -348,4 +348,8 @@ public class SupplierService {
 
     }
 
+    public List<Supplier> getSupplierList() {
+        return supplierDao.getBySiteId(UserContextService.getSiteId());
+    }
+
 }
