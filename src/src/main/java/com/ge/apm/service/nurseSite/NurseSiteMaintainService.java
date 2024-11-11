@@ -2015,6 +2015,8 @@ public class NurseSiteMaintainService {
 											DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 											description = " "+localDateTime.format(formatter);
 											break;
+										case "Switch":
+											break;
 										default:
 											description=" "+tempData.getVariableText();
 											break;
