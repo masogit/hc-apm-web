@@ -101,7 +101,7 @@
                              </f:facet>
                         </p:column>
 
-                        <p:column headerText="区域" filterBy="#{item.region}"  filterMatchMode="EQ">
+                        <!--<p:column headerText="区域" filterBy="#{item.region}"  filterMatchMode="EQ">
                             <h:outputText value="#{item.region}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -109,6 +109,9 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
+                        </p:column>-->
+                        <p:column headerText="zone" filterBy="#{item.zone}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.zone}" />
                         </p:column>
 
                         <p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" >
