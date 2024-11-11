@@ -193,6 +193,9 @@ public enum GatewayURL {
 
     // davinci
     DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),
+
+    // davinci
+    DAVINCI_GET_TOKEN("/davinci/tokenToToken"),
     // 科室间调剂
     SECONDMENT_PUSH_WECHAT_MSG("/hcapmworkflowservice/api/apm/secondment/remote/message/{orderId}/{type}"),
     SECONDMENT_REMINDER_TO_RETURN("/hcapmworkflowservice/api/apm/secondment/reminderToReturn/{orderId}"),

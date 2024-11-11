@@ -349,9 +349,9 @@
 
     <script>
         function davinciToken(){
-            // var token = "#{userContextService.getAccessToken()}";
-            // token=token.replace("Bearer ","")
-            // localStorage.setItem("TOKEN", token || '#'); // # for test/dev perpose
+            var token = "#{daVinciController.davinciAccessToken()}";
+            // alert(token);
+            localStorage.setItem("TOKEN", token || '#'); // # for test/dev perpose
             // localStorage.setItem("TOKEN_EXPIRE", Date.now() + 8640000);
 
         }
