@@ -46,4 +46,10 @@ public class DaVinciController {
         return daVinciShareLink;
     }
 
+    public String  davinciAccessToken(){
+        String apmToken= UserContextService.getAccessToken();
+        return   microServiceUtil.getDavinciToken(apmToken);
+
+    }
+
 }

@@ -447,4 +447,41 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         }
         return "";
     }
+
+    public String getDavinciToken(String token) {
+        try {
+            String webContextUrl = getWebContextUrl();
+            String davinciGetTokenString = GatewayURL.DAVINCI_GET_TOKEN.toString();
+            String url = webContextUrl + davinciGetTokenString;
+            logger.info("get davinci token url  ================================== {}", url);
+
+            HttpHeaders headers = new HttpHeaders();
+            MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+            headers.setContentType(type);
+            headers.add("Authorization", token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, entity, LinkedHashMap.class);
+
+            if (!response.getStatusCode().equals(HttpStatus.OK)) {
+                return null;
+            }
+            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
+            if (body.containsKey("header")) {
+                LinkedHashMap<String, Object> header = (LinkedHashMap<String, Object>) body.get("header");
+                if (header.containsKey("code")) {
+                    int code = (int) header.get("code");
+                    if (code == 200) {
+                        return (String) header.get("token");
+                    }
+
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("getDavinciToken error:", e);
+        }
+        return null;
+    }
+
 }
