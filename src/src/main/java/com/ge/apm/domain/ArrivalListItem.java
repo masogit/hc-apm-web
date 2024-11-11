@@ -440,6 +440,54 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "recruite_dept_uid")
     private String recruiteDeptUid;
 
+    //入库单号
+    @Column(name = "in_stock_no")
+    private String inStockNo;
+
+    //库存状态
+    @Column(name = "stock_status")
+    private Integer stockStatus;
+
+    //入库单据时间
+    @Column(name = "in_stock_documents_date")
+    private Date inStockDocumentsDate;
+
+    //出库单据时间
+    @Column(name = "out_stock_documents_date")
+    private Date outStockDocumentsDate;
+
+    public String getInStockNo() {
+        return inStockNo;
+    }
+
+    public void setInStockNo(String inStockNo) {
+        this.inStockNo = inStockNo;
+    }
+
+    public Integer getStockStatus() {
+        return stockStatus;
+    }
+
+    public void setStockStatus(Integer stockStatus) {
+        this.stockStatus = stockStatus;
+    }
+
+    public Date getInStockDocumentsDate() {
+        return inStockDocumentsDate;
+    }
+
+    public void setInStockDocumentsDate(Date inStockDocumentsDate) {
+        this.inStockDocumentsDate = inStockDocumentsDate;
+    }
+
+    public Date getOutStockDocumentsDate() {
+        return outStockDocumentsDate;
+    }
+
+    public void setOutStockDocumentsDate(Date outStockDocumentsDate) {
+        this.outStockDocumentsDate = outStockDocumentsDate;
+    }
+
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;
     }

@@ -50,6 +50,20 @@ public class AssetInstallationApiService extends MicroServiceInvoker{
         }
     }
 
+    public String auditInStocked(String token, String itemId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<>(itemId, header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.AUDIT_IN_STOCKED);
+        String url = gatewayURL.replace("{arrivalListItemId}", itemId);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            return response.getBody().toString();
+        } else {
+            return null;
+        }
+    }
+
     public String reAssignOrderOwner(String token, String itemId, String currentPersonUID) {
         HttpHeaders header = createHttpHeaders(token);
         header.add("assignee", currentPersonUID);

@@ -50,8 +50,10 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     ArrivalListItem findByQrCode(String qrCode);
 
+    @Query(value = "select RIGHT(max(in_stock_no), 3) from arrival_list_item ali, arrival_list al where al.tenant_uid = ?1 and ali.arrival_list_id = al.id and ali.in_stock_no like ?2",nativeQuery = true)
+    String queryInStockNo(String tenantUid, String inStockNo);
 
-    @Query(value = "select max(out_stock_no) from arrival_list_item ali where ali.out_stock_no like ?1",nativeQuery = true)
-    String queryStockNo(String stockNo);
+    @Query(value = "select RIGHT(max(out_stock_no),3) from arrival_list_item ali, arrival_list al where al.tenant_uid = ?1 and ali.arrival_list_id = al.id and ali.out_stock_no like ?2",nativeQuery = true)
+    String queryOutStockNo(String tenantUid, String outStockNo);
     List<ArrivalListItem> findBySiteUidAndOutStockNoAndOutStockNoNotNull(String siteUid, String outStockNo);
 }

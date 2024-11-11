@@ -11,12 +11,21 @@
             </div>
             <div class="ui-g-12">
                 <p:tabView id="assetOutStockTab"  dynamic="true" cache="false" activeIndex="0">
-                    <p:ajax event="tabChange"/>
-                    <p:tab title="未出库" id="showList">
+                    <p:ajax event="tabChange" listener="#{assetStockedController.onTabChange}" />
+                    <!--<p:tab title="未出库" id="showList">
                         <ui:include src="unOutStock.xhtml"/>
                     </p:tab>
                     <p:tab title="已出库">
                         <ui:include src="outStocked.xhtml"/>
+                    </p:tab>-->
+                    <p:tab title="审核入库" id="auditInStocked">
+                        <ui:include src="auditInStocked.xhtml"/>
+                    </p:tab>
+                    <p:tab title="入库记录" id="inStockedRecord">
+                        <ui:include src="inStockedRecord.xhtml"/>
+                    </p:tab>
+                    <p:tab title="出库记录" id="outStockedRecord">
+                        <ui:include src="outStockedRecord.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>
