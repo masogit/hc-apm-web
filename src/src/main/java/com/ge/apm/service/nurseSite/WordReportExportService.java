@@ -154,6 +154,8 @@ public class WordReportExportService {
                                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     description =" "+ localDateTime.format(formatter);
                                     break;
+                                case "Switch":
+                                    break;
                                 default:
                                     description=" "+nurseSiteMaintainData.getVariableText();
                                     break;
