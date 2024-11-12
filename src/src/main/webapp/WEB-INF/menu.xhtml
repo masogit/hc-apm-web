@@ -79,9 +79,6 @@
                 var token = "#{userContextService.getAccessToken()}";
                 localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
                 localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
-                var davinciToken = "#{daVinciController.davinciAccessToken()}";
-                localStorage.setItem("TOKEN", davinciToken || '#');
-
             }
 
             document.querySelector('.menu-content').addEventListener('mouseenter', function(evt) {

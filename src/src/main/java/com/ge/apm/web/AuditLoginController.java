@@ -175,4 +175,12 @@ public class AuditLoginController {
         return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
     }
 
+    @RequestMapping(method = RequestMethod.GET,value = "/davinci-access-token")
+    @ResponseBody
+    public Map<String, Object> davinciAccessToken(@RequestParam("token") String apmToken) {
+
+        return   microServiceUtil.getDavinciToken(apmToken);
+
+    }
+
 }

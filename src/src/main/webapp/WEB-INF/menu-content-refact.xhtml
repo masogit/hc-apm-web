@@ -337,7 +337,7 @@
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
-            <p:menuitem id="biReport" value="BI报表" icon="fa fa-tachometer fa-fw"  url="/davinci#/projects"   target="_blank"  rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW')}" onclick="davinciToken()" />
+            <p:menuitem id="biReport" value="BI报表" icon="fa fa-tachometer fa-fw"   target="_blank"  rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW')}" onclick="davinciToken()"  />
             <!-- 我的账号 -->
             <p:menuitem id="um53" value="#{msg.profile}" icon="fa fa-user-circle fa-fw" outcome="/portal/profile.xhtml"/>
             <!-- 注销 -->
@@ -348,10 +348,21 @@
 
 
     <script>
-        function davinciToken(){
-            // var token = "#{daVinciController.davinciAccessToken()}";
-            // alert(token);
-            // localStorage.setItem("TOKEN", token || '#');
+        function davinciToken() {
+            var token = "#{userContextService.getAccessToken()}";
+            fetch('/geapm/web/davinci-access-token?token='+ encodeURIComponent(token))
+                .then(response => response.json())
+                .then(data => {
+                    var token = data.davinciToken;
+                    var loginUser = data.loginUser;
+                    localStorage.setItem("TOKEN", token || '');
+                    localStorage.setItem("TOKEN_EXPIRE", (Date.now() + 86400000).toString());
+                    localStorage.setItem("loginUser", loginUser || '');
+                    window.open('/davinci#/projects','_blank');
+                })
+                .catch(error => {
+                    console.error('Error fetching token:', error);
+                });
         }
 
     </script>
