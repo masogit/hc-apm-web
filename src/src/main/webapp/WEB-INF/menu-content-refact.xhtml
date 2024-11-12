@@ -348,10 +348,34 @@
 
 
     <script>
-        function davinciToken(){
-            var token = "#{daVinciController.davinciAccessToken()}";
-            localStorage.setItem("TOKEN", token || '#');
-            localStorage.setItem("TOKEN_EXPIRE", Date.now() + 8640000);
+        // function davinciToken(){
+        //     var map = "#{daVinciController.davinciAccessToken()}";
+        //     var token=  map.get("davinciToken");
+        //     var loginUser=  map.get("loginUser");
+        //     alert(token);
+        //     alert(loginUser);
+        //     localStorage.setItem("TOKEN", token || '#');
+        //     localStorage.setItem("TOKEN_EXPIRE", Date.now() + 8640000);
+        //     localStorage.setItem("loginUser", loginUser);
+        // }
+        function davinciToken() {
+            var token = "#{userContextService.getAccessToken()}";
+            fetch('/geapm/web/davinci-access-token?token='+ encodeURIComponent(token))
+                .then(response => response.json())
+                .then(data => {
+                    var token = data.davinciToken;
+                    var loginUser = data.loginUser;
+
+                    alert(token);
+                    alert(loginUser);
+
+                    localStorage.setItem("TOKEN", token || '');
+                    localStorage.setItem("TOKEN_EXPIRE", (Date.now() + 86400000).toString());
+                    localStorage.setItem("loginUser", loginUser || '');
+                })
+                .catch(error => {
+                    console.error('Error fetching token:', error);
+                });
         }
 
     </script>
