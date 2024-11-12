@@ -47,10 +47,10 @@ public class DaVinciController {
         return daVinciShareLink;
     }
 
-    public Map davinciAccessToken(){
-        String apmToken= UserContextService.getAccessToken();
-        return   microServiceUtil.getDavinciToken(apmToken);
-
-    }
+//    public Map davinciAccessToken(){
+//        String apmToken= UserContextService.getAccessToken();
+//        return   microServiceUtil.getDavinciToken(apmToken);
+//
+//    }
 
 }
