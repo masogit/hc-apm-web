@@ -10,10 +10,14 @@ import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +27,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,9 +40,10 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private UaaService uaaService;
     private String filterClinicalDeptOrg;
     private AutoCompleteService autoCompleteService;
-    private AssetInstallationApiService installApiService;
+    private AssetInstallationService assetInstallationService;
     private AssetOutStockService assetOutStockService;
-    private AssetInstallationService aiService;
+    private OrgInfoRepository orgInfoRepository;
+    private AssetInfoRepository assetInfoRepository;
     private UserAccount currentUser;
     private ArrivalListItem searchItem;
     private Supplier supplier;
@@ -54,18 +60,25 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private String searchDeptName;
     private List<Supplier> supplierList;
     private List<ArrivalListItem> selectedItems = ListUtil.newArrayList();
+    @Getter @Setter
+    private StreamedContent exportInStockFile;
+    @Getter @Setter
+    private StreamedContent exportOutStockFile;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        installApiService = WebUtil.getBean(AssetInstallationApiService.class);
+        assetInstallationService = WebUtil.getBean(AssetInstallationService.class);
         assetOutStockService = WebUtil.getBean(AssetOutStockService.class);
-        aiService = WebUtil.getBean(AssetInstallationService.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         SupplierService supplierService = WebUtil.getBean(SupplierService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierService.getSupplierList();
+        org = orgInfoRepository.findById(currentUser.getOrgInfoId());
+        orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
         initSearchItem();
     }
 
@@ -102,7 +115,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
                 searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, 1, "1*"));
                 break;
             case "inStockedRecord":
-                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3), "1*"));
+                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3, 4), "1*"));
                 break;
             case "outStockedRecord":
                 searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
@@ -149,6 +162,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if (ObjectUtil.isNotEmpty(searchItem.getOutStockNo())) {
             searchFilters.add(new SearchFilter("outStockNo", SearchFilter.Operator.LIKE, searchItem.getOutStockNo(), "1*"));
         }
+        if (ObjectUtil.isNotEmpty(searchItem.getStockStatus())) {
+            searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, searchItem.getStockStatus(), "1*"));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -167,12 +183,12 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void auditInStocked(ArrivalListItem arrivalListItem) {
-        installApiService.auditInStocked(UserContextService.getAccessToken(), arrivalListItem.getId());
+        assetInstallationService.auditInStocked(UserContextService.getAccessToken(), arrivalListItem.getId());
     }
 
     public void bathAuditInStocked() {
         for (ArrivalListItem selectedItem : selectedItems) {
-            installApiService.auditInStocked(UserContextService.getAccessToken(), selectedItem.getId());
+            assetInstallationService.auditInStocked(UserContextService.getAccessToken(), selectedItem.getId());
         }
     }
 
@@ -181,26 +197,79 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedInStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含已出库的设备，无法生成入库单！");
+            return;
+        }
         String inStockNo = assetOutStockService.queryInStockNo("RK");
-        Date now = DateUtil.now();
         for (ArrivalListItem selectedItem : selectedItems) {
             selectedItem.setInStockNo(inStockNo);
-            selectedItem.setInStockDocumentsDate(now);
             selectedItem.setStockStatus(3);
         }
         dao.save(selectedItems);
     }
 
     public void generatedOutStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
+            return;
+        }
+        if (ObjectUtil.isEmpty(recruiteDept)) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("领用科室，不能为空！");
+            return;
+        }
         String inStockNo = assetOutStockService.queryOutStockNo("CK");
         Date now = DateUtil.now();
+        List<String> assetIds = ListUtil.newArrayList();
         for (ArrivalListItem selectedItem : selectedItems) {
             selectedItem.setOutStockNo(inStockNo);
-            selectedItem.setOutStockDocumentsDate(now);
             selectedItem.setRecruiteDeptUid(recruiteDept.getUid());
             selectedItem.setClinicalDeptUID(recruiteDept.getUid());
             selectedItem.setRecruiter(currentUser.getUid());
+            selectedItem.setOutStocDate(now);
             selectedItem.setStockStatus(4);
+            assetIds.add(selectedItem.getAssetUID());
+        }
+        if (ObjectUtil.isNotEmpty(assetIds)) {
+            assetInfoRepository.outStocked(assetIds, recruiteDept.getId(), recruiteDept.getUid(), recruiteDept.getName());
+        }
+        dao.save(selectedItems);
+    }
+
+    public void exportAll(String sockType) throws IOException {
+        if (ObjectUtil.isEmpty(selectedItems)) {
+            WebUtil.addErrorMessage("请选择打印设备！");
+            return;
+        }
+        List<String> stockNos;
+        List<Integer> stockStatus = selectedItems.stream().map(ArrivalListItem::getStockStatus).distinct().collect(Collectors.toList());
+        if ("inStock".equals(sockType)) {
+            stockNos = selectedItems.stream().map(ArrivalListItem::getInStockNo).distinct().collect(Collectors.toList());
+        } else {
+            stockNos = selectedItems.stream().map(ArrivalListItem::getOutStockNo).distinct().collect(Collectors.toList());
+            if (stockStatus.size() > 1 || !stockStatus.contains(4)) {
+                WebUtil.addErrorMessage("只能打印已出库的设备！");
+                return;
+            }
+        }
+        if (stockNos.size() > 1) {
+            WebUtil.addErrorMessage("不同单号无法打印！");
+            return;
+        }
+        if (ObjectUtil.isEmpty(stockNos.get(0))) {
+            WebUtil.addErrorMessage("没有单号无法打印！");
+            return;
+        }
+        Date now = DateUtil.now();
+        if ("inStock".equals(sockType)) {
+            exportInStockFile = assetOutStockService.exportWord(selectedItems, sockType);
+            selectedItems.forEach(t -> t.setInStockDocumentsDate(now));
+        } else {
+            exportOutStockFile = assetOutStockService.exportWord(selectedItems, sockType);
+            selectedItems.forEach(t -> t.setOutStockDocumentsDate(now));
         }
         dao.save(selectedItems);
     }
@@ -242,7 +311,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public String getOrgNameByUid(String orgUid) {
         if (!Strings.isNullOrEmpty(orgUid)) {
-            OrgInfo org = aiService.getOrgInfoByUid(orgUid);
+            OrgInfo org = orgInfoRepository.getOrgInfoByUid(orgUid);
             return org==null? null:org.getName();
         }else {
             return null;

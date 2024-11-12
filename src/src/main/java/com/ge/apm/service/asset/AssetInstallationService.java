@@ -168,68 +168,12 @@ public class AssetInstallationService {
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalListItem(token, itemId, isFinish);
-
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if (res.contains("successfully")) {
+            ArrivalListItem temp = itemDao.findById(itemId);
             if (isFinish) {
-                ArrivalListItem temp = itemDao.findById(itemId);
-                AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
-                if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 3);
-                }
-                assetDepreciationService.saveAssetDerpeciation(newAsset);
-                if (isGeneratePmOrder) {
-                    pmService.createPMrequest(newAsset.getUid(), null);
-                }
-                List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
-                        .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("business") || item.getBoSubType().contains("clinical") || item.getBoSubType().contains("technical") || item.getBoSubType().contains("fixasset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
-                assetPicList.addAll(getPicList(temp.getArrivalListId()));
-                assetPicList.forEach(item -> {
-                    item.setId(null);
-                    item.setBoUuid(newAsset.getUid());
-                    item.setBoId(newAsset.getId());
-                    switch (item.getBoSubType()) {
-                        case "asset":
-                            item.setBoSubType("1");
-                            break;
-                        case "asset2":
-                            item.setBoSubType("2");
-                            break;
-                        case "asset3":
-                            item.setBoSubType("3");
-                            break;
-                        case "asset4":
-                        case "business":
-                        case "clinical":
-                        case "technical":
-                        case "fixasset":
-                            item.setBoSubType("4");
-                            break;
-                        default:
-                    }
-
-/*                    // See: YHAAO-2346: ignore verification & other document.
-                    if ("4".equals(item.getBoSubType()) && V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType())) {
-                        return;
-                    }*/
-
-                    item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-                });
-                blobDao.save(assetPicList);
-                if (!userContextService.needInstorageCheck()) {
-                    temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
-                    itemDao.save(temp);
-                }
-
-                ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(temp.getId());
-                if (null != contractItem) {
-                    contractItem.setAssetUid(temp.getAssetUID());
-                    ContractInfoItem tempContractItem = contractItemDao.save(contractItem);
-                    this.updateAssetParent(tempContractItem, newAsset);
-                }
+                saveAsset(temp, isGeneratePmOrder);
             } else {
                 //after reject;
-                ArrivalListItem temp = itemDao.findById(itemId);
                 if (!Strings.isNullOrEmpty(temp.getQrCode())) {
                     qrCodeService.releaseQrCode(temp.getQrCode(), temp.getArrivalList().getSiteUID());
                 }
@@ -239,6 +183,68 @@ public class AssetInstallationService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public void auditInStocked(String token, String itemId) {
+        installApiService.auditInStocked(token, itemId);
+        ArrivalListItem temp = itemDao.findById(itemId);
+        saveAsset(temp, temp.getIsGeneratePmOrder());
+    }
+
+    public void saveAsset(ArrivalListItem temp, Boolean isGeneratePmOrder) {
+        Integer stockStatus = 1;
+        if (stockStatus.equals(temp.getStockStatus())) {
+            return;
+        }
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        AssetInfo newAsset = Optional.ofNullable(temp.getAssetUID()).map(assetDao::getByUid).orElse(new AssetInfo());
+        if (ObjectUtil.isNotEmpty(newAsset.getQrCode())) {
+            qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 3);
+        }
+        assetDepreciationService.saveAssetDerpeciation(newAsset);
+        if (isGeneratePmOrder) {
+            pmService.createPMrequest(newAsset.getUid(), null);
+        }
+        List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(temp.getId())).orElse(new ArrayList<>())
+                .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("business") || item.getBoSubType().contains("clinical") || item.getBoSubType().contains("technical") || item.getBoSubType().contains("fixasset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
+        assetPicList.addAll(getPicList(temp.getArrivalListId()));
+        assetPicList.forEach(item -> {
+            item.setId(null);
+            item.setBoUuid(newAsset.getUid());
+            item.setBoId(newAsset.getId());
+            switch (item.getBoSubType()) {
+                case "asset":
+                    item.setBoSubType("1");
+                    break;
+                case "asset2":
+                    item.setBoSubType("2");
+                    break;
+                case "asset3":
+                    item.setBoSubType("3");
+                    break;
+                case "asset4":
+                case "business":
+                case "clinical":
+                case "technical":
+                case "fixasset":
+                    item.setBoSubType("4");
+                    break;
+                default:
+            }
+            item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+        });
+        blobDao.save(assetPicList);
+        if (!userContextService.needInstorageCheck()) {
+            temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
+            itemDao.save(temp);
+        }
+
+        ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(temp.getId());
+        if (null != contractItem) {
+            contractItem.setAssetUid(temp.getAssetUID());
+            ContractInfoItem tempContractItem = contractItemDao.save(contractItem);
+            this.updateAssetParent(tempContractItem, newAsset);
         }
     }
 

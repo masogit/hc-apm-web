@@ -448,7 +448,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return "";
     }
 
-    public String getDavinciToken(String token) {
+    public Map getDavinciToken(String token) {
+        HashMap<String, Object> map = new HashMap<>();
+
         try {
             String webContextUrl = getWebContextUrl();
             String davinciGetTokenString = GatewayURL.DAVINCI_GET_TOKEN.toString();
@@ -472,16 +474,22 @@ public class MicroServiceUtil extends MicroServiceInvoker {
                 if (header.containsKey("code")) {
                     int code = (int) header.get("code");
                     if (code == 200) {
-                        return (String) header.get("token");
+//                        return (String) header.get("token");
+                        map.put("davinciToken", header.get("token"));
+
                     }
 
                 }
             }
-            return null;
+            if (body.containsKey("payload")) {
+                String jsonString = JSON.toJSONString(body.get("payload"));
+                map.put("loginUser", jsonString);
+            }
+            return map;
         } catch (Exception e) {
             logger.error("getDavinciToken error:", e);
         }
-        return null;
+        return map;
     }
 
 }
