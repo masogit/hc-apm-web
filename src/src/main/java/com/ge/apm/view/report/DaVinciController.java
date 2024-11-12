@@ -14,6 +14,7 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.Map;
 
 @ManagedBean
 @ViewScoped
@@ -46,7 +47,7 @@ public class DaVinciController {
         return daVinciShareLink;
     }
 
-    public String  davinciAccessToken(){
+    public Map davinciAccessToken(){
         String apmToken= UserContextService.getAccessToken();
         return   microServiceUtil.getDavinciToken(apmToken);
 
