@@ -44,6 +44,8 @@ public class AssetOutStockService {
     OrgInfoRepository orgInfoRepository;
 
     public static final String PATH_WORD_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stock_template.docx";
+    public static final String PATH_WORD_IN_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/in_stocked_template.docx";
+    public static final String PATH_WORD_OUT_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stocked_template.docx";
 
 
 
@@ -83,8 +85,25 @@ public class AssetOutStockService {
         byte[] templateBytes = buildReportTemplate(PATH_WORD_TEMPLATE);
 
         byte[] bytes = this.renderDocx(data, templateBytes);
-        StreamedContent streamedContent = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", "out_stock_template.docx");
-        return streamedContent;
+        return new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", "out_stock_template.docx");
+    }
+
+    public StreamedContent exportWord(List<ArrivalListItem> arrivalListItemList, String sockType) throws IOException {
+        //1、doc模板部分
+        Map<String, Object> data = createFileData(arrivalListItemList);
+        String templatePath;
+        String fileName;
+        if ("inStock".equals(sockType)) {
+            templatePath = PATH_WORD_IN_STOCK_TEMPLATE;
+            fileName = "入库单.docx";
+        } else {
+            templatePath = PATH_WORD_OUT_STOCK_TEMPLATE;
+            fileName = "出库单.docx";
+        }
+        byte[] templateBytes = buildReportTemplate(templatePath);
+
+        byte[] bytes = this.renderDocx(data, templateBytes, sockType);
+        return new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", fileName);
     }
 
     public byte[] buildReportTemplate(String templatePath) throws IOException {
@@ -121,6 +140,37 @@ public class AssetOutStockService {
         return data;
     }
 
+    public Map<String, Object> createFileData(List<ArrivalListItem> arrivalListItemList){
+        ArrivalListItem temp = arrivalListItemList.get(0);
+        String deptName = Optional.ofNullable(temp.getRecruiteDeptUid()).map(orgInfoRepository::getByUid).map(OrgInfo::getName).orElse("");
+        Map<String, Object> data = new HashMap<>();
+        data.put("depName", deptName);
+        data.put("date", DateUtil.format(new Date(), "yyyy-MM-dd"));
+        data.put("inStockNo", temp.getInStockNo());
+        data.put("outStockNo", temp.getOutStockNo());
+        data.put("userName", UserContextService.getCurrentUserAccount().getName());
+        data.put("sum", arrivalListItemList.size());
+        data.put("sumPrice", arrivalListItemList.stream().mapToDouble(ArrivalListItem::getPurchasePrice).sum());
+        data.put("invoiceNum", temp.getArrivalList().getInvoiceNum());
+        data.put("vendor", temp.getArrivalList().getVendor());
+
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for(ArrivalListItem arrivalListItem : arrivalListItemList){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("type", "专用设备");
+            mm.put("assetName", arrivalListItem.getArrivalList().getAssetName());
+            mm.put("functionType", arrivalListItem.getArrivalList().getFunctionType());
+            mm.put("unit", "台");
+            mm.put("qty", "1");
+            mm.put("purchasePrice", arrivalListItem.getPurchasePrice());
+            mm.put("total", arrivalListItem.getPurchasePrice());
+            mm.put("vendor", arrivalListItem.getArrivalList().getVendor());
+            dataList.add(mm);
+        }
+        data.put("list", dataList);
+        return data;
+    }
+
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
         byte[] bytes;
         XWPFTemplate template = null;
@@ -128,6 +178,24 @@ public class AssetOutStockService {
             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+            template.render(data);
+            template.write(out);
+            bytes = out.toByteArray();
+        }finally {
+            if (template != null) {
+                template.close();
+            }
+        }
+        return bytes;
+    }
+
+    private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes, String stockType) throws IOException {
+        byte[] bytes;
+        XWPFTemplate template = null;
+        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+            template = XWPFTemplate.compile(inputStream);
+            template.registerPolicy("list", new AssetOutStockTableRenderPolicy(stockType));
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();

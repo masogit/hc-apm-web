@@ -393,4 +393,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select  ai.* from asset_info ai  left join  efficiency_equipment_info eei on ai.uid=eei.asset_uid   where ai.tenant_uid=?1 and ai.is_valid =true and ai.is_deleted=false   and (ai.institution_uid in (?2) or ai.hospital_uid in (?2) or ai.site_uid in (?2))  and ai.clinical_dept_uid=?3      and eei.uid is null limit 5000 ",nativeQuery = true)
     List<AssetInfo> getAssetInfoIsNotEfficiencyEquipment(String tenantUID, List<String> siteOrgUids, String clinicalDeptUid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE asset_info SET clinical_dept_id = ?2, clinical_dept_uid = ?3, clinical_dept_name = ?4 WHERE uid IN ?1",nativeQuery = true)
+    void outStocked(List<String> assetIds, Integer clinicalDeptId, String clinicalDeptUid, String clinicalDeptName);
 }
