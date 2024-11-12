@@ -349,9 +349,9 @@
 
     <script>
         function davinciToken(){
-            // var token = "#{daVinciController.davinciAccessToken()}";
-            // alert(token);
-            // localStorage.setItem("TOKEN", token || '#');
+            var token = "#{daVinciController.davinciAccessToken()}";
+            localStorage.setItem("TOKEN", token || '#');
+            localStorage.setItem("TOKEN_EXPIRE", Date.now() + 8640000);
         }
 
     </script>
