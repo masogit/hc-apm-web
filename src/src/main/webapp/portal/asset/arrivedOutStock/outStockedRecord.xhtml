@@ -33,7 +33,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.vendor}</label>
-                    <p:autoComplete dropdown="true" value="#{assetStockedController.supplier}"  scrollHeight="300"  forceSelection="true"
+                    <p:autoComplete dropdown="true" value="#{assetStockedController.supplier}" scrollHeight="300"  forceSelection="true"
                                     completeMethod="#{assetStockedController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                     </p:autoComplete>
                 </h:panelGroup>
@@ -85,7 +85,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <p:commandButton value="#{msg.Search}" validateClient="true" update=":growl :assetOutStockTab:AssetOutStockedListForm :assetOutStockTab:AssetOutStockedListForm:datalist"/>
-            <p:commandButton value="清空条件" validateClient="true" actionListener="#{assetStockedController.initSearchItem()}" update=":growl :assetOutStockTab:outStockedDataForm"/>
+            <p:commandButton value="清空条件" validateClient="true" actionListener="#{assetStockedController.initSearchItem()}" update=":growl :assetOutStockTab:outStockedDataForm :assetOutStockTab:AssetOutStockedListForm:datalist"/>
         </p:fieldset>
     </h:form>
 
@@ -115,6 +115,9 @@
             </p:column>
             <p:column headerText="#{msg.vendor}">
                 <h:outputText value="#{item.arrivalList.vendor}"/>
+            </p:column>
+            <p:column headerText="制单人">
+                <h:outputText value="#{assetStockedController.getUserNameByUid(item.outStockUser)}"/>
             </p:column>
             <p:column headerText="#{msg.financingNum}">
                 <h:outputText value="#{item.financingNum}"/>
@@ -149,25 +152,29 @@
                 <h:outputText value="#{assetStockedController.getOrgNameByUid(item.recruiteDeptUid)}"/>
             </p:column>
             <p:column headerText="状态">
-                <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}" style="color: #989898"/>
+                <h:outputText value="#{fieldMsg.fieldValue('stockStatus', item.stockStatus)}" style="color: #989898"/>
             </p:column>
             <f:facet name="{Toolbar}">
-                <p:commandButton value="生成出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
-                <p:commandButton validateClient="true" value="打印出库单" ajax="false" title="打印出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}"
-                                 actionListener="#{assetStockedController.exportAll('outStock')}" update=":growl :assetOutStockTab:AssetOutStockedListForm:datalist" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                 icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray">
-                    <p:fileDownload value="#{assetStockedController.exportOutStockFile}"/>
-                </p:commandButton>
+                <p:commandButton value="生成出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.generatedStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+                <p:commandButton value="打印出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
             </f:facet>
         </p:dataTable>
     </h:form>
-    <p:dialog id="GeneratedOutStockDocDlg" widgetVar="GeneratedOutStockDocDialog" modal="true" resizable="true" draggable="true" width="1450" header="生成出库单">
+    <p:dialog id="GeneratedOutStockDocDlg" widgetVar="GeneratedOutStockDocDialog" modal="true" resizable="true" draggable="true" width="1450" header="#{assetStockedController.outStock ? '打印出库单' : '生成出库单'}">
         <h:form id="GeneratedOutStockForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
                     <label class="label">合计数量：#{assetStockedController.selectedItems.size()}；合计金额：#{assetStockedController.totalPurchasePrice()}</label>
                 </h:panelGroup>
-                <h:panelGroup>
+                <h:panelGroup rendered="#{assetStockedController.outStock}">
+                    <label class="label">出库单号</label>
+                    <p:autoComplete dropdown="true" value="#{assetStockedController.outStockNo}" scrollHeight="300"  forceSelection="true"
+                                    completeMethod="#{assetStockedController.autoCompleteOutStockNo}">
+                        <p:ajax event="itemSelect" listener="#{assetStockedController.onNoChange('outStock')}" update=":assetOutStockTab:GeneratedOutStockForm"/>
+                        <p:ajax listener="#{assetStockedController.onNoChange('outStock')}" update=":assetOutStockTab:GeneratedOutStockForm"/>
+                    </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!assetStockedController.outStock}">
                     <label class="label">领用科室<span style="color: red">*</span></label>
                     <p:inputText id="dept" value="#{assetStockedController.recruiteDept.name}" readonly="true" required="true" requiredMessage="领用科室 #{msg.ValidationRequire}"/>
                     <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
@@ -231,10 +238,15 @@
                     <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}" style="color: #989898"/>
                 </p:column>
             </p:dataTable>
-            <p:commandButton validateClient="true" action="#{assetStockedController.generatedOutStockDoc()}"
+            <p:commandButton validateClient="true" action="#{assetStockedController.generatedOutStockDoc()}" rendered="#{!assetStockedController.outStock}"
                              value="#{msg.Confirm}" update=":assetOutStockTab:GeneratedOutStockForm :assetOutStockTab:AssetOutStockedListForm:datalist" icon="ui-icon-check"
                              oncomplete="handleSubmit(args, 'GeneratedOutStockDocDialog');"/>
-            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('GeneratedOutStockDocDialog').hide()"/>
+            <p:commandButton immediate="true" value="打印" disabled="#{assetStockedController.selectedItems.size() == 0}" rendered="#{assetStockedController.outStock}" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray"
+                             actionListener="#{assetStockedController.exportAll('outStock')}"
+                             onclick="PrimeFaces.monitorDownload(start, stop)">
+                <p:fileDownload value="#{assetStockedController.exportOutStockFile}"/>
+            </p:commandButton>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetOutStockedListForm:datalist" onclick="PF('GeneratedOutStockDocDialog').hide()"/>
         </h:form>
     </p:dialog>
 </ui:composition>
