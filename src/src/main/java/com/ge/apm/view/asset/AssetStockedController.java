@@ -12,6 +12,7 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.component.tree.Tree;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -48,6 +49,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private ArrivalListItem searchItem;
     private Supplier supplier;
     private OrgInfo recruiteDept;
+    @Getter @Setter
+    private OrgInfo queryRecruiteDept;
     private OrgInfo org;
     private TreeNode orgTreeEdit;
     private String tabId;
@@ -90,6 +93,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         startPrice = null;
         endPrice = null;
         searchItem = new ArrivalListItem();
+        queryRecruiteDept = null;
         searchItem.setArrivalList(new ArrivalList());
     }
 
@@ -164,6 +168,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         }
         if (ObjectUtil.isNotEmpty(searchItem.getStockStatus())) {
             searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, searchItem.getStockStatus(), "1*"));
+        }
+        if (ObjectUtil.isNotEmpty(queryRecruiteDept)) {
+            searchFilters.add(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.EQ, queryRecruiteDept.getUid(), "1*"));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -306,7 +313,13 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
-        recruiteDept = (OrgInfo) node.getData();
+        Tree source = (Tree) event.getSource();
+        String id = source.getId();
+        if ("orgTreeQuery".equals(id)) {
+            queryRecruiteDept = (OrgInfo) node.getData();
+        } else {
+            recruiteDept = (OrgInfo) node.getData();
+        }
     }
 
     public String getOrgNameByUid(String orgUid) {
