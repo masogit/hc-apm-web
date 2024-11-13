@@ -24,6 +24,10 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     List<ArrivalListItem> findByIdIn(Collection<String> ids);
 
+    List<ArrivalListItem> findByInStockNo(String inStockNo);
+
+    List<ArrivalListItem> findByOutStockNo(String inStockNo);
+
     List<ArrivalListItem> findByArrivalListIdIn(Collection<String> arrivalListIds);
 
     @Query(value = "select listItem.* from arrival_list list,arrival_list_item listItem where list.id=listItem.arrival_list_id and list.contract_num=?1 and listItem.clinical_dept_uid=?2 and listItem.install_status=?3 order by listItem.function_type",nativeQuery=true)

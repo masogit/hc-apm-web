@@ -67,6 +67,14 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private StreamedContent exportInStockFile;
     @Getter @Setter
     private StreamedContent exportOutStockFile;
+    @Getter @Setter
+    private String inStockNo;
+    @Getter @Setter
+    private String outStockNo;
+    @Getter @Setter
+    private Boolean inStock = Boolean.FALSE;
+    @Getter @Setter
+    private Boolean outStock = Boolean.FALSE;
 
     @Override
     protected void init() {
@@ -105,14 +113,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     @Override
     protected Page<ArrivalListItem> loadData(PageRequest pageRequest) {
         searchFilters = new ArrayList<>();
-        if (!this.hasFilterOnField("arrivalList.siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
-        }
+        selectedItems = ListUtil.newArrayList();
+        pckFilters(searchFilters);
         tabId = tabId == null ? "auditInStocked" : tabId;
         switch (tabId) {
             case "auditInStocked":
@@ -175,6 +177,17 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
+    private void pckFilters(List<SearchFilter> searchFilters) {
+        if (!this.hasFilterOnField("arrivalList.siteUID")) {
+            List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+        }
+    }
+
     @Override
     public void onFilter(FilterEvent event) {
         selected = null;
@@ -189,6 +202,32 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         return autoCompleteService.autoCompleteVendor(query, supplierList);
     }
 
+    public Collection<String> autoCompleteInStockNo(String query) {
+        List<SearchFilter> searchFilterList = ListUtil.newArrayList();
+        pckFilters(searchFilterList);
+        searchFilterList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
+        searchFilterList.add(new SearchFilter("inStockNo", SearchFilter.Operator.LIKE, query, "1*"));
+        List<ArrivalListItem> listItems = dao.findBySearchFilter(searchFilterList);
+        return listItems.stream().map(ArrivalListItem::getInStockNo).distinct().collect(Collectors.toList());
+    }
+
+    public Collection<String> autoCompleteOutStockNo(String query) {
+        List<SearchFilter> searchFilterList = ListUtil.newArrayList();
+        pckFilters(searchFilterList);
+        searchFilterList.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, 4, "1*"));
+        searchFilterList.add(new SearchFilter("outStockNo", SearchFilter.Operator.LIKE, query, "1*"));
+        List<ArrivalListItem> listItems = dao.findBySearchFilter(searchFilterList);
+        return listItems.stream().map(ArrivalListItem::getOutStockNo).distinct().collect(Collectors.toList());
+    }
+
+    public void onNoChange(String stockType) {
+        if ("inStock".equals(stockType) && ObjectUtil.isNotEmpty(inStockNo)) {
+            selectedItems = dao.findByInStockNo(inStockNo);
+        } else if (ObjectUtil.isNotEmpty(outStockNo)) {
+            selectedItems = dao.findByOutStockNo(outStockNo);
+        }
+    }
+
     public void auditInStocked(ArrivalListItem arrivalListItem) {
         assetInstallationService.auditInStocked(UserContextService.getAccessToken(), arrivalListItem.getId());
     }
@@ -200,7 +239,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public Double totalPurchasePrice() {
-        return selectedItems.stream().mapToDouble(ArrivalListItem::getPurchasePrice).sum();
+        return selectedItems.stream().filter(t -> ObjectUtil.isNotEmpty(t.getPurchasePrice())).mapToDouble(ArrivalListItem::getPurchasePrice).sum();
     }
 
     public void generatedInStockDoc() {
@@ -212,6 +251,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         String inStockNo = assetOutStockService.queryInStockNo("RK");
         for (ArrivalListItem selectedItem : selectedItems) {
             selectedItem.setInStockNo(inStockNo);
+            selectedItem.setInStockUser(currentUser.getUid());
             selectedItem.setStockStatus(3);
         }
         dao.save(selectedItems);
@@ -237,6 +277,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             selectedItem.setClinicalDeptUID(recruiteDept.getUid());
             selectedItem.setRecruiter(currentUser.getUid());
             selectedItem.setOutStocDate(now);
+            selectedItem.setOutStockUser(currentUser.getUid());
             selectedItem.setStockStatus(4);
             assetIds.add(selectedItem.getAssetUID());
         }
@@ -246,14 +287,33 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         dao.save(selectedItems);
     }
 
-    public void exportAll(String sockType) throws IOException {
+    public void generatedStockDoc(String stockType) {
+        if ("inStock".equals(stockType)) {
+            inStock = Boolean.FALSE;
+        } else {
+            outStock = Boolean.FALSE;
+        }
+    }
+
+    public void printStockDoc(String stockType) {
+        inStockNo = null;
+        outStockNo = null;
+        if ("inStock".equals(stockType)) {
+            inStock = Boolean.TRUE;
+        } else {
+            outStock = Boolean.TRUE;
+        }
+        selectedItems = ListUtil.newArrayList();
+    }
+
+    public void exportAll(String stockType) throws IOException {
         if (ObjectUtil.isEmpty(selectedItems)) {
             WebUtil.addErrorMessage("请选择打印设备！");
             return;
         }
         List<String> stockNos;
         List<Integer> stockStatus = selectedItems.stream().map(ArrivalListItem::getStockStatus).distinct().collect(Collectors.toList());
-        if ("inStock".equals(sockType)) {
+        if ("inStock".equals(stockType)) {
             stockNos = selectedItems.stream().map(ArrivalListItem::getInStockNo).distinct().collect(Collectors.toList());
         } else {
             stockNos = selectedItems.stream().map(ArrivalListItem::getOutStockNo).distinct().collect(Collectors.toList());
@@ -271,11 +331,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             return;
         }
         Date now = DateUtil.now();
-        if ("inStock".equals(sockType)) {
-            exportInStockFile = assetOutStockService.exportWord(selectedItems, sockType);
+        if ("inStock".equals(stockType)) {
+            exportInStockFile = assetOutStockService.exportWord(selectedItems, stockType);
             selectedItems.forEach(t -> t.setInStockDocumentsDate(now));
         } else {
-            exportOutStockFile = assetOutStockService.exportWord(selectedItems, sockType);
+            exportOutStockFile = assetOutStockService.exportWord(selectedItems, stockType);
             selectedItems.forEach(t -> t.setOutStockDocumentsDate(now));
         }
         dao.save(selectedItems);
@@ -325,18 +385,18 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     public String getOrgNameByUid(String orgUid) {
         if (!Strings.isNullOrEmpty(orgUid)) {
             OrgInfo org = orgInfoRepository.getOrgInfoByUid(orgUid);
-            return org==null? null:org.getName();
+            return org == null ? null : org.getName();
         }else {
             return null;
         }
     }
 
-    public String getArrivalFormatTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-        if (varArrivalDateTo == null) {
-            return arrivalFormatTime;
-        } else {
-            return "~" + sdf.format(varArrivalDateTo);
+    public String getUserNameByUid(String userUid) {
+        if (!Strings.isNullOrEmpty(userUid)) {
+            UserAccount user = uaaService.getUserByUid(userUid);
+            return user == null ? null : user.getName();
+        }else {
+            return null;
         }
     }
 
