@@ -220,6 +220,17 @@ public class V2_ServiceRequest implements Serializable {
     @Column(name="sr_repair_source")
     private String srRepairSource;
 
+    @Column(name="external_work_order")//是否是外部工单
+    private String externalWorkOrder;
+
+    public String getExternalWorkOrder() {
+        return externalWorkOrder;
+    }
+
+    public void setExternalWorkOrder(String externalWorkOrder) {
+        this.externalWorkOrder = externalWorkOrder;
+    }
+
     public String getRepairReportSendPlace() {
         return repairReportSendPlace;
     }

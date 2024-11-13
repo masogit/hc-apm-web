@@ -1472,7 +1472,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
 
         }
-
+        //如果是远东本地版推过来的mvs工单，因为ServiceRequest中RequestorId为本地版的数据，所以ua1为空那么久默认取当前登录人
+        if("3".equals(selectedWorkOrder.getServiceRequest().getExternalWorkOrder())){
+            ua1 = loginUser;
+        };
         if (selectedWorkOrder.getEntryType() == null) {
             selectedWorkOrder.setEntryType(0);
         }
