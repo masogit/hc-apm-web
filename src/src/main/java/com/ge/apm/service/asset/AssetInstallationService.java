@@ -203,7 +203,7 @@ public class AssetInstallationService {
             qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 3);
         }
         assetDepreciationService.saveAssetDerpeciation(newAsset);
-        if (isGeneratePmOrder) {
+        if (Boolean.TRUE.equals(isGeneratePmOrder)) {
             pmService.createPMrequest(newAsset.getUid(), null);
         }
         List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(temp.getId())).orElse(new ArrayList<>())

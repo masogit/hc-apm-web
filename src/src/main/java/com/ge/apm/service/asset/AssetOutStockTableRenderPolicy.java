@@ -27,7 +27,9 @@ public class AssetOutStockTableRenderPolicy extends AbstractWoTableRenderPolicy 
                 addCell(row, extractValue(arrivalItem, "type"));
                 addCell(row, extractValue(arrivalItem, "assetName"));
                 addCell(row, extractValue(arrivalItem, "functionType"));
-                addCell(row, extractValue(arrivalItem, "unit"));
+                if ("outStock".equals(stockType)) {
+                    addCell(row, extractValue(arrivalItem, "unit"));
+                }
                 addCell(row, extractValue(arrivalItem, "qty"));
                 addCell(row, extractValue(arrivalItem, "purchasePrice"));
                 addCell(row, extractValue(arrivalItem, "total"));
