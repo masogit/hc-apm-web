@@ -103,8 +103,8 @@
                 <h:outputText value="#{item.arrivalList.invoiceDate}"/>
             </p:column>
             <p:column headerText="#{msg.Operation}">
-                <p:commandLink actionListener="#{assetStockedController.auditInStocked(item)}" update="assetOutStockTab:AssetAuditInStockedListForm:datalist" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" value="审核入库">
-                    <p:confirm header="#{item.stockStatus == 1 ? '审核入库' : ''}" message="#{item.stockStatus == 1 ? '确认审核？' : ''}" icon="ui-icon-warning"/>
+                <p:commandLink actionListener="#{assetStockedController.auditInStocked(item)}" update="assetOutStockTab:AssetAuditInStockedListForm:datalist" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager') and !item.stockStatus == 1}" value="审核入库">
+                    <p:confirm header="审核入库" message="确认审核？" icon="ui-icon-warning"/>
                 </p:commandLink>
             </p:column>
             <f:facet name="{Toolbar}">
