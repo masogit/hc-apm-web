@@ -1729,12 +1729,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String submitApproval(Integer usageStatusconstant) {
+        Integer usageStatus = selected.getUsageStatus();
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         selected.setUsageStatus(usageStatusconstant);
         String redirectUrl = applyChange();
         if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
             String token = UserContextService.getAccessToken();
             wxMessageService.submitAssetApprovalSendMessage(selected,"待审核");
+        }else{
+            selected.setUsageStatus(usageStatus);
         }
         return redirectUrl;
     }

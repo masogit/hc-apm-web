@@ -456,6 +456,14 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "out_stock_documents_date")
     private Date outStockDocumentsDate;
 
+    //入库单制单人
+    @Column(name = "in_stock_user")
+    private String inStockUser;
+
+    //出库单制单人
+    @Column(name = "out_stock_user")
+    private String outStockUser;
+
     public String getInStockNo() {
         return inStockNo;
     }
