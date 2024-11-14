@@ -11,3 +11,6 @@ update zkb_part_order p set zone = (select a.zone from zkb_contract_asset a wher
 -- YHAAO-23014  新增资产出入库管理员
 INSERT INTO sys_role ( "name", "role_desc", "role_desc_en")  select 'StockedManager', '出入库管理员',  'Stocked Manager'
 where not exists (select 1 from sys_role where name='StockedManager');
+--删除维修和保养工单中 asset_id外键约束，因为云版mvs租户可能不存在相关设备
+ALTER TABLE v2_pm_order DROP CONSTRAINT IF EXISTS fk_p6lxi1rkh49qtix91am8excms;
+ALTER TABLE v2_work_order DROP CONSTRAINT IF EXISTS fk_fg05gp9eenc2sqth59kv2jk3t;
