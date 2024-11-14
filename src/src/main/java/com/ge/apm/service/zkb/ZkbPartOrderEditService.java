@@ -37,8 +37,6 @@ public class ZkbPartOrderEditService {
     @Autowired
     private ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
 
-    @Autowired
-    private ZkbZoneRepository zkbZoneRepository;
 
     public String workFlowCheck(ZkbPartOrder selected, List<ZkbContract> contractList, AssetInfo assetInfo, String notGeAsset, String orderType){
         if(contractList.size() == 0){
@@ -58,10 +56,10 @@ public class ZkbPartOrderEditService {
                 if(StrUtil.isEmpty(zkbContractAsset.getZone())){
                     return "设备Zone为空，请检查！";
                 }else {
-                    List<ZkbZone> zkbZoneList = zkbZoneRepository.findByZone(zkbContractAsset.getZone());
-                    if(zkbZoneList.isEmpty()){
-                        return "设备Zone不存在，请检查！";
-                    }
+                   List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZone(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), zkbContractAsset.getZone());
+                   if(zkbPartOrderUserConfigs.isEmpty()){
+                       return "Zone未配置相应的区域经理，请检查！";
+                   }
                 }
             }
 
