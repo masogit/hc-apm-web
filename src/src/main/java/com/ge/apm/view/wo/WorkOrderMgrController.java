@@ -1528,6 +1528,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     // 走多级审批流,提交审核
     public void submitForApproval() throws Exception {
+        String woId = selectedWorkOrder.getId();
+        saveRepairWorkOrder();
+        selectedWorkOrder=woService.getWorkOrderById(woId);
         if(selectedWorkOrder == null){
             return;
         }
@@ -1548,6 +1551,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+
         WebUtil.addErrorMessage("审批发起成功!");
         return ;
 
@@ -2581,6 +2585,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void submitWorkOrder() {
+        try {
+            String woId = selectedWorkOrder.getId();
+            saveRepairWorkOrder();
+            selectedWorkOrder=woService.getWorkOrderById(woId);
+        }catch (Exception e){
+            logger.error("submitWorkOrder saveRepairWorkOrder error: ",e);
+        }
+
         if(StringUtils.isEmpty(comments)){
             comments= WebUtil.getMessage("QuotationApproval");
         }
