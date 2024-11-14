@@ -1472,7 +1472,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
 
         }
-
+        //如果是远东本地版推过来的mvs工单，因为ServiceRequest中RequestorId为本地版的数据，所以ua1为空那么久默认取当前登录人
+        if("3".equals(selectedWorkOrder.getServiceRequest().getExternalWorkOrder())){
+            ua1 = loginUser;
+        };
         if (selectedWorkOrder.getEntryType() == null) {
             selectedWorkOrder.setEntryType(0);
         }
@@ -1525,6 +1528,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     // 走多级审批流,提交审核
     public void submitForApproval() throws Exception {
+        String woId = selectedWorkOrder.getId();
+        saveRepairWorkOrder();
+        selectedWorkOrder=woService.getWorkOrderById(woId);
         if(selectedWorkOrder == null){
             return;
         }
@@ -1545,6 +1551,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+
         WebUtil.addErrorMessage("审批发起成功!");
         return ;
 
@@ -2578,6 +2585,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void submitWorkOrder() {
+        try {
+            String woId = selectedWorkOrder.getId();
+            saveRepairWorkOrder();
+            selectedWorkOrder=woService.getWorkOrderById(woId);
+        }catch (Exception e){
+            logger.error("submitWorkOrder saveRepairWorkOrder error: ",e);
+        }
+
         if(StringUtils.isEmpty(comments)){
             comments= WebUtil.getMessage("QuotationApproval");
         }
