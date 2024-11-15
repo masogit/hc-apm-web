@@ -50,7 +50,6 @@
             </p:panelGrid>
             <p:commandButton value="#{msg.Search}" validateClient="true" update=":growl :assetOutStockTab:AssetAuditInStockedListForm :assetOutStockTab:AssetAuditInStockedListForm:datalist"/>
             <p:commandButton value="清空条件" validateClient="true" actionListener="#{assetStockedController.initSearchItem()}" update=":growl :assetOutStockTab:auditInStockedDataForm :assetOutStockTab:AssetAuditInStockedListForm:datalist"/>
-
         </p:fieldset>
     </h:form>
 
@@ -103,7 +102,7 @@
                 <h:outputText value="#{item.arrivalList.invoiceDate}"/>
             </p:column>
             <p:column headerText="#{msg.Operation}">
-                <p:commandLink actionListener="#{assetStockedController.auditInStocked(item)}" update="assetOutStockTab:AssetAuditInStockedListForm:datalist" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager') and !item.stockStatus == 1}" value="审核入库">
+                <p:commandLink actionListener="#{assetStockedController.auditInStocked(item)}" update="assetOutStockTab:AssetAuditInStockedListForm:datalist" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager') or item.stockStatus != 1}" value="审核入库">
                     <p:confirm header="审核入库" message="确认审核？" icon="ui-icon-warning"/>
                 </p:commandLink>
             </p:column>
