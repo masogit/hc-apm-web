@@ -2585,10 +2585,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void submitWorkOrder() {
+
+        String approverUid=this.selectedApproverUid;
         try {
             String woId = selectedWorkOrder.getId();
+            Integer currentStepId = selectedWorkOrder.getCurrentStepId();
+
             saveRepairWorkOrder();
             selectedWorkOrder=woService.getWorkOrderById(woId);
+            selectedWorkOrder.setCurrentStepId(currentStepId);
         }catch (Exception e){
             logger.error("submitWorkOrder saveRepairWorkOrder error: ",e);
         }
@@ -2603,7 +2608,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 item.setApproved(null);
             }
         });
-        woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments, this.selectedApproverUid);
+        woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments, approverUid);
         cancel();
     }
 

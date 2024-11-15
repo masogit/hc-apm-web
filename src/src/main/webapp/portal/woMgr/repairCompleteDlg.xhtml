@@ -21,6 +21,7 @@
                                         value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
                                         showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
                                         required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
+                                <p:ajax event="dateSelect"/>
                             </p:calendar>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -35,6 +36,7 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </c:otherwise>
                                 </c:choose>
+                                <p:ajax event="change" process="@this"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
 
@@ -61,11 +63,15 @@
                     <p:panelGrid  id="subStatusStartSubStatusTime" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
                             <label class="label">#{msg.startTime}</label>
-                            <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
                             <label class="label">#{msg.endTime}</label>
-                            <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -82,16 +88,22 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.patProblems}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  maxlength="500"   />
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  maxlength="500"   >
+                                <p:ajax />
+                            </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.patActions}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  maxlength="500"  />
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  maxlength="500"  >
+                                <p:ajax />
+                            </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup>
 
                             <label class="label">#{msg.patTests}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"   maxlength="500" />
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"   maxlength="500" >
+                                <p:ajax />
+                            </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
@@ -134,20 +146,25 @@
                             <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==0 || workOrderMgrController.selectedWorkOrder.entryType==null}">
                                 <label class="label">#{workOrderMgrController.getManHourShow()}</label>
                                 <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
+                                    <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1}">
                                 <label class="label">#{workOrderMgrController.getManHourShow()}</label>
                                 <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
+                                    <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.otherExpense}</label><!--其它费用-->
-                                <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" />
+                                <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" >
+                                    <p:ajax />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
                                 <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
+                                    <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -295,7 +312,9 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.LatestDevelopments}</label>
-                                <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.comment}" rows="3"  cols="40"  maxlength="500"  />
+                                <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.comment}" rows="3"  cols="40"  maxlength="500"  >
+                                    <p:ajax />
+                                </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
 
