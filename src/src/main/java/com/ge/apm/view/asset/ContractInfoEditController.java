@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -18,6 +19,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +33,10 @@ import javax.faces.bean.ViewScoped;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.web.WebUtil;
@@ -37,6 +45,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 import javaslang.Tuple2;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -103,6 +114,13 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<I18nMessage> contractAttachmentTypeList;
 
+    @Getter @Setter
+    private List<String> selectedBlobIdList;
+    @Getter @Setter
+    private Map<String, Boolean> blobObjectSelectedMap;
+    @Getter @Setter
+    private StreamedContent attachListFile;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
@@ -166,6 +184,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         initOrgTree();
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("contractAttachmentType");
         contractAttachmentTypeList =contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+        blobObjectSelectedMap = new HashMap();
     }
 
     @Override
@@ -753,6 +772,66 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             disable = true;
         }
         return disable;
+    }
+
+    public void pick(String itemId){
+        selectedBlobIdList = new ArrayList<>();
+        blobObjectSelectedMap.forEach((k, v) -> {
+            if (v)
+                selectedBlobIdList.add(k);
+        });
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = attachements.stream().noneMatch(item -> !blobObjectSelectedMap.containsKey(item.getId()) || !blobObjectSelectedMap.get(item.getId()));
+        for (V2_BlobObject item : attachements) {
+            blobObjectSelectedMap.put(item.getId(), !isSelectedAll);
+        }
+        selectedBlobIdList = new ArrayList<>();
+        blobObjectSelectedMap.forEach((k, v) -> {
+            if (v) {
+                selectedBlobIdList.add(k);
+            } else {
+                selectedBlobIdList.remove(k);
+            }
+        });
+    }
+
+    public boolean isChecked() {
+        Map<String, Boolean> map = this.blobObjectSelectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void bathDeleteAttach() {
+        for (String blobId : selectedBlobIdList) {
+            blobObjectSelectedMap.remove(blobId);
+            removeAttachmentById(blobId);
+        }
+    }
+
+    public void bathDownloadAttach() {
+        String zipName = Optional.ofNullable(selected.getContractNum()).orElse("") + selected.getName() + ".zip";
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zipOut = new ZipOutputStream(bout)) {
+            Map<String, V2_BlobObject> blobObjectMap = attachements.stream().collect(Collectors.toMap(V2_BlobObject::getId, t -> t));
+            for (String blobId : selectedBlobIdList) {
+                V2_BlobObject blobObject = blobObjectMap.get(blobId);
+                String name = FieldValueMessageController.fieldValue("contractAttachmentType", blobObject.getBoSubType()) + "_" + blobObject.getObjectName();
+                zipOut.putNextEntry(new ZipEntry(name));
+                byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(blobObject.getObjectStorageId()).getStream());
+                IOUtils.write(bytess, zipOut);
+                zipOut.closeEntry();
+            }
+            zipOut.close();
+            attachListFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", zipName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public Map<String, Object> getSelectedObjectMap() {

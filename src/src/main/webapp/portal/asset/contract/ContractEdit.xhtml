@@ -149,27 +149,43 @@
                                 </p:inputText>
                             </h:panelGroup>
                         </p:panelGrid>
-                        <h:panelGroup >
+                        <h:panelGroup>
+                            <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":AssetContractEditForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{contractInfoEditController.bathDeleteAttach}" disabled="#{!contractInfoEditController.isChecked()}">
+                                <p:confirm header="批量删除文件" message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                            <p:commandButton value="批量下载文件" class="bathDownloadAttach" actionListener="#{contractInfoEditController.bathDownloadAttach}" disabled="#{!contractInfoEditController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                <p:fileDownload value="#{contractInfoEditController.attachListFile}"/>
+                            </p:commandButton>
                             <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
                                 <f:facet name="header">
                                     <div class="ui-g" style="text-align:left">
+                                        <div class="ui-g-1">
+                                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                                <p:ajax listener="#{contractInfoEditController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
+                                            </p:selectBooleanCheckbox>
+                                        </div>
                                         <h:outputText value="#{msg.AttachmentType}" class="ui-g-2"/>
                                         <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
-                                        <h:outputText value="#{msg.UploadTime}" class="ui-g-3" />
+                                        <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
                                         <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
-                                        <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-2" rendered="#{contractInfoEditController.canBeEdit}"/>
+                                        <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-1" rendered="#{contractInfoEditController.canBeEdit}"/>
                                     </div>
                                 </f:facet>
 
                                 <div class="ui-g">
+                                    <div class="ui-g-1">
+                                        <p:selectBooleanCheckbox value="#{contractInfoEditController.blobObjectSelectedMap[fileitem.id]}" id="selectCheckBox" class="selectCheckBoxHeader">
+                                            <p:ajax process="@this" listener="#{contractInfoEditController.pick(fileitem.id)}" update="@(.selectCheckBox) @(.selectCheckBox) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
+                                        </p:selectBooleanCheckbox>
+                                    </div>
                                     <h:outputText value="#{fieldMsg.fieldValue('contractAttachmentType', fileitem.boSubType)}" class="ui-g-2"/>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="ui-g-3"/>
 <!--                                    <p:link href="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>-->
-                                    <h:outputText value="#{fileitem.createdDate}" class="ui-g-3">
+                                    <h:outputText value="#{fileitem.createdDate}" class="ui-g-2">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                     </h:outputText>
                                     <h:outputText value="#{contractInfoEditController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
-                                    <p:commandLink value="#{msg.Delete}" class="ui-g-2" update="AttachList " actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
+                                    <p:commandLink value="#{msg.Delete}" class="ui-g-1" update="AttachList " actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandLink>
                                 </div>
@@ -746,6 +762,20 @@
                 }
                 if (valid) {
                     handleSubmit(args, 'repairCompleteDialog');
+                }
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetContractEditForm\\:AttachList\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
             //]]>
