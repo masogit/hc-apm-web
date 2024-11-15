@@ -144,11 +144,11 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">型号<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="model" value="#{adverseEventApproveController.selected.model}" required="true" requiredMessage="型号不能为空"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                        <p:inputText id="model" value="#{adverseEventApproveController.selected.model}" required="false" requiredMessage="型号不能为空"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">规格<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="standard" value="#{adverseEventApproveController.selected.standard}" required="true" requiredMessage="规格不能为空" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                        <p:inputText id="standard" value="#{adverseEventApproveController.selected.standard}" required="false" requiredMessage="规格不能为空" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">产地<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
