@@ -14,3 +14,6 @@ where not exists (select 1 from sys_role where name='StockedManager');
 --删除维修和保养工单中 asset_id外键约束，因为云版mvs租户可能不存在相关设备
 ALTER TABLE v2_pm_order DROP CONSTRAINT IF EXISTS fk_p6lxi1rkh49qtix91am8excms;
 ALTER TABLE v2_work_order DROP CONSTRAINT IF EXISTS fk_fg05gp9eenc2sqth59kv2jk3t;
+
+-- YHAAO-23300 添加网页版供应商登录地址
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'https://hcapm.gehealthcloud.cn/reports/vender/index', '网页版供应商链接', 'vendorLoginUrl', '网页版供应商链接', 'f', 't', 1 where not exists (select * from config_item where key = 'vendorLoginUrl');
