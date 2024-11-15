@@ -28,20 +28,20 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private VenderCompanyRepository dao;
     private BlobFileService blobService;
     private SupplierRepository supplierRepository;
+    private ConfigItemValueRepository configItemValueRepository;
     private SupplierController supplierController;
     @Getter @Setter
     private String supplierType;
     @Getter @Setter
     private Map<String, List<V2_BlobObject>> attachmentMap = MapUtil.newHashMap();
     private UserAccount currentUser;
-    private MicroServiceUtil microServiceUtil;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(VenderCompanyRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.filterBySite = false;
@@ -138,6 +138,6 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     }
 
     public String getVenderCompanyLoginUrl() {
-        return microServiceUtil.getDownLoadUrl().replace("gateway","") + "reports/vender/index";
+        return configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "vendorLoginUrl");
     }
 }
