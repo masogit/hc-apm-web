@@ -139,19 +139,19 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup rendered="#{not empty adverseEventManagementController.selected.id}">
                                     <label class="label">工单编号</label>
-                                    <p:inputText id="workOrderNum" value="#{adverseEventManagementController.selected.workOrderNum}"  disabled="true"/>
+                                    <p:inputText id="workOrderNum" value="#{adverseEventManagementController.selected.workOrderNum}"  readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告人姓名<span style="color:red">*</span></label>
-                                    <p:inputText id="serialNum" value="#{adverseEventManagementController.selected.reporterName}" required="false" requiredMessage="报告人姓名不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="serialNum" value="#{adverseEventManagementController.selected.reporterName}" required="false" requiredMessage="报告人姓名不能为空" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd HH:mm" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="false" requiredMessage="报告日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd HH:mm" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="false" requiredMessage="报告日期不能为空" disabled="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">科室<span style="color:red">*</span></label>
-                                    <p:inputText id="department" value="#{adverseEventManagementController.selectAdverseSite.name}" required="true" requiredMessage="科室不能为空" readonly="true" class="department"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="department" value="#{adverseEventManagementController.selectAdverseSite.name}" required="true" requiredMessage="科室不能为空" readonly="true" class="department" />
                                     <p:commandButton id="btnDept" type="button" icon="fa fa-angle-down" iconPos="right"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     <p:overlayPanel widgetVar="varPanelDepartOrg" for="btnDept" hideEffect="fade" dynamic="false" modal="false">
                                         <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -169,11 +169,11 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">发生地</label>
-                                    <p:inputText id="occurredPlace" value="#{adverseEventManagementController.selected.occurredPlace}"  disabled="true"/>
+                                    <p:inputText id="occurredPlace" value="#{adverseEventManagementController.selected.occurredPlace}"  readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup id="repairReportSendPlaceGroup" rendered="#{adverseEventManagementController.selected.adverseEventType eq '2'}">
                                     <label class="label">设备报修发生场地<span style="color:red">#{adverseEventManagementController.selected.adverseEventType eq '2' ? '*' : ''}</span></label>
-                                    <p:selectOneMenu value="#{adverseEventManagementController.selected.repairReportSendPlace}" required="#{adverseEventManagementController.selected.adverseEventType eq '2' ? true :false}" disabled="true">
+                                    <p:selectOneMenu value="#{adverseEventManagementController.selected.repairReportSendPlace}" required="#{adverseEventManagementController.selected.adverseEventType eq '2' ? true :false}" readonly="true">
                                         <f:selectItem itemLabel="请选择"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
@@ -186,11 +186,11 @@
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup>
                                         <label class="label">资产名称<span style="color:red">*</span></label>
-                                        <p:inputText id="assetName" value="#{adverseEventManagementController.selected.assetName}" required="false"  requiredMessage="资产名称不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm or not empty adverseEventManagementController.selected.woId}"/>
+                                        <p:inputText id="assetName" value="#{adverseEventManagementController.selected.assetName}" required="false"  requiredMessage="资产名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm or not empty adverseEventManagementController.selected.woId}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">设备编号<span style="color:red">*</span></label>
-                                        <p:inputText id="deviceNum" value="#{adverseEventManagementController.selected.deviceNum}" required="false"  requiredMessage="设备编号不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="deviceNum" value="#{adverseEventManagementController.selected.deviceNum}" required="false"  requiredMessage="设备编号不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
@@ -211,19 +211,19 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="productInfo">
                                     <h:panelGroup>
                                         <label class="label">产品名称<span style="color:red">*</span></label>
-                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">注册证编号<span style="color:red">*</span></label>
-                                        <p:inputText id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}" required="false"  requiredMessage="注册证编号不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}" required="false"  requiredMessage="注册证编号不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号</label>
-                                        <p:inputText id="previouslyRegistrationNum" value="#{adverseEventManagementController.selected.previouslyRegistrationNum}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="previouslyRegistrationNum" value="#{adverseEventManagementController.selected.previouslyRegistrationNum}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号是否上报</label>
-                                        <p:selectOneRadio value="#{adverseEventManagementController.selected.previouslyRegistrationReport}" id="previouslyRegistrationReport" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:selectOneRadio value="#{adverseEventManagementController.selected.previouslyRegistrationReport}" id="previouslyRegistrationReport" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                             <p:ajax event="change" update="@this"/>
                                             <f:selectItem itemValue="true"/>
                                             <f:selectItem itemValue="false" />
@@ -239,39 +239,39 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="false">
                                         <label class="label">产品类别</label>
-                                        <p:inputText id="productCategory" value="#{adverseEventManagementController.selected.productCategory}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="productCategory" value="#{adverseEventManagementController.selected.productCategory}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">型号<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="model" value="#{adverseEventManagementController.selected.model}" required="false" requiredMessage="型号不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="model" value="#{adverseEventManagementController.selected.model}" required="false" requiredMessage="型号不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">规格<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="standard" value="#{adverseEventManagementController.selected.standard}" required="false" requiredMessage="规格不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="standard" value="#{adverseEventManagementController.selected.standard}" required="false" requiredMessage="规格不能为空" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">产地<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="originPlace" value="#{adverseEventManagementController.selected.originPlace}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="originPlace" value="#{adverseEventManagementController.selected.originPlace}" required="false" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 1}">
                                         <label class="label">产品批号</label>
-                                        <p:inputText id="productLotNum" maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="productLotNum" maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 1}">
                                         <label class="label">产品编号</label>
-                                        <p:inputText id="productNum" maxlength="100" value="#{adverseEventManagementController.selected.productNum}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="productNum" maxlength="100" value="#{adverseEventManagementController.selected.productNum}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">批号<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText  maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText  maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}" required="false" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">编号</label>
-                                        <p:inputText maxlength="100" value="#{adverseEventManagementController.selected.productNum}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText maxlength="100" value="#{adverseEventManagementController.selected.productNum}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">UDI<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:inputText id="udi" value="#{adverseEventManagementController.selected.udi}" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="udi" value="#{adverseEventManagementController.selected.udi}" required="false" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">生产日期<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
@@ -287,12 +287,12 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 1}">
                                         <label class="label">上市许可证持有人名称</label>
-                                        <p:inputText id="marketingAuthHolder" value="#{adverseEventManagementController.selected.marketingAuthHolder}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" />
+                                        <p:inputText id="marketingAuthHolder" value="#{adverseEventManagementController.selected.marketingAuthHolder}" readonly="#{adverseEventManagementController.readOnlyCreateForm}" />
                                     </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset legend="操作人" rendered="false">
-                                <p:selectOneRadio value="#{adverseEventManagementController.selected.operator}" id="operator" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                <p:selectOneRadio value="#{adverseEventManagementController.selected.operator}" id="operator" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                     <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:operatorDescHi" />
                                     <f:selectItem itemValue="1" />
                                     <f:selectItem itemValue="2" />
@@ -318,7 +318,7 @@
                                 <p:panelGrid id="operatorDescHi" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup rendered="#{adverseEventManagementController.selected.operator == 4}">
                                         <label class="label">操作人描述</label>
-                                        <p:inputText id="operatorDesc" maxlength="50" value="#{adverseEventManagementController.selected.operatorDesc}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="operatorDesc" maxlength="50" value="#{adverseEventManagementController.selected.operatorDesc}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
@@ -328,16 +328,16 @@
                             <p:fieldset legend="事发事件信息">
                                 <h:panelGroup>
                                     <label class="label">事件发生日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="事件发生日期不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="事件发生日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup id="eventDiscoverDateGroup">
                                     <label class="label">发现或获知日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="发现或获知日期不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="发现或获知日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
                             <p:fieldset legend="安全事件伤害信息" id="harmDegreeDecHi">
                                 <label class="label">伤害程度<span style="color:red">*</span></label>
-                                <p:selectOneRadio value="#{adverseEventManagementController.selected.harmDegree}" id="harmDegree" layout="custom" required="false" requiredMessage="伤害程度不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                <p:selectOneRadio value="#{adverseEventManagementController.selected.harmDegree}" id="harmDegree" layout="custom" required="false" requiredMessage="伤害程度不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                     <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:harmDegreeDecHi" />
                                     <f:selectItem itemValue="1" />
                                     <f:selectItem itemValue="2" />
@@ -357,19 +357,19 @@
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{adverseEventManagementController.selected.harmDegree == 3}">
                                     <label class="label">伤害描述</label>
-                                    <p:inputText id="harmDegreeDesc" maxlength="100" value="#{adverseEventManagementController.selected.harmDegreeDesc}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="harmDegreeDesc" maxlength="100" value="#{adverseEventManagementController.selected.harmDegreeDesc}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
                             <p:fieldset legend="事件主要表现">
                                 <h:panelGroup>
                                     <label class="label">伤害表现</label>
-                                    <p:inputTextarea id="harmPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.harmPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“伤害表现”本格填写“无”"></p:inputTextarea>
+                                    <p:inputTextarea id="harmPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.harmPerform}" readonly="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“伤害表现”本格填写“无”"></p:inputTextarea>
                                     <p:dataGrid id="harmPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.harmPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.harmPerformFile ne null and !empty adverseEventManagementController.selected.harmPerformFile}">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
                                                 <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFiled(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
-                                                <p:commandButton actionListener="#{adverseEventManagementController.removeHarmPerformFile(fileitem)}" update="harmPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                                <p:commandButton actionListener="#{adverseEventManagementController.removeHarmPerformFile(fileitem)}" update="harmPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
@@ -380,23 +380,23 @@
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
                                                 <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
-                                                <p:commandButton actionListener="#{adverseEventManagementController.removeTempHarmPerform(fileitem)}" update="injuryPerformance" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                                <p:commandButton actionListener="#{adverseEventManagementController.removeTempHarmPerform(fileitem)}" update="injuryPerformance" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|ZIP|RAR|MP4|MOV)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|ZIP|RAR|MP4|MOV)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">器械故障表现</label>
-                                    <p:inputTextarea id="deviceFaultPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.deviceFaultPerform}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“器械故障表现”本格填写”无“"></p:inputTextarea>
+                                    <p:inputTextarea id="deviceFaultPerform" style="width: 500px;" maxlength="1000" value="#{adverseEventManagementController.selected.deviceFaultPerform}" readonly="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="“伤害表现”与“器械故障表现”必填其一，若无“器械故障表现”本格填写”无“"></p:inputTextarea>
                                     <p:dataGrid id="deviceFaultPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.deviceFaultPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.deviceFaultPerformFile ne null and !empty adverseEventManagementController.selected.deviceFaultPerformFile }">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
                                                 <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFiled(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
-                                                <p:commandButton actionListener="#{adverseEventManagementController.removeDeviceFaultPerformFile(fileitem)}" update="deviceFaultPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                                <p:commandButton actionListener="#{adverseEventManagementController.removeDeviceFaultPerformFile(fileitem)}" update="deviceFaultPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
@@ -407,7 +407,7 @@
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
                                                 <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
-                                                <p:commandButton actionListener="#{adverseEventManagementController.removeTempDeviceFaultPerform(fileitem)}" update="mechanicalFailure" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                                <p:commandButton actionListener="#{adverseEventManagementController.removeTempDeviceFaultPerform(fileitem)}" update="mechanicalFailure" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
@@ -421,11 +421,11 @@
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup>
                                     <label class="label">姓名</label>
-                                    <p:inputText id="patientName" maxlength="50" value="#{adverseEventManagementController.selected.patientName}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="patientName" maxlength="50" value="#{adverseEventManagementController.selected.patientName}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">出生日期</label>
-                                    <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">年龄类型</label>
@@ -448,12 +448,12 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">年龄</label>
-                                        <p:inputText id="patientAge" value="#{adverseEventManagementController.selected.patientAge}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <p:inputText id="patientAge" value="#{adverseEventManagementController.selected.patientAge}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">性别</label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.patientSex}" id="patientSex" layout="custom"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.patientSex}" id="patientSex" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />
                                     </p:selectOneRadio>
@@ -472,11 +472,11 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">病历号</label>
-                                    <p:inputText id="medicalCaseNum" maxlength="100" value="#{adverseEventManagementController.selected.medicalCaseNum}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="medicalCaseNum" maxlength="100" value="#{adverseEventManagementController.selected.medicalCaseNum}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">既往病史</label>
-                                    <p:inputTextarea id="medicalHistory" maxlength="500" value="#{adverseEventManagementController.selected.medicalHistory}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputTextarea id="medicalHistory" maxlength="500" value="#{adverseEventManagementController.selected.medicalHistory}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
@@ -484,16 +484,16 @@
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">预期治疗疾病或者作用</label>
-                                    <p:inputTextarea id="exceptAffect" maxlength="1000" value="#{adverseEventManagementController.selected.exceptAffect}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputTextarea id="exceptAffect" maxlength="1000" value="#{adverseEventManagementController.selected.exceptAffect}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">器械使用日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8" id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup id="usePlaceDecHi">
                                     <label class="label">使用场所<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.usePlace}" id="usePlace" layout="custom" required="false" requiredMessage="使用场所不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.usePlace}" id="usePlace" layout="custom" required="false" requiredMessage="使用场所不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                         <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:usePlaceDecHi" />
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />
@@ -514,24 +514,24 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">场所名称</label>
-                                    <p:inputText id="placeName" maxlength="100" value="#{adverseEventManagementController.selected.placeName}"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText id="placeName" maxlength="100" value="#{adverseEventManagementController.selected.placeName}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">使用过程<span style="color:red">*</span></label>
-                                    <p:inputTextarea id="useProcess" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.useProcess}" required="false" requiredMessage="使用过程不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="至少包括使用目的、使用依据、使用情况、不良事件发生情况、对受害者的影响或伤害、采取的治疗措施、不良事件的转归"/>
+                                    <p:inputTextarea id="useProcess" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.useProcess}" required="false" requiredMessage="使用过程不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="至少包括使用目的、使用依据、使用情况、不良事件发生情况、对受害者的影响或伤害、采取的治疗措施、不良事件的转归"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">合并用药/器械情况说明</label>
-                                    <p:inputTextarea id="deviceDesc" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.deviceDesc}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="若无“合并用药/械情况”本格填写“无”"/>
+                                    <p:inputTextarea id="deviceDesc" style="width: 500px;" maxlength="500" value="#{adverseEventManagementController.selected.deviceDesc}" readonly="#{adverseEventManagementController.readOnlyCreateForm}" placeholder="若无“合并用药/械情况”本格填写“无”"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
                         <p:tab title="事件原因初步分析与处置">
                             <h:panelGroup>
                                 <label class="label">事件原因分析<span style="color:red">*</span></label>
-                                <p:selectManyCheckbox  value="#{adverseEventManagementController.selectedOptions}" widgetVar="blub"  required="false" requiredMessage="事件原因分析不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"
+                                <p:selectManyCheckbox  value="#{adverseEventManagementController.selectedOptions}" widgetVar="blub"  required="false" requiredMessage="事件原因分析不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"
                                                        layout="lineDirection" columns="1" styleClass="grid-checkbox"  >
                                     <p:ajax />
                                     <f:selectItem itemLabel="产品原因（包括说明书等）" itemValue="1" />
@@ -539,7 +539,7 @@
                                     <f:selectItem itemLabel="患者自身原因" itemValue="3" />
                                     <f:selectItem itemLabel="无法确定" itemValue="4" />
                                 </p:selectManyCheckbox>
-                              <!--  <p:selectOneRadio value="#{adverseEventManagementController.selected.eventCauseAnalyze}"  required="true"  id="eventCauseAnalyze" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}" requiredMessage="事件原因分析不能为空" >
+                              <!--  <p:selectOneRadio value="#{adverseEventManagementController.selected.eventCauseAnalyze}"  required="true"  id="eventCauseAnalyze" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}" requiredMessage="事件原因分析不能为空" >
                                     <f:selectItem itemValue="1"/>
                                     <f:selectItem itemValue="2" />
                                     <f:selectItem itemValue="3" />
@@ -564,26 +564,26 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">事件原因分析描述</label>
-                                <p:inputTextarea id="eventCauseDesc" maxlength="500" value="#{adverseEventManagementController.selected.eventCauseDesc}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                <p:inputTextarea id="eventCauseDesc" maxlength="500" value="#{adverseEventManagementController.selected.eventCauseDesc}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">初步处置情况<span style="color:red">*</span></label>
-                                <p:inputTextarea id="initDisposeSitu"  required="false"  maxlength="500" requiredMessage="初步处置情况不能为空" value="#{adverseEventManagementController.selected.initDisposeSitu}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                <p:inputTextarea id="initDisposeSitu"  required="false"  maxlength="500" requiredMessage="初步处置情况不能为空" value="#{adverseEventManagementController.selected.initDisposeSitu}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="哨点监测" rendered="#{adverseEventManagementController.selected.adverseEventType eq '2'}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">故障零部件或结构<span style="color:red">*</span></label>
-                                    <p:inputTextarea value="#{adverseEventManagementController.selected.faultyParts}"  maxlength="200" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障零部件或结构不能为空"/>
+                                    <p:inputTextarea value="#{adverseEventManagementController.selected.faultyParts}"  maxlength="200" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障零部件或结构不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">潜在风险（可能导致的临床风险）<span style="color:red">*</span></label>
-                                    <p:inputTextarea value="#{adverseEventManagementController.selected.potentialRisks}" maxlength="200" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="潜在风险（可能导致的临床风险）不能为空"/>
+                                    <p:inputTextarea value="#{adverseEventManagementController.selected.potentialRisks}" maxlength="200" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="潜在风险（可能导致的临床风险）不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">可能导致的伤害程度<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.mayFalHtType}" id="mayFalHtType" layout="custom" required="false" requiredMessage="可能导致的伤害程度不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.mayFalHtType}" id="mayFalHtType" layout="custom" required="false" requiredMessage="可能导致的伤害程度不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />
                                         <f:selectItem itemValue="3" />
@@ -603,7 +603,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">是否有维修方案<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.hasMaintenancePlan}" id="hasMaintenancePlan" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="是否有维修方案不能为空">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.hasMaintenancePlan}" id="hasMaintenancePlan" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="是否有维修方案不能为空">
                                         <f:selectItem itemValue="1"/>
                                         <f:selectItem itemValue="2" />
                                     </p:selectOneRadio>
@@ -618,7 +618,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">是否有有效维护保养措施<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.hasMaintenanceMeasures}" id="hasMaintenanceMeasures" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="是否有有效维护保养措施不能为空">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.hasMaintenanceMeasures}" id="hasMaintenanceMeasures" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="是否有有效维护保养措施不能为空">
                                         <f:selectItem itemValue="1"/>
                                         <f:selectItem itemValue="2" />
                                     </p:selectOneRadio>
@@ -633,23 +633,23 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">设备启用日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceStartDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="设备启用日期不能为空"/>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceStartDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="设备启用日期不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">维修方案具体内容</label>
-                                    <p:inputText value="#{adverseEventManagementController.selected.maintenancePlanInfo}" maxlength="2000" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText value="#{adverseEventManagementController.selected.maintenancePlanInfo}" maxlength="2000" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">有效维护保养措施具体内容</label>
-                                    <p:inputText value="#{adverseEventManagementController.selected.maintenanceMeasuresInfo}" maxlength="2000" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:inputText value="#{adverseEventManagementController.selected.maintenanceMeasuresInfo}" maxlength="2000" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">设备报废（停用）日期</label>
-                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup id="maintenanceOrganizationInfoGroup">
                                     <label class="label">维修机构<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.maintenanceOrganization}" id="maintenanceOrganization" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="维修机构不能为空">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.maintenanceOrganization}" id="maintenanceOrganization" layout="custom" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="维修机构不能为空">
                                         <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:maintenanceOrganizationInfoGroup" />
                                         <f:selectItem itemValue="1"/>
                                         <f:selectItem itemValue="2" />
@@ -669,13 +669,13 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.selected.maintenanceOrganization eq '2' or adverseEventManagementController.selected.maintenanceOrganization eq '3'}">
                                         <label class="label">机构名称或描述<span style="color:red">#{adverseEventManagementController.selected.maintenanceOrganization eq '2' or adverseEventManagementController.selected.maintenanceOrganization eq '3' ? '*' : ''}</span></label>
-                                        <p:inputText value="#{adverseEventManagementController.selected.maintenanceOrganizationInfo}" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="机构名称或描述不能为空"/>
+                                        <p:inputText value="#{adverseEventManagementController.selected.maintenanceOrganizationInfo}" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="机构名称或描述不能为空"/>
                                     </h:panelGroup>
                                 </h:panelGroup>
 
                                 <h:panelGroup id="processingModeInfoGroup">
                                     <label class="label">故障处理方式<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.processingMode}" id="processingMode" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障处理方式不能为空" >
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.processingMode}" id="processingMode" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障处理方式不能为空" >
                                         <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:processingModeInfoGroup" />
                                         <f:selectItem itemValue="1" itemLabel="硬件维修或更换"/>
                                         <f:selectItem itemValue="2" itemLabel="软件升级"/>
@@ -683,13 +683,13 @@
                                     </p:selectOneRadio>
                                     <h:panelGroup rendered="#{adverseEventManagementController.selected.processingMode.contains('3')}">
                                         <label class="label">故障处理方式描述<span style="color:red">#{adverseEventManagementController.selected.processingMode eq '3' ? '*' : ''}</span></label>
-                                        <p:inputText value="#{adverseEventManagementController.selected.processingModeInfo}" maxlength="2000" disabled="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障处理方式描述不能为空"/>
+                                        <p:inputText value="#{adverseEventManagementController.selected.processingModeInfo}" maxlength="2000" readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="故障处理方式描述不能为空"/>
                                     </h:panelGroup>
                                 </h:panelGroup>
 
                                 <h:panelGroup>
                                     <label class="label">使用次数</label>
-                                    <p:spinner id="useCnt" value="#{adverseEventManagementController.selected.useCnt}" min="0" max="10000000" disabled="#{adverseEventManagementController.readOnlyCreateForm}" />
+                                    <p:spinner id="useCnt" value="#{adverseEventManagementController.selected.useCnt}" min="0" max="10000000" readonly="#{adverseEventManagementController.readOnlyCreateForm}" />
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
