@@ -22,6 +22,7 @@ import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -511,7 +512,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             copyPropertiesExclude(selected, assetInfo);
         }
 
+        Date now = DateUtil.now();
         for (AssetInfo assetInfo: newList) {
+            assetInfo.setLastModifiedDate(now);
             dao.save(assetInfo);
             onAfterNewObject(assetInfo);
         }
