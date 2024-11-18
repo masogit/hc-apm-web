@@ -596,12 +596,12 @@
         <p:dialog  widgetVar="unfinishedAssetOrderDetailDialog"  modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true"    appendTo="@(body)"  height="300" width="500"   >
             <p:fieldset legend="当前有设备工单未完成,请进行处理">
                 <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain()}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
-                <br/>
+                <br/> <br/> <br/>
                 <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
                     未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{not empty assetInfoEditController.pmOrderList}">
-                    未完成维修工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
+                    未完成保养工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
                 </h:panelGroup>
 
             </p:fieldset>
