@@ -820,7 +820,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             Map<String, V2_BlobObject> blobObjectMap = attachements.stream().collect(Collectors.toMap(V2_BlobObject::getId, t -> t));
             for (String blobId : selectedBlobIdList) {
                 V2_BlobObject blobObject = blobObjectMap.get(blobId);
-                String name = FieldValueMessageController.fieldValue("contractAttachmentType", blobObject.getBoSubType()) + "_" + blobObject.getObjectName();
+                String name = FieldValueMessageController.fieldValue("contractAttachmentType", blobObject.getBoSubType()).replaceAll("/", "或") + "_" + blobObject.getObjectName();
                 zipOut.putNextEntry(new ZipEntry(name));
                 byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(blobObject.getObjectStorageId()).getStream());
                 IOUtils.write(bytess, zipOut);
