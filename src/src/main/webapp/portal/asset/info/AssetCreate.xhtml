@@ -316,7 +316,7 @@
                                     <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
 
                                     <p:commandButton id="preInactive" rendered="#{assetInfoEditController.CRUDActionName eq '修改' and  assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   oncomplete="PF('scrapapply').show()"  immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete()}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
 
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
@@ -428,6 +428,14 @@
                 if(xhr.status!==206){
                     PF('signatureDlg').hide();
                     PF('scrapapply').hide();
+                }
+            }
+            function handleCheckAssetOrderIsCompletes(xhr, status, args) {
+                var asetOrderIsComplete = args.asetOrderIsComplete;
+                if(asetOrderIsComplete==true) {
+                    PF('unfinishedAssetOrderDetailDialog').show();
+                }else{
+                    PF('scrapapply').show();
                 }
             }
             //<![CDATA[
@@ -581,6 +589,21 @@
                 <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.toDelete()}" value="是" icon="ui-icon-check"
                                  oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
                 <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
+
+
+        <p:dialog  widgetVar="unfinishedAssetOrderDetailDialog"  modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true"    appendTo="@(body)"  height="300" width="500"   >
+            <p:fieldset legend="当前有设备工单未完成,请进行处理">
+                <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain()}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+                <br/>
+                <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
+                    未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{not empty assetInfoEditController.pmOrderList}">
+                    未完成维修工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
+                </h:panelGroup>
+
             </p:fieldset>
         </p:dialog>
 
