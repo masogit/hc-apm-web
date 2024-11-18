@@ -172,4 +172,7 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 
 	List<NurseSiteMaintainItem> findByIdIn(Collection<String> ids);
 
+	@Query(value = "SELECT DISTINCT item.* FROM nurse_site_maintain_item item LEFT JOIN nurse_site_maintain_data itemdata ON item.id = itemdata.parent_id WHERE item.asset_uid = ?1  AND itemdata.check_value IS NULL ",nativeQuery = true)
+	public List<NurseSiteMaintainItem> findNoCheckedByAssetUid(String assetUid );
+
 }
