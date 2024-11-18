@@ -162,4 +162,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 
 	@Query(value = "select * from v2_pm_order order by last_modified_date desc limit ?1 offset ?2",nativeQuery = true)
 	List<V2_PmOrder> limit(Integer limit, Integer offset);
+
+	@Query(nativeQuery = true,value = "select * from v2_pm_order where asset_uid=?1 and is_finished =?2")
+	List<V2_PmOrder> findByAssetUidAndIsFinished(String assetUid,boolean status);
 }

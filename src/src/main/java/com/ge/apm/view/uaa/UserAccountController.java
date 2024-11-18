@@ -34,6 +34,8 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,7 +46,9 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.context.LocaleHolder;
+import webapp.framework.dao.BySearchFilterSpecification;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.dao.extend.BySearchFilterSpecificationExtend;
 import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -540,7 +544,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (ObjectUtil.isNotEmpty(assetTypeUserUidSet)) {
             searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN, assetTypeUserUidSet, "1*"));
         }
-        Page<UserAccount> pageUserAccount = dao.findBySearchFilter(this.searchFilterList, pageRequest);
+        Page<UserAccount> pageUserAccount = getPageUserAccount(this.searchFilterList, pageRequest);
         for (UserAccount user : pageUserAccount) {
             List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
             if (!orgListByUid.isEmpty()) {
@@ -548,6 +552,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
         return pageUserAccount;
+    }
+    private Page<UserAccount> getPageUserAccount(final List<SearchFilter> filterFilter, Pageable pageable){
+        if (filterFilter == null)
+            return dao.findAll(pageable);
+        else {
+            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true);
+            return dao.findAll(spec, pageable);
+        }
     }
 
     @Override
