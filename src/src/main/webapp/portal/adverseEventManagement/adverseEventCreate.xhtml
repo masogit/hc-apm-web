@@ -147,7 +147,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd HH:mm" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="false" requiredMessage="报告日期不能为空" disabled="true"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.reportDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd HH:mm" value="#{adverseEventManagementController.selected.reportDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="false" requiredMessage="报告日期不能为空" disabled="true"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">科室<span style="color:red">*</span></label>
@@ -275,15 +282,36 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">生产日期<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:outputLabel value="#{adverseEventManagementController.selected.productionDate}" >
+                                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                            </p:outputLabel>
+                                        </c:if>
+                                        <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        </c:if>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">有效期至<span style="color:red">#{adverseEventManagementController.assetType == 2?'*':''}</span></label>
-                                        <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="有效期至不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:outputLabel value="#{adverseEventManagementController.selected.validUntil}" >
+                                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                            </p:outputLabel>
+                                        </c:if>
+                                        <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="有效期至不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        </c:if>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
                                         <label class="label">停用日期</label>
-                                        <p:calendar timeZone="GMT+8"  id="retirementDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.retirementDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:outputLabel value="#{adverseEventManagementController.selected.retirementDate}" >
+                                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                            </p:outputLabel>
+                                        </c:if>
+                                        <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:calendar timeZone="GMT+8"  id="retirementDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.retirementDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        </c:if>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 1}">
                                         <label class="label">上市许可证持有人名称</label>
@@ -328,11 +356,25 @@
                             <p:fieldset legend="事发事件信息">
                                 <h:panelGroup>
                                     <label class="label">事件发生日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="事件发生日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.eventOccurredDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="事件发生日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup id="eventDiscoverDateGroup">
                                     <label class="label">发现或获知日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="发现或获知日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.eventDiscoverDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="发现或获知日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                             </p:fieldset>
                             <p:fieldset legend="安全事件伤害信息" id="harmDegreeDecHi">
@@ -425,7 +467,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">出生日期</label>
-                                    <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.patientBornDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">年龄类型</label>
@@ -488,7 +537,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">器械使用日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8" id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.deviceUsedDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8" id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
 
                                 <h:panelGroup id="usePlaceDecHi">
@@ -633,7 +689,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">设备启用日期<span style="color:red">*</span></label>
-                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceStartDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="设备启用日期不能为空"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.deviceStartDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceStartDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}" required="false" requiredMessage="设备启用日期不能为空"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">维修方案具体内容</label>
@@ -645,7 +708,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">设备报废（停用）日期</label>
-                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <c:if test="#{adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventManagementController.selected.deviceEndDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventManagementController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{adverseEventManagementController.selected.deviceEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup id="maintenanceOrganizationInfoGroup">
                                     <label class="label">维修机构<span style="color:red">*</span></label>
