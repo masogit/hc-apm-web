@@ -1555,14 +1555,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             Map<String, List<NurseSiteMaintainItem>> maintainIdsMap = maintainItemByParentId.stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
             List<NurseSiteMaintainItem> after = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) > 0).collect(Collectors.toList());
             List<NurseSiteMaintainItem> history = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) < 0).collect(Collectors.toList());
-
-
             ArrayList<NurseSiteMaintainItem> nurseSiteMaintainItems = new ArrayList<>();
             for (NurseSiteMaintainItem nurseSiteMaintainItem : history) {
                 if(!nurseSiteMaintainItem.getIsFinish()){
                     nurseSiteMaintainItem.setCheckDate(new Date());
                     nurseSiteMaintainItem.setIsFinish(true);
-//                    nurseSiteMaintainItem.setStatus(1);
                     nurseSiteMaintainItem.setUpdateByUid(loginUser.getUid());
                     nurseSiteMaintainItem.setUpdateDate(new Date());
                     nurseSiteMaintainItem.setModifyByUid(loginUser.getUid());
@@ -1591,8 +1588,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 }
             }
             if(CollectionUtils.isNotEmpty(nurseSiteMaintainItems)){
-//                nurseSiteMaintainItemRepository.save(nurseSiteMaintainItems);
-//                nurseSiteMaintainDataRepository.save(nurseSiteMaintainData1);
                 for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItems) {
                     List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
                     if (CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent)) {
@@ -1609,6 +1604,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     }
                 }
             }
+            //删除检查项配置相关数据
+//            List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(selected.getUid());
+            nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(selected.getUid());
+//            for(String parentId : parentIds) {
+//                int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
+//                if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
+//            }
             WebUtil.addSuccessMessage("已自动处理未完成临床助手工单");
         }else{
             WebUtil.addErrorMessage("没有未完成的临床助手工单");
