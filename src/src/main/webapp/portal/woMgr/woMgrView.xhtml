@@ -77,8 +77,8 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1}"/>-->
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1 or !assetInfoEditController.hasScrappedAuthority()}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.currentStepId ne 4}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
                             </p:selectOneRadio>
                             <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
