@@ -292,7 +292,6 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         if (StringUtils.isNotBlank(this.queryTenantUID)) {
             searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.queryTenantUID)));
         }
-        searchFilters.add((new SearchFilter("notGeAsset","t".equals(this.notGeAsset)?SearchFilter.Operator.EQ:SearchFilter.Operator.IsNull, "t".equals(this.notGeAsset)?this.notGeAsset:null)));
         if (!(StringUtils.isNotBlank(this.loginName) && this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))) {
             searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusFalseValue)));
         } else if (!export) {
@@ -308,6 +307,13 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             if (StringUtils.isNotBlank(this.queryStatus) && !ALL.equals(this.queryStatus)) {
                 searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus)));
             }
+        }
+        if("t".equals(this.notGeAsset)){
+            searchFilters.add((new SearchFilter("notGeAsset",SearchFilter.Operator.EQ, this.notGeAsset)));
+        }else {
+            searchFilters.add((new SearchFilter("notGeAsset",SearchFilter.Operator.IsNull, null, "1*2+")));
+            searchFilters.add((new SearchFilter("notGeAsset",SearchFilter.Operator.EQ, "f", "1*2+")));
+
         }
         return searchFilters;
     }
