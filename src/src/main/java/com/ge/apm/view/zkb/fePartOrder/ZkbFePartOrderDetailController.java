@@ -666,6 +666,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }
     }
 
+    public boolean hasOrderModifyRight() {
+        return zkbFePartOrderService.hasOrderModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
+    }
+
     public void setSubtractTotalStatusDisabled(Boolean subtractTotalStatusDisabled) {
         this.subtractTotalStatusDisabled = subtractTotalStatusDisabled;
     }

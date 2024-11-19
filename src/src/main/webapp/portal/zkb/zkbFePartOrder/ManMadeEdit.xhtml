@@ -242,7 +242,7 @@
                     <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.remark}"  rows="2" cols="20" >
                     </p:inputTextarea>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderModifyRight()}">
+                <h:panelGroup rendered="#{zkbFePartOrderDetailController.hasOrderModifyRight()}">
                     <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
                 </h:panelGroup>
             </p:panelGrid>
