@@ -56,13 +56,23 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private String tabId;
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
-    private Date startDate;
-    private Date endDate;
     private Double startPrice;
     private Double endPrice;
     private String searchDeptName;
     private List<Supplier> supplierList;
     private List<ArrivalListItem> selectedItems = ListUtil.newArrayList();
+    @Getter @Setter
+    private Date startDate;
+    @Getter @Setter
+    private Date endDate;
+    @Getter @Setter
+    private Date inStockBusinessStartDate;
+    @Getter @Setter
+    private Date inStockBusinessEndDate;
+    @Getter @Setter
+    private Date outStockBusinessStartDate;
+    @Getter @Setter
+    private Date outStockBusinessEndDate;
     @Getter @Setter
     private StreamedContent exportInStockFile;
     @Getter @Setter
@@ -98,6 +108,10 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         supplier = new Supplier();
         startDate = null;
         endDate = null;
+        inStockBusinessStartDate = null;
+        inStockBusinessEndDate = null;
+        outStockBusinessStartDate = null;
+        outStockBusinessEndDate = null;
         startPrice = null;
         endPrice = null;
         searchItem = new ArrivalListItem();
@@ -134,6 +148,18 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         }
         if (ObjectUtil.isNotEmpty(endDate)) {
             searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, endDate, "1*"));
+        }
+        if (ObjectUtil.isNotEmpty(inStockBusinessStartDate)) {
+            searchFilters.add(new SearchFilter("inStockBusinessDate", SearchFilter.Operator.GTE, inStockBusinessStartDate, "1*"));
+        }
+        if (ObjectUtil.isNotEmpty(inStockBusinessEndDate)) {
+            searchFilters.add(new SearchFilter("inStockBusinessDate", SearchFilter.Operator.LTE, inStockBusinessEndDate, "1*"));
+        }
+        if (ObjectUtil.isNotEmpty(outStockBusinessStartDate)) {
+            searchFilters.add(new SearchFilter("outStockBusinessDate", SearchFilter.Operator.GTE, outStockBusinessStartDate, "1*"));
+        }
+        if (ObjectUtil.isNotEmpty(outStockBusinessEndDate)) {
+            searchFilters.add(new SearchFilter("outStockBusinessDate", SearchFilter.Operator.LTE, outStockBusinessEndDate, "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getInstallDate())) {
             searchFilters.add(new SearchFilter("inStockNo", SearchFilter.Operator.LIKE, searchItem.getInStockNo(), "1*"));
@@ -196,6 +222,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public void onTabChange(TabChangeEvent event) {
         tabId = event.getTab().getId();
+        initSearchItem();
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
@@ -249,7 +276,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             return;
         }
         String inStockNo = assetOutStockService.queryInStockNo("RK");
+        Date now = DateUtil.now();
         for (ArrivalListItem selectedItem : selectedItems) {
+            if (ObjectUtil.isEmpty(selectedItem.getInStockNo())) {
+                selectedItem.setOutStockBusinessDate(now);
+            }
             selectedItem.setInStockNo(inStockNo);
             selectedItem.setInStockUser(currentUser.getUid());
             selectedItem.setStockStatus(3);
@@ -466,22 +497,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public void setArrivalFormatTime(String arrivalFormatTime) {
         this.arrivalFormatTime = arrivalFormatTime;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
     public Double getStartPrice() {
