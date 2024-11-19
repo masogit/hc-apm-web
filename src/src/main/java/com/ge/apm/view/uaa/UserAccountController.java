@@ -1793,7 +1793,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void exportAll() {
         generateListSearchFilter();
-        List<UserAccount> listUserAccount = dao.findBySearchFilter(searchFilterList);
+        List<UserAccount> listUserAccount = getUserList(this.searchFilterList);
         if (listUserAccount == null || listUserAccount.size() == 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NoData"));
             return;
@@ -1801,7 +1801,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userAccountExportService.supplementUserAccount(listUserAccount);
         downloadFile(userAccountExportService.parseUserAccountToMap(listUserAccount));
     }
+    private List<UserAccount> getUserList(final List<SearchFilter> filterFilter){
+        if(filterFilter == null){
+            return (List<UserAccount>) dao.findAll();
+        }else{
+            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true);
+            return dao.findAll(spec);
+        }
 
+
+    }
     private void downloadFile(List<Map<String, Object>> data) {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
