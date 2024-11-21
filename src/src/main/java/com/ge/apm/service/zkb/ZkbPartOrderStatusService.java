@@ -65,7 +65,7 @@ public class ZkbPartOrderStatusService {
         }else{
             List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<>();
             if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
-                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZone(selected.getCurrentStep(),selected.getZone());
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContains(selected.getCurrentStep(),selected.getZone());
             }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep())){
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 2){

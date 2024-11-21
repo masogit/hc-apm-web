@@ -56,7 +56,7 @@ public class ZkbPartOrderEditService {
                 if(StrUtil.isEmpty(zkbContractAsset.getZone())){
                     return "设备Zone为空，请检查！";
                 }else {
-                   List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZone(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), zkbContractAsset.getZone());
+                   List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), zkbContractAsset.getZone());
                    if(zkbPartOrderUserConfigs.isEmpty()){
                        return "Zone未配置相应的区域经理，请检查！";
                    }
@@ -496,7 +496,7 @@ public class ZkbPartOrderEditService {
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                errorLog.append("附件不能为空！");
+                //errorLog.append("附件不能为空！");
             }
         }else{
             if("t".equals(selected.getScoreFlag())){
