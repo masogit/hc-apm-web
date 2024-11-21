@@ -4,6 +4,7 @@ import com.ge.apm.domain.PurchaseInfo;
 import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
@@ -162,9 +163,19 @@ public class ZkbPartOrderProvider {
         if(StrUtil.isNotEmpty(assetTypeDi)){
             sql.append(" and asset_type_di = '" + assetTypeDi + "'");
         }
-        String zone = param.get("zone") == null ? "" : (String)param.get("zone");
-        if(StrUtil.isNotEmpty(zone)){
-            sql.append(" and zone = '" + zone + "'");
+        List<String> zones = param.get("zone") == null ?  new ArrayList<>() : (List<String>)param.get("zone");
+        if(CollectionUtils.isNotEmpty(zones)){
+            sql.append(" and ( ");
+            int i= 0;
+            for(String zone : zones){
+                if(i == (zones.size() - 1)){
+                    sql.append(" zone = '"+ zone + "' ");
+                }else{
+                    sql.append(" zone = '" + zone + "' or ");
+                }
+                i++;
+            }
+            sql.append(" ) ");
         }
         String orderType = param.get("orderType") == null ? "" : (String)param.get("orderType");
         if(StrUtil.isNotEmpty(orderType)){
