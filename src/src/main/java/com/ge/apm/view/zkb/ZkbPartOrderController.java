@@ -29,10 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -273,6 +270,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
             }else if(zkbPartOrderUserConfigList.size() == 1){
+                boolean rsQuery = true;
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if("US".equals(zkbPartOrderUserConfig.getAssetType())){
@@ -291,8 +289,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    mm.put("zone", zkbPartOrderUserConfig.getZone());
-                    mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                    if(StringUtils.isNotEmpty(zkbPartOrderUserConfig.getZone())){
+                        List<String> zones = Arrays.asList(zkbPartOrderUserConfig.getZone().split(","));
+                        mm.put("zone", zones);
+                        mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                    }else {
+                        rsQuery = false;
+                    }
                 }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     List<String> currentSteps = new ArrayList<>();
                     currentSteps.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
@@ -318,7 +321,11 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }else if(ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.CompleteAuditPending.toString());
                 }
-                pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+                if(rsQuery){
+                    pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+                }else {
+                    pendingQty = 0;
+                }
             }else if(zkbPartOrderUserConfigList.size() == 2){
                 boolean is4ooRole = true;
                 boolean isCommercialRole = false;
@@ -464,10 +471,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             tseMap.put(ZkbPartOrderStep.PartOrderStep.TsePending.toString(), ZkbPartOrderStep.PartOrderStep.TsePending.toString());
                         }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if(StringUtils.isEmpty(queryStatus)){
-                                Predicate pre1 = builder.equal(root.get("zone"), zkbPartOrderUserConfig.getZone());
-                                Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
-                                Predicate pre3 = builder.and(pre1, pre2);
-                                userConfigPredicates.add(pre3);
+                                if(!StrUtil.isEmpty(zkbPartOrderUserConfig.getZone())){
+                                    List<String> strs = Arrays.asList(zkbPartOrderUserConfig.getZone().split(","));
+                                    Expression<String> exp = root.get("zone");
+                                    Predicate pre1 = exp.in(strs);
+                                    Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                                    Predicate pre3 = builder.and(pre1, pre2);
+                                    userConfigPredicates.add(pre3);
+                                }else{
+                                    Predicate pre1 = builder.isNull(root.get("currentStep"));
+                                    userConfigPredicates.add(pre1);
+                                }
                             }else if("all".equals(queryStatus)){
                                 /*Predicate pre1 = builder.equal(root.get("zone"), zkbPartOrderUserConfig.getZone());
                                 Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
