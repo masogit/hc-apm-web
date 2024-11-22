@@ -60,6 +60,14 @@ public class KeyAssetReport implements Serializable {
     @JoinColumn(name = "dept_id", insertable = false, updatable = false)
     private OrgInfo clinicalDept;
 
+
+    /**
+     * 使用科室
+     */
+    @Column(name = "asset_dept_name")
+    private String assetDeptName;//使用科室
+
+
     /**
      * 报表年份
      */

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.KeyAssetReportMapper">
+
+    <select id="findList" resultType="com.ge.apm.domain.KeyAssetReport">
+
+        WITH other_users_with_matching_permissions AS (
+        SELECT up.key_asset_report_id
+        FROM key_asset_report_org up where  up.org_id in
+            <foreach item="item" collection="deptId" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        GROUP BY up.key_asset_report_id
+        HAVING
+        (select  count(*) from   key_asset_report_org where key_asset_report_id  =up.key_asset_report_id ) <![CDATA[ <= ]]> count(*)
+        )
+        SELECT u.*
+        FROM key_asset_report u
+        JOIN other_users_with_matching_permissions oump ON u.id = oump.key_asset_report_id
+        WHERE
+         u.tenant_uid = #{tenantUid}
+        <if test="reportYear != null ">
+            AND u.report_year =#{reportYear}
+        </if>
+        <if test="reportType != null ">
+            AND u.report_type =#{reportType}
+        </if>
+        <if test="assetName != null and assetName!='' ">
+            AND u.asset_name like  concat('%',#{assetName},'%')
+        </if>
+
+        <if test="assetDeptName != null and assetDeptName!='' ">
+            AND u.asset_dept_name  like  concat('%',#{assetDeptName},'%')
+        </if>
+        <if test="formFiller != null and formFiller!='' ">
+            AND u.form_filler like   concat('%',#{formFiller},'%')
+        </if>
+        order by  u.create_time desc
+        LIMIT #{page} OFFSET #{offset}
+    </select>
+
+
+
+
+    <select id="findcount" resultType="long">
+
+        WITH other_users_with_matching_permissions AS (
+        SELECT up.key_asset_report_id
+        FROM key_asset_report_org up where  up.org_id in
+        <foreach item="item" collection="deptId" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+        GROUP BY up.key_asset_report_id
+        HAVING
+        (select  count(*) from   key_asset_report_org where key_asset_report_id  =up.key_asset_report_id ) <![CDATA[ <= ]]> count(*)
+        )
+        SELECT count(u.*)
+        FROM key_asset_report u
+        JOIN other_users_with_matching_permissions oump ON u.id = oump.key_asset_report_id
+        WHERE
+         u.tenant_uid = #{tenantUid}
+        <if test="reportYear != null ">
+            AND u.report_year =#{reportYear}
+        </if>
+        <if test="reportType != null ">
+            AND u.report_type =#{reportType}
+        </if>
+
+        <if test="assetName != null and assetName!='' ">
+            AND u.asset_name like  concat('%',#{assetName},'%')
+        </if>
+
+        <if test="assetDeptName != null and assetDeptName!='' ">
+            AND u.asset_dept_name  like  concat('%',#{assetDeptName},'%')
+        </if>
+        <if test="formFiller != null and formFiller!='' ">
+            AND u.form_filler like   concat('%',#{formFiller},'%')
+        </if>
+
+    </select>
+
+
+
+</mapper>

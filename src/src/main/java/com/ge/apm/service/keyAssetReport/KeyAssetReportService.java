@@ -10,8 +10,8 @@ import java.util.*;
 @Component
 public class KeyAssetReportService {
 
-    public Set<Map<String, Object>> groupAsset(List<AssetInfo> assetList){
-        Set<Map<String, Object>> set = new HashSet<>();
+    public Set<Map<String, Object>> groupAsset(List<AssetInfo> assetList,Set<Map<String, Object>>  set){
+//        Set<Map<String, Object>> set = new HashSet<>();
 
         if(CollectionUtils.isNotEmpty(assetList)){
             for (AssetInfo assetInfo : assetList) {
@@ -29,6 +29,9 @@ public class KeyAssetReportService {
                 if(value.isPresent()){
                     Map<String, Object> valueMap = value.get();
                     valueMap.put("quantity", Integer.parseInt(valueMap.get("quantity").toString()) + 1);
+                    if(!valueMap.get("deptUid").toString().contains(assetInfo.getClinicalDeptUID())){
+                        valueMap.put("deptUid", valueMap.get("deptUid")+","+assetInfo.getClinicalDeptUID());
+                    }
                     // 获取启用日期
                     Date date = (Date) valueMap.get("installDate");
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
@@ -44,6 +47,7 @@ public class KeyAssetReportService {
                     valueMap.put("installDate", assetInfo.getInstallDate());
                     valueMap.put("quantity", 1);
                     valueMap.put("title", "设备明细");
+                    valueMap.put("deptUid", assetInfo.getClinicalDeptUID());
                     set.add(valueMap);
                 }
             }

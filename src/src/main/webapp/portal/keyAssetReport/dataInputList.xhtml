@@ -53,13 +53,13 @@
                         <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.clinicaldepart}" filterBy="#{item.clinicalDept.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.clinicalDept.name}"/>
+                        <p:column headerText="#{msg.clinicaldepart}" filterBy="#{item.assetDeptName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetDeptName}"/>
                         </p:column>
                         <p:column headerText="#{msg.formFiller}" filterBy="#{item.formFiller}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.formFiller}"/>
                         </p:column>
-                        <p:column headerText="#{msg.formFillTime}" filterBy="#{item.formFillTime}" filterMatchMode="GTE">
+                        <p:column headerText="#{msg.formFillTime}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterFillTime" widgetVar="varFilterFillTime" value="#{keyAssetReportController.filterFillTime}"/>
                             </f:facet>
