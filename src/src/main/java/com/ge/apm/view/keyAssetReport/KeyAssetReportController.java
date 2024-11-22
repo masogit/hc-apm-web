@@ -3,12 +3,15 @@ package com.ge.apm.view.keyAssetReport;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.KeyAssetReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.keyAssetReport.KeyAssetReportService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -33,6 +37,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -42,6 +47,7 @@ import java.util.*;
 public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAssetReport> {
 
     private KeyAssetReportRepository dao;
+    private KeyAssetReportOrgRepository keyAssetReportOrgRepository;
     private OrgInfoRepository orgDao;
     private AssetInfoRepository assetDao;
     private UserOrgInfoRepository userOrgInfoRepository;
@@ -59,6 +65,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private TreeNode queryOrgTree;
     @Getter @Setter
     private OrgInfo dept;
+
+
+    @Getter @Setter
+    private Set<String> deptList;
+
     @Getter @Setter
     private String assetName;
     @Getter @Setter
@@ -101,8 +112,15 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter @Setter
     private Integer operationOrder;
 
+    @Getter @Setter
+    private String searchDeptName;
+
     private String previewUrl;
     private String previewUrlForYear;
+
+    private UaaService uaaService;
+
+    private KeyAssetReportMapper keyAssetReportMapper;
 
     @Override
     protected void init() {
@@ -112,11 +130,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         service = WebUtil.getBean(KeyAssetReportService.class);
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        keyAssetReportMapper = WebUtil.getBean(KeyAssetReportMapper.class);
+        keyAssetReportOrgRepository = WebUtil.getBean(KeyAssetReportOrgRepository.class);
 
         org = orgDao.findById(UserContextService.getCurrentUserAccount().getOrgInfoId());
 
         UserAccount account = UserContextService.getCurrentUserAccount();
-        UaaService uaaService = WebUtil.getBean(UaaService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 //        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4));
         queryOrgTree = initQueryOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
@@ -145,6 +165,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetOperationForYear = new ArrayList<>();
         initAssetOperation();
         operationOrder = 1;
+        allAssetList=new ArrayList<>();
+        selectedAssetList=new HashSet<>();
+        addedAssetList=new ArrayList<>();
+        deptList=new HashSet<>();
     }
 
     @Override
@@ -153,7 +177,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         selectedDept = selected.getClinicalDept();
         assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
         assetOperationDetail = null;
-
+        List<KeyAssetReportOrg> byKeyAssetReportId = keyAssetReportOrgRepository.findByKeyAssetReportId(selected.getId());
+        deptList=byKeyAssetReportId.stream().map(KeyAssetReportOrg::getOrgId).collect(Collectors.toSet());
         if(1 == this.selected.getReportType()){
             assetOperation = JSON.parseObject(selected.getAssetOperation(), List.class);
             assetOperationForYear = new ArrayList<>();
@@ -219,17 +244,27 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if(CollectionUtils.isEmpty(this.searchFilters)){
             this.searchFilters = new ArrayList<>();
         }
-        Set<Integer> idList = findOrgUidListByUserUid(UserContextService.getCurrentUserAccount().getUid());
-        if(CollectionUtils.isNotEmpty(idList)){
-            searchFilters.add(new SearchFilter("deptId", SearchFilter.Operator.IN, idList));
+        Set<String> orgUids = getOrgUidListByUserUid(UserContextService.getCurrentUserAccount().getUid());
+        if(CollectionUtils.isNotEmpty(orgUids)){
+//            searchFilters.add(new SearchFilter("deptId", SearchFilter.Operator.IN, idList));
         }else{
             return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
         }
-
-        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
+//        List<KeyAssetReport> keyAssetReports = dao.selectList();
+//        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+//        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         List<SearchFilter> searchFilters = this.searchFilters;
-        return dao.findBySearchFilter(searchFilters, page);
+        Map<String, Object> param = new HashMap<>();
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        param.put("deptId", orgUids);
+        param.put("tenantUid", UserContextService.getCurrentUserAccount().getTenantUID());
+
+        covQueryCondition(searchFilters,param);
+        List<KeyAssetReport> list = keyAssetReportMapper.findList(param);
+        Long count = keyAssetReportMapper.findcount(param);
+        return new PageImpl<>(list, pageRequest, count);
+//        return dao.findBySearchFilter(searchFilters, page);
     }
 
     private Set<Integer> findOrgUidListByUserUid(String userUid) {
@@ -252,6 +287,27 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         return new HashSet<>();
     }
 
+    private Set<String> getOrgUidListByUserUid(String userUid) {
+        Set<String> listResult = new HashSet<String>();
+        List<UserOrgInfo> listUserOrgInfo = userOrgInfoRepository.findOrgUidListByUserUid(userUid);
+        if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+            for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+                listResult.add(listUserOrgInfo.get(i).getOrgUid());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(listResult)) {
+            Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+            if(tempResult!=null){
+                listResult.addAll(tempResult);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(listResult)){
+            return listResult;
+        }
+        return new HashSet<>();
+    }
+
+    @Transactional
     public void saveKeyAssetReport(){
         if(null == this.selected.getReportYear()){
             WebUtil.addErrorMessage(WebUtil.getMessage("reportYear") + WebUtil.getMessage("ValidationRequire"));
@@ -273,17 +329,17 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if(null == this.selected.getClinicalDept()){
-            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-//            WebUtil.addErrorMessage("请选择科室并选择设备!");
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
-        }
+//        if(null == this.selected.getClinicalDept()){
+//            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+////            WebUtil.addErrorMessage("请选择科室并选择设备!");
+//            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//            return;
+//        }
         int countReport = 0;
         if("Create".equals(this.crudActionName)){
-            countReport = dao.countByReport(this.selected.getAssetName(), this.selectedDept.getId(), this.selected.getReportYear());
+            countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear());
         }else if("Edit".equals(this.crudActionName)){
-            countReport = dao.countByReportAndId(this.selected.getAssetName(), this.selectedDept.getId(),
+            countReport = dao.countByReportAndId(this.selected.getAssetName(),deptList,
                     this.selected.getReportYear(), this.selected.getId());
         }
         if(countReport > 0){
@@ -346,6 +402,19 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setAssetOperation(JSON.toJSONString(assetOperationForYear));
         }
         dao.save(this.selected);
+        if("Edit".equals(this.crudActionName)){
+            keyAssetReportOrgRepository.deleteByKeyAssetReportId(selected.getId());
+        }
+        ArrayList<KeyAssetReportOrg> keyAssetReportOrgs = new ArrayList<>();
+        for (String orgUid : deptList) {
+            KeyAssetReportOrg keyAssetReportOrg = new KeyAssetReportOrg();
+            keyAssetReportOrg.setKeyAssetReportId(selected.getId());
+            keyAssetReportOrg.setOrgId(orgUid);
+            keyAssetReportOrgs.add(keyAssetReportOrg);
+        }
+        keyAssetReportOrgRepository.save(keyAssetReportOrgs);
+        deptList=new HashSet<>();
+
     }
 
     @Override
@@ -356,7 +425,14 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     public void saveAssetList(){
-        assetDetail = service.groupAsset(addedAssetList);
+        if(CollectionUtils.isEmpty(assetDetail)){
+            assetDetail= new HashSet<>();
+        }
+        assetDetail = service.groupAsset(addedAssetList,assetDetail);
+        if(CollectionUtils.isEmpty(deptList)){
+            deptList= new HashSet<>();
+        }
+        deptList.add(dept.getUid());
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -412,6 +488,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     public void resetSelectAssetPage(){
+        dept=null;
         allAssetList = new ArrayList<>();
         addedAssetList = new ArrayList<>();
         selectedAssetUid = new HashMap<>(32);
@@ -432,7 +509,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
-        if (dept.getOrgLevel() == 4) {
+        if (dept.getOrgType() == 4) {
             assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
         }
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
@@ -532,6 +609,53 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             return previewUrl + id;
         }else{
             return previewUrlForYear + id;
+        }
+    }
+
+    public void treeSeachCondition(){
+        UserAccount account = UserContextService.getCurrentUserAccount();
+
+            TreeNode treeNode = null;
+            if(StrUtil.isEmpty(searchDeptName)){
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3);
+            }else{
+                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3, searchDeptName);
+            }
+            queryOrgTree = initOrgTree(treeNode);
+
+    }
+
+
+
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "reportYear":
+                    param.put("reportYear",  Integer.parseInt(searchFilter.value.toString()));
+                    break;
+                case "reportType":
+                    param.put("reportType",  Integer.parseInt(searchFilter.value.toString()));
+                    break;
+                case "assetName":
+                    param.put("assetName", searchFilter.value);
+                    break;
+                case "assetDeptName":
+                    param.put("assetDeptName", searchFilter.value);
+                    break;
+                case "formFiller":
+                    param.put("formFiller", searchFilter.value);
+                    break;
+                case "formFillTime":
+                    if (searchFilter.operator.name().equals("GTE")) {
+                        param.put("formFillTime", searchFilter.value);
+                    } else {
+                        param.put("formFillTime", searchFilter.value);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

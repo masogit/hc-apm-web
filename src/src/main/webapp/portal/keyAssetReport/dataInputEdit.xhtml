@@ -39,24 +39,24 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.clinicaldepart}*</label>
-                        <p:inputText id="dept" readonly="true" style="width: 80%"
-                                     value="#{keyAssetReportController.selectedDept.name}"/>
-                        <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
-                        <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade" style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">
-                            <p:scrollPanel style="height:300px; border: 0" mode="native">
-                                <p:tree id="orgTree" value="#{keyAssetReportController.orgTree}" var="node"
-                                        selectionMode="single" class="tree" style="width:98%; border:0">
-                                    <p:ajax process="@this" event="select" update="editForm:dept editForm:selectAssetBtn"
-                                            listener="#{keyAssetReportController.onSelectTreeNode}"
-                                            oncomplete="PF('varOrg').hide();"/>
-                                    <p:ajax process="@this" event="expand"/>
-                                    <p:ajax process="@this" event="collapse"/>
-                                    <p:treeNode type="org">
-                                        <h:outputText value="#{node}"/>
-                                    </p:treeNode>
-                                </p:tree>
-                            </p:scrollPanel>
-                        </p:overlayPanel>
+                        <p:inputText id="dept" style="width: 80%"
+                                     value="#{keyAssetReportController.selected.assetDeptName}"/>
+<!--                        <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>-->
+<!--                        <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade" style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">-->
+<!--                            <p:scrollPanel style="height:300px; border: 0" mode="native">-->
+<!--                                <p:tree id="orgTree" value="#{keyAssetReportController.orgTree}" var="node"-->
+<!--                                        selectionMode="single" class="tree" style="width:98%; border:0">-->
+<!--                                    <p:ajax process="@this" event="select" update="editForm:dept editForm:selectAssetBtn"-->
+<!--                                            listener="#{keyAssetReportController.onSelectTreeNode}"-->
+<!--                                            oncomplete="PF('varOrg').hide();"/>-->
+<!--                                    <p:ajax process="@this" event="expand"/>-->
+<!--                                    <p:ajax process="@this" event="collapse"/>-->
+<!--                                    <p:treeNode type="org">-->
+<!--                                        <h:outputText value="#{node}"/>-->
+<!--                                    </p:treeNode>-->
+<!--                                </p:tree>-->
+<!--                            </p:scrollPanel>-->
+<!--                        </p:overlayPanel>-->
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.selectAssetChoose}*</label>
