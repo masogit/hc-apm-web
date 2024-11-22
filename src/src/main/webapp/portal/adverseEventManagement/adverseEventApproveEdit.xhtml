@@ -145,7 +145,7 @@
                                         <p:inputText id="productCategory" value="#{adverseEventApproveController.selected.productCategory}"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
-                                        <label class="label">型号<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
+                                        <label class="label">型号<span style="color:red">*</span></label>
                                         <p:inputText id="model" value="#{adverseEventApproveController.selected.model}" required="false" requiredMessage="型号不能为空"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
@@ -161,7 +161,7 @@
                                         <p:inputText maxlength="100" value="#{adverseEventApproveController.selected.productLotNum}"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
-                                        <label class="label">产品编号</label>
+                                        <label class="label">产品编号<span style="color:red">*</span></label>
                                         <p:inputText maxlength="100" value="#{adverseEventApproveController.selected.productNum}"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
@@ -177,7 +177,7 @@
                                         <p:inputText id="udi" value="#{adverseEventApproveController.selected.udi}" required="#{adverseEventApproveController.assetType == 2 ? 'true':'false'}" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">生产日期<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
+                                        <label class="label">生产日期<span style="color:red">*</span></label>
                                         <p:outputLabel value="#{adverseEventApproveController.selected.productionDate}" >
                                             <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
                                         </p:outputLabel>
@@ -299,7 +299,7 @@
                                     <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{adverseEventApproveController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">器械故障表现</label>
+                                    <label class="label">器械故障表现<span style="color:red">*</span></label>
                                     <p:inputTextarea id="deviceFaultPerform" maxlength="1000" value="#{adverseEventApproveController.selected.deviceFaultPerform}" readonly="#{adverseEventApproveController.readOnlyCreateForm}"></p:inputTextarea>
                                     <p:dataGrid id="deviceFaultPerformFile" var="fileitem" value="#{adverseEventApproveController.selected.deviceFaultPerformFile}" columns="5" layout="grid" rendered="#{adverseEventApproveController.selected.deviceFaultPerformFile ne null and !empty adverseEventApproveController.selected.deviceFaultPerformFile }">
                                         <p:panel  style="text-align:center">
@@ -467,7 +467,7 @@
                                 </h:panelGroup>-->
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">事件原因分析描述</label>
+                                <label class="label">事件原因分析描述<span style="color:red">*</span></label>
                                 <p:inputTextarea id="eventCauseDesc" maxlength="500" value="#{adverseEventApproveController.selected.eventCauseDesc}" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                             </h:panelGroup>
                             <h:panelGroup>
