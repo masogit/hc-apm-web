@@ -129,6 +129,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     private ConfigItemValueRepository configItemValueRepository;
 
+    private TenantInfoRepository tenantInfoRepository;
+
     String configItemValue;
 
 
@@ -144,6 +146,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         /*接口类*/
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -189,6 +192,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             if(StrUtil.isNotEmpty(configItemValue) && "3".equals(configItemValue)){
                 assetType = 2;
             }
+            loadUsePlace();
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
@@ -205,6 +209,14 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
                 selectedOptions = selected.getEventCauseAnalyze().split(",");
             }
             multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(selected.getUid());
+        }
+    }
+
+    public void loadUsePlace(){
+        String usePlaceConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "enableInsertUsePlace");
+        if(StrUtil.isNotEmpty(usePlaceConfigValue) && "true".equals(usePlaceConfigValue)){
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+            selected.setPlaceName(tenantInfo == null ? "" : tenantInfo.getName());
         }
     }
 
