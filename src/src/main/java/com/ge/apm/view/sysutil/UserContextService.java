@@ -1396,6 +1396,14 @@ public class UserContextService implements Serializable {
 
         return enableAuditGroupConfiguration;
     }
+    public boolean enableDisplayExternalWorkOrder(){
+        String displayExternalWorkOrder = getConfigItemValue("displayExternalWorkOrder");
+        return Boolean.TRUE.toString().equalsIgnoreCase(displayExternalWorkOrder);
+    }
+    public boolean enableDisplayRemoteWorkOrder(){
+        String displayRemoteWorkOrder = getConfigItemValue("displayRemoteWorkOrder");
+        return Boolean.TRUE.toString().equalsIgnoreCase(displayRemoteWorkOrder);
+    }
         /**
          *  通过key获取指定的配置
          * @param key
