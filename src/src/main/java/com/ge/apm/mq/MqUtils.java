@@ -123,7 +123,16 @@ public class MqUtils {
         try {
             userAccount=userAccount!=null?userAccount:UserContextService.getCurrentUserAccount();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("user",userAccount);
+            UserAccount user = new UserAccount();
+            user.setId(userAccount.getId());
+            user.setName(userAccount.getName());
+            user.setLoginName(userAccount.getLoginName());
+            user.setUid(userAccount.getUid());
+            user.setHospitalUID(userAccount.getHospitalUID());
+            user.setTenantUID(userAccount.getTenantUID());
+            user.setInstitutionUID(userAccount.getInstitutionUID());
+            user.setSiteUID(userAccount.getSiteUID());
+            jsonObject.put("user",user);
             jsonObject.put("featureName",featureName);
             jsonObject.put("businessType",businessType);
             MqContext build = MqContext.builder().jsonObject(jsonObject).exChange(RabbitConfig.ACCESS_RECORDS_CHANGE).routingKey(RabbitConfig.ACCESS_RECORDS_KEY).type("UserAccessRecords").time(new Date()).build();
