@@ -9,6 +9,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.keyAssetReport.KeyAssetReportService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -56,63 +57,88 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private KeyAssetReportService service;
 
     private OrgInfo org;
-    @Getter @Setter
+    @Getter
+    @Setter
     private TreeNode orgTree;
-    @Getter @Setter
+    @Getter
+    @Setter
     private OrgInfo selectedDept;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TreeNode queryOrgTree;
-    @Getter @Setter
+    @Getter
+    @Setter
     private OrgInfo dept;
 
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<String> deptList;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String assetName;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String assetGroup;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String functionType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String departNum;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<AssetInfo> allAssetList;// 待选设备列表
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<AssetInfo> addedAssetList;// 已添加设备列表
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> selectedAssetUid;// 待选设备列表，选中的设备uid
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<AssetInfo> selectedAssetList;// 待选设备列表，选中的设备
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> addedAssetUid;// 已添加设备列表，选中的设备uid
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<AssetInfo> addedSelectAssetList;// 已添加设备列表，选中的设备
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean allListSelected = Boolean.FALSE;// 待选设备列表，是否全部选中
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean cancelAllSelected = Boolean.FALSE;// 已添加设备列表，是否全部选中
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<Map<String, Object>> assetDetail;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Map<String, String>> assetOperation;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Map<String, String>> assetOperationForYear;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, String> assetOperationDetail;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String operationType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String filterFillTime = null;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer operationOrder;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String searchDeptName;
 
     private String previewUrl;
@@ -121,6 +147,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private UaaService uaaService;
 
     private KeyAssetReportMapper keyAssetReportMapper;
+    private SysAuthGroupRepository sysAuthGroupDao;
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private JmReportRepository reportRepository;
+
 
     @Override
     protected void init() {
@@ -132,20 +162,23 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         keyAssetReportMapper = WebUtil.getBean(KeyAssetReportMapper.class);
         keyAssetReportOrgRepository = WebUtil.getBean(KeyAssetReportOrgRepository.class);
-
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
         org = orgDao.findById(UserContextService.getCurrentUserAccount().getOrgInfoId());
-
+        sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         UserAccount account = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
 //        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4));
         queryOrgTree = initQueryOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
-
+        reportRepository = WebUtil.getBean(JmReportRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+       /* previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+                "/1019468057985105920?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
         previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+                "/1020890977340911616?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";*/
+        queryReport();
+
     }
 
     @Override
@@ -165,10 +198,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetOperationForYear = new ArrayList<>();
         initAssetOperation();
         operationOrder = 1;
-        allAssetList=new ArrayList<>();
-        selectedAssetList=new HashSet<>();
-        addedAssetList=new ArrayList<>();
-        deptList=new HashSet<>();
+        allAssetList = new ArrayList<>();
+        selectedAssetList = new HashSet<>();
+        addedAssetList = new ArrayList<>();
+        deptList = new HashSet<>();
     }
 
     @Override
@@ -178,12 +211,12 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
         assetOperationDetail = null;
         List<KeyAssetReportOrg> byKeyAssetReportId = keyAssetReportOrgRepository.findByKeyAssetReportId(selected.getId());
-        deptList=byKeyAssetReportId.stream().map(KeyAssetReportOrg::getOrgId).collect(Collectors.toSet());
-        if(1 == this.selected.getReportType()){
+        deptList = byKeyAssetReportId.stream().map(KeyAssetReportOrg::getOrgId).collect(Collectors.toSet());
+        if (1 == this.selected.getReportType()) {
             assetOperation = JSON.parseObject(selected.getAssetOperation(), List.class);
             assetOperationForYear = new ArrayList<>();
             operationOrder = 1;
-        }else if(2 == this.selected.getReportType()){
+        } else if (2 == this.selected.getReportType()) {
             initAssetOperation();
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
             operationOrder = assetOperationForYear.size() + 1;
@@ -191,9 +224,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         super.prepareEdit();
     }
 
-    public void initAssetOperation(){
+    public void initAssetOperation() {
         assetOperation = new ArrayList<>();
-        for (int i = 1; i< 13; i++) {
+        for (int i = 1; i < 13; i++) {
             Map<String, String> map = new HashMap<>();
             map.put("month", i + "月");
             map.put("order", i + "");
@@ -201,21 +234,21 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
     }
 
-    public void preCreateOperation(){
+    public void preCreateOperation() {
         operationType = "Create";
         assetOperationDetail = new HashMap<>();
     }
 
-    public void preEditOperation(){
+    public void preEditOperation() {
         operationType = "Edit";
     }
 
-    public void deleteOperation(){
+    public void deleteOperation() {
         Iterator<Map<String, String>> iterator = assetOperationForYear.iterator();
 
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Map<String, String> next = iterator.next();
-            if(next.get("month").equals(assetOperationDetail.get("month"))){
+            if (next.get("month").equals(assetOperationDetail.get("month"))) {
                 iterator.remove();
                 break;
             }
@@ -223,16 +256,16 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetOperationDetail = null;
     }
 
-    public void saveAssetOperation(){
-        if("Create".equals(operationType)){
+    public void saveAssetOperation() {
+        if ("Create".equals(operationType)) {
             for (Map<String, String> map : assetOperationForYear) {
-                if(map.get("month").equals(assetOperationDetail.get("month"))){
+                if (map.get("month").equals(assetOperationDetail.get("month"))) {
                     WebUtil.addErrorMessage("年份不能重复！");
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                     return;
                 }
             }
-            assetOperationDetail.put("order",operationOrder + "");
+            assetOperationDetail.put("order", operationOrder + "");
             assetOperationForYear.add(assetOperationDetail);
             operationOrder += 1;
         }
@@ -241,13 +274,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Override
     protected Page<KeyAssetReport> loadData(PageRequest pageRequest) {
 
-        if(CollectionUtils.isEmpty(this.searchFilters)){
+        if (CollectionUtils.isEmpty(this.searchFilters)) {
             this.searchFilters = new ArrayList<>();
         }
         Set<String> orgUids = getOrgUidListByUserUid(UserContextService.getCurrentUserAccount().getUid());
-        if(CollectionUtils.isNotEmpty(orgUids)){
+        if (CollectionUtils.isNotEmpty(orgUids)) {
 //            searchFilters.add(new SearchFilter("deptId", SearchFilter.Operator.IN, idList));
-        }else{
+        } else {
             return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
         }
 //        List<KeyAssetReport> keyAssetReports = dao.selectList();
@@ -260,7 +293,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         param.put("deptId", orgUids);
         param.put("tenantUid", UserContextService.getCurrentUserAccount().getTenantUID());
 
-        covQueryCondition(searchFilters,param);
+        covQueryCondition(searchFilters, param);
         List<KeyAssetReport> list = keyAssetReportMapper.findList(param);
         Long count = keyAssetReportMapper.findcount(param);
         return new PageImpl<>(list, pageRequest, count);
@@ -276,12 +309,12 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             }
         }
         if (CollectionUtils.isNotEmpty(listResult)) {
-            Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
-            if(tempResult!=null){
+            Set<String> tempResult = orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+            if (tempResult != null) {
                 listResult.addAll(tempResult);
             }
         }
-        if(CollectionUtils.isNotEmpty(listResult)){
+        if (CollectionUtils.isNotEmpty(listResult)) {
             return orgInfoRepository.findIdListByUid(listResult);
         }
         return new HashSet<>();
@@ -296,35 +329,35 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             }
         }
         if (CollectionUtils.isNotEmpty(listResult)) {
-            Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
-            if(tempResult!=null){
+            Set<String> tempResult = orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+            if (tempResult != null) {
                 listResult.addAll(tempResult);
             }
         }
-        if(CollectionUtils.isNotEmpty(listResult)){
+        if (CollectionUtils.isNotEmpty(listResult)) {
             return listResult;
         }
         return new HashSet<>();
     }
 
     @Transactional
-    public void saveKeyAssetReport(){
-        if(null == this.selected.getReportYear()){
+    public void saveKeyAssetReport() {
+        if (null == this.selected.getReportYear()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("reportYear") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if(StringUtils.isBlank(this.selected.getAssetName())){
+        if (StringUtils.isBlank(this.selected.getAssetName())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentName") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if(StringUtils.isBlank(this.selected.getFormFiller())){
+        if (StringUtils.isBlank(this.selected.getFormFiller())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("formFiller") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if(null == this.selected.getFormFillTime()){
+        if (null == this.selected.getFormFillTime()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("formFillTime") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
@@ -336,22 +369,22 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 //            return;
 //        }
         int countReport = 0;
-        if("Create".equals(this.crudActionName)){
+        if ("Create".equals(this.crudActionName)) {
             countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear());
-        }else if("Edit".equals(this.crudActionName)){
-            countReport = dao.countByReportAndId(this.selected.getAssetName(),deptList,
+        } else if ("Edit".equals(this.crudActionName)) {
+            countReport = dao.countByReportAndId(this.selected.getAssetName(), deptList,
                     this.selected.getReportYear(), this.selected.getId());
         }
-        if(countReport > 0){
+        if (countReport > 0) {
             WebUtil.addErrorMessage("年份+科室+设备名称重复,不能提交!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if(null == assetDetail){
+        if (null == assetDetail) {
             WebUtil.addErrorMessage("请选择设备!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
-        }else{
+        }/*else{
             for (Map<String, Object> map : assetDetail) {
                 if(null == map.get("price") || null == map.get("depreciation") || null == map.get("repairSpend")
                     || null == map.get("maintenanceSpend") || null == map.get("suppliesSpend")){
@@ -360,15 +393,15 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                     return;
                 }
             }
-        }
-        if(2 == this.selected.getReportType()){
-            if(CollectionUtils.isEmpty(assetOperation)){
+        }*/
+        if (2 == this.selected.getReportType()) {
+            if (CollectionUtils.isEmpty(assetOperation)) {
                 WebUtil.addErrorMessage("请录入设备运营情况数据!");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
         }
-        if(1 == this.selected.getReportType()){
+       /* if(1 == this.selected.getReportType()){
             for (Map<String, String> map : assetOperation) {
                 if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
                         (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
@@ -385,8 +418,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                     return;
                 }
             }
-        }
-        if("Create".equals(crudActionName)){
+        }*/
+        if ("Create".equals(crudActionName)) {
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
             this.selected.setTenantUID(userAccount.getTenantUID());
             this.selected.setInstitutionUID(userAccount.getInstitutionUID());
@@ -396,13 +429,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreateTime(new Date());
         }
         this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
-        if(1 == this.selected.getReportType()){
+        if (1 == this.selected.getReportType()) {
             this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
-        }else if(2 == this.selected.getReportType()){
+        } else if (2 == this.selected.getReportType()) {
             this.selected.setAssetOperation(JSON.toJSONString(assetOperationForYear));
         }
         dao.save(this.selected);
-        if("Edit".equals(this.crudActionName)){
+        if ("Edit".equals(this.crudActionName)) {
             keyAssetReportOrgRepository.deleteByKeyAssetReportId(selected.getId());
         }
         ArrayList<KeyAssetReportOrg> keyAssetReportOrgs = new ArrayList<>();
@@ -413,24 +446,24 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             keyAssetReportOrgs.add(keyAssetReportOrg);
         }
         keyAssetReportOrgRepository.save(keyAssetReportOrgs);
-        deptList=new HashSet<>();
+        deptList = new HashSet<>();
 
     }
 
     @Override
-    public void delete(){
+    public void delete() {
         dao.delete(this.selected);
         this.selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
     }
 
-    public void saveAssetList(){
-        if(CollectionUtils.isEmpty(assetDetail)){
-            assetDetail= new HashSet<>();
+    public void saveAssetList() {
+        if (CollectionUtils.isEmpty(assetDetail)) {
+            assetDetail = new HashSet<>();
         }
-        assetDetail = service.groupAsset(addedAssetList,assetDetail);
-        if(CollectionUtils.isEmpty(deptList)){
-            deptList= new HashSet<>();
+        assetDetail = service.groupAsset(addedAssetList, assetDetail);
+        if (CollectionUtils.isEmpty(deptList)) {
+            deptList = new HashSet<>();
         }
         deptList.add(dept.getUid());
     }
@@ -487,8 +520,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         dept = (OrgInfo) node.getData();
     }
 
-    public void resetSelectAssetPage(){
-        dept=null;
+    public void resetSelectAssetPage() {
+        dept = null;
         allAssetList = new ArrayList<>();
         addedAssetList = new ArrayList<>();
         selectedAssetUid = new HashMap<>(32);
@@ -503,8 +536,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         departNum = "";
     }
 
-    public void findAssetList(){
+    public void findAssetList() {
         List<SearchFilter> assetSearchFilter = new ArrayList<>();
+        if (Objects.nonNull(medicalInstrumentsClassificationCompCtrl.getSelectedSysAuthGroup())) {
+            String classificationCode = medicalInstrumentsClassificationCompCtrl.getSelectedSysAuthGroup().getClassificationCode();
+            assetSearchFilter.add(new SearchFilter("medicalApparatusClassification", SearchFilter.Operator.EQ, classificationCode, "1*"));
+
+        }
         //assetSearchFilter.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
         assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
@@ -515,17 +553,17 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         assetSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
 
-        if(StringUtils.isNotBlank(this.getDepartNum())) {
+        if (StringUtils.isNotBlank(this.getDepartNum())) {
             assetSearchFilter.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, this.getDepartNum(), "1*"));
         } else {
-            if(StringUtils.isNotBlank(this.getAssetName())) {
+            if (StringUtils.isNotBlank(this.getAssetName())) {
                 assetSearchFilter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
                 assetSearchFilter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
             }
-            if(StringUtils.isNotBlank(this.getAssetGroup())) {
+            if (StringUtils.isNotBlank(this.getAssetGroup())) {
                 assetSearchFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.getAssetGroup(), "1*"));
             }
-            if(StringUtils.isNotBlank(this.getFunctionType())) {
+            if (StringUtils.isNotBlank(this.getFunctionType())) {
                 assetSearchFilter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
             }
         }
@@ -535,19 +573,20 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
     // 待选设备列表，选中/取消选中
     public void updateSelectedAssetList(AjaxBehaviorEvent event) {
-        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
-        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
-        if(box.isSelected()) {
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox) event.getSource();
+        AssetInfo asset = (AssetInfo) box.getAttributes().get("assetObj");
+        if (box.isSelected()) {
             selectedAssetList.add(asset);
         } else {
             selectedAssetList.remove(asset);
         }
     }
+
     // 已添加设备列表，选中/取消选中
     public void updateAddedAssetList(AjaxBehaviorEvent event) {
-        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
-        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
-        if(box.isSelected()) {
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox) event.getSource();
+        AssetInfo asset = (AssetInfo) box.getAttributes().get("assetObj");
+        if (box.isSelected()) {
             addedSelectAssetList.add(asset);
         } else {
             addedSelectAssetList.remove(asset);
@@ -556,7 +595,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
     // 待选设备列表，全选
     public void addAllAssetsOfCurrentPage() {
-        if(allListSelected) {
+        if (allListSelected) {
             allAssetList.stream().forEach(t -> {
                 selectedAssetUid.put(t.getUid(), Boolean.TRUE);
                 selectedAssetList.add(t);
@@ -572,7 +611,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
     // 已添加设备列表，全选
     public void addAddedAssetsOfCurrentPage(AjaxBehaviorEvent event) {
-        if(cancelAllSelected) {
+        if (cancelAllSelected) {
             addedAssetList.stream().forEach(t -> {
                 addedAssetUid.put(t.getUid(), Boolean.TRUE);
                 addedSelectAssetList.add(t);
@@ -585,57 +624,58 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
         cancelAllSelected = !cancelAllSelected;
     }
-    public void addAssetInfo(){
-        for(AssetInfo assetInfo: selectedAssetList){
-            if(!addedAssetList.contains(assetInfo)){
+
+    public void addAssetInfo() {
+        for (AssetInfo assetInfo : selectedAssetList) {
+            if (!addedAssetList.contains(assetInfo)) {
                 addedAssetList.add(assetInfo);
             }
         }
     }
-    public void removeAssetInfo(){
+
+    public void removeAssetInfo() {
         addedAssetList.removeAll(addedSelectAssetList);
         addedSelectAssetList.clear();
         addedAssetUid.clear();
     }
 
-    public void clearAssetInfo(){
+    public void clearAssetInfo() {
         addedAssetList.clear();
         addedAssetUid.clear();
         addedSelectAssetList.clear();
     }
 
-    public String preview(String id, Integer type){
-        if(1 == type){
+    public String preview(String id, Integer type) {
+        if (1 == type) {
             return previewUrl + id;
-        }else{
+        } else {
             return previewUrlForYear + id;
         }
     }
 
-    public void treeSeachCondition(){
+    public void treeSeachCondition() {
         UserAccount account = UserContextService.getCurrentUserAccount();
 
-            TreeNode treeNode = null;
-            if(StrUtil.isEmpty(searchDeptName)){
-                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3);
-            }else{
-                treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3, searchDeptName);
-            }
-            queryOrgTree = initOrgTree(treeNode);
+        TreeNode treeNode = null;
+        if (StrUtil.isEmpty(searchDeptName)) {
+            treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3);
+        } else {
+            treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3, searchDeptName);
+        }
+        queryOrgTree = initOrgTree(treeNode);
 
     }
 
 
-
     public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
-        for (SearchFilter searchFilter :searchFilters) {
+        for (SearchFilter searchFilter : searchFilters) {
             String fieldName = searchFilter.fieldName;
             switch (fieldName) {
                 case "reportYear":
-                    param.put("reportYear",  Integer.parseInt(searchFilter.value.toString()));
+                    param.put("reportYear", Integer.parseInt(searchFilter.value.toString()));
                     break;
                 case "reportType":
-                    param.put("reportType",  Integer.parseInt(searchFilter.value.toString()));
+                    param.put("reportType", Integer.parseInt(searchFilter.value.toString()));
                     break;
                 case "assetName":
                     param.put("assetName", searchFilter.value);
@@ -657,5 +697,31 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                     break;
             }
         }
+
+    }
+
+    public String getMedicalApparatusClassification(String medicalApparatusClassification) {
+        if (StringUtils.isNotBlank(medicalApparatusClassification)) {
+            SysAuthGroup classificationCode = sysAuthGroupDao.findByClassificationCode(medicalApparatusClassification);
+            if (Objects.nonNull(classificationCode)) {
+                return classificationCode.getDisplayName();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取积木报表的url
+     */
+    public void queryReport() {
+        JmReport reportYear = reportRepository.findReportByName("重点医疗设备使用状况报表(年)-2024");
+        JmReport reportMonth = reportRepository.findReportByName("重点医疗设备使用状况报表(月)-2024");
+        if (Objects.nonNull(reportYear)) {
+            previewUrlForYear = reportYear.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        }
+        if (Objects.nonNull(reportMonth)) {
+            previewUrl = reportMonth.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        }
+
     }
 }
