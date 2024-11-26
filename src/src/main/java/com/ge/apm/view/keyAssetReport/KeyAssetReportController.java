@@ -75,9 +75,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter
     @Setter
     private Set<String> deptList;
-    @Getter
-    @Setter
-    private Set<Integer> assetIds;
 
     @Getter
     @Setter
@@ -205,19 +202,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         selectedAssetList = new HashSet<>();
         addedAssetList = new ArrayList<>();
         deptList = new HashSet<>();
-        assetIds=new HashSet<>();
     }
 
     @Override
     public void prepareEdit() {
         initAssetOperation();
         selectedDept = selected.getClinicalDept();
-        if(selected.getAssetDetail()!=null){
-            assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
-
-        }else{
-            assetDetail=new HashSet<>();
-        }
+        assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
         assetOperationDetail = null;
         List<KeyAssetReportOrg> byKeyAssetReportId = keyAssetReportOrgRepository.findByKeyAssetReportId(selected.getId());
         deptList = byKeyAssetReportId.stream().map(KeyAssetReportOrg::getOrgId).collect(Collectors.toSet());
@@ -230,19 +221,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
             operationOrder = assetOperationForYear.size() + 1;
         }
-        assetIds=new HashSet<>();
-        for (Map<String, Object> stringObjectMap : assetDetail) {
-            if(stringObjectMap.get("assetId")!=null){
-                String stringIds = (String) stringObjectMap.get("assetId");
-                List<Integer> ids = Arrays.stream(stringIds.split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .map(Integer::parseInt) // 转换为Integer
-                        .collect(Collectors.toList());
-                assetIds.addAll(ids);
-            }
-        }
-
         super.prepareEdit();
     }
 
@@ -390,28 +368,23 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 //            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //            return;
 //        }
-//        if(CollectionUtils.isEmpty(deptList)){
-//            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-//            WebUtil.addErrorMessage("请选择科室并选择设备!");
-//        }
         int countReport = 0;
         if ("Create".equals(this.crudActionName)) {
-            countReport = dao.countByReport(this.selected.getAssetName(), this.selected.getAssetDeptName(), this.selected.getReportYear(),this.selected.getReportType());
+            countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear());
         } else if ("Edit".equals(this.crudActionName)) {
-            countReport = dao.countByReportAndId(this.selected.getAssetName(), this.selected.getAssetDeptName(),
-                    this.selected.getReportYear(), this.selected.getId(),this.selected.getReportType());
+            countReport = dao.countByReportAndId(this.selected.getAssetName(), deptList,
+                    this.selected.getReportYear(), this.selected.getId());
         }
         if (countReport > 0) {
-            WebUtil.addErrorMessage("年份+科室+设备名称+报表类型重复,不能提交!");
+            WebUtil.addErrorMessage("年份+科室+设备名称重复,不能提交!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-//        if (null == assetDetail) {
-//            WebUtil.addErrorMessage("请选择设备!");
-//            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-//            return;
-//        }
-        /*else{
+        if (null == assetDetail) {
+            WebUtil.addErrorMessage("请选择设备!");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }/*else{
             for (Map<String, Object> map : assetDetail) {
                 if(null == map.get("price") || null == map.get("depreciation") || null == map.get("repairSpend")
                     || null == map.get("maintenanceSpend") || null == map.get("suppliesSpend")){
@@ -455,11 +428,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreator(userAccount.getName());
             this.selected.setCreateTime(new Date());
         }
-        if(assetDetail!=null){
-            this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
-        }
+        this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
         if (1 == this.selected.getReportType()) {
-            dataFormat(assetOperation);
             this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
         } else if (2 == this.selected.getReportType()) {
             this.selected.setAssetOperation(JSON.toJSONString(assetOperationForYear));
@@ -475,18 +445,14 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             keyAssetReportOrg.setOrgId(orgUid);
             keyAssetReportOrgs.add(keyAssetReportOrg);
         }
-        if(CollectionUtils.isNotEmpty(keyAssetReportOrgs)){
-            keyAssetReportOrgRepository.save(keyAssetReportOrgs);
-        }
+        keyAssetReportOrgRepository.save(keyAssetReportOrgs);
         deptList = new HashSet<>();
-        assetIds=new HashSet<>();
 
     }
 
     @Override
     public void delete() {
         dao.delete(this.selected);
-        keyAssetReportOrgRepository.deleteByKeyAssetReportId(selected.getId());
         this.selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
     }
@@ -495,18 +461,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (CollectionUtils.isEmpty(assetDetail)) {
             assetDetail = new HashSet<>();
         }
+        assetDetail = service.groupAsset(addedAssetList, assetDetail);
         if (CollectionUtils.isEmpty(deptList)) {
             deptList = new HashSet<>();
         }
-        List<AssetInfo> filterAssetList=addedAssetList;
-        if(CollectionUtils.isNotEmpty(assetIds)){
-             filterAssetList = addedAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
-        }
-        assetDetail = service.groupAsset(filterAssetList, assetDetail);
-        if (CollectionUtils.isEmpty(assetIds)) {
-            assetIds = new HashSet<>();
-        }
-        assetIds.addAll(filterAssetList.stream().map(AssetInfo::getId).collect(Collectors.toSet()));
         deptList.add(dept.getUid());
     }
 
@@ -611,9 +569,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
 
         allAssetList = assetDao.findBySearchFilter(assetSearchFilter);
-        if(CollectionUtils.isNotEmpty(assetIds)){
-            allAssetList = allAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
-        }
     }
 
     // 待选设备列表，选中/取消选中
@@ -769,22 +724,4 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
 
     }
-
-    public void dataFormat(List<Map<String, String>> dataList) {
-        for (Map<String, String> data : dataList) {
-            String income = data.get("income");
-            String repairSpend = data.get("repairSpend");
-            String numberOfCheck = data.get("numberOfCheck");
-            String maintenanceSpend = data.get("maintenanceSpend");
-            String netIncome = data.get("netIncome");
-            String depreciation = data.get("depreciation");
-            String suppliesSpend = data.get("suppliesSpend");
-            if (income == null && repairSpend == null && numberOfCheck == null && maintenanceSpend == null && netIncome == null && depreciation == null && suppliesSpend == null) {
-                data.put("validData", "0");
-            } else {
-                data.put("validData", "1");
-            }
-        }
-    }
-
 }
