@@ -6,6 +6,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.PurchaseOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -13,6 +14,7 @@ import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -129,6 +131,8 @@ public class PurchaseOrderController extends GenericCRUDUUIDController<PurchaseO
 
     @Override
     protected void init() {
+        AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
+        accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/purchase/List.xhtml", UserContextService.getCurrentUserAccount());
         venderInfoRepository = WebUtil.getBean(VenderInfoRepository.class);;
         purchaseVenderRepository = WebUtil.getBean(PurchaseVenderRepository.class);;
         dao = WebUtil.getBean(PurchaseOrderInfoRepository.class);
