@@ -17,13 +17,17 @@ public class KeyAssetReportService {
             for (AssetInfo assetInfo : assetList) {
                 String functionType = assetInfo.getFunctionType();
                 String makerShortName = assetInfo.getMakerShortName();
+                String locationName = assetInfo.getLocationName();
                 if(null == functionType){
                     functionType = "";
                 }
                 if(null == makerShortName){
                     makerShortName = "";
                 }
-                String key = functionType + makerShortName;
+                if(null==locationName){
+                    locationName = "";
+                }
+                String key = functionType + makerShortName+ locationName;
                 Optional<Map<String, Object>> value = set.stream().filter(a -> key.equals(a.get("key"))).findFirst();
 
                 if(value.isPresent()){
@@ -34,6 +38,8 @@ public class KeyAssetReportService {
                     }
                     // 获取启用日期
                     Date date = (Date) valueMap.get("installDate");
+                    valueMap.put("locationName", locationName);
+
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
                         if(date.getTime() > assetInfo.getInstallDate().getTime()){
                             valueMap.put("installDate", assetInfo.getInstallDate());
@@ -48,6 +54,7 @@ public class KeyAssetReportService {
                     valueMap.put("quantity", 1);
                     valueMap.put("title", "设备明细");
                     valueMap.put("deptUid", assetInfo.getClinicalDeptUID());
+                    valueMap.put("locationName", assetInfo.getLocationName());
                     set.add(valueMap);
                 }
             }
