@@ -10,12 +10,10 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -65,9 +63,6 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
 
     @Override
     protected void init() {
-        AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
-        accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/asset/List.xhtml", UserContextService.getCurrentUserAccount());
-
         dao = WebUtil.getBean(BudgetAssetInfoRepository.class);
         budgetAssetDao = WebUtil.getBean(BudgetApplicationAssetRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
