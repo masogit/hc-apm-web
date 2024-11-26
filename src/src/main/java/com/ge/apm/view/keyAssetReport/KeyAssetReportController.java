@@ -430,6 +430,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
         this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
         if (1 == this.selected.getReportType()) {
+            dataFormat(assetOperation);
             this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
         } else if (2 == this.selected.getReportType()) {
             this.selected.setAssetOperation(JSON.toJSONString(assetOperationForYear));
@@ -724,4 +725,22 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
 
     }
+
+    public void dataFormat(List<Map<String, String>> dataList) {
+        for (Map<String, String> data : dataList) {
+            String income = data.get("income");
+            String repairSpend = data.get("repairSpend");
+            String numberOfCheck = data.get("numberOfCheck");
+            String maintenanceSpend = data.get("maintenanceSpend");
+            String netIncome = data.get("netIncome");
+            String depreciation = data.get("depreciation");
+            String suppliesSpend = data.get("suppliesSpend");
+            if (income == null && repairSpend == null && numberOfCheck == null && maintenanceSpend == null && netIncome == null && depreciation == null && suppliesSpend == null) {
+                data.put("validData", "0");
+            } else {
+                data.put("validData", "1");
+            }
+        }
+    }
+
 }
