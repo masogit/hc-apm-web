@@ -247,6 +247,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     public void setUserSearchFilters() {
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         if (!ObjectUtils.isEmpty(selectSite)) {
             String[] fields = new String[]{"siteUID", "hospitalUID", "institutionUID"};
             Arrays.asList(fields).forEach(field -> this.updateSearchFilter(new SearchFilter(field, SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+")));
