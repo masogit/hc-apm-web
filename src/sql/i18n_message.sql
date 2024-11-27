@@ -5464,3 +5464,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'month', '月份', 'Month', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'netIncome', '净收入', 'Net income', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'inCome', '收入', 'Income', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'numberOfCheck', '检查数(项目)', 'Number of check', NULL, -1);
