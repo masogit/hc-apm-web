@@ -86,7 +86,7 @@
     </select>
 
     <sql id="queryConfigIds">
-        left join nurse_site_maintain_item  nsmi on nsm.id = nsmi.parent_id left join asset_info ai on nsmi.asset_uid = ai.uid
+        left join nurse_site_maintain_item nsmi on nsm.id = nsmi.parent_id left join asset_info ai on nsmi.asset_uid = ai.uid
         <where>
             <if test="scheduleDateStart != null">
                 and nsmi.schedule_date >= #{scheduleDateStart}
@@ -130,5 +130,6 @@
                 </foreach>
             </if>
         </where>
+        group by nsm.id
     </sql>
 </mapper>
