@@ -75,6 +75,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter
     @Setter
     private Set<String> deptList;
+    @Getter
+    @Setter
+    private Set<Integer> assetIds;
 
     @Getter
     @Setter
@@ -221,6 +224,19 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
             operationOrder = assetOperationForYear.size() + 1;
         }
+        assetIds=new HashSet<>();
+        for (Map<String, Object> stringObjectMap : assetDetail) {
+            if(stringObjectMap.get("assetId")!=null){
+                String stringIds = (String) stringObjectMap.get("assetId");
+                List<Integer> ids = Arrays.stream(stringIds.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(Integer::parseInt) // 转换为Integer
+                        .collect(Collectors.toList());
+                assetIds.addAll(ids);
+            }
+        }
+
         super.prepareEdit();
     }
 
@@ -368,15 +384,19 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 //            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //            return;
 //        }
+        if(CollectionUtils.isEmpty(deptList)){
+            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage("请选择科室并选择设备!");
+        }
         int countReport = 0;
         if ("Create".equals(this.crudActionName)) {
-            countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear());
+            countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear(),this.selected.getReportType());
         } else if ("Edit".equals(this.crudActionName)) {
             countReport = dao.countByReportAndId(this.selected.getAssetName(), deptList,
-                    this.selected.getReportYear(), this.selected.getId());
+                    this.selected.getReportYear(), this.selected.getId(),this.selected.getReportType());
         }
         if (countReport > 0) {
-            WebUtil.addErrorMessage("年份+科室+设备名称重复,不能提交!");
+            WebUtil.addErrorMessage("年份+科室+设备名称+报表类型重复,不能提交!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
@@ -463,10 +483,18 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (CollectionUtils.isEmpty(assetDetail)) {
             assetDetail = new HashSet<>();
         }
-        assetDetail = service.groupAsset(addedAssetList, assetDetail);
         if (CollectionUtils.isEmpty(deptList)) {
             deptList = new HashSet<>();
         }
+        List<AssetInfo> filterAssetList=addedAssetList;
+        if(CollectionUtils.isNotEmpty(assetIds)){
+             filterAssetList = addedAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
+        }
+        assetDetail = service.groupAsset(filterAssetList, assetDetail);
+        if (CollectionUtils.isEmpty(assetIds)) {
+            assetIds = new HashSet<>();
+        }
+        assetIds.addAll(filterAssetList.stream().map(AssetInfo::getId).collect(Collectors.toSet()));
         deptList.add(dept.getUid());
     }
 
@@ -571,6 +599,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
 
         allAssetList = assetDao.findBySearchFilter(assetSearchFilter);
+        if(CollectionUtils.isNotEmpty(assetIds)){
+            allAssetList = allAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
+        }
     }
 
     // 待选设备列表，选中/取消选中
