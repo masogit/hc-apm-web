@@ -5454,3 +5454,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','2','已审核','Approval',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','3','已入库','In stock',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','4','已出库','Out stock',NULL,-1);
+--重点设备
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualRepairExpenses', '年维修支出', 'Annual repair expenses', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualMaintenanceExpenses', '年维保支出', 'Annual maintenance expenses', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualConsumablesExpenses', '年耗材支出', 'Annual consumables expenses', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualNetIncome', '年度净收入', 'Annual net income', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualIncome', '年收入', 'Annual income', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualNumberOfCheck', '年检查数(项目)', 'Annual number of check(project)', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'month', '月份', 'Month', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'netIncome', '净收入', 'Net income', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'inCome', '收入', 'Income', NULL, -1);
