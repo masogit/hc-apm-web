@@ -420,6 +420,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Override
     public void delete(){
         dao.delete(this.selected);
+        keyAssetReportOrgRepository.deleteByKeyAssetReportId(selected.getId());
         this.selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
     }
