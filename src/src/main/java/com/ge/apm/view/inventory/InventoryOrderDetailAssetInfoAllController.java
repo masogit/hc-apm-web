@@ -5,14 +5,19 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.inventory.InventoryOrderService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +28,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -46,6 +49,13 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     private String queryAssetUid;
     //选定的院区
     private OrgInfo selectSite;
+    private OrgInfoTreeService orgInfoTreeService;
+    @Getter @Setter
+    private String filterClinicalDeptOrg;
+    @Getter @Setter
+    private Set<String> clinicalDeptOrgUidSet;
+    @Getter @Setter
+    private List<OrgInfo> clinicalDeptList;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -54,9 +64,11 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        loadClinicalDeptList();
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             queryAssetUid = (String) UrlEncryptController
@@ -108,6 +120,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             param.put("queryAssetUid", queryAssetUid);
             searchFilters.add(new SearchFilter("queryAssetUid", SearchFilter.Operator.EQ, queryAssetUid));
         }
+        if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
+            param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
+        }
         inventoryOrderService.covQueryCondition(searchFilters, param);
         List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
         Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
@@ -153,6 +168,49 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
             selectSite = null;
         }
+    }
+
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
     }
 
 	public List<String> getListClinicalDeptName() {
