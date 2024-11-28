@@ -250,7 +250,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Artificial' and !(zkbPartOrderEditController.selectedContract.contractType eq 'CCS' or zkbPartOrderEditController.selectedContract.contractType eq 'Biomed')}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Artificial' and !(zkbPartOrderEditController.checkPcbMvsTotal()) and !(zkbPartOrderEditController.selectedContract.contractType eq 'CCS' or zkbPartOrderEditController.selectedContract.contractType eq 'Biomed')}">
                             <label class="label">保养申请*</label>
                             <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.selected.maintainFlag}" required="true" requiredMessage="保养申请 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="ArtificialGroup"  />
@@ -555,13 +555,21 @@
                                 </p:column>
                             </c:when>
                         </c:choose>
-
                         <p:column headerText="配件名称">
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
-                        <p:column headerText="配件数量">
-                            <h:outputText value="#{item.prePartQty}"/>
-                        </p:column>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderEditController.checkPcbMvsTotal()}">
+                                <p:column headerText="配件list price">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="配件数量">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:otherwise>
+                        </c:choose>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
