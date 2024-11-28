@@ -10,7 +10,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 4, 'true', '是否显示远程工单', 'displayRemoteWorkOrder', '是否显示远程工单', 'f','t',3 where not exists(select * from config_item where key = 'displayRemoteWorkOrder');
 
 -- YHAAO-23419 mvs 工单显示控制
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '启用MVS工单同步', 'synchronizeWorkOrder', '启用MVS工单同步', 'f','t',3 where not exists(select * from config_item where key = 'synchronizeWorkOrder');
-insert into public.config_item_value (uid,key,value,tenant_uid,institution_uid,hospital_uid,site_uid) select replace(uuid_generate_v4()::text,'-',''),'synchronizeWorkOrder','true',tenant_uid,tenant_uid,tenant_uid,tenant_uid  from tenant_option_config  where synchronize_work_order = true;
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '启MVS工单同步', 'synchronizeWorkOrder', '启MVS工单同步', 'f','t',3 where not exists(select * from config_item where key = 'synchronizeWorkOrder');
+insert into public.config_item_value (uid,key,value,tenant_uid,institution_uid,hospital_uid,site_uid) select replace(uuid_generate_v4()::text,'-',''),'synchronizeWorkOrder','true',top.tenant_uid,top.tenant_uid,top.tenant_uid,top.tenant_uid  from tenant_option_config top left join config_item_value civ on civ.site_uid =top.tenant_uid where top.synchronize_work_order = true and civ.uid is null;
 -- YHAAO-23381  后台清理保养已取消的工单 淄博市市立医院
 delete from v2_pm_order using v2_pm_order pm left join i18n_message i18n ON i18n.value_zh = pm.current_step_name where pm.tenant_uid='7c2fee46a62048e8940290ca6730cf94' and i18n.msg_key='Canceled';

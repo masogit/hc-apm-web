@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.DateUtil;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Component
@@ -49,19 +50,24 @@ public class KeyAssetReportService {
 
                     // 获取启用日期
                     valueMap.put("locationName", locationName);
-
+                    if(null == valueMap.get("installDate") && null != assetInfo.getInstallDate()){
+                        valueMap.put("installDate", assetInfo.getInstallDate());
+                    }
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
                         Date date =null;
-                        if(valueMap.get("installDate").getClass()==Date.class){
+                        if(valueMap.get("installDate").getClass()==Date.class   || valueMap.get("installDate").getClass() == Timestamp.class  ||valueMap.get("installDate").getClass()==java.sql.Date.class){
                             date=(Date) valueMap.get("installDate");
                         }
                         if(valueMap.get("installDate").getClass()==String.class){
                             String installDate = (String) valueMap.get("installDate");
                              date = DateUtil.getDateByFormatStr(installDate, "yyyy-MM-dd");
                         }
-                        if(date.getTime() > assetInfo.getInstallDate().getTime()){
-                            valueMap.put("installDate", assetInfo.getInstallDate());
+                        if(date!=null){
+                            if(date.getTime() > assetInfo.getInstallDate().getTime()){
+                                valueMap.put("installDate", assetInfo.getInstallDate());
+                            }
                         }
+
                     }
                 }else{
                     Map<String, Object> valueMap = new HashMap<>();
