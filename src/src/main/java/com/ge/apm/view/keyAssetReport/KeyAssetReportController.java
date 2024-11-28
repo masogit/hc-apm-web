@@ -205,6 +205,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         selectedAssetList = new HashSet<>();
         addedAssetList = new ArrayList<>();
         deptList = new HashSet<>();
+        assetIds=new HashSet<>();
     }
 
     @Override
@@ -466,8 +467,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             keyAssetReportOrg.setOrgId(orgUid);
             keyAssetReportOrgs.add(keyAssetReportOrg);
         }
-        keyAssetReportOrgRepository.save(keyAssetReportOrgs);
+        if(CollectionUtils.isNotEmpty(keyAssetReportOrgs)){
+            keyAssetReportOrgRepository.save(keyAssetReportOrgs);
+        }
         deptList = new HashSet<>();
+        assetIds=new HashSet<>();
 
     }
 
