@@ -35,12 +35,14 @@
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="EQ">
-			<f:facet name="filter">
-				<p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItems value="#{inventoryOrderDetailAssetInfoAllController.listClinicalDeptName}" />
-				</p:selectOneMenu>
+		<p:column headerText="#{msg.clinicalDeptName}">
+			<f:facet name="header">
+				<h:outputText value="#{msg.clinicalDeptName}"/><br/>
+				<p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoAllController.filterClinicalDeptOrg}" appendTo="@(Body)"
+								scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoAllController.autoCompleteDeptName}" size="5">
+					<p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoAllController.onClinicalDeptNameFilterChange}" process="@this"  update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoAllListForm:datalistAll"/>
+					<p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoAllController.onClinicalDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoAllListForm:datalistAll"/>
+				</p:autoComplete>
 			</f:facet>
 			<h:outputText value="#{item.clinicalDeptName}" />
 		</p:column>

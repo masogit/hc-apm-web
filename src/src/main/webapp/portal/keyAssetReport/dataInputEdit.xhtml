@@ -59,7 +59,7 @@
 <!--                        </p:overlayPanel>-->
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.selectAssetChoose}*</label>
+                        <label class="label">#{msg.selectAssetChoose}</label>
                         <p:commandButton id="selectAssetBtn" value="#{msg.selectAssetChoose}"
                             actionListener="#{keyAssetReportController.resetSelectAssetPage}" update=":keyAssetSelectDlg" oncomplete="PF('keyAssetSelectDialog').show()"/>
                     </h:panelGroup>
@@ -80,15 +80,8 @@
                             <p:column headerText="#{msg.installDate}">
                                 <h:outputText value="#{item.installDate}"/>
                             </p:column>
-                            <p:column headerText="#{msg.historicalGains}" rendered="#{1 == keyAssetReportController.selected.reportType}">
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{item.historicalGains}"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputNumber value="#{item.historicalGains}" inputStyle="max-width: 80%"/>
-                                    </f:facet>
-                                </p:cellEditor>
+                            <p:column headerText="#{msg.locationName}">
+                                <h:outputText value="#{item.locationName}"/>
                             </p:column>
                             <p:column headerText="#{msg.Price}">
                                 <p:cellEditor>
@@ -97,6 +90,39 @@
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputNumber value="#{item.price}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.Operation}" style="width: 70px">
+                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.assetOperation}" id="assetOperationaPanel">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{1 == keyAssetReportController.selected.reportType}">
+                        <p:dataTable id="assetOperation" value="#{keyAssetReportController.assetOperation}" var="item" editable="true"
+                                     rowKey="#{item}" rows="999" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.month}">
+                                <h:outputText value="#{item.month}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.numberOfCheck}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.numberOfCheck}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber decimalPlaces="0" value="#{item.numberOfCheck}" style="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.income}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.income}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.income}" inputStyle="max-width: 80%"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -129,47 +155,23 @@
                                         <p:inputNumber value="#{item.maintenanceSpend}" inputStyle="max-width: 80%"/>
                                     </f:facet>
                                 </p:cellEditor>
-                            </p:column>
-                            <p:column headerText="#{msg.suppliesSpend}">
+                            </p:column> <p:column headerText="#{msg.suppliesSpend}">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.suppliesSpend}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{item.suppliesSpend}" inputStyle="max-width: 80%"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                            <p:column headerText="#{msg.netIncome}">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{item.suppliesSpend}"/>
+                                        <h:outputText value="#{item.netIncome}"/>
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputNumber value="#{item.suppliesSpend}" inputStyle="max-width: 80%"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                            <p:column headerText="#{msg.Operation}" style="width: 70px">
-                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panelGrid>
-                </p:fieldset>
-                <p:fieldset legend="#{msg.assetOperation}" id="assetOperationaPanel">
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{1 == keyAssetReportController.selected.reportType}">
-                        <p:dataTable id="assetOperation" value="#{keyAssetReportController.assetOperation}" var="item" editable="true"
-                                     rowKey="#{item}" rows="999" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="#{msg.Date}">
-                                <h:outputText value="#{item.month}"/>
-                            </p:column>
-                            <p:column headerText="#{msg.checkPeopleNum}">
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{item.checkPeopleNum}"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputNumber decimalPlaces="0" value="#{item.checkPeopleNum}" style="max-width: 80%"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                            <p:column headerText="#{msg.sumIncome}">
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{item.sumIncome}"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputNumber value="#{item.sumIncome}" inputStyle="max-width: 80%"/>
+                                        <p:inputNumber value="#{item.netIncome}" inputStyle="max-width: 80%"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -187,11 +189,26 @@
                             <p:column headerText="#{msg.Year}">
                                 <h:outputText value="#{item.month}"/>
                             </p:column>
-                            <p:column headerText="#{msg.checkItemNum}">
-                                <h:outputText value="#{item.checkPeopleNum}"/>
+                            <p:column headerText="#{msg.annualNumberOfCheck}">
+                                <h:outputText value="#{item.annualNumberOfCheck}"/>
                             </p:column>
-                            <p:column headerText="#{msg.sumIncome}">
-                                <h:outputText value="#{item.sumIncome}"/>
+                            <p:column headerText="#{msg.annualIncome}">
+                                <h:outputText value="#{item.annualIncome}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.depreciation}">
+                                <h:outputText value="#{item.depreciation}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.annualMaintenanceExpenses}">
+                                <h:outputText value="#{item.annualMaintenanceExpenses}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.annualRepairExpenses}">
+                                <h:outputText value="#{item.annualRepairExpenses}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.annualConsumablesExpenses}">
+                                <h:outputText value="#{item.annualConsumablesExpenses}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.annualNetIncome}">
+                                <h:outputText value="#{item.annualNetIncome}"/>
                             </p:column>
                             <f:facet name="{Toolbar}">
                                 <h:panelGroup>

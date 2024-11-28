@@ -67,6 +67,12 @@
             <if test="startDate != null and endDate != null">
                 AND t.lastModifiedDate BETWEEN #{startDate} AND #{endDate}
             </if>
+            <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
+                AND t.clinicalDeptUid IN
+                <foreach item="item" collection="clinicalDeptUids" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </sql>
 
@@ -77,6 +83,7 @@
                 ai.id assetId,
                 ai.uid assetUid,
                 ai.name,
+                ai.clinical_dept_uid clinicalDeptUid,
                 ai.clinical_dept_name clinicalDeptName,
                 ai.qr_code qrCode,
                 ai.depart_num departNum,
@@ -133,7 +140,7 @@
                     )
                 </if>
             UNION ALL
-            SELECT NULL AS assetId, NULL AS assetUid, NULL AS name,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
+            SELECT NULL AS assetId, NULL AS assetUid, NULL AS name,clinical_dept_uid clinicalDeptUid,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
                 <if test="orgUidList != null and orgUidList.size > 0">
                     AND (
                     iod.institution_uid IN
@@ -255,7 +262,7 @@
 
     <sql id="noneOrderCondition">
         (
-        SELECT ai.id,ai.name,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName
+        SELECT ai.id,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName
         FROM asset_info ai LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id
         <if test="orderIdList != null and orderIdList.size > 0">
             AND iod.inventory_order_id IN

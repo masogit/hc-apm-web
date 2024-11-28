@@ -15,4 +15,6 @@ public interface JmReportRepository extends GenericRepositoryUUID<JmReport>{
     List<JmReport> findAll();
     @Query(nativeQuery = true, value = "SELECT a.* FROM table_jm_report a WHERE  a.name='工单备件单打印'")
     JmReport findPartPrintReport();
+    @Query(nativeQuery = true,value = "SELECT a.* FROM table_jm_report a WHERE  a.name=?1 limit 1")
+    JmReport findReportByName(String name);
 }

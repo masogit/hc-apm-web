@@ -6,10 +6,16 @@ import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +29,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.*;
@@ -47,6 +54,13 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private int inventoryStatus = 0;
     private List<String> listAccessClinical;
 	private String encodeAssetStr;
+	private OrgInfoTreeService orgInfoTreeService;
+	@Getter @Setter
+	private String filterClinicalDeptOrg;
+	@Getter @Setter
+	private Set<String> clinicalDeptOrgUidSet;
+	@Getter @Setter
+	private List<OrgInfo> clinicalDeptList;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -54,6 +68,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+		orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -65,6 +80,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
             listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
         }
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+		loadClinicalDeptList();
 	}
 
 	@Override
@@ -95,6 +111,9 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+		if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
+			searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet, "1*"));
+		}
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
@@ -173,6 +192,40 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		// 更新资产盘点日期
 		Set<Integer> assetIds = nonInventoryOrderDetails.stream().map(t -> t.getAssetInfo().getId()).collect(Collectors.toSet());
 		assetInfoRepository.bathInventory(assetIds);
+	}
+
+	private void loadClinicalDeptList() {
+		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+	}
+
+	public List<String> autoCompleteDeptName(String query) {
+		if (clinicalDeptList == null) {
+			return Collections.emptyList();
+		}
+
+		List<OrgInfo> res = this.clinicalDeptList.stream()
+				.filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+						|| (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+				.collect(Collectors.toList());
+		res.sort(new PinYinComparatorByName());
+		return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+	}
+
+	public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+		if (event instanceof SelectEvent) {
+			filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+		}
+		if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+			filterClinicalDeptOrg = null;
+		}
+		if (filterClinicalDeptOrg != null) {
+			List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+			Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+			clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+		} else {
+			clinicalDeptOrgUidSet = Collections.emptySet();
+		}
 	}
 
 }

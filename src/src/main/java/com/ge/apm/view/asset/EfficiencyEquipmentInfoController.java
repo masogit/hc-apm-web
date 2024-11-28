@@ -209,11 +209,12 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
             BigDecimal income=hisResultDto!=null?hisResultDto.getAmount()!=null?hisResultDto.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
             BigDecimal cost=assetCostDTO!=null?assetCostDTO.getAmount()!=null?assetCostDTO.getAmount():BigDecimal.ZERO:BigDecimal.ZERO;
 //            BigDecimal checkNumberPeople=iot!=null?iot.getCheckNumberPeople()!=null?iot.getCheckNumberPeople():BigDecimal.ZERO:BigDecimal.ZERO;
-            currentPageAsset.setIncome(income);
-            currentPageAsset.setCost(cost);
-//            currentPageAsset.setCheckNumberPeople(checkNumberPeople);
             Integer id = currentPageAsset.getAssetInfo().getId();
             BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
+
+            currentPageAsset.setIncome(income);
+            currentPageAsset.setCost(cost.add(bigDecimal));
+//            currentPageAsset.setCheckNumberPeople(checkNumberPeople);
             BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
             currentPageAsset.setProfits(profits);
             if(!(income.compareTo(BigDecimal.ZERO)==0)){
@@ -395,10 +396,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
                 }
                 BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
                 BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
-                efficiencyEquipmentInfo.setIncome(income);
-                efficiencyEquipmentInfo.setCost(cost);
                 Integer id = efficiencyEquipmentInfo.getAssetId();
                 BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
+                efficiencyEquipmentInfo.setIncome(income);
+                efficiencyEquipmentInfo.setCost(cost.add(bigDecimal));
                 BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
                 efficiencyEquipmentInfo.setProfits(profits);
                 if(!(income.compareTo(BigDecimal.ZERO)==0)){
