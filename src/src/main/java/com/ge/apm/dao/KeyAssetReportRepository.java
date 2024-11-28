@@ -20,9 +20,10 @@ public interface KeyAssetReportRepository extends GenericRepositoryUUID<KeyAsset
 
 
 
-    @Query(nativeQuery = true, value = "select count(1) from key_asset_report where asset_name = ?1 and asset_dept_name = ?2 and report_year = ?3")
-    int countByReport(String assetName, String deptName, Integer reportYear);
-
+    @Query(nativeQuery = true, value = "select count(1) from key_asset_report where asset_name = ?1 and asset_dept_name = ?2 and report_year = ?3   and report_type = ?4 ")
+    int countByReport(String assetName, String deptName, Integer reportYear,Integer reportType);
+    @Query(nativeQuery = true, value = "select count(1) from key_asset_report where asset_name = ?1 and asset_dept_name = ?2 and report_year = ?3    and report_type = ?5   and id != ?4")
+    int countByReportAndId(String assetName, String deptName,  Integer reportYear, String uid,Integer reportType);
 
     @Query(nativeQuery = true, value = "select count(1) from key_asset_report kar left join key_asset_report_org karo  on kar.id=karo.key_asset_report_id    where kar.asset_name = ?1 and karo.org_id in ?2 and kar.report_year = ?3  and kar.report_type = ?4   ")
     int countByReport(String assetName, Set<String> orgUids, Integer reportYear,Integer reportType);
