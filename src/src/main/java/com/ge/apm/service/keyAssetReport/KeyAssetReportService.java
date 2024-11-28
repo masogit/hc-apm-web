@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.DateUtil;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Component
@@ -52,7 +53,7 @@ public class KeyAssetReportService {
 
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
                         Date date =null;
-                        if(valueMap.get("installDate").getClass()==Date.class){
+                        if(valueMap.get("installDate").getClass()==Date.class   || valueMap.get("installDate").getClass() == Timestamp.class  ||valueMap.get("installDate").getClass()==java.sql.Date.class){
                             date=(Date) valueMap.get("installDate");
                         }
                         if(valueMap.get("installDate").getClass()==String.class){
