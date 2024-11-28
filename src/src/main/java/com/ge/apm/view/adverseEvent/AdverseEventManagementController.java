@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -420,11 +421,16 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setPreviouslyRegistrationReport(false);
         this.selected.setProductionDate(assetSelected.getManufactDate());
         this.selected.setModel(assetSelected.getFunctionType());
+        this.selected.setProductNum(assetSelected.getSerialNum());
         //设备截止日期
         if(assetType == 1){
-            this.selected.setValidUntil(assetSelected.getAssetLifecycleDeadline());
+            //this.selected.setValidUntil(assetSelected.getAssetLifecycleDeadline());
+            if(assetSelected.getManufactDate() != null && assetSelected.getLifecycle() != null){
+                Date d = DateUtil.offsetMonth(assetSelected.getManufactDate(), assetSelected.getLifecycle());
+                d = DateUtil.offsetDay(d, -1);
+                this.selected.setValidUntil(d);
+            }
         }
-
     }
 
     public void unSelect() {
