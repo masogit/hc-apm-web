@@ -32,7 +32,7 @@ public class TenantOptionConfig implements Serializable {
 
     @Column(name = "show_is_pm")
     private Boolean showIsPm;
-
+    // Filed deprecated, Replace with configItem.key eq synchronizeWorkOrder.
     @Column(name = "synchronize_work_order")
     private Boolean synchronizeWorkOrder;
 }
