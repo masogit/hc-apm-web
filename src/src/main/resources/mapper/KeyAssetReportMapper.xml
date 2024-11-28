@@ -3,78 +3,125 @@
 <mapper namespace="com.ge.apm.dao.mapper.KeyAssetReportMapper">
 
     <select id="findList" resultType="com.ge.apm.domain.KeyAssetReport">
-
-        WITH other_users_with_matching_permissions AS (
-        SELECT up.key_asset_report_id
-        FROM key_asset_report_org up where  up.org_id in
-            <foreach item="item" collection="deptId" separator="," open="(" close=")" index="">
-                #{item}
-            </foreach>
-        GROUP BY up.key_asset_report_id
-        HAVING
-        (select  count(*) from   key_asset_report_org where key_asset_report_id  =up.key_asset_report_id ) <![CDATA[ <= ]]> count(*)
-        )
-        SELECT u.*
-        FROM key_asset_report u
-        JOIN other_users_with_matching_permissions oump ON u.id = oump.key_asset_report_id
+        WITH key_asset_report_counts AS (
+        SELECT
+        key_asset_report_id,
+        COUNT(*) AS total_count
+        FROM
+        key_asset_report_org
+        GROUP BY
+        key_asset_report_id
+        ),
+        matching_permissions AS (
+        SELECT
+        up.key_asset_report_id,
+        COUNT(up.key_asset_report_id) AS org_count
+        FROM
+        key_asset_report_org up
         WHERE
-         u.tenant_uid = #{tenantUid}
-        <if test="reportYear != null ">
-            AND u.report_year =#{reportYear}
-        </if>
-        <if test="reportType != null ">
-            AND u.report_type =#{reportType}
-        </if>
-        <if test="assetName != null and assetName!='' ">
-            AND u.asset_name like  concat('%',#{assetName},'%')
-        </if>
-
-        <if test="assetDeptName != null and assetDeptName!='' ">
-            AND u.asset_dept_name  like  concat('%',#{assetDeptName},'%')
-        </if>
-        <if test="formFiller != null and formFiller!='' ">
-            AND u.form_filler like   concat('%',#{formFiller},'%')
-        </if>
-        order by  u.create_time desc
-        LIMIT #{page} OFFSET #{offset}
-    </select>
-
-
-
-
-    <select id="findcount" resultType="long">
-
-        WITH other_users_with_matching_permissions AS (
-        SELECT up.key_asset_report_id
-        FROM key_asset_report_org up where  up.org_id in
+        up.org_id IN
         <foreach item="item" collection="deptId" separator="," open="(" close=")" index="">
             #{item}
         </foreach>
-        GROUP BY up.key_asset_report_id
-        HAVING
-        (select  count(*) from   key_asset_report_org where key_asset_report_id  =up.key_asset_report_id ) <![CDATA[ <= ]]> count(*)
+        GROUP BY
+        up.key_asset_report_id
         )
-        SELECT count(u.*)
-        FROM key_asset_report u
-        JOIN other_users_with_matching_permissions oump ON u.id = oump.key_asset_report_id
+        SELECT
+        kar.*
+        FROM
+        key_asset_report kar
+        LEFT JOIN
+        matching_permissions mp
+        ON
+        kar.id = mp.key_asset_report_id
+        LEFT JOIN
+        key_asset_report_counts karc
+        ON
+        kar.id = karc.key_asset_report_id
         WHERE
-         u.tenant_uid = #{tenantUid}
+        kar.tenant_uid = #{tenantUid}
+        AND (
+        karc.total_count is null
+        OR (mp.org_count >= COALESCE(karc.total_count, 0) AND karc.total_count IS NOT NULL)
+        )
         <if test="reportYear != null ">
-            AND u.report_year =#{reportYear}
+            AND kar.report_year =#{reportYear}
         </if>
         <if test="reportType != null ">
-            AND u.report_type =#{reportType}
+            AND kar.report_type =#{reportType}
         </if>
-
         <if test="assetName != null and assetName!='' ">
-            AND u.asset_name like  concat('%',#{assetName},'%')
+            AND kar.asset_name like  concat('%',#{assetName},'%')
         </if>
 
         <if test="assetDeptName != null and assetDeptName!='' ">
-            AND u.asset_dept_name  like  concat('%',#{assetDeptName},'%')
+            AND kar.asset_dept_name  like  concat('%',#{assetDeptName},'%')
         </if>
         <if test="formFiller != null and formFiller!='' ">
-            AND u.form_filler like   concat('%',#{formFiller},'%')
+            AND kar.form_filler like   concat('%',#{formFiller},'%')
+        </if>
+        order by  kar.create_time desc
+        LIMIT #{page} OFFSET #{offset}
+    </select>
+
+    <select id="findcount" resultType="long">
+        WITH key_asset_report_counts AS (
+        SELECT
+        key_asset_report_id,
+        COUNT(*) AS total_count
+        FROM
+        key_asset_report_org
+        GROUP BY
+        key_asset_report_id
+        ),
+        matching_permissions AS (
+        SELECT
+        up.key_asset_report_id,
+        COUNT(up.key_asset_report_id) AS org_count
+        FROM
+        key_asset_report_org up
+        WHERE
+        up.org_id IN
+        <foreach item="item" collection="deptId" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+        GROUP BY
+        up.key_asset_report_id
+        )
+        SELECT
+         count(kar.*)
+        FROM
+        key_asset_report kar
+        LEFT JOIN
+        matching_permissions mp
+        ON
+        kar.id = mp.key_asset_report_id
+        LEFT JOIN
+        key_asset_report_counts karc
+        ON
+        kar.id = karc.key_asset_report_id
+        WHERE
+        kar.tenant_uid = #{tenantUid}
+        AND (
+        karc.total_count is null
+        OR (mp.org_count >= COALESCE(karc.total_count, 0) AND karc.total_count IS NOT NULL)
+        )
+        <if test="reportYear != null ">
+            AND kar.report_year =#{reportYear}
+        </if>
+        <if test="reportType != null ">
+            AND kar.report_type =#{reportType}
+        </if>
+
+        <if test="assetName != null and assetName!='' ">
+            AND kar.asset_name like  concat('%',#{assetName},'%')
+        </if>
+
+        <if test="assetDeptName != null and assetDeptName!='' ">
+            AND kar.asset_dept_name  like  concat('%',#{assetDeptName},'%')
+        </if>
+        <if test="formFiller != null and formFiller!='' ">
+            AND kar.form_filler like   concat('%',#{formFiller},'%')
         </if>
 
     </select>
