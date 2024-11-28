@@ -212,7 +212,12 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     public void prepareEdit() {
         initAssetOperation();
         selectedDept = selected.getClinicalDept();
-        assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
+        if(selected.getAssetDetail()!=null){
+            assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
+
+        }else{
+            assetDetail=new HashSet<>();
+        }
         assetOperationDetail = null;
         List<KeyAssetReportOrg> byKeyAssetReportId = keyAssetReportOrgRepository.findByKeyAssetReportId(selected.getId());
         deptList = byKeyAssetReportId.stream().map(KeyAssetReportOrg::getOrgId).collect(Collectors.toSet());
@@ -385,10 +390,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 //            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //            return;
 //        }
-        if(CollectionUtils.isEmpty(deptList)){
-            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-            WebUtil.addErrorMessage("请选择科室并选择设备!");
-        }
+//        if(CollectionUtils.isEmpty(deptList)){
+//            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+//            WebUtil.addErrorMessage("请选择科室并选择设备!");
+//        }
         int countReport = 0;
         if ("Create".equals(this.crudActionName)) {
             countReport = dao.countByReport(this.selected.getAssetName(), this.selected.getAssetDeptName(), this.selected.getReportYear(),this.selected.getReportType());
@@ -401,11 +406,12 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if (null == assetDetail) {
-            WebUtil.addErrorMessage("请选择设备!");
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
-        }/*else{
+//        if (null == assetDetail) {
+//            WebUtil.addErrorMessage("请选择设备!");
+//            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//            return;
+//        }
+        /*else{
             for (Map<String, Object> map : assetDetail) {
                 if(null == map.get("price") || null == map.get("depreciation") || null == map.get("repairSpend")
                     || null == map.get("maintenanceSpend") || null == map.get("suppliesSpend")){
@@ -449,7 +455,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreator(userAccount.getName());
             this.selected.setCreateTime(new Date());
         }
-        this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
+        if(assetDetail!=null){
+            this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
+        }
         if (1 == this.selected.getReportType()) {
             dataFormat(assetOperation);
             this.selected.setAssetOperation(JSON.toJSONString(assetOperation));

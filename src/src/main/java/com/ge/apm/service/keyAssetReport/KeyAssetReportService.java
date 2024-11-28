@@ -4,6 +4,7 @@ import com.ge.apm.domain.AssetInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import webapp.framework.util.DateUtil;
 
 import java.util.*;
 
@@ -50,7 +51,14 @@ public class KeyAssetReportService {
                     valueMap.put("locationName", locationName);
 
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
-                        Date date = (Date) valueMap.get("installDate");
+                        Date date =null;
+                        if(valueMap.get("installDate").getClass()==Date.class){
+                            date=(Date) valueMap.get("installDate");
+                        }
+                        if(valueMap.get("installDate").getClass()==String.class){
+                            String installDate = (String) valueMap.get("installDate");
+                             date = DateUtil.getDateByFormatStr(installDate, "yyyy-MM-dd");
+                        }
                         if(date.getTime() > assetInfo.getInstallDate().getTime()){
                             valueMap.put("installDate", assetInfo.getInstallDate());
                         }
