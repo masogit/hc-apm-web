@@ -390,9 +390,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
         int countReport = 0;
         if ("Create".equals(this.crudActionName)) {
-            countReport = dao.countByReport(this.selected.getAssetName(), deptList, this.selected.getReportYear(),this.selected.getReportType());
+            countReport = dao.countByReport(this.selected.getAssetName(), this.selected.getAssetDeptName(), this.selected.getReportYear(),this.selected.getReportType());
         } else if ("Edit".equals(this.crudActionName)) {
-            countReport = dao.countByReportAndId(this.selected.getAssetName(), deptList,
+            countReport = dao.countByReportAndId(this.selected.getAssetName(), this.selected.getAssetDeptName(),
                     this.selected.getReportYear(), this.selected.getId(),this.selected.getReportType());
         }
         if (countReport > 0) {
