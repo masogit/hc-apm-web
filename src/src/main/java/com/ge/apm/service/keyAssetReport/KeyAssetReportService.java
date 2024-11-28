@@ -50,7 +50,9 @@ public class KeyAssetReportService {
 
                     // 获取启用日期
                     valueMap.put("locationName", locationName);
-
+                    if(null == valueMap.get("installDate") && null != assetInfo.getInstallDate()){
+                        valueMap.put("installDate", assetInfo.getInstallDate());
+                    }
                     if(null != valueMap.get("installDate") && null != assetInfo.getInstallDate()){
                         Date date =null;
                         if(valueMap.get("installDate").getClass()==Date.class   || valueMap.get("installDate").getClass() == Timestamp.class  ||valueMap.get("installDate").getClass()==java.sql.Date.class){
