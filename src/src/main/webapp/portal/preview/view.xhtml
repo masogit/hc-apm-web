@@ -10,7 +10,7 @@
 <ui:composition>
 
    <p:dialog id="previewedDlg" width="1000" height="800"  widgetVar="previewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
-      <p:graphicImage url="#{preViewerBean.url}"   width="100%" height="780px" />
+      <p:graphicImage value="#{fileDownloadService.getFile(preViewerBean.getObjectId())}" stream="false"   width="100%" height="780px" />
    </p:dialog>
  </ui:composition>
 </html>
