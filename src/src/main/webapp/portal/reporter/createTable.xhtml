@@ -297,7 +297,7 @@
                                 <p:inputText value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Number'}" >
-                                <p:inputNumber value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}" decimalPlaces="#{fieldItem.decimalLength}" />
+                                <p:inputNumber value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}" decimalPlaces="4" />
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Select'}" >
                                 <p:selectOneMenu value="#{tableCreateController.editTableItem.defaultValue}">
