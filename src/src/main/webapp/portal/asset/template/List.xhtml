@@ -25,10 +25,10 @@
                         <p:ajax event="rowSelect" listener="#{toBeTerminatedTemplateController.onSelect()}"
                                 update="createButton editButton deleteButton"/>
 
-                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
-                                  filterMatchMode="EQ">
-                            <h:outputText value="#{toBeTerminatedTemplateController.getTenantName(item.tenantUID)}"/>
-                        </p:column>
+<!--                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"-->
+<!--                                  filterMatchMode="EQ">-->
+<!--                            <h:outputText value="#{toBeTerminatedTemplateController.getTenantName(item.tenantUID)}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
                                   filterMatchMode="EQ">
                             <h:outputText
