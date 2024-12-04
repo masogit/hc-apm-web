@@ -114,7 +114,7 @@
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">营业许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
