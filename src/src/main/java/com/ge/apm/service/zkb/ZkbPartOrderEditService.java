@@ -511,7 +511,7 @@ public class ZkbPartOrderEditService {
                 errorLog.append("附件不能为空！");
             }
         }else{
-            if(checkPcbMvsTotal(selectedContract)){
+            if(CopyByInvok.F.equals(selected.getSsaKeyFlag()) && checkPcbMvsTotal(selectedContract)){
                 if(CopyByInvok.F.equals(selected.getScoreFlag())){
                     errorLog.append("该合同只支持积分申请！");
                 }
