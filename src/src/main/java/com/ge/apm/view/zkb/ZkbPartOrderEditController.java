@@ -346,9 +346,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(!currentScoreFlag){
                 selected.setScoreFlag(CopyByInvok.T);
                 scoreFlagChange();
-                currentScoreText += ";该合同只支持积分申请,请检查！";
+                currentScoreText += "；该合同只支持积分申请,请检查！";
             }else{
-                currentScoreText += ";该合同只支持积分申请,请检查！";
+                currentScoreText += "；该合同只支持积分申请,请检查！";
             }
         }
     }
