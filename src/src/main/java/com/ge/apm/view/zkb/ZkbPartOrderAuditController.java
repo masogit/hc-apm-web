@@ -403,7 +403,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(zkbContract != null && (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) ||
                 "PCB MVS".equals(zkbContract.getContractType()))){
             int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
-            if(total > 1000){
+            if(total >= 1000){
                 result = true;
             }
         }
