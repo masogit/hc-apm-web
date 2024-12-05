@@ -126,6 +126,14 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return fileStream;
     }
 
+    public byte[] downloadSingleFileByte(String fileId) {
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+        byte[] result = response.getBody();
+        return result;
+    }
+
     public Boolean deleteFileObject(String token, String objectId) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");

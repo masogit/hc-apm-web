@@ -334,6 +334,8 @@
                 <p:menuitem id="um5026" value="#{msg.SystemClientInfo}" outcome="/portal/iot/systemClientInfo.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_CHILD_ACCT_EDIT')}"/>
                 <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
+                <p:menuitem id="um5029" value="系统模板管理" outcome="/portal/config/template/systemTemplate.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
+
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
