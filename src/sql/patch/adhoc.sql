@@ -14,3 +14,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 insert into public.config_item_value (uid,key,value,tenant_uid,institution_uid,hospital_uid,site_uid) select replace(uuid_generate_v4()::text,'-',''),'synchronizeWorkOrder','true',top.tenant_uid,top.tenant_uid,top.tenant_uid,top.tenant_uid  from tenant_option_config top left join config_item_value civ on civ.site_uid =top.tenant_uid where top.synchronize_work_order = true and civ.uid is null;
 -- YHAAO-23381  后台清理保养已取消的工单 淄博市市立医院
 delete from v2_pm_order using v2_pm_order pm left join i18n_message i18n ON i18n.value_zh = pm.current_step_name where pm.tenant_uid='7c2fee46a62048e8940290ca6730cf94' and i18n.msg_key='Canceled';
+
+-- YHAAO-23542
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否允许外修关单', 'externalRepairOrderClose', '是否允许外修关单', 'f','t',3 where not exists(select * from config_item where key = 'externalRepairOrderClose');
