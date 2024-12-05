@@ -4,12 +4,11 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.RenderData;
 import com.deepoove.poi.data.TableRenderData;
 import com.deepoove.poi.data.TextRenderData;
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
+import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -43,6 +42,11 @@ public class AssetOutStockService {
     @Autowired
     OrgInfoRepository orgInfoRepository;
 
+    @Autowired
+    private MicroServiceUtil microServiceUtil;
+
+    @Autowired
+    private SystemTemplateValueRepository systemTemplateValueRepository;
     public static final String PATH_WORD_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stock_template.docx";
     public static final String PATH_WORD_IN_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/in_stocked_template.docx";
     public static final String PATH_WORD_OUT_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stocked_template.docx";
@@ -93,14 +97,19 @@ public class AssetOutStockService {
         Map<String, Object> data = createFileData(arrivalListItemList);
         String templatePath;
         String fileName;
+        String type;
         if ("inStock".equals(sockType)) {
             templatePath = PATH_WORD_IN_STOCK_TEMPLATE;
             fileName = "入库单.docx";
+            type=SystemTemplate.SystemTemplateEnum.IN_STOCKED.getCode();
         } else {
             templatePath = PATH_WORD_OUT_STOCK_TEMPLATE;
             fileName = "出库单.docx";
+            type=SystemTemplate.SystemTemplateEnum.OUT_STOCKED.getCode();
         }
-        byte[] templateBytes = buildReportTemplate(templatePath);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),type,"doc");
+        byte[] templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
 
         byte[] bytes = this.renderDocx(data, templateBytes, sockType);
         return new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", fileName);

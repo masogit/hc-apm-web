@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="系统模板管理"/>
+                </div>
+                <h:form id="TemplateListForm">
+                    <p:dataTable id="datalist" value="#{systemTemplateController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{systemTemplateController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect"
+                                update="editButton "/>
+                        <p:ajax event="filter" listener="#{systemTemplateController.onFilter}" />
+<!--                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUid}" filterBy="#{item.institutionUid}"-->
+<!--                                  filterMatchMode="EQ">-->
+<!--                            <h:outputText-->
+<!--                                    value="#{systemTemplateController.getOrgName(item.institutionUid)}"/>-->
+<!--                        </p:column>-->
+<!--                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUid}" filterBy="#{item.hospitalUid}"-->
+<!--                                  filterMatchMode="EQ">-->
+<!--                            <h:outputText-->
+<!--                                    value="#{systemTemplateController.getOrgName(item.hospitalUid)}"/>-->
+<!--                        </p:column>-->
+<!--                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUid}" filterBy="#{item.siteUid}"-->
+<!--                                  filterMatchMode="EQ">-->
+<!--                            <h:outputText value="#{systemTemplateController.getOrgName(item.siteUid)}"/>-->
+<!--                        </p:column>-->
+
+
+                        <p:column headerText="模板类型" sortBy="#{item.templateType}" filterBy="#{item.templateType}"
+                                  filterMatchMode="EQ">
+                            <h:outputText value="#{systemTemplateController.getTemplateName(item.templateType)}"/>
+                        </p:column>
+
+                        <p:column headerText="文件类型" sortBy="#{item.fileType}" filterBy="#{item.fileType}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.fileType}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
+                                  filterMatchMode="EQ">
+                            <p:commandLink value="#{item.fileName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.storageId)}" styleClass="p-mr-2"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             actionListener="#{systemTemplateController.prepareEdit()}"
+                                             update=":TemplateEditDlg"
+                                             oncomplete="PF('TemplateEditDialog').show()"
+                                             disabled="#{empty systemTemplateController.selected}"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

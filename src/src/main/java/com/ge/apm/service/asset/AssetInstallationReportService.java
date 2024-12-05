@@ -2,10 +2,15 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.SystemTemplate;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +53,7 @@ public class AssetInstallationReportService {
     public static final String REPORT_ASSET_TITLE_BATCH = "固定资产验收单(面单)";
     public static final String REPORT_ASSET_TITLE_BATCH_BOTTOM = "固定资产验收单(底单)";
 
-    public static final String REPORT_TYPE_TECHNOLOGY = "technology";
+    public static final String REPORT_TYPE_TECHNOLOGY = "technology";   //技术验收
     public static final String REPORT_TYPE_BUSINESS = "business";
     public static final String REPORT_TYPE_CLINICAL = "clinical";
     public static final String REPORT_TYPE_DETAIL = "detail";
@@ -58,6 +63,12 @@ public class AssetInstallationReportService {
 
     @Autowired
     private OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    private MicroServiceUtil microServiceUtil;
+
+    @Autowired
+    private SystemTemplateValueRepository systemTemplateValueRepository;
 
     public Map<String, Object> createReportData(ArrivalListItem arrivalListItem){
 
@@ -269,27 +280,43 @@ public class AssetInstallationReportService {
 
         byte[] templateBytes = null;
         String templatePath = null;
-
+        String templateType=null;
         if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
             templatePath = REPORT_TECHNOLOGY_TEMPLATE;
+            templateType= SystemTemplate.SystemTemplateEnum.TECHNOLOGY.getCode();
         }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
             templatePath = REPORT_BUSINESS_TEMPLATE;
+            templateType= SystemTemplate.SystemTemplateEnum.BUSINESS.getCode();
         }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
             templatePath = REPORT_CLINICAL_TEMPLATE;
+            templateType= SystemTemplate.SystemTemplateEnum.CLINICAL.getCode();
+
         }else if(REPORT_TYPE_ASSET.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE;
+//            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET.getCode();
+
         }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH;
+            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH.getCode();
+
         }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
+            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM.getCode();
+
         }else if(REPORT_TYPE_DETAIL.equals(reportType)){
             templatePath = REPORT_DETAIL_TEMPLATE;
-        }
+            templateType= SystemTemplate.SystemTemplateEnum.DETAIL.getCode();
 
-        if(templatePath != null){
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
         }
-
+        if(templateType!=null){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,"doc");
+            templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
+        }else{
+            if(templatePath != null){
+                templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
+            }
+        }
         return templateBytes;
     }
 
