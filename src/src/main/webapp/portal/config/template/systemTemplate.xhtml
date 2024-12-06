@@ -12,6 +12,27 @@
                     <p:outputLabel class="pageTitle" value="系统模板管理"/>
                 </div>
                 <h:form id="TemplateListForm">
+
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{systemTemplateController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0;" mode="native">
+                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{systemTemplateController.onSelectSiteTreeNode}" update="TemplateListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+
                     <p:dataTable id="datalist" value="#{systemTemplateController.lazyModel}" var="item"
                                  widgetVar="varDataList"
                                  selectionMode="single" selection="#{systemTemplateController.selected}"

@@ -7,8 +7,12 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +48,8 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     private SystemTemplateValueRepository systemTemplateValueRepository;
 
-
+    @Getter@Setter
+    private OrgInfo selectSite;
 
     @Override
     protected SystemTemplateRepository getDAO() {
@@ -61,13 +66,12 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         blobService = WebUtil.getBean(BlobFileService.class);
         systemTemplateRepository = WebUtil.getBean(SystemTemplateRepository.class);
         systemTemplateValueRepository = WebUtil.getBean(SystemTemplateValueRepository.class);
+        selectSite = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
 
     }
 
-
     @Override
     protected Page<SystemTemplate> loadData(PageRequest pageRequest) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> searchFilters = this.searchFilters;
 
         if(searchFilters == null){
@@ -77,8 +81,18 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         List<SystemTemplate> list = page.getContent();
         if(CollectionUtils.isNotEmpty(list)) {
             for (SystemTemplate systemTemplate : list) {
-                SystemTemplateValue  value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(), user.getTenantUID());
-                if(value!=null){
+                SystemTemplateValue  value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(), selectSite.getSiteUID());
+                if(value == null){
+                    value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(),  selectSite.getHospitalUID());
+                    if(value == null){
+                        value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(),  selectSite.getInstitutionUID());
+                        if(value == null){
+                            value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(), selectSite.getTenantUID());
+                        }
+                    }
+                }
+
+                if(value != null){
                     systemTemplate.setStorageId(value.getStorageId());
                     systemTemplate.setFileName(value.getFileName());
                 }
@@ -97,89 +111,37 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         return SystemTemplate.SystemTemplateEnum.getName(code);
     }
 
-
-
-
-    public String getOrgFullName(OrgInfo org) {
-        if (null == org || org.getId() == -1) {
-            return null;
-        }
-        StringBuilder name = new StringBuilder(org.getName());
-        while (org.getParentOrg() != null) {
-            org = org.getParentOrg();
-            name.insert(0, org.getName() + "/");
-        }
-
-        return name.toString();
-    }
-
-
-
-    public String getOrgName(String uid) {
-        OrgInfo oi = orgInfoRepository.getByUid(uid);
-        if (oi == null) {
-            return null;
-        }
-        return oi.getName();
-    }
-
-
-
-
-
-
-    public String getInsNameByUId(String uid) {
-        OrgInfo oi = orgInfoRepository.getByUid(uid);
-        if (oi == null) {
-            return null;
-        }
-        if (oi.getOrgLevel() == 1) {
-            return oi.getName();
-        }
-        return null;
-    }
-
-    public String getHospitalNameByUId(String uid) {
-        OrgInfo oi = orgInfoRepository.getByUid(uid);
-        if (oi == null) {
-            return null;
-        }
-        if (oi.getOrgLevel() == 2) {
-            return oi.getName();
-        }
-        return null;
-    }
-
-    public String getSiteNameByUId(String uid) {
-        OrgInfo oi = orgInfoRepository.getByUid(uid);
-        if (oi == null) {
-            return null;
-        }
-        if (oi.getOrgLevel() == 3) {
-            return oi.getName();
-        }
-        return null;
-    }
-
     public String getTenantName(String tenantUID) {
         return tenantInfoRepository.findByuid(tenantUID).getName();
     }
 
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if (null != event) {
+            if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+                OrgInfo site = (OrgInfo) event.getTreeNode().getData();
+                if(StringUtils.isNotEmpty(site.getUid())){
+                    this.selectSite = site;
+                }
+            } else {
+                this.selectSite = orgInfoRepository.getByUid(user.getSiteUID());
+            }
+        }
+    }
 
 
     public void   saveTemplate(){
         if(uploadedFileObject==null){
             return;
         }
-        SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(this.selected.getId(), user.getTenantUID());
+        SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(this.selected.getId(), selectSite.getSiteUID());
         if(systemTemplateValue == null){
             systemTemplateValue = new SystemTemplateValue();
             systemTemplateValue.setSystemTemplateId(this.selected.getId());
+            systemTemplateValue.setTenantUid(selectSite.getTenantUID());
+            systemTemplateValue.setInstitutionUid(selectSite.getInstitutionUID());
+            systemTemplateValue.setHospitalUid(selectSite.getHospitalUID());
+            systemTemplateValue.setSiteUid(selectSite.getSiteUID());
         }
-        systemTemplateValue.setTenantUid(user.getTenantUID());
-        systemTemplateValue.setInstitutionUid(user.getTenantUID());
-        systemTemplateValue.setHospitalUid(user.getTenantUID());
-        systemTemplateValue.setSiteUid(user.getTenantUID());
         systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
         systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
         systemTemplateValue.setCreateBy(user.getUid());
