@@ -4,10 +4,10 @@ select replace(uuid_generate_v4()::text,'-',''), 14, 'false', '不良事件上�
 
 -- YHAAO-23399
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 4, 'true', '是否显示外部工单', 'displayExternalWorkOrder', '是否显示外部工单', 'f','t',3 where not exists(select * from config_item where key = 'displayExternalWorkOrder');
+select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '是否显示外部工单', 'displayExternalWorkOrder', '是否显示外部工单 (维修、保养)', 'f','t',3 where not exists(select * from config_item where key = 'displayExternalWorkOrder');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 4, 'true', '是否显示远程工单', 'displayRemoteWorkOrder', '是否显示远程工单', 'f','t',3 where not exists(select * from config_item where key = 'displayRemoteWorkOrder');
+select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '是否显示远程工单', 'displayRemoteWorkOrder', '是否显示远程工单 (维修、保养)', 'f','t',3 where not exists(select * from config_item where key = 'displayRemoteWorkOrder');
 
 -- YHAAO-23419 mvs 工单显示控制
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '启用MVS工单同步', 'synchronizeWorkOrder', '启用MVS工单同步', 'f','t',3 where not exists(select * from config_item where key = 'synchronizeWorkOrder');

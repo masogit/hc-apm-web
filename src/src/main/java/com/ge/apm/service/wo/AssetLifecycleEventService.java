@@ -1,13 +1,11 @@
 package com.ge.apm.service.wo;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,14 +31,21 @@ public class AssetLifecycleEventService {
 	private static final String SHEET_NAME = "datalist";
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
-	
+
 	public String getMsStatus(AssetLifecycleEvent alse) {
         String strStatus = null;
         try {
-            JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
+			List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList("workOrderStatus", alse.getAssetInfo().getSiteId());
+			JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
             if (parse != null) {
-                strStatus = parse.getString("status");
-            }
+                String status = parse.getString("status");
+				Optional<I18nMessage> first = msgList.stream().filter(item -> item.getMsgKey().equalsIgnoreCase(status)).findFirst();
+				if(first.isPresent()){
+					strStatus = first.get().getValue();
+				}else{
+					strStatus = status;
+				}
+			}
         } catch (Exception e) {
         	LOGGER.error("Fail to parse description for status: " + alse.getId(), e);
         }
@@ -124,5 +129,12 @@ public class AssetLifecycleEventService {
 		}
 
 		return Boolean.TRUE;
+	}
+
+	public List<I18nMessage> getStatusList(String...msgKey) {
+		List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList("workOrderStatus", -1);
+		if(msgKey == null || msgKey.length == 0) return msgList;
+		List<String> list = Arrays.asList(msgKey);
+		return msgList.stream().filter(item->list.contains(item.getMsgKey())).sorted(Comparator.comparingInt(item -> list.indexOf(item.getMsgKey()))).collect(Collectors.toList());
 	}
 }
