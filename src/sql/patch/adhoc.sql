@@ -17,3 +17,6 @@ delete from v2_pm_order using v2_pm_order pm left join i18n_message i18n ON i18n
 
 -- YHAAO-23542
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否允许外修关单', 'externalRepairOrderClose', '是否允许外修关单', 'f','t',3 where not exists(select * from config_item where key = 'externalRepairOrderClose');
+
+-- YHAAO-23597
+ALTER TABLE asset_lifecycle_event ALTER COLUMN description TYPE VARCHAR(2047);
