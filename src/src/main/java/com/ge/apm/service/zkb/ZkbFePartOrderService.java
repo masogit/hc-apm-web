@@ -1403,7 +1403,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (CollectionUtils.isNotEmpty(assetInfoList)) {
             AssetInfo assetInfo = assetInfoList.get(0);
             selected.setArtificialType("");
-            if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {//  设备分类为超声的时候
+            //if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {//  设备分类为超声的时候
                 Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
                 ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
                 if(zkbContractAssetSet!=null){
@@ -1417,9 +1417,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                         selected.setArtificialType(lowArtificialTypeValue);
                     }else if(assetTypeDepot.equals(zkbContractAsset.getAssetType())){
                         selected.setArtificialType(depotArtificialTypeValue);
+                    }else{
+                        selected.setArtificialType(zkbContractAsset.getAssetType());
                     }
                 }
-            }
+            //}
             selected.setManufacture(assetInfo.getManufacture());
             selected.setQrCode(assetInfo.getQrCode());
             selected.setDepartNum(assetInfo.getDepartNum());
