@@ -2,6 +2,7 @@ package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ServiceRequestReport;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -395,4 +396,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		this.descriptionStatusFilter = descriptionStatusFilter;
 	}
 
+	public List<I18nMessage> getStatusList(String...msgKey){
+		return service.getStatusList(msgKey);
+	}
 }
