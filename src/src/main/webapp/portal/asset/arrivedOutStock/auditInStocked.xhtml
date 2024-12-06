@@ -47,6 +47,10 @@
                     <label class="label">#{msg.arrivalListInvoiceNum}</label>
                     <p:inputText value="#{assetStockedController.searchItem.arrivalList.invoiceNum}"/>
                 </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.arrivalListContractNum}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.contractNum}"/>
+                </h:panelGroup>
             </p:panelGrid>
             <p:commandButton value="#{msg.Search}" validateClient="true" update=":growl :assetOutStockTab:AssetAuditInStockedListForm :assetOutStockTab:AssetAuditInStockedListForm:datalist"/>
             <p:commandButton value="清空条件" validateClient="true" actionListener="#{assetStockedController.initSearchItem()}" update=":growl :assetOutStockTab:auditInStockedDataForm :assetOutStockTab:AssetAuditInStockedListForm:datalist"/>

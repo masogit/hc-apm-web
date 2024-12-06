@@ -200,6 +200,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if (ObjectUtil.isNotEmpty(queryRecruiteDept)) {
             searchFilters.add(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.EQ, queryRecruiteDept.getUid(), "1*"));
         }
+        if (ObjectUtil.isNotEmpty(searchItem.getArrivalList().getContractNum())) {
+            searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.LIKE, searchItem.getArrivalList().getContractNum(), "1*"));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
