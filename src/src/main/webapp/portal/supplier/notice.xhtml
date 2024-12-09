@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <div class="ui-g-12 card">
+        <h:form id="VenderNoticeForm">
+            <p:dataTable id="datalist2" value="#{venderNoticeController.lazyModel}" var="item" widgetVar="varDataList2"
+                         selectionMode="single" selection="#{venderNoticeController.selected}" stickyHeader=""
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:ajax event="rowSelect" update="editButton "/>
+                <p:ajax event="filter" listener="#{venderNoticeController.onFilter}" oncomplete="rc();"/>
+                <p:column headerText="#{msg.vendor}" sortBy="#{item.venderCompanyId}" filterBy="#{item.venderCompanyId}" filterMatchMode="LIKE">
+                    <h:outputText value="#{venderNoticeController.companyMap.get(item.venderCompanyId)}"/>
+                </p:column>
+                <p:column headerText="通知人" sortBy="#{item.noticeUser}" filterBy="#{item.noticeUser}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.noticeUser}"/>
+                </p:column>
+                <p:column headerText="通知内容" sortBy="#{item.noticeContent}" filterBy="#{item.noticeContent}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.noticeContent}"/>
+                </p:column>
+                <p:column headerText="通知时间" sortBy="#{item.noticeDate}">
+                    <h:outputText value="#{item.noticeDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="状态" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu value="#{venderCompanyController.supplierType}" onchange="PF('varDataList').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" noSelectionOption="true" />
+                            <f:selectItem itemLabel="未完成" itemValue="0" />
+                            <f:selectItem itemLabel="已完成" itemValue="1" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.status == 1 ? '已完成' : '未完成'}"/>
+                </p:column>
+                <p:column headerText="回复人" sortBy="#{item.replyUser}" filterBy="#{item.replyUser}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.replyUser}"/>
+                </p:column>
+                <p:column headerText="回复内容" sortBy="#{item.replyContent}" filterBy="#{item.replyContent}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.replyContent}"/>
+                </p:column>
+                <p:column headerText="回复时间" sortBy="#{item.replyDate}">
+                    <h:outputText value="#{item.replyDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{venderNoticeController.prepareCreate}" update="supplierTab:VenderNoticeEditDlg" oncomplete="PF('VenderNoticeEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                    <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{venderNoticeController.prepareEdit}" update="supplierTab:VenderNoticeEditDlg @(.modiSupplyDlg)" oncomplete="PF('VenderNoticeEditDialog').show()" disabled="#{empty venderNoticeController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+        <p:dialog id="VenderNoticeEditDlg" width="600" height="500" class="modiSupplyDlg" widgetVar="VenderNoticeEditDialog" modal="true" resizable="false" drag00gable="true" appendTo="@this" header="#{venderNoticeController.CRUDActionName}" >
+            <h:form id="VenderNoticeEditForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{venderNoticeController.selected != null}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.vendor}</label>
+                        <p:autoComplete dropdown="true" value="#{venderNoticeController.venderCompany}" scrollHeight="300" forceSelection="true" converter="venderCompanyConverter"
+                                        completeMethod="#{venderNoticeController.autoCompleteVenderCompany}" var="t" itemLabel="#{t.name}" itemValue="#{t}">
+                            <p:ajax event="itemSelect" process="@this" listener="#{venderNoticeController.onSelectedObjectChange}" />
+                            <p:ajax listener="#{venderNoticeController.onSelectedObjectChange}" />
+                        </p:autoComplete>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">通知内容</label>
+                        <p:inputText id="noticeContent" value="#{venderNoticeController.selected.noticeContent}"  required="true" requiredMessage="通知内容 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <!--<h:panelGroup>
+                        <label class="label">通知时间</label>
+                        <p:calendar timeZone="GMT+8" id="productionLicenseExpireDate" pattern="yyyy/MM/dd"
+                                    value="#{venderNoticeController.selected.noticeDate}" required="false"
+                                    showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>-->
+                </p:panelGrid>
+                <p:commandButton validateClient="true" actionListener="#{venderNoticeController.saveSubmit}" value="#{msg.Save}" update="supplierTab:VenderNoticeForm:datalist2 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'VenderNoticeEditDialog');"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('VenderNoticeEditDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+    </div>
+</ui:composition>
+</html>
