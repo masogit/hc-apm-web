@@ -20,3 +20,5 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-23597
 ALTER TABLE asset_lifecycle_event ALTER COLUMN description TYPE VARCHAR(2047);
+ALTER TABLE sieble_sr_data ALTER COLUMN sr_description TYPE VARCHAR(2047);
+ALTER TABLE sieble_sr_data ALTER COLUMN origin_data TYPE VARCHAR(6143);
