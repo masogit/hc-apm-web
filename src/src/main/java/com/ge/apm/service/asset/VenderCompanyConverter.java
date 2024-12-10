@@ -25,9 +25,6 @@ public class VenderCompanyConverter implements Converter {
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if (value != null && !value.trim().isEmpty()) {
             try {
-                if (Integer.parseInt(value) < 0) {
-                    return null;
-                }
                 VenderCompanyRepository dao = WebUtil.getBean(VenderCompanyRepository.class);
                 return dao.findById(value);
             } catch (NumberFormatException e) {

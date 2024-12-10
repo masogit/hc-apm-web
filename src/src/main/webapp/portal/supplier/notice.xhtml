@@ -18,10 +18,10 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:ajax event="rowSelect" update="editButton "/>
+                <p:ajax event="rowSelect" update="editButton deleteButton"/>
                 <p:ajax event="filter" listener="#{venderNoticeController.onFilter}" oncomplete="rc();"/>
                 <p:column headerText="#{msg.vendor}" sortBy="#{item.venderCompanyId}" filterBy="#{item.venderCompanyId}" filterMatchMode="LIKE">
-                    <h:outputText value="#{venderNoticeController.companyMap.get(item.venderCompanyId)}"/>
+                    <h:outputText value="#{venderNoticeController.companyMap.get(item.venderCompanyId).getName()}"/>
                 </p:column>
                 <p:column headerText="通知人" sortBy="#{item.noticeUser}" filterBy="#{item.noticeUser}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.noticeUser}"/>
@@ -58,6 +58,9 @@
                 <f:facet name="{Toolbar}">
                     <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{venderNoticeController.prepareCreate}" update="supplierTab:VenderNoticeEditDlg" oncomplete="PF('VenderNoticeEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
                     <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{venderNoticeController.prepareEdit}" update="supplierTab:VenderNoticeEditDlg @(.modiSupplyDlg)" oncomplete="PF('VenderNoticeEditDialog').show()" disabled="#{empty venderNoticeController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{venderNoticeController.delete}" update="supplierTab:VenderNoticeForm:datalist2" disabled="#{empty venderNoticeController.selected}">
+                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                    </p:commandButton>
                 </f:facet>
             </p:dataTable>
         </h:form>
