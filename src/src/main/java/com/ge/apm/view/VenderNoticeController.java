@@ -38,13 +38,13 @@ public class VenderNoticeController extends GenericCRUDUUIDController<VenderNoti
     @Getter @Setter
     private List<VenderCompany> venderCompanies;
     @Getter @Setter
-    private Map<String, String> companyMap;
+    private Map<String, VenderCompany> companyMap;
     @Override
     protected void init() {
         dao = WebUtil.getBean(VenderNoticeRepository.class);
         venderCompanyRepository = WebUtil.getBean(VenderCompanyRepository.class);
         venderCompanies = venderCompanyRepository.find();
-        companyMap = venderCompanies.stream().collect(Collectors.toMap(VenderCompany::getId, VenderCompany::getName));
+        companyMap = venderCompanies.stream().collect(Collectors.toMap(VenderCompany::getId, t -> t));
         loginUser = UserContextService.getCurrentUserAccount();
         this.filterBySite = false;
     }
@@ -62,8 +62,8 @@ public class VenderNoticeController extends GenericCRUDUUIDController<VenderNoti
         if (this.hasFilterOnField("venderCompanyId")) {
             String value = searchFilters.stream().filter(sf -> "venderCompanyId".equals(sf.fieldName)).findFirst().get().value.toString();
             List<String> venderCompanyIds = ListUtil.newArrayList("-1");
-            for (Map.Entry<String, String> entry : companyMap.entrySet()) {
-                if (entry.getValue().contains(value)) {
+            for (Map.Entry<String, VenderCompany> entry : companyMap.entrySet()) {
+                if (entry.getValue().getName().contains(value)) {
                     venderCompanyIds.add(entry.getKey());
                 }
             }
@@ -86,12 +86,22 @@ public class VenderNoticeController extends GenericCRUDUUIDController<VenderNoti
         dao.save(this.selected);
     }
 
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        venderCompany = null;
+    }
+
+    public void prepareEdit() {
+        super.prepareEdit();
+        venderCompany = companyMap.get(selected.getVenderCompanyId());
+    }
+
     public List<VenderCompany> autoCompleteVenderCompany(String query) {
         return venderCompanies.stream().filter(t -> ObjectUtil.isEmpty(query) || t.getName().contains(query)).collect(Collectors.toList());
     }
 
     public void onSelectedObjectChange() {
-        System.out.println("111");
         this.selected.setVenderCompanyId(venderCompany.getId());
     }
 
