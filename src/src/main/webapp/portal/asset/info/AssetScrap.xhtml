@@ -40,7 +40,7 @@
 
                 <h:panelGroup rendered="#{assetInfoEditController.getIsAssetStaff()}">
                     <label class="label">处置方式*</label>
-                    <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" requiredMessage="#{msg.equipmentDisposalMethod} #{msg.ValidationRequire}}"   required="#{assetInfoEditController.getIsAssetStaff()}" >
+                    <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('equipmentDisposalMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         <p:ajax event="itemSelect"  update="nodeForm:customDisposalMethod  nodeForm:scrapButton "/>
@@ -50,7 +50,7 @@
                 <h:panelGroup id="customDisposalMethod" rendered="#{assetInfoEditController.getIsAssetStaff()}">
                     <h:panelGroup  rendered="#{assetInfoEditController.equipmentDisposalMethod eq '0'}" >
                         <label class="label">自定义处置方式*</label>
-                        <p:inputTextarea placeholder="自定义处置方式" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256"  required="#{assetInfoEditController.getIsAssetStaff() and assetInfoEditController.equipmentDisposalMethod eq '0'}"/>
+                        <p:inputTextarea placeholder="自定义处置方式" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256" />
                         <p:outputLabel value="#{assetInfoEditController.customDisposalMethod}" />
                     </h:panelGroup>
                 </h:panelGroup>
