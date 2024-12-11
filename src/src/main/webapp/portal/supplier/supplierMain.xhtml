@@ -21,6 +21,9 @@
                     <p:tab title="供应商关联" id="supplierRelation" rendered="#{userContextService.canRender('ASSET_VENDER') and userContextService.accessContainsFunctionMenu('ASSET_VENDER')   }">
                         <ui:include src="relation.xhtml"/>
                     </p:tab>
+                    <p:tab title="供应商通知" id="supplierNotice" rendered="#{userContextService.canRender('ASSET_VENDER') and userContextService.accessContainsFunctionMenu('ASSET_VENDER')   }">
+                        <ui:include src="notice.xhtml"/>
+                    </p:tab>
                 </p:tabView>
             </div>
         </div>
