@@ -21,10 +21,6 @@ ALTER TABLE asset_lifecycle_event ALTER COLUMN description TYPE VARCHAR(2047);
 ALTER TABLE sieble_sr_data ALTER COLUMN sr_description TYPE VARCHAR(2047);
 ALTER TABLE sieble_sr_data ALTER COLUMN origin_data TYPE VARCHAR(6143);
 
--- YHAAO-23381  后台清理保养已取消的工单 淄博市市立医院
-drop table if exists v2_pm_order_241201;
-create table if not exists v2_pm_order_241201 AS  (select pm.* from  v2_pm_order pm left join i18n_message i18n ON i18n.value_zh = pm.current_step_name left join electric_safety_data  esd on pm.id = esd.v2_pm_order_id where pm.tenant_uid='7c2fee46a62048e8940290ca6730cf94' and i18n.msg_key='Canceled' and esd.id is null);
-delete from v2_pm_order using v2_pm_order pm left join i18n_message i18n ON i18n.value_zh = pm.current_step_name left join electric_safety_data esd on pm.id = esd.v2_pm_order_id where pm.tenant_uid='7c2fee46a62048e8940290ca6730cf94' and i18n.msg_key='Canceled' and esd.id is null;
 
 -- YHAAO-23657 重点医疗设备，清数据
 delete from key_asset_report;
