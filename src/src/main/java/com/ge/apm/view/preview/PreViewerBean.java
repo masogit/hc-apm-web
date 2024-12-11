@@ -61,6 +61,7 @@ public class PreViewerBean implements ServerEventInterface {
             int l = rootPath.lastIndexOf("/geapm");
             rootPath =rootPath.substring(0,l);
             pdfUrl = rootPath + "/gateway/hcapmobjecthubservice/api/apm/objectHub/objects/"+objectId+"/preView";
+            logger.info("pdfUrl:" + pdfUrl);
         }
     }
 
