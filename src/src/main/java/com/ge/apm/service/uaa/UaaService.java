@@ -1,6 +1,7 @@
 package com.ge.apm.service.uaa;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
@@ -12,6 +13,7 @@ import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -67,6 +69,9 @@ public class UaaService {
 
     @Autowired
     private UserAccountHistoryService userAccountHistoryService;
+
+    @Autowired
+    private OrgInfoMapper orgInfoMapper;
 
     @Autowired
     private PermissionGroupMapper permissionGroupMapper;
@@ -1704,6 +1709,11 @@ public class UaaService {
     public boolean isOpenNewMenuRoles(String tenantUid) {
         TenantInfo tenantInfo = configService.getTenantByUid(tenantUid);
         return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
+    }
+
+    public List<OrgInfo> filterNoneAsset(List<String> orgUidList) {
+        orgUidList = ObjectUtil.isEmpty(orgUidList) ? ListUtil.newArrayList("-1") : orgUidList;
+        return orgInfoMapper.filterNoneAsset(orgUidList);
     }
 
 }

@@ -65,6 +65,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private int currentMonthCount = 0;
     private int nextMonthCount = 0;
     private String queryAssetUID;
+    private Boolean scrapped = false;
     private Boolean flag = true;
     private Boolean measurementRepairVisible;
     private Map<String, Boolean> selectedMap;
@@ -164,10 +165,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
 
         wrapper.andNew();
-        if(!this.hasFilterOnField("status")){
+        if (scrapped) {
+            wrapper.eq("ai.status", 4);
+        } else {
             wrapper.ne("ai.status", 4);
-        }
-        if(!this.hasFilterOnField("isValid")){
             wrapper.eq("ai.is_valid", true);
         }
         if(!this.hasFilterOnField("isDeleted")){
@@ -313,9 +314,12 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void onTabChange(TabChangeEvent event){
         String tabId = event.getTab().getId();
-        if("measuringAssetList".equals(tabId)){
+        if ("measuringAssetList".equals(tabId)){
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", "measuringResultMain.xhtml");
+        }
+        if ("scrappedMeasuringAssetList".equals(tabId)) {
+            scrapped = true;
         }
     }
 
