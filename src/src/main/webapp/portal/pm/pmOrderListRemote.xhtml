@@ -53,7 +53,7 @@
 <!--							<f:selectItem itemLabel="Open" itemValue="Open" />-->
 <!--							<f:selectItem itemLabel="Closed" itemValue="Closed" />-->
 <!--							<f:selectItem itemLabel="Cancelled" itemValue="Cancelled" />-->
-							<f:selectItems value="#{fieldMsg.getFieldValueList('workOrderStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							<f:selectItems value="#{assetLifecycleEvent5Controller.getStatusList('Open','Closed','Cancelled')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 						</p:selectOneMenu>
 					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent5Controller.getMsStatus(item)}" />

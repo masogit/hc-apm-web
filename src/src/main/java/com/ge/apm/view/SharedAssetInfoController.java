@@ -150,7 +150,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             //2、使用科室：任意科室  所属科室：调剂中心
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.IsNotNull,null));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IN,deptids));
-            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IsNotNull,null));
+//            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IsNotNull,null));
         }
 
         if (filterSatId != null && !filterSatId.equals("")){
@@ -403,7 +403,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
         String clinicalDeptUID = a.getAssetDeptUID();
 
-        return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
+        return sharedAssetTypeUid != null && StringUtils.isNotEmpty(clinicalDeptUID) && !deptids.contains(clinicalDeptUID);
 
     }
 

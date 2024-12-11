@@ -40,6 +40,12 @@
                                     <p:ajax process="@this"/>
                                 </p:selectCheckboxMenu>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">过滤无设备科室</label>
+                                <p:selectBooleanCheckbox value="#{inventoryOrderController.filterNoneAsset}" >
+                                    <p:ajax listener="#{inventoryOrderController.onCreate()}" update="approveuser"/>
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
