@@ -58,8 +58,11 @@ public class PreViewerBean implements ServerEventInterface {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
             String rootPath = request.getRequestURL().toString();
+            logger.info("rootPath:" + rootPath);
+
             int l = rootPath.lastIndexOf("/geapm");
             rootPath =rootPath.substring(0,l);
+            rootPath = rootPath.replace("http","https");
             pdfUrl = rootPath + "/gateway/hcapmobjecthubservice/api/apm/objectHub/objects/"+objectId+"/preView";
             logger.info("pdfUrl:" + pdfUrl);
         }
