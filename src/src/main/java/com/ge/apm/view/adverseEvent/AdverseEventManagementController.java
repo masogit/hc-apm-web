@@ -486,6 +486,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
             }
         } catch (Exception e) {
             selected.setStatus(oldStatus);
+            injuryPerformance.clear();
+            mechanicalFailure.clear();
             String result = e.getMessage();
             if(result.indexOf(";") > -1){
                 List<String> r = Arrays.asList(result.split(";"));
