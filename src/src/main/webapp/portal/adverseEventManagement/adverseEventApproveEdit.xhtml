@@ -26,6 +26,10 @@
                 margin-right: 40px;
             }
         </style>
+        <script type="text/javascript">
+
+
+        </script>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="不良事件上报"/>
@@ -279,11 +283,12 @@
                                     <p:dataGrid id="harmPerformFile" var="fileitem" value="#{adverseEventApproveController.selected.harmPerformFile}" columns="5" layout="grid" rendered="#{adverseEventApproveController.selected.harmPerformFile ne null and !empty adverseEventApproveController.selected.harmPerformFile}">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
-                                                <p:commandButton actionListener="#{adverseEventApproveController.removeHarmPerformFile(fileitem)}" update="harmPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventApproveController.readOnlyCreateForm}">
-                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                                </p:commandButton>
+                                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
+                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
+                                                </p:graphicImage>
                                             </h:panelGrid>
+                                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+
                                         </p:panel>
                                     </p:dataGrid>
                                     <p:dataGrid id="injuryPerformance" var="fileitem" value="#{adverseEventApproveController.injuryPerformance}" columns="5" layout="grid">
@@ -777,6 +782,7 @@
                     </style>
                 </h:form>
             </div>
+           
             <p:dialog modal="true" id="returnReasonDisable" widgetVar="returnReasonDisable" header="退回" appendTo="@(body)">
                 <h:form id="returnForm">
                     <h:panelGrid columns="1" cellpadding="5">
@@ -807,6 +813,7 @@
                 </h:form>
             </p:dialog>
         </div>
+        <ui:include src="../preview/view.xhtml"></ui:include>
 
     </ui:define>
 </ui:composition>

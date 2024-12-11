@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -36,6 +37,8 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +74,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     private List<TempFileUtil> injuryPerformance;
     @Getter@Setter
     private List<TempFileUtil> mechanicalFailure;
-
+    private BlobFileService blobService;
     private boolean readOnlyCreateForm = true;
 
     private boolean readOnlyEditForm = false;
@@ -106,6 +109,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         String selectedId = WebUtil.getRequestParameter("selectedId");
@@ -278,6 +282,23 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
         excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
 
+    }
+
+    public void exportFiled(AdverseEventsFile adverseEventsFile) throws IOException {
+        InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        response.setHeader("Content-Disposition", "attachment;filename=" + adverseEventsFile.getObjectName());
+        StreamUtils.copy(inputStream, response.getOutputStream());
+        facesContext.responseComplete();
+        facesContext.renderResponse();
+    }
+
+    public boolean isPreView(String ty){
+        if(ty.contains("image") || ty.contains("pdf")){
+            return true;
+        }
+        return false;
     }
 
     public void removeTempHarmPerform(TempFileUtil file) {
