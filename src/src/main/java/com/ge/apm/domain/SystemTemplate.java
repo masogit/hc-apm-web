@@ -71,11 +71,14 @@ public class SystemTemplate implements Serializable {
         BUSINESS("BUSINESS","商务验收模板"),
         CLINICAL("CLINICAL","临床验收模板"),
         DETAIL("DETAIL","验收资料详单"),
-//        FIXASSET("FIXASSET"," "),
         FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)"),
         FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)"),
-
         SUPPLIER_IMPORT("SUPPLIER_IMPORT","供应商导入模板"),
+        DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板"),
+        ASSET_COUNTRYAREA_TEMPLATE("ASSET_COUNTRYAREA_TEMPLATE","资产导入模板-县域租户"),
+        ASSET_COUNTRYAREA_TEMPLATE_EN("ASSET_COUNTRYAREA_TEMPLATE_EN","资产导入模板-县域租户_en"),
+        ASSET_TEMPLATE("ASSET_TEMPLATE","资产导入模板"),
+        ASSET_TEMPLATE_EN("ASSET_TEMPLATE_EN","资产导入模板_en"),
 
 
         ;

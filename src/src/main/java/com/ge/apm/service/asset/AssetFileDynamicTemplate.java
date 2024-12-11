@@ -6,15 +6,14 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.AssetTypeGroupRepository;
+import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -98,6 +97,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     @Autowired
     private AssetTypeGroupRepository assetTypeGroupRepository;
+
+
+    @Autowired
+    private MicroServiceUtil microServiceUtil;
+
+    @Autowired
+    private SystemTemplateValueRepository systemTemplateValueRepository;
 //    int siteId;
 
     public AssetFileDynamicTemplate(boolean crossSite) throws IOException {
@@ -111,22 +117,31 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
+        String templateType;
         String fileName = "APM_Asset_Dynamic_Template.xlsx";
         if (userContextService.isCountyArea()) {
             if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template.xlsx";
+                templateType=SystemTemplate.SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE.getCode();
             } else {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template_en.xlsx";
+                templateType=SystemTemplate.SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE_EN.getCode();
             }
         } else {
             if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_Template.xlsx";
+                templateType=SystemTemplate.SystemTemplateEnum.ASSET_TEMPLATE.getCode();
             } else {
                 fileName = "APM_Asset_Dynamic_Template_en.xlsx";
+                templateType=SystemTemplate.SystemTemplateEnum.ASSET_TEMPLATE_EN.getCode();
             }
         }
 
-        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,"excel");
+        byte[] templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
+        InputStream inputStream = new ByteArrayInputStream(templateBytes);
+//        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         assetSheet = workBook.getSheet(SHEET_ASSET);
