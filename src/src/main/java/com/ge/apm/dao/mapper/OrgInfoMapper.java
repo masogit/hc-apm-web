@@ -34,4 +34,12 @@ public interface OrgInfoMapper {
 			") select * from cte_org")
 	List<OrgInfo> listParentClinicalDeptsWithSelectedClinicalDept(@Param("orgUid") String orgUid);
 
+	@Select({
+			"<script>" +
+					"select oi.* from org_info oi join asset_info ai on oi.uid = ai.clinical_dept_uid where ai.clinical_dept_uid in " +
+					"<foreach item = 'item' index = 'index' collection = 'orgUidList' open='(' separator=',' close=')'>" +
+					"#{item}" +
+					"</foreach> group by oi.id"+
+					"</script>"})
+    List<OrgInfo> filterNoneAsset(@Param("orgUidList") List<String> orgUidList);
 }

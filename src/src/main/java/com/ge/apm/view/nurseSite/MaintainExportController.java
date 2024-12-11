@@ -318,7 +318,7 @@ public class MaintainExportController {
         } catch (Exception ex) {
             addMessage("报告导出失败：" + ex.getMessage());
             exportFile = null;
-            LOGGER.error("Fail to export word document", ex);
+            LOGGER.error("Fail to export word document", ex.getMessage(), ex);
         }
     }
 

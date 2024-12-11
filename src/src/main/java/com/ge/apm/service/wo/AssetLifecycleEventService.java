@@ -2,6 +2,7 @@ package com.ge.apm.service.wo;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -128,5 +129,12 @@ public class AssetLifecycleEventService {
 		}
 
 		return Boolean.TRUE;
+	}
+
+	public List<I18nMessage> getStatusList(String...msgKey) {
+		List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList("workOrderStatus", -1);
+		if(msgKey == null || msgKey.length == 0) return msgList;
+		List<String> list = Arrays.asList(msgKey);
+		return msgList.stream().filter(item->list.contains(item.getMsgKey())).sorted(Comparator.comparingInt(item -> list.indexOf(item.getMsgKey()))).collect(Collectors.toList());
 	}
 }

@@ -51,6 +51,8 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     List<String> selectedOrgUid; //勾选盘点科室
     @Setter @Getter
     private InventoryOrder inventoryOrder;
+    @Getter @Setter
+    private Boolean filterNoneAsset = true;
 	@Override
     protected void init() {
         dao = WebUtil.getBean(InventoryOrderRepository.class);
@@ -133,6 +135,11 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     public void onCreate() throws IllegalAccessException, InstantiationException {
         super.prepareCreate();
         orgsForSelected = apiService.onCreateInventory();
+        if (filterNoneAsset) {
+            List<OrgInfo> orgInfos = uaaService.filterNoneAsset(orgsForSelected.stream().map(OrgDto::getUid).collect(Collectors.toList()));
+            List<Integer> orgInfoIds = orgInfos.stream().map(OrgInfo::getId).collect(Collectors.toList());
+            orgsForSelected = orgsForSelected.stream().filter(t -> orgInfoIds.contains(t.getId())).collect(Collectors.toList());
+        }
     }
 
     public void onFinishOrder(String id){
@@ -152,7 +159,6 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
     }
-
 
     @Override
     protected GenericRepositoryUUID<InventoryOrder> getDAO() {

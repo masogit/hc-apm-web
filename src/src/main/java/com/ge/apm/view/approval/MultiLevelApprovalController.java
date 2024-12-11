@@ -286,7 +286,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     I18nMessage equipmentDisposalMethod = i18nMessageService.getByMsgTypeAndMsgKey("equipmentDisposalMethod", assetScrap.getEquipmentDisposalMethod());
                     if(equipmentDisposalMethod!=null){
                         if(equipmentDisposalMethod.getMsgKey().equals("0")){
-                            String method=equipmentDisposalMethod.getValueZh()+"("+assetScrap.getCustomDisposalMethod()+")";
+                            String method;
+                            if(assetScrap.getCustomDisposalMethod()!=null){
+                                method =equipmentDisposalMethod.getValueZh()+"("+assetScrap.getCustomDisposalMethod()+")";
+                            }else{
+                                method =equipmentDisposalMethod.getValueZh();
+                            }
                             assetScrap.setCustomDisposalMethod(method);
                         }else{
                             assetScrap.setCustomDisposalMethod(equipmentDisposalMethod.getValueZh());

@@ -316,7 +316,7 @@
                                     <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
 
                                     <p:commandButton id="preInactive" rendered="#{assetInfoEditController.CRUDActionName eq '修改' and  assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP') and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete()}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
+                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.selected.uid)}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
 
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
@@ -613,25 +613,25 @@
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">申请理由*</label>
-                        <p:inputTextarea placeholder="报废申请*"  value="#{assetInfoEditController.applyReason}" maxlength="256" />
+                        <p:inputTextarea placeholder="报废申请"  value="#{assetInfoEditController.applyReason}" maxlength="256"  required="true" />
                         <p:outputLabel value="#{assetInfoEditController.applyReason}" />
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{assetInfoEditController.getIsAssetStaff()}">
                         <label class="label">鉴定理由*</label>
-                        <p:inputTextarea placeholder="鉴定理由*"  value="#{assetInfoEditController.approvalReason}" maxlength="256" />
+                        <p:inputTextarea placeholder="鉴定理由"  value="#{assetInfoEditController.approvalReason}" maxlength="256"  required="#{assetInfoEditController.getIsAssetStaff()}"/>
                         <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{assetInfoEditController.getIsAssetStaff()}">
                         <label class="label">处置方式</label>
-                        <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" requiredMessage="#{msg.equipmentDisposalMethod} #{msg.ValidationRequire}}">
+                        <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('equipmentDisposalMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            <p:ajax event="itemSelect"  update="nodeForm:customDisposalMethod"/>
+                            <p:ajax event="itemSelect"  update="nodeForm:customDisposalMethod  nodeForm:scrapButton "/>
 
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup id="customDisposalMethod">
+                    <h:panelGroup id="customDisposalMethod" rendered="#{assetInfoEditController.getIsAssetStaff()}">
                         <h:panelGroup  rendered="#{assetInfoEditController.equipmentDisposalMethod eq '0'}" >
                             <label class="label">自定义处置方式</label>
                             <p:inputTextarea placeholder="自定义处置方式" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256" />
@@ -640,10 +640,10 @@
                     </h:panelGroup>
                 </p:panelGrid>
 
-                <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleCompleteSig(xhr, status, args);"/>
+                <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleCompleteSig(xhr, status, args);"/>
                 <p:commandButton style="display: none" id="openSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
 
-                <p:commandButton  validateClient="true" immediate="false"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
+                <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
             </h:form>
 
         </p:dialog>
