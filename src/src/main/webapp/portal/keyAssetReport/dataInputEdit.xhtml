@@ -93,8 +93,12 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="#{msg.Operation}" style="width: 70px">
-                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"/>
+                            <p:column headerText="#{msg.Operation}" style="width: 100px; align-items: center; ">
+                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"   style="display: inline-block; margin-right: 10px;"/>
+                                <p:commandLink id="del" title="#{msg.Delete}" actionListener="#{keyAssetReportController.deleteAsset(item)}" update="editForm" style="display: inline-block;">
+                                    <p:graphicImage name="icons/delete.png" style="width: 20px; height: 20px;" />
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning" />
+                                </p:commandLink>
                             </p:column>
                         </p:dataTable>
                     </p:panelGrid>
