@@ -809,6 +809,26 @@ public class AssetImport implements Serializable {
     private String spare05;
     @Getter
     @Setter
+    @ExcelProperty("spare06")
+    private String spare06;
+    @Getter
+    @Setter
+    @ExcelProperty("spare07")
+    private String spare07;
+    @Getter
+    @Setter
+    @ExcelProperty("spare08")
+    private String spare08;
+    @Getter
+    @Setter
+    @ExcelProperty("spare09")
+    private String spare09;
+    @Getter
+    @Setter
+    @ExcelProperty("spare10")
+    private String spare10;
+    @Getter
+    @Setter
     private Long billingTime; // 累计借用计费时长分钟
 
     @Getter
