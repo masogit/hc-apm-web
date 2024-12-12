@@ -82,18 +82,19 @@
 
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="入库单号">
-                <h:outputText value="#{item.inStockNo}"/>
+                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />
+<!--                <h:outputText value="#{item.inStockNo}"/>-->
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.inStockBusinessDate}">
                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                 </h:outputText>
             </p:column>
-            <p:column headerText="单据时间">
-                <h:outputText value="#{item.inStockDocumentsDate}">
-                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                </h:outputText>
-            </p:column>
+<!--            <p:column headerText="单据时间">-->
+<!--                <h:outputText value="#{item.inStockDocumentsDate}">-->
+<!--                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
+<!--                </h:outputText>-->
+<!--            </p:column>-->
             <p:column headerText="#{msg.vendor}">
                 <h:outputText value="#{item.arrivalList.vendor}"/>
             </p:column>
@@ -134,7 +135,7 @@
             </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成入库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.generatedStockDoc('inStock')}" validateClient="true" oncomplete="PF('GeneratedInStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
-                <p:commandButton value="打印入库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('inStock')}" validateClient="true" oncomplete="PF('GeneratedInStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
+                <p:commandButton value="打印入库单" rendered="false" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('inStock')}" validateClient="true" oncomplete="PF('GeneratedInStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
             </f:facet>
         </p:dataTable>
     </h:form>
@@ -203,5 +204,10 @@
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetInStockedListForm:datalist" onclick="PF('GeneratedInStockDocDialog').hide()"/>
         </h:form>
     </p:dialog>
+    <script type="text/javascript">
+        function reload() {
+            window.location.reload();
+        }
+    </script>
 </ui:composition>
 </html>

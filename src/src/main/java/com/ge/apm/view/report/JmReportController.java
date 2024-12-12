@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -251,7 +252,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
     public String getType(Integer type) {
         String typeName = "";
-        if (type.equals(1)) {
+        if (ObjectUtil.isEmpty(type)|| type.equals(1)) {
             typeName = "积木";
         } else if (type.equals(2)) {
             typeName = "达芬奇";
