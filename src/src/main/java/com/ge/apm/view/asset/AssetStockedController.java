@@ -273,6 +273,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedInStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成入库单！");
+            return;
+        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成入库单！");
@@ -292,6 +297,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedOutStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成出库单！");
+            return;
+        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
@@ -431,6 +441,14 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             return user == null ? null : user.getName();
         }else {
             return null;
+        }
+    }
+
+    public String openNewWindowView(String stockNo) {
+        if (stockNo.startsWith("RK")) {
+            return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo;
+        } else {
+            return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo + "&amp;userName=" + currentUser.getName();
         }
     }
 
