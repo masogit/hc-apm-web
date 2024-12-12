@@ -1281,4 +1281,44 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare06')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare06}</label>
+            <p:inputText id="spare06" value="#{assetInfoEditController.selected.spare06}" disabled="#{!assetInfoEditController.needEdit('spare06')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare07')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare07}</label>
+            <p:inputText id="spare07" value="#{assetInfoEditController.selected.spare07}" disabled="#{!assetInfoEditController.needEdit('spare07')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare08')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare08}</label>
+            <p:inputText id="spare08" value="#{assetInfoEditController.selected.spare08}" disabled="#{!assetInfoEditController.needEdit('spare08')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare09')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare09}</label>
+            <p:inputText id="spare09" value="#{assetInfoEditController.selected.spare09}" disabled="#{!assetInfoEditController.needEdit('spare09')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare10')}">
+        <h:panelGroup >
+            <label class="label">#{msg.spare10}</label>
+            <p:inputText id="spare10" value="#{assetInfoEditController.selected.spare10}" disabled="#{!assetInfoEditController.needEdit('spare10')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

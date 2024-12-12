@@ -79,7 +79,7 @@
                                 <p:inputText id="licenseStartDate" value="#{venderCompanyController.selected.licenseStartDate}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">营业执照结束日期</label>
+                                <label class="label">营业执照截止日期</label>
                                 <p:inputText id="licenseEndDate" value="#{venderCompanyController.selected.licenseEndDate}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -97,25 +97,25 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="营业许可证信息">
+                    <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">营业许可证编码</label>
+                                <label class="label">许可证编码</label>
                                 <p:inputText id="permitCode" value="#{venderCompanyController.selected.permitCode}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">营业许可证开始日期</label>
+                                <label class="label">许可证开始日期</label>
                                 <p:inputText id="permitStartDate" value="#{venderCompanyController.selected.permitStartDate}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">营业许可证结束日期</label>
+                                <label class="label">许可证截止日期</label>
                                 <p:inputText id="permitEndDate" value="#{venderCompanyController.selected.permitEndDate}" readonly="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">营业许可证附件</f:facet>
+                                    <f:facet name="header">许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
@@ -151,7 +151,7 @@
                                 <p:inputText id="manufacturingPermitStartDate" value="#{venderCompanyController.selected.manufacturingPermitStartDate}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">生产许可证结束日期</label>
+                                <label class="label">生产许可证截止日期</label>
                                 <p:inputText id="manufacturingPermitEndDate" value="#{venderCompanyController.selected.manufacturingPermitEndDate}" readonly="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -176,7 +176,7 @@
                                 <p:inputText id="productRegistrationStartDate" value="#{venderCompanyController.selected.productRegistrationStartDate}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">产品注册证结束日期</label>
+                                <label class="label">产品注册证截止日期</label>
                                 <p:inputText id="productRegistrationEndDate" value="#{venderCompanyController.selected.productRegistrationEndDate}" readonly="true"/>
                             </h:panelGroup>
                         </p:panelGrid>

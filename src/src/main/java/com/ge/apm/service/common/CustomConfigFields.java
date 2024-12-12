@@ -138,6 +138,11 @@ public enum CustomConfigFields {
     spare03(fieldName, "spare03" ,Text),  //备用字段03
     spare04(fieldName, "spare04" ,Text),  //备用字段04
     spare05(fieldName, "spare05" ,Text),  //备用字段05
+    spare06(fieldName, "spare06" ,Text),  //备用字段06
+    spare07(fieldName, "spare07" ,Text),  //备用字段07
+    spare08(fieldName, "spare08" ,Text),  //备用字段08
+    spare09(fieldName, "spare09" ,Text),  //备用字段09
+    spare10(fieldName, "spare10" ,Text),  //备用字段10
 
 
     ;
