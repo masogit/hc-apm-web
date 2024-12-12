@@ -6,8 +6,10 @@
 package com.ge.apm.view.sysutil;
 
 import com.ge.apm.dao.CustomRoleRepository;
+import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.DownloadTemplateFileType;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
@@ -23,6 +25,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.context.RequestContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
@@ -47,10 +50,18 @@ public class FileDownloadService {
     private MicroServiceUtil msService;
     private CustomRoleRepository customRoleRepository;
 
+
+    private SystemTemplateValueRepository systemTemplateValueRepository;
+    private UserContextService userContextService;
+
     @PostConstruct
     protected void init() {
         msService = WebUtil.getBean(MicroServiceUtil.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        systemTemplateValueRepository = WebUtil.getBean(SystemTemplateValueRepository.class);
+
+         userContextService = WebUtil.getBean(UserContextService.class);
+
     }
 
     public StreamedContent getFile(String fileId) {
@@ -88,10 +99,16 @@ public class FileDownloadService {
 
     public void exportTemplateFile(String type) {
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
-        String fileName = DownloadTemplateFileType.getTemplateFile(type, ucs.isLocale());
-        InputStream inputStream = FileDownloadService.class.getClassLoader().getResourceAsStream("template/" + fileName);
+//        String fileName = DownloadTemplateFileType.getTemplateFile(type, ucs.isLocale());
+
+        SystemTemplate.SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate(type, ucs.isLocale());
+
+//        InputStream inputStream = FileDownloadService.class.getClassLoader().getResourceAsStream("template/" + fileName);
+
+        InputStream inputStream = getTemplateFileInputStream(systemTemplate.getCode(), systemTemplate.getFileType());
+
         inputStream =processorTemplateFile(inputStream,type);
-        exportFile(inputStream, fileName);
+        exportFile(inputStream, systemTemplate.getFileName());
     }
 
     private InputStream processorTemplateFile(InputStream inputStream,String type)  {
@@ -143,5 +160,16 @@ public class FileDownloadService {
             e.printStackTrace();
         }
     }
+
+
+
+    public InputStream getTemplateFileInputStream(String templateType,String fileType){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,fileType);
+        byte[] templateBytes = msService.downloadSingleFileByte(storageId);
+        return new ByteArrayInputStream(templateBytes);
+    }
+
+
 
 }

@@ -65,30 +65,42 @@ public class SystemTemplate implements Serializable {
 
 
     public enum SystemTemplateEnum{
-        OUT_STOCKED("OUT_STOCKED","出库模板"),
-        IN_STOCKED("IN_STOCKED","入库模板"),
-        TECHNOLOGY("TECHNOLOGY","技术验收模板"),
-        BUSINESS("BUSINESS","商务验收模板"),
-        CLINICAL("CLINICAL","临床验收模板"),
-        DETAIL("DETAIL","验收资料详单"),
-        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)"),
-        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)"),
-        SUPPLIER_IMPORT("SUPPLIER_IMPORT","供应商导入模板"),
-        DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板"),
-        ASSET_COUNTRYAREA_TEMPLATE("ASSET_COUNTRYAREA_TEMPLATE","资产导入模板-县域租户"),
-        ASSET_COUNTRYAREA_TEMPLATE_EN("ASSET_COUNTRYAREA_TEMPLATE_EN","资产导入模板-县域租户_en"),
-        ASSET_TEMPLATE("ASSET_TEMPLATE","资产导入模板"),
-        ASSET_TEMPLATE_EN("ASSET_TEMPLATE_EN","资产导入模板_en"),
+        OUT_STOCKED("OUT_STOCKED","出库模板","word","out_stocked_template.docx"),
+        IN_STOCKED("IN_STOCKED","入库模板","word","in_stocked_template.docx"),
+        TECHNOLOGY("TECHNOLOGY","技术验收模板","word","TechnologyReportTemplate.docx"),
+        BUSINESS("BUSINESS","商务验收模板","word","BusinessReportTemplate.docx"),
+        CLINICAL("CLINICAL","临床验收模板","word","ClinicalReportTemplate.docx"),
+        DETAIL("DETAIL","验收资料详单","word","DetailReportTemplate.docx"),
+        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word","AssetReportTemplateBatch.docx"),
+        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word","AssetReportTemplateBatchBottom.docx"),
+        SUPPLIER_IMPORT("SUPPLIER_IMPORT","供应商导入模板","word","APM_Supplier.xlsx"),
+        DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板","word","transferorder_template.docx"),
+        ASSET_COUNTRYAREA_TEMPLATE("ASSET_COUNTRYAREA_TEMPLATE","资产导入模板-县域租户","excel","APM_Asset_Dynamic_CountryArea_Template.xlsx"),
+        ASSET_COUNTRYAREA_TEMPLATE_EN("ASSET_COUNTRYAREA_TEMPLATE_EN","资产导入模板-县域租户_en","excel","APM_Asset_Dynamic_CountryArea_Template_en.xlsx"),
+        ASSET_TEMPLATE("ASSET_TEMPLATE","资产导入模板","excel","APM_Asset_Dynamic_Template.xlsx"),
+        ASSET_TEMPLATE_EN("ASSET_TEMPLATE_EN","资产导入模板_en","excel","APM_Asset_Dynamic_Template_en.xlsx"),
 
+        CONTRACT("CONTRACT","合同导入模板","excel","APM_Contract_Service_Template.xlsx"),
+        CONTRACT_EN("CONTRACT_EN","合同导入模板_en","excel","APM_Contract_Service_Template_en.xlsx"),
+        CONTRACT_ITEM("CONTRACT_ITEM","合同相关设备导入模板","excel","APM_ContractItem_Service_Template.xlsx"),
+        BENEFIT_ANALYSIS("BENEFIT_ANALYSIS","设备效益分析导出模板","excel","APM_EfficiencyEquipment_export_Template.xlsx"),
+        USER_ACCOUNT("USER_ACCOUNT","用户导入模板","excel","UserAccountImport_Template.xlsx"),
 
         ;
-        String code;
-        String name;
+        final String code;
+        final String name;
+        final String fileType;
 
-        SystemTemplateEnum(String code,String name) {
+        final String fileName;
+
+        SystemTemplateEnum(String code,String name,String fileType,String fileName) {
             this.code = code;
 
             this.name = name;
+
+            this.fileType = fileType;
+
+            this.fileName = fileName;
         }
 
         public static String getName(String code) {
@@ -107,6 +119,16 @@ public class SystemTemplate implements Serializable {
         public String getName() {
             return name;
         }
+
+        public String getFileType() {
+            return fileType;
+        }
+
+
+        public String getFileName() {
+            return fileName;
+        }
+
     }
 
 
