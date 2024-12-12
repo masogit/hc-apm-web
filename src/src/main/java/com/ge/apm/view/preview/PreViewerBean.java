@@ -72,6 +72,8 @@ public class PreViewerBean implements ServerEventInterface {
                     blobObject.getObjectName().toLowerCase().contains(".pdf")
             ){
                 type = 1;
+                pdfUrl = getHttpURL(objectId);
+                logger.info("pdfUrl:" + pdfUrl);
             }else{
                 type = -1;
             }
