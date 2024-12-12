@@ -202,7 +202,9 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid","assetDisposalResults","spare06","spare07","spare08","spare09","spare10");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid","assetDisposalResults",
+                "spare06", "spare07", "spare08", "spare09", "spare10"
+        );
     }
 
     public static List<String> getTemplateEnableList() {
