@@ -809,4 +809,39 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
     }
 
+    @Transactional
+    public void deleteAsset(Map<String, Object> map){
+        logger.info(JSON.toJSON(map));
+
+        String key = (String) map.get("key");
+        String deptUids = (String) map.get("deptUid");
+        String deleteAssetIds = (String) map.get("assetId");
+
+        List<Integer> ids = Arrays.stream(deleteAssetIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        ids.forEach(assetIds::remove);
+
+        List<String> deleteDeptUids = Arrays.asList(deptUids.split(","));
+
+        assetDetail = assetDetail.stream().filter(item -> !item.get("key").equals(key)).collect(Collectors.toSet());
+
+        Set<String> clinicalDeptUids = new HashSet<>();
+        for (Map<String, Object> stringObjectMap : assetDetail) {
+            String deptUidString = (String)  stringObjectMap.get("deptUid");
+            List<String> deptUidList = Arrays.asList(deptUidString.split(","));
+            clinicalDeptUids.addAll(deptUidList);
+
+        }
+        deleteDeptUids.removeAll(clinicalDeptUids);
+        if(selected.getId()!=null){
+            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUids);
+            saveKeyAssetReport();
+        }
+
+        deptList=clinicalDeptUids;
+    }
+
 }
