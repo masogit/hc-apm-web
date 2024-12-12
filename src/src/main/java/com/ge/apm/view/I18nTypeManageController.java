@@ -149,16 +149,16 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void  reset(){
         selected.setI18nMessageList(ListUtils.newArrayList());
-        logger.info("reset:"+selected.getMsgType());
+        LOGGER.info("reset:{},",selected.getMsgType());
         saveConfig();
         resetCache();
-        logger.info("end reset:"+selected.getMsgType());
+        LOGGER.info("end reset:{}",selected.getMsgType());
     }
     public void saveConfig(){
-        logger.info("saveConfig:"+selected.getMsgType());
+        LOGGER.info("saveConfig:{}",selected.getMsgType());
         doSaveI18nMessage();
         resetCache();
-        logger.info("end saveConfig:"+selected.getMsgType());
+        LOGGER.info("end saveConfig:{}",selected.getMsgType());
     }
     public void doSaveI18nMessage(){
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
