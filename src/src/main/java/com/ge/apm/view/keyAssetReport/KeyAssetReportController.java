@@ -154,7 +154,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private JmReportRepository reportRepository;
 
-
+    private  UserAccount account;
     @Override
     protected void init() {
         dao = WebUtil.getBean(KeyAssetReportRepository.class);
@@ -169,7 +169,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         org = orgDao.findById(UserContextService.getCurrentUserAccount().getOrgInfoId());
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
-        UserAccount account = UserContextService.getCurrentUserAccount();
+        account = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
 //        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4));
@@ -594,7 +594,16 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
         if (dept.getOrgType() == 4) {
-            assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+            List<OrgInfo> userAccessibleSiteListWithClinicalDept = uaaService.getUserAccessibleSiteListWithClinicalDept(account.getUid());
+            Set<OrgInfo> clinicalDeptSet = new HashSet<>();
+            collectChildClinicalDeptInExstingList(dept,userAccessibleSiteListWithClinicalDept,clinicalDeptSet);
+            if(CollectionUtils.isNotEmpty(clinicalDeptSet)){
+                Set<String> clinicalDeptUids = clinicalDeptSet.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+                assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptUids), "1*"));
+
+            }
+//            assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, dept.getUid(), "1*"));
+
         }
         assetSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         assetSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
@@ -618,6 +627,20 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if(CollectionUtils.isNotEmpty(assetIds)){
             allAssetList = allAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
         }
+    }
+
+
+    public void collectChildClinicalDeptInExstingList(OrgInfo parentOrg, List<OrgInfo> clinicalDeptList, Set<OrgInfo> clinicalDeptSetOutput) {
+
+        clinicalDeptSetOutput.add(parentOrg);
+
+        for (OrgInfo orgInfo: clinicalDeptList) {
+            if (!orgInfo.getParentUID().equals(parentOrg.getUid())) continue;
+            collectChildClinicalDeptInExstingList(orgInfo, clinicalDeptList, clinicalDeptSetOutput);
+
+        }
+
+
     }
 
     // 待选设备列表，选中/取消选中
