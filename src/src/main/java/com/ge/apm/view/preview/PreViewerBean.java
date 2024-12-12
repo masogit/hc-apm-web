@@ -52,12 +52,29 @@ public class PreViewerBean implements ServerEventInterface {
             List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(objectId);
             if(!CollectionUtils.isEmpty(allByObjectStorageId)){
                 blobObject = allByObjectStorageId.get(0);
-                String objectType = blobObject.getObjectType();
-                type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
+                //type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
+                getTypeByObject();
             }
+        }
+    }
 
-            pdfUrl = getHttpURL(objectId);
-            logger.info("pdfUrl:" + pdfUrl);
+    public void getTypeByObject(){
+        if(blobObject == null){
+            type = -1;
+        }else {
+            if(blobObject.getObjectType().contains("image") ||
+               blobObject.getObjectName().toLowerCase().contains(".jpg") ||
+               blobObject.getObjectName().toLowerCase().contains(".png") ||
+               blobObject.getObjectName().toLowerCase().contains(".jpeg")
+            ){
+                type = 0;
+            }else if(blobObject.getObjectType().contains("pdf") ||
+                    blobObject.getObjectName().toLowerCase().contains(".pdf")
+            ){
+                type = 1;
+            }else{
+                type = -1;
+            }
         }
     }
 
