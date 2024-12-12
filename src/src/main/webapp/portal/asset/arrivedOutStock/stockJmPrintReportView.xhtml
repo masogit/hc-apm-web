@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="打印预览"/>
+            </div>
+            <iframe src="#{assetStockedJmPrintViewController.stockPrintJmReportUrl()}" style="width: 100%;height: 800px;"></iframe>
+        </div>
+    </ui:define>
+</ui:composition>
+
