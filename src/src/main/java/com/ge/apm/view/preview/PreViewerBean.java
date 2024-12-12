@@ -55,17 +55,26 @@ public class PreViewerBean implements ServerEventInterface {
                 String objectType = blobObject.getObjectType();
                 type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
             }
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-            String rootPath = request.getRequestURL().toString();
-            logger.info("rootPath:" + rootPath);
 
-            int l = rootPath.lastIndexOf("/geapm");
-            rootPath =rootPath.substring(0,l);
-            rootPath = rootPath.replace("http:","https:");
-            pdfUrl = rootPath + "/gateway/hcapmobjecthubservice/api/apm/objectHub/objects/"+objectId+"/preView";
+            pdfUrl = getHttpURL(objectId);
             logger.info("pdfUrl:" + pdfUrl);
         }
+    }
+
+    public String getHttpURL(String objectId){
+        StringBuilder sbPath = new StringBuilder();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
+        if(request == null){
+            return "";
+        }
+        if("localhost".equals(request.getServerName())){
+            sbPath.append("http://localhost:8090/hcapmobjecthubservice/api/apm/objectHub/objects/").append(objectId).append("/preView");
+        }else{
+            sbPath.append("https://").append(request.getServerName()).append("gateway/hcapmobjecthubservice/api/apm/objectHub/objects").append(objectId).append("/preView");
+        }
+
+        return sbPath.toString();
     }
 
 
