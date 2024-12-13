@@ -58,7 +58,8 @@ public class QRPreViewerBean implements ServerEventInterface {
         }
     }
     public StreamedContent getImg(String code) throws IOException {
-        return  getImg(code, currentUser.getSiteUID());
+        String[] split = code.split(":");
+        return  getImg(split[0], split[1]);
     }
     public StreamedContent getImg(String code, String siteUid) throws IOException {
         StreamedContent streamedContent = cacheStreamedContent.get(code);
