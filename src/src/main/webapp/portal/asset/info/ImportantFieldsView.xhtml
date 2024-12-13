@@ -110,6 +110,28 @@
         <h:outputText value="#{item.createdBy}"/>
     </p:column>
 
+    <p:column headerText="#{msg.spare06}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('spare06')}">
+        <h:outputText value="#{item.spare06}" />
+    </p:column>
+    <p:column headerText="#{msg.spare07}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('spare07')}">
+        <h:outputText value="#{item.spare07}" />
+    </p:column>
+    <p:column headerText="#{msg.spare08}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('spare08')}">
+        <h:outputText value="#{item.spare08}" />
+    </p:column>
+    <p:column headerText="#{msg.spare09}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('spare09')}">
+        <h:outputText value="#{item.spare09}" />
+    </p:column>
+    <p:column headerText="#{msg.spare10}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('spare10')}">
+        <h:outputText value="#{item.spare10}" />
+    </p:column>
+
+
     <!-- 修改时间 -->
     <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
         <f:facet name="filter">

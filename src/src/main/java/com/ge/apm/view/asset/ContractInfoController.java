@@ -5,6 +5,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -12,6 +13,8 @@ import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -170,8 +173,16 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             contractService.updateContractStatus(contractInfo.getId(), ContractInfo.ContractStatus.COMPLETE.toString());
         }
     }
-    
-    
+
+    public void doubleClick(SelectEvent event){
+        selected = (ContractInfo) event.getObject();
+        String str = "action=Edit&selectedid=".concat(selected.getId());
+        String url = "ContractView.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
+
     public void deleteContract(){
         if(contractService.deleteContract(selected)){
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));

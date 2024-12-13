@@ -309,10 +309,12 @@
                                     <p:dataGrid id="deviceFaultPerformFile" var="fileitem" value="#{adverseEventApproveController.selected.deviceFaultPerformFile}" columns="5" layout="grid" rendered="#{adverseEventApproveController.selected.deviceFaultPerformFile ne null and !empty adverseEventApproveController.selected.deviceFaultPerformFile }">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
-                                                <p:commandButton actionListener="#{adverseEventApproveController.removeDeviceFaultPerformFile(fileitem)}" update="deviceFaultPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{adverseEventApproveController.readOnlyCreateForm}">
-                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                                </p:commandButton>
+                                                <h:panelGrid columns="1" style="width:100%" >
+                                                    <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
+                                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
+                                                    </p:graphicImage>
+                                                </h:panelGrid>
+                                                <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>

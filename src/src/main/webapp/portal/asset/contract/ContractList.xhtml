@@ -50,7 +50,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-
+                        <p:ajax event="rowDblselect" listener="#{contractInfoController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:ajax event="rowSelect"  update="createButton deleteButton editButton renewalButton"/>
                         <p:ajax event="filter" listener="#{contractInfoController.onFilter}" oncomplete="rc();"/>
                         <p:column headerText="#{msg.contractNum}" sortBy="#{item.contractNum}" filterBy="#{item.contractNum}" filterMatchMode="LIKE">
@@ -171,14 +171,22 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-    </ui:define>
-    <script type="text/javascript">
-        function start() {
-            PF('statusDialog').show();
-        }
 
-        function stop() {
-            PF('statusDialog').hide();
-        }
-    </script>
+        <script type="text/javascript">
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
 </ui:composition>

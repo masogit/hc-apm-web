@@ -996,6 +996,7 @@
                                     <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
+                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
 
                         </f:facet>
                     </p:dataTable>
@@ -1112,6 +1113,7 @@
                 </h:form>
             </div>
         </div>
+        <ui:include src="/portal/preview/QRView.xhtml"/>
         <ui:include src="RelRuleAsset.xhtml"/>
         <ui:include src="BatchEditBefore.xhtml"/>
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
