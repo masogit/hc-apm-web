@@ -996,7 +996,7 @@
                                     <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
-                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
+                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
 
                         </f:facet>
                     </p:dataTable>
