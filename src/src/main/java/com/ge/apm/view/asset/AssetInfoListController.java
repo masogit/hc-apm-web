@@ -5,6 +5,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
@@ -82,6 +83,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     private ContractInfoMapper contractInfoMapper;
+
+    private QRPreViewerBean qrPreViewerBean;
     //选定的院区
     private OrgInfo selectSite;
 
@@ -228,6 +231,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
         user = UserContextService.getCurrentUserAccount();
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
@@ -890,16 +894,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
-//        String verificationCode = "";
-//        Random random = new Random();
-//        for (int i = 0; i < 6; i++) {
-//            int r = random.nextInt(10); //每次随机出一个数字（0-9）
-//            verificationCode = verificationCode + r;  //把每次随机出的数字拼在一起
-//        }
-//        resultAssetMap = new HashMap<>();
-//
-//        resultAssetMap.put(verificationCode,resultList);
-//        WebUtil.navigateTo("AssetInfoBatchEdit.xhtml?faces-redirect=true&uidList= "+ verificationCode);
+    }
+    public void prepareViewQrcode(){
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        List<AssetInfo> assetInfos = dao.findByUidIn(assetUids);
+        List<String> collect = assetInfos.stream().filter(item->StringUtils.isNotEmpty(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUID()).collect(Collectors.toList());
+        qrPreViewerBean.onServerEvent("",collect);
     }
     public void navigateTo(){
         String verificationCode = "";

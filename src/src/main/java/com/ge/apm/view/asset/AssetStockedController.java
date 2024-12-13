@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -22,6 +23,8 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -45,6 +48,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private AssetOutStockService assetOutStockService;
     private OrgInfoRepository orgInfoRepository;
     private AssetInfoRepository assetInfoRepository;
+    private QRPreViewerBean qrPreViewerBean;
+
     private UserAccount currentUser;
     private ArrivalListItem searchItem;
     private Supplier supplier;
@@ -96,6 +101,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         SupplierService supplierService = WebUtil.getBean(SupplierService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
+        qrPreViewerBean=WebUtil.getBean(QRPreViewerBean.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierService.getSupplierList();
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
@@ -138,7 +144,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
                 searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3, 4), "1*"));
                 break;
             case "outStockedRecord":
-                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
+               // searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
                 break;
             default:
                 break;
@@ -273,6 +279,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedInStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成入库单！");
+            return;
+        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成入库单！");
@@ -292,6 +303,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedOutStockDoc() {
+        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成出库单！");
+            return;
+        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
@@ -432,6 +448,33 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         }else {
             return null;
         }
+    }
+
+    public String openNewWindowView(String stockNo) {
+        if (stockNo.startsWith("RK")) {
+            return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo;
+        } else {
+            return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo + "&amp;userName=" + currentUser.getName();
+        }
+    }
+
+    public void prepareViewQrcode(){
+        if(CollectionUtils.isEmpty(this.selectedItems)){
+            WebUtil.addErrorMessage("请选择出库单!");
+            return;
+        }
+        List<String> collect = this.selectedItems.stream().filter(item->StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUid()).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(collect)){
+            List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(assetUids)){
+                WebUtil.addErrorMessage("未查询到相关设备二维码");
+                return;
+            }
+            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
+            collect = assetInfos.stream().filter(item-> StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUID()).collect(Collectors.toList());
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        qrPreViewerBean.onServerEvent("",collect);
     }
 
     public String getFilterClinicalDeptOrg() {

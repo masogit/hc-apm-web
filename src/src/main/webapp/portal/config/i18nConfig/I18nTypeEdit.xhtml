@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="i18nTypeDlg" widgetVar="i18nTypeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.i18nConfig}" max-height="600" width="850">
+            <h:form id="i18nTypeForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemName}*</label>
+                        <p:inputText id="name" value="#{i18nTypeManageController.selected.name}"  style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.msgType}*</label>
+                        <p:outputLabel id="msgType" value="#{i18nTypeManageController.selected.msgType}" disabled="true" style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.description}*</label>
+                        <p:inputText id="description" value="#{i18nTypeManageController.selected.description}" style="width: 95%;"/>
+                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">本院区独有</label>-->
+<!--                        <p:selectOneRadio id="alone" value="#{i18nTypeManageController.selected.alone}" disabled="true" layout="lineDirection">-->
+<!--                            <f:selectItem itemLabel="是" itemValue="true"/>-->
+<!--                            <f:selectItem itemLabel="否" itemValue="false"/>-->
+<!--                        </p:selectOneRadio>-->
+<!--                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">默认</label>
+                        <p:selectOneRadio id="defaultValue" value="#{i18nTypeManageController.selected.defaultValue}" disabled="true" layout="lineDirection">
+                            <f:selectItem itemLabel="是" itemValue="true"/>
+                            <f:selectItem itemLabel="否" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemValue}*</label>
+                        <p:dataTable id="i18nDatalist" class="datalist" value="#{i18nTypeManageController.selected.i18nMessageList}" var="item" widgetVar="i18nDataList"
+                             selectionMode="single" selection="#{i18nTypeManageController.selectedI18n}"
+                             paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="5" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="5,10"
+                             lazy="true" rowKey="#{item.msgKey}">
+
+                            <p:ajax event="rowSelect" update="editBtn deleteBtn" />
+
+                            <p:column headerText="#{msg.ConfigItemKey}">
+                                <h:outputText value="#{item.msgKey}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.ConfigItemName}-#{msg.Chinese}">
+                                <h:outputText value="#{item.valueZh}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.ConfigItemName}-#{msg.English}">
+                                <h:outputText value="#{item.valueEn}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.ConfigItemName}-#{msg.Traditional}">
+                                <h:outputText value="#{item.valueTw}"/>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton id="addButton" icon="ui-icon-plus" actionListener="#{i18nTypeManageController.prepareAddI18n}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{i18nTypeManageController.selected.type eq -1}"/>
+                                <p:commandButton id="editBtn" icon="ui-icon-pencil" actionListener="#{i18nTypeManageController.prepareEditI18n}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{empty i18nTypeManageController.selectedI18n}" />
+                                <p:commandButton id="deleteBtn" icon="ui-icon-close" actionListener="#{i18nTypeManageController.deleteI18n}" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="i18nDatalist" disabled="#{empty i18nTypeManageController.selectedI18n || i18nTypeManageController.selected.type eq -1}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{i18nTypeManageController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'i18nTypeDlg');" />
+                <p:commandButton validateClient="true" value="重置" actionListener="#{i18nTypeManageController.reset()}" disabled="#{i18nTypeManageController.selected.defaultValue}" update=":growl @(.datalist)" oncomplete="PF('i18nTypeDlg').hide()" icon="ui-icon-check" >
+                    <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
+                </p:commandButton>
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('i18nTypeDlg').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

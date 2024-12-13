@@ -105,18 +105,19 @@
 
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="出库单号">
-                <h:outputText value="#{item.outStockNo}"/>
+                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.outStockNo)}" value="#{item.outStockNo}" onblur="reload()" />
+<!--                <h:outputText value="#{item.outStockNo}"/>-->
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.outStockBusinessDate}">
                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                 </h:outputText>
             </p:column>
-            <p:column headerText="单据时间">
-                <h:outputText value="#{item.outStockDocumentsDate}">
-                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                </h:outputText>
-            </p:column>
+<!--            <p:column headerText="单据时间">-->
+<!--                <h:outputText value="#{item.outStockDocumentsDate}">-->
+<!--                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
+<!--                </h:outputText>-->
+<!--            </p:column>-->
             <p:column headerText="#{msg.vendor}">
                 <h:outputText value="#{item.arrivalList.vendor}"/>
             </p:column>
@@ -160,7 +161,8 @@
             </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.generatedStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
-                <p:commandButton value="打印出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+                <p:commandButton value="打印出库单" rendered="false" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray" icon="ui-icon-print" title="预览打印二维码"  actionListener="#{assetStockedController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="handleSubmit(args,'qrPreviewedDlg')" />
             </f:facet>
         </p:dataTable>
     </h:form>
@@ -253,5 +255,10 @@
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetOutStockedListForm:datalist" onclick="PF('GeneratedOutStockDocDialog').hide()"/>
         </h:form>
     </p:dialog>
+    <script type="text/javascript">
+        function reload() {
+            window.location.reload();
+        }
+    </script>
 </ui:composition>
 </html>

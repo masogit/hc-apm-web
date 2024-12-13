@@ -15,8 +15,11 @@
                <p:graphicImage value="#{fileDownloadService.getFile(preViewerBean.getObjectId())}" stream="false"   width="100%" height="780px" />
            </c:when>
            <c:when test="#{preViewerBean.type eq 1}">
-               <embed src="http://localhost:8090/hcapmobjecthubservice/api/apm/objectHub/objects/6757d14444dd36a7a4876f05/pdf2" type="application/pdf"  width="100%" height="780px" />
+               <embed src="#{preViewerBean.pdfUrl}" type="application/pdf"  width="100%" height="780px" />
            </c:when>
+           <c:otherwise>
+               <h:outputText value="预览失败！" />
+           </c:otherwise>
        </c:choose>
    </p:dialog>
  </ui:composition>

@@ -60,7 +60,7 @@
                                 </p:selectBooleanCheckbox>
                                 <f:facet name="header"  >
                                     <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetDepartmentConvertForm:datalist reportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetDepartmentConvertForm:datalist reportButton previewQRCode " oncomplete="updateSelectAllCheckBox();"/>
                                     </p:selectBooleanCheckbox>
                                 </f:facet>
                             </p:column>
@@ -148,11 +148,13 @@
 <!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
 <!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
 <!--                                </p:commandButton>-->
+                                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not departmentConvertController.isChecked()}" actionListener="#{departmentConvertController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
                             </f:facet>
                         </p:dataTable>
                     </h:form>
                 </div>
             </div>
+            <ui:include src="/portal/preview/QRView.xhtml"/>
         </div>
         <script>
             afterPageLoad = function () {
