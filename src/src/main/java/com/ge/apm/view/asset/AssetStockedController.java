@@ -463,16 +463,13 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             WebUtil.addErrorMessage("请选择出库单!");
             return;
         }
-        List<String> collect = this.selectedItems.stream().filter(item->StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUid()).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(collect)){
-            List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
-            if(CollectionUtils.isEmpty(assetUids)){
-                WebUtil.addErrorMessage("未查询到相关设备二维码");
-                return;
-            }
-            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
-            collect = assetInfos.stream().filter(item-> StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUID()).collect(Collectors.toList());
+        List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(assetUids)){
+            WebUtil.addErrorMessage("未查询到相关设备二维码");
+            return;
         }
+        List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
+        List<String> collect = assetInfos.stream().filter(item -> StringUtils.hasText(item.getQrCode())).map(item -> item.getQrCode() + ":" + item.getSiteUID()).collect(Collectors.toList());
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         qrPreViewerBean.onServerEvent("",collect);
     }
