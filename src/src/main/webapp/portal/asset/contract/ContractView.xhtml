@@ -380,6 +380,12 @@
                             <p:column headerText="#{msg.InstallationStatus}">
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.arrivalListItem.installStatus)}"/>
                             </p:column>
+                            <p:column width="140" >
+                                <f:facet name="header" >
+                                    <h:outputText value="#{msg.operation}" />
+                                </f:facet>
+                                <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLinkByAsset(item.assetInfo)}" style="padding:10px" disabled="#{empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                            </p:column>
                         </p:dataTable>
                     </p:fieldset>
 
@@ -397,6 +403,12 @@
                             </p:column>
                             <p:column headerText="#{msg.clinicalDeptName}">
                                 <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+                            </p:column>
+                            <p:column width="140" >
+                                <f:facet name="header" >
+                                    <h:outputText value="#{msg.operation}" />
+                                </f:facet>
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLinkByUid(item.assetUid)}">#{msg.View}</p:link>
                             </p:column>
                         </p:dataTable>
                     </p:fieldset>
@@ -424,6 +436,12 @@
                             </p:column>
                             <p:column headerText="#{msg.Quantity}" >
                                 <h:outputText value="#{item[1].apartsQuantity}" />
+                            </p:column>
+                            <p:column width="140" rendered="#{contractInfoEditController.canBeEdit}">
+                                <f:facet name="header" >
+                                    <h:outputText value="#{msg.operation}" />
+                                </f:facet>
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLinkByAsset(item[0])}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                             </p:column>
                         </p:dataTable>
                     </p:fieldset>
