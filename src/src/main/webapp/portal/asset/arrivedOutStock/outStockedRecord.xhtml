@@ -162,6 +162,7 @@
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.generatedStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
                 <p:commandButton value="打印出库单" rendered="false" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" actionListener="#{assetStockedController.printStockDoc('outStock')}" validateClient="true" oncomplete="PF('GeneratedOutStockDocDialog').show()" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray" icon="ui-icon-print" title="预览打印二维码"  actionListener="#{assetStockedController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="handleSubmit(args,'qrPreviewedDlg')" />
             </f:facet>
         </p:dataTable>
     </h:form>
