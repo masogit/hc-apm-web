@@ -31,8 +31,8 @@ public class SystemTemplateValue implements Serializable {
 //    @Column(name = "file_type")
 //    private String fileType;  //文件类型
 //
-//    @Column(name = "template_type")
-//    private String templateType;  //模板类型
+    @Column(name = "template_type")
+    private String templateType;  //模板类型
 
     @Column(name = "storage_id")
     private String storageId;
@@ -58,8 +58,6 @@ public class SystemTemplateValue implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
-    @Column(name = "system_template_id", columnDefinition = "CHAR(64)")
-    private String systemTemplateId;
 
 
 

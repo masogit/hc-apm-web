@@ -9,6 +9,7 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -137,6 +138,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private AssetInfoMapper assetInfoMapper;
 
+    private FileDownloadService fileDownloadService;
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -144,6 +146,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     @Override
     protected void init() {
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         user = UserContextService.getCurrentUserAccount();
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
@@ -358,7 +362,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
 
     public void exportAssetExcelTemplate() {
-        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
+//        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
+        InputStream resourceAsStream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BATCH_ASSET_TERMINATION.getCode(), SystemTemplate.SystemTemplateEnum.BATCH_ASSET_TERMINATION.getFileType());
         assetTemplateFile = new DefaultStreamedContent(resourceAsStream, "application/vnd.ms-excel", "template.xlsx");
     }
 

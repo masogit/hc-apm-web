@@ -293,7 +293,7 @@ public class AssetInstallationReportService {
 
         }else if(REPORT_TYPE_ASSET.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE;
-//            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET.getCode();
+            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET.getCode();
 
         }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH;

@@ -81,13 +81,13 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         List<SystemTemplate> list = page.getContent();
         if(CollectionUtils.isNotEmpty(list)) {
             for (SystemTemplate systemTemplate : list) {
-                SystemTemplateValue  value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(), selectSite.getSiteUID());
+                SystemTemplateValue  value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectSite.getSiteUID());
                 if(value == null){
-                    value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(),  selectSite.getHospitalUID());
+                    value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(),  selectSite.getHospitalUID());
                     if(value == null){
-                        value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(),  selectSite.getInstitutionUID());
+                        value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectSite.getInstitutionUID());
                         if(value == null){
-                            value = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(systemTemplate.getId(), selectSite.getTenantUID());
+                            value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectSite.getTenantUID());
                         }
                     }
                 }
@@ -133,10 +133,10 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         if(uploadedFileObject==null){
             return;
         }
-        SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstBySystemTemplateIdAndSiteUid(this.selected.getId(), selectSite.getSiteUID());
+        SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(this.selected.getTemplateType(), selectSite.getSiteUID());
         if(systemTemplateValue == null){
             systemTemplateValue = new SystemTemplateValue();
-            systemTemplateValue.setSystemTemplateId(this.selected.getId());
+            systemTemplateValue.setTemplateType(this.selected.getTemplateType());
             systemTemplateValue.setTenantUid(selectSite.getTenantUID());
             systemTemplateValue.setInstitutionUid(selectSite.getInstitutionUID());
             systemTemplateValue.setHospitalUid(selectSite.getHospitalUID());

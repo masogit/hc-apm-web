@@ -6,8 +6,10 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.BuildManagement;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
@@ -290,7 +293,10 @@ public class BuildManagementService {
     }
 
     public ExcelDocument exportBuildManagement(TreeNode orgTree) throws IOException {
-        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
+//        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
+        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
+        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;

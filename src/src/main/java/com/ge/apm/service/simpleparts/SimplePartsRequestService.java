@@ -11,6 +11,7 @@ import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.map.HashedMap;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
@@ -510,7 +512,10 @@ public class SimplePartsRequestService {
      */
     public byte[] buildReportTemplate() throws IOException {
 
-        return IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(REPORT_OUT_BOUND_ORDER));
+//        return IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(REPORT_OUT_BOUND_ORDER));
+         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        return fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getCode(), SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getFileType());
+
     }
 
     //导出一条记录

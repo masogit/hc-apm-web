@@ -7,6 +7,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetLifecyleService;
@@ -17,6 +18,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.view.asset.components.BatchRiskAssessment;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -120,10 +122,13 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     @Getter@Setter
     private String assetName; //设备名称
 
+    private FileDownloadService fileDownloadService;
 
     @Override
     protected void init() {
         /*接口类*/
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -502,7 +507,10 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         maps.forEach((key, val) -> {
             dataMaps.put(key + ".docx", buildWordTitle(val));
         });
-        XWPFTemplate doc = XWPFTemplate.compile(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/riskAssessment/assetRiskAssessment.docx"));
+//        FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/riskAssessment/assetRiskAssessment.docx")
+        InputStream inputStream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT.getCode(), SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT.getFileType());
+
+        XWPFTemplate doc = XWPFTemplate.compile(inputStream);
         if (!CollectionUtils.isEmpty(assetInfos) && assetInfos.size() == 1) {
             dataMaps.forEach((key, val) -> {
                 try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {

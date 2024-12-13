@@ -12,6 +12,7 @@ import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -77,9 +78,12 @@ public class BudgetApplicationExportService {
 
     private MicroServiceUtil msService;
 
+    private FileDownloadService fileDownloadService;
+
     @PostConstruct
     protected void init() {
         msService = WebUtil.getBean(MicroServiceUtil.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
     }
 
     /**
@@ -113,7 +117,10 @@ public class BudgetApplicationExportService {
     public void generateSingleBudget(BudgetApplicationAsset budgetApplicationAsset, BudgetApplication budgetApplication, List<V2_BlobObject> blobObjects, ZipOutputStream zout,String docPrefix, String attachmentPrefix) throws IOException, ParseException {
         //1、doc模板部分
         Map<String, Object> data = createReportData(budgetApplicationAsset, budgetApplication);
-        byte[] templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
+//        byte[] templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
+
+        byte[] templateBytes =fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
+
         /*if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
         }else {
