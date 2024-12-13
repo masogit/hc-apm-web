@@ -10,7 +10,9 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.DepartmentConvertService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -53,6 +55,8 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private TenantInfoRepository tenantInfoRepository;
 
     private DepartmentConvertService departmentConvertService;
+
+    private QRPreViewerBean qrPreViewerBean;
     @Override
     protected AssetDepartmentConvertRepository getDAO() {
         return dao;
@@ -72,6 +76,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         departmentConvertService = WebUtil.getBean(DepartmentConvertService.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
 
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
@@ -235,7 +240,14 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
             WebUtil.addErrorMessage("Fail to download report");
         }
     }
-
+    public void prepareViewQrcode(){
+        List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,selectedIds));
+        List<AssetDepartmentConvert> bySearchFilter = dao.findBySearchFilter(searchFilters);
+        List<String> collect = bySearchFilter.stream().map(AssetDepartmentConvert::getAssetQrCode).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        qrPreViewerBean.onServerEvent("",collect);
+    }
     public Integer getStatus() {
         return status;
     }
