@@ -144,7 +144,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
                 searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3, 4), "1*"));
                 break;
             case "outStockedRecord":
-               // searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
+                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
                 break;
             default:
                 break;
