@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -58,6 +59,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private DepartmentConvertService departmentConvertService;
 
     private QRPreViewerBean qrPreViewerBean;
+
     @Override
     protected AssetDepartmentConvertRepository getDAO() {
         return dao;
@@ -245,8 +247,12 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,selectedIds));
-        List<AssetDepartmentConvert> bySearchFilter = dao.findBySearchFilter(searchFilters);
-        List<String> collect = bySearchFilter.stream().filter(item-> StringUtils.hasText(item.getAssetQrCode())).map(item->item.getAssetQrCode()+":"+item.getOutSiteUid()).collect(Collectors.toList());
+        List<AssetDepartmentConvert> assetDepartmentConvertList = dao.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isEmpty(assetDepartmentConvertList)) return;
+        List<String> assetUidList = assetDepartmentConvertList.stream().filter(item-> StringUtils.hasText(item.getAssetUid())).map(AssetDepartmentConvert::getAssetUid).collect(Collectors.toList());
+        List<AssetInfo> assetInfoList = departmentConvertService.getAssetInfoList(assetUidList);
+        if(CollectionUtils.isEmpty(assetInfoList)) return;
+        List<String> collect = assetInfoList.stream().filter(item -> StringUtils.hasText(item.getQrCode())).map(item -> item.getQrCode() + ":" + item.getSiteUID()).collect(Collectors.toList());
         qrPreViewerBean.onServerEvent("",collect);
     }
     public Integer getStatus() {

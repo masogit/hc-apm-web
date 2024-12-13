@@ -87,11 +87,12 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         List<I18nMessage> defaultMsgList = listMap.get(-1);
         selected.setDefaultMsgList(defaultMsgList);
         boolean defaultValue = false;
-        if(!CollectionUtils.isEmpty(msgList)){
+        boolean alone = false;
+        if(CollectionUtils.isNotEmpty(msgList)){
             I18nMessage i18nMessage = msgList.get(0);
             defaultValue =Integer.valueOf(-1).equals(i18nMessage.getSiteId());
             selected.setDefaultValue(defaultValue);
-        }else{
+        }else if(CollectionUtils.isNotEmpty(defaultMsgList)){
             List<I18nMessage> collect = selected.getDefaultMsgList().stream().map(item -> {
                 I18nMessage i18nMessage = new I18nMessage();
                 BeanUtils.copyProperties(item, i18nMessage);
@@ -100,9 +101,16 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             selected.setI18nMessageList(collect);
             defaultValue = Boolean.TRUE;
             selected.setDefaultValue(defaultValue);
+        }else{
+            searchFilters.clear();
+            searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
+            i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
+            selected.setDefaultMsgList(i18nMessageList);
+            selected.setI18nMessageList(i18nMessageList);
+            alone = CollectionUtils.isEmpty(defaultMsgList);
+            selected.setAlone(alone);
         }
-        boolean alone = CollectionUtils.isEmpty(defaultMsgList);
-        selected.setAlone(alone);
+
         LOGGER.info("msgType:{},siteId:{},default:{},alone:{}",msgType,siteId,defaultValue,alone);
     }
     public void editI18nConfig(){
