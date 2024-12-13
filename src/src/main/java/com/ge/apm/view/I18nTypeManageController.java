@@ -188,13 +188,13 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         }
         dao.save(selected);
         DbMessageSource.reLoadMessages();
-        configCacheService.cleanCacheNames();
+//        configCacheService.cleanCacheNames();
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();
-        String o1Str = stringBuilder_o1.append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).toString();
+        String o1Str = stringBuilder_o1.append(o1.getId()).append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).toString();
         StringBuilder stringBuilder_o2 = new StringBuilder();
-        String o2Str = stringBuilder_o2.append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o1.getValueTw()).toString();
+        String o2Str = stringBuilder_o2.append(o2.getId()).append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o1.getValueTw()).toString();
         return o1Str.equals(o2Str);
     }
     public TenantInfo getSelectTenant() {
