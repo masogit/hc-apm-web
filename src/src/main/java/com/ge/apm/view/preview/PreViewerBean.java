@@ -4,6 +4,7 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.TempFileUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -81,18 +82,11 @@ public class PreViewerBean implements ServerEventInterface {
     }
 
     public String getHttpURL(String objectId){
+        String pdfPreViewUrl = microServiceUtil.getPdfPreViewUrl();
         StringBuilder sbPath = new StringBuilder();
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-        if(request == null){
-            return "";
+        if(StrUtil.isNotEmpty(pdfPreViewUrl)){
+            sbPath.append(pdfPreViewUrl).append("/hcapmobjecthubservice/api/apm/objectHub/objects/").append(objectId).append("/preView");
         }
-        if("localhost".equals(request.getServerName())){
-            sbPath.append("http://localhost:8090/hcapmobjecthubservice/api/apm/objectHub/objects/").append(objectId).append("/preView");
-        }else{
-            sbPath.append("https://").append(request.getServerName()).append("gateway/hcapmobjecthubservice/api/apm/objectHub/objects").append(objectId).append("/preView");
-        }
-
         return sbPath.toString();
     }
 
