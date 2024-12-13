@@ -54,6 +54,9 @@ public class MicroServiceInvoker {
     @Value("#{systemEnvironment['TOKEN_SECRETKEY'] ?: urlProperties.tokenSecretkey}")
     protected String tokenSecretkey;
 
+    @Value("#{urlProperties.pdfPreViewGateway}")
+    public String pdfPreViewUrl;
+
     @Autowired
     protected BlobObjectRepository blobObjectRepository;
 
@@ -76,6 +79,10 @@ public class MicroServiceInvoker {
 
     public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();
+    }
+
+    public String getPdfPreViewUrl(){
+        return pdfPreViewUrl;
     }
 
     protected Boolean isOkay(ResponseEntity res) {

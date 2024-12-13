@@ -1,7 +1,6 @@
 package com.ge.apm.view.adverseEvent;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -49,7 +48,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -482,6 +480,12 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
                 }
                 injuryPerformance.clear();
                 mechanicalFailure.clear();
+                if(CollectionUtils.isEmpty(selected.getHarmPerformFile())){
+                    selected.setHarmPerformFile(new ArrayList<>());
+                }
+                if(CollectionUtils.isEmpty(selected.getDeviceFaultPerformFile())){
+                    selected.setDeviceFaultPerformFile(new ArrayList<>());
+                }
                 MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
         } catch (Exception e) {

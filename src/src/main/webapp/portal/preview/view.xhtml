@@ -17,6 +17,9 @@
            <c:when test="#{preViewerBean.type eq 1}">
                <embed src="#{preViewerBean.pdfUrl}" type="application/pdf"  width="100%" height="780px" />
            </c:when>
+           <c:otherwise>
+               <h:outputText value="预览失败！" />
+           </c:otherwise>
        </c:choose>
    </p:dialog>
  </ui:composition>
