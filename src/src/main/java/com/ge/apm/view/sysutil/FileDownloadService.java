@@ -170,6 +170,10 @@ public class FileDownloadService {
         return new ByteArrayInputStream(templateBytes);
     }
 
-
+    public byte[] getTemplateFileByte(String templateType,String fileType){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,fileType);
+        return   msService.downloadSingleFileByte(storageId);
+    }
 
 }

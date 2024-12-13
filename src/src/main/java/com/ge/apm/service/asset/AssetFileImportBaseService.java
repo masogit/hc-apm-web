@@ -17,6 +17,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -61,6 +62,7 @@ public class AssetFileImportBaseService {
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
+    protected FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 
     protected AssetCreateService assetCreateService = WebUtil.getBean(AssetCreateService.class);
     protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();

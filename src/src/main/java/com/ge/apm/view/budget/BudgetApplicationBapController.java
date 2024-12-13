@@ -13,6 +13,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
@@ -130,11 +131,14 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     private List<String> removeFileBlobId = new ArrayList<>();
     @Getter @Setter
     private String searchDeptName;
+
+    private FileDownloadService fileDownloadService;
     @Override
     protected void init() {
         AccessRecordsService accessRecordsService = WebUtil.getBean(AccessRecordsService.class);
         accessRecordsService.accessRecords(AccessRecordsFeature.BUDGET.getFeatureCode(), "/budget/application/List.xhtml", UserContextService.getCurrentUserAccount());
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
         purchaseBudgetConfigRepository = WebUtil.getBean(PurchaseBudgetConfigRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -244,7 +248,8 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         List<BudgetApplication> dataList = persistService.loadDataList(this.searchFilters);
         List<Map<String, Object>> budgetDataList = persistService.createBudgeApplicationData(dataList,orderType);
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/application/excel/APM_Budget_BAP_Exp_Template.xlsx");
+//            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/application/excel/APM_Budget_BAP_Exp_Template.xlsx");
+            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUDGET_BAP_EXP.getCode(), SystemTemplate.SystemTemplateEnum.BUDGET_BAP_EXP.getFileType());
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             persistService.exportData(doc, budgetDataList,orderType);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Budget_BAP.xlsx");

@@ -1,5 +1,6 @@
 package com.ge.apm.service.pm;
 
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.PmExportFormatter;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
@@ -39,7 +40,8 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
 
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
-        InputStream inputStream = PmFileExportTemplate.class.getClassLoader().getResourceAsStream("template/PmOrder_export.xlsx");
+//        InputStream inputStream = PmFileExportTemplate.class.getClassLoader().getResourceAsStream("template/PmOrder_export.xlsx");
+        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
         pmSheet = workBook.getSheet("Sheet1");
     }

@@ -31,7 +31,7 @@ public class SystemTemplate implements Serializable {
 
 
     @Column(name = "file_type")
-    private String fileType;  //模板类型
+    private String fileType;  //模板类型 唯一
 
     @Column(name = "template_type")
     private String templateType;  //模板类型
@@ -65,26 +65,95 @@ public class SystemTemplate implements Serializable {
 
 
     public enum SystemTemplateEnum{
+        //出库入库
         OUT_STOCKED("OUT_STOCKED","出库模板","word","out_stocked_template.docx"),
         IN_STOCKED("IN_STOCKED","入库模板","word","in_stocked_template.docx"),
+
+        //到货安装
+        ARRIVAL_ITEM("ARRIVAL_ITEM","导出安装单模板","excel","APM_AssetArrivalItem_Template.xlsx"),
+        ARRIVAL_SUPPLIER_REPORT("ARRIVAL_SUPPLIER_REPORT","到货安装单模板","word","ArrivalSupplierReportTemplate.docx"),
+
         TECHNOLOGY("TECHNOLOGY","技术验收模板","word","TechnologyReportTemplate.docx"),
         BUSINESS("BUSINESS","商务验收模板","word","BusinessReportTemplate.docx"),
         CLINICAL("CLINICAL","临床验收模板","word","ClinicalReportTemplate.docx"),
         DETAIL("DETAIL","验收资料详单","word","DetailReportTemplate.docx"),
+
+        FIXASSET("FIXASSET","固定资产验收单","word","AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
+
         FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word","AssetReportTemplateBatch.docx"),
         FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word","AssetReportTemplateBatchBottom.docx"),
-        SUPPLIER_IMPORT("SUPPLIER_IMPORT","供应商导入模板","word","APM_Supplier.xlsx"),
+
+        //调拨
         DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板","word","transferorder_template.docx"),
+        // 设备
         ASSET_COUNTRYAREA_TEMPLATE("ASSET_COUNTRYAREA_TEMPLATE","资产导入模板-县域租户","excel","APM_Asset_Dynamic_CountryArea_Template.xlsx"),
         ASSET_COUNTRYAREA_TEMPLATE_EN("ASSET_COUNTRYAREA_TEMPLATE_EN","资产导入模板-县域租户_en","excel","APM_Asset_Dynamic_CountryArea_Template_en.xlsx"),
         ASSET_TEMPLATE("ASSET_TEMPLATE","资产导入模板","excel","APM_Asset_Dynamic_Template.xlsx"),
         ASSET_TEMPLATE_EN("ASSET_TEMPLATE_EN","资产导入模板_en","excel","APM_Asset_Dynamic_Template_en.xlsx"),
 
+        //合同
         CONTRACT("CONTRACT","合同导入模板","excel","APM_Contract_Service_Template.xlsx"),
         CONTRACT_EN("CONTRACT_EN","合同导入模板_en","excel","APM_Contract_Service_Template_en.xlsx"),
         CONTRACT_ITEM("CONTRACT_ITEM","合同相关设备导入模板","excel","APM_ContractItem_Service_Template.xlsx"),
-        BENEFIT_ANALYSIS("BENEFIT_ANALYSIS","设备效益分析导出模板","excel","APM_EfficiencyEquipment_export_Template.xlsx"),
+        CONTRACT_EXPORT("CONTRACT_EXPORT","合同信息导出模板","excel","APM_Contract_Export_Template.xlsx"),
+
+        //供应商
+        SUPPLIER("SUPPLIER","供应商导入模板","word","APM_Supplier.xlsx"),
+        //用户
         USER_ACCOUNT("USER_ACCOUNT","用户导入模板","excel","UserAccountImport_Template.xlsx"),
+        USER_ACCOUNT_EXPORT("USER_ACCOUNT_EXPORT","用户导出模板","excel","APM_UserAccount_Template.xlsx"),
+        //计量
+        MEASURING_RESULT("MEASURING_RESULT","计量数据导入模板","excel","APM_MEASURING_Template.xls"),
+        // HIS模板
+        BENEFIT_ANALYSIS("BENEFIT_ANALYSIS","设备效益分析导出模板","excel","APM_EfficiencyEquipment_export_Template.xlsx"),
+        HIS_CLINICAL("HIS_CLINICAL","HIS科室导入模板","excel","His_clinical.xlsx"),
+        HIS_EQUIPMENT_SFXM("HIS_EQUIPMENT_SFXM","HIS收费项目导入模板","excel","His_sfxm.xlsx"),
+        HIS_EQUIPMENT_CONNECT("HIS_EQUIPMENT_CONNECT","HIS联机设备导入模板","excel","His_equipment_connect.xlsx"),
+        HIS_EQUIPMENT_DATA_SOURCE("HIS_EQUIPMENT_DATA_SOURCE","HIS收费明细源数据导入模板","excel","His_data_source_Template.xlsx"),
+
+
+        //MVS
+        MVS_CONTRACT("MVS_CONTRACT","MVS合同信息模板","excel","APM_mvs_contract.xlsx"),
+        MVS_SITE("MVS_SITE","MVS院区导入模板","excel","APM_mvs_site.xlsx"),
+
+
+        //保养
+        PM_ORDER_EXPORT("PM_ORDER_EXPORT","保养导出模板","excel","PmOrder_export.xlsx"),
+        PM_ORDER_IMPORT("PM_ORDER_IMPORT","保养工单导入模板","excel","PmOrderImport.xls"),
+        MEASURE_ELECTRIC_SAFETY("MEASURE_ELECTRIC_SAFETY","电气安全数据导入模板","ps","APM_Electric_Safety_Template.ps"),
+
+        //预算
+        BUDGET_IMPORT("BUDGET_IMPORT","预算导入模板","excel","Budget_Import_Template.xlsx"),
+        OVER_FIFTY_THOUSAND("OVER_FIFTY_THOUSAND","医疗仪器设备年度采购申报表模板","word","over_fifty_thousand.docx"),
+        BUDGET_BAP_EXP("BUDGET_BAP_EXP","申购导出模板","excel","APM_Budget_BAP_Exp_Template.xlsx"),
+
+        //组织结构
+        ORG_INFO("ORG_INFO","组织机构导入模板","excel","APM_Org_Template.xlsx"),
+        BUILD_MANAGEMENT("BUILD_MANAGEMENT","楼宇管理导出模板","excel","APM_Building_Template.xlsx"),
+
+
+
+
+        //设备绩效报表模板
+        SMALL_ASSET_PERFORMANCE("SMALL_ASSET_PERFORMANCE","设备绩效报表模板","excel","APM_SmallAssetPerformance_Template.xlsx"),
+        SMALL_ASSET_PERFORMANCE_CONFIG("SMALL_ASSET_PERFORMANCE_CONFIG","设备绩效报表配置模板","excel","APM_SmallAssetPerformanceConfig_Template.xlsx"),
+
+        //报废
+        BATCH_ASSET_TERMINATION("BATCH_ASSET_TERMINATION","批量报废文件模板","excel","APM_Asset_Termination_Template.xlsx"),
+
+        //
+        ASSET_RISK_ASSESSMENT("ASSET_RISK_ASSESSMENT","医疗设备风险评估模板","word","assetRiskAssessment.docx"),
+
+        //日常检查
+        NURSE_SITE_MAINTAIN("NURSE_SITE_MAINTAIN","日常检查报表模板","excel","APM_NurseSiteMaintain_Template.xlsx"),
+        NURSE_SITE_MAINTAIN_DETAIL("NURSE_SITE_MAINTAIN_DETAIL","日常检查报表详情模板","excel","APM_NurseSiteMaintainDetail_Template.xlsx"),
+        NURSE_SITE_MAINTAIN_WORD("NURSE_SITE_MAINTAIN_WORD","日常检查报表Word模板","word","APM_NurseSiteMaintainDetail_Template.xlsx"),//这个模板没有系统自己创建的word
+
+        //备件
+        PARTS_OUT_BOUND_ORDER("PARTS_OUT_BOUND_ORDER","备件出库单模板","word","outBoundOrderReportTemplate.docx"),
+
+
+
 
         ;
         final String code;

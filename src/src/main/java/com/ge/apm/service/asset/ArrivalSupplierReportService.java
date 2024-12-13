@@ -4,13 +4,16 @@ import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
@@ -27,7 +30,7 @@ public class ArrivalSupplierReportService {
 
     protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ArrivalSupplierReportService.class);
 
-    public static final String REPORT_ARRIVAL_SUPPLIER_TEMPLATE = "/portal/asset/arrived/reportTemplate/ArrivalSupplierReportTemplate.docx";
+//    public static final String REPORT_ARRIVAL_SUPPLIER_TEMPLATE = "/portal/asset/arrived/reportTemplate/ArrivalSupplierReportTemplate.docx";
 
     public static final String REPORT_ARRIVAL_SUPPLIER_TITLE = "到货安装单";
 
@@ -92,12 +95,18 @@ public class ArrivalSupplierReportService {
     public byte[] buildReportTemplate() throws IOException {
 
         byte[] templateBytes = null;
-        String templatePath = REPORT_ARRIVAL_SUPPLIER_TEMPLATE;
+//        String templatePath = REPORT_ARRIVAL_SUPPLIER_TEMPLATE;
+//
+//        if(templatePath != null){
+//            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
+//        }
+//
+        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 
-        if(templatePath != null){
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
+        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
+        if(inputStream != null){
+            templateBytes = IOUtils.toByteArray(inputStream);
         }
-
         return templateBytes;
     }
 

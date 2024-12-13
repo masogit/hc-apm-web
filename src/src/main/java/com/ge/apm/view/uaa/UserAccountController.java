@@ -13,6 +13,7 @@ import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.security.UserDetailsServiceImpl;
 import com.ge.apm.service.uaa.*;
 import com.ge.apm.service.utils.*;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -175,6 +176,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private List<OrgInfo> affiliationDepartmentGroup = new ArrayList<>();
     private List<String> childNodeUid=new ArrayList<>();
 
+    private FileDownloadService fileDownloadService;
+
     public boolean isPropagateSelectionUp() {
         return propagateSelectionUp;
     }
@@ -255,6 +258,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private UserAssetGroupRepository userAssetGroupDao;
     @Override
     protected void init() {
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         this.searchFilters = new ArrayList<>();
         filterBySite = false;
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
@@ -1813,7 +1818,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     private void downloadFile(List<Map<String, Object>> data) {
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
+//            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
+            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.USER_ACCOUNT_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.USER_ACCOUNT_EXPORT.getFileType());
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = userAccountExportService.exportData(doc, data);
             if (exportFlag) {

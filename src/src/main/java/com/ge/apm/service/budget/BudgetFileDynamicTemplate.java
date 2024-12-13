@@ -6,7 +6,9 @@
 package com.ge.apm.service.budget;
 
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
@@ -52,8 +55,10 @@ public class BudgetFileDynamicTemplate  {
     public BudgetFileDynamicTemplate() throws IOException {
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
-        String fileName = "Budget_Import_Template.xlsx";
-        InputStream inputStream = BudgetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
+//        String fileName = "Budget_Import_Template.xlsx";
+//        InputStream inputStream = BudgetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
+        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUDGET_IMPORT.getCode(), SystemTemplate.SystemTemplateEnum.BUDGET_IMPORT.getFileType());
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         budgetSheet = workBook.getSheet(SHEET_BUDGET);
