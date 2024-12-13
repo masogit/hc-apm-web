@@ -19,4 +19,9 @@ public interface KeyAssetReportOrgRepository extends GenericRepositoryUUID<KeyAs
     void deleteByKeyAssetReportId(String id);
 
     List<KeyAssetReportOrg> findByKeyAssetReportId(String id);
+
+    @Transactional
+    @Modifying
+    void deleteByKeyAssetReportIdAndOrgIdIn(String id, List<String> deleteDeptUids);
+
 }
