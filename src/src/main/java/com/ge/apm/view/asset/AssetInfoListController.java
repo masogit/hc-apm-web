@@ -898,7 +898,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void prepareViewQrcode(){
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> assetInfos = dao.findByUidIn(assetUids);
-        List<String> collect = assetInfos.stream().map(AssetInfo::getQrCode).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        List<String> collect = assetInfos.stream().filter(item->StringUtils.isNotEmpty(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUID()).collect(Collectors.toList());
         qrPreViewerBean.onServerEvent("",collect);
     }
     public void navigateTo(){

@@ -24,6 +24,7 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -457,7 +458,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             WebUtil.addErrorMessage("请选择出库单!");
             return;
         }
-        List<String> collect = this.selectedItems.stream().map(ArrivalListItem::getQrCode).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        List<String> collect = this.selectedItems.stream().filter(item->StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUid()).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(collect)){
             List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
             if(CollectionUtils.isEmpty(assetUids)){
@@ -465,7 +466,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
                 return;
             }
             List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
-            collect = assetInfos.stream().map(AssetInfo::getQrCode).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+            collect = assetInfos.stream().filter(item-> StringUtils.hasText(item.getQrCode())).map(item->item.getQrCode()+":"+item.getSiteUID()).collect(Collectors.toList());
         }
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         qrPreViewerBean.onServerEvent("",collect);

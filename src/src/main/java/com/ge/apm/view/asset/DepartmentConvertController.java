@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -245,7 +246,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,selectedIds));
         List<AssetDepartmentConvert> bySearchFilter = dao.findBySearchFilter(searchFilters);
-        List<String> collect = bySearchFilter.stream().map(AssetDepartmentConvert::getAssetQrCode).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        List<String> collect = bySearchFilter.stream().filter(item-> StringUtils.hasText(item.getAssetQrCode())).map(item->item.getAssetQrCode()+":"+item.getOutSiteUid()).collect(Collectors.toList());
         qrPreViewerBean.onServerEvent("",collect);
     }
     public Integer getStatus() {
