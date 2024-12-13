@@ -148,7 +148,7 @@
 <!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
 <!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
 <!--                                </p:commandButton>-->
-                                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not departmentConvertController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
+                                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not departmentConvertController.isChecked()}" actionListener="#{departmentConvertController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
                             </f:facet>
                         </p:dataTable>
                     </h:form>
