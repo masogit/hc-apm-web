@@ -969,6 +969,31 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('spare05',item.spare05)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'spare06'}">
+                                <p:column headerText="#{msg.spare06}" sortBy="#{item.spare06}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare06',item.spare06)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare07'}">
+                                <p:column headerText="#{msg.spare07}" sortBy="#{item.spare07}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare07',item.spare07)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare08'}">
+                                <p:column headerText="#{msg.spare08}" sortBy="#{item.spare08}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare08',item.spare08)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare09'}">
+                                <p:column headerText="#{msg.spare09}" sortBy="#{item.spare09}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare09',item.spare09)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare10'}">
+                                <p:column headerText="#{msg.spare10}" sortBy="#{item.spare10}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('spare10',item.spare10)}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
