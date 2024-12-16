@@ -7,6 +7,7 @@ import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +57,11 @@ public class PreViewerBean implements ServerEventInterface {
                 //type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
                 getTypeByObject();
             }
+        }
+        if(type == -1){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        }else{
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
         }
     }
 
