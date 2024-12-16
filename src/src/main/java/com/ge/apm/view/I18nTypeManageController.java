@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.alibaba.excel.util.ListUtils;
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.I18nTypeManageRepository;
 import com.ge.apm.dao.TenantInfoRepository;
@@ -8,7 +9,6 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.I18nTypeManage;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -82,58 +82,57 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.IN, Arrays.asList(-1,siteId)));
         List<I18nMessage> i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
         Map<Integer, List<I18nMessage>> listMap = i18nMessageList.stream().collect(Collectors.groupingBy(I18nMessage::getSiteId));
-        List<I18nMessage> msgList = listMap.get(siteId);
-        selected.setI18nMessageList(msgList);
-        List<I18nMessage> defaultMsgList = listMap.get(-1);
-        selected.setDefaultMsgList(defaultMsgList);
         boolean defaultValue = false;
         boolean alone = false;
-        if(CollectionUtils.isNotEmpty(msgList)){
-            I18nMessage i18nMessage = msgList.get(0);
-            defaultValue =Integer.valueOf(-1).equals(i18nMessage.getSiteId());
-            selected.setDefaultValue(defaultValue);
-        }else if(CollectionUtils.isNotEmpty(defaultMsgList)){
-            List<I18nMessage> collect = selected.getDefaultMsgList().stream().map(item -> {
+        List<I18nMessage> defaultMsgList = listMap.get(-1); // 获取默认值
+        if(CollectionUtils.isNotEmpty(defaultMsgList)){
+            List<I18nMessage> collect = defaultMsgList.stream().map(item -> {
                 I18nMessage i18nMessage = new I18nMessage();
                 BeanUtils.copyProperties(item, i18nMessage);
                 return i18nMessage;
             }).collect(Collectors.toList());
-            selected.setI18nMessageList(collect);
             defaultValue = Boolean.TRUE;
+            selected.setI18nMessageList(collect);
             selected.setDefaultValue(defaultValue);
-        }else{
+        }
+        List<I18nMessage> msgList = listMap.get(siteId); // 获取当前租户
+        if(CollectionUtils.isNotEmpty(msgList)){
+            I18nMessage i18nMessage = msgList.get(0);
+            defaultValue =Integer.valueOf(-1).equals(i18nMessage.getSiteId());
+            selected.setDefaultValue(defaultValue);
+            selected.setI18nMessageList(msgList);
+        }
+
+        if(CollectionUtils.isEmpty(selected.getDefaultMsgList()) && CollectionUtils.isEmpty(selected.getI18nMessageList())){
             searchFilters.clear();
             searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
             i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
             selected.setDefaultMsgList(i18nMessageList);
             selected.setI18nMessageList(i18nMessageList);
-            alone = CollectionUtils.isEmpty(defaultMsgList);
-            selected.setAlone(alone);
         }
-
+        alone = CollectionUtils.isEmpty(defaultMsgList);
+        selected.setAlone(alone);
         LOGGER.info("msgType:{},siteId:{},default:{},alone:{}",msgType,siteId,defaultValue,alone);
     }
     public void editI18nConfig(){
-        //TODO
-        System.out.println("editI18nConfig:"+ selectedI18n);
+        LOGGER.info("editI18nConfig:{}", JSON.toJSONString(selectedI18n));
     }
     public void prepareAddI18n(){
         //TODO
         selectedI18n = new I18nMessage();
         selectedI18n.setMsgType(selected.getMsgType());
         selected.getI18nMessageList().add(selectedI18n);
-        System.out.println("prepareAddI18n:"+ selectedI18n);
+        LOGGER.info("prepareAddI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void prepareEditI18n(){
         //TODO
-        System.out.println("prepareEditI18n:"+ selectedI18n);
+        LOGGER.info("prepareEditI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void deleteI18n(){
-        //TODO
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList().stream().filter(item->!item.getMsgKey().equals(selectedI18n.getMsgKey())).collect(Collectors.toList());
         selected.setI18nMessageList(i18nMessageList);
         selectedI18n = null;
-        System.out.println("deleteI18n:"+ selectedI18n);
+        LOGGER.info("deleteI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void  reset(){
         selected.setI18nMessageList(ListUtils.newArrayList());
@@ -175,8 +174,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         if(CollectionUtils.isNotEmpty(deleteI18nMessageList)){
             i18nMessageRepository.delete(deleteI18nMessageList);
         }
-        DbMessageSource.reLoadMessages();
         dao.save(selected);
+        DbMessageSource.reLoadMessages();
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();

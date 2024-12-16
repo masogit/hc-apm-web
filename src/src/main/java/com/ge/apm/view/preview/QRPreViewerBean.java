@@ -7,6 +7,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -58,10 +60,25 @@ public class QRPreViewerBean implements ServerEventInterface {
         }
     }
     public StreamedContent getImg(String code) throws IOException {
-        String[] split = code.split(":");
-        return  getImg(split[0], split[1]);
+        StreamedContent qrCodeImage = null;
+        try {
+            if(StringUtils.hasText(code)){
+                String[] split = code.split(":");
+                String qrCode = split[0];
+                String siteUid = split[1];
+                if(StringUtils.isEmpty(siteUid)){
+                    siteUid = currentUser.getSiteUID();
+                }
+                qrCodeImage = getImg(qrCode, siteUid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            itemList = itemList.stream().filter(item->!item.equals(code)).collect(Collectors.toList());
+            logger.info("previewer qrcode error :{}",code);
+        }
+        return  qrCodeImage;
     }
-    public StreamedContent getImg(String code, String siteUid) throws IOException {
+    private StreamedContent getImg(String code, String siteUid) throws IOException {
         StreamedContent streamedContent = cacheStreamedContent.get(code);
         if(streamedContent == null){
             ByteArrayOutputStream os = new ByteArrayOutputStream();
