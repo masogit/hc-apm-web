@@ -170,17 +170,22 @@ public class V2_WorkOrderService {
     }
 
     public List<V2_BlobObject> getPicListBySrUid(String srUid,Integer type, String boSubType) {
-        List<SearchFilter> blobSearchFilters = new ArrayList();
+        List<SearchFilter> blobSearchFilters = new ArrayList<>();
         blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
-      if(type ==1 && boSubType == V2_BlobObject.BO_SUB_TYPE_DOCS ) {
-              blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_SUB_TYPE_DOCS ));
-      }
-        if(type ==1 && boSubType == V2_BlobObject.BO_SUB_TYPE_IMG ) {
-                blobSearchFilters.add(new SearchFilter("objectType", SearchFilter.Operator.LIKE, "image/%"));
-                blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "Image", "1*2+" ));
-                blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.IsNull,null,"1*2+" ));
+        if (type ==1 && Objects.equals(boSubType, V2_BlobObject.BO_SUB_TYPE_DOCS)) {
+            blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_SUB_TYPE_DOCS ));
         }
-
+        if (type ==1 && Objects.equals(boSubType, V2_BlobObject.BO_SUB_TYPE_IMG)) {
+            blobSearchFilters.add(new SearchFilter("objectType", SearchFilter.Operator.LIKE, "image/%"));
+            blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "Image", "1*2+" ));
+            blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.IsNull,null,"1*2+" ));
+        }
+        if (type == 2) {
+            blobSearchFilters.add(new SearchFilter("objectType", SearchFilter.Operator.LIKE, "audio/%"));
+        }
+        if (type == 3) {
+            blobSearchFilters.add(new SearchFilter("objectType", SearchFilter.Operator.LIKE, "video/%"));
+        }
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
