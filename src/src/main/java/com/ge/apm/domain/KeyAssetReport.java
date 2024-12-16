@@ -119,4 +119,6 @@ public class KeyAssetReport implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    @Column(name="summary", columnDefinition = "VARCHAR(2500)")
+    private String summary;
 }

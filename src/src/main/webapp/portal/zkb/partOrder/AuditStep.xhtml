@@ -211,7 +211,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartsHighTypeGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.zkbContract.contractType eq 'CCS' or zkbPartOrderAuditController.zkbContract.contractType eq 'Biomed')}">
+                        <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.checkPcbMvsTotal()) and !(zkbPartOrderAuditController.zkbContract.contractType eq 'CCS' or zkbPartOrderAuditController.zkbContract.contractType eq 'Biomed')}">
                             <label class="label">保养申请*</label>
                             <p:selectOneMenu id="maintainFlag" disabled="true" value="#{zkbPartOrderAuditController.selected.maintainFlag}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -442,9 +442,18 @@
                         <p:column headerText="配件名称">
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
-                        <p:column headerText="配件数量">
-                            <h:outputText value="#{item.prePartQty}"/>
-                        </p:column>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderAuditController.checkPcbMvsTotal()}">
+                                <p:column headerText="配件list price">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="配件数量">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:otherwise>
+                        </c:choose>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
@@ -528,9 +537,18 @@
                         <p:column headerText="配件名称">
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
-                        <p:column headerText="配件数量">
-                            <h:outputText value="#{item.prePartQty}"/>
-                        </p:column>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderAuditController.checkPcbMvsTotal()}">
+                                <p:column headerText="配件list price">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="配件数量">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                            </c:otherwise>
+                        </c:choose>
                        <p:column headerText="备注（说明是否DOA或者Short life）">
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
@@ -748,6 +766,9 @@
 
                 </p:fieldset>
                 <p:fieldset id="orderedFieldset" legend="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showOrderedFieldsetText}" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showOrder}">
+                    <c:if test="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                        <p:outputLabel id="trainTips" style="color: red;font-weight:bold;margin-left: 12px;font-size: small" value="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.trainTips}"/>
+                    </c:if>
                     <p:panelGrid id="orderedGrid" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}"><!--备件-->
@@ -871,7 +892,6 @@
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
-                                    <p:outputLabel id="trainTips" style="color: red;font-weight:bold;margin-left: 0px;font-size: small" value="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.trainTips}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">备注</label>
@@ -924,14 +944,29 @@
                         <p:column headerText="配件名称*">
                             <p:inputText value="#{item.partName}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" />
                         </p:column>
-                        <p:column headerText="配件数量*">
-                            <h:outputText value="#{item.prePartQty}"/>
-                        </p:column>
-                        <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <p:column headerText="实际配件数量*">
-                                <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" />
-                            </p:column>
-                        </c:if>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderAuditController.checkPcbMvsTotal()}">
+                                <p:column headerText="配件list price*">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                                <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                                    <p:column headerText="实际配件list price*">
+                                        <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" />
+                                    </p:column>
+                                </c:if>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="配件数量*">
+                                    <h:outputText value="#{item.prePartQty}"/>
+                                </p:column>
+                                <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                                    <p:column headerText="实际配件数量*">
+                                        <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" />
+                                    </p:column>
+                                </c:if>
+                            </c:otherwise>
+                        </c:choose>
+
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>

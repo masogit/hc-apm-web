@@ -16,12 +16,14 @@
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.clinicalDeptNamePyCode}">
-			<f:facet name="filter">
-				<p:selectOneMenu onchange="PF('varDataListNoWorkOrder').filter()" autoWidth="false" style="max-width: 150px;">
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItems value="#{inventoryOrderDetailAssetInfoNoWorkOrderController.listClinicalDeptName}" />
-				</p:selectOneMenu>
+		<p:column headerText="#{msg.clinicalDeptName}">
+			<f:facet name="header">
+				<h:outputText value="#{msg.clinicalDeptName}"/><br/>
+				<p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoNoWorkOrderController.filterClinicalDeptOrg}" appendTo="@(Body)"
+								scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoNoWorkOrderController.autoCompleteDeptName}" size="5">
+					<p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoNoWorkOrderController.onClinicalDeptNameFilterChange}" process="@this" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoListNoWorkOrderForm:datalistNoWorkOrder"/>
+					<p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoNoWorkOrderController.onClinicalDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoListNoWorkOrderForm:datalistNoWorkOrder"/>
+				</p:autoComplete>
 			</f:facet>
 			<h:outputText value="#{item.clinicalDeptName}" />
 		</p:column>

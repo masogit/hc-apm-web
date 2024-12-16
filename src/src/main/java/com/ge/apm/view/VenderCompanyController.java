@@ -1,9 +1,14 @@
 package com.ge.apm.view;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.ConfigItemValueRepository;
+import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.VenderCompanyRepository;
+import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.VenderCompany;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -18,7 +23,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -36,6 +44,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private Map<String, List<V2_BlobObject>> attachmentMap = MapUtil.newHashMap();
     private UserAccount currentUser;
 
+    private PreViewerBean preViewerBean;
     @Override
     protected void init() {
         dao = WebUtil.getBean(VenderCompanyRepository.class);
@@ -43,6 +52,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
+        preViewerBean = WebUtil.getBean(PreViewerBean.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.filterBySite = false;
     }
@@ -139,5 +149,9 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
 
     public String getVenderCompanyLoginUrl() {
         return configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "vendorLoginUrl");
+    }
+
+    public void preViewed(String objectId){
+        preViewerBean.onServerEvent("",objectId);
     }
 }

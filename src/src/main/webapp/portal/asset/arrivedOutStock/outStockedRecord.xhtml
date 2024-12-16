@@ -76,6 +76,10 @@
                     </p:overlayPanel>
                 </h:panelGroup>
                 <h:panelGroup>
+                    <label class="label">#{msg.arrivalListContractNum}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.contractNum}"/>
+                </h:panelGroup>
+                <h:panelGroup>
                     <label class="label">状态</label>
                     <p:selectOneMenu value="#{assetStockedController.searchItem.stockStatus}">
                         <f:selectItem itemLabel="请选择" itemValue="#{null}"/>

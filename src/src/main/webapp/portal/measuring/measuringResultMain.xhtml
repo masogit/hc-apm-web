@@ -10,7 +10,7 @@
             </div>
 
             <div class="ui-g-12">
-                <p:tabView id="measuringTab" class="ui-g-12">
+                <p:tabView id="measuringTab" dynamic="true" class="ui-g-12">
                     <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                     <p:tab title="计量结果" id="measuringAssetList" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_INFO_VIEW')}">
                         <ui:include src="measuringAssetList.xhtml"/>
@@ -23,6 +23,9 @@
                     </p:tab>
                     <p:tab title="计量附件批量上传" id="fileImport" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_INFO_EDIT')}">
                         <ui:include src="fileImport.xhtml"/>
+                    </p:tab>
+                    <p:tab title="报废计量结果" id="scrappedMeasuringAssetList" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_INFO_EDIT')}">
+                        <ui:include src="scrappedMeasuringAssetList.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>

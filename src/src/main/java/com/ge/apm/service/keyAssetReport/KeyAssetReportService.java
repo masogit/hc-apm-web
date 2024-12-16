@@ -60,7 +60,7 @@ public class KeyAssetReportService {
                         }
                         if(valueMap.get("installDate").getClass()==String.class){
                             String installDate = (String) valueMap.get("installDate");
-                            date = DateUtil.getDateByFormatStr(installDate, "yyyy-MM-dd");
+                             date = DateUtil.getDateByFormatStr(installDate, "yyyy-MM-dd");
                         }
                         if(date!=null){
                             if(date.getTime() > assetInfo.getInstallDate().getTime()){
