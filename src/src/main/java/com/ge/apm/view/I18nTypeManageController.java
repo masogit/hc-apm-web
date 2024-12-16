@@ -9,6 +9,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.I18nTypeManage;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     private UserAccount currentUser;
     private I18nTypeManageRepository dao;
     private TenantInfoRepository tenantInfoRepository;
+    private ConfigCacheService configCacheService;
     private TenantInfo selectTenant;
     private Integer selectTenantId;
 
@@ -46,6 +48,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         dao = WebUtil.getBean(I18nTypeManageRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         selectTenant = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
         selectTenantId = selectTenant.getId();
@@ -92,7 +95,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
                 return i18nMessage;
             }).collect(Collectors.toList());
             defaultValue = Boolean.TRUE;
-            selected.setI18nMessageList(collect);
+            selected.setDefaultMsgList(collect);
+            selected.setI18nMessageList(new ArrayList<>(collect));
             selected.setDefaultValue(defaultValue);
         }
         List<I18nMessage> msgList = listMap.get(siteId); // 获取当前租户
@@ -107,8 +111,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             searchFilters.clear();
             searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
             i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
-            selected.setDefaultMsgList(i18nMessageList);
-            selected.setI18nMessageList(i18nMessageList);
+            selected.setDefaultMsgList(new ArrayList<>(i18nMessageList));
+            selected.setI18nMessageList(new ArrayList<>(i18nMessageList));
         }
         alone = CollectionUtils.isEmpty(defaultMsgList);
         selected.setAlone(alone);
@@ -176,6 +180,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         }
         dao.save(selected);
         DbMessageSource.reLoadMessages();
+        configCacheService.cleanCacheNames();
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();

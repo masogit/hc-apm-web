@@ -455,7 +455,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public void prepareViewQrcode(){
         if(CollectionUtils.isEmpty(this.selectedItems)){
-            WebUtil.addErrorMessage("请选择出库单!");
+            WebUtil.addErrorMessage("请选择设备");
             return;
         }
         List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
