@@ -103,7 +103,7 @@
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
-                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:ajax  event="click" update="pmTab:previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                 </p:graphicImage>
                             </h:panelGrid>
@@ -243,7 +243,7 @@
                     <p:dataGrid id="partPictureList" var="fileitem" value="#{v2PmOrderController.getPartPictures(v2PmOrderController.selected.id)}" columns="5" layout="grid" >
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
-                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:ajax  event="click" update="pmTab:previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                 </p:graphicImage>
                             </h:panelGrid>
