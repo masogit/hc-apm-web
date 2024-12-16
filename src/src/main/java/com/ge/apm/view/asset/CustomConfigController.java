@@ -616,16 +616,19 @@ public class CustomConfigController {
 
     public void resetField(){
         i18nMessageService.resetCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId());
-        DbMessageSource.reLoadMessages();
+        resetCache();
     }
 
     public void renameField(){
         allFields.put(currentEditField.getKey(), newName);
         i18nMessageService.changeCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId(),newName);
-        DbMessageSource.reLoadMessages();
+        resetCache();
         newName = "";
     }
-
+    private void resetCache(){
+        DbMessageSource.reLoadMessages();
+        configCacheService.cleanCacheNames();
+    }
     public boolean isRenameFields(String key) {
         try {
             return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
