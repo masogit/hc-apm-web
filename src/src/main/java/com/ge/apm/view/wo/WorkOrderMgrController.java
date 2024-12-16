@@ -186,6 +186,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
+    private List<V2_BlobObject> videoList;
     private List<V2_BlobObject> attachList;
     public static List<AssetInfo> assetInfos = null;
 
@@ -1158,9 +1159,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
-        audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
-        attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);
+        videoList = woService.getPicListBySrUid(selected.getSrId(), 3, null);
+        picList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
+        attachList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
         // 获取temp user信息
         initExternalTempUser();
     }
@@ -1200,10 +1202,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
 
-        List<V2_BlobObject> pList = woService.getPicListBySrUid(srId, type, boSubType).stream().filter(item -> type == 1 ^
-                (item.getObjectType() != null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+        /*List<V2_BlobObject> pList = woService.getPicListBySrUid(srId, type, boSubType).stream().filter(item -> type == 1 ^
+                (item.getObjectType() != null && (item.getObjectType().contains("audio") || item.getObjectType().contains("video")))).collect(Collectors.toList());
 
-        return pList;
+        return pList;*/
+        return woService.getPicListBySrUid(srId, type, boSubType);
     }
 
     /*
@@ -3241,6 +3244,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void setAudioList(List<V2_BlobObject> audioList) {
         this.audioList = audioList;
+    }
+
+    public List<V2_BlobObject> getVideoList() {
+        return videoList;
+    }
+
+    public void setVideoList(List<V2_BlobObject> videoList) {
+        this.videoList = videoList;
     }
 
     public String getRequestAssetUid() {

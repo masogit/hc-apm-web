@@ -189,6 +189,16 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+                    <p:dataGrid var="audioItem" value="#{workOrderMgrController.videoList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.videoList}">
+                        <f:facet name="header">报修视频</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <video controls="" name="media">
+                                    <source src="#{fileDownloadService.getImgUrl(audioItem.objectStorageId)}"/>
+                                </video>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
                     <c:forEach items="#{workOrderMgrController.selectedWorkOrderList}" var="woItem" varStatus="rowIndex" >
                         <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? msg.CurrentWorkorder:msg.WorkOrder}" toggleable="false" >
                             <div class="ui-g">
