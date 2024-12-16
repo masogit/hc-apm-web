@@ -297,11 +297,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedOutStockDoc() {
-        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("包含不同到货单，无法生成出库单！");
-            return;
-        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
