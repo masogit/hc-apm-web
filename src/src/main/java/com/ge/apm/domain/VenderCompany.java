@@ -201,6 +201,13 @@ public class VenderCompany implements Serializable {
     @Column(name = "approval_result")
     private String approvalResult;
 
+    @Transient
+    private Boolean relation;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "vender_company_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private List<Supplier> supplierList = new ArrayList<>();
+
     public String getAuthor() {
         return author;
     }
@@ -567,6 +574,22 @@ public class VenderCompany implements Serializable {
 
     public void setProductRegistrationAttachments(List<V2_BlobObject> productRegistrationAttachments) {
         this.productRegistrationAttachments = productRegistrationAttachments;
+    }
+
+    public Boolean getRelation() {
+        return relation;
+    }
+
+    public void setRelation(Boolean relation) {
+        this.relation = relation;
+    }
+
+    public List<Supplier> getSupplierList() {
+        return supplierList;
+    }
+
+    public void setSupplierList(List<Supplier> supplierList) {
+        this.supplierList = supplierList;
     }
 
     @Override
