@@ -10,6 +10,7 @@ import com.ge.apm.domain.VenderCompany;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import org.primefaces.context.RequestContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -40,6 +42,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private SupplierController supplierController;
     @Getter @Setter
     private String supplierType;
+    @Getter @Setter
+    private Boolean relation;
     @Getter @Setter
     private Map<String, List<V2_BlobObject>> attachmentMap = MapUtil.newHashMap();
     private UserAccount currentUser;
@@ -71,7 +75,30 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         if (ObjectUtil.isNotEmpty(hasSuppliers)) {
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.NotIN, hasSuppliers.stream().map(Supplier::getVenderCompanyId).collect(Collectors.toList())));
         }*/
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<Supplier> hasSuppliers = supplierRepository.findByTenantUIDAndVenderCompanyIdIsNotNull(UserContextService.getCurrentUserAccount().getTenantUID());
+        List<String> venderCompanyIds = ListUtil.newArrayList("-1");
+        venderCompanyIds.addAll(hasSuppliers.stream().map(Supplier::getVenderCompanyId).collect(Collectors.toList()));
+        if (this.hasFilterOnField("relation")) {
+            if (relation) {
+                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, venderCompanyIds));
+            } else {
+                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.NotIN, venderCompanyIds));
+            }
+            this.removeFilterOnField("relation");
+        }
+        if(this.hasFilterOnField("supplierType")){
+            switch (supplierType){
+                case "1": searchFilters.add(new SearchFilter("supplierT",SearchFilter.Operator.EQ,true));break;
+                case "2": searchFilters.add(new SearchFilter("maintainerT",SearchFilter.Operator.EQ,true));break;
+                case "3": searchFilters.add(new SearchFilter("manufacturerT",SearchFilter.Operator.EQ,true));break;
+            }
+            this.removeFilterOnField("supplierType");
+        }
+        Page<VenderCompany> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        for (VenderCompany venderCompany : page.getContent()) {
+            venderCompany.setRelation(venderCompanyIds.contains(venderCompany.getId()));
+        }
+        return page;
     }
 
     public void relation(){
