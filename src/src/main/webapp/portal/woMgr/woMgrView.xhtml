@@ -150,7 +150,7 @@
                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                     </p:graphicImage>
                                 </h:panelGrid>
-                                <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                                <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                             </p:panel>
                         </p:dataGrid>
                     </p:fieldset>
@@ -162,7 +162,7 @@
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                 </p:graphicImage>
                             </h:panelGrid>
-                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                         </p:panel>
                     </p:dataGrid>
                 </p:fieldset>
