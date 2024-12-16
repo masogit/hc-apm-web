@@ -92,6 +92,7 @@
                                 <p:dataList id="licenseAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">营业执照附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -113,9 +114,10 @@
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">营业许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -124,6 +126,7 @@
                                 <p:dataList id="afterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'afterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">售后服务承诺附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -132,6 +135,7 @@
                                 <p:dataList id="authorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">授权书附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -156,6 +160,7 @@
                                 <p:dataList id="manufacturingPermitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">生产许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -180,6 +185,7 @@
                                 <p:dataList id="productRegistrationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'productRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">产品注册证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -187,6 +193,7 @@
                     <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" disabled="#{venderCompanyController.relationDisabled()}" value="添加供应商" update="supplierTab:VenderCompanyDetailForm supplierTab:VenderCompanyForm:datalist1  supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check"/>
                 </p:fieldset>
             </h:form>
+            <ui:include src="/portal/preview/view.xhtml" />
         </div>
     </ui:composition>
 </html>

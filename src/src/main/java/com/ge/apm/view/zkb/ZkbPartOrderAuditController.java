@@ -398,6 +398,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return false;
     }
 
+    public boolean checkPcbMvsTotal(){
+        boolean result = false;
+        if(zkbContract != null && (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) ||
+                "PCB MVS".equals(zkbContract.getContractType()))){
+            int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+            if(total >= 1000){
+                result = true;
+            }
+        }
+        return result;
+    }
+
 
     public boolean getUnrealStatusRender(){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){

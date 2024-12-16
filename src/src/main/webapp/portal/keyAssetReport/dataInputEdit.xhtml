@@ -222,8 +222,15 @@
                         </p:dataTable>
                     </p:panelGrid>
 
-                </p:fieldset>
+                </p:fieldset >
                 <br/>
+                <p:fieldset legend="#{msg.equipmentSummary}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <label class="label">#{msg.summary}</label>
+                        <p:inputTextarea value="#{keyAssetReportController.selected.summary}" maxlength="2500" cols="150" autoResize="true" />
+                    </p:panelGrid>
+
+                </p:fieldset>
                 <p:commandButton validateClient="true" value="#{msg.Save}" update=":growl keyAssetReportListForm:datalist reportYear" icon="ui-icon-check"
                                  actionListener="#{keyAssetReportController.saveKeyAssetReport}"
                                  oncomplete="handleSubmit(args, 'keyAssetReportEditDialog');"/>

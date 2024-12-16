@@ -418,7 +418,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     public boolean isDepotAsset(){
         boolean rs = false;
-        if(this.contractList != null){
+        if(this.contractList != null && this.contractList.size() > 0){
             if(ZkbFePartOrderService.assetTypeDepot.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))){
                 rs = true;
             }

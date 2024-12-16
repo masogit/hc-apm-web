@@ -259,15 +259,34 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             editCurrentScoreFlag();
             handleQtyByOrderType();
+
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
             //判断是否是放射类以及合同类型是否是DI或者PCB
-            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType())){
                 if(assetInfo.getAssetGroup().equals(1)){
                     radiationQuotaTypeFlag = true;
                     Integer q = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
                     if(q<= 0){
                         selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
                         spareArtificialFlag = true;
+                    }
+                }else{
+                    radiationQuotaTypeFlag = false;
+                    selected.setRadiationQuotaType(null);
+                }
+            }else if(ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
+                if(assetInfo.getAssetGroup().equals(1)){
+                    if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
+                        radiationQuotaTypeFlag = true;
+                        selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
+                        spareArtificialFlag = true;
+                    }else{
+                        radiationQuotaTypeFlag = true;
+                        Integer q = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
+                        if(q<= 0){
+                            selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
+                            spareArtificialFlag = true;
+                        }
                     }
                 }else{
                     radiationQuotaTypeFlag = false;
@@ -321,6 +340,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(!currentScoreFlag){
             boolean r = zkbPartOrderService.checkScoreFlagValid(selected,selectedContract);
             currentScoreFlag = !r;
+        }
+
+        if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
+            if(!currentScoreFlag){
+                selected.setScoreFlag(CopyByInvok.T);
+                scoreFlagChange();
+                currentScoreText += "；该合同只支持积分申请,请检查！";
+            }else{
+                currentScoreText += "；该合同只支持积分申请,请检查！";
+            }
         }
     }
 
@@ -389,6 +418,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else{
             return false;
         }
+    }
+
+    public boolean checkPcbMvsTotal() {
+        return zkbPartOrderEditService.checkPcbMvsTotal(selectedContract);
     }
 
     public boolean isItemCreateDisabled(){

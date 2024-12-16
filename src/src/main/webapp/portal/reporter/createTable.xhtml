@@ -297,7 +297,7 @@
                                 <p:inputText value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Number'}" >
-                                <p:inputNumber value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}" decimalPlaces="#{fieldItem.decimalLength}" />
+                                <p:inputNumber value="#{tableCreateController.editTableItem.defaultValue}" placeholder="#{tableCreateController.editTableItem.defaultValue}" decimalPlaces="4" />
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Select'}" >
                                 <p:selectOneMenu value="#{tableCreateController.editTableItem.defaultValue}">
@@ -335,7 +335,7 @@
                                         <f:selectItem itemLabel="#{msg.LessThanOrEqualTo}" itemValue="#{'LE'}"/>
                                         <f:selectItem itemLabel="#{msg.LessThan}" itemValue="#{'LT'}"/>
                                     </p:selectOneMenu>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" />
+                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" decimalPlaces="4" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">#{msg.LowerLimit}</label>
@@ -344,7 +344,7 @@
                                         <f:selectItem itemLabel="#{msg.GreaterThanOrEqualTo}" itemValue="#{'GE'}"/>
                                         <f:selectItem itemLabel="#{msg.GreaterThan}" itemValue="#{'GT'}"/>
                                     </p:selectOneMenu>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" />
+                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" decimalPlaces="4"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">#{msg.ResultIdentifier}</label>

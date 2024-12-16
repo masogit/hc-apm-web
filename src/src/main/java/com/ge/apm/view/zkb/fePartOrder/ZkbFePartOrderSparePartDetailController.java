@@ -1030,7 +1030,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public boolean isDepotAsset(){
         boolean rs = false;
-        if(this.contractList != null){
+        if(this.contractList != null && this.contractList.size() > 0){
             if(ZkbFePartOrderService.depotArtificialTypeValue.equals(this.selected.getArtificialType())){
                 rs = true;
             }

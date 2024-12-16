@@ -70,6 +70,7 @@ public class UserContextService implements Serializable {
     private Boolean flagIsHospitalUser = null;
     private Boolean enableAssetGroupAssetTypeGroupAssociation = null;// 开启资产分类是否关联设备分类
     private Boolean enableAuditGroupConfiguration = null;// 开启核心组审核
+    private Boolean synchronizeWorkOrder = null;// 开启MVS工单同步
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
@@ -1102,8 +1103,12 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        TenantOptionConfig tenantOptionConfig = WebUtil.getBean(ConfigCacheService.class).getTenantOptionConfigByUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
-        return tenantOptionConfig.getSynchronizeWorkOrder();
+        if(synchronizeWorkOrder == null){
+            synchronizeWorkOrder = Boolean.FALSE;
+            String value = getConfigItemValue( "synchronizeWorkOrder");
+            synchronizeWorkOrder=Boolean.TRUE.toString().equalsIgnoreCase(value);
+        }
+        return synchronizeWorkOrder;
     }
 
     public static boolean isYiMaiYangGuangTenantForServer() {

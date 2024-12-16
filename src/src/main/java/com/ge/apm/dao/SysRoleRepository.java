@@ -14,7 +14,7 @@ public interface SysRoleRepository extends GenericRepository<SysRole> {
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public SysRole getByRoleDesc(String name);
-    
+
     public List<SysRole> getByNameIn(List<String> names);
 
     List<SysRole> findByIdIn(List<Integer> sysRoleIds);
@@ -26,4 +26,7 @@ public interface SysRoleRepository extends GenericRepository<SysRole> {
     public int getIdByName(String name);
 
     public SysRole getById(Integer id);
+
+    @Query(value="select *  from sys_role where id in(select role_id from user_role where user_id = ?1 )",nativeQuery = true)
+    List<SysRole> getUserRolesByUserId(Integer userId);
 }

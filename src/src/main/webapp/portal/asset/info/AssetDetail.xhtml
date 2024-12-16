@@ -6,7 +6,7 @@
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <ui:define name="head">
-<!--        <h:outputStylesheet name="css/assetUsageAll.css"/>-->
+        <!--        <h:outputStylesheet name="css/assetUsageAll.css"/>-->
         <h:outputScript name="js/assetUsageAll.js"/>
         <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
         <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
@@ -476,7 +476,7 @@
                                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown} {Exporters}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                              rows="5" emptyMessage="#{msg.noRecordFound}"
-                                             >
+                                >
 
                                     <p:column headerText="工单编号" >
                                         <h:outputText value="#{item.workOrderNum}"/>
@@ -510,11 +510,11 @@
                         </p:panelGrid>
                     </h:form>
                     <p:panel  id="approvale"
-                             header="设备流程记录"
-                             toggleable="true"
-                             toggleSpeed="500"  widgetVar="approvale"
-                             style="margin-bottom:20px;">
-                            <ui:include src="ApprovalProcess.xhtml"/>
+                              header="设备流程记录"
+                              toggleable="true"
+                              toggleSpeed="500"  widgetVar="approvale"
+                              style="margin-bottom:20px;">
+                        <ui:include src="ApprovalProcess.xhtml"/>
                     </p:panel>
 
 
@@ -543,6 +543,7 @@
 
             </p:tabView>
 
+            <ui:include src="AssetScrap.xhtml"/>
 
             <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                 <h:form id="qrCodeLibShowForm">
@@ -621,6 +622,7 @@
 
         <h:panelGroup >
             <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+            <p:commandButton id="preInactiveEnable" rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4)   and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoDetailController.selected.uid)}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
 
         </h:panelGroup>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
@@ -653,7 +655,7 @@
             afterPageLoad = function () {
                 $(".jqplot-table-legend").css("display", "none");
             }
-            
+
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0];
                 s.src = pic.src;

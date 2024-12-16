@@ -502,12 +502,16 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if(CollectionUtils.isNotEmpty(assetIds)){
             filterAssetList = addedAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
         }
+        if(CollectionUtils.isEmpty(filterAssetList)){
+            return;
+        }
         assetDetail = service.groupAsset(filterAssetList, assetDetail);
         if (CollectionUtils.isEmpty(assetIds)) {
             assetIds = new HashSet<>();
         }
         assetIds.addAll(filterAssetList.stream().map(AssetInfo::getId).collect(Collectors.toSet()));
-        deptList.add(dept.getUid());
+        Set<String> clinicalDeptUids = filterAssetList.stream().map(AssetInfo::getClinicalDeptUID).collect(Collectors.toSet());
+        deptList.addAll(clinicalDeptUids);
     }
 
     public TreeNode initOrgTree(TreeNode treeNode) {
@@ -700,15 +704,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
     public void treeSeachCondition() {
         UserAccount account = UserContextService.getCurrentUserAccount();
-
-        TreeNode treeNode = null;
-        if (StrUtil.isEmpty(searchDeptName)) {
-            treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3);
-        } else {
-            treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3, searchDeptName);
+        queryOrgTree = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 3));
+        if (StrUtil.isNotBlank(searchDeptName)) {
+            uaaService.filterTreeNode(queryOrgTree, searchDeptName, -1, -1);
         }
-        queryOrgTree = initOrgTree(treeNode);
-
     }
 
 

@@ -32,12 +32,12 @@
 
     <select id="searchMaintain" resultMap="maintainBean">
         select nsm.* from nurse_site_maintain nsm
-        <where>
-            <choose>
-                <when test="assetTypes != null and assetTypes.size > 0">
-                    <include refid="queryConfigIds"/>
-                </when>
-                <otherwise>
+        <choose>
+            <when test="assetTypes != null and assetTypes.size > 0">
+                <include refid="queryConfigIds"/>
+            </when>
+            <otherwise>
+                <where>
                     <if test="scheduleDateStart != null">
                         and nsm.schedule_date >= #{scheduleDateStart}
                     </if>
@@ -79,20 +79,20 @@
                         </foreach>
                         )
                     </if>
-                </otherwise>
-            </choose>
-        </where>
+                </where>
+            </otherwise>
+        </choose>
+
     </select>
 
     <sql id="queryConfigIds">
-        and nsm.id in (
-        select nsmi.parent_id from nurse_site_maintain_item nsmi join asset_info ai on nsmi.asset_uid = ai.uid
+        left join nurse_site_maintain_item nsmi on nsm.id = nsmi.parent_id left join asset_info ai on nsmi.asset_uid = ai.uid
         <where>
             <if test="scheduleDateStart != null">
                 and nsmi.schedule_date >= #{scheduleDateStart}
             </if>
             <if test="scheduleDateEnd != null">
-                and nsmi.schedule_date &lt; #{scheduleDateEnd}
+                and nsmi.schedule_date &lt;= #{scheduleDateEnd}
             </if>
             <if test="tenantUid != null">
                 and ai.tenant_uid = #{tenantUid}
@@ -130,6 +130,6 @@
                 </foreach>
             </if>
         </where>
-        )
+        group by nsm.id
     </sql>
 </mapper>

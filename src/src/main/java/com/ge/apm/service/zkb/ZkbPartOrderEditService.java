@@ -447,6 +447,18 @@ public class ZkbPartOrderEditService {
         }
     }
 
+    public boolean checkPcbMvsTotal(ZkbContract zkbContract){
+        boolean r = false;
+        if(zkbContract != null && (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) ||
+            "PCB MVS".equals(zkbContract.getContractType()))){
+            int total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+            if(total >= 1000){
+                r = true;
+            }
+        }
+        return r;
+    }
+
     /**
      * 申请保存前必填项Check，
      * @return
@@ -499,6 +511,11 @@ public class ZkbPartOrderEditService {
                 errorLog.append("附件不能为空！");
             }
         }else{
+            if(CopyByInvok.F.equals(selected.getSsaKeyFlag()) && checkPcbMvsTotal(selectedContract)){
+                if(CopyByInvok.F.equals(selected.getScoreFlag())){
+                    errorLog.append("该合同只支持积分申请！");
+                }
+            }
             if("t".equals(selected.getScoreFlag())){
                 boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
                 if(!r){
