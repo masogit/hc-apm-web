@@ -283,7 +283,7 @@
                                     <p:dataGrid id="harmPerformFile" var="fileitem" value="#{adverseEventApproveController.selected.harmPerformFile}" columns="5" layout="grid" rendered="#{adverseEventApproveController.selected.harmPerformFile ne null and !empty adverseEventApproveController.selected.harmPerformFile}">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
+                                                <p:ajax  event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
                                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
                                                 </p:graphicImage>
                                             </h:panelGrid>
@@ -310,7 +310,7 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <h:panelGrid columns="1" style="width:100%" >
-                                                    <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
+                                                    <p:ajax  event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
                                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
                                                     </p:graphicImage>
                                                 </h:panelGrid>
@@ -817,5 +817,17 @@
         </div>
         <ui:include src="../preview/view.xhtml"></ui:include>
 
+        <script type="text/javascript">
+
+            function handlePreview(args, dialog) {
+                debugger;
+                var jqDialog = jQuery('#' + dialog);
+                if (args.validationFailed) {
+                    PF(dialog).hide();
+                } else {
+                    PF(dialog).show();
+                }
+            }
+        </script>
     </ui:define>
 </ui:composition>
