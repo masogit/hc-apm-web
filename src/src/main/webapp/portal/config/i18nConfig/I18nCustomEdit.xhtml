@@ -17,7 +17,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputText id="msgKey" autocomplete="off" value="#{i18nTypeManageController.selectedI18n.msgKey}" required="true" disabled="#{i18nTypeManageController.selected.type eq -1}" requiredMessage="#{msg.ConfigItemName}-#{msg.Chinese}#{msg.ValidationRequire}" style="width: 95%;"/>
+                        <p:inputText id="msgKey" autocomplete="off" value="#{i18nTypeManageController.selectedI18n.msgKey}" required="true" disabled="#{i18nTypeManageController.selected.type eq -1 || 'Edit'.equals(i18nTypeManageController.getSelectActionName())}" requiredMessage="#{msg.ConfigItemName}-#{msg.Chinese}#{msg.ValidationRequire}" style="width: 95%;"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
