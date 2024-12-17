@@ -149,14 +149,18 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void  reset(){
         selected.setI18nMessageList(ListUtils.newArrayList());
+        logger.info("reset:"+selected.getMsgType());
         saveConfig();
+        resetCache();
+        logger.info("end reset:"+selected.getMsgType());
     }
     public void saveConfig(){
         logger.info("saveConfig:"+selected.getMsgType());
         doSaveI18nMessage();
+        resetCache();
         logger.info("end saveConfig:"+selected.getMsgType());
     }
-    private void doSaveI18nMessage(){
+    public void doSaveI18nMessage(){
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
         List<I18nMessage> defaultMsgList = selected.getDefaultMsgList();
         boolean b = i18nMessageList.stream().anyMatch(item -> {
@@ -187,8 +191,10 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             i18nMessageRepository.delete(deleteI18nMessageList);
         }
         dao.save(selected);
+    }
+    public void resetCache(){
         DbMessageSource.reLoadMessages();
-//        configCacheService.cleanCacheNames();
+        configCacheService.cleanCacheNames();
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();
