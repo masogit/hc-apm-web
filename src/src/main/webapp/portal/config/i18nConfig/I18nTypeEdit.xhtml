@@ -75,7 +75,7 @@
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{i18nTypeManageController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'i18nTypeDlg');" />
                 <p:commandButton validateClient="true" value="重置" actionListener="#{i18nTypeManageController.reset()}" disabled="#{i18nTypeManageController.selected.defaultValue}" update=":growl @(.datalist)" oncomplete="PF('i18nTypeDlg').hide()" icon="ui-icon-check" >
-                    <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
+                    <p:confirm header="重置确认" message="您确定要重置此i18n配置么？" icon="ui-icon-alert"/>
                 </p:commandButton>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('i18nTypeDlg').hide()"/>
             </h:form>
