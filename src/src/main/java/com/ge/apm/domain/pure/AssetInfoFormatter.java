@@ -1174,6 +1174,11 @@ public class AssetInfoFormatter {
         map.put(getMessage("spare03"), this.getSpare03AsString());
         map.put(getMessage("spare04"), this.getSpare04AsString());
         map.put(getMessage("spare05"), this.getSpare05AsString());
+        map.put(getMessage("spare06"), assetInfo.getSpare06());
+        map.put(getMessage("spare07"), assetInfo.getSpare07());
+        map.put(getMessage("spare08"), assetInfo.getSpare08());
+        map.put(getMessage("spare09"), assetInfo.getSpare09());
+        map.put(getMessage("spare10"), assetInfo.getSpare10());
 
         map.put(getMessage("UCMID"), assetInfo.getUCMID());
         map.put(getMessage("productFamily"), assetInfo.getProductFamily());

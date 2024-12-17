@@ -143,56 +143,28 @@
 <!--                        </h:panelGroup>-->
                     </p:panelGrid>
                     <p:fieldset legend="#{msg.RequestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
-                        <div class="ui-g-4">
-                            <div class="container-fluid" style="height: 400px; overflow: auto;">
-                                <div class="row" id="picDiv">
-                                    <c:forEach items="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" var="attach" >
-                                        <div>
-                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                                 style="opacity:0; width:1px; height:1px" />
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                            </div>
-                        </div>
-                        <script type="text/javascript">
-                            new Viewer(document.getElementById('picDiv'), {inline: true});
-                        </script>
-<!--                        <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">-->
-<!--                            <f:facet name="header">#{msg.RequestImage}</f:facet>-->
-<!--                            <p:panel  style="text-align:center" >-->
-<!--                                <h:panelGrid columns="1" style="width:100%" >-->
-<!--                                    <p:graphicImage value="#{fileDownloadService.getFile(picItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto"/>-->
-<!--                                </h:panelGrid>-->
-<!--                            </p:panel>-->
-<!--                        </p:dataGrid>-->
+                        <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                    </p:graphicImage>
+                                </h:panelGrid>
+                                <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                            </p:panel>
+                        </p:dataGrid>
                     </p:fieldset>
                 <p:fieldset legend="#{msg.RepairImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
-                    <div class="ui-g-4">
-                        <div class="container-fluid" style="height: 400px; overflow: auto;">
-                            <div class="row" id="picDiv1">
-                                <c:forEach items="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" var="attach" >
-                                    <div>
-                                        <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                             style="opacity:0; width:1px; height:1px" />
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </div>
-                    </div>
-                    <script type="text/javascript">
-                        new Viewer(document.getElementById('picDiv1'), {inline: true});
-                    </script>
-<!--                    <p:dataGrid var="woPicItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">-->
-<!--                        <f:facet name="header">#{msg.RepairImage}</f:facet>-->
-<!--                        <p:panel  style="text-align:center">-->
-<!--                            <h:panelGrid columns="1" style="width:100%">-->
-<!--                                <p:graphicImage value="#{fileDownloadService.getFile(woPicItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto"/>-->
-<!--                            </h:panelGrid>-->
-<!--                        </p:panel>-->
-<!--                    </p:dataGrid>-->
+                    <p:dataGrid id="woPicItem" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                </p:graphicImage>
+                            </h:panelGrid>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                        </p:panel>
+                    </p:dataGrid>
                 </p:fieldset>
 
                 <p:dataGrid var="woAttachItem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}">

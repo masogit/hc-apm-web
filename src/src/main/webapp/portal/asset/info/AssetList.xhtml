@@ -969,6 +969,31 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('spare05',item.spare05)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'spare06'}">
+                                <p:column headerText="#{msg.spare06}" filterBy="#{item.spare06}" filterMatchMode="LIKE" sortBy="#{item.spare06}">
+                                    <h:outputText value="#{item.spare06}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare07'}">
+                                <p:column headerText="#{msg.spare07}" filterBy="#{item.spare07}" filterMatchMode="LIKE" sortBy="#{item.spare07}">
+                                    <h:outputText value="#{item.spare07}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare08'}">
+                                <p:column headerText="#{msg.spare08}" filterBy="#{item.spare08}" filterMatchMode="LIKE" sortBy="#{item.spare08}">
+                                    <h:outputText value="#{item.spare08}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare09'}">
+                                <p:column headerText="#{msg.spare09}" filterBy="#{item.spare09}" filterMatchMode="LIKE" sortBy="#{item.spare09}">
+                                    <h:outputText value="#{item.spare09}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'spare10'}">
+                                <p:column headerText="#{msg.spare10}" filterBy="#{item.spare10}" filterMatchMode="LIKE" sortBy="#{item.spare10}">
+                                    <h:outputText value="#{item.spare10}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
@@ -996,6 +1021,7 @@
                                     <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
+                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
 
                         </f:facet>
                     </p:dataTable>
@@ -1112,6 +1138,7 @@
                 </h:form>
             </div>
         </div>
+        <ui:include src="/portal/preview/QRView.xhtml"/>
         <ui:include src="RelRuleAsset.xhtml"/>
         <ui:include src="BatchEditBefore.xhtml"/>
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
