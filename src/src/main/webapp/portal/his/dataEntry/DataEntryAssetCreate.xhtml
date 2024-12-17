@@ -16,6 +16,12 @@
         <ui:include src="DataEntry_AssetAdd.xhtml"/>
 
         <h:form id="dataEntryAssetCreate">
+            <h:panelGroup id="messagePanel">
+                <c:forEach items="#{dataEntryCreateController.checkDuplicateMap}" var="msg">
+                    <p style="color:red">#{msg.value}</p>
+                </c:forEach>
+
+            </h:panelGroup>
 
             <p:growl autoUpdate="true" life="10000"/>
             <p:fieldset>
@@ -45,6 +51,8 @@
 
                             <p:inputNumber minValue="0" decimalPlaces="2"
                                            value="#{dataentry.entryAmount}">
+                                <p:ajax event="blur" listener="#{dataEntryCreateController.checkDuplicate(dataentry)}"
+                                        update="messagePanel"/>
                             </p:inputNumber>
                         </h:panelGroup>
 
@@ -54,7 +62,11 @@
                                         pattern="#{userContextService.timeFormat()}"
                                         value="#{dataentry.startDate}"
                                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                        mask="true"/>
+                                        mask="true">
+                                <p:ajax event="dateSelect"  listener="#{dataEntryCreateController.checkDuplicate(dataentry)}"
+                                        update="messagePanel"/>
+                            </p:calendar>
+
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -63,7 +75,11 @@
                                         pattern="#{userContextService.timeFormat()}"
                                         value="#{dataentry.endDate}"
                                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                        mask="true"/>
+                                        mask="true">
+                                <p:ajax event="dateSelect" listener="#{dataEntryCreateController.checkDuplicate(dataentry)}"
+                                        update="messagePanel"/>
+                            </p:calendar>
+
                         </h:panelGroup>
                     </c:forEach>
 

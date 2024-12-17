@@ -24,6 +24,8 @@
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{dataEntryCreateController.hisAssetGroupsString}"
                                             class="groupNameChange" id="groupNameChange" var="item"  itemValue="#{item}"  itemLabel="#{item.groupNameOrgName}"  converter="hisAssetGroupConverter"  disabled="#{ not empty dataEntryCreateController.selected.uid}" >
                                 <p:ajax event="itemSelect"  listener="#{dataEntryCreateController.getGroupMatchAsset}" update="dataEntryGroupCreate:selectAssetInfos"/>
+                                <p:ajax event="itemSelect"  listener="#{dataEntryCreateController.checkGroupDuplicate()}"
+                                        update="messagePanel"/>
                             </p:autoComplete>
                     </h:panelGroup>
 
@@ -32,7 +34,8 @@
                         <p:selectOneMenu id="entryType"  value="#{dataEntryCreateController.selected.entryType}" disabled="#{ not empty dataEntryCreateController.selected.uid}"
                                          required="true"
                                          requiredMessage="请选择录入类型" collectionType="java.util.ArrayList">
-                            <p:ajax event="itemSelect"/>
+                            <p:ajax event="itemSelect"  listener="#{dataEntryCreateController.checkGroupDuplicate()}"
+                                    update="messagePanel"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{dataEntryCreateController.costType}" var="item"
                                            itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
@@ -59,7 +62,10 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{dataEntryCreateController.selected.startDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" required="true" requiredMessage="生效开始时间必填"/>
+                                    mask="true" required="true" requiredMessage="生效开始时间必填">
+                            <p:ajax event="dateSelect"  listener="#{dataEntryCreateController.checkGroupDuplicate()}"
+                                    update="messagePanel"/>
+                        </p:calendar>
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -69,11 +75,18 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{dataEntryCreateController.selected.endDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true"
-                                    mask="true" required="true" requiredMessage="生效结束时间必填"/>
+                                    mask="true" required="true" requiredMessage="生效结束时间必填">
+                            <p:ajax event="dateSelect"  listener="#{dataEntryCreateController.checkGroupDuplicate()}"
+                                    update="messagePanel"/>
+                        </p:calendar>
                     </h:panelGroup>
 
                 </p:panelGrid>
-
+                <h:panelGroup id="messagePanel">
+                    <c:forEach items="#{dataEntryCreateController.checkDuplicateMap}" var="msg">
+                        <p style="color:red">#{msg.value}</p>
+                    </c:forEach>
+                </h:panelGroup>
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
                     <p:dataTable id="selectAssetInfos" value="#{dataEntryCreateController.selectAssetInfos}" var="asset"
@@ -88,6 +101,9 @@
                         </p:column>
                         <p:column headerText="设备名称">
                             <h:outputText value="#{asset.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="制造商序列号">
+                            <h:outputText value="#{asset.assetInfo.serialNum}"/>
                         </p:column>
                         <p:column headerText="金额(元)">
 
