@@ -394,7 +394,7 @@ public class OrgInfoService {
         List<Map<String, Object>> resultList = new ArrayList<>();
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        InputStream  stream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
+        InputStream  stream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ORG_INFO.getCode(), SystemTemplate.SystemTemplateEnum.ORG_INFO.getFileType());
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
