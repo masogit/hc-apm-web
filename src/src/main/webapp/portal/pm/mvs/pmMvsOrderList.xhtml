@@ -74,18 +74,29 @@
                         </p:column>
                 <p:column headerText="#{msg.functionType}" sortBy="#{item.mvsIbMapping.assetInfo.functionType}" filterBy="#{item.mvsIbMapping.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.mvsIbMapping.assetInfo.functionType}"/>
                 </p:column>
-                        <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
-                            <h:outputText value="#{item.ruleLevel}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
-                            <f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
-                        </p:column>
+                <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{msg.ruleLevel}" filterBy="#{msg.ruleLevel}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.filterPmRuleLevel}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:if test="#{v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                            <c:if test="#{!v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.ruleLevel)}"/>
+                </p:column>
+                <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
+                </p:column>
                 <p:column headerText="#{msg.hospitalId}" sortBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterBy="#{item.mvsIbMapping.assetInfo.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilterMVS}">
