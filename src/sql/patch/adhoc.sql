@@ -1,2 +1,2 @@
-drop table  i18n_type_manage;
+DROP TABLE if exists i18n_type_manage;
 create table if not exists public.i18n_type_manage as (select CAST(replace(uuid_generate_v4()::text,'-','') as varchar(32)) as id,CAST(t1.msg_type as varchar(255)),CAST(coalesce(t2.value_zh,t2.msg_key,t1.msg_type) as varchar(255)) as name, -1 as type,CAST('' as varchar(255)) as description from  (select  msg_type from  i18n_message where  msg_type not in('label','message','customI18n','field_name')  group by msg_type having msg_type not like '%68%') t1 left join i18n_message t2 on t1.msg_type=t2.msg_key and t2.msg_type = 'label');
