@@ -41,6 +41,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     private TenantInfo selectTenant;
     private Integer selectTenantId;
 
+    private String selectActionName;
+
     private I18nMessage selectedI18n;
 
     @Override
@@ -85,18 +87,12 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.IN, Arrays.asList(-1,siteId)));
         List<I18nMessage> i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
         Map<Integer, List<I18nMessage>> listMap = i18nMessageList.stream().collect(Collectors.groupingBy(I18nMessage::getSiteId));
-        boolean defaultValue = false;
+        boolean defaultValue = true;
         boolean alone = false;
         List<I18nMessage> defaultMsgList = listMap.get(-1); // 获取默认值
         if(CollectionUtils.isNotEmpty(defaultMsgList)){
-            List<I18nMessage> collect = defaultMsgList.stream().map(item -> {
-                I18nMessage i18nMessage = new I18nMessage();
-                BeanUtils.copyProperties(item, i18nMessage);
-                return i18nMessage;
-            }).collect(Collectors.toList());
-            defaultValue = Boolean.TRUE;
-            selected.setDefaultMsgList(collect);
-            selected.setI18nMessageList(new ArrayList<>(collect));
+            selected.setDefaultMsgList(defaultMsgList);
+            selected.setI18nMessageList(copy(defaultMsgList));
             selected.setDefaultValue(defaultValue);
         }
         List<I18nMessage> msgList = listMap.get(siteId); // 获取当前租户
@@ -105,24 +101,35 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             defaultValue =Integer.valueOf(-1).equals(i18nMessage.getSiteId());
             selected.setDefaultValue(defaultValue);
             selected.setI18nMessageList(msgList);
+            if(CollectionUtils.isEmpty(selected.getDefaultMsgList())){
+                selected.setDefaultMsgList(copy(msgList));
+            }
         }
 
         if(CollectionUtils.isEmpty(selected.getDefaultMsgList()) && CollectionUtils.isEmpty(selected.getI18nMessageList())){
             searchFilters.clear();
             searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
             i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
-            selected.setDefaultMsgList(new ArrayList<>(i18nMessageList));
-            selected.setI18nMessageList(new ArrayList<>(i18nMessageList));
+            selected.setDefaultMsgList(i18nMessageList);
+            selected.setI18nMessageList(copy(i18nMessageList));
         }
         alone = CollectionUtils.isEmpty(defaultMsgList);
         selected.setAlone(alone);
         LOGGER.info("msgType:{},siteId:{},default:{},alone:{}",msgType,siteId,defaultValue,alone);
+    }
+    private List<I18nMessage> copy(List<I18nMessage> source){
+        return source.stream().map(item -> {
+            I18nMessage i18nMessage = new I18nMessage();
+            BeanUtils.copyProperties(item, i18nMessage);
+            return i18nMessage;
+        }).collect(Collectors.toList());
     }
     public void editI18nConfig(){
         LOGGER.info("editI18nConfig:{}", JSON.toJSONString(selectedI18n));
     }
     public void prepareAddI18n(){
         //TODO
+        this.selectActionName="Created";
         selectedI18n = new I18nMessage();
         selectedI18n.setMsgType(selected.getMsgType());
         selected.getI18nMessageList().add(selectedI18n);
@@ -130,9 +137,11 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void prepareEditI18n(){
         //TODO
+        this.selectActionName="Edit";
         LOGGER.info("prepareEditI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void deleteI18n(){
+        this.selectActionName="Deleted";
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList().stream().filter(item->!item.getMsgKey().equals(selectedI18n.getMsgKey())).collect(Collectors.toList());
         selected.setI18nMessageList(i18nMessageList);
         selectedI18n = null;
@@ -151,6 +160,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
         List<I18nMessage> defaultMsgList = selected.getDefaultMsgList();
         boolean b = i18nMessageList.stream().anyMatch(item -> {
+            if(item.getId() == null) return Boolean.TRUE;
             Optional<I18nMessage> first = defaultMsgList.stream().filter(deItem -> deItem.getMsgKey().equals(item.getMsgKey())).findFirst();
             if (first.isPresent()) {
                 I18nMessage i18nMessage = first.get();
@@ -158,16 +168,14 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             }
             return Boolean.TRUE;
         });
-        if(b) {
-            if(!selected.isAlone() && selected.isDefaultValue()){
-                i18nMessageList.stream().forEach(item->{
-                    Integer siteId = item.getSiteId();
-                    if(siteId == null || Integer.valueOf(-1).equals(siteId)){
-                        item.setId(null);
-                        item.setSiteId(selectTenantId);
-                    }
-                });
-            }
+        if(b || i18nMessageList.size() != defaultMsgList.size()) {
+            i18nMessageList.stream().forEach(item->{
+                Integer siteId = item.getSiteId();
+                if(siteId == null || Integer.valueOf(-1).equals(siteId)){
+                    item.setId(null);
+                    item.setSiteId(selectTenantId);
+                }
+            });
             if(CollectionUtils.isNotEmpty(i18nMessageList)){
                 i18nMessageRepository.save(i18nMessageList);
             }
@@ -212,4 +220,9 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     public void setSelectedI18n(I18nMessage selectedI18n) {
         this.selectedI18n = selectedI18n;
     }
+
+    public String getSelectActionName() {
+        return selectActionName;
+    }
+
 }
