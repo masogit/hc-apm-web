@@ -312,10 +312,6 @@ public class AssetInstallationReportService {
             UserAccount user = UserContextService.getCurrentUserAccount();
             String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,"doc");
             templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
-        }else{
-            if(templatePath != null){
-                templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(templatePath));
-            }
         }
         return templateBytes;
     }

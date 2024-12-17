@@ -63,6 +63,9 @@ public enum DownloadTemplateFileType {
     HIS_EQUIPMENT_DATA_SOURCE(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE),
     SUPPLIER(SystemTemplate.SystemTemplateEnum.SUPPLIER, SystemTemplate.SystemTemplateEnum.SUPPLIER),
     ARRIVAL_ITEM(SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM, SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM),
+
+    ASSET_PURCHASE(SystemTemplate.SystemTemplateEnum.ASSET_PURCHASE, SystemTemplate.SystemTemplateEnum.ASSET_PURCHASE),
+
     ;
 
     private final SystemTemplate.SystemTemplateEnum enumZh;

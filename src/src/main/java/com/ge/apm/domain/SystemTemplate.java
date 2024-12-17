@@ -153,6 +153,10 @@ public class SystemTemplate implements Serializable {
         PARTS_OUT_BOUND_ORDER("PARTS_OUT_BOUND_ORDER","备件出库单模板","word","outBoundOrderReportTemplate.docx"),
 
 
+        //资产分类
+        ASSET_TYPE_GROUP("ASSET_TYPE_GROUP","资产分类模板","excel","APM_Auth_Template.xlsx"),
+        ASSET_PURCHASE("ASSET_PURCHASE","采购清单模板","excel","APM_PURCHASE_Template.xls"),
+        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","excel","单价50万元以上（含50万）设备论证报告.docx"),
 
 
         ;

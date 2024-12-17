@@ -259,7 +259,10 @@
                     </p:fieldset>
                     <p:fieldset legend="模板下载"  >
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <p:commandLink process="@this" ajax="false"><a href="docTemplate/单价50万元以上（含50万）设备论证报告.docx" title="download">单价50万元以上（含50万）设备论证报告</a></p:commandLink>
+                             <p> 单价50万元以上（含50万）设备论证报告</p>
+
+                             <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('ASSET_ARGUMENT_REPORT')}" styleClass="p-mr-2"/>
+
 
                         </p:panelGrid>
                     </p:fieldset>
