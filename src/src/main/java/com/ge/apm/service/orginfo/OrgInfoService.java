@@ -4,10 +4,12 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
@@ -389,7 +392,9 @@ public class OrgInfoService {
     public ExcelDocument exportOrg() throws IOException {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<Map<String, Object>> resultList = new ArrayList<>();
-        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
+//        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
+        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        InputStream  stream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
