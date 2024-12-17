@@ -85,10 +85,6 @@ public class MicroServiceInvoker {
         return pdfPreViewUrl;
     }
 
-    public String getWebContextUrl() {
-        return webContextUrl;
-    }
-
     protected Boolean isOkay(ResponseEntity res) {
 
         if (!res.getStatusCode().equals(HttpStatus.OK)) {
