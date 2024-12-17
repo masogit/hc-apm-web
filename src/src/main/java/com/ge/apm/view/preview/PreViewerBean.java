@@ -88,7 +88,7 @@ public class PreViewerBean implements ServerEventInterface {
     }
 
     public String getHttpURL(String objectId){
-        String pdfPreViewUrl = microServiceUtil.getPdfPreViewUrl();
+        String pdfPreViewUrl = microServiceUtil.getWebContextUrl();
         StringBuilder sbPath = new StringBuilder();
         if(StrUtil.isNotEmpty(pdfPreViewUrl)){
             sbPath.append(pdfPreViewUrl).append("/hcapmobjecthubservice/api/apm/objectHub/objects/").append(objectId).append("/preView");
