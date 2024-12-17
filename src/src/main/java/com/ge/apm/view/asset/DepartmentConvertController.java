@@ -10,7 +10,9 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.DepartmentConvertService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -18,6 +20,8 @@ import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -53,6 +57,9 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private TenantInfoRepository tenantInfoRepository;
 
     private DepartmentConvertService departmentConvertService;
+
+    private QRPreViewerBean qrPreViewerBean;
+
     @Override
     protected AssetDepartmentConvertRepository getDAO() {
         return dao;
@@ -72,6 +79,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         departmentConvertService = WebUtil.getBean(DepartmentConvertService.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
 
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
@@ -235,7 +243,18 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
             WebUtil.addErrorMessage("Fail to download report");
         }
     }
-
+    public void prepareViewQrcode(){
+        List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,selectedIds));
+        List<AssetDepartmentConvert> assetDepartmentConvertList = dao.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isEmpty(assetDepartmentConvertList)) return;
+        List<String> assetUidList = assetDepartmentConvertList.stream().filter(item-> StringUtils.hasText(item.getAssetUid())).map(AssetDepartmentConvert::getAssetUid).collect(Collectors.toList());
+        List<AssetInfo> assetInfoList = departmentConvertService.getAssetInfoList(assetUidList);
+        if(CollectionUtils.isEmpty(assetInfoList)) return;
+        List<String> collect = assetInfoList.stream().filter(item -> StringUtils.hasText(item.getQrCode())).map(item -> item.getQrCode() + ":" + item.getSiteUID()).collect(Collectors.toList());
+        qrPreViewerBean.onServerEvent("",collect);
+    }
     public Integer getStatus() {
         return status;
     }

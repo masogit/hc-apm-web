@@ -200,4 +200,8 @@ public class DepartmentConvertService {
 
         return signatureBytes;
     }
+
+    public List<AssetInfo>  getAssetInfoList(List<String> assetUid){
+       return assetInfoRepository.findByUidIn(assetUid);
+    }
 }
