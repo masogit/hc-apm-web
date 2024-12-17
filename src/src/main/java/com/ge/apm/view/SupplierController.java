@@ -429,7 +429,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         }
 //        InputStream stream = SupplierController.class.getClassLoader().getResourceAsStream("template/APM_Supplier.xlsx");
 
-        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
+        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.SUPPLIER.getCode(), SystemTemplate.SystemTemplateEnum.SUPPLIER.getFileType());
 
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
