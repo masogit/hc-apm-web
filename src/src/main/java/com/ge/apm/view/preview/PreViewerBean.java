@@ -3,7 +3,7 @@ package com.ge.apm.view.preview;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.TempFileUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,18 +11,12 @@ import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 @ManagedBean
@@ -44,6 +38,10 @@ public class PreViewerBean implements ServerEventInterface {
     public void init() {
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         microServiceUtil= WebUtil.getBean(MicroServiceUtil.class);
+        String objectId = WebUtil.getRequestParameter("objectId");
+        if (ObjectUtil.isNotEmpty(objectId)) {
+            onServerEvent("", objectId);
+        }
     }
 
     @Override
