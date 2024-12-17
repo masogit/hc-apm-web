@@ -7,13 +7,39 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
+        <style>
+            .measuringExpiredSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .measuringExpired {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
         <div class="ui-g-12 card">
+            <h:form>
+                <h:panelGrid id="filterType" columns="2" style="float: right">
+                    <h:panelGroup style="float: right">
+                        <span >#{msg.Legend}：</span>
+                        <span class="measuringExpiredSoon">计量即将到期</span>
+                        <span></span>
+                        <span class="measuringExpired">计量已经到期</span>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
             <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
                 <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
                              selectionMode="single" selection="#{measureAssetListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             rowStyleClass="#{item.measuringAlertStatus}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
