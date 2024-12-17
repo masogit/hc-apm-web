@@ -134,6 +134,8 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     @Setter
     private List<HisGroupDataEntryHistory> hisGroupDataEntryHistories;
 
+    private DataEntryAssetDetailRepository dataEntryAssetDetailRepository;
+
     @Getter
     @Setter
     private boolean isSaveDisable=true;
@@ -159,6 +161,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         hisGroupDataEntryHistoryRepository = WebUtil.getBean(HisGroupDataEntryHistoryRepository.class);
+        dataEntryAssetDetailRepository = WebUtil.getBean(DataEntryAssetDetailRepository.class);
 
         getGetHisAssetGroups();
     }
@@ -543,4 +546,57 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
         }
     }
+
+
+    @Getter
+    @Setter
+    private Map<String,String> checkDuplicateMap=new HashMap<>();
+
+    public void checkDuplicate(DataEntry dataEntry) {
+
+        List<I18nMessage> hisEntryType = i18nMessageService.getByMsgType("HisEntryType");
+
+        if (dataEntry.getEntryAmount() != null && dataEntry.getStartDate() != null && dataEntry.getEndDate() != null && !CollectionUtils.isEmpty(selectAssets)) {
+            int count = dataEntryAssetDetailRepository.findByAssetUidAndEntryTypeAndDate(selectAssets.get(0).getUid(), dataEntry.getEntryType(), dataEntry.getStartDate(), dataEntry.getEndDate());
+            if (count > 0) {
+                List<I18nMessage> collect = hisEntryType.stream().filter(item -> item.getMsgKey().equals(dataEntry.getEntryType())).collect(Collectors.toList());
+                checkDuplicateMap.put(dataEntry.getEntryType(), "设备在同一时间段内已录入过"+collect.get(0).getValueZh()+"建议核实后再录入数据");
+            }else{
+                if(checkDuplicateMap.containsKey(dataEntry.getEntryType())){
+                    checkDuplicateMap.remove(dataEntry.getEntryType());
+                }
+            }
+
+        } else {
+            if(checkDuplicateMap.containsKey(dataEntry.getEntryType())){
+                checkDuplicateMap.remove(dataEntry.getEntryType());
+
+            }
+        }
+    }
+
+    public void checkGroupDuplicate(){
+        List<I18nMessage> hisEntryTypes = i18nMessageService.getByMsgType("HisEntryType");
+        if(selected!=null && selected.getEntryType()!=null && selected.getStartDate()!=null && selected.getEndDate()!=null && !CollectionUtils.isEmpty(selectAssetInfos)){
+            checkDuplicateMap=new HashMap<>();
+            List<I18nMessage> dataEntryType = hisEntryTypes.stream().filter(item -> item.getMsgKey().equals(selected.getEntryType())).collect(Collectors.toList());
+            Set<String> assetUids = selectAssetInfos.stream().map(HisAssetGroupClinicalMatch::getAssetUid).collect(Collectors.toSet());
+            List<DataEntryAssetDetail> dataEntryAssetDetails = dataEntryAssetDetailRepository.findByAssetUidsAndEntryTypeAndDate(assetUids, selected.getEntryType(), selected.getStartDate(), selected.getEndDate());
+            Set<String> dbAssetUids = dataEntryAssetDetails.stream().map(DataEntryAssetDetail::getAssetUid).collect(Collectors.toSet());
+            if(!CollectionUtils.isEmpty(dbAssetUids)){
+                Set<HisAssetGroupClinicalMatch> existAssets = selectAssetInfos.stream().filter(item -> dbAssetUids.contains(item.getAssetUid())).collect(Collectors.toSet());
+                String message="";
+                for (HisAssetGroupClinicalMatch existAsset : existAssets) {
+                    message=message+"【"+existAsset.getAssetInfo().getName()+","+existAsset.getAssetInfo().getSerialNum() + "】";
+                }
+                checkDuplicateMap.put(selected.getEntryType(),message+"在同一时间段内已录入过"+dataEntryType.get(0).getValueZh()+"建议核实后再录入数据");
+            }else{
+                checkDuplicateMap.clear();
+            }
+
+        }else{
+            checkDuplicateMap.clear();
+        }
+    }
+
 }
