@@ -41,7 +41,11 @@ public class BuildManagementService {
     public ExcelDocument exportOrg() throws IOException {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<Map<String, Object>> resultList = new ArrayList<>();
-        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
+
+        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
+        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
+//        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
