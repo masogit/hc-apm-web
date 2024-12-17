@@ -835,9 +835,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             clinicalDeptUids.addAll(deptUidList);
 
         }
-        deleteDeptUids.removeAll(clinicalDeptUids);
+        List<String> deleteDeptUidList = new ArrayList<>(deleteDeptUids);
+        deleteDeptUidList.removeAll(clinicalDeptUids);
         if(selected.getId()!=null){
-            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUids);
+            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUidList);
             saveKeyAssetReport();
         }
 
