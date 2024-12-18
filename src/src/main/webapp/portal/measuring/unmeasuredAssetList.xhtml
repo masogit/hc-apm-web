@@ -7,9 +7,26 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
+        <style>
+            .measuringExpiredSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
         <div class="ui-g-12 card">
-            <h:form id="unmeasuredAssetListForm" rendered="#{unmeasuredAssetListController.customRoleAuth.authSearch}">
 
+            <h:form id="unmeasuredAssetListForm" rendered="#{unmeasuredAssetListController.customRoleAuth.authSearch}">
+                    <h:panelGrid id="expiredSoon" columns="2" style="float: right" rendered="#{unmeasuredAssetListController.queryIndex eq 2}">
+                        <h:panelGroup style="float: right">
+                            <span >#{msg.Legend}：</span>
+                            <span class="measuringExpiredSoon">计量即将到期</span>
+                        </h:panelGroup>
+                    </h:panelGrid>
                 <h:panelGrid id="buttonSet" columns="3" cellpadding="5">
                     <p:commandButton value="从未计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm" actionListener="#{unmeasuredAssetListController.setQueryIndex(0)}" disabled="#{unmeasuredAssetListController.queryIndex==0}"/>
                     <p:commandButton value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm" actionListener="#{unmeasuredAssetListController.setQueryIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
@@ -20,6 +37,7 @@
                              selectionMode="single" selection="#{unmeasuredAssetListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             rowStyleClass="#{unmeasuredAssetListController.queryIndex eq 2 ? item.measuringAlertStatus : ''}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
