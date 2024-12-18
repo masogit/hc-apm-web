@@ -10,15 +10,19 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.nurseSite.WordReportExportService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MessageUtil;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -38,6 +42,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -100,6 +105,17 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     @Getter
     private List<MultiLevelApproval> multiLevelApprovals;
 
+    @Setter @Getter
+    private String filterDeptOrg;
+
+    private List<OrgInfo> clinicalDeptList;
+
+    private Set<String> filterClinicalDeptOrg;
+
+    private OrgInfoTreeService orgInfoTreeService;
+
+    private UaaService uaaService;
+
     @Override
     protected void init() {
         /*接口类*/
@@ -110,6 +126,8 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         String selectedId = WebUtil.getRequestParameter("selectedId");
@@ -119,6 +137,7 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         mechanicalFailure = new ArrayList<>();
         /*初始化方法*/
         loadAdverseEventById(selectedId);
+        loadClinicalDeptList();
     }
 
     public void loadAdverseEventById(String id) {
@@ -139,12 +158,37 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         }
     }
 
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+
     @Override
     protected Page<AdverseEvents> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (!CollectionUtils.isEmpty(filterClinicalDeptOrg)) {
+            searchFilters.add(new SearchFilter("department",SearchFilter.Operator.EQ, filterClinicalDeptOrg.iterator().next()));
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for(SearchFilter searchFilter : searchFilters){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("fieldName", searchFilter.fieldName);
+            if("reportDate".equals(searchFilter.fieldName)){
+                mm.put("valueDate", searchFilter.value);
+            }else{
+                mm.put("valueString", searchFilter.value);
+            }
+            mm.put("operator", searchFilter.operator.name());
+            list.add(mm);
+        }
         if (StringUtils.isEmpty(eventStatusFilter)) {
             eventStatusFilter = "2,3,4,6,7,8";
         }
-        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "approve");
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "approve", list);
         currentPageAdverse = pageResult.getContent();
         return pageResult;
     }
@@ -268,9 +312,23 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         if (StringUtils.isEmpty(eventStatusFilter)) {
             eventStatusFilter = "2,3,4,6,7,8";
         }
-        PageRequest p = new PageRequest(0, 10000);
-        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), p, eventStatusFilter, queryStr, "approve");
-        List<AdverseEvents> adverseEventsList = pageResult.getContent();
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (!CollectionUtils.isEmpty(filterClinicalDeptOrg)) {
+            searchFilters.add(new SearchFilter("department",SearchFilter.Operator.EQ, filterClinicalDeptOrg.iterator().next()));
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for(SearchFilter searchFilter : searchFilters){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("fieldName", searchFilter.fieldName);
+            if("reportDate".equals(searchFilter.fieldName)){
+                mm.put("valueDate", searchFilter.value);
+            }else{
+                mm.put("valueString", searchFilter.value);
+            }
+            mm.put("operator", searchFilter.operator.name());
+            list.add(mm);
+        }
+        List<AdverseEvents> adverseEventsList = adverseEventServiceClient.queryAdverseEvents(UserContextService.getAccessToken(), eventStatusFilter, queryStr, "approve", list);
         for(AdverseEvents adverseEvents : adverseEventsList){
             MultiLevelApproval recentApprove = multiLevelApprovalRepository.getRecentApprove(adverseEvents.getUid());
             if (recentApprove != null) {
@@ -281,24 +339,35 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         }
         InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
         excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
-
     }
 
-    public void exportFiled(AdverseEventsFile adverseEventsFile) throws IOException {
-        InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-        response.setHeader("Content-Disposition", "attachment;filename=" + adverseEventsFile.getObjectName());
-        StreamUtils.copy(inputStream, response.getOutputStream());
-        facesContext.responseComplete();
-        facesContext.renderResponse();
-    }
-
-    public boolean isPreView(String ty){
-        if(ty.contains("image") || ty.contains("pdf")){
-            return true;
+    public List<String> autoCompleteDeptName(String query) {
+        if (CollectionUtils.isEmpty(clinicalDeptList)) {
+            return Collections.emptyList();
         }
-        return false;
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+        if (!Strings.isNullOrEmpty(filterDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterDeptOrg.equals(item.getName()))) {
+            filterDeptOrg = null;
+        }
+        if (filterDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterDeptOrg)).collect(Collectors.toList());
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            filterClinicalDeptOrg = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            filterClinicalDeptOrg = Collections.emptySet();
+        }
     }
 
     public void removeTempHarmPerform(TempFileUtil file) {
