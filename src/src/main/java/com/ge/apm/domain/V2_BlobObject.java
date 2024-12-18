@@ -197,7 +197,7 @@ public class V2_BlobObject implements Serializable {
     private String tenantUid;
 
     @Transient
-    private List<String> showImageTypeList = ListUtil.newArrayList("pdf", "png", "jpeg");
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpeg");
 
     public String getId() {
         return id;
@@ -367,9 +367,9 @@ public class V2_BlobObject implements Serializable {
         this.tenantUid = tenantUid;
     }
 
-    public boolean showImage() {
+    public boolean showPreview() {
         String type = objectName.substring(objectName.indexOf(".") + 1);
-        return showImageTypeList.contains(type.toLowerCase());
+        return showPreviewTypeList.contains(type.toLowerCase());
     }
 
     @Override
