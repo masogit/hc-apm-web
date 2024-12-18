@@ -132,7 +132,6 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     String configItemValue;
 
-
     @Getter@Setter
     private StreamedContent excelFile;
 
@@ -294,7 +293,23 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     //获取设备列表
     @Override
     protected Page<AdverseEvents> loadData(PageRequest pageRequest) {
-        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "report");
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+            searchFilters.add(new SearchFilter("department",SearchFilter.Operator.EQ, clinicalDeptOrgUidSet.iterator().next()));
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for(SearchFilter searchFilter : searchFilters){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("fieldName", searchFilter.fieldName);
+            if("reportDate".equals(searchFilter.fieldName)){
+                mm.put("valueDate", searchFilter.value);
+            }else{
+                mm.put("valueString", searchFilter.value);
+            }
+            mm.put("operator", searchFilter.operator.name());
+            list.add(mm);
+        }
+        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), pageRequest, eventStatusFilter, queryStr, "report", list);
         currentPageAdverse = pageResult.getContent();
         return pageResult;
     }
@@ -555,9 +570,23 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public void exportExcel(){
-        PageRequest p = new PageRequest(0, 10000);
-        Page<AdverseEvents> pageResult = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), p, eventStatusFilter, queryStr, "report");
-        List<AdverseEvents> adverseEventsList = pageResult.getContent();
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+            searchFilters.add(new SearchFilter("department",SearchFilter.Operator.EQ, clinicalDeptOrgUidSet.iterator().next()));
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for(SearchFilter searchFilter : searchFilters){
+            Map<String, Object> mm = new HashMap<>();
+            mm.put("fieldName", searchFilter.fieldName);
+            if("reportDate".equals(searchFilter.fieldName)){
+                mm.put("valueDate", searchFilter.value);
+            }else{
+                mm.put("valueString", searchFilter.value);
+            }
+            mm.put("operator", searchFilter.operator.name());
+            list.add(mm);
+        }
+        List<AdverseEvents> adverseEventsList = adverseEventServiceClient.queryAdverseEvents(UserContextService.getAccessToken(),  eventStatusFilter, queryStr, "report",list);
         for(AdverseEvents adverseEvents : adverseEventsList){
             MultiLevelApproval recentApprove = multiLevelApprovalRepository.getRecentApprove(adverseEvents.getUid());
             if (recentApprove != null) {

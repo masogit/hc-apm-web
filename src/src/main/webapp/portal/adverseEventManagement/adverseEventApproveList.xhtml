@@ -50,6 +50,8 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,,20,50,100">
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:ajax event="filter" listener="#{adverseEventApproveController.onFilter}" />
+
                         <p:column width="36" id="checkBoxColumn" exportable="false">
                             <p:selectBooleanCheckbox value="#{adverseEventApproveController.selectedMap[item.workOrderNum]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this adverseEventsApproveList" oncomplete="updateSelectAllCheckBox();"/>
@@ -60,10 +62,24 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.workOrderNum}" >
+                        <p:column headerText="#{msg.workOrderNum}" filterBy="#{item.workOrderNum}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.workOrderNum}"/>
                         </p:column>
-                        <p:column headerText="状态" >
+                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"  />
+                                    <f:selectItem itemLabel="暂存" itemValue="1"  />
+                                    <f:selectItem itemLabel="待审核" itemValue="2"  />
+                                    <f:selectItem itemLabel="审核中" itemValue="3"  />
+                                    <f:selectItem itemLabel="已退回" itemValue="4"  />
+                                    <f:selectItem itemLabel="已作废" itemValue="5"  />
+                                    <f:selectItem itemLabel="审核完成" itemValue="6"  />
+                                    <f:selectItem itemLabel="待上报" itemValue="7"  />
+                                    <f:selectItem itemLabel="上报完成" itemValue="8"  />
+                                    <f:selectItem itemLabel="买方填写" itemValue="9"  />
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText
                                     value="#{item.status == 1?'暂存':
                                     item.status == 2?'待审核':
@@ -76,37 +92,69 @@
                                     item.status == 9?'买方填写':
                                     '未知'  }"/>
                         </p:column>
-                        <p:column headerText="#{msg.reporterName}" >
+                        <p:column headerText="#{msg.reporterName}" filterBy="#{item.reporterName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.reporterName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.reportDate}" >
+                        <p:column headerText="#{msg.reportDate}" filterBy="#{item.reportDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterReportDate" widgetVar="varFilterReportDate" />
+                            </f:facet>
                             <h:outputText value="#{item.reportDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.department}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{adverseEventApproveController.filterDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{adverseEventApproveController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{adverseEventApproveController.onDeptNameFilterChange}" process="@this"  update=":adverseListForm:adverseEventsApproveList" />
+                                    <p:ajax process="@this" listener="#{adverseEventApproveController.onDeptNameFilterChange}" update=":adverseListForm:adverseEventsApproveList" />
+                                </p:autoComplete>
+                            </f:facet>
                             <h:outputText value="#{adverseEventApproveController.reporterList(item.department)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.adverseEventType}" >
+                        <p:column headerText="#{msg.adverseEventType}" filterBy="#{item.adverseEventType}"  filterMatchMode="EQ" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"  />
+                                    <f:selectItem itemLabel="医疗器械不良事件" itemValue="1"  />
+                                    <f:selectItem itemLabel="医疗器械不良事件哨点监测" itemValue="2"  />
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{item.adverseEventType eq '2' ? '医疗器械不良事件哨点监测' : '医疗器械不良事件'}"/>
                         </p:column>
-                        <p:column headerText="#{msg.repairReportSendPlace}" >
+                        <p:column headerText="#{msg.repairReportSendPlace}" filterBy="#{item.repairReportSendPlace}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('repairReportSendPlace', item.repairReportSendPlace)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.occurredPlace}" >
+                        <p:column headerText="#{msg.occurredPlace}" filterBy="#{item.occurredPlace}"  filterMatchMode="LIKE" >
                             <h:outputText value="#{item.occurredPlace}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.assetName}" >
+                        <p:column headerText="#{msg.assetName}" filterBy="#{item.assetName}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.deviceNum}" >
+                        <p:column headerText="#{msg.deviceNum}" filterBy="#{item.deviceNum}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.deviceNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.productName}" >
+                        <p:column headerText="#{msg.productName}" filterBy="#{item.productName}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.productName}"/>
                         </p:column>
-                        <p:column headerText="伤害程度">
+                        <p:column headerText="伤害程度" filterBy="#{item.harmDegree}"  filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"  />
+                                    <f:selectItem itemLabel="死亡" itemValue="1"  />
+                                    <f:selectItem itemLabel="严重伤害" itemValue="2"  />
+                                    <f:selectItem itemLabel="其他" itemValue="3"  />
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{item.harmDegree == 1 ?'死亡':item.harmDegree == 2?'严重伤害':'其他'}" class="#{item.harmDegree != 1?'':'priorityItem priorityItem1'}"/>
                         </p:column>
                         <p:column headerText="操作" exportable="false" style="width: 110px;">
@@ -124,6 +172,16 @@
                     </p:dataTable>
                 </h:form>
             </div>
+            <p:overlayPanel widgetVar="panelFilterReportDate" for=":adverseListForm:adverseEventsApproveList:filterReportDate" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varReportDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="vaReportDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList','varFilterReportDate','varReportDateFrom','vaReportDateTo'); PF('panelFilterReportDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterReportDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
             <p:dialog modal="true" id="dlgSendMailDisable" widgetVar="dlgSendMailDisable" header="邮件发送" appendTo="@(body)">
                 <h:form id="sendMailForm">
                     <h:panelGrid columns="1" cellpadding="5">

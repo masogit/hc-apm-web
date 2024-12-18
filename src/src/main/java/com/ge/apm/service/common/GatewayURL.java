@@ -158,6 +158,7 @@ public enum GatewayURL {
     APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent"),
     // 上报人不良事件列表
     ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/reporterList"),
+    ADVERSE_EVENTS_LIST_ALL("/hcapmassetservice/api/apm/asset/adverse/events/queryAllAdverseEvent"),
     // 不良事件作废
     ADVERSE_EVENTS_INVALID("/hcapmassetservice/api/apm/asset/adverse/events/invalidAdverseEvent"),
     // 不良事件暂存上报

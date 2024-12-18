@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TempFileUtil;
+import org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +23,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import webapp.framework.dao.SearchFilter;
 
 import java.util.*;
 
@@ -80,16 +82,16 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         return JSON.parseObject(JSON.toJSONString(body.get("data")), AdverseEvents.class);
     }
 
-    public Page<AdverseEvents> getAdverseEventsById(String token, PageRequest pageRequest, String status, String queryStr, String findType) {
-        HttpEntity<String> requestEntity = new HttpEntity<>(createHttpHeaders(token));
+    public Page<AdverseEvents> getAdverseEventsById(String token, PageRequest pageRequest, String status, String queryStr, String findType,List<Map<String, Object>> searchFilters) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.add("page", (pageRequest.getPageNumber() == 0?1:pageRequest.getPageNumber()+1) + "");
         paramMap.add("pageSize", pageRequest.getPageSize() + "");
         paramMap.add("status", status);
         paramMap.add("queryStr", queryStr);
+        HttpEntity<List<Map<String,Object>>> requestEntity = new HttpEntity<List<Map<String,Object>>>(searchFilters, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(findType.equals("report")?GatewayURL.ADVERSE_EVENTS_LIST:GatewayURL.APPROVE_ADVERSE_EVENTS_LIST);
         UriComponentsBuilder builderUrl = UriComponentsBuilder.fromHttpUrl(gatewayURL).queryParams(paramMap);
-        ResponseEntity<String> response = template.exchange(builderUrl.build(false).toUriString(), HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> response = template.exchange(builderUrl.build(false).toUriString(), HttpMethod.POST, requestEntity, String.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             String result = response.getBody();
             JSONObject jsonObject = JSONObject.parseObject(result);
@@ -99,6 +101,26 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
             }
         }
         return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+    }
+
+    public List<AdverseEvents> queryAdverseEvents(String token, String status, String queryStr, String findType,List<Map<String, Object>> searchFilters) {
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("status", status);
+        paramMap.add("queryStr", queryStr);
+        paramMap.add("findType", findType);
+        HttpEntity<List<Map<String,Object>>> requestEntity = new HttpEntity<>(searchFilters, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(findType.equals("report")?GatewayURL.ADVERSE_EVENTS_LIST_ALL:GatewayURL.ADVERSE_EVENTS_LIST_ALL);
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromHttpUrl(gatewayURL).queryParams(paramMap);
+        ResponseEntity<String> response = template.exchange(builderUrl.build(false).toUriString(), HttpMethod.POST, requestEntity, String.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            String result = response.getBody();
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            JSONArray data = jsonObject.getJSONArray("data");
+            if (null != data) {
+                return data.toJavaList(AdverseEvents.class);
+            }
+        }
+        return new ArrayList<>();
     }
 
     public AdverseEvents getAdverseEventsById(String token, String id) {
