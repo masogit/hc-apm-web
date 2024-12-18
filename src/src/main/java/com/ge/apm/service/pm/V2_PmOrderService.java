@@ -16,15 +16,21 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +38,7 @@ import java.util.stream.Collectors;
  * @author 212579464
  */
 @Component
+@Lazy(false)
 public class V2_PmOrderService extends MicroServiceInvoker {
 	private static final Logger log = LoggerFactory.getLogger(V2_PmOrderService.class);
     @Autowired
@@ -85,6 +92,33 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     @Autowired
     private PmOrderRuleCheckListRepository pmckLstDao;
 
+    @PostConstruct
+    public void initialize(){
+        setPyNameCode();
+    }
+
+    private void setPyNameCode(){
+        CompletableFuture.runAsync(()->{
+            long o = System.currentTimeMillis();
+            log.info("pmOrderRules start:{}", o);
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            long count = pmOrderRuleRepository.count();
+            log.info("pmOrderRules size:{}",count);
+            if(count > 0){
+                searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.IsNull,null));
+                searchFilters.add(new SearchFilter("name", SearchFilter.Operator.IsNotNull,null));
+                Page<PmOrderRule> page = null;
+                while ((page = pmOrderRuleRepository.findBySearchFilter(searchFilters, new PageRequest(0, 500))).getTotalElements() > 0){
+                    for (PmOrderRule pmOrderRule : page) {
+                         pmOrderRule.setName(pmOrderRule.getName());
+                    }
+                    pmOrderRuleRepository.save(page);
+
+                }
+            }
+            log.info("pmOrderRules end:{}",System.currentTimeMillis()-o);
+        });
+    }
     /*
     *1 查看工单时候否pm_performance_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
     * 2 查看工单时候否pm_safty_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
