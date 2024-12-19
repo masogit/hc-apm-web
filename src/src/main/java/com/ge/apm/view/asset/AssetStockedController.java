@@ -144,7 +144,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
                 searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3, 4), "1*"));
                 break;
             case "outStockedRecord":
-               // searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
+                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
                 break;
             default:
                 break;
@@ -303,11 +303,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedOutStockDoc() {
-        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("包含不同到货单，无法生成出库单！");
-            return;
-        }
         if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
@@ -460,7 +455,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
 
     public void prepareViewQrcode(){
         if(CollectionUtils.isEmpty(this.selectedItems)){
-            WebUtil.addErrorMessage("请选择出库单!");
+            WebUtil.addErrorMessage("请选择设备");
             return;
         }
         List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());

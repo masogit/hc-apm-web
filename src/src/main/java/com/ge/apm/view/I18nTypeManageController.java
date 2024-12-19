@@ -9,6 +9,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.I18nTypeManage;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -36,8 +37,11 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     private UserAccount currentUser;
     private I18nTypeManageRepository dao;
     private TenantInfoRepository tenantInfoRepository;
+    private ConfigCacheService configCacheService;
     private TenantInfo selectTenant;
     private Integer selectTenantId;
+
+    private String selectActionName;
 
     private I18nMessage selectedI18n;
 
@@ -46,6 +50,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         dao = WebUtil.getBean(I18nTypeManageRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         selectTenant = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
         selectTenantId = selectTenant.getId();
@@ -82,17 +87,12 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.IN, Arrays.asList(-1,siteId)));
         List<I18nMessage> i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
         Map<Integer, List<I18nMessage>> listMap = i18nMessageList.stream().collect(Collectors.groupingBy(I18nMessage::getSiteId));
-        boolean defaultValue = false;
+        boolean defaultValue = true;
         boolean alone = false;
         List<I18nMessage> defaultMsgList = listMap.get(-1); // 获取默认值
         if(CollectionUtils.isNotEmpty(defaultMsgList)){
-            List<I18nMessage> collect = defaultMsgList.stream().map(item -> {
-                I18nMessage i18nMessage = new I18nMessage();
-                BeanUtils.copyProperties(item, i18nMessage);
-                return i18nMessage;
-            }).collect(Collectors.toList());
-            defaultValue = Boolean.TRUE;
-            selected.setI18nMessageList(collect);
+            selected.setDefaultMsgList(defaultMsgList);
+            selected.setI18nMessageList(copy(defaultMsgList));
             selected.setDefaultValue(defaultValue);
         }
         List<I18nMessage> msgList = listMap.get(siteId); // 获取当前租户
@@ -101,6 +101,9 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             defaultValue =Integer.valueOf(-1).equals(i18nMessage.getSiteId());
             selected.setDefaultValue(defaultValue);
             selected.setI18nMessageList(msgList);
+            if(CollectionUtils.isEmpty(selected.getDefaultMsgList())){
+                selected.setDefaultMsgList(copy(msgList));
+            }
         }
 
         if(CollectionUtils.isEmpty(selected.getDefaultMsgList()) && CollectionUtils.isEmpty(selected.getI18nMessageList())){
@@ -108,17 +111,25 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
             i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
             selected.setDefaultMsgList(i18nMessageList);
-            selected.setI18nMessageList(i18nMessageList);
+            selected.setI18nMessageList(copy(i18nMessageList));
         }
         alone = CollectionUtils.isEmpty(defaultMsgList);
         selected.setAlone(alone);
         LOGGER.info("msgType:{},siteId:{},default:{},alone:{}",msgType,siteId,defaultValue,alone);
+    }
+    private List<I18nMessage> copy(List<I18nMessage> source){
+        return source.stream().map(item -> {
+            I18nMessage i18nMessage = new I18nMessage();
+            BeanUtils.copyProperties(item, i18nMessage);
+            return i18nMessage;
+        }).collect(Collectors.toList());
     }
     public void editI18nConfig(){
         LOGGER.info("editI18nConfig:{}", JSON.toJSONString(selectedI18n));
     }
     public void prepareAddI18n(){
         //TODO
+        this.selectActionName="Created";
         selectedI18n = new I18nMessage();
         selectedI18n.setMsgType(selected.getMsgType());
         selected.getI18nMessageList().add(selectedI18n);
@@ -126,9 +137,11 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void prepareEditI18n(){
         //TODO
+        this.selectActionName="Edit";
         LOGGER.info("prepareEditI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void deleteI18n(){
+        this.selectActionName="Deleted";
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList().stream().filter(item->!item.getMsgKey().equals(selectedI18n.getMsgKey())).collect(Collectors.toList());
         selected.setI18nMessageList(i18nMessageList);
         selectedI18n = null;
@@ -136,17 +149,22 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void  reset(){
         selected.setI18nMessageList(ListUtils.newArrayList());
+        LOGGER.info("reset:{},",selected.getMsgType());
         saveConfig();
+        resetCache();
+        LOGGER.info("end reset:{}",selected.getMsgType());
     }
     public void saveConfig(){
-        logger.info("saveConfig:"+selected.getMsgType());
+        LOGGER.info("saveConfig:{}",selected.getMsgType());
         doSaveI18nMessage();
-        logger.info("end saveConfig:"+selected.getMsgType());
+        resetCache();
+        LOGGER.info("end saveConfig:{}",selected.getMsgType());
     }
-    private void doSaveI18nMessage(){
+    public void doSaveI18nMessage(){
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
         List<I18nMessage> defaultMsgList = selected.getDefaultMsgList();
         boolean b = i18nMessageList.stream().anyMatch(item -> {
+            if(item.getId() == null) return Boolean.TRUE;
             Optional<I18nMessage> first = defaultMsgList.stream().filter(deItem -> deItem.getMsgKey().equals(item.getMsgKey())).findFirst();
             if (first.isPresent()) {
                 I18nMessage i18nMessage = first.get();
@@ -154,16 +172,14 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             }
             return Boolean.TRUE;
         });
-        if(b) {
-            if(!selected.isAlone() && selected.isDefaultValue()){
-                i18nMessageList.stream().forEach(item->{
-                    Integer siteId = item.getSiteId();
-                    if(siteId == null || Integer.valueOf(-1).equals(siteId)){
-                        item.setId(null);
-                        item.setSiteId(selectTenantId);
-                    }
-                });
-            }
+        if(b || i18nMessageList.size() != defaultMsgList.size()) {
+            i18nMessageList.stream().forEach(item->{
+                Integer siteId = item.getSiteId();
+                if(siteId == null || Integer.valueOf(-1).equals(siteId)){
+                    item.setId(null);
+                    item.setSiteId(selectTenantId);
+                }
+            });
             if(CollectionUtils.isNotEmpty(i18nMessageList)){
                 i18nMessageRepository.save(i18nMessageList);
             }
@@ -175,13 +191,16 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             i18nMessageRepository.delete(deleteI18nMessageList);
         }
         dao.save(selected);
+    }
+    public void resetCache(){
         DbMessageSource.reLoadMessages();
+        configCacheService.cleanCacheNames();
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();
-        String o1Str = stringBuilder_o1.append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).toString();
+        String o1Str = stringBuilder_o1.append(o1.getId()).append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).toString();
         StringBuilder stringBuilder_o2 = new StringBuilder();
-        String o2Str = stringBuilder_o2.append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o1.getValueTw()).toString();
+        String o2Str = stringBuilder_o2.append(o2.getId()).append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o1.getValueTw()).toString();
         return o1Str.equals(o2Str);
     }
     public TenantInfo getSelectTenant() {
@@ -207,4 +226,9 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     public void setSelectedI18n(I18nMessage selectedI18n) {
         this.selectedI18n = selectedI18n;
     }
+
+    public String getSelectActionName() {
+        return selectActionName;
+    }
+
 }

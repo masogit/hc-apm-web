@@ -37,8 +37,8 @@ import java.util.*;
  * @author 212547631
  */
 @Entity
-@Table(name = "asset_info",indexes = {@Index(columnList = "asset_dept_uid"),@Index(columnList = "shared_asset_type")})
-public class AssetInfo implements ChineseName,Serializable {
+@Table(name = "asset_info", indexes = {@Index(columnList = "asset_dept_uid"), @Index(columnList = "shared_asset_type")})
+public class AssetInfo implements ChineseName, Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -82,7 +82,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;//制造商
-    
+
     @Size(max = 64)
     @Column(name = "manufacture_id")
     private String manufactureId;//制造商Id
@@ -187,10 +187,10 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
     private String assetDeptUID;
-    
+
     @Column(name = "asset_type") // 设备类型, 支持自定义
     private String assetType;
-    
+
     @Column(name = "asset_CDFA_type") // CDFA设备类型
     private String assetCDFAType;
 
@@ -284,11 +284,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
     private Date factoryWarrantyDate;//质保截止日期
-    
+
     @Column(name = "accept_date")
     @Temporal(TemporalType.DATE)
     private Date acceptDate;//验收日期
-    
+
     @Column(name = "warranty_month")
     private Integer warrantyMonth;//质保时间（月）
 
@@ -370,7 +370,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
-    @Column(name="parent_asset_uid",columnDefinition = "CHAR(32)")
+    @Column(name = "parent_asset_uid", columnDefinition = "CHAR(32)")
     private String parentAssetUid;
 
     @Column(name = "inventory_status")
@@ -409,7 +409,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
-    @NotFound(action= NotFoundAction.IGNORE)
+    @NotFound(action = NotFoundAction.IGNORE)
     private OrgInfo hospital;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
@@ -423,7 +423,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
     //资产价值分类
     @Column(name = "asset_value_category")
     private String assetValueCategory;
@@ -439,8 +439,8 @@ public class AssetInfo implements ChineseName,Serializable {
     //资金来源[1:科研,2:教学,3:医疗,4:干保]
     @Column(name = "capital_source")
     private Integer capitalSource;
-    
-  //资金来源[1:自有资金,2:合资公司资金]
+
+    //资金来源[1:自有资金,2:合资公司资金]
     @Column(name = "capital_source2")
     private Integer capitalSource2;
 
@@ -530,7 +530,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "ib_status")
     private Integer ibStatus;
-    
+
     //专有分类 YHAAO-3890 一般设备、仪器仪表及量具、专用设备 3类
     @Column(name = "proprietary_class")
     private String proprietaryClass;
@@ -580,7 +580,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "mvs_equip")
     private Integer mvsEquip;
-    
+
     // 所属课题项目
     @Column(name = "subject_project")
     private String subjectProject;
@@ -641,7 +641,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     //联通状态，默认 1未联通，2 联通, 3 N/A
     @Column(name = "connect_to_insite")
-    private Integer connectToInsite=3;
+    private Integer connectToInsite = 3;
 
     //默认1：未见异常、 2：报警、 3：维修中、 4: 无联通无报警、 5： 无显示
     @Column(name = "ib_device_status")
@@ -702,45 +702,58 @@ public class AssetInfo implements ChineseName,Serializable {
     //是否风险评估
     @Column(name = "is_risk_assessment")
     private Boolean isRiskAssessment;
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "check_cycle")
     private String checkCycle; //检查周期
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "detection_cycle")
     private String detectionCycle; //检测周期
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "maintenance_period")
     private String maintenancePeriod; //保养周期
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "sum_risk_score")
     private String sumRiskScore; //风险总分
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "assessment_date")
     private Date assessmentDate; //评估日期
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "assessment_by")
     private String assessmentBy; //评估人员
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "asset_achievements")
     private String assetAchievements; //设备绩效
 
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "asset_quantity")
     private Integer assetQuantity; //设备数量 YHAAO-16852
 
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "product_family")
     private String productFamily; //系列
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "product_segment")
     private Integer productSegment;//高端/中端/低端
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "mvs_contract_start_date")
     private Date mvsContractStartDate;//续签合同start date
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "mvs_contract_end_date")
     private Date mvsContractEndDate;//续签合同end date
-    @Getter@Setter
+    @Getter
+    @Setter
     @Column(name = "asset_lifecycle_deadline")
     private Date assetLifecycleDeadline;
 
@@ -752,7 +765,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     @TableField(exist = false)
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
-    
+
     @Transient
     @TableField(exist = false)
     private SharedAssetReqDetail sharedAssetReqDetail;
@@ -872,10 +885,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter @Setter
     private String warrantyStatus;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     @Column(name = "offline_update_date")
     private Date offlineUpdateDate;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }
@@ -888,9 +901,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @TableField(exist = false)
     private String sharedAssetSwapIndexId;
 
-
-
-
     //待报废操作人
     @Transient
     @TableField(exist = false)
@@ -898,7 +908,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     @TableField(exist = false)
     private Date terminateOperationDate;
-
 
     @Column(name = "supplier_py_code")
     private String supplierPyCode;
@@ -920,11 +929,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "product_place")
     private String productPlace;
 
-
     // 保修
     @Column(name = "guarantee")
     private String guarantee;
-
 
     @Column(name = "start_using_date")
     @Temporal(TemporalType.DATE)
@@ -939,8 +946,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @JsonProperty
     @Column(name = "is_mvs_tant")
     private Boolean isMvsTant;
-//    @Column(name = "swap_type")
-//    private String swapType;
+
     @Column(name = "sharable")
     private Boolean sharable;
     @Column(name = "is_open_tube")
@@ -976,7 +982,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "has_registration_no")
     private Integer hasRegistrationNo;
 
-
     /**
      * 异常反馈
      */
@@ -998,13 +1003,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "tubewatch_status")
     private String tubeWatchStatus;
 
-
     /**
      * 当前位置
      */
     @Column(name = "asset_location")
-    private String  assetLocation;
-
+    private String assetLocation;
 
     @Getter
     @Setter
@@ -1050,10 +1053,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     @Column(name = "billing_time")
     private Long billingTime; // 累计借用计费时长分钟
-
     @Getter
     @Setter
-    @Column(name = "billing_cost",columnDefinition = "decimal(11,2)")
+    @Column(name = "billing_cost", columnDefinition = "decimal(11,2)")
     private Double billingCost;//累计费用
     @Getter
     @Setter
@@ -1063,21 +1065,33 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     @Column(name = "borrow_config_id")
     private String borrowConfigId;
-
-
     @Column(name = "is_special_asset", columnDefinition = "boolean default false")
     private boolean isSpecialAsset; //是否特种设备
-
-
     @Column(name = "asset_scrap_id")
     private String assetScrapId; //设备报废id
-
-
+    @Transient
+    @TableField(exist = false)
+    private BigDecimal scaleAssessment;
 
     @Transient
     @TableField(exist = false)
-    private BigDecimal  scaleAssessment;
+    private String measuringAlertStatus;
 
+    public String getMeasuringAlertStatus() {
+        if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
+            DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
+            if(dt.isBeforeNow()) {
+                measuringAlertStatus = "measuringExpired";
+            } else if(dt.minusDays(45).isBeforeNow()) {
+                measuringAlertStatus = "measuringExpiredSoon";
+            }
+        }
+        return measuringAlertStatus;
+    }
+
+    public void setMeasuringAlertStatus(String measuringAlertStatus) {
+        this.measuringAlertStatus = measuringAlertStatus;
+    }
 
     public boolean isSpecialAsset() {
         return isSpecialAsset;
@@ -1473,14 +1487,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public String getAssetTagsView() {
         String assetTagsView = "";
-        if(assetTags==null){
+        if (assetTags == null) {
             return assetTagsView;
         }
-        for(AssetTags tag:assetTags){
-            assetTagsView += tag.getTag()+",";
+        for (AssetTags tag : assetTags) {
+            assetTagsView += tag.getTag() + ",";
         }
-        if(!"".equals(assetTagsView)){
-            assetTagsView = assetTagsView.substring(0,assetTagsView.length() - 1);
+        if (!"".equals(assetTagsView)) {
+            assetTagsView = assetTagsView.substring(0, assetTagsView.length() - 1);
         }
         return assetTagsView;
     }
@@ -1494,7 +1508,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name="asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
 
     @Column(name = "last_check_company")
@@ -1509,28 +1523,28 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
-		return sharedAssetReqDetailList;
-	}
+        return sharedAssetReqDetailList;
+    }
 
-	public void setSharedAssetReqDetailList(Set<SharedAssetReqDetail> sharedAssetReqDetailList) {
-		this.sharedAssetReqDetailList = sharedAssetReqDetailList;
-	}
+    public void setSharedAssetReqDetailList(Set<SharedAssetReqDetail> sharedAssetReqDetailList) {
+        this.sharedAssetReqDetailList = sharedAssetReqDetailList;
+    }
 
-	public SharedAssetReqDetail getSharedAssetReqDetail() {
-		return sharedAssetReqDetail;
-	}
+    public SharedAssetReqDetail getSharedAssetReqDetail() {
+        return sharedAssetReqDetail;
+    }
 
-	public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
-		this.sharedAssetReqDetail = sharedAssetReqDetail;
-	}
+    public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
+        this.sharedAssetReqDetail = sharedAssetReqDetail;
+    }
 
-	public SharedAssetType getSharedAssetTypeEntity() {
-		return sharedAssetTypeEntity;
-	}
+    public SharedAssetType getSharedAssetTypeEntity() {
+        return sharedAssetTypeEntity;
+    }
 
-	public void setSharedAssetTypeEntity(SharedAssetType sharedAssetTypeEntity) {
-		this.sharedAssetTypeEntity = sharedAssetTypeEntity;
-	}
+    public void setSharedAssetTypeEntity(SharedAssetType sharedAssetTypeEntity) {
+        this.sharedAssetTypeEntity = sharedAssetTypeEntity;
+    }
 
     public OrgInfo getAssetDeptOrg() {
         return assetDeptOrg;
@@ -1542,7 +1556,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanBorrow() {
         Boolean rst = Boolean.FALSE;
-        if(this.clinicalDeptUID != null && this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
+        if (this.clinicalDeptUID != null && this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
             rst = Boolean.TRUE;
         }
         return rst;
@@ -1550,18 +1564,19 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Boolean getCanReturn() {
         Boolean rst = Boolean.FALSE;
-        if(this.clinicalDeptUID != null && !this.clinicalDeptUID.equals(this.assetDeptUID)) {
+        if (this.clinicalDeptUID != null && !this.clinicalDeptUID.equals(this.assetDeptUID)) {
             rst = Boolean.TRUE;
-            if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
+            if (this.sharedAssetReqDetail != null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())) {
                 rst = Boolean.FALSE;
             }
         }
         return rst;
     }
+
     //
     public Boolean getCanEdit() {
         Boolean rst = Boolean.FALSE;
-        if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
+        if (this.sharedAssetReqDetail != null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())) {
             rst = Boolean.TRUE;
         }
         return rst;
@@ -1608,14 +1623,14 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public Integer getCapitalSource2() {
-		return capitalSource2;
-	}
+        return capitalSource2;
+    }
 
-	public void setCapitalSource2(Integer capitalSource2) {
-		this.capitalSource2 = capitalSource2;
-	}
+    public void setCapitalSource2(Integer capitalSource2) {
+        this.capitalSource2 = capitalSource2;
+    }
 
-	public Integer getRiskGrade() {
+    public Integer getRiskGrade() {
         return riskGrade;
     }
 
@@ -1851,7 +1866,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getDepartNumAndName() {
-        return name + (StringUtils.isEmpty(departNum)?"":departNum);
+        return name + (StringUtils.isEmpty(departNum) ? "" : departNum);
     }
 
     public String getAccountingDeptUID() {
@@ -1990,7 +2005,7 @@ public class AssetInfo implements ChineseName,Serializable {
         return serialNum;
     }
 
-    public void setSerialNum(String serialNum)   {
+    public void setSerialNum(String serialNum) {
         this.serialNum = serialNum;
     }
 
@@ -2051,14 +2066,14 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getNurseLocation() {
-		return nurseLocation;
-	}
+        return nurseLocation;
+    }
 
-	public void setNurseLocation(String nurseLocation) {
-		this.nurseLocation = nurseLocation;
-	}
+    public void setNurseLocation(String nurseLocation) {
+        this.nurseLocation = nurseLocation;
+    }
 
-	public Integer getClinicalDeptId() {
+    public Integer getClinicalDeptId() {
         return clinicalDeptId;
     }
 
@@ -2093,9 +2108,13 @@ public class AssetInfo implements ChineseName,Serializable {
         this.assetGroup = assetGroup;
     }
 
-    public Integer getAssetClass() { return assetClass; }
+    public Integer getAssetClass() {
+        return assetClass;
+    }
 
-    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
+    public void setAssetClass(Integer assetClass) {
+        this.assetClass = assetClass;
+    }
 
     public Integer getAssetDeptId() {
         return assetDeptId;
@@ -2649,7 +2668,7 @@ public class AssetInfo implements ChineseName,Serializable {
         this.maitananceId = maitananceId;
     }
 
-   public Boolean getIsPm() {
+    public Boolean getIsPm() {
         return isPm;
     }
 
@@ -2657,9 +2676,13 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isPm = isPm;
     }
 
-    public Boolean getIsFixed() { return isFixed; }
+    public Boolean getIsFixed() {
+        return isFixed;
+    }
 
-    public void setIsFixed(Boolean isFixed) { this.isFixed = isFixed; }
+    public void setIsFixed(Boolean isFixed) {
+        this.isFixed = isFixed;
+    }
 
     public Boolean getIsChecked() {
         return isChecked;
@@ -2898,31 +2921,30 @@ public class AssetInfo implements ChineseName,Serializable {
     public String toString() {
         return name;
     }
-    
+
     @Override
     public String getPinYin() {
-		return getNamePyCode();
-	}
-    
-    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        return getNamePyCode();
+    }
+
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType, String clinicalDeptName, String clinicalDeptUID, String nurseLocation) {
         this.id = id;
         this.name = name;
         this.uid = uid;
         this.departNum = departNum;
         this.serialNum = serialNum;
         this.functionType = functionType;
-        this.clinicalDeptName=clinicalDeptName;
-        this.clinicalDeptUID=clinicalDeptUID;
-        this.nurseLocation=nurseLocation;
+        this.clinicalDeptName = clinicalDeptName;
+        this.clinicalDeptUID = clinicalDeptUID;
+        this.nurseLocation = nurseLocation;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
         reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
-        if (this.getSharedAssetReqDetail().getLeaseRequest()==null){
+        if (this.getSharedAssetReqDetail().getLeaseRequest() == null) {
             reqHeader.put("type", "2");
-        }
-        else {
+        } else {
             reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
         }
         reqHeader.put("details", new LinkedList<Map<String, String>>());
@@ -2979,32 +3001,31 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }*/
-    
+
     @Transient
     @TableField(exist = false)
     private String warrantyAlertStatus = null;
 
-    public String getWarrantyAlertStatus(){
+    public String getWarrantyAlertStatus() {
         return warrantyAlertStatus;
     }
-    
-    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays){
-        if(warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
 
-        if(warrantyDate!=null){
+    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays) {
+        if (warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
+
+        if (warrantyDate != null) {
             // first check Warranty Date
             DateTime dt = TimeUtil.toJodaDate(warrantyDate);
-            if(dt.isBeforeNow())
+            if (dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
-            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+            else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
-        }
-        else if(factoryWarrantyDate!=null){
+        } else if (factoryWarrantyDate != null) {
             // then check factory Warranty Date
             DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
-            if(dt.isBeforeNow())
+            if (dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
-            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+            else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
         }
     }
@@ -3064,11 +3085,11 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getUCMID() {
-      return UCMID;
+        return UCMID;
     }
 
     public void setUCMID(String UCMID) {
-      this.UCMID = UCMID;
+        this.UCMID = UCMID;
     }
 
     public String getMainDirectory() {
@@ -3134,9 +3155,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
         this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
-    public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
 
-    public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
+    public String getSharedAssetSwapIndex() {
+        return sharedAssetSwapIndex;
+    }
+
+    public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) {
+        this.sharedAssetSwapIndex = sharedAssetSwapIndex;
+    }
 
     public Integer getRunningStatus() {
         return runningStatus;
@@ -3155,7 +3181,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public Integer getSharedStatus() {
-        return sharedStatus==null?1:sharedStatus;
+        return sharedStatus == null ? 1 : sharedStatus;
     }
 
     public void setSharedStatus(Integer sharedStatus) {
@@ -3178,29 +3204,45 @@ public class AssetInfo implements ChineseName,Serializable {
         this.contractType = contractType;
     }
 
-    public Integer getEmpowermentStatus() { return empowermentStatus; }
+    public Integer getEmpowermentStatus() {
+        return empowermentStatus;
+    }
 
-    public void setEmpowermentStatus(Integer empowermentStatus) { this.empowermentStatus = empowermentStatus; }
+    public void setEmpowermentStatus(Integer empowermentStatus) {
+        this.empowermentStatus = empowermentStatus;
+    }
 
-    public Date getCheckDate() { return checkDate; }
+    public Date getCheckDate() {
+        return checkDate;
+    }
 
-    public void setCheckDate(Date checkDate) { this.checkDate = checkDate; }
+    public void setCheckDate(Date checkDate) {
+        this.checkDate = checkDate;
+    }
 
-    public String getBoUuid() { return boUuid; }
+    public String getBoUuid() {
+        return boUuid;
+    }
 
-    public void setBoUuid(String boUuid) { this.boUuid = boUuid; }
+    public void setBoUuid(String boUuid) {
+        this.boUuid = boUuid;
+    }
 
     public Integer getNetworkingStatus() {
         return networkingStatus;
     }
 
-    public void setNetworkingStatus(Integer networkingStatus) { this.networkingStatus = networkingStatus; }
+    public void setNetworkingStatus(Integer networkingStatus) {
+        this.networkingStatus = networkingStatus;
+    }
 
     public Boolean getIsUseRegistration() {
         return isUseRegistration;
     }
 
-    public void setIsUseRegistration(Boolean isUseRegistration) { this.isUseRegistration = isUseRegistration; }
+    public void setIsUseRegistration(Boolean isUseRegistration) {
+        this.isUseRegistration = isUseRegistration;
+    }
 
     public String getRemark() {
         return remark;
@@ -3210,13 +3252,21 @@ public class AssetInfo implements ChineseName,Serializable {
         this.remark = remark;
     }
 
-    public Date getLastPmDateOne() { return lastPmDateOne; }
+    public Date getLastPmDateOne() {
+        return lastPmDateOne;
+    }
 
-    public void setLastPmDateOne(Date lastPmDateOne) { this.lastPmDateOne = lastPmDateOne; }
+    public void setLastPmDateOne(Date lastPmDateOne) {
+        this.lastPmDateOne = lastPmDateOne;
+    }
 
-    public Date getLastPmDateFour() { return lastPmDateFour; }
+    public Date getLastPmDateFour() {
+        return lastPmDateFour;
+    }
 
-    public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
+    public void setLastPmDateFour(Date lastPmDateFour) {
+        this.lastPmDateFour = lastPmDateFour;
+    }
 
     public String getParentAssetUid() {
         return parentAssetUid;
@@ -3226,14 +3276,14 @@ public class AssetInfo implements ChineseName,Serializable {
         this.parentAssetUid = parentAssetUid;
     }
 
-    public void clearDefaultValue(){
-        this.isChecked=null;
-        this.isFixed=null;
-        this.isWarranty=null;
-        this.isCleaned=null;
-        this.isPm=null;
-        this.isUseRegistration=null;
-        this.networkingStatus=null;
+    public void clearDefaultValue() {
+        this.isChecked = null;
+        this.isFixed = null;
+        this.isWarranty = null;
+        this.isCleaned = null;
+        this.isPm = null;
+        this.isUseRegistration = null;
+        this.networkingStatus = null;
     }
 
     public String getAssetLocation() {

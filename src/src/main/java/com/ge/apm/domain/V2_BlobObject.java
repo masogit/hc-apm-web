@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
@@ -195,6 +196,9 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    @Transient
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpeg");
+
     public String getId() {
         return id;
     }
@@ -361,6 +365,11 @@ public class V2_BlobObject implements Serializable {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
+    }
+
+    public boolean showPreview() {
+        String type = objectName.substring(objectName.indexOf(".") + 1);
+        return showPreviewTypeList.contains(type.toLowerCase());
     }
 
     @Override

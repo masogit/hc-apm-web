@@ -17,7 +17,7 @@
                     <h:panelGroup>
                         <p>#{msg.description}</p>
                         <p>
-                            1. <a href="APM_Auth_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+                            1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('ASSET_TYPE_GROUP')}" styleClass="p-mr-2"/>
                         </p>
                         <p>2. #{msg.FillInTheFileToBeImported},sheet名称开头两位为0-9的数字</p>
                         <p>3. #{msg.upFileImport}</p>

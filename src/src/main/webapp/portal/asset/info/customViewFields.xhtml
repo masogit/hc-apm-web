@@ -804,31 +804,31 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare06')}">
         <h:panelGroup >
             <label class="label">#{msg.spare06}</label>
-            <p:inputText id="spare06" value="#{fieldMsg.fieldValue('spare06', assetInfoDetailController.selected.spare01)}" readonly="true"/>
+            <p:inputText id="spare06" value="#{assetInfoDetailController.selected.spare06}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare06')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare07')}">
         <h:panelGroup >
             <label class="label">#{msg.spare07}</label>
-            <p:inputText id="spare07" value="#{fieldMsg.fieldValue('spare07', assetInfoDetailController.selected.spare07)}" readonly="true"/>
+            <p:inputText id="spare07" value="#{assetInfoDetailController.selected.spare07}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare08')}">
         <h:panelGroup >
             <label class="label">#{msg.spare08}</label>
-            <p:inputText id="spare08" value="#{fieldMsg.fieldValue('spare08', assetInfoDetailController.selected.spare08)}" readonly="true"/>
+            <p:inputText id="spare08" value="#{assetInfoDetailController.selected.spare08}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare09')}">
         <h:panelGroup >
             <label class="label">#{msg.spare09}</label>
-            <p:inputText id="spare09" value="#{fieldMsg.fieldValue('spare09', assetInfoDetailController.selected.spare09)}" readonly="true"/>
+            <p:inputText id="spare09" value="#{assetInfoDetailController.selected.spare09}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'spare10')}">
         <h:panelGroup >
             <label class="label">#{msg.spare10}</label>
-            <p:inputText id="spare10" value="#{fieldMsg.fieldValue('spare10', assetInfoDetailController.selected.spare10)}" readonly="true"/>
+            <p:inputText id="spare10" value="#{assetInfoDetailController.selected.spare10}" readonly="true"/>
         </h:panelGroup>
     </c:if>
 </ui:composition>

@@ -1,23 +1,14 @@
 package com.ge.apm.domain;
 
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "pm_order_rule")
@@ -32,7 +23,9 @@ public class PmOrderRule implements Serializable{
     
     @Column(name = "name")
 	private String name;
-    
+
+	@Column(name = "name_py_code")
+	private String namePyCode;
     @Column(name = "asset_group")
 	private Integer assetGroup;//设备类型
     
@@ -176,7 +169,27 @@ public class PmOrderRule implements Serializable{
 	}
 	public void setName(String name) {
 		this.name = name;
+		if (!StringUtils.isEmpty(name)) {
+			this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+		}
 	}
+
+	public String getNamePyCode() {
+		return namePyCode;
+	}
+
+	public void setNamePyCode(String namePyCode) {
+		this.namePyCode = namePyCode;
+	}
+
+	public String getPeriodUnit() {
+		return periodUnit;
+	}
+
+	public void setPeriodUnit(String periodUnit) {
+		this.periodUnit = periodUnit;
+	}
+
 	public Integer getAssetGroup() {
 		return assetGroup;
 	}
