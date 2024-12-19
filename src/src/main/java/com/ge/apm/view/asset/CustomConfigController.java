@@ -616,6 +616,7 @@ public class CustomConfigController {
 
     public void resetField(){
         i18nMessageService.resetCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId());
+        allFields.put(currentEditField.getKey(), i18nMessageService.getSystemFieldName(CustomConfigFields.valueOf(currentEditField.getKey())));
         resetCache();
     }
 
