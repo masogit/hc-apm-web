@@ -336,9 +336,16 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
     }
 
     public String applicationDataFlow(Integer applicationStatus,String applicationStep) {
-        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.toString().equals(applicationStep)){
+        if(BudgetApplication.APPLICATIONSTEP.PendingApproval.name().equals(applicationStep)){
             if(!checkSubmit()){
                 return "";
+            }
+            BudgetApplicationAsset applicationAsset = selected.getBudgetAssets().iterator().next();
+            if(applicationAsset.getApplicationPrice().compareTo(new BigDecimal(500000)) == 1){
+                if(attachList.isEmpty()){
+                    WebUtil.addSuccessMessage("失败:附件必须上传！");
+                    return "";
+                }
             }
             //无可用的审批流
             boolean resultMultiLevelApproval = persistService.checkMultiLevelApproval(selected);
