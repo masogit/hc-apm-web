@@ -146,7 +146,9 @@
                     </f:facet>
                     <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                 </p:column>
-
+                <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrController.showLocationName()}">
+                    <h:outputText value="#{item.assetInfo.locationName}"/>
+                </p:column>
                 <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.serviceRequest.srNum}"/>
                 </p:column>
