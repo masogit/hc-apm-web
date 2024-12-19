@@ -13,6 +13,7 @@ import com.ge.apm.domain.budget.BudgetApplicationAssetVo;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
+import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.BudgetFileDynamicTemplate;
 import com.ge.apm.service.budget.BudgetPersistService;
 import com.ge.apm.service.common.SysRoleConstant;
@@ -86,6 +87,8 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
     public final static String EDIT_ACTION = "Edit";
 
     private BlobFileService blobService;
+
+    private BudgetApplicationExportService budgetApplicationExportService;
     /**
      * 编辑数据主键
      */
@@ -143,6 +146,7 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         blobService = WebUtil.getBean(BlobFileService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        budgetApplicationExportService = WebUtil.getBean(BudgetApplicationExportService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
@@ -805,5 +809,19 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
 
     }
 
+    public void exportAll()  {
+        try {
+            buildCurDetail(selected.getId());
+            if(this.curSelectApplicationBudgetAsset!=null ){
+                this.attachList = blobObjectRepository.findByBoUuid(this.curSelectApplicationBudgetAsset.getId());
+            }
+            exportFile = budgetApplicationExportService.exportZip(curSelectApplicationBudgetAsset, attachList, BudgetApplicationExportService.FILE_NAME_ROOT_TEMP);
+
+        }catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

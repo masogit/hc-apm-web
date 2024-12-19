@@ -44,10 +44,12 @@ import java.util.zip.ZipOutputStream;
 public class BudgetApplicationExportService {
 
     public static final String FILE_TITLE = "医疗仪器设备年度采购申报表";
+    public static final String FILE_TITLE_TEMP = "医疗仪器设备临时采购申报表";
     public static final String OVER_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/over_fifty_thousand.docx";
     public static final String LESS_FIFTY_THOUSAND = "/portal/budget/application/docTemplate/less_fifty_thousand.docx";
     public static final int TOTAL_SPLIT = 50000;
-    public static final String FILE_NAME_ROOT = "年度采购申购单";
+    public static final String FILE_NAME_ROOT_YEAR = "年度采购申购单";
+    public static final String FILE_NAME_ROOT_TEMP = "临时采购申购单";
 
     public static final String PURCHASE_ROOT = "采购汇总下载";
     public static final String PURCHASE_FILE_TITLE = "采购单";
@@ -95,7 +97,7 @@ public class BudgetApplicationExportService {
         for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
             BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
             List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
-            generateSingleBudget(budgetApplicationAsset, budgetApplication,blobObjects, zout, FILE_NAME_ROOT, ATTACHMENT);
+            generateSingleBudget(budgetApplicationAsset, budgetApplication,blobObjects, zout, FILE_NAME_ROOT_YEAR, ATTACHMENT);
         }
         zout.close();
         StreamedContent streamedContent = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Export_Purchase.zip");
@@ -103,12 +105,12 @@ public class BudgetApplicationExportService {
     }
 
 
-    public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects) throws IOException, ParseException {
+    public StreamedContent exportZip(BudgetApplicationAsset budgetApplicationAsset, List<V2_BlobObject> blobObjects, String rootFileName) throws IOException, ParseException {
         BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
-        String base = FILE_NAME_ROOT + "-" + budgetApplicationAsset.getApplicationNum();
+        String base = rootFileName + "-" + budgetApplicationAsset.getApplicationNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream zout = new ZipOutputStream(bout);
-        generateSingleBudget(budgetApplicationAsset,budgetApplication, blobObjects,zout, FILE_NAME_ROOT, ATTACHMENT);
+        generateSingleBudget(budgetApplicationAsset,budgetApplication, blobObjects,zout, rootFileName, ATTACHMENT);
         zout.close();
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
@@ -129,7 +131,7 @@ public class BudgetApplicationExportService {
 
         byte[] bytes = this.renderDocx(data, templateBytes);
 
-        String fileName = buildFileName(data, false);
+        String fileName = buildFileName(data, false, budgetApplication.getOrderType());
         zout.putNextEntry(new ZipEntry(docPrefix + "/" + fileName));
         IOUtils.write(bytes, zout);
         zout.closeEntry();
@@ -300,7 +302,7 @@ public class BudgetApplicationExportService {
     }
 
     public StreamedContent exportDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, false));
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, false, "BAP"));
         return streamedContent;
     }
 
@@ -322,7 +324,7 @@ public class BudgetApplicationExportService {
         return bytes;
     }
 
-    private String buildFileName(Map<String, Object> data, boolean isEncoding){
+    private String buildFileName(Map<String, Object> data, boolean isEncoding,String orderType){
         String assetName = "";
         if(data.get("assetName") != null){
             assetName = data.get("assetName").toString();
@@ -331,6 +333,11 @@ public class BudgetApplicationExportService {
         }
 
         String reportTypeTitle = FILE_TITLE;
+        if(BudgetApplication.OrderType.BAP.name().equals(orderType)){
+            reportTypeTitle = FILE_TITLE;
+        }else{
+            reportTypeTitle = FILE_TITLE_TEMP;
+        }
 
         if(isEncoding){
             return this.encoding(reportTypeTitle) + "-" + this.encoding(assetName) + ".docx";
