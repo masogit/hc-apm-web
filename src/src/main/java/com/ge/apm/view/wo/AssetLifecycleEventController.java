@@ -1,15 +1,18 @@
 package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ServiceRequestReport;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.AssetLifecycleEventService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +58,12 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
 	protected String queryAssetUid;
 
+	private ConfigItemValueRepository configItemValueRepository;
+
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
 		dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
+		configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 		fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 		service = WebUtil.getBean(AssetLifecycleEventService.class);
 		this.filterBySite = false;
@@ -356,6 +362,15 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		} catch (Exception e) {
 			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
 		}
+	}
+
+	public boolean showLocationName(){
+		UserAccount loginUser = UserContextService.getCurrentUserAccount();
+		String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+		if (StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue)) {
+			return true;
+		}
+		return false;
 	}
 
 	public Set<AssetLifecycleEvent> getSetSelectedItems() {

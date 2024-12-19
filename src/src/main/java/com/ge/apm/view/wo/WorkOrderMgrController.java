@@ -38,6 +38,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -1707,6 +1708,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         checkInDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         V2_WorkOrder checkInWorkOrder = dao.findById(woid);
         woService.checkIn(checkInWorkOrder);
+    }
+
+    public boolean showLocationName(){
+        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+        if (StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue)) {
+            return true;
+        }
+        return false;
     }
 
     public void repairWorkOrder() {

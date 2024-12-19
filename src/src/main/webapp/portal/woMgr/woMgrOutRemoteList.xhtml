@@ -45,6 +45,9 @@
 					filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 				</p:column>
+				<p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{assetLifecycleEvent6Controller.showLocationName()}">
+					<h:outputText value="#{item.assetInfo.locationName}"/>
+				</p:column>
 				<p:column headerText="#{msg.status}" filterBy="#{item.description}" filterMatchMode="LIKE">
 					<f:facet name="filter">
 						<p:selectOneMenu onchange="PF('varWoMgrOutRemoteDataList').filter()">
