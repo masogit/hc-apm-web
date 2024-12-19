@@ -1,6 +1,7 @@
 package com.ge.apm.view.measuring;
 
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -91,6 +92,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private WorkflowService workflowService;
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
     private TenantInfo currentTenantInfo;
+    private PreViewerBean preViewerBean;
 
     @Override
     protected void init() {
@@ -108,6 +110,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
+        preViewerBean = WebUtil.getBean(PreViewerBean.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -391,6 +394,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     public boolean canBatchUpload() {
         ConfigItemValue configItemValue = configItemMapper.findByKey("batch_upload", currentUser.getSiteUID());
         return ObjectUtil.isNotEmpty(configItemValue) && Boolean.TRUE.toString().equals(configItemValue.getValue());
+    }
+
+    public String getFileNewWindowUrl(String objectId) {
+        return "/portal/preview/view.xhtml?faces-redirect=true&amp;objectId=" + objectId;
     }
 
 }

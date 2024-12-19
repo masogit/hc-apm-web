@@ -593,6 +593,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, dept.getInstitutionUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
+        assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IsNotNull, null, "1*"));
         if (dept.getOrgType() == 4) {
             List<OrgInfo> userAccessibleSiteListWithClinicalDept = uaaService.getUserAccessibleSiteListWithClinicalDept(account.getUid());
             Set<OrgInfo> clinicalDeptSet = new HashSet<>();
@@ -823,6 +824,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
         ids.forEach(assetIds::remove);
+        Set<Integer> filterIds = new HashSet<>(assetIds);
 
         List<String> deleteDeptUids = Arrays.asList(deptUids.split(","));
 
@@ -835,12 +837,13 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             clinicalDeptUids.addAll(deptUidList);
 
         }
-        deleteDeptUids.removeAll(clinicalDeptUids);
+        List<String> deleteDeptUidList = new ArrayList<>(deleteDeptUids);
+        deleteDeptUidList.removeAll(clinicalDeptUids);
         if(selected.getId()!=null){
-            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUids);
+            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUidList);
             saveKeyAssetReport();
         }
-
+        assetIds=filterIds;
         deptList=clinicalDeptUids;
     }
 

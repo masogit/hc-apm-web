@@ -3,7 +3,7 @@ package com.ge.apm.domain;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,9 +30,9 @@ public class I18nTypeManage  {
     @Transient
     private boolean defaultValue;
     @Transient
-    private List<I18nMessage> i18nMessageList;
+    private List<I18nMessage> i18nMessageList = new ArrayList<>();
     @Transient
-    private List<I18nMessage> defaultMsgList;
+    private List<I18nMessage> defaultMsgList = new ArrayList<>();
 
     public String getId() {
         return id;

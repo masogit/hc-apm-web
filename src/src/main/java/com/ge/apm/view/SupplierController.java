@@ -17,6 +17,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -74,7 +75,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private Boolean isSelectedCurrentPage = false;
     private boolean activeSupplier;
     private boolean activeVender;
-
+    private FileDownloadService fileDownloadService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
@@ -83,6 +84,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         arrivalListItemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         currentUser = UserContextService.getCurrentUserAccount();
         activeSupplier = supplierService.activeSupplier();
         activeVender = supplierService.activeVender();
@@ -424,7 +427,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             map.put("类型", getGongyingshangLeixing(supplier));
             resultList.add(map);
         }
-        InputStream stream = SupplierController.class.getClassLoader().getResourceAsStream("template/APM_Supplier.xlsx");
+//        InputStream stream = SupplierController.class.getClassLoader().getResourceAsStream("template/APM_Supplier.xlsx");
+
+        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.SUPPLIER.getCode(), SystemTemplate.SystemTemplateEnum.SUPPLIER.getFileType());
+
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startNum = 1;
