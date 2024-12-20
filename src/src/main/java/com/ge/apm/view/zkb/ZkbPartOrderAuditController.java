@@ -287,6 +287,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                     selected.setWhetherDeduct(CopyByInvok.T);
                                 }
                             }
+                            if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) ||
+                                ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType()) ){
+                                zkbPartOrderStatusVo.setMaintainTips("该合同需要联系OTR添加 PM active entitlement；");
+                            }
                         }else{
                             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
                             if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
