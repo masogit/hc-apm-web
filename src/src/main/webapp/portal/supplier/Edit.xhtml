@@ -66,20 +66,29 @@
                             <label class="label">#{msg.type}*</label>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{supplierController.selected.maintainerT}"/>
+                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{supplierController.selected.maintainerT}">
+                                <p:ajax process="@this" update="SupplierEditForm"/>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{supplierController.selected.manufacturerT}"/>
+                            <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{supplierController.selected.manufacturerT}">
+                                <p:ajax process="@this" update="SupplierEditForm"/>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{supplierController.selected.supplierT}"/>
+                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{supplierController.selected.supplierT}">
+                                <p:ajax process="@this" update="SupplierEditForm"/>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="pictureList" value="#{supplierController.getAttachList('1')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -132,92 +141,84 @@
                             <p:inputText value="#{supplierController.selected.licenseScope}" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="licenseAttachements" value="#{supplierController.getAttachList('License')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">营业执照附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="licenseAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="licenseAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typeLicense" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typeLicense" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="licenseAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
-<!--                <p:fieldset legend="营业许可证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="营业许可证信息">
+<!--                <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息" rendered="#{supplierController.activeSupplier()}">-->
+                <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息" rendered="#{supplierController.selected.supplierT}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
-                            <label class="label">营业许可证编码</label>
+                            <label class="label">许可证编码</label>
                             <p:inputText value="#{supplierController.selected.permitCode}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">营业许可证截止日期</label>
+                            <label class="label">许可证截止日期</label>
                             <p:calendar timeZone="GMT+8" id="permitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.permitEndDate}" required="false" requiredMessage="营业许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="permitAttachements" value="#{supplierController.getAttachList('Permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                            <f:facet name="header">营业许可证附件</f:facet>
+                            <f:facet name="header">许可证附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="permitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="permitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typePermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typePermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="permitAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                     <br/>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="afterServiceAttachements" value="#{supplierController.getAttachList('AfterService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">售后服务承诺附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="afterServiceAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="afterServiceAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typeAfterService" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typeAfterService" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="afterServiceAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                     <br/>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="authorizationAttachements" value="#{supplierController.getAttachList('Authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
                             <f:facet name="header">授权书附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="authorizationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="authorizationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typeAuthorization" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typeAuthorization" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="authorizationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
 <!--                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="生产许可证信息">
+                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.selected.manufacturerT}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">生产许可证编码</label>
@@ -228,26 +229,24 @@
                             <p:calendar timeZone="GMT+8" id="manufacturingPermitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.manufacturingPermitEndDate}" required="false" requiredMessage="生产许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="manufacturingPermitAttachements" value="#{supplierController.getAttachList('ManufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">生产许可证附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="manufacturingPermitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="manufacturingPermitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typeManufacturingPermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typeManufacturingPermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="manufacturingPermitAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>
 <!--                <p:fieldset legend="产品注册证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="产品注册证信息">
+                <p:fieldset legend="产品注册证信息" rendered="false">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">产品注册证编号</label>
@@ -262,21 +261,19 @@
                             <p:calendar timeZone="GMT+8" id="productRegistrationEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.productRegistrationEndDate}" required="false" requiredMessage="产品注册证结束日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <p:dataList id="productRegistrationAttachements" value="#{supplierController.getAttachList('ProductRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">产品注册证附件</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
-                            <h:panelGroup rendered="#{supplierController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" alt=""
-                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" onclick="previewImg()"/>
-                            </h:panelGroup>
-                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="productRegistrationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                            </p:commandLink>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="productRegistrationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="typeProductRegistration" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                        <p:fileUpload id="typeProductRegistration" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="100000000"  update="productRegistrationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>

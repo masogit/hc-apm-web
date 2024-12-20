@@ -9,7 +9,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -17,7 +16,10 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -76,6 +78,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private boolean activeSupplier;
     private boolean activeVender;
     private FileDownloadService fileDownloadService;
+    private PreViewerBean preViewerBean;
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
@@ -85,14 +88,21 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         supplierService = WebUtil.getBean(SupplierService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        preViewerBean = WebUtil.getBean(PreViewerBean.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         activeSupplier = supplierService.activeSupplier();
         activeVender = supplierService.activeVender();
         this.filterBySite = false;
-        this.selectedMapPending = new HashMap();
-        this.selectedMapApproved = new HashMap();
-        this.selectedMap = new HashMap();
+        this.selectedMapPending = new HashMap<>();
+        this.selectedMapApproved = new HashMap<>();
+        this.selectedMap = new HashMap<>();
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+        if (ObjectUtil.isNotEmpty(selectedId)) {
+            this.selected = dao.findByUid(selectedId);
+            attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        }
     }
 
     @Override
@@ -255,6 +265,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             blobObject.setBoSubType(type);
             blobObject.setBoUuid(selected.getUid());
             blobService.saveBlobObject(blobObject);
+            try {
+                blobService.sendImageCompressMQ(blobObject);
+            } catch (Exception e) {
+                logger.error("供应商，图片生成缩略图MQ发生失败：", e);
+            }
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
@@ -322,6 +337,17 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             }
         }
         return false;
+    }
+
+    public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+        String url = "selectedid=" + selected.getUid();
+        url = "View.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+//        url = "VenderCompanyDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void onItemSelected() {
@@ -558,6 +584,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             noFoundList.add(supplier);
         }
         return noFoundList;
+    }
+
+    public void preViewed(String objectId){
+        preViewerBean.onServerEvent("",objectId);
     }
 
     public boolean activeSupplier(){

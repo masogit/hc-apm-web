@@ -48,7 +48,8 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" update="createButton editButton "/>
+                        <p:ajax event="rowSelect" update="createButton editButton" />
+                        <p:ajax event="rowDblselect" listener="#{supplierController.onSelectAsset}" onstart="prepareViewWindow();" oncomplete="openViewWindow(xhr, status, args)" update="createButton editButton" />
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36" id="checkBox" exportable="false">
@@ -151,6 +152,18 @@
                     $(".selectCheckBoxHeaderApproved")[0].children[1].classList.remove("ui-state-active");
                 }
             }
+
+            var newWin;
+            function prepareViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openViewWindow(xhr, status, args) {
+                newWin.document.body.innerHTML = '加载中...';
+                newWin.location.href = args.url;
+            }
+
 
             // function updateSelectAllCheckBox() {
             //     var checkboxlist = $(".selectCheckBox");
