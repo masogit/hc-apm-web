@@ -250,10 +250,10 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Artificial' and !(zkbPartOrderEditController.checkPcbMvsTotal()) and !(zkbPartOrderEditController.selectedContract.contractType eq 'CCS' or zkbPartOrderEditController.selectedContract.contractType eq 'Biomed')}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Artificial' and !(zkbPartOrderEditController.checkPcbMvsTotal()) }">
                             <label class="label">保养申请*</label>
                             <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.selected.maintainFlag}" required="true" requiredMessage="保养申请 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="ArtificialGroup"  />
+                                <p:ajax event="change" update="ArtificialGroup scoreFlagGroup exchangeTypeGroup" listener="#{zkbPartOrderEditController.maintainFlagChange}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
