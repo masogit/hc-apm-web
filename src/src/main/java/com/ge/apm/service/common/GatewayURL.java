@@ -157,7 +157,7 @@ public enum GatewayURL {
     // // 审核不良事件上报工单 （通过、退回）
     APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent"),
     // 上报人不良事件列表
-    ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/reporterList"),
+    ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/reporterListToWeb"),
     ADVERSE_EVENTS_LIST_ALL("/hcapmassetservice/api/apm/asset/adverse/events/queryAllAdverseEvent"),
     // 不良事件作废
     ADVERSE_EVENTS_INVALID("/hcapmassetservice/api/apm/asset/adverse/events/invalidAdverseEvent"),
@@ -167,7 +167,7 @@ public enum GatewayURL {
     ADVERSE_EVENTS_WITHDRAWN("/hcapmassetservice/api/apm/asset/adverse/events/adverseEventWithdrawn"),
 
     // 审核人不良事件列表
-    APPROVE_ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/approveList"),
+    APPROVE_ADVERSE_EVENTS_LIST("/hcapmassetservice/api/apm/asset/adverse/events/approveListToWeb"),
     // 审核暂存
     APPROVE_TEMP_SAVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveStagingAdverseEvent"),
     // 不良事件发送邮件
