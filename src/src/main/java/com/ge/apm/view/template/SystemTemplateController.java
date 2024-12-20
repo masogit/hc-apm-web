@@ -50,6 +50,8 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     @Getter@Setter
     private OrgInfo selectSite;
+    @Getter@Setter
+    private String businessType;
 
     @Override
     protected SystemTemplateRepository getDAO() {
@@ -109,6 +111,14 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     public String getTemplateName(String code){
         return SystemTemplate.SystemTemplateEnum.getName(code);
+    }
+
+    public String getBusinessName(String code){
+        return SystemTemplate.SystemTemplateBusinessEnum.getName(code);
+    }
+
+    public List<SystemTemplate.SystemTemplateBusinessEnum> getBusinessTypes(){
+       return Arrays.asList(SystemTemplate.SystemTemplateBusinessEnum.values());
     }
 
     public String getTenantName(String tenantUID) {

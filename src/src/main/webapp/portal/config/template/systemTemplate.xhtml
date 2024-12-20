@@ -34,7 +34,7 @@
 
 
                     <p:dataTable id="datalist" value="#{systemTemplateController.lazyModel}" var="item"
-                                 widgetVar="varDataList"
+                                 widgetVar="datalist"
                                  selectionMode="single" selection="#{systemTemplateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -61,7 +61,17 @@
 <!--                            <h:outputText value="#{systemTemplateController.getOrgName(item.siteUid)}"/>-->
 <!--                        </p:column>-->
 
+                        <p:column headerText="业务类型" sortBy="#{item.businessType}" filterBy="#{item.businessType}"
+                                  filterMatchMode="EQ">
 
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{systemTemplateController.businessType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{systemTemplateController.getBusinessTypes()}" var="item" itemLabel="#{item.name}" itemValue="#{item.code}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{systemTemplateController.getBusinessName(item.businessType)}"/>
+                        </p:column>
                         <p:column headerText="模板类型" sortBy="#{item.templateType}" filterBy="#{item.templateType}"
                                   filterMatchMode="EQ">
                             <h:outputText value="#{systemTemplateController.getTemplateName(item.templateType)}"/>
