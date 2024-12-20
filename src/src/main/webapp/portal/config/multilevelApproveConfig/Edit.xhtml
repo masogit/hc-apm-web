@@ -146,6 +146,26 @@
                             </p:outputPanel>
                         </p:scrollPanel>
                     </p:fieldset>
+
+                    <p:fieldset id="assetRepairFieldset" legend="备件类别" rendered="#{multiLevelApprovalConfigController.selected.businessType eq 'assetRepair'}">
+                        <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
+                            <p:outputPanel id="checkboxPanelPartType">
+                                <p:selectBooleanCheckbox  id="selectAllPartType"
+                                                          value="#{multiLevelApprovalConfigController.selectAssetGroupParts}"
+                                                          itemLabel="全选">
+                                    <p:ajax update="selectPartTypes"
+                                            listener="#{multiLevelApprovalConfigController.selectAssetParts}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:selectManyCheckbox id="selectPartTypes" value="#{multiLevelApprovalConfigController.selected.selectAssetPartsTypes}" layout="pageDirection" filterMatchMode="contains">
+                                    <f:selectItems value="#{multiLevelApprovalConfigController.partsTypes}"  var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax update="@parent:selectAllPartType" listener="#{multiLevelApprovalConfigController.setSelectAssetPartsCheck}"/>
+                                </p:selectManyCheckbox>
+                            </p:outputPanel>
+                        </p:scrollPanel>
+                    </p:fieldset>
+
+
+
                     <p:fieldset legend="资产分类" rendered="#{multiLevelApprovalConfigController.enableAssetType}">
                         <p:scrollPanel  style="height: 200px;" scrollHeight="auto" mode="native">
 <!--                            <p:selectManyCheckbox  value="#{multiLevelApprovalConfigController.selected.selectAssetTypes}" layout="pageDirection">-->

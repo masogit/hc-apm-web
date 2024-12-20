@@ -90,6 +90,10 @@
                         <p:column headerText="设备名称">
                             <h:outputText value="#{asset.assetInfo.name}"/>
                         </p:column>
+                        <p:column headerText="制造商序列号">
+                            <h:outputText value="#{asset.assetInfo.serialNum}"/>
+                        </p:column>
+
                         <p:column headerText="金额(元)">
 
                             <p:inputNumber    minValue="0" decimalPlaces="2"   readonly="true"  roundMethod="ROUND_DOWN"	 value="#{asset.amount}" inputStyle="text-align: center">
@@ -123,6 +127,10 @@
                             <p:column headerText="设备名称">
                                 <h:outputText value="#{asset.assetName}"/>
                             </p:column>
+                            <p:column headerText="制造商序列号">
+                                <h:outputText value="#{asset.serialNum}"/>
+                            </p:column>
+
                             <p:column headerText="金额(元)">
 
                                 <p:inputNumber    minValue="0" decimalPlaces="2"   readonly="true"  roundMethod="ROUND_DOWN"	 value="#{asset.amount}" inputStyle="text-align: center">
