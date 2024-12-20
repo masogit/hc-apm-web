@@ -30,6 +30,8 @@ import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkOrderService;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -128,6 +130,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private SharedAssetRequestRepository sharedAssetRequestRepository;
     @Autowired
     private SharedAssetService sharedAssetService;
+
+    @Autowired
+    private V2_WorkOrderService woService;
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
         logger.info("approvableTarget" + approvableTarget);
@@ -198,15 +203,135 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget, false);
+        return getMultiLevelApprovalSubmit(approvableTarget, level, multiLevelApprovalConfig, userAccount);
+    }
+
+
+    /**
+     * 保存并提交到审批人  维修多配件开启多审批接口
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public MultiLevelApproval getMultiLevelApprovalPersonAndSubmitWorkOrder(ApprovableTarget approvableTarget, Integer level, boolean isApproval)  {
+        if (level == null) {
+            level = 1;
+        }
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        if (ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT == approvableTarget.getBusinessType()) {
+
+            HashMap<String,Object> map = getMultiLevelApprovalConfigs(approvableTarget);
+            boolean isApprovalAll = (boolean) map.get("isApprovalAll");
+            List<MultiLevelApprovalConfig>  multiLevelApprovalConfigs = (List<MultiLevelApprovalConfig>) map.get("list");
+            if(!isApprovalAll  ){
+                return null;
+            }
+
+
+            if (CollectionUtils.isEmpty(multiLevelApprovalConfigs)) return null;
+            List<MultiLevelApprovalConfig> filterConfig = new ArrayList<>(multiLevelApprovalConfigs.stream()
+                    .collect(Collectors.toMap(
+                            MultiLevelApprovalConfig::getId,
+                            obj -> obj,
+                            (existing, replacement) -> existing,
+                            LinkedHashMap::new
+                    ))
+                    .values());
+
+            ArrayList<MultiLevelApproval> multiLevelApprovals = new ArrayList<>();
+            int i=0;
+            String maxFinacingNum = null;
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig : filterConfig) {
+                MultiLevelApproval multiLevelApproval=    getMultiLevelApprovalSubmit(approvableTarget, level, multiLevelApprovalConfig, userAccount);
+                if(multiLevelApproval==null){
+                    throw new RuntimeException("审批流有误");
+                }
+                if(i==0){
+                    maxFinacingNum=multiLevelApproval.getApprovalNumber();
+                }else{
+                    int  finacingNum = Integer.parseInt(maxFinacingNum.substring(8));
+                    String num = String.format("%06d", ++finacingNum);
+                    DateTime now = new DateTime();
+                    String prefix = ApprovalConstant.APPROVAL_NUM;
+                    String year = now.toString("yyyyMM");
+                    maxFinacingNum=prefix+year+num;
+                    multiLevelApproval.setApprovalNumber(maxFinacingNum);
+                }
+                multiLevelApprovals.add(multiLevelApproval);
+                i+=1;
+            }
+            multiLevelApprovalRepository.save(multiLevelApprovals);
+            return multiLevelApprovals.get(0);
+        }else{
+            MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget, false);
+            return getMultiLevelApprovalSubmit(approvableTarget, level, multiLevelApprovalConfig, userAccount);
+        }
+    }
+
+    public  HashMap<String,Object> getMultiLevelApprovalConfigs(ApprovableTarget approvableTarget) {
+        List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(approvableTarget.getBusinessUid());
+        List<V2_WorkOrder_Detail> collect = workOrderDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
+        Map<String, List<V2_WorkOrder_Detail>> partsTypeMap = collect.stream().collect(Collectors.groupingBy(V2_WorkOrder_Detail::getPartsType));
+
+
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = new ArrayList<>();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(user.getSiteUID(), switchBusyTypeToString(approvableTarget.getBusinessType()));
+
+
+        boolean enableAssetType = user.isEnableAssetTypeGroup();
+        if (approvableTarget.getApprovalAssetInfo() != null) {
+            configList = filterConfigs(configList, approvableTarget, enableAssetType);
+        }
+        double sum = collect.stream()
+                .map(V2_WorkOrder_Detail::getPartsPrice)
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+        boolean isApprovalAll=true;
+
+        for (Map.Entry<String, List<V2_WorkOrder_Detail>> stringListEntry : partsTypeMap.entrySet()) {
+            List<V2_WorkOrder_Detail> value = stringListEntry.getValue();
+
+            List<MultiLevelApprovalConfig> filterConfig = new ArrayList<>();
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig : configList) {
+                Map configMap = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
+                List<String> selectAssetPartsTypes = (List<String>) configMap.get("selectAssetPartsTypes");
+                boolean contains = selectAssetPartsTypes.contains(stringListEntry.getKey());
+                if (contains) {
+                    filterConfig.add(multiLevelApprovalConfig);
+                }
+            }
+            if (!filterConfig.isEmpty()) {
+                MultiLevelApprovalConfig multiLevelApprovalConfig = getPartsSteam(filterConfig, BigDecimal.valueOf(sum));
+                if (multiLevelApprovalConfig == null) {
+//                    return null;
+                    isApprovalAll=false;
+                }else{
+                    multiLevelApprovalConfigs.add(multiLevelApprovalConfig);
+                }
+            }else{
+//                return null;
+                isApprovalAll=false;
+            }
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("isApprovalAll",isApprovalAll);
+        map.put("list",multiLevelApprovalConfigs);
+        return map;
+    }
+
+    @Transactional
+    public MultiLevelApproval getMultiLevelApprovalSubmit(ApprovableTarget approvableTarget, Integer level, MultiLevelApprovalConfig multiLevelApprovalConfig, UserAccount userAccount) {
         if (multiLevelApprovalConfig != null) {
             String approvalItem = multiLevelApprovalConfig.getApprovalItem();
             if (null != approvalItem) {
                 MultiLevelApproval multiLevelApproval = new MultiLevelApproval();
                 List<String> sendUserUids = ListUtil.newArrayList();
-                List<com.ge.apm.domain.ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<com.ge.apm.domain.ApprovalNode>>() {
+                List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
                 });
                 if (approvalNodes != null && !approvalNodes.isEmpty()) {
-                    com.ge.apm.domain.ApprovalNode approvalNode = approvalNodes.get(0);
+                    ApprovalNode approvalNode = approvalNodes.get(0);
                     if (approvalNode != null) {
                         boolean usingRole = approvalNode.getUsingRole();
                         if (usingRole) {//角色审批
@@ -226,12 +351,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             if(CollectionUtils.isEmpty(userUids)){
                                 userUids=new ArrayList<>();
                             }
-                            List<String> uids=  getRoleApproveCondition(approvalNode,approvableTarget.getBusinessUid(),approvableTarget.getBusinessType());
+                            List<String> uids=  getRoleApproveCondition(approvalNode, approvableTarget.getBusinessUid(), approvableTarget.getBusinessType());
                             if(CollectionUtils.isNotEmpty(uids)){
                                 userUids.addAll(uids);
                                 userUids = userUids.stream().distinct().collect(Collectors.toList());
                             }
-                             List<String> strings = generationAdjustment(approvalNodes, approvalNode,approvableTarget.getBusinessUid(),approvableTarget.getBusinessType());
+                             List<String> strings = generationAdjustment(approvalNodes, approvalNode, approvableTarget.getBusinessUid(), approvableTarget.getBusinessType());
                             if(CollectionUtils.isNotEmpty(strings)){
                                 userUids = strings;
                             }
@@ -384,13 +509,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
                 v2_WorkOrderRepository.save(v2WorkOrder);
-                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
+                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null,multiLevelApproval);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2PmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_DISAGREE);
                 v2_PmOrderRepository.save(v2PmOrder);
-                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
+                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null,multiLevelApproval);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
                 // 预算管理 审批不通过
@@ -454,46 +579,134 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     }
 
-    public void doWorkDetailByIsAgreeType(String id, int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
+    public void doWorkDetailByIsAgreeType(String id, int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList,MultiLevelApproval multiLevelApproval) {
         List<V2_WorkOrder_Detail> approvedDetailsNew = getWorkOrderDetail(id);
         if (approvedDetailsNew.isEmpty()) {
             return;
         }
-        if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
-            //最后一个审批通过的时候 生成相应单子
-            for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
-                    continue;
+        if(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT==multiLevelApproval.getBusinessType()){
+            doWorkDetailByIsAgreeTypeAssetRepair(id,isAgreeType,accessorySparePartsBuyList,accessorySparePartsRequestList,multiLevelApproval);
+        }else{
+            if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
+                //最后一个审批通过的时候 生成相应单子
+                for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                    V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                    if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
+                        continue;
+                    }
+                    v2_workOrder_detail.setApproved(Boolean.TRUE);
+                    v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
+                    if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                        accessorySparePartsRequestList.add(v2_workOrder_detail);
+                    } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                        accessorySparePartsBuyList.add(v2_workOrder_detail);
+                    }
                 }
-                v2_workOrder_detail.setApproved(Boolean.TRUE);
-                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
-                if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
-                    accessorySparePartsRequestList.add(v2_workOrder_detail);
-                } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
-                    accessorySparePartsBuyList.add(v2_workOrder_detail);
+            } else {
+                for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                    V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                    if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
+                        continue;
+                    }
+                    v2_workOrder_detail.setApproved(Boolean.FALSE);
+                    v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
                 }
-            }
-        } else {
-            for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
-                    continue;
-                }
-                v2_workOrder_detail.setApproved(Boolean.FALSE);
-                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
             }
         }
     }
 
-    /**
-     * @param busiType
-     * @param amount
-     * @return MultiLevelApprovalConfig
-     * @date 2020/7/30 16:00
-     * 根据金额查询审批配置信息
-     *
-     */
+    public void doWorkDetailByIsAgreeTypeAssetRepair(String id, int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList,MultiLevelApproval multiLevelApproval) {
+        List<V2_WorkOrder_Detail> approvedDetailsNew = getWorkOrderDetail(id);
+        if (approvedDetailsNew.isEmpty()) {
+            return;
+        }
+        List<V2_WorkOrder_Detail> workOrderDetails = approvedDetailsNew.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
+        double sum = Optional.of(workOrderDetails)
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(Objects::nonNull)
+                .map(V2_WorkOrder_Detail::getPartsPrice)
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        String workflowConfigApproveUid = multiLevelApproval.getWorkflowConfigApproveUid();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean enableAssetTypeGroup = user.isEnableAssetTypeGroup();
+        MultiLevelApprovalConfig multiLevelApprovalConfig = multiApprovalConfigDao.findById(workflowConfigApproveUid);
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiApprovalConfigDao.findByHierOrgUidAndBusinessTypeAndEnable(multiLevelApprovalConfig.getHierOrgUid(), multiLevelApprovalConfig.getBusinessType(), true);
+        V2_WorkOrder workOrderById = woService.getWorkOrderById(id);
+        ApprovableTarget approvableTarget = new ApprovableTarget() {
+            @Override
+            public BigDecimal getTotalPriceToBigDecimal() {
+                return BigDecimal.valueOf(sum);
+            }
+
+            @Override
+            public String getBusinessNumber() {
+                return multiLevelApproval.getBusinessNumber();
+            }
+
+            @Override
+            public String getBusinessUid() {
+                return multiLevelApproval.getBusinessUid();
+            }
+            @Override
+            public int getBusinessType() {
+                return 7;
+            }
+            @Override
+            public AssetInfo getApprovalAssetInfo() {
+                return workOrderById.getAssetInfo();
+            }
+        };
+        List<MultiLevelApprovalConfig>  configList = filterConfigs(multiLevelApprovalConfigs, approvableTarget, enableAssetTypeGroup);
+
+
+
+        //过滤掉当前审批流审批的是哪些备件
+        Map currentConfig = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
+        List<String> currentConfigPartsType = (List<String>) currentConfig.get("selectAssetPartsTypes");
+        workOrderDetails = workOrderDetails.stream().filter(item -> currentConfigPartsType.contains(item.getPartsType())).collect(Collectors.toList());
+
+        //在审批流中过滤符合的备件
+        for (V2_WorkOrder_Detail workOrderDetail : workOrderDetails) {
+            List<MultiLevelApprovalConfig> filterConfig = new ArrayList<>();
+            for (MultiLevelApprovalConfig config : configList) {
+                Map configMap = JSON.parseObject(config.getConfigration(), Map.class);
+                List<String> selectAssetPartsTypes = (List<String>) configMap.get("selectAssetPartsTypes");
+                boolean contains = selectAssetPartsTypes.contains(workOrderDetail.getPartsType());
+                if (contains) {
+                    filterConfig.add(config);
+                }
+            }
+            if(CollectionUtils.isNotEmpty(filterConfig)){
+                MultiLevelApprovalConfig approvalConfig = getPartsSteam(filterConfig, BigDecimal.valueOf(sum));
+                if(approvalConfig!=null){
+                    if(multiLevelApprovalConfig.getId().equals(approvalConfig.getId())){
+                        if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
+                            workOrderDetail.setApproved(Boolean.TRUE);
+                            if (ApmConstant.TREASURY_USE.equals(workOrderDetail.getPartsType())) {//库房领用
+                                accessorySparePartsRequestList.add(workOrderDetail);
+                            } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(workOrderDetail.getPartsType())) {//医工采购
+                                accessorySparePartsBuyList.add(workOrderDetail);
+                            }
+                        }else{
+                            workOrderDetail.setApproved(Boolean.FALSE);
+                        }
+                        v2_WorkOrderDetailRepository.save(workOrderDetail);
+                    }
+                }
+            }
+        }
+    }
+        /**
+         * @param busiType
+         * @param amount
+         * @return MultiLevelApprovalConfig
+         * @date 2020/7/30 16:00
+         * 根据金额查询审批配置信息
+         *
+         */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount, boolean approvalFlag,ApprovableTarget approvableTarget) {
         logger.info("-----校验开启多级审核请求参数 busiType : " + " , amount : " + amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -759,11 +972,18 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         switch (multiLevelApproval.getBusinessType()) {
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
                                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
-                                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
-                                v2_WorkOrderRepository.save(v2WorkOrder);
+
                                 List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
                                 List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-                                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
+                                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList,multiLevelApproval);
+
+                                List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(v2WorkOrder.getId());
+                                List<V2_WorkOrder_Detail> collect = workOrderDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
+                                if(CollectionUtils.isEmpty(collect)){
+                                    v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
+                                    v2_WorkOrderRepository.save(v2WorkOrder);
+                                }
+
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
                                     generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList, userAccountRepository.findById(v2WorkOrder.getCurrentPersonId()));
@@ -790,7 +1010,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 v2_PmOrderRepository.save(v2PmOrder);
                                 List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = new ArrayList<>();//申购
                                 List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = new ArrayList<>();//申领
-                                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
+                                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList,multiLevelApproval);
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
                                     generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList, userAccountRepository.getByUid(v2PmOrder.getCurrentPersonId()));

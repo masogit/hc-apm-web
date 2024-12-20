@@ -105,6 +105,13 @@ public class MultiLevelApprovalConfig implements Serializable {
     @Transient
     private List<String> selectAssetGroups=new ArrayList<>();
 
+
+    /**
+     * 备件类型
+     */
+    @Transient
+    private List<String> selectAssetPartsTypes=new ArrayList<>();
+
     /**
      * 创建日期
      */
@@ -202,5 +209,13 @@ public class MultiLevelApprovalConfig implements Serializable {
 
     public void setSelectAssetGroups(List<String> selectAssetGroups) {
         this.selectAssetGroups = selectAssetGroups;
+    }
+
+    public List<String> getSelectAssetPartsTypes() {
+        return selectAssetPartsTypes;
+    }
+
+    public void setSelectAssetPartsTypes(List<String> selectAssetPartsTypes) {
+        this.selectAssetPartsTypes = selectAssetPartsTypes;
     }
 }
