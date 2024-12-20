@@ -292,7 +292,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-
+        checkDuplicateMap=new HashMap<>();
         if (UserSiteOrgTreeComponentController.ORG_CHANGE.equals(eventName)) {
             //his org code changes
             this.selectedOrg = (OrgInfo)eventObject;
@@ -585,9 +585,10 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             Set<String> dbAssetUids = dataEntryAssetDetails.stream().map(DataEntryAssetDetail::getAssetUid).collect(Collectors.toSet());
             if(!CollectionUtils.isEmpty(dbAssetUids)){
                 Set<HisAssetGroupClinicalMatch> existAssets = selectAssetInfos.stream().filter(item -> dbAssetUids.contains(item.getAssetUid())).collect(Collectors.toSet());
-                String message="";
+                StringBuilder message= new StringBuilder();
                 for (HisAssetGroupClinicalMatch existAsset : existAssets) {
-                    message=message+"【"+existAsset.getAssetInfo().getName()+","+existAsset.getAssetInfo().getSerialNum() + "】";
+                    String serialNum=existAsset.getAssetInfo().getSerialNum()==null?"":existAsset.getAssetInfo().getSerialNum();
+                    message.append("【").append(existAsset.getAssetInfo().getName()).append(",").append(serialNum).append("】");
                 }
                 checkDuplicateMap.put(selected.getEntryType(),message+"在同一时间段内已录入过"+dataEntryType.get(0).getValueZh()+"建议核实后再录入数据");
             }else{
