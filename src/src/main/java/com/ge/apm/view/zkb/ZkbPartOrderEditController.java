@@ -812,6 +812,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void maintainFlagChange(){
+        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+            selected.setScoreFlag(CopyByInvok.T);
+            currentScoreFlag = true;
+        }else {
+            currentScoreFlag = false;
+        }
+        scoreFlagChange();
+    }
+
     public void ssaKeyFlagChange(){
         calcRemainQty();
         if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
