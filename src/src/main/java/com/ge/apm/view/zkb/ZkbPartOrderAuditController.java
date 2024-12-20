@@ -1186,6 +1186,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void preProbeLogistics(){
+        if(StringUtils.isEmpty(selected.getOrderNo())){
+            WebUtil.addErrorMessage("Order#不能为空！");
+            return;
+        }
+        if(StringUtils.isEmpty(selected.getCatNo())){
+            WebUtil.addErrorMessage("配件号不能为空！");
+            return;
+        }
+        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNo(),selected.getOrderNo(),selected.getCatNo());
+        if(svcEngineLogisticsLineVOList == null || svcEngineLogisticsLineVOList.size() == 0){
+            WebUtil.addErrorMessage("查询结果为空！");
+        }
+    }
+
     public void prepareModify(String m){
         modifyType = m;
         if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(m)){
