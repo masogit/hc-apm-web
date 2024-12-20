@@ -1548,7 +1548,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         selectedWorkOrder.setTotalPriceToBigDecimal(totalPriceToBigDecimal);
-        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedWorkOrder, null, false);
+
+
+        HashMap<String,Object> map = multiLevelApprovalService.getMultiLevelApprovalConfigs(selectedWorkOrder);
+        boolean isApprovalAll = (boolean) map.get("isApprovalAll");
+        List<MultiLevelApprovalConfig>  multiLevelApprovalConfigs = (List<MultiLevelApprovalConfig>) map.get("list");
+        if(!isApprovalAll &&  !CollectionUtils.isEmpty(multiLevelApprovalConfigs)  ){
+           //存在有部分审批流
+            WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
+            return ;
+        }
+        if(!isApprovalAll &&  CollectionUtils.isEmpty(multiLevelApprovalConfigs)  ){
+            //没有匹配的审批流走老逻辑
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("checkApproval", true);
+            return ;
+        }
+
+        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitWorkOrder(selectedWorkOrder, null, false);
         if (approval == null) {
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;

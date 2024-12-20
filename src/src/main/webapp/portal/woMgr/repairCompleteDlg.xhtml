@@ -323,12 +323,14 @@
                     <h:panelGroup id="commandButtonId">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
-                        <c:if test="${not workOrderMgrController.hasConfigMultiLevelApproval}">
-                            <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                        </c:if>
-                        <c:if test="${workOrderMgrController.hasConfigMultiLevelApproval}">
-                            <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="PF('repairCompleteDialog').hide()" disabled="#{!workOrderMgrController.approveFlag}" />
-                        </c:if>
+<!--                        <c:if test="${not workOrderMgrController.hasConfigMultiLevelApproval}">-->
+                            <p:commandButton validateClient="false" id="oldApproval" style="display:none"    immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}"/>
+<!--                        </c:if>-->
+<!--                        <c:if test="${workOrderMgrController.hasConfigMultiLevelApproval}">-->
+<!--                            <p:commandButton  validateClient="true"  immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="PF('repairCompleteDialog').hide()"  />-->
+<!--                        </c:if>-->
+                        <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check"  oncomplete="handleCheckApprovalCompletes(xhr, status, args);" />
+
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -379,6 +381,9 @@
         <ui:include src="coWorkDialog.xhtml"/>
         <ui:include src="manHoursDetail.xhtml"/>
 
+
+
+
         <script type="text/javascript">
             function handleValidFields(xhr, status, args) {
                 var valid = true;
@@ -419,6 +424,18 @@
                 }
                 if(valid1){
                     handleSubmit(args, 'submitCommentsDlg')
+                }
+            }
+
+
+            function handleCheckApprovalCompletes(xhr, status, args) {
+                var checkApproval = args.checkApproval;
+                if(checkApproval==true) {
+                    var button = document.getElementById('woTab:repairCompleteDialogForm:oldApproval');
+                    alert(button)
+                    button.click();
+                }else{
+                    PF('repairCompleteDialog').hide();
                 }
             }
         </script>
