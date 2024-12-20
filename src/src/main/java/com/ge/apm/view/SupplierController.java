@@ -101,7 +101,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if (ObjectUtil.isNotEmpty(selectedId)) {
             this.selected = dao.findByUid(selectedId);
-            attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+            if(selected!=null){
+                attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+
+            }
         }
     }
 
