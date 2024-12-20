@@ -92,12 +92,15 @@
                                 <p:dataList id="licenseAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">营业执照附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息">
+                    <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息" rendered="#{supplierController.selected.supplierT}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">许可证编码</label>
@@ -117,7 +120,10 @@
                                 <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -126,7 +132,10 @@
                                 <p:dataList id="afterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'afterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">售后服务承诺附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -135,12 +144,15 @@
                                 <p:dataList id="authorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">授权书附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="生产许可证信息">
+                    <p:fieldset legend="生产许可证信息" rendered="#{supplierController.selected.manufacturerT}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">生产许可证编码</label>
@@ -160,12 +172,15 @@
                                 <p:dataList id="manufacturingPermitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">生产许可证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="产品注册证信息">
+                    <p:fieldset legend="产品注册证信息" rendered="false">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">产品注册证编号</label>
@@ -185,7 +200,10 @@
                                 <p:dataList id="productRegistrationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'productRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">产品注册证附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton title="#{msg.preview}" rendered="#{fileitem.objectType.contains('image')}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="supplierTab:previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                 </p:dataList>
                             </h:panelGroup>
                         </p:panelGrid>
