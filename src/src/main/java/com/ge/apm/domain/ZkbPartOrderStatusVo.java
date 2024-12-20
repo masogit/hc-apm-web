@@ -63,6 +63,8 @@ public class ZkbPartOrderStatusVo {
     @Getter@Setter
     private String trainTips="";
     @Getter@Setter
+    private String maintainTips = "";
+    @Getter@Setter
     private String unrealTips = "";
     @Getter@Setter
     private String saveTips;
