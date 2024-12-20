@@ -197,7 +197,7 @@ public class V2_BlobObject implements Serializable {
     private String tenantUid;
 
     @Transient
-    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpeg");
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
 
     public String getId() {
         return id;
