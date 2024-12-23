@@ -158,7 +158,7 @@
                     </h:panelGroup>
                 </p:fieldset>
 <!--                <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息" rendered="#{supplierController.selected.supplierT}">
+                <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">许可证编码</label>
@@ -218,7 +218,7 @@
                     </h:panelGroup>
                 </p:fieldset>
 <!--                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.selected.manufacturerT}">
+                <p:fieldset legend="生产许可证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">生产许可证编码</label>
@@ -246,7 +246,7 @@
                     </h:panelGroup>
                 </p:fieldset>
 <!--                <p:fieldset legend="产品注册证信息" rendered="#{supplierController.activeSupplier()}">-->
-                <p:fieldset legend="产品注册证信息" rendered="false">
+                <p:fieldset legend="产品注册证信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">产品注册证编号</label>
