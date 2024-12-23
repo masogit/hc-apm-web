@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.service.zkb.ZkbPartOrderStatusService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -289,7 +290,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             }
                             if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) ||
                                 ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType()) ){
-                                zkbPartOrderStatusVo.setMaintainTips("该合同需要联系OTR添加 PM active entitlement；");
+                                Date date1 = DateUtil.parse("2024/11/22");
+                                if(date1.before(zkbContract.getCreatedDate())){
+                                    zkbPartOrderStatusVo.setMaintainTips("该合同需要联系OTR添加 PM active entitlement；");
+                                }
                             }
                         }else{
                             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
