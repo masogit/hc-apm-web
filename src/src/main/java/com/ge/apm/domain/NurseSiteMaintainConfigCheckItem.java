@@ -21,6 +21,7 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 
 	private Long key;
 	private String name;
+	private String groupName;
 	private String description;
 	private String id;
 	private String fieldType;
@@ -51,6 +52,14 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 
 	public String getDescription() {

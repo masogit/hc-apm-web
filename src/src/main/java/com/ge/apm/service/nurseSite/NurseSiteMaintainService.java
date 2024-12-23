@@ -476,6 +476,7 @@ public class NurseSiteMaintainService {
 				obj.put("key", item.getKey());
 				obj.put("description", item.getDescription());
 				obj.put("id", item.getId());
+				obj.put("groupName", item.getGroupName());
 				String fieldType = item.getFieldType();
 				String defaultValue = item.getDefaultValue();
 				if(StringUtils.isEmpty(fieldType)){

@@ -50,6 +50,8 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private List<NurseSiteMaintainConfigCheckItem> listCheckData=new ArrayList<>();
 	private MaintainController maintainController;
 	private Boolean checkRequired=Boolean.TRUE;
+
+	private NurseSiteMaintainConfigCheckItem selectCheckItem;
 	@PostConstruct
 	public void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -311,5 +313,17 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 			}
 		}
 		return name;
+	}
+
+	public void showDescription(NurseSiteMaintainConfigCheckItem item){
+		selectCheckItem = item;
+	}
+
+	public NurseSiteMaintainConfigCheckItem getSelectCheckItem() {
+		return selectCheckItem;
+	}
+
+	public void setSelectCheckItem(NurseSiteMaintainConfigCheckItem selectCheckItem) {
+		this.selectCheckItem = selectCheckItem;
 	}
 }

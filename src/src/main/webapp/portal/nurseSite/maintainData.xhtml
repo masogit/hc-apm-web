@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+	  xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+	  xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
 	<p:dialog id="maintainDlg" widgetVar="maintainDialog" header="检查详情" modal="true" resizable="true"  draggable="true" appendTo="@(body)" width="1000">
@@ -40,20 +42,26 @@
 								</td>
 								<td><h:outputText value="#{maintainItemController.getUpdateByName(item2)}" /></td>
 								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
-									<td >
-										<h:panelGrid columns="3" layout="grid" styleClass="showcase-text-align-center">
-											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}"  />
+									<td style="width: 300px">
+										<h:panelGrid columns="1" layout="grid" styleClass="showcase-text-align-center" title="#{item3.description}">
+											<p:ajax event="dblclick" listener="#{maintainItemController.setSelectCheckItem(item3)}" update=":showDescription" oncomplete="PF('showDescription').show()" />
+											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}"  >
+												<p:ajax event="change" process="@this" update="maintainDlgTable" />
+											</p:triStateCheckbox>
 											<h:panelGroup>
-											<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
-											<p:inputText  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text'}"/>
-											<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number'}"/>
-											<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select'}">
-												<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-												<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
-											</p:selectOneMenu>
-											<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date'}"
-														pattern="yyyy/MM/dd"
-														showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+													<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
+													<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' and item2.getDataValue(item3.name).checkValueWeb ne 2}" />
+													<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number' and item2.getDataValue(item3.name).checkValueWeb ne 2}"/>
+													<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select' and item2.getDataValue(item3.name).checkValueWeb ne 2}">
+														<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+														<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
+													</p:selectOneMenu>
+													<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date' and item2.getDataValue(item3.name).checkValueWeb ne 2}"
+																pattern="yyyy/MM/dd"
+																showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+													<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
+														<p:ajax process="@this" />
+													</p:inputText>
 											</h:panelGroup>
 										</h:panelGrid>
 								  </td>
@@ -144,6 +152,17 @@
 			}
 
 		</h:outputScript>
+	</p:dialog>
+	<p:dialog header="#{maintainItemController.selectCheckItem.name}" id="showDescription"  widgetVar="showDescription" minHeight="40" width="350" showEffect="fade" closeOnEscape="true">
+		<c:choose>
+			<c:when test="#{not empty maintainItemController.selectCheckItem.description}">
+				<p class="m-0">#{maintainItemController.selectCheckItem.description}</p>
+			</c:when>
+			<c:otherwise>
+				<p class="m-0">暂无说明</p>
+			</c:otherwise>
+		</c:choose>
+
 	</p:dialog>
 </ui:composition>
 </html>
