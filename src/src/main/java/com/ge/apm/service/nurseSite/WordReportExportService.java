@@ -137,7 +137,7 @@ public class WordReportExportService {
                                 .map(list -> list.isEmpty() ? null : list.get(0))
                                 .orElse(new NurseSiteMaintainCheckItem());
                         String description="";
-                        if(nurseSiteMaintainData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
+                        if(nurseSiteMaintainData.getVariableText()!=null  && !"false".equals(nurseSiteMaintainData.getVariableText()) && !"true".equals(nurseSiteMaintainData.getVariableText()) && nurseSiteMaintainCheckItem.getFieldType()!=null){
                             switch (nurseSiteMaintainCheckItem.getFieldType()){
                                 case "Select":
                                     String options = nurseSiteMaintainCheckItem.getOptions();
@@ -149,10 +149,15 @@ public class WordReportExportService {
                                     }
                                     break;
                                 case "Date":
-                                    Instant instant = Instant.ofEpochMilli(Long.parseLong(nurseSiteMaintainData.getVariableText()));
-                                    LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                                    description =" "+ localDateTime.format(formatter);
+                                    try {
+                                        Instant instant = Instant.ofEpochMilli(Long.parseLong(nurseSiteMaintainData.getVariableText()));
+                                        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                        description = " "+localDateTime.format(formatter);
+
+                                    } catch (Exception e) {
+                                        logger.error("日期转换异常 tempData:{},nurseSiteMaintainCheckItem:{}", JSON.toJSONString(nurseSiteMaintainData),JSON.toJSONString(nurseSiteMaintainCheckItem));
+                                    }
                                     break;
                                 case "Switch":
                                     break;
