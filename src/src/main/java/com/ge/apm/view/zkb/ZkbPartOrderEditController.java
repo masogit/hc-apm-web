@@ -813,13 +813,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void maintainFlagChange(){
-        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
-            selected.setScoreFlag(CopyByInvok.T);
-            currentScoreFlag = true;
-        }else {
-            currentScoreFlag = false;
+        if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) ||
+                ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
+            if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+                selected.setScoreFlag(CopyByInvok.T);
+                currentScoreFlag = true;
+            }else {
+                currentScoreFlag = false;
+            }
+            scoreFlagChange();
         }
-        scoreFlagChange();
     }
 
     public void ssaKeyFlagChange(){
