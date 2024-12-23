@@ -916,7 +916,7 @@
                             <p:confirm header="确认信息" message="是否确定取消派工" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <h:panelGroup >
-                            <p:commandButton value="物流查看"  process="@this" immediate="false" update=":zkbLogisticsDlg" actionListener="#{zkbPartOrderAuditController.preProbeLogistics()}" oncomplete="PF('zkbLogisticsDlg').show()" rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}"/>
+                            <p:commandButton value="物流查看"  process="@this" immediate="false" update=":zkbLogisticsDlg" actionListener="#{zkbPartOrderAuditController.preProbeLogistics()}" oncomplete="PF('zkbLogisticsDlg').show()" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}"/>
                             <p:commandButton immediate="false" process="@this" value="下单信息修改" rendered="#{zkbPartOrderAuditController.isCanModifyOrder()}" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
                         </h:panelGroup>
 
