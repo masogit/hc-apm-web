@@ -64,7 +64,10 @@ public class NurseSiteMaintainData {
 	private Integer checkValueWeb;
 	@Transient
 	private Date dateValue;
-
+	@Column(name = "error_text",columnDefinition = "text")
+	private String errorText;
+	@Transient
+	private String description;
 	public String getId() {
 		return id;
 	}
@@ -225,5 +228,21 @@ public class NurseSiteMaintainData {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getErrorText() {
+		return errorText;
+	}
+
+	public void setErrorText(String errorText) {
+		this.errorText = errorText;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

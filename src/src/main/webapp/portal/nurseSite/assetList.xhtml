@@ -20,7 +20,7 @@
                         <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}"
                                 var="node" selectionMode="single">
                             <p:ajax process="@this" event="select"
-                                    update="@parent:selectedOrgName,@parent:deptOrgInfoCreate,:maintainConfigCreateForm:addCheckList2,@parent:selectAll"
+                                    update="@parent:selectedOrgName,@parent:deptOrgInfoCreate,@parent:selectAll"
                                     listener="#{assetSelectController.onSelectOrgFromTree}" oncomplete="PF('varOrgPanel').hide();" />
                             <p:ajax process="@this" event="expand" />
                             <p:ajax process="@this" event="collapse" />

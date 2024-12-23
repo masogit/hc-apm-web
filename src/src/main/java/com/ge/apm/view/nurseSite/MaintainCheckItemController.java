@@ -176,7 +176,11 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 
 
 	}
-
+	public List<String> getGroupNames(){
+		List<String> groupNames = dao.findGroupName(currentUser.getSiteUID());
+		groupNames=groupNames.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+		return groupNames;
+	}
 	public void prepareAddOption(){
 		tableOption=new TableOption();
 		edit=false;

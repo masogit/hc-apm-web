@@ -21,6 +21,15 @@
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
                         <p:ajax event="filter" listener="#{maintainCheckItemController.onFilter}" />
+                        <p:column headerText="分组" filterBy="#{item.groupName}" filterMatchMode="LIKE">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{maintainCheckItemController.groupNames}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.groupName}" />
+                        </p:column>
                         <p:column headerText="检查项" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}" />
                         </p:column>
@@ -86,9 +95,17 @@
         </p:dialog>
 		<p:dialog id="maintainConfigcheckItemEditDlg" widgetVar="maintainConfigcheckItemEditDlg" width="450" height="500" modal="true" resizable="true"
 			draggable="true" appendTo="@(body)" header="日常检查项配置">
-			<h:form id="checkItemEditForm" rendered="#{maintainCheckItemController.selected!=null}">
+			<h:form  id="checkItemEditForm" rendered="#{maintainCheckItemController.selected!=null}">
+                <f:passThroughAttribute name="autocomplete" value="off" />
 				<h:panelGroup>
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label>分组：</label>
+                            <p:selectOneMenu autocomplete="false" id="groupName" value="#{maintainCheckItemController.selected.groupName}" editable="true" filter="true" filterMatchMode="startsWith">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
+                                <f:selectItems value="#{maintainCheckItemController.groupNames}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 						<h:panelGroup>
 							<label>#{msg.name} *：</label>
 							<p:inputText id="name" value="#{maintainCheckItemController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
