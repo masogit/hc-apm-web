@@ -66,6 +66,8 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	
 	@Column(name="name")
 	private String name;
+	@Column(name="group_name")
+	private String groupName;
 	
 	@Column(name="description")
 	private String description;
@@ -292,5 +294,13 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 
 	public void setRequired(Boolean required) {
 		this.required = required;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 }

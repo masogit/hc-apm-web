@@ -12,7 +12,7 @@ import javax.faces.context.FacesContext;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
@@ -38,8 +38,6 @@ import org.springframework.data.domain.Sort.Direction;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
@@ -116,6 +114,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	@Getter
 	private OrgInfo selectSite;
 
+	private NurseSiteMaintainCheckItemRepository nurseSiteMaintainConfigItemRepository;
+	private boolean disabled;
+
+	private NurseSiteMaintainConfigCheckItem editCheckItem;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -127,6 +129,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		nurseSiteMaintainConfigItemRepository = WebUtil.getBean(NurseSiteMaintainCheckItemRepository.class);
         nurseSiteMaintainService.init();
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         setOrgUid = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -291,9 +294,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		setDefaultValueForAssetList();
 		//TODO
+		this.objPairCheckItem = null;
         assetSelectController.loadData4Edit(this.selected);
         loadWholeCheckItem(selected.getTenantUID());
-        loadSelectedCheckItem();
+		//loadSelectedCheckItem();
 	}
 	
 	private void initValues(){
@@ -303,7 +307,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listWeekDay=new ArrayList<String>();
 		listPairCheckItems=null;
 		isSaveDisable=true;
-		initObjPairCheckItem();
+//		initObjPairCheckItem();
 		if(listOrgInfo==null){
 			listOrgInfo=new ArrayList<OrgInfo>();
 		}
@@ -387,12 +391,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					|| siteUID.equals(selectedOrg.getInstitutionUID())
 					|| siteUID.equals(selectedOrg.getTenantUID());
 		}).collect(Collectors.toList());
-		if(listSelectedCheckItems==null){
-			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
-		}
-		else{
-			listSelectedCheckItems.clear();
-		}
 	}
 	private void loadSelectedCheckItem(){
 		if(listWholeCheckItems==null){
@@ -550,7 +548,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				}
 			}
 		}
-		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems,jsonArray);
+//		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems,jsonArray);
 		nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		if(isSave){
 			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
@@ -569,10 +567,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private void checkSaveDisable(){
 		try {
 			isSaveDisable=false;
-			if(listCheckAssets.size()==0){
-				isSaveDisable=true;
-			}
-			else if(listSelectedCheckItems.size()+listPairCheckItems.size()<2){
+			if(CollectionUtils.isEmpty(listPairCheckItems)){
 				isSaveDisable=true;
 			}
 		} catch (Exception e) {
@@ -580,6 +575,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			isSaveDisable=true;
 			LOGGER.error("checkSaveDisable"+e.getMessage());
 		}
+		closeDlg();
 	}
 
 	public void applyChange(int type){
@@ -637,26 +633,31 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					return;
 				}
 			}
-
-			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
+			if(objPairCheckItem.getKey() == null){
+				objPairCheckItem.setKey(new Date().getTime());
+			}
+			listPairCheckItems.add(objPairCheckItem);
 		}else{
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				String name = listPairCheckItem.getName();
-				if(name.equals(objPairCheckItem.getName())){
+				if(name.equals(editCheckItem.getName())){
 					BeanUtils.copyProperties(objPairCheckItem,listPairCheckItem);
+					if(listPairCheckItem.getKey() == null){
+						listPairCheckItem.setKey(new Date().getTime());
+					}
 					break;
 				}
 			}
 		}
-		initObjPairCheckItem();
+//		initObjPairCheckItem();
 		checkSaveDisable();
 	}
 	public void closeDlg(){
 		objPairCheckItem=null;
 	}
-	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
+	public void deleteItemDetail(){
 		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
-			listPairCheckItems = listPairCheckItems.stream().filter(it -> !it.getName().equals(item.getName())).collect(Collectors.toList());
+			listPairCheckItems = listPairCheckItems.stream().filter(it -> !it.getName().equals(objPairCheckItem.getName())).collect(Collectors.toList());
 		}
 		checkSaveDisable();
 	}
@@ -759,18 +760,26 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listStrNurseSiteMaintainConfig = listStrNurseSiteMaintainConfig;
 	}
 	public NurseSiteMaintainConfigCheckItem getObjCheckItem() {
-		if(objPairCheckItem==null){
-			initObjPairCheckItem();
-		}
 
 		return objPairCheckItem;
 	}
 	public void  createObjCheckItem(){
 		this.objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+		objPairCheckItem.setKey(new Date().getTime());
 		this.internalCreate=true;
+		this.disabled=Boolean.FALSE;
 	}
 	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
-		this.objPairCheckItem = objCheckItem;
+		if(objCheckItem != null){
+			editCheckItem = null;
+			NurseSiteMaintainConfigCheckItem temp=new NurseSiteMaintainConfigCheckItem();
+			BeanUtils.copyProperties(objCheckItem,temp);
+			editCheckItem = objCheckItem;
+			this.objPairCheckItem = temp;
+			this.disabled = StringUtils.isNotEmpty(objPairCheckItem.getId());
+		}else{
+			this.objPairCheckItem = objCheckItem;
+		}
 		this.internalCreate=false;
 	}
 	
@@ -794,18 +803,22 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				for(int i=0;i<jsonArray.size();++i){
 					NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
 					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1);
-					if(StringUtils.isEmpty(p.getId())){
-						list.add(p);
+					if (p.getKey()==null) {
+						p.setKey(new Date().getTime());
 					}
-					//to be done
-					else if(!containsCheckItem(listWholeCheckItems,p)){
-						list.add(p);
-					}
+					list.add(p);
+//					if(StringUtils.isEmpty(p.getId())){
+//						list.add(p);
+//					}
+//					//to be done
+//					else if(!containsCheckItem(listWholeCheckItems,p)){
+//						list.add(p);
+//					}
 				}
 			}
-			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
-			p.setName("");
-			list.add(p);
+//			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
+//			p.setName("");
+//			list.add(p);
 			listPairCheckItems=list;
 			checkSaveDisable();
 		}
@@ -820,6 +833,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		p.setFieldType(checkItem.getFieldType());
 		String options = checkItem.getOptions();
 		p.setRequired(checkItem.getRequired());
+		p.setKey(checkItem.getKey());
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{
@@ -1034,7 +1048,42 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			return false;
 		}
 	}
-
+	public List<String> getGroupNames(){
+		List<String> groupNames = nurseSiteMaintainConfigItemRepository.findGroupName(currentUser.getSiteUID());
+		groupNames=groupNames.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+		return groupNames;
+	}
+	public void onSelectObjCheckItem(){
+		Optional<NurseSiteMaintainCheckItem> first = listWholeCheckItems.stream().filter(item -> item.getName().equals(objPairCheckItem.getName())).findFirst();
+		if (first.isPresent()) {
+			NurseSiteMaintainCheckItem nurseSiteMaintainCheckItem = first.get();
+			BeanUtils.copyProperties(nurseSiteMaintainCheckItem,objPairCheckItem);
+			disabled = Boolean.TRUE;
+		}else{
+			NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = new NurseSiteMaintainConfigCheckItem();
+			nurseSiteMaintainConfigCheckItem.setName(objPairCheckItem.getName());
+			objPairCheckItem = nurseSiteMaintainConfigCheckItem;
+			disabled = Boolean.FALSE;
+		}
+	}
+	public void checkItemMoveUp(){
+		int i = listPairCheckItems.indexOf(objPairCheckItem);
+		if(i != 0){
+			int index = i - 1;
+			NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = listPairCheckItems.get(index);
+			listPairCheckItems.set(index,objPairCheckItem);
+			listPairCheckItems.set(i,nurseSiteMaintainConfigCheckItem);
+		}
+	}
+	public void checkItemMoveDown(){
+		int i = listPairCheckItems.indexOf(objPairCheckItem);
+		if(i != listPairCheckItems.size() - 1){
+			int index = i + 1;
+			NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = listPairCheckItems.get(index);
+			listPairCheckItems.set(index,objPairCheckItem);
+			listPairCheckItems.set(i,nurseSiteMaintainConfigCheckItem);
+		}
+	}
 	public void recover(){
     	BeanUtils.copyProperties(objPairCheckItemEdit,objPairCheckItem);
 	}
@@ -1053,5 +1102,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setCreateOption(boolean createOption) {
 		this.createOption = createOption;
+	}
+
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 }
