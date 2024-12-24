@@ -480,9 +480,9 @@ public class AssetInfoBulkEditService {
                     Set<String> temp = items.stream().map(u -> u.getParentId()).collect(Collectors.toSet());
                     parentIds.removeAll(temp);
                 }
-                if (parentIds != null && !parentIds.isEmpty()) {
+                /*if (parentIds != null && !parentIds.isEmpty()) {
                     nurseSiteMaintainConfigRepository.deleteMaintainConfigData(parentIds);
-                }
+                }*/
             }
         }
     }
