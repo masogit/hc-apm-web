@@ -58,13 +58,13 @@
                                 <label class="label">#{msg.vendor}#{msg.type}</label>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{venderCompanyController.selected.maintainerT}"/>
+                                <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{venderCompanyController.selected.maintainerT}" disabled="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{venderCompanyController.selected.manufacturerT}"/>
+                                <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{venderCompanyController.selected.manufacturerT}" disabled="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.selected.supplierT}"/>
+                                <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.selected.supplierT}" disabled="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
