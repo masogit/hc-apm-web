@@ -26,6 +26,7 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -759,6 +760,13 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         if (null != selectedAssetTypeGroup){
             arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
         }
+        if(StrUtil.isNotEmpty(arrivalListItem.getDepartNum())){
+            Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
+            if (Boolean.FALSE.equals(isvalidDeptNum._1)) {
+                WebUtil.addErrorMessage(isvalidDeptNum._2);
+                return false;
+            }
+        }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             boolean res = aiService.saveOrUpdateItem(arrivalListItem);
@@ -953,6 +961,14 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             oldQrCode = "";
         }
         onDepartNumChange("qrCode");
+    }
+
+    public void checkDepartNumChange(){
+        Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
+        if (Boolean.FALSE.equals(isvalidDeptNum._1)) {
+            WebUtil.addErrorMessage(isvalidDeptNum._2);
+            arrivalListItem.setDepartNum("");
+        }
     }
 
     public void onDepartNumChange(String fieldName) {

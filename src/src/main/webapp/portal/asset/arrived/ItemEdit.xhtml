@@ -269,7 +269,7 @@
                                     <label class="label">#{msg.departNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired}" 
                                                  requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" maxlength="64">
-                                        <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)" />
+                                        <p:ajax event="blur" process="@this" listener="#{assetInstallationController.checkDepartNumChange()}" update="@(.financingNum) @this" />
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
