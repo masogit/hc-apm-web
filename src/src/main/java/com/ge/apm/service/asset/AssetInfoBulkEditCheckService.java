@@ -228,12 +228,12 @@ public class AssetInfoBulkEditCheckService {
             if(CollectionUtils.isEmpty(idsByParentId)) nurseSiteMaintainItemRepository.deleteMaintainById(item.getParentId());
         }
         //删除检查项配置相关数据
-        List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
         nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
+        /*List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
         for(String parentId : parentIds) {
             int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
             if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
-        }
+        }*/
     }
     /**
      * 批量导入资产时

@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -1999,7 +2000,7 @@ public class NurseSiteMaintainService {
 										.map(list -> list.isEmpty() ? null : list.get(0))
 										.orElse(new NurseSiteMaintainCheckItem());
 								String description="";
-								if(tempData.getVariableText()!=null && nurseSiteMaintainCheckItem.getFieldType()!=null){
+								if(tempData.getVariableText()!=null  && !"false".equals(tempData.getVariableText()) && !"true".equals(tempData.getVariableText()) && nurseSiteMaintainCheckItem.getFieldType()!=null){
 									switch (nurseSiteMaintainCheckItem.getFieldType()){
 										case "Select":
 											String options = nurseSiteMaintainCheckItem.getOptions();
@@ -2011,10 +2012,15 @@ public class NurseSiteMaintainService {
 											}
 											break;
 										case "Date":
-											Instant instant = Instant.ofEpochMilli(Long.parseLong(tempData.getVariableText()));
-											LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-											DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-											description = " "+localDateTime.format(formatter);
+											try {
+													Instant instant = Instant.ofEpochMilli(Long.parseLong(tempData.getVariableText()));
+													LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+													DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+													description = " "+localDateTime.format(formatter);
+
+											} catch (Exception e) {
+												LOGGER.error("日期转换异常 tempData:{},nurseSiteMaintainCheckItem:{}", JSON.toJSONString(tempData),JSON.toJSONString(nurseSiteMaintainCheckItem));
+											}
 											break;
 										case "Switch":
 											break;

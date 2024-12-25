@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
@@ -159,11 +160,17 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         qrCodeLibRepository = WebUtil.getBean(QrCodeLibRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
-
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 String copyFrom = (String) UrlEncryptController.getValueFromMap(encodeStr, "copyFrom");
                 prepareCreate();
+                // 添加默认科室
+                String stockDeptUid = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("setAssetOutStockDept", currentUser.getSiteUID())).map(ConfigItemValue::getValue).orElse("");
+                if (ObjectUtil.isNotEmpty(stockDeptUid)) {
+                    String deptName = deptInfoList.stream().filter(item -> item.getUid().equals(stockDeptUid)).findFirst().map(OrgInfo::getName).orElse(null);
+                    selected.setClinicalDeptUID(stockDeptUid);
+                    selected.setClinicalDeptName(deptName);
+                }
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                     setCopyFrom(copyFrom);
