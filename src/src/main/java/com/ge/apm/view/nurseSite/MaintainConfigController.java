@@ -802,7 +802,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				JSONArray jsonArray=JSONObject.parseArray(strTemp);
 				for(int i=0;i<jsonArray.size();++i){
 					NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
-					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1);
+					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1,(JSONObject) jsonArray.get(i));
 					if (p.getKey()==null) {
 						p.setKey(new Date().getTime());
 					}
@@ -824,7 +824,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		return listPairCheckItems;
 	}
-	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
+	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem,JSONObject jsonObject){
 		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
 		p.setId(checkItem.getId());
 		p.setName(checkItem.getName());
@@ -834,6 +834,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		String options = checkItem.getOptions();
 		p.setRequired(checkItem.getRequired());
 		p.setKey(checkItem.getKey());
+		p.setGroupName(jsonObject.getString("groupName"));
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{

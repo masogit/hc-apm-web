@@ -50,18 +50,21 @@
 											</p:triStateCheckbox>
 											<h:panelGroup>
 													<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
-													<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' and item2.getDataValue(item3.name).checkValueWeb ne 2}" />
-													<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number' and item2.getDataValue(item3.name).checkValueWeb ne 2}"/>
-													<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select' and item2.getDataValue(item3.name).checkValueWeb ne 2}">
+													<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' }" />
+													<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number' }"/>
+													<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select' }">
 														<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 														<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 													</p:selectOneMenu>
-													<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date' and item2.getDataValue(item3.name).checkValueWeb ne 2}"
+													<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date'}"
 																pattern="yyyy/MM/dd"
 																showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-													<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
-														<p:ajax process="@this" />
-													</p:inputText>
+											</h:panelGroup>
+											<h:panelGroup rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
+												<label class="label"><span style="color:red;margin-left: -50px">#{'*'}</span></label>
+												<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" >
+													<p:ajax process="@this" />
+												</p:inputText>
 											</h:panelGroup>
 										</h:panelGrid>
 								  </td>
