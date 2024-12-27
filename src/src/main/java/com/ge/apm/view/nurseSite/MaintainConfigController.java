@@ -118,6 +118,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private boolean disabled;
 
 	private NurseSiteMaintainConfigCheckItem editCheckItem;
+
+	private Set<String> groupNames;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -637,6 +639,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				objPairCheckItem.setKey(new Date().getTime());
 			}
 			listPairCheckItems.add(objPairCheckItem);
+
 		}else{
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				String name = listPairCheckItem.getName();
@@ -1050,9 +1053,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	public List<String> getGroupNames(){
-		List<String> groupNames = nurseSiteMaintainConfigItemRepository.findGroupName(currentUser.getSiteUID());
-		groupNames=groupNames.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-		return groupNames;
+		Set<String> result = new HashSet<>();
+		if(CollectionUtils.isEmpty(groupNames)){
+			List<String> groupNameTemp = nurseSiteMaintainConfigItemRepository.findGroupName(currentUser.getSiteUID());
+			groupNames=groupNameTemp.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
+
+		}
+		result.addAll(groupNames);
+		if(CollectionUtils.isNotEmpty(this.listPairCheckItems)){
+			List<String> groupName = listPairCheckItems.stream().map(NurseSiteMaintainConfigCheckItem::getGroupName).collect(Collectors.toList());
+			result.addAll(groupName);
+		}
+		return result.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 	}
 	public void onSelectObjCheckItem(){
 		Optional<NurseSiteMaintainCheckItem> first = listWholeCheckItems.stream().filter(item -> item.getName().equals(objPairCheckItem.getName())).findFirst();
