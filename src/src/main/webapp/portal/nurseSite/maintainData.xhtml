@@ -44,24 +44,34 @@
 								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
 									<td style="width: 300px">
 										<h:panelGrid columns="1" layout="grid" styleClass="showcase-text-align-center" title="#{item3.description}">
-											<p:ajax event="dblclick" listener="#{maintainItemController.setSelectCheckItem(item3)}" update=":showDescription" oncomplete="PF('showDescription').show()" />
+<!--											<p:ajax event="dblclick" listener="#{maintainItemController.setSelectCheckItem(item3)}" update=":showDescription" oncomplete="PF('showDescription').show()" />-->
 											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}"  >
-												<p:ajax event="change" process="@this" update="maintainDlgTable" />
+												<p:ajax  event="change" process="@this" update="maintainDlgTable" />
 											</p:triStateCheckbox>
-											<h:panelGroup>
+											<h:panelGroup rendered="#{not empty item3.fieldType}">
 													<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
-													<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' and item2.getDataValue(item3.name).checkValueWeb ne 2}" />
-													<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number' and item2.getDataValue(item3.name).checkValueWeb ne 2}"/>
-													<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select' and item2.getDataValue(item3.name).checkValueWeb ne 2}">
+												<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' }" >
+													<p:ajax   process="@this" update="maintainDlgTable" />
+												</p:inputText>
+												<p:inputText type="number"  value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{ item3.fieldType eq 'Number' }">
+													<p:ajax event="change" process="@this" update="maintainDlgTable" />
+												</p:inputText>
+													<p:selectOneMenu  value="#{item2.getDataValue(item3.name).variableText}"   rendered="#{ item3.fieldType eq 'Select' }">
+														<p:ajax  process="@this" update="maintainDlgTable" />
 														<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 														<f:selectItems value="#{item3.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
 													</p:selectOneMenu>
-													<p:calendar timeZone="GMT+8" id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date' and item2.getDataValue(item3.name).checkValueWeb ne 2}"
+													<p:calendar timeZone="GMT+8"  id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date'}"
 																pattern="yyyy/MM/dd"
-																showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-													<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
-														<p:ajax process="@this" />
-													</p:inputText>
+																showOn="button" showButtonPanel="true" navigator="true" mask="true">
+														<p:ajax  event="blur" process="@this" update="maintainDlgTable" />
+													</p:calendar>
+											</h:panelGroup>
+											<h:panelGroup rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
+												<label class="label"><span style="color:red;margin-left: -50px">#{'*'}</span></label>
+												<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" >
+													<p:ajax event="change" process="@this" update="maintainDlgTable" />
+												</p:inputText>
 											</h:panelGroup>
 										</h:panelGrid>
 								  </td>

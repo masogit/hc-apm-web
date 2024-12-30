@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,6 +72,8 @@ public class HisGroupDataEntryHistory {
         private String groupName;
 
         private String assetName;
+
+        private AssetInfo assetInfo; //不序列化保存库   需要倒查
 
     }
 

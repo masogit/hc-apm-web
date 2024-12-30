@@ -369,6 +369,11 @@ public class MaintainController implements ServerEventInterface{
 					addErrMessage(assetName+",检查项："+checkItem+" (勾选项、输入项), "+str);
 				}
 			}
+			if(Boolean.FALSE.equals(listDatum.getCheckValue()) && StringUtils.isEmpty(listDatum.getErrorText())){
+				checkRequired = Boolean.FALSE;
+				String checkItem = listDatum.getCheckItem();
+				addErrMessage(assetName+",检查项："+checkItem+" 异常说明不能为空");
+			}
 		}
 	}
 

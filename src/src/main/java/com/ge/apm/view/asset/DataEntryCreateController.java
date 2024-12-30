@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -372,15 +373,15 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             List<HisGroupDataEntryHistory.AssetGroupDetail> assetGroupDetails = JSONObject.parseObject(hisGroupDataEntryHistory.getJsonString(), new TypeReference<List<HisGroupDataEntryHistory.AssetGroupDetail>>() {});
             List<String> assetUids = assetGroupDetails.stream().map(HisGroupDataEntryHistory.AssetGroupDetail::getAssetUid).collect(Collectors.toList());
             List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
+            Map<String, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getUid, Function.identity(), (existing, replacement) -> existing));
 
             Map<String, String> assetMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo::getName, (existing, replacement) -> existing));
             assetGroupDetails.forEach(i->{
                 i.setGroupName(selectHisAssetGroupAssetMatch.getHisAssetGroup().getName());
                 i.setAssetName(assetMap.get(i.getAssetUid()));
-
+                i.setAssetInfo(assetInfoMap.get(i.getAssetUid()));
             });
             hisGroupDataEntryHistory.setAssetGroupDetailList(assetGroupDetails);
-
         }
     }
 

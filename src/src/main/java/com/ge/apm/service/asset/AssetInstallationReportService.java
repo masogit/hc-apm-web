@@ -10,14 +10,17 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
@@ -35,7 +38,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class AssetInstallationReportService {
 
-    protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AssetInstallationReportService.class);
+    protected static final Logger logger = Logger.getLogger(AssetInstallationReportService.class);
 
     public static final String REPORT_TECHNOLOGY_TEMPLATE = "/portal/asset/arrived/reportTemplate/TechnologyReportTemplate.docx";
     public static final String REPORT_BUSINESS_TEMPLATE = "/portal/asset/arrived/reportTemplate/BusinessReportTemplate.docx";
@@ -280,38 +283,37 @@ public class AssetInstallationReportService {
 
         byte[] templateBytes = null;
         String templatePath = null;
-        String templateType=null;
+        SystemTemplate.SystemTemplateEnum systemTemplateEnum = null;
         if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
             templatePath = REPORT_TECHNOLOGY_TEMPLATE;
-            templateType= SystemTemplate.SystemTemplateEnum.TECHNOLOGY.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.TECHNOLOGY;
         }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
             templatePath = REPORT_BUSINESS_TEMPLATE;
-            templateType= SystemTemplate.SystemTemplateEnum.BUSINESS.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.BUSINESS;
         }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
             templatePath = REPORT_CLINICAL_TEMPLATE;
-            templateType= SystemTemplate.SystemTemplateEnum.CLINICAL.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.CLINICAL;
 
         }else if(REPORT_TYPE_ASSET.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE;
-            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET;
 
         }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH;
-            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH;
 
         }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
-            templateType= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM;
 
         }else if(REPORT_TYPE_DETAIL.equals(reportType)){
             templatePath = REPORT_DETAIL_TEMPLATE;
-            templateType= SystemTemplate.SystemTemplateEnum.DETAIL.getCode();
+            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.DETAIL;
 
         }
-        if(templateType!=null){
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),templateType,"doc");
-            templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
+        if(systemTemplateEnum!=null){
+            FileDownloadService   fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+            templateBytes =fileDownloadService.getTemplateFileByte(systemTemplateEnum.getCode(), systemTemplateEnum.getFileType());
         }
         return templateBytes;
     }
