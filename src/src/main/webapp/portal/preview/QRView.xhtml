@@ -15,7 +15,7 @@
                    <p:printer target="qrcodePanel" />
            </p:commandButton>
            <p:panelGrid id="qrcodePanel"  columns="2" layout="grid"  rendered="#{qRPreViewerBean.itemList.size() > 0}">
-               <p:outputLabel>总数：#{qRPreViewerBean.itemList.size()}</p:outputLabel>
+               <p:outputLabel><h1>设备数量：#{qRPreViewerBean.itemList.size()} 台</h1></p:outputLabel>
                <p:outputLabel></p:outputLabel>
                    <c:forEach var="item" items="#{qRPreViewerBean.itemList}">
                        <p:outputPanel id="pnlPrint">
