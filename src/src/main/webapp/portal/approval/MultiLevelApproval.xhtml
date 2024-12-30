@@ -26,8 +26,8 @@
                 <h:form id="approvalForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                     <p:commandButton value="我发起的"   process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.initiatedByMe}" actionListener="#{multiLevelApprovalListController.initiateApprovalByMe}" />
-                    <p:commandButton value="待审批"     process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.pendingApprovalByMe}" actionListener="#{multiLevelApprovalListController.pendingApprovalByMe}" />
-                    <p:commandButton value="我审批的"   process="@this" update="approvalList ItemDetailViewForm buttonSet"  disabled="#{multiLevelApprovalListController.approvedByMe}" actionListener="#{multiLevelApprovalListController.approvedApprovalByMe}" />
+                    <p:commandButton value="待审批"     process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.pendingApprovalByMe}" actionListener="#{multiLevelApprovalListController.pendingApprovalByMe}"   rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
+                    <p:commandButton value="我审批的"   process="@this" update="approvalList ItemDetailViewForm buttonSet"  disabled="#{multiLevelApprovalListController.approvedByMe}" actionListener="#{multiLevelApprovalListController.approvedApprovalByMe}"  rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
                 </h:panelGrid>
 
                 <p:dataTable id="approvalList" value="#{multiLevelApprovalListController.lazyModel}" var="item"
