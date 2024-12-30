@@ -27,7 +27,7 @@
 						<p:column headerText="分组">
 							<h:outputText value="#{item.groupName}" />
 						</p:column>
-						<p:column headerText="备注">
+						<p:column headerText="描述">
 							<h:outputText value="#{item.description}" />
 						</p:column>
 						<p:column headerText="类型">
@@ -147,7 +147,7 @@
 						</p:selectOneMenu>
 					</h:panelGroup>
 					<h:panelGroup>
-						<label>备注：</label>
+						<label>描述：</label>
 						<p:inputText id="description" disabled="#{maintainConfigController.disabled}" value="#{maintainConfigController.objCheckItem.description}" />
 					</h:panelGroup>
 					<h:panelGroup >

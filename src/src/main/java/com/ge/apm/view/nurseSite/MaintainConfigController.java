@@ -118,6 +118,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private boolean disabled;
 
 	private NurseSiteMaintainConfigCheckItem editCheckItem;
+
+	private Set<String> groupNames;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -637,6 +639,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				objPairCheckItem.setKey(new Date().getTime());
 			}
 			listPairCheckItems.add(objPairCheckItem);
+
 		}else{
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				String name = listPairCheckItem.getName();
@@ -802,7 +805,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				JSONArray jsonArray=JSONObject.parseArray(strTemp);
 				for(int i=0;i<jsonArray.size();++i){
 					NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
-					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1);
+					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1,(JSONObject) jsonArray.get(i));
 					if (p.getKey()==null) {
 						p.setKey(new Date().getTime());
 					}
@@ -824,7 +827,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		return listPairCheckItems;
 	}
-	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
+	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem,JSONObject jsonObject){
 		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
 		p.setId(checkItem.getId());
 		p.setName(checkItem.getName());
@@ -834,6 +837,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		String options = checkItem.getOptions();
 		p.setRequired(checkItem.getRequired());
 		p.setKey(checkItem.getKey());
+		p.setGroupName(jsonObject.getString("groupName"));
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{
@@ -1049,9 +1053,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	public List<String> getGroupNames(){
-		List<String> groupNames = nurseSiteMaintainConfigItemRepository.findGroupName(currentUser.getSiteUID());
-		groupNames=groupNames.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-		return groupNames;
+		Set<String> result = new HashSet<>();
+		if(CollectionUtils.isEmpty(groupNames)){
+			List<String> groupNameTemp = nurseSiteMaintainConfigItemRepository.findGroupName(currentUser.getSiteUID());
+			groupNames=groupNameTemp.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
+
+		}
+		result.addAll(groupNames);
+		if(CollectionUtils.isNotEmpty(this.listPairCheckItems)){
+			List<String> groupName = listPairCheckItems.stream().map(NurseSiteMaintainConfigCheckItem::getGroupName).collect(Collectors.toList());
+			result.addAll(groupName);
+		}
+		return result.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 	}
 	public void onSelectObjCheckItem(){
 		Optional<NurseSiteMaintainCheckItem> first = listWholeCheckItems.stream().filter(item -> item.getName().equals(objPairCheckItem.getName())).findFirst();

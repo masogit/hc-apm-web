@@ -400,7 +400,7 @@ public class AssetFileImportController {
 
     public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
 
-        filterErrorRecords();
+        getDisplayAssetsNew();
     }
 
     public void filterErrorRecords() {
@@ -639,6 +639,9 @@ public class AssetFileImportController {
     }
 
     public List<AssetImport> getDisplayAssetsNew() {
+        if(isDisplayErrorsOnly()){
+            return displayAssetsNew.stream().filter(e->e.getImportStatus().equals(AssetFileImportBaseService.ImportStatus.Failure)||e.getImportStatus().equals(AssetFileImportBaseService.ImportStatus.CheckFail)).collect(Collectors.toList());
+        }
         return displayAssetsNew;
     }
 
