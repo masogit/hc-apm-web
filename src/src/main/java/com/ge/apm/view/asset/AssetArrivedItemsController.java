@@ -17,6 +17,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -97,9 +98,11 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private List<OrgInfo> clinicalDeptList;
     private UserAccount currentUser;
+    private FileDownloadService fileDownloadService;
 
     @Override
     protected void init() {
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -496,7 +499,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
         try {//.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx")
-            InputStream stream = AssetArrivedItemsController.class.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx");
+//            InputStream stream = AssetArrivedItemsController.class.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx");
+            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM.getCode(),SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM.getFileType());
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = exportData(doc, data, fields);
             if (Boolean.TRUE.equals(exportFlag)) {
