@@ -1028,6 +1028,7 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setCreatedDate(new Date());
                 newZkbContractAsset.setLastModifiedBy(currentUser.getName());
                 newZkbContractAsset.setLastModifiedDate(new Date());
+                newZkbContractAsset.setZone(zkbContractAssetVO.getZone());
                 zkbContractAssetRepository.save(newZkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null, null);
 
