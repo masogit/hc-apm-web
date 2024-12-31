@@ -32,6 +32,7 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -299,6 +300,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private ConfigCacheService configCacheService;
 
+    private FileDownloadService fileDownloadService;
+
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
     }
@@ -389,9 +392,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            String filePath = fileScanService.getUploadFileFullPath(path);
            File dest = new File(filePath + File.separator+"pm.xlsx");
           FileUtils.forceMkdir(new File(filePath));
-            String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
-            File source = new File(sourcePath);
-           FileUtils.copyFile(source,dest);
+//            String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
+//            File source = new File(sourcePath);
+//           FileUtils.copyFile(source,dest);
+           InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
+           FileUtils.copyToFile(inputStream,dest);
            genPmExcel(filePath + File.separator+"pm.xlsx",list);
            excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "PmOrder_Export.xlsx");
            long end = System.currentTimeMillis();
@@ -1665,6 +1670,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     protected void init() {
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         fileScanService = WebUtil.getBean(FileScanService.class);
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
