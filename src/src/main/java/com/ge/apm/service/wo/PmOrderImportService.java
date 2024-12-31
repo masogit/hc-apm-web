@@ -44,7 +44,7 @@ public class PmOrderImportService {
     public StreamedContent getWorkOrderTemplate() throws IOException {
 //        FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/pm/pmOrderReportTemplate/" + "PmOrderImport.xls")
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getCode(), SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getFileType());
+        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_IMPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_IMPORT.getFileType());
         DefaultStreamedContent ret= new DefaultStreamedContent(inputStream);
         ret.setName("PmOrderImport.xls");
         ret.setContentType("application/vnd.ms-excel");
