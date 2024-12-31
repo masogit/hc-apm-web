@@ -121,9 +121,11 @@
                                 <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('varDataList').filter()"  value="#{departmentConvertController.status}" >
                                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="已取消" itemValue="-1" noSelectionOption="true" />
                                         <f:selectItem itemLabel="转入确认中" itemValue="1" noSelectionOption="true" />
                                         <f:selectItem itemLabel="审批中" itemValue="2" noSelectionOption="true" />
                                         <f:selectItem itemLabel="已完成" itemValue="3" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="已拒绝" itemValue="5" noSelectionOption="true" />
                                     </p:selectOneMenu>
                                 </f:facet>
                                 <h:outputText value="#{departmentConvertController.getStatusName(item.currentStatus)}"/>
