@@ -39,7 +39,9 @@
             </p:column>
 
             <p:column headerText="#{msg.srNum}" >
-                <h:outputText value="#{item.serviceRequest.srNum}"/>
+                <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryIndex=12&amp;actionName=View&amp;selectedid='.concat(item.id))}" styleClass="p-mr-2">
+                    <h:outputText value="#{item.serviceRequest.srNum}"/>
+                </p:commandLink>
             </p:column>
             <p:column headerText="#{msg.requestorName}" >
                 <h:outputText value="#{item.serviceRequest.requestorName}"/>
