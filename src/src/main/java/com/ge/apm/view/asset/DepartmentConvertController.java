@@ -202,6 +202,9 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
         String stringStatus = null;
         switch (status) {
+            case -1:
+                stringStatus="已取消";
+                break;
             case 1:
                 stringStatus="转入确认中";
                 break;
@@ -211,6 +214,9 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
             case 3:
             case 4:
                 stringStatus="已完成";
+                break;
+            case 5:
+                stringStatus="已拒绝";
                 break;
             default:
                 break;
