@@ -6,7 +6,7 @@
 	  xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-	<p:dialog id="maintainDlg" widgetVar="maintainDialog" header="检查详情" modal="true" resizable="true"  draggable="true" appendTo="@(body)" width="1000">
+	<p:dialog id="maintainDlg" widgetVar="maintainDialog" header="检查详情" modal="true" resizable="true"  draggable="true" appendTo="@(body)" width="70%" >
 		<h:outputText rendered="#{empty maintainItemController.lazyModel}" value="工单详情后台生成中，请稍候刷新页面查看。"></h:outputText>
 		<h:form id="maintainDlgTable" rendered="#{not empty maintainItemController.lazyModel}" >
 			<div class="ui-datatable ui-widget" style="overflow: visible; height: 480px;">
