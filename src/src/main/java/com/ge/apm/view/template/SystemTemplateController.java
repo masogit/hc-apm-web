@@ -28,6 +28,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @ManagedBean
@@ -248,9 +249,17 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
     public void rebuildOrgTree() {
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
-            orgTree = uaaService.getOrgTreeBySite(user.getSiteUID());
+            orgTree = getOrgTreeBySite(user.getSiteUID());
         } else {
-            orgTree = uaaService.buildOrgTree(tenantUid, "", -1, -1);
+            orgTree = getOrgTreeBySite(tenantUid);
         }
     }
+
+    public TreeNode getOrgTreeBySite(String siteUID){
+        List<OrgInfo> orgList = orgInfoRepository.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+        return uaaService.getOrgTreeNodes(siteUID, orgList);
+    }
+
+
+
 }
