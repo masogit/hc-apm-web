@@ -34,7 +34,7 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="adverseListForm">
-                    <h:panelGrid id="searchStrSet" columns="2" cellpadding="5">
+                    <h:panelGrid id="searchStrSet" columns="2" cellpadding="5" rendered="false">
                         <label class="label">资产名称或科室名称筛选：</label>
                         <p:inputText id="queryStr" value="#{adverseEventApproveController.queryStr}">
                             <p:ajax event="blur" process="@this" update="adverseEventsApproveList" />
