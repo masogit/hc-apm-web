@@ -129,6 +129,8 @@ public class ExportTerminatedAppraisalService {
                 }
 
             });
+            // 确保 ZIP 文件的末尾被正确写入
+            zout.finish();
             return new ApmStreamedContent(new ByteArrayInputStream(out.toByteArray()), "application/zip", "报废鉴定.zip");
         } catch (Exception e) {
             logger.error("报废鉴定表导出失败 e:", e);
