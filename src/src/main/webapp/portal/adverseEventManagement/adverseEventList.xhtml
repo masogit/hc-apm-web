@@ -33,7 +33,7 @@
                         <p:commandButton value="已作废" disabled="#{adverseEventManagementController.eventStatusFilter eq '5'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('5')}" />
                         <p:commandButton value="审核完成" disabled="#{adverseEventManagementController.eventStatusFilter eq '6,8'}" process="@this" update="buttonSet adverseEventsList" actionListener="#{adverseEventManagementController.setEventStatus('6,8')}" />
                     </h:panelGrid>
-                    <h:panelGrid id="searchStrSet" columns="2" cellpadding="5">
+                    <h:panelGrid id="searchStrSet" columns="2" cellpadding="5" rendered="false">
                         <label class="label">资产名称或科室名称筛选：</label>
                         <p:inputText id="queryStr" value="#{adverseEventManagementController.queryStr}">
                             <p:ajax event="blur" process="@this" update="adverseEventsList" />
