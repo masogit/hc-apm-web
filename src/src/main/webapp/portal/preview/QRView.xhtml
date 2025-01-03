@@ -10,19 +10,18 @@
 <ui:composition>
 
    <p:dialog id="qrPreviewedDlg" width="1000" height="800"  widgetVar="qrPreviewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
-       <p:panelGrid   columns="1" layout="grid" styleClass="showcase-text-align-center" rendered="#{qRPreViewerBean.itemList.size() > 0}">
-           <p:commandButton value="打印" icon="ui-icon-print" style="position: relative;left: 90%">
-                   <p:printer target="qrcodePanel" />
+       <p:panelGrid   columns="2" layout="grid" styleClass="showcase-text-align-center" rendered="#{qRPreViewerBean.itemList.size() > 0}">
+           <p:outputLabel><h1>设备数量：#{qRPreViewerBean.itemList.size()} 台</h1></p:outputLabel>
+           <p:commandButton value="打印" icon="ui-icon-print" style="position: relative;left: 80%">
+               <p:printer target="qrcodePanel" />
            </p:commandButton>
-           <p:panelGrid id="qrcodePanel"  columns="2" layout="grid"  rendered="#{qRPreViewerBean.itemList.size() > 0}">
-               <p:outputLabel><h1>设备数量：#{qRPreViewerBean.itemList.size()} 台</h1></p:outputLabel>
-               <p:outputLabel></p:outputLabel>
-                   <c:forEach var="item" items="#{qRPreViewerBean.itemList}">
-                       <p:outputPanel id="pnlPrint">
-                        <p:graphicImage value="#{qRPreViewerBean.getImg(item)}" stream="false"/>
-                       </p:outputPanel>
-                   </c:forEach>
-           </p:panelGrid>
+       </p:panelGrid>
+       <p:panelGrid id="qrcodePanel"  columns="2" layout="grid"  rendered="#{qRPreViewerBean.itemList.size() > 0}">
+               <c:forEach var="item" items="#{qRPreViewerBean.itemList}">
+                   <p:outputPanel id="pnlPrint">
+                    <p:graphicImage value="#{qRPreViewerBean.getImg(item)}" stream="false"/>
+                   </p:outputPanel>
+               </c:forEach>
        </p:panelGrid>
    </p:dialog>
  </ui:composition>

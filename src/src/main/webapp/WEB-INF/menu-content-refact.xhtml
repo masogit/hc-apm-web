@@ -68,8 +68,8 @@
                    </c:when>
                    <c:when test="#{item eq 'MULTILEVEL_APPROVE'}">
                        <!--多级审批  -->
-                       <p:submenu id="um001" label="审批" icon="fa fa-check-square-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_')}">
-                           <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
+                       <p:submenu id="um001" label="审批" icon="fa fa-check-square-o fa-fw" >
+                           <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" />
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'PARTS_APPLY'}">

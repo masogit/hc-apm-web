@@ -58,7 +58,7 @@ public enum DownloadTemplateFileType {
     MVS_CONTRACT(SystemTemplate.SystemTemplateEnum.MVS_CONTRACT, SystemTemplate.SystemTemplateEnum.MVS_CONTRACT),
     MVS_SITE(SystemTemplate.SystemTemplateEnum.MVS_SITE, SystemTemplate.SystemTemplateEnum.MVS_SITE),
     HIS_EQUIPMENT_CONNECT(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_CONNECT, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_CONNECT),
-    HIS_CLINICAL(SystemTemplate.SystemTemplateEnum.USER_ACCOUNT, SystemTemplate.SystemTemplateEnum.USER_ACCOUNT),
+    HIS_CLINICAL(SystemTemplate.SystemTemplateEnum.HIS_CLINICAL, SystemTemplate.SystemTemplateEnum.HIS_CLINICAL),
     HIS_EQUIPMENT_SFXM(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_SFXM, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_SFXM),
     HIS_EQUIPMENT_DATA_SOURCE(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE),
     SUPPLIER(SystemTemplate.SystemTemplateEnum.SUPPLIER, SystemTemplate.SystemTemplateEnum.SUPPLIER),

@@ -2,7 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -13,24 +13,53 @@
                 </div>
                 <h:form id="TemplateListForm">
 
-                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <h:panelGroup>
-                            <p:commandButton id="btnOrg" value="#{systemTemplateController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
-                                <p:scrollPanel style="height:300px;border: 0;" mode="native">
-                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{systemTemplateController.onSelectSiteTreeNode}" update="TemplateListForm" oncomplete="PF('varPanelOrg').hide();"/>
-                                        <p:ajax process="@this" event="expand"/>
-                                        <p:ajax process="@this" event="collapse"/>
-                                        <p:treeNode type="org">
-                                            <h:outputText value="#{node.name}"/>
-                                        </p:treeNode>
-                                        <p:treeNode type="hidden" rendered="false"/>
-                                    </p:tree>
-                                </p:scrollPanel>
-                            </p:overlayPanel>
-                        </h:panelGroup>
-                    </h:panelGrid>
+                    <p:commandButton id="btnSite" rendered="#{userContextService.isSuperAdmin}" value="#{systemTemplateController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
+                        <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{systemTemplateController.tenantUid}">
+                            <p:ajax process="@this" event="click" update=":TemplateListForm" listener="#{systemTemplateController.setTenantInfoValue(systemTemplateController.tenantUid)}" oncomplete="PF('varPanelSite').hide();"/>
+
+                            <f:selectItems value="#{systemTemplateController.getTenantInfoList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneListbox>
+                    </p:overlayPanel>
+
+                    <p:commandButton id="btnOrg" value="#{systemTemplateController.selectedOrg==null?msg.AllHospitals:systemTemplateController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{systemTemplateController.orgTree}"    var="node" selectionMode="single">
+                                <p:ajax process="@this" event="select" update=":TemplateListForm" listener="#{systemTemplateController.onSelectSiteTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node}"/>
+                                </p:treeNode>
+                                <p:treeNode type="hidden" rendered="false"/>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+
+
+
+
+
+<!--                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">-->
+<!--                        <h:panelGroup>-->
+<!--                            <p:commandButton id="btnOrg" value="#{systemTemplateController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>-->
+<!--                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">-->
+<!--                                <p:scrollPanel style="height:300px;border: 0;" mode="native">-->
+<!--                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">-->
+<!--                                        <p:ajax process="@this" event="select" listener="#{systemTemplateController.onSelectSiteTreeNode}" update="TemplateListForm" oncomplete="PF('varPanelOrg').hide();"/>-->
+<!--                                        <p:ajax process="@this" event="expand"/>-->
+<!--                                        <p:ajax process="@this" event="collapse"/>-->
+<!--                                        <p:treeNode type="org">-->
+<!--                                            <h:outputText value="#{node.name}"/>-->
+<!--                                        </p:treeNode>-->
+<!--                                        <p:treeNode type="hidden" rendered="false"/>-->
+<!--                                    </p:tree>-->
+<!--                                </p:scrollPanel>-->
+<!--                            </p:overlayPanel>-->
+<!--                        </h:panelGroup>-->
+<!--                    </h:panelGrid>-->
 
 
                     <p:dataTable id="datalist" value="#{systemTemplateController.lazyModel}" var="item"
