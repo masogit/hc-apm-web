@@ -77,7 +77,7 @@ public class SystemTemplate implements Serializable {
         MVS("MVS","MVS模块"),
         NURSE_SITE_MAINTAIN("NURSE_SITE_MAINTAIN","日常检查模块"),
         MEASURING_RESULT("MEASURING_RESULT","计量模块"),
-        PM("PM","日常检查模块"),
+        PM("PM","保养"),
 
         BUDGET("BUDGET","预算模块"),
         ORG_INFO("ORG_INFO","组织机构模块"),
@@ -168,14 +168,15 @@ public class SystemTemplate implements Serializable {
 
 
         //保养
-        PM_ORDER_EXPORT("PM_ORDER_EXPORT","保养导出模板","excel",SystemTemplateBusinessEnum.MVS.getCode(),"PmOrder_export.xlsx"),
-        PM_ORDER_IMPORT("PM_ORDER_IMPORT","保养工单导入模板","excel",SystemTemplateBusinessEnum.MVS.getCode(),"PmOrderImport.xls"),
-        MEASURE_ELECTRIC_SAFETY("MEASURE_ELECTRIC_SAFETY","电气安全数据导入模板","ps",SystemTemplateBusinessEnum.MVS.getCode(),"APM_Electric_Safety_Template.ps"),
+        PM_ORDER_EXPORT("PM_ORDER_EXPORT","保养导出模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrder_export.xlsx"),
+        PM_ORDER_IMPORT("PM_ORDER_IMPORT","保养工单导入模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrderImport.xls"),
+        MEASURE_ELECTRIC_SAFETY("MEASURE_ELECTRIC_SAFETY","电气安全数据导入模板","ps",SystemTemplateBusinessEnum.PM.getCode(),"APM_Electric_Safety_Template.ps"),
 
         //预算
         BUDGET_IMPORT("BUDGET_IMPORT","预算导入模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"Budget_Import_Template.xlsx"),
         OVER_FIFTY_THOUSAND("OVER_FIFTY_THOUSAND","医疗仪器设备年度采购申报表模板","word",SystemTemplateBusinessEnum.BUDGET.getCode(),"over_fifty_thousand.docx"),
         BUDGET_BAP_EXP("BUDGET_BAP_EXP","申购导出模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"APM_Budget_BAP_Exp_Template.xlsx"),
+        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
 
         //组织结构
         ORG_INFO("ORG_INFO","组织机构导入模板","excel",SystemTemplateBusinessEnum.ORG_INFO.getCode(),"APM_Org_Template.xlsx"),
@@ -205,7 +206,6 @@ public class SystemTemplate implements Serializable {
         //资产分类
         ASSET_TYPE_GROUP("ASSET_TYPE_GROUP","资产分类模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_Auth_Template.xlsx"),
         ASSET_PURCHASE("ASSET_PURCHASE","采购清单模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_PURCHASE_Template.xls"),
-        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
 
 
 

@@ -8,6 +8,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,7 @@ import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,8 +56,9 @@ public class DepartmentConvertService {
     public byte[] getActiveTemplateBytes() throws IOException {
         byte[] templateBytes = null;
 
-        String  fileName = "transferorder_template.docx";
-        templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/" + fileName));
+        FileDownloadService   fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        templateBytes=fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getCode(), SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getFileType());
+
         return templateBytes;
     }
 
