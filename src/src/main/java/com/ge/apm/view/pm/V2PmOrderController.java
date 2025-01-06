@@ -39,6 +39,7 @@ import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -155,6 +156,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private List<UnstructuredData> pmCheckItemList;// 每条检查项记录
     private CustomConfigObject currentCustomConfig;
     private ExternalTempUserRepository externalTempUserDao;
+    private ConfigItemValueRepository configItemValueRepository;
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -1671,7 +1673,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     protected void init() {
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         fileScanService = WebUtil.getBean(FileScanService.class);
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -3868,5 +3870,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean showLocationName(){
+        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+        if (StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue)) {
+            return true;
+        }
+        return false;
     }
 }
