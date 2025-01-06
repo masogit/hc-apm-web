@@ -561,7 +561,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
             int count = dataEntryAssetDetailRepository.findByAssetUidAndEntryTypeAndDate(selectAssets.get(0).getUid(), dataEntry.getEntryType(), dataEntry.getStartDate(), dataEntry.getEndDate());
             if (count > 0) {
                 List<I18nMessage> collect = hisEntryType.stream().filter(item -> item.getMsgKey().equals(dataEntry.getEntryType())).collect(Collectors.toList());
-                checkDuplicateMap.put(dataEntry.getEntryType(), "设备在同一时间段内已录入过"+collect.get(0).getValueZh()+"建议核实后再录入数据");
+                checkDuplicateMap.put(dataEntry.getEntryType(), "设备在同一时间段内已录入过"+collect.get(0).getValueZh()+",建议核实后再录入数据");
             }else{
                 if(checkDuplicateMap.containsKey(dataEntry.getEntryType())){
                     checkDuplicateMap.remove(dataEntry.getEntryType());
@@ -591,7 +591,7 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                     String serialNum=existAsset.getAssetInfo().getSerialNum()==null?"":existAsset.getAssetInfo().getSerialNum();
                     message.append("【").append(existAsset.getAssetInfo().getName()).append(",").append(serialNum).append("】");
                 }
-                checkDuplicateMap.put(selected.getEntryType(),message+"在同一时间段内已录入过"+dataEntryType.get(0).getValueZh()+"建议核实后再录入数据");
+                checkDuplicateMap.put(selected.getEntryType(),message+"在同一时间段内已录入过"+dataEntryType.get(0).getValueZh()+",建议核实后再录入数据");
             }else{
                 checkDuplicateMap.clear();
             }
