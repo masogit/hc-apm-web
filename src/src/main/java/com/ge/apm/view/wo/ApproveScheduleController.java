@@ -83,7 +83,7 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
                 auditGroupConfigurationDetail.setSrNum(approveSchedule.getSrNum());
             }
         }
-        List<V2_WorkOrder> workOrders = workOrderService.findBySrNum(selected.getSrNum());
+        List<V2_WorkOrder> workOrders = workOrderService.findBySrNum(selected.getTenantUID(), selected.getSrNum());
         workOrder = workOrders.stream().findFirst().get();
     }
     public String getUserName(String userUid){

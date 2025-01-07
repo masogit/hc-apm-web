@@ -45,5 +45,5 @@ public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_Servi
 
     Page<ServiceRequestProjection> findProjectionByAssetIdIn(Collection<Integer> assetIds, Pageable pr);
 
-    public V2_ServiceRequest findBySrNum(String srNum);
+    public V2_ServiceRequest findByTenantUIDAndSrNum(String tenantUid, String srNum);
 }
