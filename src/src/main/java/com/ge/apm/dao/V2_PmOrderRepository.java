@@ -67,7 +67,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tai.serial_num as serialNum,\n" +
 			"\tai.depart_num as departNum,\n" +
 			"\tai.function_type as functionType,\n" +
-			"\tvpo.rule_level as ruleLevel,\n" +
+			"\t (select value_zh from i18n_message where msg_type='ruleLevelFour' and msg_key = cast(vpo.rule_level as text)) as ruleLevel,\n" +
 			"\t (select value_zh from i18n_message where msg_type='pmType' and msg_key = cast(vpo.pm_type as text)) as pmType,\n" +
 			"\t(\n" +
 			"\tselect\n" +
