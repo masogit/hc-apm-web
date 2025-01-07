@@ -7,11 +7,11 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDialog"
-              onHide="#{toBeTerminatedTemplateController.onSelect()}" width="1000" height="450" modal="true"
+    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDlg"
+              width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
               header="编辑系统模板">
-        <h:form id="WoExportTemplateEditForm">
+        <h:form id="editTemplateForm">
             <h:panelGroup id="display">
                 <p:fieldset id="basic">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -42,20 +42,20 @@
                             <p:fileUpload fileUploadListener="#{systemTemplateController.uploadDataFile}"
                                           value="#{systemTemplateController.file}" mode="advanced"
                                           dragDropSupport="false" style="width:100%" process="@this"
-                                          multiple="false" sizeLimit="10000000" update=":WoExportTemplateEditForm:fileName"
+                                          multiple="false" sizeLimit="10000000" update=":editTemplateForm:fileName"
                                           auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
-                                          allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|XLS|XLSX|DOC|DOCX|PDF)$/" label="#{msg.Add}"/>
+                                          allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|XLS|XLSX|DOC|DOCX|PDF|ps|PS)$/" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
                                  actionListener="#{systemTemplateController.saveTemplate()}" value="#{msg.Save}"
-                                 update="display,:TemplateEditDlg, :TemplateListForm:datalist, :growl"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDialog');"/>
+                                 update="TemplateListForm:datalist"
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDlg');"/>
                 &nbsp;&nbsp;
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                 onclick="PF('TemplateEditDialog').hide()"/>
+                                 onclick="PF('TemplateEditDlg').hide()"/>
             </h:panelGroup>
         </h:form>
     </p:dialog>
