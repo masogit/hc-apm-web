@@ -426,7 +426,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         info.put("生产厂家", curItem.getManufacture());
         info.put("产地", curItem.getOrigin());
         info.put("发票号", curItem.getInvoiceNum());
-        info.put("合同价格", BigDecimal.valueOf(curItem.getContractPrice()));
+        if(curItem.getContractPrice()!=null){
+            info.put("合同价格", BigDecimal.valueOf(curItem.getContractPrice()));
+        }
         info.put("合同号", curItem.getContractNum());
         info.put("供应商", curItem.getVendor());
         info.put("经办人", curItem.getAgent());
