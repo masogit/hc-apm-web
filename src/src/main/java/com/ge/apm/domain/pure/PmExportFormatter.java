@@ -31,6 +31,7 @@ public class PmExportFormatter<T> {
     private OrgInfoRepository orgDao;
     private List<I18nMessage> i18PmtypeList=null;
     private List<I18nMessage> i18OrderTypeList=null;
+    private List<I18nMessage> i18nRuleLevel=null;
     private V2_PmOrder v2_pmOrder;
     private String type = null;
 
@@ -51,6 +52,7 @@ public class PmExportFormatter<T> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         i18PmtypeList =I18dao.getByMsgType("pmType");
         i18OrderTypeList  =I18dao.getByMsgType("intExtType");
+        i18nRuleLevel  =I18dao.getByMsgType("ruleLevelFour");
 
         v2PmOrderController = WebUtil.getBean(V2PmOrderController.class);
         pmOrderRule = v2PmOrderController.getRulePm(v2_pmOrder);
@@ -74,13 +76,14 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
-            if("1".equals(this.getRuleLevel())){
-                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
-            }else if("4".equals(this.getRuleLevel())){
-                map.put(ExportFields.RUNLEVEL.getChinese(), "质量控制");
-            }else {
-                map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
-            }
+//            if("1".equals(this.getRuleLevel())){
+//                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
+//            }else if("4".equals(this.getRuleLevel())){
+//                map.put(ExportFields.RUNLEVEL.getChinese(), "质量控制");
+//            }else {
+//                map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
+//            }
+            map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18nRuleLevel,v2_pmOrder.getRuleLevel()));
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
             map.put(ExportFields.PMRULE.getChinese(), this.pmOrderRule.getName());
