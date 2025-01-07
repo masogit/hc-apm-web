@@ -413,9 +413,7 @@ public class AssetFileImportController {
             logger.info("filter error records is empty. ");
             return;
         }
-
         List<AssetImport> result = new ArrayList<>();
-
         for (AssetImport assetImport : displayAssetsNew) {
 
             if (AssetFileImportService.ImportStatus.CheckFail.equals(assetImport.getImportStatus()) || AssetFileImportService.ImportStatus.Failure.equals(assetImport.getImportStatus())) {
@@ -423,11 +421,8 @@ public class AssetFileImportController {
             }
 
         }
-
         displayErrorAssets = result;
-
         if (importOrgMap == null) return;
-
         List<Map<String, Object>> resultMap = new ArrayList<>();
         logger.info("filter org map start,size:{}", CollectionUtils.isNotEmpty(importOrgMap) ? importOrgMap.size() : 0);
         for (Map<String, Object> map : importOrgMap) {
