@@ -335,17 +335,23 @@ public class AssetInstallationService {
         departNumFilters.clear();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
         departNumFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.EQ, item.getArrivalList().getTenantUID()));
+
+        //处理指定的租户对设备编号不验证
+        //对于邵逸夫租户排除退货状态的数据YHAAO-14535
+        String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(currentTenantUid);
+        if(tenantInfo != null){
+            if("3".equals(tenantInfo.getCustomTenant())){
+                //return new Tuple2(true, "");
+                departNumFilters.add(new SearchFilter("installStatus", SearchFilter.Operator.NE, "rejected"));
+            }
+        }
+
         List<ArrivalListItem> itemList = itemDao.findBySearchFilter(departNumFilters);
         if (null == itemList || itemList.isEmpty()) {
             return new Tuple2(true, "");
         }
-        //处理指定的租户对设备编号不验证
-        String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
-        List<TenantInfo> tanentIfos = tenantInfoDao.findByCustomTenant("3");
-        String tanentInfoUid = tanentIfos.get(0).getUid();
-        if(tanentInfoUid.equals(currentTenantUid)){
-            return new Tuple2(true, "");
-        }
+
         if (itemList.size() > 1) {
             return new Tuple2(false, "设备编号已被分配");
         }
