@@ -162,6 +162,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private WxMessageService wxMessageService;
 
     private UserAccount loginUser;
+    private TenantInfoRepository tenantInfoDao;
 
     @Getter @Setter
     private Map<String, Boolean> arrivalRequireField = new HashMap<>();
@@ -211,6 +212,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
         loginUser = UserContextService.getCurrentUserAccount();
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
 
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
@@ -1310,5 +1312,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     public void setOwner3(UserAccount owner3) {
         this.owner3 = owner3;
+    }
+
+    public boolean isSyf(){
+        String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
+        TenantInfo tanentIfo = tenantInfoDao.findByUid(currentTenantUid);
+        return "3".equals(tanentIfo.getCustomTenant());
     }
 }
