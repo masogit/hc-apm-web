@@ -639,8 +639,16 @@ public class AssetFileImportController {
     }
 
     public List<AssetImport> getDisplayAssetsNew() {
-        if(isDisplayErrorsOnly()){
-            return displayAssetsNew.stream().filter(e->e.getImportStatus().equals(AssetFileImportBaseService.ImportStatus.Failure)||e.getImportStatus().equals(AssetFileImportBaseService.ImportStatus.CheckFail)).collect(Collectors.toList());
+        logger.info("asset import result display error:{}", isDisplayErrorsOnly());
+        if (isDisplayErrorsOnly()) {
+            List<AssetImport> error = new ArrayList<>();
+            for (AssetImport assetImport : displayAssetsNew) {
+                if (AssetFileImportBaseService.ImportStatus.Failure.equals(assetImport.getImportStatus()) || AssetFileImportBaseService.ImportStatus.CheckFail.equals(assetImport.getImportStatus())) {
+                    error.add(assetImport);
+                }
+            }
+            logger.info("error size:{}", error.size());
+            return error;
         }
         return displayAssetsNew;
     }
@@ -672,9 +680,9 @@ public class AssetFileImportController {
     public List<AssetInfo> importAssetDataAsync(List<AssetImport> assetData, Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
         int mid = assetData.size() / 2;
         UserAccount currentAccount = UserContextService.getCurrentUserAccount();
-        DbResourcesUtil resourcesUtil=WebUtil.getBean(DbResourcesUtil.class);
-        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache, currentAccount,resourcesUtil))
-                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid, assetData.size()), autoGenerateQrcode, orgNamesUriCache, currentAccount,resourcesUtil)), (a, b) -> {
+        DbResourcesUtil resourcesUtil = WebUtil.getBean(DbResourcesUtil.class);
+        CompletableFuture<List<AssetInfo>> t = CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(0, mid), autoGenerateQrcode, orgNamesUriCache, currentAccount, resourcesUtil))
+                .thenCombine(CompletableFuture.supplyAsync(() -> streamingService.importAssetDataAsync(assetData.subList(mid, assetData.size()), autoGenerateQrcode, orgNamesUriCache, currentAccount, resourcesUtil)), (a, b) -> {
                     List<AssetInfo> result = new ArrayList<>();
                     if (CollectionUtils.isNotEmpty(a)) {
                         result.addAll(a);
