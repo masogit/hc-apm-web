@@ -42,7 +42,7 @@
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="bacth" process="@this" icon="fa fa-cogs" style="zoom:0.8;" title="批量添加" update=":batchAdd"
-											 oncomplete="PF('batchAdd').show()"  />
+											 actionListener="#{maintainConfigController.setSelectAll()}" oncomplete="PF('batchAdd').show()"  />
 							<p:commandButton id="createButton2" process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":checkItemEditDlg"
 								 actionListener="#{maintainConfigController.createObjCheckItem}" oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.name}" />
 							<p:commandButton id="editButton2"   icon="ui-icon-edit" style="zoom:0.8;" title="#{msg.Edit}"
@@ -147,15 +147,16 @@
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<h:panelGroup>
 						<label>#{msg.name} *：</label>
-						<p:selectOneMenu  id="name" value="#{maintainConfigController.objCheckItem.name}" editable="true" filter="true" filterMatchMode="LIKE" autoWidth="200">
-							<p:ajax event="change" process="@this" listener="#{maintainConfigController.onSelectObjCheckItem}" update="checkItemEditForm"></p:ajax>
-							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
-							<f:selectItems value="#{maintainConfigController.listWholeCheckItems}" var="item" itemLabel="#{item.name} #{item.description} #{item.groupName}" itemValue="#{item.name}" />
-						</p:selectOneMenu>
+<!--						<p:selectOneMenu  id="name" value="#{maintainConfigController.objCheckItem.name}" editable="true" filter="true" filterMatchMode="LIKE" autoWidth="200">-->
+<!--							<p:ajax event="change" process="@this" listener="#{maintainConfigController.onSelectObjCheckItem}" update="checkItemEditForm"></p:ajax>-->
+<!--							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>-->
+<!--							<f:selectItems value="#{maintainConfigController.listWholeCheckItems}" var="item" itemLabel="#{item.name} #{item.description} #{item.groupName}" itemValue="#{item.name}" />-->
+<!--						</p:selectOneMenu>-->
+						<p:inputText id="name"  value="#{maintainConfigController.objCheckItem.name}" />
 					</h:panelGroup>
 					<h:panelGroup>
 						<label>分组：</label>
-						<p:selectOneMenu disabled="#{maintainConfigController.disabled}" id="groupName" value="#{maintainConfigController.objCheckItem.groupName}" editable="true" filter="true" filterMatchMode="LIKE" autoWidth="200">
+						<p:selectOneMenu disabled="#{maintainConfigController.disabled}" id="groupName" value="#{maintainConfigController.objCheckItem.groupName}" editable="true" filter="true" filterMatchMode="contains" autoWidth="200">
 							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
 							<f:selectItems value="#{maintainConfigController.groupNames}"/>
 						</p:selectOneMenu>
