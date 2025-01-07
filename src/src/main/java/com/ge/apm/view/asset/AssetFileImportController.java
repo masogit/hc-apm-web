@@ -210,6 +210,7 @@ public class AssetFileImportController {
             canbeImported = checkresult.get("canBeImport");
             unCheckedNurseSite = checkresult.get("unCheckedNurseSite");
             filterErrorRecords();
+            logger.info("filter error records end");
 
         } catch (IOException e) {
             WebUtil.addErrorMessage("File can not be read!", null);
@@ -407,13 +408,17 @@ public class AssetFileImportController {
 
         if (!displayErrorsOnly) return;
 
-        if (CollectionUtils.isEmpty(displayAssetsNew)) return;
+        if (CollectionUtils.isEmpty(displayAssetsNew)) {
+            displayErrorAssets = new ArrayList<>();
+            logger.info("filter error records is empty. ");
+            return;
+        }
 
         List<AssetImport> result = new ArrayList<>();
 
         for (AssetImport assetImport : displayAssetsNew) {
 
-            if ( AssetFileImportService.ImportStatus.CheckFail.equals(assetImport.getImportStatus()) || AssetFileImportService.ImportStatus.Failure.equals(assetImport.getImportStatus())) {
+            if (AssetFileImportService.ImportStatus.CheckFail.equals(assetImport.getImportStatus()) || AssetFileImportService.ImportStatus.Failure.equals(assetImport.getImportStatus())) {
                 result.add(assetImport);
             }
 
@@ -424,18 +429,20 @@ public class AssetFileImportController {
         if (importOrgMap == null) return;
 
         List<Map<String, Object>> resultMap = new ArrayList<>();
-
+        logger.info("filter org map start,size:{}", CollectionUtils.isNotEmpty(importOrgMap) ? importOrgMap.size() : 0);
         for (Map<String, Object> map : importOrgMap) {
-
-            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-            if (importStatus == null) continue;
-
-            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                resultMap.add(map);
+            try {
+                AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+                logger.info("importStatus:{}", importStatus);
+                if (importStatus == null) continue;
+                if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                    resultMap.add(map);
+                }
+            }catch (Exception e){
+                logger.info("convert failed:{}", e.getMessage());
             }
-
         }
-
+        logger.info("filter error org records successful. ");
         displayOrgs = resultMap;
     }
 
@@ -639,7 +646,7 @@ public class AssetFileImportController {
     public List<AssetImport> getDisplayAssetsNew() {
         logger.info("asset import result display error:{}", isDisplayErrorsOnly());
         if (isDisplayErrorsOnly()) {
-          return displayErrorAssets;
+            return displayErrorAssets;
         }
         return displayAssetsNew;
     }
