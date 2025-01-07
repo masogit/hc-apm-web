@@ -34,6 +34,11 @@ public class SystemTemplateValue implements Serializable {
     @Column(name = "template_type")
     private String templateType;  //模板类型
 
+
+    @Column(name = "template_type_name")
+    private String templateTypeName;  //模板类型名称
+
+
     @Column(name = "storage_id")
     private String storageId;
 

@@ -2,6 +2,7 @@ package com.ge.apm.view.template;
 
 import com.ge.apm.dao.*;
 
+import com.ge.apm.dao.mapper.SystemTemplateMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
@@ -14,11 +15,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -26,6 +30,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionListener;
+import javax.swing.text.StyledEditorKit;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,6 +72,11 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     @Getter
     @Setter
+    private SystemTemplateValue systemTemplateValue;
+
+    private SystemTemplateMapper systemTemplateMapper;
+    @Getter
+    @Setter
     private List<OrgInfo> affiliationDepartmentGroup = new ArrayList<>();
 
     @Override
@@ -81,6 +92,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         blobService = WebUtil.getBean(BlobFileService.class);
         systemTemplateRepository = WebUtil.getBean(SystemTemplateRepository.class);
         systemTemplateValueRepository = WebUtil.getBean(SystemTemplateValueRepository.class);
+        systemTemplateMapper = WebUtil.getBean(SystemTemplateMapper.class);
 //        selectSite = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         uaaService = WebUtil.getBean(UaaService.class);
         selectedTenant = tenantInfoRepository.findByuid(user.getTenantUID());
@@ -110,36 +122,86 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         }
     }
 
+//    @Override
+//    protected Page<SystemTemplate> loadData(PageRequest pageRequest) {
+//        List<SearchFilter> searchFilters = this.searchFilters;
+//
+//        if(searchFilters == null){
+//            searchFilters = new ArrayList<>();
+//        }
+//        Page<SystemTemplate> page = systemTemplateRepository.findBySearchFilter(searchFilters, pageRequest);
+//        List<SystemTemplate> list = page.getContent();
+//        if(CollectionUtils.isNotEmpty(list)) {
+//            for (SystemTemplate systemTemplate : list) {
+//                SystemTemplateValue  value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getSiteUID());
+//                if(value == null){
+//                    value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(),  selectedOrg.getHospitalUID());
+//                    if(value == null){
+//                        value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getInstitutionUID());
+//                        if(value == null){
+//                            value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getTenantUID());
+//                        }
+//                    }
+//                }
+//
+//                if(value != null){
+//                    systemTemplate.setStorageId(value.getStorageId());
+//                    systemTemplate.setFileName(value.getFileName());
+//                }
+//            }
+//        }
+//        return page;
+//    }
+
+
     @Override
     protected Page<SystemTemplate> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = this.searchFilters;
-
-        if(searchFilters == null){
-            searchFilters = new ArrayList<>();
+        if (CollectionUtils.isEmpty(this.searchFilters)) {
+            this.searchFilters = new ArrayList<>();
         }
-        Page<SystemTemplate> page = systemTemplateRepository.findBySearchFilter(searchFilters, pageRequest);
-        List<SystemTemplate> list = page.getContent();
-        if(CollectionUtils.isNotEmpty(list)) {
-            for (SystemTemplate systemTemplate : list) {
-                SystemTemplateValue  value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getSiteUID());
-                if(value == null){
-                    value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(),  selectedOrg.getHospitalUID());
-                    if(value == null){
-                        value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getInstitutionUID());
-                        if(value == null){
-                            value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getTenantUID());
-                        }
-                    }
-                }
+        Map<String, Object> param = new HashMap<>();
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        param.put("siteUid", selectedOrg.getSiteUID());
+        covQueryCondition(this.searchFilters,param);
 
-                if(value != null){
-                    systemTemplate.setStorageId(value.getStorageId());
-                    systemTemplate.setFileName(value.getFileName());
-                }
+        List<SystemTemplate> list = systemTemplateMapper.searchSystemTemplate(param);
+
+        for (SystemTemplate systemTemplate : list) {
+            if(systemTemplate.getTemplateTypeNameValue()!=null){
+                systemTemplate.setTemplateTypeName(systemTemplate.getTemplateTypeNameValue());
+            }
+            systemTemplate.setOnlyId(systemTemplate.getValueId()==null?systemTemplate.getId():systemTemplate.getValueId());
+        }
+        Long count = systemTemplateMapper.searchSystemTemplateCount(param);
+        return new PageImpl<>(list, pageRequest, count);
+    }
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter : searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "businessType":
+                    param.put("businessType", searchFilter.value);
+                    break;
+                case "templateType":
+                    param.put("templateType", searchFilter.value);
+                    break;
+                default:
+                    break;
             }
         }
-        return page;
+
     }
+
+    public void onRowSelect(SelectEvent event) {
+        if (null == event.getObject()) {
+            return;
+        }
+        SystemTemplate systemTemplate = (SystemTemplate) event.getObject();
+
+    }
+
+
     public void uploadDataFile(FileUploadEvent event) {
         this.file = event.getFile();
         uploadedFileObject = blobService.uploadFile(file);
@@ -175,7 +237,16 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
             }
         }
     }
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+//        super.prepareCreate();
+        this.systemTemplateValue = new SystemTemplateValue();
+    }
 
+    @Override
+    public void prepareEdit()   {
+        systemTemplateValue= systemTemplateValueRepository.findById(selected.getValueId());
+    }
 
     public void   saveTemplate(){
         if(uploadedFileObject==null){
@@ -198,6 +269,57 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
         uploadedFileObject.setBoUuid(systemTemplateValue.getId());
         blobService.saveBlobObject(uploadedFileObject);
+
+        file=null;
+
+    }
+    public void   addTemplate(){
+        if(uploadedFileObject==null){
+            return;
+        }
+
+            systemTemplateValue.setTemplateType(this.selected.getTemplateType());
+            systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
+            systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
+            systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
+            systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+
+        systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
+        systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+        systemTemplateValue.setCreateBy(user.getUid());
+        systemTemplateValue.setCreateTime(new Date());
+        systemTemplateValueRepository.save(systemTemplateValue);
+        uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+        uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+        blobService.saveBlobObject(uploadedFileObject);
+
+        file=null;
+
+    }
+
+
+
+
+
+
+    public void   editTemplate(){
+        if(uploadedFileObject!=null){
+            systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+            systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
+
+        }
+//        systemTemplateValue.setTemplateType(this.selected.getTemplateType());
+//        systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
+//        systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
+//        systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
+//        systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+
+        systemTemplateValueRepository.save(systemTemplateValue);
+        if(uploadedFileObject!=null){
+            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+            uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+            blobService.saveBlobObject(uploadedFileObject);
+        }
 
         file=null;
 
@@ -261,5 +383,17 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
     }
 
 
+    public void resetSystemTemplate() {
+        systemTemplateValueRepository.deleteBySiteUid(selectedOrg.getSiteUID());
+        WebUtil.addSuccessMessage("组织机构下的系统模板已重置");
 
+
+    }
+
+    public void resetSystemTemplate(String valueId) {
+        systemTemplateValueRepository.deleteById(valueId);
+        WebUtil.addSuccessMessage("子系统模板已删除");
+
+
+    }
 }
