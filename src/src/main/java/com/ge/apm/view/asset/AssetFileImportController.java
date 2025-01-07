@@ -400,29 +400,26 @@ public class AssetFileImportController {
 
     public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
 
-        getDisplayAssetsNew();
+        filterErrorRecords();
     }
 
     public void filterErrorRecords() {
 
         if (!displayErrorsOnly) return;
 
-        if (importAssetMap == null) return;
+        if (CollectionUtils.isEmpty(displayAssetsNew)) return;
 
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<AssetImport> result = new ArrayList<>();
 
-        for (Map<String, Object> map : importAssetMap) {
+        for (AssetImport assetImport : displayAssetsNew) {
 
-            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-            if (importStatus == null) continue;
-
-            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                result.add(map);
+            if ( AssetFileImportService.ImportStatus.CheckFail.equals(assetImport.getImportStatus()) || AssetFileImportService.ImportStatus.Failure.equals(assetImport.getImportStatus())) {
+                result.add(assetImport);
             }
 
         }
 
-        displayAssets = result;
+        displayErrorAssets = result;
 
         if (importOrgMap == null) return;
 
@@ -443,6 +440,7 @@ public class AssetFileImportController {
     }
 
     List<Map<String, Object>> displayAssets;
+    List<AssetImport> displayErrorAssets;
 
     List<AssetImport> displayAssetsNew;
 
@@ -641,14 +639,7 @@ public class AssetFileImportController {
     public List<AssetImport> getDisplayAssetsNew() {
         logger.info("asset import result display error:{}", isDisplayErrorsOnly());
         if (isDisplayErrorsOnly()) {
-            List<AssetImport> error = new ArrayList<>();
-            for (AssetImport assetImport : displayAssetsNew) {
-                if (AssetFileImportBaseService.ImportStatus.Failure.equals(assetImport.getImportStatus()) || AssetFileImportBaseService.ImportStatus.CheckFail.equals(assetImport.getImportStatus())) {
-                    error.add(assetImport);
-                }
-            }
-            logger.info("error size:{}", error.size());
-            return error;
+          return displayErrorAssets;
         }
         return displayAssetsNew;
     }
