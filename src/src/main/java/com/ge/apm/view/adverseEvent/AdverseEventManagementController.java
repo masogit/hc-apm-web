@@ -533,23 +533,27 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     public void removeAdverseFile(){
         List<AdverseEventsFile> list = new ArrayList<>();
-        for(AdverseEventsFile adverseEventsFile : selected.getHarmPerformFile()){
-            if(StrUtil.isEmpty(adverseEventsFile.getAdverseEventsUid())){
-                list.add(adverseEventsFile);
+        if(selected.getHarmPerformFile() != null){
+            for(AdverseEventsFile adverseEventsFile : selected.getHarmPerformFile()){
+                if(StrUtil.isEmpty(adverseEventsFile.getAdverseEventsUid())){
+                    list.add(adverseEventsFile);
+                }
             }
-        }
-        if (!CollectionUtils.isEmpty(list)) {
-            selected.getHarmPerformFile().removeAll(list);
+            if (!CollectionUtils.isEmpty(list)) {
+                selected.getHarmPerformFile().removeAll(list);
+            }
         }
 
         list = new ArrayList<>();
-        for(AdverseEventsFile adverseEventsFile : selected.getDeviceFaultPerformFile()){
-            if(StrUtil.isEmpty(adverseEventsFile.getAdverseEventsUid())){
-                list.add(adverseEventsFile);
+        if(selected.getDeviceFaultPerformFile() != null){
+            for(AdverseEventsFile adverseEventsFile : selected.getDeviceFaultPerformFile()){
+                if(StrUtil.isEmpty(adverseEventsFile.getAdverseEventsUid())){
+                    list.add(adverseEventsFile);
+                }
             }
-        }
-        if (!CollectionUtils.isEmpty(list)) {
-            selected.getDeviceFaultPerformFile().removeAll(list);
+            if (!CollectionUtils.isEmpty(list)) {
+                selected.getDeviceFaultPerformFile().removeAll(list);
+            }
         }
     }
 
