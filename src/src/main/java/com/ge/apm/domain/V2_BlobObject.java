@@ -368,7 +368,7 @@ public class V2_BlobObject implements Serializable {
     }
 
     public boolean showPreview() {
-        String type = objectName.substring(objectName.indexOf(".") + 1);
+        String type = objectName.substring(objectName.lastIndexOf(".") + 1);
         return showPreviewTypeList.contains(type.toLowerCase());
     }
 
