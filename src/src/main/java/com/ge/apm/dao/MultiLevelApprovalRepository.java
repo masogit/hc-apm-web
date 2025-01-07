@@ -72,4 +72,6 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Query(value = "select * from multi_level_approval where created_date = ( SELECT MAX ( created_date ) FROM multi_level_approval ml WHERE ml.business_uid = ?1 AND ml.actual_approver_date IS NOT NULL )", nativeQuery = true)
     public MultiLevelApproval getRecentApprove(String businessUid);
 
+    public List<MultiLevelApproval> findByBusinessTypeAndBusinessUid(int businessType,String businessUid);
+
 }
