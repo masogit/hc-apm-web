@@ -690,6 +690,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 		});
 	}
+	public void setSelectAll(){
+		selectCheckItemController.setSelectAll(false);
+		selectCheckItemController.clear();
+	}
 	public void closeDlg(){
 		objPairCheckItem=null;
 	}

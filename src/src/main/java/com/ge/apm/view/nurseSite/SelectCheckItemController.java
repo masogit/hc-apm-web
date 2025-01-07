@@ -39,6 +39,8 @@ public class SelectCheckItemController extends GenericCRUDUUIDController<NurseSi
 	private Map<String, Boolean> selectedMap;
 	private List<NurseSiteMaintainCheckItem> currentPage;
 
+    private Boolean selectAll;
+
     private ServerEventInterface callingController;
     private OrgInfo orgInfo;
     protected void init() {
@@ -110,6 +112,19 @@ public class SelectCheckItemController extends GenericCRUDUUIDController<NurseSi
         List<NurseSiteMaintainCheckItem> bySearchFilter = dao.findBySearchFilter(searchFilters);
         ((MaintainConfigController)callingController).saveSelectCheckList(bySearchFilter);
         selectedMap.clear();
+        selectAll = false;
 
+    }
+
+    public Boolean getSelectAll() {
+        return selectAll;
+    }
+
+    public void setSelectAll(Boolean selectAll) {
+        this.selectAll = selectAll;
+    }
+
+    public void clear(){
+        selectedMap.clear();
     }
 }

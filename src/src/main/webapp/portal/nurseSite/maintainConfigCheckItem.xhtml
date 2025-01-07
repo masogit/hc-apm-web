@@ -101,7 +101,7 @@
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label>分组：</label>
-                            <p:selectOneMenu autocomplete="false" id="groupName" value="#{maintainCheckItemController.selected.groupName}" editable="true" filter="true" filterMatchMode="startsWith">
+                            <p:selectOneMenu autocomplete="false" id="groupName" value="#{maintainCheckItemController.selected.groupName}" editable="true" filter="true" filterMatchMode="contains" autoWidth="200">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
                                 <f:selectItems value="#{maintainCheckItemController.groupNames}"/>
                             </p:selectOneMenu>
@@ -111,7 +111,7 @@
 							<p:inputText id="name" value="#{maintainCheckItemController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
 						</h:panelGroup>
 						<h:panelGroup>
-							<label>备注：</label>
+							<label>描述：</label>
 							<p:inputText id="description" value="#{maintainCheckItemController.selected.description}" />
 						</h:panelGroup>
                         <h:panelGroup >
