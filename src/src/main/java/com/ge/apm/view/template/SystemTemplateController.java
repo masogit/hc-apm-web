@@ -1,5 +1,6 @@
 package com.ge.apm.view.template;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 
 import com.ge.apm.domain.*;
@@ -179,28 +180,36 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     public void   saveTemplate(){
         if(uploadedFileObject==null){
+            WebUtil.addErrorMessage("上传文件为空！请上传文件");
             return;
         }
-        SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(this.selected.getTemplateType(), selectedOrg.getSiteUID());
-        if(systemTemplateValue == null){
-            systemTemplateValue = new SystemTemplateValue();
-            systemTemplateValue.setTemplateType(this.selected.getTemplateType());
-            systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
-            systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
-            systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
-            systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+        try{
+            logger.info("systemTemplate saveTemplate  selected:{} query............", JSON.toJSONString(selected));
+            SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(this.selected.getTemplateType(), selectedOrg.getSiteUID());
+            logger.info("systemTemplate saveTemplate  findFirstByTemplateTypeAndSiteUid  systemTemplateValue:{}", JSON.toJSONString(systemTemplateValue));
+            if(systemTemplateValue == null){
+                systemTemplateValue = new SystemTemplateValue();
+                systemTemplateValue.setTemplateType(this.selected.getTemplateType());
+                systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
+                systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
+                systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
+                systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+            }
+            systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
+            systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+            systemTemplateValue.setCreateBy(user.getUid());
+            systemTemplateValue.setCreateTime(new Date());
+            systemTemplateValueRepository.save(systemTemplateValue);
+            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+            uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+            blobService.saveBlobObject(uploadedFileObject);
+            WebUtil.addSuccessMessage("保存成功");
+        }catch (Exception e){
+            logger.error("systemTemplate saveTemplate  error:",e);
+            WebUtil.addErrorMessage("保存失败");
         }
-        systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
-        systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
-        systemTemplateValue.setCreateBy(user.getUid());
-        systemTemplateValue.setCreateTime(new Date());
-        systemTemplateValueRepository.save(systemTemplateValue);
-        uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-        uploadedFileObject.setBoUuid(systemTemplateValue.getId());
-        blobService.saveBlobObject(uploadedFileObject);
-
         file=null;
-
+        uploadedFileObject=null;
     }
 
 
