@@ -179,12 +179,14 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
 
     public void   saveTemplate(){
+        logger.info("systemTemplate saveTemplate  selected:{},uploadedFileObject:{} query............", JSON.toJSONString(selected),JSON.toJSONString(uploadedFileObject));
+
         if(uploadedFileObject==null){
+            logger.info("systemTemplate saveTemplate uploadedFileObject is null ");
             WebUtil.addErrorMessage("上传文件为空！请上传文件");
             return;
         }
         try{
-            logger.info("systemTemplate saveTemplate  selected:{} query............", JSON.toJSONString(selected));
             SystemTemplateValue   systemTemplateValue = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(this.selected.getTemplateType(), selectedOrg.getSiteUID());
             logger.info("systemTemplate saveTemplate  findFirstByTemplateTypeAndSiteUid  systemTemplateValue:{}", JSON.toJSONString(systemTemplateValue));
             if(systemTemplateValue == null){
