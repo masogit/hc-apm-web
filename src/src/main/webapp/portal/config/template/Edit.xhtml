@@ -7,8 +7,8 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDialog"
-              onHide="#{toBeTerminatedTemplateController.onSelect()}" width="1000" height="450" modal="true"
+    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDlg"
+               width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
               header="编辑系统模板">
         <h:form id="WoExportTemplateEditForm">
@@ -26,6 +26,14 @@
                             <label class="label">文件类型(必须一致)</label>
                             <h:outputText  value="#{systemTemplateController.selected.fileType}"/>
                         </h:panelGroup>
+
+
+
+                        <h:panelGroup>
+                            <label class="label">模板类型名称*</label>
+                            <p:inputText  value="#{systemTemplateController.systemTemplateValue.templateTypeName}" required="true"/>
+                        </h:panelGroup>
+
 
                         <h:panelGroup id="fileName">
                             <label class="label">文件名称</label>
@@ -50,12 +58,12 @@
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
-                                 actionListener="#{systemTemplateController.saveTemplate()}" value="#{msg.Save}"
+                                 actionListener="#{systemTemplateController.editTemplate()}" value="#{msg.Save}"
                                  update="display,:TemplateEditDlg, :TemplateListForm:datalist, :growl"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDialog');"/>
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDlg');"/>
                 &nbsp;&nbsp;
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                 onclick="PF('TemplateEditDialog').hide()"/>
+                                 onclick="PF('TemplateEditDlg').hide()"/>
             </h:panelGroup>
         </h:form>
     </p:dialog>
