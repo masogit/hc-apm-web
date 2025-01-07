@@ -44,6 +44,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -427,7 +428,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         info.put("产地", curItem.getOrigin());
         info.put("发票号", curItem.getInvoiceNum());
         if(curItem.getContractPrice()!=null){
-            info.put("合同价格", BigDecimal.valueOf(curItem.getContractPrice()));
+            DecimalFormat df = new DecimalFormat("0.00");
+            String price= df.format(curItem.getContractPrice());
+            info.put("合同价格",price);
         }
         info.put("合同号", curItem.getContractNum());
         info.put("供应商", curItem.getVendor());
