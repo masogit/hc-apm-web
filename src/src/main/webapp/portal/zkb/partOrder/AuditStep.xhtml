@@ -211,7 +211,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartsHighTypeGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.checkPcbMvsTotal()) and !(zkbPartOrderAuditController.zkbContract.contractType eq 'CCS' or zkbPartOrderAuditController.zkbContract.contractType eq 'Biomed')}">
+                        <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.checkPcbMvsTotal()) }">
                             <label class="label">保养申请*</label>
                             <p:selectOneMenu id="maintainFlag" disabled="true" value="#{zkbPartOrderAuditController.selected.maintainFlag}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
