@@ -2146,12 +2146,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (!Strings.isNullOrEmpty(orderId)) {
             filters.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId, "1*"));
         }else{
-            List<String> orderIds = getVisableMvsAssetSystemId();
+            TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+            Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+            String tenantUid = tenantInfo.get().getUid();
+            filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
+            List<String> assetUids = pmOrderService.getMvsAssectUidsStr(token);
+            if (CollectionUtils.isEmpty(assetUids)) {
+                assetUids.add("1++1");
+            }
+            filters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, assetUids));
+
+          /*  List<String> orderIds = getVisableMvsAssetSystemId();
             if (CollectionUtils.isEmpty(orderIds)) {
                 orderIds = new ArrayList<>();
                 orderIds.add("0");
-            }
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
+            }*/
+
+            //filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
             filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
             for (SearchFilter searchFilter : filterArrayList) {
                 if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
