@@ -291,7 +291,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) ||
                                 ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType()) ){
                                 Date date1 = DateUtil.parse("2024/11/22");
-                                if(date1.before(zkbContract.getCreatedDate())){
+                                if(date1.after(zkbContract.getCreatedDate())){
                                     zkbPartOrderStatusVo.setMaintainTips("该合同需要联系OTR添加 PM active entitlement；");
                                 }
                             }
