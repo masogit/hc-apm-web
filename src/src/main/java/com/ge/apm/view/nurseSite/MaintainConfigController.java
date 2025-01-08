@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.PageEvent;
@@ -120,13 +121,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private NurseSiteMaintainConfigCheckItem editCheckItem;
 
 	private Set<String> groupNames;
+
+	private SelectCheckItemController selectCheckItemController;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         searchController = WebUtil.getBean(SearchController.class);
         searchController.setCallingController(this);
         assetSelectController = WebUtil.getBean(AssetSelectController.class);
-        assetSelectController.setCallingController(this);
+		assetSelectController.setCallingController(this);
+		selectCheckItemController = WebUtil.getBean(SelectCheckItemController.class);
+		selectCheckItemController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		configMapper = WebUtil.getBean(NurseSiteMaintainConfigMapper.class);
@@ -222,6 +227,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     		try {
     			if("changeSite".equals(eventName)){
     				loadWholeCheckItem(currentUser.getTenantUID());
+					selectCheckItemController.onServerEvent("",assetSelectController.getSelectedOrg());
 				}else if ("change".equals(eventName)){
 					listCheckAssets=(List<AssetInfo>)eventObject;
 				}else{
@@ -626,6 +632,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		if(StringUtils.isBlank(objPairCheckItem.getFieldType())){
 			objPairCheckItem.setRequired(Boolean.FALSE);
 		}
+		if(StringUtils.isBlank(objPairCheckItem.getName())){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage("名称不能为空");
+			return;
+		}
     	if(this.internalCreate){
 			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
 				if(listPairCheckItem.getName().equals(objPairCheckItem.getName())){
@@ -654,6 +665,34 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 //		initObjPairCheckItem();
 		checkSaveDisable();
+	}
+	public void saveSelectCheckList(List<NurseSiteMaintainCheckItem> checkItems){
+		checkItems.forEach(checkItem->{
+			boolean b = listPairCheckItems.stream().anyMatch(item -> item.getName().equals(checkItem.getName()));
+			if(!b){
+				NurseSiteMaintainConfigCheckItem temp= new NurseSiteMaintainConfigCheckItem();
+				temp.setId(checkItem.getId());
+				temp.setName(checkItem.getName());
+				temp.setGroupName(checkItem.getGroupName());
+				temp.setKey(checkItem.getKey());
+				temp.setRequired(checkItem.getRequired());
+				temp.setDescription(checkItem.getDescription());
+				temp.setDefaultValue(checkItem.getDefaultValue());
+				temp.setFieldType(checkItem.getFieldType());
+				String options = checkItem.getOptions();
+				if(StringUtils.isNotEmpty(options)){
+					JSONArray objects = JSONArray.parseArray(options);
+					List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+					temp.setOptions(tableOptions);
+				}
+				listPairCheckItems.add(temp);
+			}
+
+		});
+	}
+	public void setSelectAll(){
+		selectCheckItemController.setSelectAll(false);
+		selectCheckItemController.clear();
 	}
 	public void closeDlg(){
 		objPairCheckItem=null;

@@ -507,8 +507,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         switch (multiLevelApproval.getBusinessType()) {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
-                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
-                v2_WorkOrderRepository.save(v2WorkOrder);
+                List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUid(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, multiLevelApproval.getBusinessUid());
+                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> item.getApprovalNodeStatus() == 0).collect(Collectors.toList());
+                if(CollectionUtils.isEmpty(filterList)){
+                    v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);
+                    v2_WorkOrderRepository.save(v2WorkOrder);
+                }
                 this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null,multiLevelApproval);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
@@ -979,7 +983,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
                                 List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(v2WorkOrder.getId());
                                 List<V2_WorkOrder_Detail> collect = workOrderDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
-                                if(CollectionUtils.isEmpty(collect)){
+                                List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUid(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, multiLevelApproval.getBusinessUid());
+                                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> item.getApprovalNodeStatus() == 0).collect(Collectors.toList());
+                                if(CollectionUtils.isEmpty(filterList)){
                                     v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                     v2_WorkOrderRepository.save(v2WorkOrder);
                                 }

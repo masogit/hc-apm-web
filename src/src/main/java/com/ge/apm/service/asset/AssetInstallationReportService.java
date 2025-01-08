@@ -3,10 +3,8 @@ package com.ge.apm.service.asset;
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.SystemTemplate;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -25,6 +23,7 @@ import webapp.framework.web.WebUtil;
 import javax.faces.context.FacesContext;
 import java.io.*;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +72,9 @@ public class AssetInstallationReportService {
     @Autowired
     private SystemTemplateValueRepository systemTemplateValueRepository;
 
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
+
     public Map<String, Object> createReportData(ArrivalListItem arrivalListItem){
 
 
@@ -100,7 +102,13 @@ public class AssetInstallationReportService {
         reportData.put("receipt_number", arrivalListItem.getArrivalList().getReceiptNumber());//入库单号
         reportData.put("contract_num", arrivalListItem.getArrivalList().getContractNum());//合同号
         reportData.put("invoice_num", arrivalListItem.getArrivalList().getInvoiceNum());//发票号
-        reportData.put("contract_price", arrivalListItem.getArrivalList().getContractPrice());//合同价格
+
+        if(arrivalListItem.getArrivalList().getContractPrice()!=null){
+            DecimalFormat df = new DecimalFormat("0.00");
+            String price= df.format(arrivalListItem.getArrivalList().getContractPrice());
+            reportData.put("contract_price", price);//合同价格
+        }
+
         reportData.put("contract_qua", arrivalListItem.getArrivalList().getQuantity());//数量
         reportData.put("manufacture", arrivalListItem.getArrivalList().getManufacture());//生产厂家
 
@@ -392,8 +400,14 @@ public class AssetInstallationReportService {
         String reportTypeTitle = "";
         if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
             reportTypeTitle = REPORT_TECHNOLOGY_TITLE;
+            if(isSyf()){
+                reportTypeTitle = "医疗设备安装报告_简易安装";
+            }
         }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
             reportTypeTitle = REPORT_BUSINESS_TITLE;
+            if(isSyf()){
+                reportTypeTitle = "医疗设备安装报告_正常安装";
+            }
         }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
             reportTypeTitle = REPORT_CLINICAL_TITLE;
         }else if(REPORT_TYPE_ASSET.equals(reportType)){
@@ -411,6 +425,11 @@ public class AssetInstallationReportService {
         }
     }
 
+    public boolean isSyf(){
+        String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
+        TenantInfo tanentIfo = tenantInfoDao.findByUid(currentTenantUid);
+        return "3".equals(tanentIfo.getCustomTenant());
+    }
     private String buildFileNameBatch(Map<String, Object> data, String reportType, boolean isEncoding){
 
         String contractNum = "";
