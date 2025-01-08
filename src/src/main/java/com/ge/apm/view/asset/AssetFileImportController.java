@@ -210,6 +210,7 @@ public class AssetFileImportController {
             canbeImported = checkresult.get("canBeImport");
             unCheckedNurseSite = checkresult.get("unCheckedNurseSite");
             filterErrorRecords();
+            logger.info("filter error records end");
 
         } catch (IOException e) {
             WebUtil.addErrorMessage("File can not be read!", null);
@@ -400,49 +401,48 @@ public class AssetFileImportController {
 
     public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
 
-        getDisplayAssetsNew();
+        filterErrorRecords();
     }
 
     public void filterErrorRecords() {
 
         if (!displayErrorsOnly) return;
 
-        if (importAssetMap == null) return;
+        if (CollectionUtils.isEmpty(displayAssetsNew)) {
+            displayErrorAssets = new ArrayList<>();
+            logger.info("filter error records is empty. ");
+            return;
+        }
+        List<AssetImport> result = new ArrayList<>();
+        for (AssetImport assetImport : displayAssetsNew) {
 
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        for (Map<String, Object> map : importAssetMap) {
-
-            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-            if (importStatus == null) continue;
-
-            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                result.add(map);
+            if (AssetFileImportService.ImportStatus.CheckFail.equals(assetImport.getImportStatus()) || AssetFileImportService.ImportStatus.Failure.equals(assetImport.getImportStatus())) {
+                result.add(assetImport);
             }
 
         }
-
-        displayAssets = result;
-
+        displayErrorAssets = result;
         if (importOrgMap == null) return;
-
         List<Map<String, Object>> resultMap = new ArrayList<>();
-
+        logger.info("filter org map start,size:{}", CollectionUtils.isNotEmpty(importOrgMap) ? importOrgMap.size() : 0);
         for (Map<String, Object> map : importOrgMap) {
-
-            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-            if (importStatus == null) continue;
-
-            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                resultMap.add(map);
+            try {
+                AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+                logger.info("importStatus:{}", importStatus);
+                if (importStatus == null) continue;
+                if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                    resultMap.add(map);
+                }
+            }catch (Exception e){
+                logger.info("convert failed:{}", e.getMessage());
             }
-
         }
-
+        logger.info("filter error org records successful. ");
         displayOrgs = resultMap;
     }
 
     List<Map<String, Object>> displayAssets;
+    List<AssetImport> displayErrorAssets;
 
     List<AssetImport> displayAssetsNew;
 
@@ -641,14 +641,7 @@ public class AssetFileImportController {
     public List<AssetImport> getDisplayAssetsNew() {
         logger.info("asset import result display error:{}", isDisplayErrorsOnly());
         if (isDisplayErrorsOnly()) {
-            List<AssetImport> error = new ArrayList<>();
-            for (AssetImport assetImport : displayAssetsNew) {
-                if (AssetFileImportBaseService.ImportStatus.Failure.equals(assetImport.getImportStatus()) || AssetFileImportBaseService.ImportStatus.CheckFail.equals(assetImport.getImportStatus())) {
-                    error.add(assetImport);
-                }
-            }
-            logger.info("error size:{}", error.size());
-            return error;
+            return displayErrorAssets;
         }
         return displayAssetsNew;
     }

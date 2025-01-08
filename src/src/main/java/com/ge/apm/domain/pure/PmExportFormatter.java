@@ -83,7 +83,7 @@ public class PmExportFormatter<T> {
 //            }else {
 //                map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
 //            }
-            map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18nRuleLevel,v2_pmOrder.getRuleLevel()));
+            map.put(ExportFields.RUNLEVEL.getChinese(), this.getFromI18(i18nRuleLevel,v2_pmOrder.getRuleLevel()));
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
             map.put(ExportFields.PMRULE.getChinese(), this.pmOrderRule.getName());

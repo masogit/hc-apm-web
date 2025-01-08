@@ -692,8 +692,8 @@ public class V2_WorkOrderService {
         return srApi.addUserSignature(signatureId);
     }
 
-    public List<V2_WorkOrder> findBySrNum(String srNum) {
-        V2_ServiceRequest request = srDao.findBySrNum(srNum);
+    public List<V2_WorkOrder> findBySrNum(String tenantUid, String srNum) {
+        V2_ServiceRequest request = srDao.findByTenantUIDAndSrNum(tenantUid, srNum);
         return woDao.findBySrId(request.getId());
     }
 }
