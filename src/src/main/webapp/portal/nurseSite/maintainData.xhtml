@@ -64,7 +64,7 @@
 													<p:calendar timeZone="GMT+8"  id="startTime" value="#{item2.getDataValue(item3.name).dateValue}"   rendered="#{ item3.fieldType eq 'Date'}"
 																pattern="yyyy/MM/dd"
 																showOn="button" showButtonPanel="true" navigator="true" mask="true">
-														<p:ajax  event="blur" process="@this" update="maintainDlgTable" />
+														<p:ajax  event="dateSelect" process="@this" update="maintainDlgTable" />
 													</p:calendar>
 											</h:panelGroup>
 											<h:panelGroup rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
