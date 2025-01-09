@@ -139,7 +139,7 @@
                     </foreach>
                     )
                 </if>
-            UNION ALL
+            <!--UNION ALL
             SELECT NULL AS assetId, NULL AS assetUid, NULL AS name,clinical_dept_uid clinicalDeptUid,org_name clinicalDeptName,qr_code qrCode,NULL departNum,NULL functionType,NULL financingNum,NULL assetStatus,NULL locationName,NULL institutionUid,NULL hospitalUid,NULL siteUid,comment,NULL isSolved,NULL inventoryCheckListItems,last_modified_by lastModifiedBy,last_modified_date lastModifiedDate,status FROM inventory_order_detail iod WHERE status = 2
                 <if test="orgUidList != null and orgUidList.size > 0">
                     AND (
@@ -160,7 +160,7 @@
                         #{item}
                     </foreach>
                     )
-                </if>
+                </if>-->
         ) t
     </sql>
 
