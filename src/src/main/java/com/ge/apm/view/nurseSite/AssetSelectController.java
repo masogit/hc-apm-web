@@ -6,6 +6,7 @@ import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -110,6 +111,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         return null;
     }
 
+    private Boolean isAllSelectedAssetGroup = Boolean.FALSE;
+
+    private List<I18nMessage> i18nMessageList;
+
+    private List<I18nMessage> listCheckI18nMessage;
     @Override
     protected void init() {
         assetSelectService = WebUtil.getBean(AssetSelectService.class);
@@ -122,6 +128,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         currentUser = UserContextService.getCurrentUserAccount();
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
         this.isSelectAll = Boolean.FALSE;
+        i18nMessageList = FieldValueMessageController.getFieldValueList("assetGroup");
     }
 
     public void loadData4Create() {
@@ -149,6 +156,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
         this.assets4Permit = null;
         this.assets5Permit=new ArrayList<>();
+        this.listCheckI18nMessage = new ArrayList<>();
+        this.isAllSelectedAssetGroup = false;
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
@@ -187,6 +196,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets4Maintain = new ArrayList<>();
         this.assets4Maintain.addAll(assetsWithoutSelected);
         this.assets5Maintain = new ArrayList<>(this.selectedAssets);
+        this.isAllSelectedAssetGroup = Boolean.FALSE;
+        this.listCheckI18nMessage = new ArrayList<>();
     }
 
 
@@ -514,6 +525,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+        if(!CollectionUtils.isEmpty(listCheckI18nMessage)){
+            List<String> collect = listCheckI18nMessage.stream().map(item -> item.getMsgKey()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.IN, collect, "1*"));
+        }
     }
 
     /**
@@ -609,7 +624,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
     }
 
-
+    public void updateSelectAllAssetGroup(){
+        if (Boolean.TRUE.equals(isAllSelectedAssetGroup)) {
+            listCheckI18nMessage = new ArrayList<>(i18nMessageList);
+        } else {
+            listCheckI18nMessage.clear();
+        }
+    }
+    public void updateItemAssetGroup() {
+        isAllSelectedAssetGroup = listCheckI18nMessage.size() == i18nMessageList.size();
+    }
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }
