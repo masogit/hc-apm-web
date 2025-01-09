@@ -77,6 +77,12 @@ public class SystemTemplate implements Serializable {
 
     @Transient
     private  String templateTypeNameValue;
+
+    @Transient
+    private  String fileNameValue;
+
+    @Transient
+    private  String valueStorageId;
     public enum SystemTemplateBusinessEnum{
         ARRIVAL_INSTALLATION("ARRIVAL_INSTALLATION","到货安装模块"),
         ASSET("ASSET","设备档案模块"),
@@ -133,10 +139,12 @@ public class SystemTemplate implements Serializable {
         ARRIVAL_ITEM("ARRIVAL_ITEM","导出安装单模板","excel",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"APM_AssetArrivalItem_Template.xlsx"),
         ARRIVAL_SUPPLIER_REPORT("ARRIVAL_SUPPLIER_REPORT","到货安装单模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ArrivalSupplierReportTemplate.docx"),
 
-        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
-        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
-        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
-        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
+        //到货安装验收模板调整为一个模板 需要用户自行添加子模板使用
+        ARRIVAL_ACCEPTANCE_REPORT("ARRIVAL_ACCEPTANCE_REPORT","到货安装验收报告","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
+//        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
+//        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
 
         FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
 
