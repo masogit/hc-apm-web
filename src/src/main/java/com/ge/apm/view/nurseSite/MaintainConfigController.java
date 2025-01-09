@@ -868,7 +868,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem,JSONObject jsonObject){
 		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
-		p.setId(checkItem.getId());
+		String id = checkItem.getId();
+		p.setId(id);
 		p.setName(checkItem.getName());
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
@@ -876,7 +877,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		String options = checkItem.getOptions();
 		p.setRequired(checkItem.getRequired());
 		p.setKey(checkItem.getKey());
-		p.setGroupName(jsonObject.getString("groupName"));
+		if(CollectionUtils.isNotEmpty(listWholeCheckItems) && StringUtils.isNotEmpty(id)){
+			Optional<String> first = listWholeCheckItems.stream().filter(item -> id.equals(item.getId()) && StringUtils.isNotEmpty(item.getGroupName())).map(NurseSiteMaintainCheckItem::getGroupName).findFirst();
+			if (first.isPresent()) {
+				p.setGroupName(first.get());
+			}else{
+				p.setGroupName(jsonObject.getString("groupName"));
+			}
+		}else{
+			p.setGroupName(jsonObject.getString("groupName"));
+		}
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
 		}else{
