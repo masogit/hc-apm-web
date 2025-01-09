@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SystemTemplateMapper">
+
+    <select id="searchSystemTemplate" resultType="com.ge.apm.domain.SystemTemplate">
+        select st.*,stv.id as valueId,stv.template_type_name as templateTypeNameValue from system_template st left join
+        system_template_value stv on st.template_type= stv.template_type and stv.site_uid=#{siteUid}
+
+        <where>
+            <if test="businessType != null ">
+                AND st.business_type =#{businessType}
+            </if>
+            <if test="templateType != null ">
+                AND st.template_type like   concat('%',#{templateType},'%')
+            </if>
+
+        </where>
+        order by st.create_time desc
+        LIMIT #{page} OFFSET #{offset}
+
+
+    </select>
+
+    <select id="searchSystemTemplateCount" resultType="long">
+        select count(*) from system_template st left join system_template_value stv on st.template_type=
+        stv.template_type and stv.site_uid=#{siteUid}
+        <where>
+            <if test="businessType != null ">
+                AND st.business_type =#{businessType}
+            </if>
+            <if test="templateType != null ">
+                AND st.template_type like   concat('%',#{templateType},'%')
+            </if>
+
+        </where>
+    </select>
+
+
+
+</mapper>
