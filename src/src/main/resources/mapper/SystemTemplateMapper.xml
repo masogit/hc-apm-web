@@ -3,7 +3,7 @@
 <mapper namespace="com.ge.apm.dao.mapper.SystemTemplateMapper">
 
     <select id="searchSystemTemplate" resultType="com.ge.apm.domain.SystemTemplate">
-        select st.*,stv.id as valueId,stv.template_type_name as templateTypeNameValue from system_template st left join
+        select st.*,stv.id as valueId,stv.template_type_name as templateTypeNameValue,stv.storage_id as valueStorageId,stv.file_name as fileNameValue  from system_template st left join
         system_template_value stv on st.template_type= stv.template_type and stv.site_uid=#{siteUid}
 
         <where>
@@ -35,6 +35,12 @@
         </where>
     </select>
 
+
+
+    <select id="findByKeyAndSiteForUseParentList" resultType="com.ge.apm.domain.SystemTemplate">
+        select st.*,stv.id as valueId,stv.template_type_name as templateTypeNameValue,stv.storage_id as valueStorageId  from system_template st left join system_template_value stv  on st.template_type = stv.template_type and stv.site_uid=#{siteUid}
+        where st.template_type=#{templateType}
+    </select>
 
 
 </mapper>
