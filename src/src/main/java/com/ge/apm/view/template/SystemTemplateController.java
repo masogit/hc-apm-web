@@ -329,7 +329,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     public void   editTemplate(){
         if(!selectedOrg.getSiteUID().equals(selected.getSiteUid())){
-            WebUtil.addErrorMessage("模板不是组织机构下面的不能删除");
+            WebUtil.addErrorMessage("模板不是组织机构下面的不能编辑");
             return;
         }
         try {
@@ -419,9 +419,11 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
     }
 
     public void resetSystemTemplate(String valueId) {
+        if(!selectedOrg.getSiteUID().equals(selected.getSiteUid())){
+            WebUtil.addErrorMessage("模板不是组织机构下面的不能删除");
+            return;
+        }
         systemTemplateValueRepository.deleteById(valueId);
         WebUtil.addSuccessMessage("子系统模板已删除");
-
-
     }
 }
