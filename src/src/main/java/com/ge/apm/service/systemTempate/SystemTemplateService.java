@@ -21,16 +21,6 @@ public class SystemTemplateService {
 
     public List<SystemTemplate> findByKeyAndSiteForUseParent(String templateType,UserAccount userAccount){
 
-        List<SystemTemplate> systemTemplates=systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,userAccount.getSiteUID());
-        if(CollectionUtils.isEmpty(systemTemplates) ||   systemTemplates.stream().anyMatch(item->item.getValueId()==null)){
-            systemTemplates=systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,userAccount.getHospitalUID());
-            if(CollectionUtils.isEmpty(systemTemplates) ||   systemTemplates.stream().anyMatch(item->item.getValueId()==null)){
-                systemTemplates=systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,userAccount.getInstitutionUID());
-            }
-            if(CollectionUtils.isEmpty(systemTemplates) ||   systemTemplates.stream().anyMatch(item->item.getValueId()==null)){
-                systemTemplates=systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,userAccount.getTenantUID());
-            }
-        }
-        return systemTemplates;
+        return systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,userAccount.getSiteUID(),userAccount.getHospitalUID(),userAccount.getInstitutionUID(),userAccount.getTenantUID());
     }
 }
