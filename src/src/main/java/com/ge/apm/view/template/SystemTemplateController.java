@@ -164,6 +164,9 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         param.put("page", pageRequest.getPageSize());
         param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
         param.put("siteUid", selectedOrg.getSiteUID());
+        param.put("hospitalUid", selectedOrg.getHospitalUID());
+        param.put("institutionUID", selectedOrg.getInstitutionUID());
+        param.put("tenantUid", selectedOrg.getTenantUID());
         covQueryCondition(this.searchFilters,param);
 
         List<SystemTemplate> list = systemTemplateMapper.searchSystemTemplate(param);
@@ -284,27 +287,35 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         file=null;
         uploadedFileObject=null;
     }
-    public void   addTemplate(){
-        if(uploadedFileObject==null){
+
+    public void addTemplate() {
+        if (uploadedFileObject == null) {
+            logger.info("systemTemplate saveTemplate uploadedFileObject is null ");
+            WebUtil.addErrorMessage("上传文件为空！请上传文件");
             return;
         }
-
+        try {
             systemTemplateValue.setTemplateType(this.selected.getTemplateType());
             systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
             systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
             systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
             systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+            systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
+            systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+            systemTemplateValue.setCreateBy(user.getUid());
+            systemTemplateValue.setCreateTime(new Date());
+            systemTemplateValueRepository.save(systemTemplateValue);
+            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+            uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+            blobService.saveBlobObject(uploadedFileObject);
 
-        systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
-        systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
-        systemTemplateValue.setCreateBy(user.getUid());
-        systemTemplateValue.setCreateTime(new Date());
-        systemTemplateValueRepository.save(systemTemplateValue);
-        uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-        uploadedFileObject.setBoUuid(systemTemplateValue.getId());
-        blobService.saveBlobObject(uploadedFileObject);
-
-        file=null;
+            WebUtil.addSuccessMessage("保存成功");
+        } catch (Exception e) {
+            logger.error("systemTemplate saveTemplate  error:", e);
+            WebUtil.addErrorMessage("保存失败");
+        }
+        file = null;
+        uploadedFileObject = null;
 
     }
 

@@ -15,5 +15,5 @@ public interface SystemTemplateMapper extends BaseMapper<SystemTemplate> {
 
     Long searchSystemTemplateCount(Map<String, Object> param);
 
-    List<SystemTemplate> findByKeyAndSiteForUseParentList(@Param("templateType") String templateType,@Param("siteUid") String siteUid);
+    List<SystemTemplate> findByKeyAndSiteForUseParentList(@Param("templateType") String templateType,@Param("siteUid") String siteUid,@Param("hospitalUid") String hospitalUid,@Param("institutionUid") String institutionUid,@Param("tenantUid") String tenantUid);
 }
