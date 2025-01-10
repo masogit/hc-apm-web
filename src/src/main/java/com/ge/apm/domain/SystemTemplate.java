@@ -83,6 +83,11 @@ public class SystemTemplate implements Serializable {
 
     @Transient
     private  String valueStorageId;
+    @Transient
+    private String siteUid;
+
+    @Transient
+    private boolean isEdit;
     public enum SystemTemplateBusinessEnum{
         ARRIVAL_INSTALLATION("ARRIVAL_INSTALLATION","到货安装模块"),
         ASSET("ASSET","设备档案模块"),

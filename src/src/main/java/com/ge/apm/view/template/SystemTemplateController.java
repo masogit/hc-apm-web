@@ -176,6 +176,9 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
                 systemTemplate.setTemplateTypeName(systemTemplate.getTemplateTypeNameValue());
             }
             systemTemplate.setOnlyId(systemTemplate.getValueId()==null?systemTemplate.getId():systemTemplate.getValueId());
+            if(selectedOrg.getSiteUID().equals(systemTemplate.getSiteUid())){
+                systemTemplate.setEdit(true);
+            }
         }
         Long count = systemTemplateMapper.searchSystemTemplateCount(param);
         return new PageImpl<>(list, pageRequest, count);
@@ -325,26 +328,29 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
 
     public void   editTemplate(){
-        if(uploadedFileObject!=null){
-            systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
-            systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
-
+        if(!selectedOrg.getSiteUID().equals(selected.getSiteUid())){
+            WebUtil.addErrorMessage("模板不是组织机构下面的不能删除");
+            return;
         }
-//        systemTemplateValue.setTemplateType(this.selected.getTemplateType());
-//        systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
-//        systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
-//        systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
-//        systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+        try {
+            if(uploadedFileObject!=null){
+                systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+                systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
 
-        systemTemplateValueRepository.save(systemTemplateValue);
-        if(uploadedFileObject!=null){
-            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-            uploadedFileObject.setBoUuid(systemTemplateValue.getId());
-            blobService.saveBlobObject(uploadedFileObject);
+            }
+            systemTemplateValueRepository.save(systemTemplateValue);
+            if(uploadedFileObject!=null){
+                uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+                uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+                blobService.saveBlobObject(uploadedFileObject);
+            }
+            WebUtil.addSuccessMessage("编辑成功");
+        }catch (Exception e){
+            logger.error("systemTemplate editTemplate  error:", e);
+            WebUtil.addErrorMessage("编辑失败");
         }
-
         file=null;
-
+        uploadedFileObject=null;
     }
 
 
