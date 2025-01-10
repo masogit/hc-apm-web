@@ -112,17 +112,14 @@
                         <f:facet name="{Toolbar}">
 
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="添加子类型模板" actionListener="#{systemTemplateController.prepareCreate}" process="@this"  update=":TemplateAddDlg"  oncomplete="PF('TemplateAddDlg').show()"   disabled="#{empty systemTemplateController.selected}"/>
-
-
-
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                              actionListener="#{systemTemplateController.prepareEdit()}"
                                              update=":TemplateEditDlg"  title="编辑子类型模板"
                                              oncomplete="PF('TemplateEditDlg').show()"
-                                             disabled="#{ empty systemTemplateController.selected.valueId }"/>
-
+                                             disabled="#{!systemTemplateController.selected.edit }"/>
+<!--                            disabled="#{ empty systemTemplateController.selected.valueId }"-->
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
-                                             title="#{msg.Delete}" disabled="#{empty  systemTemplateController.selected.valueId   }"
+                                             title="#{msg.Delete}"  disabled="#{!systemTemplateController.selected.edit }"
                                              actionListener="#{systemTemplateController.resetSystemTemplate(systemTemplateController.selected.valueId )}" update="TemplateListForm">
                                 <p:confirm header="确定删除系统模板中这个子系统模板?" message="确定删除系统模板中这个子系统模板?" icon="ui-icon-alert"/>
                             </p:commandButton>
