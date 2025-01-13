@@ -9,6 +9,7 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.mapper.SystemTemplateMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -33,6 +35,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -65,6 +68,8 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
     private SystemTemplateValue systemTemplateValue;
 
     private SystemTemplateMapper systemTemplateMapper;
+
+    private SystemTemplateService systemTemplateService;
     @Getter
     @Setter
     private List<OrgInfo> affiliationDepartmentGroup = new ArrayList<>();
@@ -84,6 +89,7 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
         systemTemplateValueRepository = WebUtil.getBean(SystemTemplateValueRepository.class);
         systemTemplateMapper = WebUtil.getBean(SystemTemplateMapper.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
 
@@ -184,39 +190,110 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
     }
 
 
+    @Transactional
     public void addTemplate() {
-        if (uploadedFileObject == null) {
-            logger.info("systemTemplate saveTemplate uploadedFileObject is null ");
-            WebUtil.addErrorMessage("上传文件为空！请上传文件");
-            return;
-        }
         try {
-            systemTemplateValue.setTemplateType(this.selected.getTemplateType());
-            systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
-            systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
-            systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
-            systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
-            systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
-            systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
-            systemTemplateValue.setCreateBy(user.getUid());
-            systemTemplateValue.setCreateTime(new Date());
-            systemTemplateValueRepository.save(systemTemplateValue);
-            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-            uploadedFileObject.setBoUuid(systemTemplateValue.getId());
-            blobService.saveBlobObject(uploadedFileObject);
-
-            WebUtil.addSuccessMessage("保存成功");
+            saveSubTemplate();
         } catch (Exception e) {
             logger.error("systemTemplate saveTemplate  error:", e);
             WebUtil.addErrorMessage("保存失败");
         }
         file = null;
         uploadedFileObject = null;
+    }
 
+    private void saveSubTemplate() {
+
+        if (uploadedFileObject == null) {
+            logger.info("systemTemplate saveTemplate uploadedFileObject is null ");
+            WebUtil.addErrorMessage("上传文件为空！请上传文件");
+            return;
+        }
+        handlerSubSystemTemplate();
+        systemTemplateValue.setTemplateType(this.selected.getTemplateType());
+        systemTemplateValue.setTenantUid(selectedOrg.getTenantUID());
+        systemTemplateValue.setInstitutionUid(selectedOrg.getInstitutionUID());
+        systemTemplateValue.setHospitalUid(selectedOrg.getHospitalUID());
+        systemTemplateValue.setSiteUid(selectedOrg.getSiteUID());
+        systemTemplateValue.setFileName(uploadedFileObject.getObjectName());
+        systemTemplateValue.setStorageId(uploadedFileObject.getObjectStorageId());
+        systemTemplateValue.setCreateBy(user.getUid());
+        systemTemplateValue.setCreateTime(new Date());
+        systemTemplateValueRepository.save(systemTemplateValue);
+        uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
+        uploadedFileObject.setBoUuid(systemTemplateValue.getId());
+        blobService.saveBlobObject(uploadedFileObject);
+        handlerSubOrgInfoSystemTemplate();
+        WebUtil.addSuccessMessage("保存成功");
     }
 
 
+    //处理当前组织添加的子模版 需要查看当前组织下的子组织是否自己添加过子模版 如果添加过需要吧这个模板添加到子组织的模板里
+    private void handlerSubOrgInfoSystemTemplate() {
+        if(selectedOrg.getOrgLevel()>2){
+            return;
+        }
+        List<SystemTemplateValue> systemTemplateValues = systemTemplateService.getOrgInfoSubSystemTemplate(selectedOrg.getTenantUID(), selected.getTemplateType());
+        List<SystemTemplateValue> collect = systemTemplateValues.stream().filter(item -> !item.getSiteUid().equals(selectedOrg.getTenantUID())).collect(Collectors.toList());
+        if(selectedOrg.getOrgLevel()==2){
+            collect = systemTemplateValues.stream().filter(item -> item.getHospitalUid().equals(selectedOrg.getHospitalUID()) &&  !item.getSiteUid().equals(item.getHospitalUid() ) ).collect(Collectors.toList());
+        }
+        if(selectedOrg.getOrgLevel()==1){
+            collect = systemTemplateValues.stream().filter(item -> item.getInstitutionUid().equals(selectedOrg.getInstitutionUID()) &&  !item.getSiteUid().equals(item.getInstitutionUid() ) ).collect(Collectors.toList());
+        }
+        if (CollectionUtils.isNotEmpty(collect)) {
+            List<SystemTemplateValue> distinctSystemTemplateValue = collect.stream()
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(
+                                    SystemTemplateValue::getSiteUid,
+                                    SystemTemplateValue -> SystemTemplateValue,
+                                    (existing, replacement) -> existing
+                            ),
+                            map -> new ArrayList<>(map.values())
+                    ));
+            List<SystemTemplateValue> templateValues = new ArrayList<>();
+            for (SystemTemplateValue templateValue : distinctSystemTemplateValue) {
+                SystemTemplateValue systemTemplateValue1 = new SystemTemplateValue();
+                systemTemplateValue1.setSiteUid(templateValue.getSiteUid());
+                systemTemplateValue1.setHospitalUid(templateValue.getHospitalUid());
+                systemTemplateValue1.setInstitutionUid(templateValue.getInstitutionUid());
+                systemTemplateValue1.setTenantUid(templateValue.getTenantUid());
+                systemTemplateValue1.setTemplateType(templateValue.getTemplateType());
+                systemTemplateValue1.setTemplateTypeName(systemTemplateValue.getTemplateTypeName());
+                systemTemplateValue1.setStorageId(systemTemplateValue.getStorageId());
+                systemTemplateValue1.setFileName(systemTemplateValue.getFileName());
+                systemTemplateValue1.setCreateBy(systemTemplateValue.getCreateBy());
+                systemTemplateValue1.setCreateTime(new Date());
+                templateValues.add(systemTemplateValue1);
+            }
+            systemTemplateValueRepository.save(templateValues);
+        }
+    }
 
+
+    //处理当前组织如果是第一次添加子模板需要把他上级组织的模板添加到他的组织下面
+    public void handlerSubSystemTemplate(){
+        List<SystemTemplate> byKeyAndSiteForUseParent = systemTemplateService.findByKeyAndSiteForUseParent(selected.getTemplateType(), selectedOrg.getSiteUID(),selectedOrg.getHospitalUID(),selectedOrg.getInstitutionUID(),selectedOrg.getTenantUID());
+        List<SystemTemplate> filterSite = byKeyAndSiteForUseParent.stream().filter(item -> !selectedOrg.getSiteUID().equals(item.getSiteUid())).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(filterSite)){
+            List<SystemTemplateValue> systemTemplateValues = new ArrayList<>();
+            for (SystemTemplate systemTemplate : filterSite) {
+                SystemTemplateValue systemTemplateValue1 = new SystemTemplateValue();
+                systemTemplateValue1.setTemplateTypeName(systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
+                systemTemplateValue1.setTemplateType(systemTemplate.getTemplateType());
+                systemTemplateValue1.setCreateTime(new Date());
+                systemTemplateValue1.setCreateBy(user.getName());
+                systemTemplateValue1.setFileName(systemTemplate.getFileNameValue()!=null?systemTemplate.getFileNameValue():systemTemplate.getFileName());
+                systemTemplateValue1.setStorageId(systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId());
+                systemTemplateValue1.setTenantUid(selectedOrg.getTenantUID());
+                systemTemplateValue1.setInstitutionUid(selectedOrg.getInstitutionUID());
+                systemTemplateValue1.setHospitalUid(selectedOrg.getHospitalUID());
+                systemTemplateValue1.setSiteUid(selectedOrg.getSiteUID());
+                systemTemplateValues.add(systemTemplateValue1);
+            }
+            systemTemplateValueRepository.save(systemTemplateValues);
+        }
+    }
 
 
 
