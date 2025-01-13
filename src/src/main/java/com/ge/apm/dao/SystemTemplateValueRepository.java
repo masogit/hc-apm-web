@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.List;
+
 
 public interface SystemTemplateValueRepository extends GenericRepositoryUUID<SystemTemplateValue> {
 
@@ -37,5 +39,9 @@ public interface SystemTemplateValueRepository extends GenericRepositoryUUID<Sys
     @Transactional
     @Query(value = "delete from system_template_value where id =?1  ", nativeQuery = true)
     int deleteById(String valueId);
+
+
+    @Query(value = "select * from system_template_value where tenant_uid =?1  and template_type=?2 ", nativeQuery = true)
+    List<SystemTemplateValue> findByTenantUidAndTemplateType(String tenantUID,String templateType);
 
 }
