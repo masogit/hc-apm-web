@@ -187,6 +187,7 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
     @Override
     public void prepareEdit()   {
         systemTemplateValue= systemTemplateValueRepository.findById(selected.getValueId());
+
     }
 
 
