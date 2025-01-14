@@ -82,7 +82,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("issue_desc", WebUtil.getMessage("FaultDescription_xlsx"));
 
         COPY_KEY_MAPPING.put("order_comment", WebUtil.getMessage("LatestDevelopments"));
-        COPY_KEY_MAPPING.put("order_usedPart", WebUtil.getMessage("PartName"));
+        COPY_KEY_MAPPING.put("order_usedPart", "拟更换配件");
         COPY_KEY_MAPPING.put("fix_org_name", WebUtil.getMessage("OuterRepairOrgName"));
         COPY_KEY_MAPPING.put("fix_status", WebUtil.getMessage("WorkorderStatus_xlsx"));
         COPY_KEY_MAPPING.put("fix_hours", WebUtil.getMessage("TotalManhours_xlsx"));
@@ -118,7 +118,7 @@ public class WorkOrderDocxRenderService {
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             template.registerPolicy("part_table", new PartTableRenderPolicy());
-            template.registerPolicy  ("proceed_table", new ProceedTableRenderPolicy());
+            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
             template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
