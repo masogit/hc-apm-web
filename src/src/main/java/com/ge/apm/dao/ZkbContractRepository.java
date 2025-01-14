@@ -104,9 +104,12 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
     @Query(value = "select distinct c.tenant_uid from zkb_contract c where c.start_date = ?1 ", nativeQuery = true)
     List<String> queryByStartDate(Date d1);
 
-    @Query(value = "select district a.tenant_uid from  zkb_ib_cross_user_status s inner join user_account a on s.login_name = a.login_name ", nativeQuery = true)
+    @Query(value = "select distinct a.tenant_uid from  zkb_ib_cross_user_status s inner join user_account a on s.login_name = a.login_name ", nativeQuery = true)
     List<String> queryTenantUidByStatus();
 
     @Query(value = "SELECT count(id)  from zkb_contract c where c.tenant_uid = ?1 and (c.contract_type = 'Biomed' or c.contract_type = 'PCB MVS')", nativeQuery = true)
     Integer fetchContractCount(String tenantUid);
+
+    @Query(value = "select * from zkb_contract c where c.tenant_uid = ?1 and c.start_date < ?2 and c.end_date >= ?2 ", nativeQuery = true)
+    List<ZkbContract> queryByTenantAndDate(String tenantUid, Date date);
 }

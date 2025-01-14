@@ -41,6 +41,17 @@ public class ZkbIntegral implements Serializable {
     @Size(max = 50)
     private String modifyReason;
 
+    @Column(name = "last_clear_date")
+    private Date lastClearDate;
+
+    public Date getLastClearDate() {
+        return lastClearDate;
+    }
+
+    public void setLastClearDate(Date lastClearDate) {
+        this.lastClearDate = lastClearDate;
+    }
+
     public String getModifyReason() {
         return modifyReason;
     }

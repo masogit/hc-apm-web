@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="积分申请"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbIntegralOrderListForm">
+                    <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
+                        <p:commandButton value="待办 #{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.pendingQty}"  process="@this" update="datalist buttonSet" disabled="#{empty zkbIntegralOrderListController.queryStatus}" rendered="#{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.showPendingStatusBtn and !(userContextService.isZkbUser())}" action="#{zkbIntegralOrderListController.queryListByStatus('')}" />
+                        <p:commandButton value="待工程师资质审批 #{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.pendingEngineerQualificationQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbIntegralOrderListController.queryStatus eq 'EngineerQualificationPending'}" rendered="#{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.showStatusBtn}" action="#{zkbIntegralOrderListController.queryListByStatus('EngineerQualificationPending')}" />
+                        <p:commandButton value="待经理审批 #{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.pendingManageQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbIntegralOrderListController.queryStatus eq 'ManagePending'}" rendered="#{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.showStatusBtn}" action="#{zkbIntegralOrderListController.queryListByStatus('ManagePending')}" />
+                        <p:commandButton value="待下单 #{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.pendingOrderQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbIntegralOrderListController.queryStatus eq 'OrderPending'}" rendered="#{zkbIntegralOrderListController.zkbIntegralOrderStatusVo.showStatusBtn}" action="#{zkbIntegralOrderListController.queryListByStatus('OrderPending')}" />
+                        <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbIntegralOrderListController.queryStatus eq 'all'}" rendered="true" action="#{zkbIntegralOrderListController.queryListByStatus('all')}" />
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" value="#{zkbIntegralOrderListController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbIntegralOrderListController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+
+                        <p:ajax event="rowSelect" listener="#{zkbIntegralOrderListController.prepareEdit}" update="editButton"/>
+                        <p:ajax event="rowDblselect" listener="#{zkbIntegralOrderListController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
+                        <p:ajax event="filter" listener="#{zkbIntegralOrderListController.onFilter}" />
+
+                        <p:column headerText="#{msg.zkbContact_tenant}" filterBy="#{item.tenantName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.tenantName}"/>
+                        </p:column>
+
+                        <p:column headerText="申请编号" filterBy="#{item.integralOrderNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.integralOrderNo}"/>
+                        </p:column>
+                         <p:column headerText="订单类型" filterBy="#{item.orderType}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbIntegralOrderType',item.orderType)}"/>
+                             <f:facet name="filter">
+                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbIntegralOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                 </p:selectOneMenu>
+                             </f:facet>
+                        </p:column>
+                        <p:column headerText="zone" filterBy="#{item.zone}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.zone}" />
+                        </p:column>
+
+                        <p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.assetInfo.name}" />
+                        </p:column>
+
+                        <p:column headerText="Sys ID" filterBy="#{item.assetInfo.systemId}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.systemId}"/>
+                        </p:column>
+                        <p:column headerText="设备类型" filterBy="#{item.assetInfo.assetGroup}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="报修单号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+
+                        <p:column headerText="合同号" filterBy="#{item.contractNo}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+                        <p:column headerText="产品型号" filterBy="#{item.productNumber}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.productNumber}"/>
+                        </p:column>
+
+                        <p:column headerText="申请人" filterBy="#{item.requestUser}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.requestUser}"/>
+                        </p:column>
+
+                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbIntegralOrderSteps',item.currentStep)}"/>
+                            <f:facet name="filter">
+                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbIntegralOrderSteps')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="状态" filterBy="#{item.status}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbIntegralOrderStatus',item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbIntegralOrderStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="申请日期"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.requestDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbIntegralOrderListController.createAction}"  disabled="#{empty zkbIntegralOrderListController.selectionTenantInfo}" rendered="#{userContextService.zkbUser}"/>
+                            <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbIntegralOrderListController.editAction}" disabled="#{empty zkbIntegralOrderListController.selected.id}"/>
+                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbIntegralOrderListController.delete}" update=":zkbIntegralOrderListForm:datalist, :growl"  >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbIntegralOrderListController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbIntegralOrderListController.exportFile}"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+</ui:composition>
