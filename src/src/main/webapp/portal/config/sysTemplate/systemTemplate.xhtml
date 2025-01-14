@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="系统模板管理"/>
+                </div>
+                <h:form id="TemplateListForm">
+
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{sysConfigTemplateController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0;" mode="native">
+                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{sysConfigTemplateController.onSelectSiteTreeNode}" update="TemplateListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+
+<!--                    <p:commandButton id="resetSystemTemplate"  value="重置系统模板" title="重置刺痛模板" update="TemplateListForm" actionListener="#{sysConfigTemplateController.resetSystemTemplate()}" style="float: right">-->
+
+<!--                        <p:confirm header="确定重置该组织机构下面的系统模板?" message="确定重置该组织机构下面的系统模板?" icon="ui-icon-alert"/>-->
+<!--                    </p:commandButton>-->
+
+
+
+
+
+
+                    <p:dataTable id="datalist" value="#{sysConfigTemplateController.lazyModel}" var="item"
+                                 widgetVar="datalist"
+                                 selectionMode="single" selection="#{sysConfigTemplateController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.onlyId}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect"
+                                update="editButton  createButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{sysConfigTemplateController.onFilter}" />
+                        <p:column headerText="业务类型" sortBy="#{item.businessType}" filterBy="#{item.businessType}"
+                                  filterMatchMode="EQ">
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{sysConfigTemplateController.businessType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{sysConfigTemplateController.getBusinessTypes()}" var="item" itemLabel="#{item.name}" itemValue="#{item.code}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{sysConfigTemplateController.getBusinessName(item.businessType)}"/>
+                        </p:column>
+                        <p:column headerText="模板类型">
+                            <h:outputText value="#{sysConfigTemplateController.getTemplateName(item.templateType)}"/>
+                        </p:column>
+
+                        <p:column headerText="模板类型名称"
+                                  filterMatchMode="EQ">
+                            <h:outputText value="#{item.templateTypeName}"/>
+                        </p:column>
+
+                        <p:column headerText="文件类型"
+                               >
+                            <h:outputText value="#{item.fileType}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.TemplateFile}">
+                            <p:commandLink value="#{item.fileNameValue!=null?item.fileNameValue:item.fileName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.valueStorageId!=null?item.valueStorageId:item.storageId)}" styleClass="p-mr-2"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+
+                            <p:commandButton id="createButton" icon="ui-icon-plus" title="添加子类型模板" actionListener="#{sysConfigTemplateController.prepareCreate}" process="@this"  update=":TemplateAddDlg"  oncomplete="PF('TemplateAddDlg').show()"   disabled="#{empty sysConfigTemplateController.selected}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             actionListener="#{sysConfigTemplateController.prepareEdit()}"
+                                             update=":TemplateEditDlg"  title="编辑子类型模板"
+                                             oncomplete="PF('TemplateEditDlg').show()"
+                                             disabled="#{!sysConfigTemplateController.selected.edit }"/>
+<!--                            disabled="#{ empty sysConfigTemplateController.selected.valueId }"-->
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                             title="#{msg.Delete}"  disabled="#{!sysConfigTemplateController.selected.edit }"
+                                             actionListener="#{sysConfigTemplateController.resetSystemTemplate(sysConfigTemplateController.selected.valueId)}" update="TemplateListForm">
+                                <p:confirm header="确定删除系统模板中这个子系统模板?" message="确定删除系统模板中这个子系统模板?" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Add.xhtml"/>
+
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

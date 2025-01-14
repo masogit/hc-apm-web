@@ -31,11 +31,12 @@ public class SystemTemplate implements Serializable {
 
 
     @Column(name = "file_type")
-    private String fileType;  //模板类型 唯一
+    private String fileType;
 
     @Column(name = "template_type")
     private String templateType;  //模板类型
-
+    @Column(name = "template_type_name")
+    private String templateTypeName;  //模板类型名称
     @Column(name = "business_type")
     private String businessType;  //业务类型
 
@@ -66,7 +67,27 @@ public class SystemTemplate implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate = new Date();
 
+    @Transient
+    private  String valueId;
 
+
+    @Transient
+    private  String onlyId;
+
+
+    @Transient
+    private  String templateTypeNameValue;
+
+    @Transient
+    private  String fileNameValue;
+
+    @Transient
+    private  String valueStorageId;
+    @Transient
+    private String siteUid;
+
+    @Transient
+    private boolean isEdit;
     public enum SystemTemplateBusinessEnum{
         ARRIVAL_INSTALLATION("ARRIVAL_INSTALLATION","到货安装模块"),
         ASSET("ASSET","设备档案模块"),
@@ -123,10 +144,12 @@ public class SystemTemplate implements Serializable {
         ARRIVAL_ITEM("ARRIVAL_ITEM","导出安装单模板","excel",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"APM_AssetArrivalItem_Template.xlsx"),
         ARRIVAL_SUPPLIER_REPORT("ARRIVAL_SUPPLIER_REPORT","到货安装单模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ArrivalSupplierReportTemplate.docx"),
 
-        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
-        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
-        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
-        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
+        //到货安装验收模板调整为一个模板 需要用户自行添加子模板使用
+        ARRIVAL_ACCEPTANCE_REPORT("ARRIVAL_ACCEPTANCE_REPORT","到货安装验收报告","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
+//        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
+//        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
 
         FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
 
@@ -360,10 +383,42 @@ public class SystemTemplate implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public String getTemplateTypeName() {
+        return templateTypeName;
+    }
+
+    public void setTemplateTypeName(String templateTypeName) {
+        this.templateTypeName = templateTypeName;
+    }
+
+    public String getValueId() {
+        return valueId;
+    }
+
+    public void setValueId(String valueId) {
+        this.valueId = valueId;
+    }
+
+    public String getTemplateTypeNameValue() {
+        return templateTypeNameValue;
+    }
+
+    public void setTemplateTypeNameValue(String templateTypeNameValue) {
+        this.templateTypeNameValue = templateTypeNameValue;
+    }
+
+    public String getOnlyId() {
+        return onlyId;
+    }
+
+    public void setOnlyId(String onlyId) {
+        this.onlyId = onlyId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (onlyId != null ? onlyId.hashCode() : 0);
         return hash;
     }
 
@@ -379,7 +434,7 @@ public class SystemTemplate implements Serializable {
             return false;
         }
         SystemTemplate other = (SystemTemplate) object;
-        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+        return (this.onlyId != null || other.onlyId == null) && (this.onlyId == null || this.onlyId.equals(other.onlyId));
     }
 
     @Override

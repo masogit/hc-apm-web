@@ -81,6 +81,9 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("issue_device_stop_time", WebUtil.getMessage("DownTime_xlsx"));
         COPY_KEY_MAPPING.put("issue_desc", WebUtil.getMessage("FaultDescription_xlsx"));
 
+        COPY_KEY_MAPPING.put("order_comment", WebUtil.getMessage("LatestDevelopments"));
+        COPY_KEY_MAPPING.put("order_usedPart", "拟更换配件");
+        COPY_KEY_MAPPING.put("fix_org_name", WebUtil.getMessage("OuterRepairOrgName"));
         COPY_KEY_MAPPING.put("fix_status", WebUtil.getMessage("WorkorderStatus_xlsx"));
         COPY_KEY_MAPPING.put("fix_hours", WebUtil.getMessage("TotalManhours_xlsx"));
         COPY_KEY_MAPPING.put("fix_fee", WebUtil.getMessage("TotalRepairPrice_xlsx"));
@@ -115,7 +118,7 @@ public class WorkOrderDocxRenderService {
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             template.registerPolicy("part_table", new PartTableRenderPolicy());
-            template.registerPolicy  ("proceed_table", new ProceedTableRenderPolicy());
+            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
             template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
@@ -157,6 +160,38 @@ public class WorkOrderDocxRenderService {
         if(size<5){
             for (int i = size; i < 5; i++) {
                 mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("auditOpinionList")) {
+            List<String> auditOpinionList= (List) source.get("auditOpinionList");
+            size = auditOpinionList.size();
+            for (int i = 0; i < size; i++) {
+                String opinion = auditOpinionList.get(i);
+                target.put("audit_opinion_title" + i, "备件审核意见： ");
+                target.put("auditOpinionList" + i, opinion);
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                target.put("audit_opinion_title" + i, "");
+                target.put("auditOpinionList" + i, "");
+            }
+        }
+        size=0;
+        if (source.containsKey("auditDateList")) {
+            List<String> auditDateList= (List) source.get("auditDateList");
+            size = auditDateList.size();
+            for (int i = 0; i < size; i++) {
+                String date = auditDateList.get(i);
+                target.put("audit_date_title" + i, "备件审核时间： ");
+                target.put("auditDateList" + i, date);
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                target.put("audit_date_title" + i, "");
+                target.put("auditDateList" + i, "");
             }
         }
         size=0;

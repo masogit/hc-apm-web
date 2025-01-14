@@ -4,8 +4,10 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -151,6 +153,8 @@ public class ExportTerminatedAppraisalService {
         Map<String, Object> datas = getData(assetInfo);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+        template.registerPolicy("list", new AssetScrapConvertRenderPolicy());
+
         template.render(datas);
         try {
             template.write(out);
@@ -216,7 +220,7 @@ public class ExportTerminatedAppraisalService {
             }
             List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
-            List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(assetScrap.getBusinessUid());
+            List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.getByBusinessUidList(assetScrap.getBusinessUid());
             Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
             listMap.forEach((id, approvalList) -> {
                 List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
@@ -234,6 +238,18 @@ public class ExportTerminatedAppraisalService {
             if(levelApprovals.size()>3){
                 logger.info("审批节点大于三");
             }
+            List<Map<String, Object>> list = new ArrayList<>();
+            for(MultiLevelApproval multiLevelApproval : multiLevelApprovals){
+                Map<String, Object> mm = new HashMap<>();
+                mm.put("actualApproverName", multiLevelApproval.getActualApproverName());
+                mm.put("approvalOpinion", multiLevelApproval.getApprovalOpinion());
+                mm.put("actualApproverDate", DateUtil.format(multiLevelApproval.getActualApproverDate(), "yyyy-MM-dd HH:mm:ss"));
+                byte[] levelSignatureBytes = getSignatureBytes(multiLevelApproval.getAuditSignature());
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(levelSignatureBytes);
+                mm.put("signature", inputStream);
+                list.add(mm);
+            }
+            map.put("list", list);
         }
 
 
@@ -280,12 +296,7 @@ public class ExportTerminatedAppraisalService {
             }
         }
         if (templateBytes == null) {
-            String fileName = null;
-            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
-                fileName = "terminated_template_zh.docx";
-            } else {
-                fileName = "terminated_template_en.docx";
-            }
+            String fileName  = "terminated_template_zh.docx";
             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/" + fileName));
         }
         return templateBytes;

@@ -44,10 +44,12 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
             XWPFTable table = doc.insertNewTable(run,1,maxCell);
             this.render(table, data);
 //            run.setText("", 23); // 清除页面标签
-            runTemplate.getRun().setText("", 0);
+//            runTemplate.getRun().setText("", 0);
         } catch (Exception var10) {
-            logger.error("dynamic table error:" + var10.getMessage(), var10);
+            var10.printStackTrace();
+            logger.info("dynamic table error:" + var10.getMessage(), var10);
         }
+        runTemplate.getRun().setText("", 0);
     }
     public void render(XWPFTable table, Object data) {
         if(data instanceof List){
