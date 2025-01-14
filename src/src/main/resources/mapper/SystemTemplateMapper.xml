@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SystemTemplateMapper">
+
+    <select id="searchSystemTemplate" resultType="com.ge.apm.domain.SystemTemplate">
+        SELECT
+            st.*,
+            COALESCE(stv_site.id, stv_hospital.id, stv_institution.id, stv_tenant.id) as valueId,
+            COALESCE(stv_site.template_type_name, stv_hospital.template_type_name, stv_institution.template_type_name, stv_tenant.template_type_name) as templateTypeNameValue,
+            COALESCE(stv_site.storage_id, stv_hospital.storage_id, stv_institution.storage_id, stv_tenant.storage_id) as valueStorageId,
+            COALESCE(stv_site.file_name, stv_hospital.file_name, stv_institution.file_name, stv_tenant.file_name) as fileNameValue,
+            COALESCE(stv_site.site_uid, stv_hospital.site_uid, stv_institution.site_uid, stv_tenant.site_uid) as siteUid
+        FROM system_template st
+                 LEFT JOIN system_template_value stv_site
+                           ON st.template_type = stv_site.template_type AND stv_site.site_uid = #{siteUid}
+                 LEFT JOIN system_template_value stv_hospital
+                           ON st.template_type = stv_hospital.template_type AND stv_hospital.site_uid = #{hospitalUid}
+                               AND stv_site.id IS NULL
+                 LEFT JOIN system_template_value stv_institution
+                           ON st.template_type = stv_institution.template_type AND stv_institution.site_uid = #{institutionUid}
+                               AND stv_site.id IS NULL AND stv_hospital.id IS NULL
+                 LEFT JOIN system_template_value stv_tenant
+                           ON st.template_type = stv_tenant.template_type AND stv_tenant.site_uid = #{tenantUid}
+                               AND stv_site.id IS NULL AND stv_hospital.id IS NULL AND stv_institution.id IS NULL
+
+        <where>
+            <if test="businessType != null and businessType != ''">
+                AND st.business_type =#{businessType}
+            </if>
+            <if test="templateType != null and templateType!='' ">
+                AND st.template_type like   concat('%',#{templateType},'%')
+            </if>
+
+        </where>
+            LIMIT #{page} OFFSET #{offset}
+    </select>
+
+    <select id="searchSystemTemplateCount" resultType="long">
+        SELECT
+        count(*)
+        FROM system_template st
+        LEFT JOIN system_template_value stv_site
+        ON st.template_type = stv_site.template_type AND stv_site.site_uid = #{siteUid}
+        LEFT JOIN system_template_value stv_hospital
+        ON st.template_type = stv_hospital.template_type AND stv_hospital.site_uid = #{hospitalUid}
+        AND stv_site.id IS NULL
+        LEFT JOIN system_template_value stv_institution
+        ON st.template_type = stv_institution.template_type AND stv_institution.site_uid = #{institutionUid}
+        AND stv_site.id IS NULL AND stv_hospital.id IS NULL
+        LEFT JOIN system_template_value stv_tenant
+        ON st.template_type = stv_tenant.template_type AND stv_tenant.site_uid = #{tenantUid}
+        AND stv_site.id IS NULL AND stv_hospital.id IS NULL AND stv_institution.id IS NULL
+        <where>
+            <if test="businessType != null and businessType != ''">
+                AND st.business_type =#{businessType}
+            </if>
+            <if test="templateType != null and templateType!='' ">
+                AND st.template_type like   concat('%',#{templateType},'%')
+            </if>
+
+        </where>
+    </select>
+
+
+
+    <select id="findByKeyAndSiteForUseParentList" resultType="com.ge.apm.domain.SystemTemplate">
+        SELECT
+            st.*,
+            COALESCE(stv_site.id, stv_hospital.id, stv_institution.id, stv_tenant.id) as valueId,
+            COALESCE(stv_site.template_type_name, stv_hospital.template_type_name, stv_institution.template_type_name, stv_tenant.template_type_name) as templateTypeNameValue,
+            COALESCE(stv_site.storage_id, stv_hospital.storage_id, stv_institution.storage_id, stv_tenant.storage_id) as valueStorageId,
+            COALESCE(stv_site.file_name, stv_hospital.file_name, stv_institution.file_name, stv_tenant.file_name) as fileNameValue,
+            COALESCE(stv_site.site_uid, stv_hospital.site_uid, stv_institution.site_uid, stv_tenant.site_uid) as siteUid
+        FROM system_template st
+                 LEFT JOIN system_template_value stv_site
+                           ON st.template_type = stv_site.template_type AND stv_site.site_uid = #{siteUid}
+                 LEFT JOIN system_template_value stv_hospital
+                           ON st.template_type = stv_hospital.template_type AND stv_hospital.site_uid = #{hospitalUid}
+                               AND stv_site.id IS NULL
+                 LEFT JOIN system_template_value stv_institution
+                           ON st.template_type = stv_institution.template_type AND stv_institution.site_uid = #{institutionUid}
+                               AND stv_site.id IS NULL AND stv_hospital.id IS NULL
+                 LEFT JOIN system_template_value stv_tenant
+                           ON st.template_type = stv_tenant.template_type AND stv_tenant.site_uid = #{tenantUid}
+                               AND stv_site.id IS NULL AND stv_hospital.id IS NULL AND stv_institution.id IS NULL
+        where st.template_type=#{templateType}
+    </select>
+
+
+</mapper>

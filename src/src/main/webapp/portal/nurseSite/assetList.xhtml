@@ -55,15 +55,22 @@
 				</p:selectOneMenu>
 			</h:panelGroup>
             <h:panelGroup>
-                <label class="label">设备名称</label>
-                <p:inputText value="#{assetSelectController.assetName}"/>
+                <label class="label">设备分类</label>
+                <p:selectBooleanCheckbox id="selectAllAssetGroup" value="#{assetSelectController.isAllSelectedAssetGroup}" itemLabel="全选" >
+                    <p:ajax update="@parent:assetGroup" listener="#{assetSelectController.updateSelectAllAssetGroup()}"/>
+                </p:selectBooleanCheckbox>
+                <p:selectManyMenu  id="assetGroup" value="#{assetSelectController.listCheckI18nMessage}" var="t" converter="i18nMessageConverter" required="false" filter="true"
+                                  filterMatchMode="contains" showCheckbox="true" style="width:100%">
+                    <p:ajax update="@parent:selectAllAssetGroup" listener="#{assetSelectController.updateItemAssetGroup()}"/>
+                    <f:selectItems value="#{assetSelectController.i18nMessageList}" var="item" itemLabel="#{item.value}" itemValue="#{item}"/>
+                    <p:column style="float: left;text-align:left;">
+                        <h:outputText value="#{t.value}" />
+                    </p:column>
+                </p:selectManyMenu>
             </h:panelGroup>
             <h:panelGroup>
-                <label class="label">设备分类</label>
-                <p:selectOneMenu value="#{assetSelectController.assetGroup}" disabled="false">
-                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                </p:selectOneMenu>
+                <label class="label">设备名称</label>
+                <p:inputText value="#{assetSelectController.assetName}"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备型号</label>

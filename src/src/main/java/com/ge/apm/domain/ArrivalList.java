@@ -245,6 +245,17 @@ public class ArrivalList implements Serializable {
     @Column(name = "vender_company_id")
     private String venderCompanyId;
 
+    @Column(name = "file_no")
+    private String fileNo;
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
+    }
+
     public String getVenderCompanyId() {
         return venderCompanyId;
     }

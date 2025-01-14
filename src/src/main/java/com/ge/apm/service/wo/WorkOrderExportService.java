@@ -12,6 +12,8 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.doctemplate.PartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DatePattern;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
@@ -81,6 +83,8 @@ public class WorkOrderExportService {
     private V2_WorkOrderService woService;
     @Autowired
     private BlobObjectRepository blobObjectRepository;
+    @Autowired
+    private ExternalTempUserRepository externalTempUserDao;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
@@ -258,6 +262,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));
             workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
             workOrderMap.put(WebUtil.getMessage("registrationNo"), workOrderExportPojo.getRegistrationNo());
+            workOrderMap.put(WebUtil.getMessage("LatestDevelopments"), workOrderExportPojo.getComment());
             workOrderMap.put(WebUtil.getMessage("warrantyDate"), formatDate2(workOrderExportPojo.getWarrantyDate()));
             workOrderMap.put(WebUtil.getMessage("factoryWarrantyDate"), formatDate2(workOrderExportPojo.getFactoryWarrantyDate()));
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
@@ -427,11 +432,19 @@ public class WorkOrderExportService {
 
         workOrderdata.stream().forEach(m -> {
             String woid = (String) m.get("woId");
+            m.put(WebUtil.getMessage("OuterRepairOrgName"), Optional.ofNullable(externalTempUserDao.findByWoId(woid)).map(ExternalTempUser::getComName).orElse(null));
+            m.put("拟更换配件", Optional.of(v2_workOrder_details).map(t -> t.stream().map(V2_WorkOrder_Detail::getParts).collect(Collectors.joining("、"))).orElse(null));
             m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a -> a.getPurchasePrice() == null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
             m.put("采购日期", Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a -> a.getPurchaseDate()).orElse(null));
             m.put("auditSignatureList", Optional.ofNullable(approvalsMap.get(woid))
                     .map(o -> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
+                    .orElse(Collections.emptyList()));
+            m.put("auditOpinionList", Optional.ofNullable(approvalsMap.get(woid))
+                    .map(o -> o.stream().map(MultiLevelApproval::getApprovalOpinion).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
+                    .orElse(Collections.emptyList()));
+            m.put("auditDateList", Optional.ofNullable(approvalsMap.get(woid))
+                    .map(o -> o.stream().map(MultiLevelApproval::getActualApproverDate).filter(ObjectUtil::isNotEmpty).map(date -> DateUtil.format(date, DatePattern.NORM_DATETIME_PATTERN)).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
 
             if (Boolean.TRUE.toString().equalsIgnoreCase(enableAuditGroupConfiguration)){

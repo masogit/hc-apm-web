@@ -292,17 +292,18 @@ public class AssetInstallationReportService {
         byte[] templateBytes = null;
         String templatePath = null;
         SystemTemplate.SystemTemplateEnum systemTemplateEnum = null;
-        if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
-            templatePath = REPORT_TECHNOLOGY_TEMPLATE;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.TECHNOLOGY;
-        }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
-            templatePath = REPORT_BUSINESS_TEMPLATE;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.BUSINESS;
-        }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
-            templatePath = REPORT_CLINICAL_TEMPLATE;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.CLINICAL;
-
-        }else if(REPORT_TYPE_ASSET.equals(reportType)){
+//        if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
+//            templatePath = REPORT_TECHNOLOGY_TEMPLATE;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.TECHNOLOGY;
+//        }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
+//            templatePath = REPORT_BUSINESS_TEMPLATE;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.BUSINESS;
+//        }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
+//            templatePath = REPORT_CLINICAL_TEMPLATE;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.CLINICAL;
+//
+//        }else
+            if(REPORT_TYPE_ASSET.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE;
             systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET;
 
@@ -314,11 +315,12 @@ public class AssetInstallationReportService {
             templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
             systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM;
 
-        }else if(REPORT_TYPE_DETAIL.equals(reportType)){
-            templatePath = REPORT_DETAIL_TEMPLATE;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.DETAIL;
-
         }
+//            else if(REPORT_TYPE_DETAIL.equals(reportType)){
+//            templatePath = REPORT_DETAIL_TEMPLATE;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.DETAIL;
+//
+//        }
         if(systemTemplateEnum!=null){
             FileDownloadService   fileDownloadService = WebUtil.getBean(FileDownloadService.class);
             templateBytes =fileDownloadService.getTemplateFileByte(systemTemplateEnum.getCode(), systemTemplateEnum.getFileType());
@@ -397,31 +399,31 @@ public class AssetInstallationReportService {
             financingNum = StringUtils.replace(financingNum, "/", "_");
         }
 
-        String reportTypeTitle = "";
-        if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
-            reportTypeTitle = REPORT_TECHNOLOGY_TITLE;
-            if(isSyf()){
-                reportTypeTitle = "医疗设备安装报告_简易安装";
-            }
-        }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
-            reportTypeTitle = REPORT_BUSINESS_TITLE;
-            if(isSyf()){
-                reportTypeTitle = "医疗设备安装报告_正常安装";
-            }
-        }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
-            reportTypeTitle = REPORT_CLINICAL_TITLE;
-        }else if(REPORT_TYPE_ASSET.equals(reportType)){
-            reportTypeTitle = REPORT_ASSET_TITLE;
-        }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
-            reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
-        }else if(REPORT_TYPE_DETAIL.equals(reportType)){
-            reportTypeTitle = REPORT_DETAIL_TITLE;
-        }
+//        String reportTypeTitle = "";
+//        if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
+//            reportTypeTitle = REPORT_TECHNOLOGY_TITLE;
+//            if(isSyf()){
+//                reportTypeTitle = "医疗设备安装报告_简易安装";
+//            }
+//        }else if(REPORT_TYPE_BUSINESS.equals(reportType)){
+//            reportTypeTitle = REPORT_BUSINESS_TITLE;
+//            if(isSyf()){
+//                reportTypeTitle = "医疗设备安装报告_正常安装";
+//            }
+//        }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
+//            reportTypeTitle = REPORT_CLINICAL_TITLE;
+//        }else if(REPORT_TYPE_ASSET.equals(reportType)){
+//            reportTypeTitle = REPORT_ASSET_TITLE;
+//        }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
+//            reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
+//        }else if(REPORT_TYPE_DETAIL.equals(reportType)){
+//            reportTypeTitle = REPORT_DETAIL_TITLE;
+//        }
 
         if(isEncoding){
-            return this.encoding(reportTypeTitle) + "-" + this.encoding(assetName) + "[" + this.encoding(financingNum) + "].docx";
+            return this.encoding(reportType) + "-" + this.encoding(assetName) + "[" + this.encoding(financingNum) + "].docx";
         }else {
-            return reportTypeTitle + "-" + assetName + "[" + financingNum + "].docx";
+            return reportType + "-" + assetName + "[" + financingNum + "].docx";
         }
     }
 
