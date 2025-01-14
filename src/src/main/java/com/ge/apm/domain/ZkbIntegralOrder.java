@@ -74,11 +74,6 @@ public class ZkbIntegralOrder implements Serializable {
      */
     @Column(name = "order_type")
     private String orderType;
-    /**
-     * 订单日期
-     */
-    @Column(name = "order_date")
-    private Date orderDate;
 
     /**
      * 当前步骤
