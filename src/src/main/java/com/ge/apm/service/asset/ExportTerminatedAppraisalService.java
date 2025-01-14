@@ -296,12 +296,7 @@ public class ExportTerminatedAppraisalService {
             }
         }
         if (templateBytes == null) {
-            String fileName = null;
-            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
-                fileName = "terminated_template_zh.docx";
-            } else {
-                fileName = "terminated_template_en.docx";
-            }
+            String fileName  = "terminated_template_zh.docx";
             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/" + fileName));
         }
         return templateBytes;
