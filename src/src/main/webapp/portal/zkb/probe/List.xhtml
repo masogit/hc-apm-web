@@ -21,14 +21,23 @@
                              rowsPerPageTemplate="20,50,100,500">
                     <p:ajax event="rowSelect" update="editButton deleteButton"  listener="#{zkbProbeController.upDateInUsed()}"/>
                     <p:ajax event="filter" listener="#{zkbProbeController.onFilter}" />
-                    <p:column headerText="探头号" filterBy="#{item.catNo}"  filterMatchMode="LIKE" >
+                    <p:column headerText="业务类型" filterBy="#{item.businessType}"  filterMatchMode="LIKE" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_probe').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('poCatBusinessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('poCatBusinessType',item.businessType)}"/>
+                    </p:column>
+                    <p:column headerText="编号" filterBy="#{item.catNo}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.catNo}"/>
                     </p:column>
-                    <p:column headerText="探头型号"  filterBy="#{item.catModel}"  filterMatchMode="LIKE"  >
+                    <p:column headerText="型号"  filterBy="#{item.catModel}"  filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.catModel}"/>
                     </p:column>
-                    <p:column headerText="探头类型"  filterBy="#{item.catType}"  filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.catType}"/>
+                    <p:column headerText="类型"  filterBy="#{item.catType}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{(empty fieldMsg.fieldValue('poCatToolBoxType',item.catType)) ? item.catType : fieldMsg.fieldValue('poCatToolBoxType',item.catType)}"/>
                     </p:column>
                     <p:column headerText="价值类型" filterBy="#{item.valueType}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('zkbProbe_valueType',item.valueType)}"/>
@@ -39,7 +48,7 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="是否有效" filterBy="#{item.isVaild}" filterMatchMode="EQ">
+                    <p:column headerText="是否有效" filterBy="#{item.isVaild}" filterMatchMode="EQ" exportable="false">
                         <h:outputText value="#{fieldMsg.fieldValue('zkbProbe_isVaild',item.isVaild)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_probe').filter()">

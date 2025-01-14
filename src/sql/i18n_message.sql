@@ -3645,6 +3645,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole','CompleteAuditPending','关单审核人','Complete Audit Pending',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole','OperationsTeam','运营团队','Operations Team',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole','EngineerQualificationPending','工程师资质审批','Engineer Qualification Pending',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStatus','Requested','已申请','Requested',NULL,-1);
@@ -5482,3 +5483,40 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderStatus','Finish','工作完成','Finish',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderStatus','Olcfix','远程支持','Olcfix',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderStatus','Equipment Up','设备上线','Esquipment Up',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('poCatBusinessType','Probe','探头','Probe',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('poCatBusinessType','ToolBox','工具箱','ToolBox',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('poCatBusinessType','SpecialPart','特殊备件','SpecialPart',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('poCatToolBoxType','Radiation','放射类设备工具箱','Radiation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('poCatToolBoxType','Ultrasonic','超声类设备工具箱','Ultrasonic',NULL,-1);
+
+
+
+--积分申请类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderType','EngineerOnSiteRepair','GE工程师现场维修','Engineer On Site Repair',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderType','EngineerOnSiteMaintenance','GE工程师现场保养','Engineer On Site Maintenance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderType','ApplicationSupport','GE应用支持','Application Support',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderType','ToolBox','工具箱','Tool Box',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','Requested','已申请','Requested',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','ManageAccept','经理审批通过','Manage Support Accept',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','ManageReject','经理审批拒绝','Manage Support Reject',NULL,-1);
+/*INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','FourHundredCancel','400取消派工','FourHundredCancel',NULL,-1);*/
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','Ordered','已下单','Ordered',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','OrderedReject','400下单拒绝','OrderedReject',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','EngineerQualificationAccept','工程师资质审批通过','Engineer Qualification Accept',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','EngineerQualificationReject','工程师资质审批拒绝','Engineer Qualification Reject',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','CommercialAccept','Commercial审批通过','Commercial Support Accept',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','CommercialReject','Commercial审批拒绝','Commercial Support Reject',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','EngineerQualificationPending','待工程师资质审批','Engineer Qualification Pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','ManagePending','待经理审批','Manage pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','OrderPending','待下单','Ordered pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','CommercialPending','待Commercial审批','Commercial pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','Complete','完成','Complete',NULL,-1);

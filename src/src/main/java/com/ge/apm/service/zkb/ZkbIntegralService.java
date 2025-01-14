@@ -132,6 +132,15 @@ public class ZkbIntegralService {
                     zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
                 }
                 zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
+
+                ZkbIntegralRecord initRecord = new ZkbIntegralRecord();
+                initRecord.setRecordType(ZkbIntegralRecord.RecordType.KpiAdd.name());
+                initRecord.setScore(initialScore);
+                initRecord.setZkbIntegralId(zkbIntegral.getId());
+                initRecord.setRemark("初始化积分");
+                initRecord.setCreatedBy(userAccount.getName());
+                initRecord.setCreatedDate(new Date());
+                zkbIntegralRecordRepository.save(initRecord);
             }
             ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
             zkbIntegralRecord.setRecordType(recordType);
@@ -158,8 +167,12 @@ public class ZkbIntegralService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deductScore(String tenantUID,Integer qty,UserAccount userAccount,String recordType){
-        ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
         Integer score = qty * unitScore;
+        deductScore(tenantUID, userAccount, recordType,score);
+    }
+
+    public void deductScore(String tenantUID,UserAccount userAccount,String recordType, int score){
+        ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
         if(ZkbIntegralRecord.RecordType.QuotaDeduct.toString().equals(recordType)){
             zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - score);
         }else if(ZkbIntegralRecord.RecordType.QuotaReturn.toString().equals(recordType)){
