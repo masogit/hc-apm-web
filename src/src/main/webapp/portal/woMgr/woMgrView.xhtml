@@ -591,8 +591,11 @@
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%" >
-                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" stream="false" height="80"  width="100"/>
+                                        <p:ajax    event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');"    listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                        </p:graphicImage>
                                     </h:panelGrid>
+                                    <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                                 </p:panel>
                             </p:dataGrid>
                             <h:panelGroup >
@@ -623,5 +626,18 @@
                 display: none!important;
             }
         </style>
+
+        <script type="text/javascript">
+
+            function handlePreview(args, dialog) {
+                debugger;
+                var jqDialog = jQuery('#' + dialog);
+                if (args.validationFailed) {
+                    PF(dialog).hide();
+                } else {
+                    PF(dialog).show();
+                }
+            }
+        </script>
     </ui:composition>
 </html>
