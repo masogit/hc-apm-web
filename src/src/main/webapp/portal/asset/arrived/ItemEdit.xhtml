@@ -79,6 +79,10 @@
                                 <label class="label">#{msg.currentPersonUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.currentPersonUID).name}" />
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">档案号</label>
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.fileNo}" />
+                            </h:panelGroup>
 
                         </p:panelGrid>
                     </p:fieldset>
