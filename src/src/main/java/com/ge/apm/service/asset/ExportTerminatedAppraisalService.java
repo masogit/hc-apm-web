@@ -204,10 +204,10 @@ public class ExportTerminatedAppraisalService {
         }
         byte[] defaultSignatureBytes = getDefaultSignatureBytes();
         String signature="signature.png";
-        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-        map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-        map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
-        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 80, signature, defaultSignatureBytes));
+        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
+//        map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
+//        map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
+//        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
         if(assetScrap!=null){
             map.put(apply_name.name(), assetScrap.getCreatedBy());
             String date = format.format(assetScrap.getCreatedDate());
@@ -216,28 +216,28 @@ public class ExportTerminatedAppraisalService {
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
             if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
                 byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
-                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 80, signature, signatureBytes));
+                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, signature, signatureBytes));
             }
-            List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
+//            List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
             List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.getByBusinessUidList(assetScrap.getBusinessUid());
-            Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
-            listMap.forEach((id, approvalList) -> {
-                List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
-                multiLevelApprovals1.add(collect.get(0));
-            });
-
-            List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
-            for (int i=1;i<=levelApprovals.size();i++){
-                if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
-                    continue;
-                }
-                byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
-                map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 80, signature, levelSignatureBytes));
-            }
-            if(levelApprovals.size()>3){
-                logger.info("审批节点大于三");
-            }
+//            Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
+//            listMap.forEach((id, approvalList) -> {
+//                List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
+//                multiLevelApprovals1.add(collect.get(0));
+//            });
+//
+//            List<MultiLevelApproval> levelApprovals = multiLevelApprovals1.stream().sorted(Comparator.comparing(MultiLevelApproval::getApprovalLevel, Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
+//            for (int i=1;i<=levelApprovals.size();i++){
+//                if(StringUtils.isBlank(levelApprovals.get(i-1).getAuditSignature())){
+//                    continue;
+//                }
+//                byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
+//                map.put(approvaAauditSignature.name()+i, new PictureRenderData(100, 70, signature, levelSignatureBytes));
+//            }
+//            if(levelApprovals.size()>3){
+//                logger.info("审批节点大于三");
+//            }
             List<Map<String, Object>> list = new ArrayList<>();
             for(MultiLevelApproval multiLevelApproval : multiLevelApprovals){
                 Map<String, Object> mm = new HashMap<>();
