@@ -223,7 +223,7 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
         uploadedFileObject.setBoUuid(systemTemplateValue.getId());
         blobService.saveBlobObject(uploadedFileObject);
-        handlerSubOrgInfoSystemTemplate();
+//        handlerSubOrgInfoSystemTemplate();
         WebUtil.addSuccessMessage("保存成功");
     }
 

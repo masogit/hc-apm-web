@@ -151,10 +151,10 @@ public class SystemTemplate implements Serializable {
 //        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
 //        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
 
-        FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
+//        FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
 
-        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatch.docx"),
-        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatchBottom.docx"),
+//        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatch.docx"),
+//        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatchBottom.docx"),
 
         //调拨
         DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板","word",SystemTemplateBusinessEnum.ASSET.code,"transferorder_template.docx"),
