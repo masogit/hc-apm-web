@@ -59,13 +59,13 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
                 XWPFTableRow row = addRow(table);
                 addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
                 List<String> object = partsPictureTable.getObjectId();
+                if(CollectionUtils.isEmpty(object)){
+                    continue;
+                }
                 int maxCell = object.size() > this.maxCell ? this.maxCell:object.size();
                 for (int j = 0; j < maxCell-1; j++) {
                     addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
                     merge.add(table.getNumberOfRows());
-                }
-                if(CollectionUtils.isEmpty(object)){
-                    break;
                 }
                 XWPFTableRow rowImage = null;
                 for (int i1 = 0; i1 < object.size(); i1++) {
@@ -137,8 +137,9 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
         if (StringUtils.isNotEmpty(storageId)) {
             try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
                 return IOUtils.toByteArray(stream);
-            } catch (IOException ignore) {
+            } catch (IOException e) {
                 //ignore
+                e.printStackTrace();
             }
         }
         return null;
