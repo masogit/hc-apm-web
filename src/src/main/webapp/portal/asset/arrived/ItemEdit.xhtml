@@ -806,12 +806,12 @@
                             </c:forEach>
 
 
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{userContextService.activeSupplier()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{userContextService.activeSupplier()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
                         </p:menuButton>
                         <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
