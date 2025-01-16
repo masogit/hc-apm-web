@@ -128,39 +128,6 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
             orgTree = null;
         }
     }
-
-//    @Override
-//    protected Page<SystemTemplate> loadData(PageRequest pageRequest) {
-//        List<SearchFilter> searchFilters = this.searchFilters;
-//
-//        if(searchFilters == null){
-//            searchFilters = new ArrayList<>();
-//        }
-//        Page<SystemTemplate> page = systemTemplateRepository.findBySearchFilter(searchFilters, pageRequest);
-//        List<SystemTemplate> list = page.getContent();
-//        if(CollectionUtils.isNotEmpty(list)) {
-//            for (SystemTemplate systemTemplate : list) {
-//                SystemTemplateValue  value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getSiteUID());
-//                if(value == null){
-//                    value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(),  selectedOrg.getHospitalUID());
-//                    if(value == null){
-//                        value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getInstitutionUID());
-//                        if(value == null){
-//                            value = systemTemplateValueRepository.findFirstByTemplateTypeAndSiteUid(systemTemplate.getTemplateType(), selectedOrg.getTenantUID());
-//                        }
-//                    }
-//                }
-//
-//                if(value != null){
-//                    systemTemplate.setStorageId(value.getStorageId());
-//                    systemTemplate.setFileName(value.getFileName());
-//                }
-//            }
-//        }
-//        return page;
-//    }
-
-
     @Override
     protected Page<SystemTemplate> loadData(PageRequest pageRequest) {
         if (CollectionUtils.isEmpty(this.searchFilters)) {
@@ -330,7 +297,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
         uploadedFileObject.setBoUuid(systemTemplateValue.getId());
         blobService.saveBlobObject(uploadedFileObject);
-        handlerSubOrgInfoSystemTemplate();
+//        handlerSubOrgInfoSystemTemplate();
         WebUtil.addSuccessMessage("保存成功");
     }
 
