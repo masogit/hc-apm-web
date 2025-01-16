@@ -303,19 +303,19 @@ public class AssetInstallationReportService {
 //            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.CLINICAL;
 //
 //        }else
-            if(REPORT_TYPE_ASSET.equals(reportType)){
-            templatePath = REPORT_ASSET_TEMPLATE;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET;
-
-        }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
-            templatePath = REPORT_ASSET_TEMPLATE_BATCH;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH;
-
-        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
-            templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
-            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM;
-
-        }
+//            if(REPORT_TYPE_ASSET.equals(reportType)){
+//            templatePath = REPORT_ASSET_TEMPLATE;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET;
+//
+//        }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
+//            templatePath = REPORT_ASSET_TEMPLATE_BATCH;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH;
+//
+//        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
+//            templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
+//            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.FIXASSET_BATCH_BOTTOM;
+//
+//        }
 //            else if(REPORT_TYPE_DETAIL.equals(reportType)){
 //            templatePath = REPORT_DETAIL_TEMPLATE;
 //            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.DETAIL;
