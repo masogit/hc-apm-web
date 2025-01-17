@@ -103,7 +103,7 @@ public class SystemTemplate implements Serializable {
         BUDGET("BUDGET","预算模块"),
         ORG_INFO("ORG_INFO","组织机构模块"),
         PARTS("PARTS","备件模块"),
-
+        WORK("WORK","维修模块"),
 
         ASSET_PERFORMANCE("ASSET_PERFORMANCE","设备绩效模块"),
         ;
@@ -194,6 +194,7 @@ public class SystemTemplate implements Serializable {
         PM_ORDER_EXPORT("PM_ORDER_EXPORT","保养导出模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrder_export.xlsx"),
         PM_ORDER_IMPORT("PM_ORDER_IMPORT","保养工单导入模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrderImport.xls"),
         MEASURE_ELECTRIC_SAFETY("MEASURE_ELECTRIC_SAFETY","电气安全数据导入模板","ps",SystemTemplateBusinessEnum.PM.getCode(),"APM_Electric_Safety_Template.ps"),
+        PM_ORDER_REPORT("PM_ORDER_REPORT","保养工单报告模板","word",SystemTemplateBusinessEnum.PM.getCode(),"maintenance-template_zh.docx"),
 
         //预算
         BUDGET_IMPORT("BUDGET_IMPORT","预算导入模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"Budget_Import_Template.xlsx"),
@@ -230,6 +231,7 @@ public class SystemTemplate implements Serializable {
         ASSET_TYPE_GROUP("ASSET_TYPE_GROUP","资产分类模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_Auth_Template.xlsx"),
         ASSET_PURCHASE("ASSET_PURCHASE","采购清单模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_PURCHASE_Template.xls"),
 
+        WORK_ORDER_REPORT("WORK_ORDER_REPORT","维修工单报告模板","word",SystemTemplateBusinessEnum.WORK.getCode(),"workOrderTemplate.docx"),
 
 
         ;
