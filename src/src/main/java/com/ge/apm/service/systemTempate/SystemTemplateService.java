@@ -6,10 +6,13 @@ import com.ge.apm.dao.mapper.SystemTemplateMapper;
 import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.SystemTemplateValue;
 import com.ge.apm.domain.UserAccount;
-import org.apache.ibatis.annotations.Param;
+import com.ge.apm.service.asset.BlobFileService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -22,6 +25,9 @@ public class SystemTemplateService {
 
     @Autowired
     private SystemTemplateValueRepository systemTemplateValueRepository;
+
+    @Autowired
+    private BlobFileService blobService;
 
 
     public List<SystemTemplate> findByKeyAndSiteForUseParent(String templateType,UserAccount userAccount){
@@ -38,5 +44,14 @@ public class SystemTemplateService {
     public List<SystemTemplate> findByKeyAndSiteForUseParent(String templateType, String siteUid, String hospitalUid,  String institutionUid,  String tenantUid){
 
         return systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,siteUid,hospitalUid,institutionUid,tenantUid);
+    }
+    public byte[] getTemplateFileByte(SystemTemplate.SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
+        List<SystemTemplate> byKeyAndSiteForUseParent = this.findByKeyAndSiteForUseParent(templateEnum.getCode(), user);
+        if(CollectionUtils.isNotEmpty(byKeyAndSiteForUseParent)){
+            SystemTemplate systemTemplate = byKeyAndSiteForUseParent.get(0);
+            String  storageId= systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId();
+            return IOUtils.toByteArray(blobService.getBlobObjectByStorageId(storageId).getStream());
+        }
+        return null;
     }
 }
