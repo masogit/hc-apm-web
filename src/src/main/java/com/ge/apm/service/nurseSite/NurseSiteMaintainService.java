@@ -1972,6 +1972,7 @@ public class NurseSiteMaintainService {
 								.orElse(new HashMap<>());
 						mapCheckItemSequence.clear();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
+						listData.sort(Comparator.comparing(NurseSiteMaintainData::getCheckItem));
 						keyName.delete(0, keyName.length());
 						if (listData != null && !listData.isEmpty()) {
 							for (NurseSiteMaintainData tempData : listData) {
