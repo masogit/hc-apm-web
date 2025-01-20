@@ -533,6 +533,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
+    @Async
     public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token) {
         HashMap<String, Object> emailWrapperMap = null;
         try {
@@ -552,6 +553,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
+    @Async
     public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
