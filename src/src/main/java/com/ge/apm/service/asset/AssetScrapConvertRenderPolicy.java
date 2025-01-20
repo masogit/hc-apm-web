@@ -56,7 +56,7 @@ public class AssetScrapConvertRenderPolicy extends AbstractWoTableRenderPolicy {
         XWPFRun run = paragraph.createRun();
         int pictureType = XWPFDocument.PICTURE_TYPE_PNG;
         int widthEMU = 100 * 9525;
-        int heightEMU = 80 * 9525;
+        int heightEMU = 70 * 9525;
         try {
             run.addPicture(inputStream, pictureType, "image.png", widthEMU, heightEMU);
         } catch (Exception e) {
