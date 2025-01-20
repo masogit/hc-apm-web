@@ -2,13 +2,24 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -18,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ZkbIntegralOrderApplyService {
+public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
     @Autowired
     ZkbPartOrderStepRepository zkbPartOrderStepRepository;
@@ -54,6 +65,8 @@ public class ZkbIntegralOrderApplyService {
     private ZkbPartOrderCatRepository zkbPartOrderCatRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+    Logger logger = LoggerFactory.getLogger(ZkbIntegralOrderApplyService.class);
 
     public String checkAsset(AssetInfo assetInfo) {
         if (assetInfo==null) {
@@ -468,6 +481,12 @@ public class ZkbIntegralOrderApplyService {
         zkbPartOrderStep.setPartOrderId(zkbIntegralOrder.getId());
         zkbPartOrderStepRepository.save(zkbPartOrderStep);
         applyIntegralHandle(zkbIntegralOrder, userAccount, ZkbIntegralRecord.RecordType.QuotaDeduct.name());
+
+        List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
+        if(strs.contains(zkbIntegralOrder.getCurrentStep())){
+            sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
+            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+        }
     }
 
     /**
@@ -514,4 +533,40 @@ public class ZkbIntegralOrderApplyService {
         }
     }
 
+    public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token) {
+        HashMap<String, Object> emailWrapperMap = null;
+        try {
+            emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
+            emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
+            emailWrapperMap.put("url", "?id=" + zkbIntegralOrder.getId());
+            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
+
+            String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_MESSAGE);
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbIntegralOrder.getIntegralOrderNo()+" sendMessage "+response.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token){
+        try {
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
+            emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
+            emailWrapperMap.put("url", "?id=" + zkbIntegralOrder.getId());
+            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
+            String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
+
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbIntegralOrder.getIntegralOrderNo()+" sendEmail " +response.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

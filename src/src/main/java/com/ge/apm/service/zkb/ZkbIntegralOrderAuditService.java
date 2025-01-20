@@ -2,15 +2,28 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
 @Service
-public class ZkbIntegralOrderAuditService {
+public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
+
+    Logger logger = LoggerFactory.getLogger(ZkbIntegralOrderAuditService.class);
 
     @Autowired
     private ZkbIntegralOrderRepository zkbIntegralOrderRepository;
@@ -32,6 +45,9 @@ public class ZkbIntegralOrderAuditService {
 
     @Autowired
     private ZkbContractRepository zkbContractRepository;
+
+    @Autowired
+    private ZkbIntegralOrderApplyService zkbIntegralOrderApplyService;
 
     public ZkbIntegralOrder queryInitData(String id,List<ZkbContract> zkbContractList, List<HashMap<String, Object>> v2_listHashMap){
         ZkbIntegralOrder selected = zkbIntegralOrderRepository.findById(id);
@@ -300,7 +316,25 @@ public class ZkbIntegralOrderAuditService {
             zkbIntegralService.deductScore(zkbIntegralOrder.getTenantUID(),userAccount, ZkbIntegralRecord.RecordType.QuotaReturn.toString(), score);
         }else{
             //如果当前步骤是commercial则需要推送短信
+            if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+                zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
+            }
+        }
 
+
+    }
+
+    @Async
+    public void sendWeChatMessages(ZkbIntegralOrder zkbIntegralOrder,String token){
+        try {
+            String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbIntegralOrder.getId());
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbIntegralOrder.getIntegralOrderNo()+" sendWeChatMessages "+response.toString());
+        } catch (RestClientException e) {
+            e.printStackTrace();
         }
 
     }
