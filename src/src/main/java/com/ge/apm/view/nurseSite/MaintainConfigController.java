@@ -182,12 +182,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			wrapper.or().eq("nsmc.tenant_uid", selectSite.getUid());
 			wrapper.andNew();
 		}
-		wrapper.in("nsmc.clinical_dept_uid", listOrgUid);
+//		wrapper.in("nsmc.clinical_dept_uid", listOrgUid);
 		wrapper.eq("uo.user_uid", currentUser.getUid());
-		wrapper.eq("ai.tenant_uid", currentUser.getTenantUID());
+		wrapper.eq("nsmc.tenant_uid", currentUser.getTenantUID());
 		WrapperSearchFilterUtils.convert(searchFilters, wrapper, "nsmc");
 		wrapper.groupBy("nsmc.id");
-		List<NurseSiteMaintainConfig> list = configMapper.findJoinAssetList(pagination, wrapper);
+		List<NurseSiteMaintainConfig> list;
+		if (currentUser.isEnableAssetTypeGroup()) {
+			list = configMapper.findJoinAssetList(pagination, wrapper);
+		} else {
+			list = configMapper.findList(pagination, wrapper);
+		}
 		List<String> createBy = list.stream().map(NurseSiteMaintainConfig::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
 		List<String> modifyBy = list.stream().map(NurseSiteMaintainConfig::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
 		modifyBy.addAll(createBy);
@@ -465,10 +470,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			listSearchFilter.add(tempFilter);
 			search=true;
 		}
-		if(isCreate){
-			SearchFilter tempFilter=new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IN,listOrgUid,"1*");
-			listSearchFilter.add(tempFilter);
-		}
+//		if(isCreate){
+//			SearchFilter tempFilter=new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IN,listOrgUid,"1*");
+//			listSearchFilter.add(tempFilter);
+//		}
 		else{
 			SearchFilter tempFilter=new SearchFilter("clinicalDeptUID",SearchFilter.Operator.EQ,this.selected.getClinicalDeptUID(),"1*");
 			listSearchFilter.add(tempFilter);
