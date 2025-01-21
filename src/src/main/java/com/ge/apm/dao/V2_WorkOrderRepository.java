@@ -57,7 +57,9 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     public List<Integer> getAssetsByNoTagGroup(Collection<String> c);
 
     public List<V2_WorkOrder> getByAssetIdAndStatusOrderByCloseTimeDesc(Integer assetId, Integer status);
-    
+
+    public List<V2_WorkOrder> getByAssetUidInAndStatusOrderByCloseTimeDesc(List<String> assetUid, Integer status);
+
     @Query(value="select distinct(o.*) from v2_work_order o where o.id in (?1)",nativeQuery=true)
     public List<V2_WorkOrder> getWorkOrderById(Set<String> ids);
 

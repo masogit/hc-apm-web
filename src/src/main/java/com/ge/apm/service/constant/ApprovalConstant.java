@@ -109,7 +109,7 @@ public interface ApprovalConstant {
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
     String APPROVAL_PURCHASE_MANAGEMENT = "purchaseManagement"; // 采购管理
     String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
-    String APPROVAL_ASSET_DEPARTMENT_CONVERT = "assetDepartmentConvert"; // 资产报废流程
+    String APPROVAL_ASSET_DEPARTMENT_CONVERT = "assetDepartmentConvert"; // 资产转科流程
     String APPROVAL_ASSET_SCRAP_CHI = "设备报废"; // 设备报废
     String APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI = "设备转科"; // 设备转科
     String APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT  = "equipmentAdjustment"; // 设备调剂

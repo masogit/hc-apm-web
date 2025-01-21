@@ -15,7 +15,7 @@
         body.layout-compact .layout-wrapper .ultima-menu li ul li a {
             font-size: 13px;!important;
         }
-        /*所有图标都可以在这个地址找,谨此留给后人: https://fontawesome.com/v4/icon */
+        /*所有图标都可以在这个地址找,谨此留给后人: https://fontawesome.com/v4/icons */
     </style>
     <div class="menu-content" tabindex="0">
         <pu:menu id="me" widgetVar="me">
@@ -30,7 +30,7 @@
                        <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-tasks fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_')}">
                            <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"/>
                            <p:menuitem id="um031" value="主子设备信息" outcome="/portal/asset/previewAsset/List" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_SUBVIEW') and userContextService.enableAssetPreview()}"/>
-                           <p:menuitem value="资产批量修改院区" outcome="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_EDIT')}"/>
+                           <p:menuitem value="资产转科管理" outcome="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_EDIT')}"/>
                            <p:menuitem id="um1002" value="#{msg.EquipmentLocation}" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_LOCATION_VIEW') and userContextService.getTenantInfo().locationEn ne null}"/>
                            <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_VIEW')}"/>
                            <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/supplierMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_VIEW')}"/>

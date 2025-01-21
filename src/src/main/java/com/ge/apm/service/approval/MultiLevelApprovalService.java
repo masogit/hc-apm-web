@@ -1031,6 +1031,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                                 AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                                List<AssetDepartmentConvert> assetDepartmentConverts = assetDepartmentConvertRepository.findByTenantAndBusinessNumber(userAccount.getTenantUID(), multiLevelApproval.getBusinessNumber());
                                 byId.setCurrentStatus(3);
                                 byId.setLastModifiedBy(userAccount.getName());
                                 byId.setLastModifiedDate(new Date());

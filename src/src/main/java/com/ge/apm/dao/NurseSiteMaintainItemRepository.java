@@ -107,6 +107,11 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 
 	@Transactional
 	@Modifying
+	@Query(value = "DELETE FROM nurse_site_maintain_config_item WHERE asset_uid in (?1)", nativeQuery = true)
+	void deleteMaintainConfigItemByAssetUidIn(List<String> assetUid);
+
+	@Transactional
+	@Modifying
 	@Query(value = "DELETE FROM nurse_site_maintain_config WHERE id = ?1", nativeQuery = true)
 	void deleteMaintainConfigById(String id);
 
@@ -174,5 +179,8 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 
 	@Query(value = "SELECT DISTINCT item.* FROM nurse_site_maintain_item item LEFT JOIN nurse_site_maintain_data itemdata ON item.id = itemdata.parent_id WHERE item.asset_uid = ?1  AND itemdata.check_value IS NULL ",nativeQuery = true)
 	public List<NurseSiteMaintainItem> findNoCheckedByAssetUid(String assetUid );
+
+	@Query(value = "SELECT DISTINCT item.* FROM nurse_site_maintain_item item LEFT JOIN nurse_site_maintain_data itemdata ON item.id = itemdata.parent_id WHERE item.asset_uid in (?1)  AND itemdata.check_value IS NULL ",nativeQuery = true)
+	public List<NurseSiteMaintainItem> findNoCheckedByAssetUidIn(List<String> assetUid);
 
 }

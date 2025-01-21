@@ -7,6 +7,7 @@ import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetTypeGroupDto;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.dto.UserOrgInfoDto;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -16,6 +17,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -532,6 +535,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     return true;
                 }
             }else{
+                // todo :: add asset department convert condition
                 WebUtil.addWarnMessage(approvalMsg);
                 return true;
             }
@@ -678,7 +682,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //审核人条件是否展示
     public boolean getApprovalConditionEnable(){
-        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR) ; //设备维修
+        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT) ; //设备维修
         if(selected!=null && selected.getBusinessType()!=null){
             return list.contains(selected.getBusinessType());
         }
@@ -1007,6 +1011,23 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     public boolean getApprovalRoleAssetHead() {
         return approvalRoleAssetHead;
+    }
+
+    public List<SelectItemDto> getApproveCondition() {
+        List<SelectItemDto> resultList = ListUtil.newArrayList();
+        switch (this.selected.getBusinessType()) {
+            case ApprovalConstant.APPROVAL_ASSET_REPAIR :
+                resultList.add(new SelectItemDto("工单设备所属科室", "1"));
+                break;
+            case ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT :
+                resultList.add(new SelectItemDto("转入科室", "2"));
+                resultList.add(new SelectItemDto("转出科室", "3"));
+                break;
+            default:
+                break;
+
+        }
+        return resultList;
     }
 
     public void setApprovalRoleAssetHead(boolean approvalRoleAssetHead) {
