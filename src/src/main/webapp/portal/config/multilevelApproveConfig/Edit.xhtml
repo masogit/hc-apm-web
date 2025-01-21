@@ -308,7 +308,7 @@
                             <p:fieldset legend="审批节点-条件">
                                 <p:selectOneMenu disabled="#{multiLevelApprovalConfigController.approvalRoleAssetHead}"  value="#{multiLevelApprovalConfigController.approvalNode.roleApproveCondition.condition}"  autoWidth="false" style="max-width: 300px;" height="300" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}条件" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItem itemLabel="工单设备所属科室" itemValue="1" />
+                                    <f:selectItems value="#{multiLevelApprovalConfigController.getApproveCondition()}" var="item"  itemLabel="#{item.label}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </p:fieldset>
                         </h:panelGroup>

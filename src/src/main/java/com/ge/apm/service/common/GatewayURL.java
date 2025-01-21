@@ -195,6 +195,7 @@ public enum GatewayURL {
     JI_MU_REPORT("/apmReport/jmreport/view"),
 
     ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+    ASSET_DEPARTMENT_COVERT_APPLY("/hcapmassetservice/api/apm/departmentConvert/assetDepartmentConvert"),
 
     // davinci
     DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),

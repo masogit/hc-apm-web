@@ -929,6 +929,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return "";
     }
 
+    public List<String> getSelectedUidList() {
+        return selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
     public List<QrCodeTemplate> getQrCodeTemplates() {
         QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
         return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
