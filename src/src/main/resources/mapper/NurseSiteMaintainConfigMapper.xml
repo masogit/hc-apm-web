@@ -28,7 +28,14 @@
     <select id="findJoinAssetList" resultMap="maintainConfigBean">
         select nsmc.* from nurse_site_maintain_config nsmc, nurse_site_maintain_config_item nsmci, asset_info ai, user_org uo, org_info oi
         where 1 = 1 AND uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid ) AND oi.org_type = 4 AND oi.uid= nsmc.clinical_dept_uid
-          and ai.uid = nsmci.asset_uid AND nsmc.deleted = ('FALSE')
+          AND nsmc.id = nsmci.parent_id AND ai.uid = nsmci.asset_uid AND nsmc.deleted = ('FALSE')
+          ${ew.sqlSegment}
+    </select>
+
+    <select id="findList" resultMap="maintainConfigBean">
+        select nsmc.* from nurse_site_maintain_config nsmc, user_org uo, org_info oi
+        where 1 = 1 AND uo.org_uid IN ( oi.tenant_uid, oi.hospital_uid, oi.site_uid, oi.institution_uid, oi.uid ) AND oi.org_type = 4 AND oi.uid= nsmc.clinical_dept_uid
+          AND nsmc.deleted = ('FALSE')
           ${ew.sqlSegment}
     </select>
 
