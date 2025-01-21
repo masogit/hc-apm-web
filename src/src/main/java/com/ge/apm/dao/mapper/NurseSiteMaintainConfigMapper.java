@@ -12,5 +12,7 @@ import java.util.Map;
 public interface NurseSiteMaintainConfigMapper extends BaseMapper<NurseSiteMaintainConfig> {
     List<NurseSiteMaintainConfig> findJoinAssetList(Pagination pagination, @Param("ew") Wrapper<NurseSiteMaintainConfig> wrapper);
 
+    List<NurseSiteMaintainConfig> findList(Pagination pagination, @Param("ew") Wrapper<NurseSiteMaintainConfig> wrapper);
+
     List<NurseSiteMaintainConfig> searchMaintainConfig(Map<String, Object> param);
 }
