@@ -124,6 +124,9 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     }
 
     public void setOneSearchStr(String oneSearchStr) {
+        if (oneSearchStr == null) {
+            return;
+        }
         this.oneSearchStr = oneSearchStr;
         if (oneSearchStr.isEmpty()) {
             this.removeFilterOnField("assetName");
