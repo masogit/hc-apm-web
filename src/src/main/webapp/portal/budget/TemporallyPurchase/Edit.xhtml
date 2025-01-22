@@ -66,6 +66,13 @@
                                                        pattern="#{userContextService.timeFormat14()}"/>
                                 </h:outputText>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">申购类型<span style="color: red">*</span></p:outputLabel>
+                                <p:selectOneMenu disabled="#{!(budgetBayController.selected.applicationStep eq 'ToSubmitted')}" value="#{budgetBayController.selected.temporallyPurchaseType}" required="false"  requiredMessage="申购类型#{msg.Blank}#{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('temporallyPurchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset legend="#{msg.BudgetAssetInfo}" id="applicationDetail" >
