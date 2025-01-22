@@ -373,7 +373,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
             budgetApplicationAssetVo.setWardCode(selected.getWardCode());
             ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
             Validator validator = validatorFactory.getValidator();
-            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo);
+            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo, BudgetApplicationGroup.class);
 
             if(CollectionUtils.isNotEmpty(checkSet)){
                 for (ConstraintViolation<BudgetApplicationAssetVo> c : checkSet){

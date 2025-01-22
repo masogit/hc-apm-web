@@ -232,7 +232,6 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
                     zkbIntegralOrderStatusVo.setHaveTrainCourseFlag(true);
                 }
             }
-
         }
     }
 
@@ -314,11 +313,14 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
                 score = 200;
             }
             zkbIntegralService.deductScore(zkbIntegralOrder.getTenantUID(),userAccount, ZkbIntegralRecord.RecordType.QuotaReturn.toString(), score);
+            sendWeChatMessages(zkbIntegralOrder, UserContextService.getAccessToken());
         }else{
             //如果当前步骤是commercial则需要推送短信
             if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
                 zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
                 zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
+            }else{
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
             }
         }
 

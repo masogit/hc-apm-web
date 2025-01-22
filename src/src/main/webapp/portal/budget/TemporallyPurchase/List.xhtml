@@ -103,6 +103,13 @@
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"  >
                                 </p:calendar>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">申购类型</p:outputLabel>
+                                <p:selectOneMenu value="#{budgetBayController.searchForm.temporallyPurchaseType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('temporallyPurchaseType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                             <h:panelGroup style="display: flex;">
                                 <p:commandButton value="#{msg.Search}"
                                                  actionListener="#{budgetBayController.search}"

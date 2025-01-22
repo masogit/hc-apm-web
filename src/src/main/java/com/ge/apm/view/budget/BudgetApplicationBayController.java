@@ -7,10 +7,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.BudgetApplicationAssetVo;
-import com.ge.apm.domain.budget.BudgetAssetInfo;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.AccessRecordsService;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
@@ -58,6 +55,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -358,9 +356,10 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
             BeanUtils.copyProperties(budgetApplicationAssetVo, curSelectApplicationBudgetAsset);
             budgetApplicationAssetVo.setApplicationDeptName(selected.getApplicationDeptName());
             budgetApplicationAssetVo.setWardCode(selected.getWardCode());
+            budgetApplicationAssetVo.setTemporallyPurchaseType(selected.getTemporallyPurchaseType());
             ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
             Validator validator = validatorFactory.getValidator();
-            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo);
+            Set<ConstraintViolation<BudgetApplicationAssetVo>> checkSet = validator.validate(budgetApplicationAssetVo, Default.class, BudgetApplicationGroup.class);
 
             if(CollectionUtils.isNotEmpty(checkSet)){
                 for (ConstraintViolation<BudgetApplicationAssetVo> c : checkSet){
@@ -455,6 +454,9 @@ public class BudgetApplicationBayController extends GenericCRUDUUIDController<Bu
         }
         if (StringUtils.isNotBlank(searchForm.getAssetName())) {
             updateSearchFilter(new SearchFilter("applicationAssetName", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
+        }
+        if(StringUtils.isNotBlank(searchForm.getTemporallyPurchaseType())){
+            updateSearchFilter(new SearchFilter("temporallyPurchaseType", SearchFilter.Operator.EQ, searchForm.getTemporallyPurchaseType()));
         }
     }
 

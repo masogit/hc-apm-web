@@ -4964,6 +4964,10 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'Appropriation', '拨款资金', 'Appropriation funds', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('sourceFunding', 'HorizontalSpecial', '横向专项经费(科研)', 'Horizontal special funds', NULL, -1);
 
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('temporallyPurchaseType', 'AssetPurchase', '设备采购', 'Asset Purchase', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('temporallyPurchaseType', 'AssetMaintenance', '设备维保', 'Asset maintenance', NULL, -1);
+
+
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetStockType', '1', '新增', 'CREATE', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('budgetStockType', '2', '更新', 'UPDATE', NULL, -1);
