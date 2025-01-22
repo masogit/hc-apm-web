@@ -123,7 +123,8 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     @Column(name="in_site_name")
     private String inSiteName;
 
-
+    @Column(name="convert_no")
+    private String convertNo;
 
 
 
@@ -315,6 +316,18 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
         return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT;
     }
 
+    @Transient
+    private boolean flag;
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    @Override
+    public boolean getFlag() {
+        return flag;
+    }
+
     public void setBusinessNumber(String businessNumber) {
         this.businessNumber = businessNumber;
     }
@@ -402,6 +415,13 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
         this.inSiteName = inSiteName;
     }
 
+    public String getConvertNo() {
+        return convertNo;
+    }
+
+    public void setConvertNo(String convertNo) {
+        this.convertNo = convertNo;
+    }
 
     public String getApprovalUid() {
         return approvalUid;

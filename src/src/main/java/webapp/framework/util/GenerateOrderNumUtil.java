@@ -26,7 +26,7 @@ public class GenerateOrderNumUtil {
         OrgInfo hospitalOrg = orgInfoRepository.getByUid(hospitalUID);
         DateTime now = new DateTime();
         String prefix = TRANSFER_OUT_BOUND_ORDER_NUM_PREFIX;
-        String orgCOde=hospitalOrg.getOrgCode()!=null?hospitalOrg.getOrgCode():"002";
+        String orgCOde=hospitalOrg.getOrgCode()!=null?hospitalOrg.getOrgCode():"000";
         String year = now.toString("yyyyMMdd");
         synchronized (this) {
             int count = assetDepartmentConvertRepository.selectCurrentFinishCount(prefix + orgCOde + year);
