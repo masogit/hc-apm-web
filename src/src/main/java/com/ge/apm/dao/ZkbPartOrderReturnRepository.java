@@ -25,6 +25,9 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
 
     List<ZkbPartOrderReturn> findByPartOrderIdAndPartNoAndIdIsNot(String partOrderId,String partNo,String id);
 
+    List<ZkbPartOrderReturn> findByPartOrderIdAndItemId(String partOrderId,String itemId);
+
+    List<ZkbPartOrderReturn> findByPartOrderIdAndItemIdAndIdIsNot(String partOrderId,String itemId,String id);
 
     /**
      * 获取配件申请归还数量

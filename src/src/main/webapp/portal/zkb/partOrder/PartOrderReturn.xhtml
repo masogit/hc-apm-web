@@ -15,9 +15,9 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">配件号*</label>
-                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" required="true" requiredMessage="配件号不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
+                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.itemId}" valueChangeListener="#{zkbPartOrderAuditController.partNoChange}" required="true" requiredMessage="配件号不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.text}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>

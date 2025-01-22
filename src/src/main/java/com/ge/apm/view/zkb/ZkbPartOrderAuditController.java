@@ -24,6 +24,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -861,8 +862,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         List<String> orderContains = new ArrayList<>();
         for(ZkbPartOrderItem i :zkbPartOrderItemList){
             HashMap<String, String> m = new HashMap<>();
-            m.put("text",i.getPartName());
-            m.put("value",i.getPartNo());
+            m.put("text",i.getPartNo()+ "("+i.getPartName() +")");
+            m.put("value",i.getId());
             partNoList.add(m);
             if(StringUtils.isNotEmpty(i.getOrderNo())){
                 if(!orderContains.contains(i.getOrderNo())){
@@ -905,7 +906,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             boolean flag = true;
             Integer total = 0;
             for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
-                if(zkbPartOrderReturn.getPartNo().equals(i.getPartNo())){
+                if(zkbPartOrderReturn.getItemId().equals(i.getId())){
                     total = i.getPartQty();
                     break;
                 }
@@ -913,9 +914,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Integer returnQty = 0;
             List<ZkbPartOrderReturn> returns = new ArrayList<>();
             if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
-                returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNo(selected.getId(),zkbPartOrderReturn.getPartNo());
+                returns = zkbPartOrderReturnRepository.findByPartOrderIdAndItemId(selected.getId(),zkbPartOrderReturn.getItemId());
             }else {
-                returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNoAndIdIsNot(selected.getId(),zkbPartOrderReturn.getPartNo(),zkbPartOrderReturn.getId());
+                returns = zkbPartOrderReturnRepository.findByPartOrderIdAndItemIdAndIdIsNot(selected.getId(),zkbPartOrderReturn.getItemId(),zkbPartOrderReturn.getId());
             }
             if(returns.size() > 0){
                 for(ZkbPartOrderReturn r : returns){
@@ -1395,6 +1396,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
+    }
+
+    public void partNoChange(ValueChangeEvent event){
+        ZkbPartOrderItem zkbPartOrderItem = selected.getZkbPartOrderItems().stream().filter(t -> t.getId().equals(event.getNewValue())).findFirst().get();
+        zkbPartOrderReturn.setPartNo(zkbPartOrderItem.getPartNo());
     }
 
     public String getModifyType() {
