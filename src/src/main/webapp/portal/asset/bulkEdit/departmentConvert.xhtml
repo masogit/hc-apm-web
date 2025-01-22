@@ -54,11 +54,14 @@
                                 </p:selectBooleanCheckbox>
                                 <f:facet name="header"  >
                                     <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) bulkEditForm:tab:AssetDepartmentConvertForm:datalist reportButton previewQRCode " oncomplete="updateSelectAllCheckBox();"/>
+                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) bulkEditForm:tab:AssetDepartmentConvertForm:datalist previewQRCode " oncomplete="updateSelectAllCheckBox();"/>
                                     </p:selectBooleanCheckbox>
                                 </f:facet>
                             </p:column>
                             <!--sharedId-->
+                            <p:column headerText="转科单号" sortBy="#{item.convertNo}" filterBy="#{item.convertNo}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.convertNo}"/>
+                            </p:column>
                             <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.assetName}"/>
                             </p:column>
@@ -131,15 +134,15 @@
                                     <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentConvertController.fileName}"
                                                     postProcessor="#{departmentConvertController.postProcessXLS}"/>
                                 </p:commandButton>
-                                <p:commandButton id="reportButton" icon="ui-icon-arrow-1-s"
-                                                 actionListener="#{departmentConvertController.exportTransferOrderFile}"
-                                                 class="btn btn-sm btn-gray batch-terminated" title="调拨单导出"
-                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
-                                                 disabled="#{not departmentConvertController.isChecked()}"
-                                >
-                                    <p:fileDownload value="#{departmentConvertController.transferOrderFile}"/>
+<!--                                <p:commandButton id="reportButton" icon="ui-icon-arrow-1-s"-->
+<!--                                                 actionListener="#{departmentConvertController.exportTransferOrderFile}"-->
+<!--                                                 class="btn btn-sm btn-gray batch-terminated" title="调拨单导出"-->
+<!--                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"-->
+<!--                                                 disabled="#{not departmentConvertController.isChecked()}"-->
+<!--                                >-->
+<!--                                    <p:fileDownload value="#{departmentConvertController.transferOrderFile}"/>-->
 
-                                </p:commandButton>
+<!--                                </p:commandButton>-->
 <!--                                <p:commandButton title="导出当前页" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" ajax="false">-->
 <!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
 <!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
