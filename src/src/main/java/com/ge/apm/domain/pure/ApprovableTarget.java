@@ -35,4 +35,8 @@ public interface ApprovableTarget {
         return null;
     }
 
+    default boolean getFlag(){
+        return false;
+    }
+
 }

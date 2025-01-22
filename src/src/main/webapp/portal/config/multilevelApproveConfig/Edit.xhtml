@@ -251,7 +251,7 @@
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{'equipmentAdjustment'.equals(multiLevelApprovalConfigController.selected.businessType) or 'assetScrap'.equals(multiLevelApprovalConfigController.selected.businessType)}">
+                    <h:panelGroup rendered="#{'equipmentAdjustment'.equals(multiLevelApprovalConfigController.selected.businessType) or 'assetScrap'.equals(multiLevelApprovalConfigController.selected.businessType) or 'assetDepartmentConvert'.equals(multiLevelApprovalConfigController.selected.businessType)}">
                         <label class="label">上级审批</label>
                             <p:selectBooleanCheckbox id="approvalRoleAssetHead" value="#{multiLevelApprovalConfigController.approvalRoleAssetHead}">
                                 <p:ajax process="@this" listener="#{multiLevelApprovalConfigController.changeApprovalStrategy}" update="approverInfoEditForm" />

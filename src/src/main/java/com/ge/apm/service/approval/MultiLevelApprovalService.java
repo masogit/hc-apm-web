@@ -52,6 +52,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.GenerateOrderNumUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -69,12 +70,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Autowired
     private UserAccountRepository userAccountRepository;
-    @Autowired
-    private WechatSendMsgService wechatSendMsgService;
-    @Autowired
-    private SimplePartsRequestService partsRequestService;
-    @Autowired
-    private SimplePartsRequestRepository partsRequestRepository;
     @Autowired
     private MultiLevelApprovalConfigRepository multiApprovalConfigDao;
     @Autowired
@@ -108,8 +103,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private SysRoleRepository roleDao;
 
     @Autowired
-    private UserOrgInfoRepository userOrgDao;
-    @Autowired
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
     @Autowired
     private OrgInfoRepository orgInfoRepository;
@@ -130,6 +123,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private SharedAssetRequestRepository sharedAssetRequestRepository;
     @Autowired
     private SharedAssetService sharedAssetService;
+    @Autowired
+    private GenerateOrderNumUtil generateOrderNumUtil;
 
     @Autowired
     private V2_WorkOrderService woService;
@@ -189,8 +184,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * @return
      */
     public MultiLevelApprovalConfig getApproveWorkflowConfig(String approvalUid) {
-        MultiLevelApprovalConfig approveWorkflowConfig = multiApprovalConfigDao.findById(approvalUid);
-        return approveWorkflowConfig;
+        return multiApprovalConfigDao.findById(approvalUid);
     }
 
     /**
@@ -477,6 +471,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void getMultiLevelApprovalPersonAndSubmitByDisagree(MultiLevelApproval multiLevelApproval, String approvalOpinion) {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
         multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE);
         multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE);
         multiLevelApproval.setActualApproverName(userAccount.getName());
@@ -564,14 +559,18 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                     UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
                     userAccounts.add(applyUser);
                 }
-                wxMessageService.sendMessage(assetInfo,"审批失败",assetScrap,userAccounts,"",userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_REFUSED);
+                wxMessageService.sendMessage(Collections.singletonList(assetInfo),"审批失败",assetScrap,userAccounts,"",userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_REFUSED);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
                 assetInfo = assetInfoDao.findByUid(assetDepartmentConvert.getAssetUid());
                 UserAccount applyUser = userAccountRepository.getByUid(assetDepartmentConvert.getTransferOutUid());
                 userAccounts.add(applyUser);
-                wxMessageService.sendMessage(assetInfo,"审批失败",assetDepartmentConvert,userAccounts,"",userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_REFUSED);
+                if (multiLevelApprovalConfig.getApprovalItem().contains("approvalStrategy")) {
+                    wxMessageService.sendMessage(Collections.singletonList(assetInfo),"审批失败",assetDepartmentConvert,userAccounts,"",userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.BATH_ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_REFUSED);
+                } else {
+                    wxMessageService.sendMessage(Collections.singletonList(assetInfo),"审批失败",assetDepartmentConvert,userAccounts,"",userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_REFUSED);
+                }
                 break;
             default:
                 //审批同意时 给审批人发送微信
@@ -1030,39 +1029,47 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
-                                AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                                AssetDepartmentConvert temp = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
                                 List<AssetDepartmentConvert> assetDepartmentConverts = assetDepartmentConvertRepository.findByTenantAndBusinessNumber(userAccount.getTenantUID(), multiLevelApproval.getBusinessNumber());
-                                byId.setCurrentStatus(3);
-                                byId.setLastModifiedBy(userAccount.getName());
-                                byId.setLastModifiedDate(new Date());
-                                byId.setTransferInName(byId.getApprovalBy());
-                                byId.setTransferInAt(new Date());
-                                byId.setTransferInUid(byId.getApprovalUid());
-                                assetDepartmentConvertRepository.save(byId);
-                                AssetInfo assetInfoByUid = assetInfoDao.getByUid(byId.getAssetUid());
-                                OrgInfo orgInfo = orgInfoRepository.getByUid(byId.getInDeptUid());
-                                assetInfoByUid.setClinicalDeptUID(byId.getInDeptUid());
-                                assetInfoByUid.setClinicalDeptId(orgInfo.getId());
-                                assetInfoByUid.setClinicalDeptName(byId.getInDeptName());
-                                assetInfoByUid.setLastModifiedDate(new Date());
-                                assetInfoByUid.setLastModifiedBy(userAccount.getName());
-                                assetInfoDao.save(assetInfoByUid);
+                                List<String> assetUidList = assetDepartmentConverts.stream().map(AssetDepartmentConvert::getAssetUid).collect(Collectors.toList());
+                                String convertNo = generateOrderNumUtil.autoGenerateOutBoundOrderNum(temp.getInDeptUid());
+                                for (AssetDepartmentConvert departmentConvert : assetDepartmentConverts) {
+                                    departmentConvert.setCurrentStatus(3);
+                                    departmentConvert.setLastModifiedBy(userAccount.getName());
+                                    departmentConvert.setLastModifiedDate(new Date());
+                                    departmentConvert.setTransferInName(departmentConvert.getApprovalBy());
+                                    departmentConvert.setTransferInAt(new Date());
+                                    departmentConvert.setTransferInUid(departmentConvert.getApprovalUid());
+                                    departmentConvert.setConvertNo(convertNo);
+                                }
+                                assetDepartmentConvertRepository.save(assetDepartmentConverts);
+                                List<AssetInfo> assetInfos = assetInfoDao.findByUidIn(assetUidList);
+                                OrgInfo orgInfo = orgInfoRepository.getByUid(temp.getInDeptUid());
+                                for (AssetInfo assetInfo : assetInfos) {
+                                    assetInfo.setClinicalDeptUID(temp.getInDeptUid());
+                                    assetInfo.setClinicalDeptId(orgInfo.getId());
+                                    assetInfo.setClinicalDeptName(temp.getInDeptName());
+                                    assetInfo.setLastModifiedDate(new Date());
+                                    assetInfo.setLastModifiedBy(userAccount.getName());
+                                }
+                                assetInfoDao.save(assetInfos);
 
-                                MqContext mqContext = new MqContext();
-                                mqContext.setClassName("MultiLevelApprovalService");
-                                mqContext.setServiceName("hc-apm-web");
-                                mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
-                                mqContext.setDescribe("资产转科审核同意");
-                                UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-                                mqUtils.sendAssetToMQ(assetInfoByUid,currentUserAccount,mqContext);
+                                for (AssetInfo assetInfo : assetInfos) {
+                                    MqContext mqContext = new MqContext();
+                                    mqContext.setClassName("MultiLevelApprovalService");
+                                    mqContext.setServiceName("hc-apm-web");
+                                    mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
+                                    mqContext.setDescribe("资产转科审核同意");
+                                    UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                                    mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+                                }
 
-
-                                Set<String> approverUids = multiLevelApprovalList.stream().map(MultiLevelApproval::getActualApproverUid).distinct().collect(Collectors.toSet());
-                                approverUids.add(byId.getTransferOutUid());
+                                Set<String> approverUids = multiLevelApprovalList.stream().map(MultiLevelApproval::getActualApproverUid).collect(Collectors.toSet());
+                                approverUids.add(temp.getTransferOutUid());
                                 List<UserAccount> userAccounts1=userAccountRepository.getByUids(approverUids);
                                 int roleId = roleDao.getIdByName("DeptHead");
-                                List<UserAccount> inUsers = userAccountRepository.findOrgUidByRoleId(byId.getInDeptUid(), roleId);
-                                List<UserAccount> outUsers = userAccountRepository.findOrgUidByRoleId(byId.getOutDeptUid(), roleId);
+                                List<UserAccount> inUsers = userAccountRepository.findOrgUidByRoleId(temp.getInDeptUid(), roleId);
+                                List<UserAccount> outUsers = userAccountRepository.findOrgUidByRoleId(temp.getOutDeptUid(), roleId);
                                 if(CollectionUtils.isNotEmpty(inUsers)){
                                     userAccounts1.addAll(inUsers);
                                 }
@@ -1070,7 +1077,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     userAccounts1.addAll(outUsers);
                                 }
                                 userAccounts1= userAccounts1.stream().distinct().collect(Collectors.toList());
-                                wxMessageService.sendMessage(assetInfoByUid,"审批通过",byId,userAccounts1,"",userAccount,byId.getApplyReason(),MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_PASS);
+                                if (multiLevelApprovalConfig.getApprovalItem().contains("approvalStrategy")) {
+                                    wxMessageService.sendMessage(assetInfos,"审批通过", temp, userAccounts1,"", userAccount, temp.getApplyReason(), MSGEvent.BATH_ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_PASS);
+                                } else {
+                                    wxMessageService.sendMessage(assetInfos,"审批通过", temp, userAccounts1,"", userAccount, temp.getApplyReason(), MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_PASS);
+                                }
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
                                 SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
@@ -1372,7 +1383,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 UserAccount approvalUser = userAccountRepository.getByUid(assetScrap.getApprovalUid());
                 userAccounts.add(approvalUser);
             }
-            wxMessageService.sendMessage(assetInfo,"审批通过",assetScrap,userAccounts,null,userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_PASS);
+            wxMessageService.sendMessage(Collections.singletonList(assetInfo),"审批通过",assetScrap,userAccounts,null,userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_PASS);
         }else{
             if(assetScrap.getAssetStatus()!=null){
                 assetInfo.setStatus(assetScrap.getAssetStatus());
@@ -1700,16 +1711,21 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     private void extracted(MultiLevelApproval multiLevelApproval, UserAccount userAccount, List<UserAccount> userAccounts, List<String> sendUserUids, MultiLevelApproval date, ApprovalNode node, String linkUrl) {
         AssetInfo assetInfo;
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
         switch (multiLevelApproval.getBusinessType()) {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
                 assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
-                wxMessageService.sendMessage(assetInfo,node.getNodeName(),assetScrap,userAccounts,linkUrl,userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_TO_APPROVAL);
+                wxMessageService.sendMessage(Collections.singletonList(assetInfo),node.getNodeName(),assetScrap,userAccounts,linkUrl,userAccount,assetScrap.getApplyReason(),MSGEvent.ASSET_SCRAP_MULTI_LEVEL_APPROVAL_TO_APPROVAL);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
                 assetInfo = assetInfoDao.findByUid(assetDepartmentConvert.getAssetUid());
-                wxMessageService.sendMessage(assetInfo,node.getNodeName(),assetDepartmentConvert,userAccounts,linkUrl,userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_TO_APPROVAL);
+                if (multiLevelApprovalConfig.getApprovalItem().contains("approvalStrategy")) {
+                    wxMessageService.sendMessage(Collections.singletonList(assetInfo),node.getNodeName(),assetDepartmentConvert,userAccounts,linkUrl,userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.BATH_ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_TO_APPROVAL);
+                } else {
+                    wxMessageService.sendMessage(Collections.singletonList(assetInfo),node.getNodeName(),assetDepartmentConvert,userAccounts,linkUrl,userAccount,assetDepartmentConvert.getApplyReason(),MSGEvent.ASSET_DEPARTMENT_CONVERT_MULTI_LEVEL_APPROVAL_TO_APPROVAL);
+                }
                 break;
             default:
                 //审批同意时 给审批人发送微信
