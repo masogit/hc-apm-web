@@ -565,7 +565,7 @@
                     <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
                 </h:panelGroup>
                 <br/>
-                <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.applyAssetScrap()}" value="确定"  icon="ui-icon-check"  oncomplete="PF('scrapapply').hide()"/>
+                <p:commandButton  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.applyAssetApplication('scrap')}" value="确定"  icon="ui-icon-check"  oncomplete="PF('scrapapply').hide()"/>
                 <p:commandButton  validateClient="true" immediate="false"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
             </h:form>
 

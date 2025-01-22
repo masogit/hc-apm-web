@@ -309,11 +309,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 secondaryApprovalData =objects;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
-                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
-                List<AssetDepartmentConvert> assetDepartmentConverts = new ArrayList<>();
-                assetDepartmentConverts.add(assetDepartmentConvert);
-                primaryApprovalData = assetDepartmentConvert;
-                secondaryApprovalData =assetDepartmentConvert;
+                List<AssetDepartmentConvert> assetDepartmentConverts = assetDepartmentConvertRepository.findByTenantAndBusinessNumber(account.getTenantUID(), multiLevelApproval.getBusinessNumber());
+                primaryApprovalData = assetDepartmentConverts;
+                secondaryApprovalData = assetDepartmentConverts;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
                   SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
