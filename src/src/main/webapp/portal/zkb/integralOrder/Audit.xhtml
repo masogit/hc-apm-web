@@ -218,10 +218,24 @@
                             <label class="label">备注</label>
                             <p:inputTextarea value="#{zkbIntegralOrderAuditController.selected.remark}" maxlength="255" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">收货信息*</label>
                             <p:inputTextarea value="#{zkbIntegralOrderAuditController.selected.receivingInfo}" rows="4" cols="120" disabled="true" >
                             </p:inputTextarea>
+                        </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">收货人*</label>
+                            <p:inputText value="#{zkbIntegralOrderAuditController.selected.receiver}" disabled="true">
+                                <p:ajax />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">收货人电话*</label>
+                            <p:inputText id="receiverPhone" value="#{zkbIntegralOrderAuditController.selected.receiverPhone}" disabled="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">收货地址*</label>
+                            <p:inputTextarea id="receiverAddress" value="#{zkbIntegralOrderAuditController.selected.receiverAddress}" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
