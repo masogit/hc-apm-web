@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -53,5 +54,21 @@ public class SystemTemplateService {
             return IOUtils.toByteArray(blobService.getBlobObjectByStorageId(storageId).getStream());
         }
         return null;
+    }
+
+
+    public InputStream getTemplateInputStream(SystemTemplate.SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
+        List<SystemTemplate> byKeyAndSiteForUseParent = this.findByKeyAndSiteForUseParent(templateEnum.getCode(), user);
+        if(CollectionUtils.isNotEmpty(byKeyAndSiteForUseParent)){
+            SystemTemplate systemTemplate = byKeyAndSiteForUseParent.get(0);
+            String  storageId= systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId();
+            return blobService.getBlobObjectByStorageId(storageId).getStream();
+        }
+        return null;
+    }
+
+    public boolean existsSiteTemplate(String templateType, String siteUid) {
+       List<SystemTemplateValue> list= systemTemplateValueRepository.findBySiteUidAndTemplateType(siteUid,templateType);
+        return list != null && !list.isEmpty();
     }
 }

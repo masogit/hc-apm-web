@@ -11,9 +11,9 @@
                     <p:outputLabel class="pageTitle" value="#{msg.ReportFormTemplateManagement}"/>
                 </div>
                 <h:form id="pmOrderReportTemplateListForm">
-                    <p:dataTable id="dataList" value="#{pmOrderReportTemplateController.lazyModel}" var="item"
+                    <p:dataTable id="dataList" value="#{pmOrderReportSysTemplateController.lazyModel}" var="item"
                                  widgetVar="varDataList"
-                                 selectionMode="single" selection="#{pmOrderReportTemplateController.selected}"
+                                 selectionMode="single" selection="#{pmOrderReportSysTemplateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -21,26 +21,26 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{pmOrderReportTemplateController.onSelect()}"
+                        <p:ajax event="rowSelect" listener="#{pmOrderReportSysTemplateController.onSelect()}"
                                 update="createButton editButton deleteButton"/>
 
-                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
+                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUid}" filterBy="#{item.tenantUid}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{pmOrderReportTemplateController.getTenantName(item.tenantUID)}"/>
+                            <h:outputText value="#{pmOrderReportSysTemplateController.getTenantName(item.tenantUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
+                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUid}" filterBy="#{item.institutionUid}"
                                   filterMatchMode="EQ">
                             <h:outputText
-                                    value="#{pmOrderReportTemplateController.getInsNameByUID(item.institutionUID)}"/>
+                                    value="#{pmOrderReportSysTemplateController.getInsNameByUID(item.institutionUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}"
+                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUid}" filterBy="#{item.hospitalUid}"
                                   filterMatchMode="EQ">
                             <h:outputText
-                                    value="#{pmOrderReportTemplateController.getHospitalNameByUID(item.hospitalUID)}"/>
+                                    value="#{pmOrderReportSysTemplateController.getHospitalNameByUID(item.hospitalUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
+                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUid}" filterBy="#{item.siteUid}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{pmOrderReportTemplateController.getSiteNameByUID(item.siteUID)}"/>
+                            <h:outputText value="#{pmOrderReportSysTemplateController.getSiteNameByUID(item.siteUid)}"/>
                         </p:column>
                         <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
@@ -49,19 +49,19 @@
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_TEMPLATE_EDIT')}"
-                                             actionListener="#{pmOrderReportTemplateController.prepareCreate()}"
+                                             actionListener="#{pmOrderReportSysTemplateController.prepareCreate()}"
                                              update=":pmOrderReportTemplateEditDlg"
                                              oncomplete="PF('pmOrderReportTemplateEditDialog').show()"
-                                             disabled="#{pmOrderReportTemplateController.existsSiteTemplate()}" />
+                                             disabled="#{pmOrderReportSysTemplateController.existsSiteTemplate()}" />
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_TEMPLATE_EDIT')}"
-                                             actionListener="#{pmOrderReportTemplateController.prepareEdit()}"
+                                             actionListener="#{pmOrderReportSysTemplateController.prepareEdit()}"
                                              update=":pmOrderReportTemplateEditDlg"
                                              oncomplete="PF('pmOrderReportTemplateEditDialog').show()"
-                                             disabled="#{empty pmOrderReportTemplateController.selected}"/>
+                                             disabled="#{empty pmOrderReportSysTemplateController.selected}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_TEMPLATE_EDIT')}"
-                                             actionListener="#{pmOrderReportTemplateController.delete}"
-                                             update=":pmOrderReportTemplateEditDlg,dataList"
-                                             disabled="#{empty pmOrderReportTemplateController.selected}">
+                                             actionListener="#{pmOrderReportSysTemplateController.delete}"
+                                             update=":pmOrderReportTemplateEditDlg,dataList,pmOrderReportTemplateListForm"
+                                             disabled="#{empty pmOrderReportSysTemplateController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                            icon="ui-icon-warning"/>
                             </p:commandButton>
