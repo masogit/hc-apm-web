@@ -231,10 +231,24 @@
                             <p:inputTextarea value="#{zkbIntegralOrderEditController.selected.remark}" maxlength="255" />
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">收货信息*</label>
                             <p:inputTextarea value="#{zkbIntegralOrderEditController.selected.receivingInfo}" rows="4" cols="120" required="false" requiredMessage="收货信息不能为空！" >
                             </p:inputTextarea>
+                        </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">收货人*</label>
+                            <p:inputText value="#{zkbIntegralOrderEditController.selected.receiver}" required="true" requiredMessage="#{msg.zkbPartOrder_receiver} #{msg.ValidationRequire}">
+                                <p:ajax />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">收货人电话*</label>
+                            <p:inputText id="receiverPhone" value="#{zkbIntegralOrderEditController.selected.receiverPhone}"  required="true" requiredMessage="#{msg.zkbPartOrder_receiverPhone} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">收货地址*</label>
+                            <p:inputTextarea id="receiverAddress" value="#{zkbIntegralOrderEditController.selected.receiverAddress}" required="true" requiredMessage="#{msg.zkbPartOrder_receiverAddress} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>

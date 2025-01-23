@@ -172,10 +172,22 @@ public class ZkbIntegralOrder implements Serializable {
     private Date lastModifiedDate;
 
     /**
-     * 收货信息
+     * 收货人
      */
-    @Column(name = "receiving_info")
-    private String receivingInfo;
+    @Column(name = "receiver")
+    private String receiver;
+
+    /**
+     * 收货人电话
+     */
+    @Column(name = "receiver_phone")
+    private String receiverPhone;
+
+    /**
+     * 收货地址
+     */
+    @Column(name = "receiver_address")
+    private String receiverAddress;
 
     /**
      * 医院名称
