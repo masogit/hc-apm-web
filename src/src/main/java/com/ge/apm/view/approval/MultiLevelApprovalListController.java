@@ -213,6 +213,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         businessMap.put(ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT,ApprovalConstant.BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME);
         businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP,ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP_NAME);
         businessMap.put(ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT,ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME);
+        businessMap.put(ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT,ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT_NAME);
         businessMap.put(ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT,ApprovalConstant.BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME);
         return  businessMap;
     }

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+
+        <style type="text/css">
+            .ui-chkbox .ui-chkbox-box .ui-icon-check {
+                color: gray!important;
+            }
+        </style>
+    </ui:define>
+
+    <h:form id="bulkEditForm">
+        <p:fieldset legend="过滤条件">
+
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                <h:panelGroup>
+                    <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+                    <p:inputText value="#{assetInfoBulkEditController.filter.siteOrg}" readonly="true" class="siteFilterChange"/>
+                    <p:commandButton id="btnOrgFilter" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
+                    <p:overlayPanel widgetVar="varPanelOrgFilter" for="btnOrgFilter" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree class="tree" style="width:98%;border:0;" value="#{assetInfoBulkEditController.tenantOrgTreeOther}" var="node" selectionMode="single">
+                                <p:ajax process="@this" event="select" update="@(.siteFilterChange) @(.pickList)"
+                                        listener="#{assetInfoBulkEditController.onSelectTreeNodeAsFilter}" oncomplete="PF('varPanelOrgFilter').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.clinicalDeptName}</label>
+                    <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.filter.clinicalDeptOrg}"
+                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDeptAsFilter}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="siteFilterChange">
+                        <p:ajax event="itemSelect" update="@(.pickList)" />
+                    </p:autoComplete>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.assetGroup}</label>
+                    <p:selectOneMenu value="#{assetInfoBulkEditController.filter.assetGroup}">
+                        <p:ajax update="@(.pickList)" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.name}/#{msg.financingNum}/#{msg.departNum}/#{msg.qrCode}/#{msg.serialNum}</label>
+                    <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}"  maxlength="100" style="width: 250px">
+                        <p:ajax event="keyup" update="@(.pickList)" />
+                    </p:inputText>
+                </h:panelGroup>
+
+            </p:panelGrid>
+        </p:fieldset>
+<!--    </h:form>-->
+        <br/>
+        <span style="color:red">每次最多操作1000条数据，如数据量大请分批操作！</span>
+<!--    <h:form id="dataForm">-->
+        <p:fieldset>
+
+            <p:pickList id="pickList" value="#{assetInfoBulkEditController.assets}"
+                        var="asset" itemLabel="#{asset}" itemValue="#{asset}"
+                        showSourceFilter="false" showTargetFilter="false" responsive="true"
+                        filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
+                <f:facet name="sourceCaption"><p  style="padding-bottom:-300px">待选设备
+                    <br/>
+                    <br/>
+                    <span style="width:18%;float: left">#{msg.EquipmentName}</span>
+                    <span style="width:20%;float: left">#{msg.financingNum}</span>
+                    <span style="width:18%;float: left">#{msg.serialNum}</span>
+                    <span style="width:21%;float: left">#{msg.departNum}</span>
+                    <span style="width:21%;float: left">#{msg.qrCode}</span></p>
+                </f:facet>
+                <f:facet name="targetCaption"><p  style="padding-bottom:-200px">已选设备
+                    <br/>
+                    <br/>
+                    <span style="width:18%;float: left">#{msg.EquipmentName}</span>
+                    <span style="width:20%;float: left">#{msg.financingNum}</span>
+                    <span style="width:18%;float: left">#{msg.serialNum}</span>
+                    <span style="width:21%;float: left">#{msg.departNum}</span>
+                    <span style="width:21%;float: left">#{msg.qrCode}</span></p>
+                </f:facet>
+                <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="@(.clsBtnChangeSite) @(.pickList)"/>
+                <p:column style="width:18%;float: left; ">
+                    <h:outputText value="#{asset.name}" />
+                </p:column>
+                <p:column style="width:20%;float: left;" >
+                    <h:outputText value="#{asset.financingNum}" />
+                </p:column>
+                <p:column style="width:18%;float: left;" >
+                    <h:outputText value="#{asset.serialNum}" />
+                </p:column>
+                <p:column style="width:21%;float: left;" >
+                    <h:outputText value="#{asset.departNum}" />
+                </p:column>
+                <p:column style="width:23%;float: left;" >
+                    <h:outputText value="#{asset.qrCode}" />
+                </p:column>
+            </p:pickList>
+        </p:fieldset>
+<!--    </h:form>-->
+        <br/>
+        <span  style="color:red">请务必将相关资产的维修负责人/保养负责人/设备标签工程师等用户迁移到新院区，以免导致工作流问题！</span>
+<!--    <h:form id="convertForm">-->
+        <p:fieldset>
+            <p:panelGrid  id="changeSite" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                <h:panelGroup>
+                    <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+                    <p:inputText id="selectedUserOrgName" value="#{assetInfoBulkEditController.selected.siteOrg}" readonly="true" class="clsNewSiteName"/>
+                    <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
+                    <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTree}" var="node" selectionMode="single">
+                                <p:ajax process="@this" event="select" update="@(.clsBtnChangeSite) @(.clsNewSiteName) @(.SiteUIDChange)"
+                                        listener="#{assetInfoBulkEditController.onSelectTreeNodeAsNewValue}" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
+                    <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selected.clinicalDeptOrg}"
+                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                        <p:ajax update="@(.clsBtnChangeSite) " />
+                    </p:autoComplete>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">申请理由<span style="color:red">*</span></label>
+                    <p:inputText value="#{assetInfoBulkEditController.applyReason}" maxlength="256" />
+                    <p:outputLabel value="#{assetInfoBulkEditController.applyReason}" />
+                </h:panelGroup>
+
+            </p:panelGrid>
+            <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
+                             disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}"
+                             oncomplete="handleComplete(xhr, status, args);" update="departmentConvertForm" class="clsBtnChangeSite"/>
+<!--                             oncomplete="handleComplete(xhr, status, args);" update="departmentConvertForm" class="clsBtnChangeSite"/>-->
+            <p:commandButton style="display: none" id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoBulkEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleAssetDepartmentCovertCompleteSig(xhr, status, args);"/>
+            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoBulkEditController.getSignature()}" value="查看签名" update="departmentConvertForm:tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
+<!--                        <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoBulkEditController.getSelectedUidList())}"-->
+<!--                                         disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" class="clsBtnChangeSite"/>-->
+        </p:fieldset>
+    </h:form>
+        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+                <p:commandButton validateClient="true" actionListener="#{assetInfoBulkEditController.todelete()}" value="是" update="departmentConvertForm:tab :growl" icon="ui-icon-check"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update="departmentConvertForm:tab :growl"/>
+            </p:fieldset>
+        </p:dialog>
+    <p:dialog id="departmentCovertSignatureDlg" widgetVar="departmentCovertSignatureDlg" header="签名" modal="true">
+        <h:form id="departmentCovertSignatureForm">
+            <h:panelGrid columnClasses="value" columns="1">
+                <h:panelGroup>
+                    <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{assetInfoBulkEditController.signatureContent}"
+                                 guideline="false" rendered="#{assetInfoBulkEditController.signatureContentStream==null}" />
+                    <p:graphicImage value="#{assetInfoBulkEditController.signatureContentStream}" stream="false" rendered="#{assetInfoBulkEditController.signatureContentStream!=null}"></p:graphicImage>
+                </h:panelGroup>
+            </h:panelGrid>
+            <p:commandButton value="确认" actionListener="#{assetInfoBulkEditController.applyAssetApplication('departmentCovert')}" oncomplete="handleAssetDepartmentCovertApproveSuccess(xhr, status, args);" />
+            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoBulkEditController.resetSignature()}" update="departmentConvertForm:tab:departmentCovertSignatureForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('departmentCovertSignatureDlg').hide()"/>
+        </h:form>
+
+    </p:dialog>
+    <script type="text/javascript">
+
+        function handleComplete(xhr, status, args) {
+            var unCheckedNurseSite = args.unCheckedNurseSite;
+            var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite;
+            var errFlag = args.errFlag == null ? false : args.errFlag
+            if(unCheckedNurseSite==true &amp;&amp; toDeleteNurseMaintainSite == false) {
+                PF('toDeleteCheckedNurseSite').show()
+            } else if (errFlag == false) {
+                document.getElementById('departmentConvertForm:tab:bulkEditForm:departmentCovertButton').click();
+            }
+        }
+
+        afterPageLoad = function () {
+            $("#searchForm\\:searchText").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+
+        function openSwapTypeViewWindow(xhr, status, args) {
+            this.location.href = args.url;
+        }
+
+        $(function () {
+            //解决两个时间选择样式问题
+            var removeUiDatepickerDivClipRect = function (i) {
+                if(i &lt; 20){
+                    i++;
+                    $("#ui-datepicker-div").css("clip","");
+                    setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
+                }
+            }
+            $("#AssetDepartmentConvertForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
+            $("#AssetDepartmentConvertForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
+        })
+        function getDate(){
+            return Date.now();
+        }
+
+        function updateSelectAllCheckBox() {
+            var checkboxlist = $(".selectCheckBox");
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+            });
+            $("#AssetDepartmentConvertForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+            if (selectAllstatus) {
+                $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+            } else {
+                $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+            }
+        }
+
+        function handleAssetDepartmentCovertCompleteSig(xhr, status, args) {
+            if(xhr.status===205){
+                document.getElementById('departmentConvertForm:tab:bulkEditForm:departmentCovertOpenSignature').click();
+            }
+        }
+
+    </script>
+</ui:composition>
+</html>
