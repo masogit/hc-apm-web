@@ -104,6 +104,7 @@ public class SystemTemplate implements Serializable {
         ORG_INFO("ORG_INFO","组织机构模块"),
         PARTS("PARTS","备件模块"),
         WORK("WORK","维修模块"),
+        INVENTORY("INVENTORY","盘点"),
 
         ASSET_PERFORMANCE("ASSET_PERFORMANCE","设备绩效模块"),
         ;
@@ -233,6 +234,7 @@ public class SystemTemplate implements Serializable {
 
         WORK_ORDER_REPORT("WORK_ORDER_REPORT","维修工单报告模板","word",SystemTemplateBusinessEnum.WORK.getCode(),"workOrderTemplate.docx"),
 
+        INVENTORY_ORDER_LIST("INVENTORY_ORDER_LIST","盘点工单列表模板","excel",SystemTemplateBusinessEnum.INVENTORY.getCode(),"inventoryOrderList.xlsx"),
 
         ;
         final String code;

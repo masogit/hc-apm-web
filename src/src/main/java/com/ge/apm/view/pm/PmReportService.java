@@ -525,7 +525,7 @@ public class PmReportService {
         long count = pmOrders.values().stream().filter(i -> i).count();
 //        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
 
-        byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT, user);
+        byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
 
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();

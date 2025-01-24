@@ -455,12 +455,12 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     public Boolean check(Integer minAmountNew,Integer maxAmountNew,boolean enable){
         List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = configDao.findByHierOrgUidAndBusinessTypeAndEnable(selected.getHierOrgUid(),selected.getBusinessType(),true);
         String approvalMsg = "已存在同级别审批流";
-        if (selected.getBusinessType().equals(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT)) {
+        /*if (selected.getBusinessType().equals(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT)) {
             if (multiLevelApprovalConfigs.size() >= 2) {
                 WebUtil.addWarnMessage(approvalMsg);
                 return true;
             }
-        }
+        }*/
         if(!multiLevelApprovalConfigs.isEmpty() && multiLevelApprovalConfigs != null){
             for (MultiLevelApprovalConfig multiLevelApprovalConfig :multiLevelApprovalConfigs){
                 String configration = multiLevelApprovalConfig.getConfigration();
@@ -526,7 +526,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     WebUtil.addWarnMessage(approvalMsg);
                     return true;
                 }
-            } else if (ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT.equals(selected.getBusinessType())) {
+            /*} else if (ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT.equals(selected.getBusinessType())) {
                 String approvalStrategy;
                 if ("Create".equals(super.crudActionName)) {
                     List<ApprovalNode> collect = nodesList.stream().filter(item -> !Objects.equals(item.getId(), SimplePartsConstant.PARTS_LOCAL_ORG_ID)).collect(Collectors.toList());
@@ -539,7 +539,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     return true;
                 } else {
                     return false;
-                }
+                }*/
             } else {
                 WebUtil.addWarnMessage(approvalMsg);
                 return true;

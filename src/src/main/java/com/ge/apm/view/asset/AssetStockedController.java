@@ -446,11 +446,19 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public String openNewWindowView(String stockNo) {
+        String viewUrl = "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
+        if (stockNo.startsWith("RK")) {
+            return viewUrl + stockNo;
+        } else {
+            return viewUrl + stockNo + "&amp;userName=" + currentUser.getName();
+        }
+/*
         if (stockNo.startsWith("RK")) {
             return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo;
         } else {
             return "/portal/asset/arrivedOutStock/stockJmPrintReportView.xhtml?faces-redirect=true&amp;stockNo=" + stockNo + "&amp;userName=" + currentUser.getName();
         }
+*/
     }
 
     public void prepareViewQrcode(){

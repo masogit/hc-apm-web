@@ -1022,7 +1022,7 @@
                                 </p:commandButton>
                             </ui:fragment>
                             <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
-                            <p:commandButton id="bathDepartmentCovert" class="btn btn-sm btn-gray batch-terminated" icon="fa fa-arrow-circle-right" title="批量申请转科" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoListController.getSelectedUidList())}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                            <p:commandButton id="bathDepartmentCovert" class="btn btn-sm btn-gray batch-terminated" icon="fa fa-arrow-circle-right" title="批量申请转科" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoListController.getSelectedUidList())}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
 
                         </f:facet>
                     </p:dataTable>
