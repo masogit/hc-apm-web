@@ -159,19 +159,18 @@
             </p:panelGrid>
             <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
                              disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}"
-                             oncomplete="handleComplete(xhr, status, args);" update="departmentConvertForm" class="clsBtnChangeSite"/>
-<!--                             oncomplete="handleComplete(xhr, status, args);" update="departmentConvertForm" class="clsBtnChangeSite"/>-->
+                             oncomplete="handleComplete(xhr, status, args);" update="bulkEditForm" class="clsBtnChangeSite"/>
             <p:commandButton style="display: none" id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoBulkEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleAssetDepartmentCovertCompleteSig(xhr, status, args);"/>
-            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoBulkEditController.getSignature()}" value="查看签名" update="departmentConvertForm:tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
+            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoBulkEditController.getSignature()}" value="查看签名" update="tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
 <!--                        <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoBulkEditController.getSelectedUidList())}"-->
 <!--                                         disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" class="clsBtnChangeSite"/>-->
         </p:fieldset>
     </h:form>
         <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
             <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
-                <p:commandButton validateClient="true" actionListener="#{assetInfoBulkEditController.todelete()}" value="是" update="departmentConvertForm:tab :growl" icon="ui-icon-check"
+                <p:commandButton validateClient="true" actionListener="#{assetInfoBulkEditController.todelete()}" value="是" update="tab :growl" icon="ui-icon-check"
                                  oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
-                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update="departmentConvertForm:tab :growl"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update="tab :growl"/>
             </p:fieldset>
         </p:dialog>
     <p:dialog id="departmentCovertSignatureDlg" widgetVar="departmentCovertSignatureDlg" header="签名" modal="true">
@@ -184,7 +183,7 @@
                 </h:panelGroup>
             </h:panelGrid>
             <p:commandButton value="确认" actionListener="#{assetInfoBulkEditController.applyAssetApplication('departmentCovert')}" oncomplete="handleAssetDepartmentCovertApproveSuccess(xhr, status, args);" />
-            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoBulkEditController.resetSignature()}" update="departmentConvertForm:tab:departmentCovertSignatureForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoBulkEditController.resetSignature()}" update="tab:departmentCovertSignatureForm" oncomplete="PF('sigPanel').clear()"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('departmentCovertSignatureDlg').hide()"/>
         </h:form>
 
@@ -198,56 +197,13 @@
             if(unCheckedNurseSite==true &amp;&amp; toDeleteNurseMaintainSite == false) {
                 PF('toDeleteCheckedNurseSite').show()
             } else if (errFlag == false) {
-                document.getElementById('departmentConvertForm:tab:bulkEditForm:departmentCovertButton').click();
-            }
-        }
-
-        afterPageLoad = function () {
-            $("#searchForm\\:searchText").keypress(function (e) {
-                if (e.keyCode == 13) {
-                    e.preventDefault();
-                }
-            });
-        }
-
-
-        function openSwapTypeViewWindow(xhr, status, args) {
-            this.location.href = args.url;
-        }
-
-        $(function () {
-            //解决两个时间选择样式问题
-            var removeUiDatepickerDivClipRect = function (i) {
-                if(i &lt; 20){
-                    i++;
-                    $("#ui-datepicker-div").css("clip","");
-                    setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
-                }
-            }
-            $("#AssetDepartmentConvertForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
-            $("#AssetDepartmentConvertForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
-        })
-        function getDate(){
-            return Date.now();
-        }
-
-        function updateSelectAllCheckBox() {
-            var checkboxlist = $(".selectCheckBox");
-            var selectAllstatus = true;
-            checkboxlist.each(function () {
-                selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
-            });
-            $("#AssetDepartmentConvertForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
-            if (selectAllstatus) {
-                $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
-            } else {
-                $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                document.getElementById('tab:bulkEditForm:departmentCovertButton').click();
             }
         }
 
         function handleAssetDepartmentCovertCompleteSig(xhr, status, args) {
             if(xhr.status===205){
-                document.getElementById('departmentConvertForm:tab:bulkEditForm:departmentCovertOpenSignature').click();
+                document.getElementById('tab:bulkEditForm:departmentCovertOpenSignature').click();
             }
         }
 

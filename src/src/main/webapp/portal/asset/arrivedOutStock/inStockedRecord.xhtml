@@ -82,7 +82,7 @@
 
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="入库单号">
-                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />
+                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" />
 <!--                <h:outputText value="#{item.inStockNo}"/>-->
             </p:column>
             <p:column headerText="业务时间">

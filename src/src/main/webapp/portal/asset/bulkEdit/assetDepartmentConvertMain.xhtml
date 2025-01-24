@@ -1,5 +1,4 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
@@ -10,18 +9,16 @@
                 <p:outputLabel class="pageTitle" value="资产转科"/>
             </div>
             <div class="ui-g-12">
-                <h:form id="departmentConvertForm">
-                    <p:tabView id="tab"  dynamic="true" cache="false" activeIndex="0">
-                        <p:ajax event="tabChange" listener="#{assetInfoBulkEditController.onTabChange}" />
-                        <p:tab title="资产批量转科" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}">
-                            <ui:include src="assetBulkEditSite1.xhtml"/>
-                        </p:tab>
-                        <p:tab title="资产转科情况" rendered="true" >
-                            <ui:include src="departmentConvert.xhtml"/>
-                        </p:tab>
-                    </p:tabView>
-                    <ui:include src="/portal/preview/QRView.xhtml"/>
-                </h:form>
+                <p:tabView id="tab"  dynamic="true" cache="false" activeIndex="0">
+                    <p:ajax event="tabChange" listener="#{assetInfoBulkEditController.onTabChange}" />
+                    <p:tab title="资产批量转科" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}">
+                        <ui:include src="assetBulkEditSite1.xhtml"/>
+                    </p:tab>
+                    <p:tab title="资产转科情况" rendered="true" >
+                        <ui:include src="departmentConvert.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+                <ui:include src="/portal/preview/QRView.xhtml"/>
             </div>
         </div>
     </ui:define>
