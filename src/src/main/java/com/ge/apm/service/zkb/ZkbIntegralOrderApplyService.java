@@ -540,7 +540,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbIntegralOrder.getId());
+            emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
 
             String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_MESSAGE);
@@ -559,7 +559,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbIntegralOrder.getId());
+            emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
             String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
 

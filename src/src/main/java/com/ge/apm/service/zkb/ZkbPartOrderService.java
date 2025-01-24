@@ -2668,7 +2668,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
@@ -2694,7 +2694,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
 
