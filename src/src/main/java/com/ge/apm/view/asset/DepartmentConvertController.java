@@ -266,6 +266,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     }
 
     public String openNewWindowView(String convertNo) {
+//             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
         return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=departmentConvert&amp;convertNo=" + convertNo;
     }
 
