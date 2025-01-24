@@ -155,7 +155,7 @@ public class DepartmentConvertService {
             Map<String, Object> mm = new HashMap<>();
             mm.put("approvalNumber", multiLevelApproval.getApprovalNumber());
             mm.put("businessNumber", multiLevelApproval.getBusinessNumber());
-            mm.put("businessType", ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI);
+            mm.put("businessType", assetDepartmentConvert.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT ? ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI : ApprovalConstant.APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT_CHI);
             mm.put("approvalLevel", multiLevelApproval.getApprovalLevel() + "级审批人");
             mm.put("actualApproverName", multiLevelApproval.getActualApproverName());
             mm.put("approvalNodeStatus", getApprovalNodeStatus(multiLevelApproval.getApprovalNodeStatus()));

@@ -1,8 +1,9 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -33,6 +34,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,9 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -88,6 +93,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private SupplierController supplierController;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
+    private WorkflowService workflowService;
+    private V2_WorkOrderService woService;
+    private AssetDepartmentConvertService assetDepartmentConvertService;
     private MqUtils mqUtils;
     private UserContextService userContextService;
     private QrCodeLib createRequest;
@@ -191,6 +199,15 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private List<AssetInfo> assetInfoList = null;
     public Set<AssetInfo> assetInfos = null;
     private UserAccount loginUser;
+    // 签名相关
+    @Getter @Setter
+    private String signatureContent;
+    @Getter
+    private StreamedContent signatureContentStream;
+    @Getter
+    private String signatureId;
+    @Getter
+    private boolean newSignature = true;
 
     @Override
     protected void init() {
@@ -221,6 +238,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         supplierController = WebUtil.getBean(SupplierController.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
+        woService= WebUtil.getBean(V2_WorkOrderService.class);
+        assetDepartmentConvertService= WebUtil.getBean(AssetDepartmentConvertService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         assetTypeGroupTreeComponentController.registerController(this);
@@ -1559,13 +1579,56 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return false;
     }
 
+    @Getter @Setter
+    private String applyReason;
+
+    public List<String> getSelectedUidList() {
+        return assets.getTarget().stream().map(AssetInfo::getUid).collect(Collectors.toList());
+    }
+
+    public void  getSig() {
+        if (StringUtils.isNotEmpty(selected.getSiteUID())) {
+            WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(selected.getSiteUID());
+            if (workflowConfig != null && Boolean.TRUE.equals(workflowConfig.getPartsNeedSign())) {
+                // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+                response.setStatus(205);
+                return;
+            }
+        }
+    }
+
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!org.springframework.util.CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureId = null;
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
+    }
+
     public void checkedIfNessesaryBeforeCommitBulkEditSite() {
         unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
         if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
-                unCheckedNurseSite = true;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
-                requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+            unCheckedNurseSite = true;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+            requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
         } else {
             commitBulkEditSite();
         }
@@ -1573,8 +1636,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     public void commitBulkEditSite() {
 
+        boolean errFlag = false;
         if (!checkIsValidInput()) {
-            return;
+            errFlag = true;
         }
 
         //commit changes after validated
@@ -1583,17 +1647,17 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         //验证
         if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
             WebUtil.addErrorMessage("有设备正在调剂中，不能更换院区!");
-            return;
+            errFlag = true;
         }
 
         if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets)){
             WebUtil.addErrorMessage("有设备正在保养中，不能更换院区！");
-            return;
+            errFlag = true;
         }
 
         if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
             WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
-            return;
+            errFlag = true;
         }
 
         for(AssetInfo as:selectedAssets){
@@ -1609,14 +1673,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                     continue;
                 }else{
                     WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                    return;
+                    errFlag = true;
                 }
             }
         }
 
         if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets)){
             WebUtil.addErrorMessage("有设备科室借调中，不能更换院区!");
-            return;
+            errFlag = true;
         }
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
@@ -1627,13 +1691,25 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             unCheckedNurseSite = false;
         }
 
+        if (errFlag) {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("errFlag", errFlag);
+            return;
+        }
+
         try {
-            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+            Map<String, Object> param = MapUtil.newHashMap();
+            param.put("assetUids", selectedAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
+            param.put("inDeptUid", selected.getClinicalDeptOrg().getUid());
+            param.put("inDeptName", selected.getClinicalDeptOrg().getName());
+            param.put("auditSignature", signatureId);
+            param.put("applyReason", applyReason);
+            assetDepartmentConvertService.apply(param);
+//            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
             assets.setSource(new ArrayList<>());
             assets.setTarget(new ArrayList<>());
             selected = new AssetInfo();
-            WebUtil.addSuccessMessage("批量修改资产院区成功!");
         } catch(Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
             logger.error(e.getMessage(), e);

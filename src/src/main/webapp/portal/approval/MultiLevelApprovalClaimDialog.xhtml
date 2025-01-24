@@ -78,7 +78,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:panelGrid>
-            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15 and multiLevelApprovalController.businessTypeFlag != 16 and multiLevelApprovalController.businessTypeFlag != 18}">
+            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15 and multiLevelApprovalController.businessTypeFlag != 16 and multiLevelApprovalController.businessTypeFlag != 18 and multiLevelApprovalController.businessTypeFlag != 19}">
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
             </h:panelGroup>
@@ -112,7 +112,7 @@
                                  value="取消申请单" update=":approvalForm:approvalList ItemDetailViewForm"
                                  oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
             </h:panelGroup>
-            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 15 or multiLevelApprovalController.businessTypeFlag == 16  or multiLevelApprovalController.businessTypeFlag == 18}">
+            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 15 or multiLevelApprovalController.businessTypeFlag == 16  or multiLevelApprovalController.businessTypeFlag == 18 or multiLevelApprovalController.businessTypeFlag == 19}">
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
                 <!--                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.returnApprove()}" value="退回上一节点" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>-->

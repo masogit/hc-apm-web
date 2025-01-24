@@ -5525,3 +5525,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','OrderPending','待下单','Ordered pending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','CommercialPending','待Commercial审批','Commercial pending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderSteps','Complete','完成','Complete',NULL,-1);
+
+-- YHAAO-23585 新增web端批量转科流程
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'bathAssetDepartmentConvert', '批量设备转科', 'bath asset department convert', NULL, '-1');

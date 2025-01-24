@@ -15,190 +15,126 @@
             }
         </style>
     </ui:define>
+        <h:form id="searchForm">
+            <h:panelGrid id="searchPanel" columns="2">
+                <p:inputText id="searchText" value="#{departmentConvertController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
+                    <p:ajax event="keyup" delay="1200" update="departmentConvertForm:tab:searchForm searchButtons" />
+                </p:inputText>
+                <h:panelGroup id='searchButtons'>
+                    <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update="departmentConvertForm:tab:AssetDepartmentConvertForm departmentConvertForm:tab:searchForm"  rendered="#{empty departmentConvertController.oneSearchStr}"/>
+                    <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update="departmentConvertForm:tab:AssetDepartmentConvertForm departmentConvertForm:tab:searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentConvertController.oneSearchStr}"/>
+                </h:panelGroup>
 
-        <div class="ui-g">
-<!--            <div class="ui-g-12">-->
-<!--                <div class="ui-g-12 card cardTitle">-->
-<!--                    <p:outputLabel class="pageTitle" value="设备转科情况"/>-->
-<!--                </div>-->
-                <div class="ui-g-12 card">
-                    <h:form id="searchForm">
-                        <h:panelGrid id="searchPanel" columns="2">
-                            <p:inputText id="searchText" value="#{departmentConvertController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
-                                <p:ajax event="keyup" delay="1200" update="bulkEditForm:tab:AssetDepartmentConvertForm searchButtons" />
-                            </p:inputText>
-                            <h:panelGroup id='searchButtons'>
-                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update="bulkEditForm:tab:AssetDepartmentConvertForm bulkEditForm:tab:searchForm"  rendered="#{empty departmentConvertController.oneSearchStr}"/>
-                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update="bulkEditForm:tab:AssetDepartmentConvertForm bulkEditForm:tab:searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentConvertController.oneSearchStr}"/>
-                            </h:panelGroup>
+            </h:panelGrid>
+        </h:form>
+        <h:form id="AssetDepartmentConvertForm">
 
-                        </h:panelGrid>
-                    </h:form>
-                    <h:form id="AssetDepartmentConvertForm">
+            <p:dataTable id="datalist" value="#{departmentConvertController.lazyModel}" var="item" widgetVar="varDataList"
+                         selectionMode="single" selection="#{departmentConvertController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.transferOutAt}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
 
-                        <p:dataTable id="datalist" value="#{departmentConvertController.lazyModel}" var="item" widgetVar="varDataList"
-                                     selectionMode="single" selection="#{departmentConvertController.selected}"
-                                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.transferOutAt}"
-                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                                     rowsPerPageTemplate="20,50,100,500">
+                <p:ajax event="filter" listener="#{departmentConvertController.onFilter}" update="" oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-                            <p:ajax event="filter" listener="#{departmentConvertController.onFilter}" update="" oncomplete="updateSelectAllCheckBox();"/>
-                            <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                <p:column width="36"  id="checkBoxColumn">
+                    <p:selectBooleanCheckbox value="#{departmentConvertController.selectedMap[item.id]}"  class="selectCheckBox">
+                        <p:ajax process="@this" update="@this @(.batch-terminated)"   oncomplete="updateSelectAllCheckBox();"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header"  >
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) departmentConvertForm:tab:AssetDepartmentConvertForm:datalist previewQRCode " oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <!--sharedId-->
+                <p:column headerText="转科单号" sortBy="#{item.convertNo}" filterBy="#{item.convertNo}" filterMatchMode="LIKE">
+                    <h:commandLink target="_blank" actionListener="#{departmentConvertController.openNewWindowView(item.convertNo)}" value="#{item.convertNo}" onblur="reload()" />
+<!--                                <h:outputText value="#{item.convertNo}"/>-->
+                </p:column>
+                <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetName}"/>
+                </p:column>
+                <p:column headerText="设备编号" sortBy="#{item.assetDeptNum}" filterBy="#{item.assetDeptNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetDeptNum}"/>
+                </p:column>
+                <p:column headerText="资产编号" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.financingNum}"/>
+                </p:column>
+                <p:column headerText="序列号" sortBy="#{item.assetSerialNum}" filterBy="#{item.assetSerialNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetSerialNum}"/>
+                </p:column>
+                <p:column headerText="型号" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.functionType}"/>
+                </p:column>
+                <p:column headerText="二维码" filterBy="#{item.assetQrCode}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetQrCode}" />
+                </p:column>
+                <p:column headerText="转出科室"  filterBy="#{item.outDeptName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.outDeptName}" />
+                </p:column>
+                <p:column headerText="转出人"   filterBy="#{item.transferOutName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.transferOutName}"/>
+                </p:column>
+                <p:column headerText="转入科室"   filterBy="#{item.inDeptName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.inDeptName}"/>
+                </p:column>
 
-                            <p:column width="36"  id="checkBoxColumn">
-                                <p:selectBooleanCheckbox value="#{departmentConvertController.selectedMap[item.id]}"  class="selectCheckBox">
-                                    <p:ajax process="@this" update="@this @(.batch-terminated)"   oncomplete="updateSelectAllCheckBox();"/>
-                                </p:selectBooleanCheckbox>
-                                <f:facet name="header"  >
-                                    <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                        <p:ajax listener="#{departmentConvertController.onSelectAllOfPage}" update="@(.selectCheckBox) bulkEditForm:tab:AssetDepartmentConvertForm:datalist previewQRCode " oncomplete="updateSelectAllCheckBox();"/>
-                                    </p:selectBooleanCheckbox>
-                                </f:facet>
-                            </p:column>
-                            <!--sharedId-->
-                            <p:column headerText="转科单号" sortBy="#{item.convertNo}" filterBy="#{item.convertNo}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.convertNo}"/>
-                            </p:column>
-                            <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.assetName}"/>
-                            </p:column>
-                            <p:column headerText="设备编号" sortBy="#{item.assetDeptNum}" filterBy="#{item.assetDeptNum}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.assetDeptNum}"/>
-                            </p:column>
-                            <p:column headerText="资产编号" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.financingNum}"/>
-                            </p:column>
-                            <p:column headerText="序列号" sortBy="#{item.assetSerialNum}" filterBy="#{item.assetSerialNum}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.assetSerialNum}"/>
-                            </p:column>
-                            <p:column headerText="型号" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.functionType}"/>
-                            </p:column>
-                            <p:column headerText="二维码" filterBy="#{item.assetQrCode}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.assetQrCode}" />
-                            </p:column>
-                            <p:column headerText="转出科室"  filterBy="#{item.outDeptName}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.outDeptName}" />
-                            </p:column>
-                            <p:column headerText="转出人"   filterBy="#{item.transferOutName}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.transferOutName}"/>
-                            </p:column>
-                            <p:column headerText="转入科室"   filterBy="#{item.inDeptName}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.inDeptName}"/>
-                            </p:column>
+                <p:column headerText="转入人"   filterBy="#{item.transferInName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.transferInName}"/>
+                </p:column>
 
-                            <p:column headerText="转入人"   filterBy="#{item.transferInName}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.transferInName}"/>
-                            </p:column>
+                <p:column headerText="转出时间" sortBy="#{item.transferOutAt}" filterBy="#{item.transferOutAt}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:calendar id="cal1" effect="fold" value="#{departmentConvertController.filterBeginTime}"
+                                    onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                    </f:facet>
+                    <h:outputText value="#{item.transferOutAt}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
+                    </h:outputText>
+                </p:column>
 
-                            <p:column headerText="转出时间" sortBy="#{item.transferOutAt}" filterBy="#{item.transferOutAt}" filterMatchMode="EQ">
-                                <f:facet name="filter">
-                                    <p:calendar id="cal1" effect="fold" value="#{departmentConvertController.filterBeginTime}"
-                                                onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
-                                </f:facet>
-                                <h:outputText value="#{item.transferOutAt}">
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
-                                </h:outputText>
-                            </p:column>
+                <p:column headerText="转入时间" sortBy="#{item.transferInAt}" filterBy="#{item.transferInAt}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:calendar id="cal12" effect="fold" value="#{departmentConvertController.returnAtTime}"
+                                    onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                    </f:facet>
+                    <h:outputText value="#{item.transferInAt}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
+                    </h:outputText>
+                </p:column>
 
-                            <p:column headerText="转入时间" sortBy="#{item.transferInAt}" filterBy="#{item.transferInAt}" filterMatchMode="EQ">
-                                <f:facet name="filter">
-                                    <p:calendar id="cal12" effect="fold" value="#{departmentConvertController.returnAtTime}"
-                                                onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
-                                </f:facet>
-                                <h:outputText value="#{item.transferInAt}">
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
-                                </h:outputText>
-                            </p:column>
+                <p:column headerText="转科状态"   filterBy="#{item.currentStatus}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()"  value="#{departmentConvertController.status}" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItem itemLabel="已取消" itemValue="-1" noSelectionOption="true" />
+                            <f:selectItem itemLabel="转入确认中" itemValue="1" noSelectionOption="true" />
+                            <f:selectItem itemLabel="审批中" itemValue="2" noSelectionOption="true" />
+                            <f:selectItem itemLabel="已完成" itemValue="3" noSelectionOption="true" />
+                            <f:selectItem itemLabel="已拒绝" itemValue="5" noSelectionOption="true" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{departmentConvertController.getStatusName(item.currentStatus)}"/>
+                </p:column>
 
-                            <p:column headerText="转科状态"   filterBy="#{item.currentStatus}" filterMatchMode="EQ">
-                                <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('varDataList').filter()"  value="#{departmentConvertController.status}" >
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                        <f:selectItem itemLabel="已取消" itemValue="-1" noSelectionOption="true" />
-                                        <f:selectItem itemLabel="转入确认中" itemValue="1" noSelectionOption="true" />
-                                        <f:selectItem itemLabel="审批中" itemValue="2" noSelectionOption="true" />
-                                        <f:selectItem itemLabel="已完成" itemValue="3" noSelectionOption="true" />
-                                        <f:selectItem itemLabel="已拒绝" itemValue="5" noSelectionOption="true" />
-                                    </p:selectOneMenu>
-                                </f:facet>
-                                <h:outputText value="#{departmentConvertController.getStatusName(item.currentStatus)}"/>
-                            </p:column>
-
-                            <f:facet name="{Toolbar}">
-<!--                                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" actionListener="#{departmentSecondmentController.fileName()}" />-->
-                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentConvertController.fileName}"
-                                                    postProcessor="#{departmentConvertController.postProcessXLS}"/>
-                                </p:commandButton>
-<!--                                <p:commandButton id="reportButton" icon="ui-icon-arrow-1-s"-->
-<!--                                                 actionListener="#{departmentConvertController.exportTransferOrderFile}"-->
-<!--                                                 class="btn btn-sm btn-gray batch-terminated" title="调拨单导出"-->
-<!--                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"-->
-<!--                                                 disabled="#{not departmentConvertController.isChecked()}"-->
-<!--                                >-->
-<!--                                    <p:fileDownload value="#{departmentConvertController.transferOrderFile}"/>-->
-
-<!--                                </p:commandButton>-->
-<!--                                <p:commandButton title="导出当前页" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" ajax="false">-->
-<!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
-<!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
-<!--                                </p:commandButton>-->
-                                <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not departmentConvertController.isChecked()}" actionListener="#{departmentConvertController.prepareViewQrcode()}" update="bulkEditForm:tab:qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
-                            </f:facet>
-                        </p:dataTable>
-                    </h:form>
-                </div>
-<!--            </div>-->
-            <ui:include src="/portal/preview/QRView.xhtml"/>
-        </div>
-        <script>
-            afterPageLoad = function () {
-                $("#searchForm\\:searchText").keypress(function (e) {
-                    if (e.keyCode == 13) {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-
-            function openSwapTypeViewWindow(xhr, status, args) {
-                this.location.href = args.url;
-            }
-
-            $(function () {
-                //解决两个时间选择样式问题
-                var removeUiDatepickerDivClipRect = function (i) {
-                    if(i &lt; 20){
-                        i++;
-                        $("#ui-datepicker-div").css("clip","");
-                        setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
-                    }
-                }
-                $("#AssetDepartmentConvertForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
-                $("#AssetDepartmentConvertForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
-            })
-            function getDate(){
-                return Date.now();
-            }
-
-            function updateSelectAllCheckBox() {
-                var checkboxlist = $(".selectCheckBox");
-                var selectAllstatus = true;
-                checkboxlist.each(function () {
-                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
-                });
-                $("#AssetDepartmentConvertForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
-                if (selectAllstatus) {
-                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
-                } else {
-                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
-                }
-            }
-        </script>
-
+                <f:facet name="{Toolbar}">
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                        <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentConvertController.fileName}"
+                                        postProcessor="#{departmentConvertController.postProcessXLS}"/>
+                    </p:commandButton>
+                    <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not departmentConvertController.isChecked()}" actionListener="#{departmentConvertController.prepareViewQrcode()}" update="departmentConvertForm:qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    <script type="text/javascript">
+        function reload() {
+            window.location.reload();
+        }
+    </script>
 </ui:composition>
 </html>

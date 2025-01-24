@@ -109,6 +109,9 @@ public class WxMessageService extends MicroServiceInvoker {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 businessTypeName=(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI);
                 break;
+            case ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT:
+                businessTypeName=(ApprovalConstant.APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT_CHI);
+                break;
             default:
                 break;
         }
