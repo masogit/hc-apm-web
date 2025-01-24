@@ -44,4 +44,7 @@ public interface SystemTemplateValueRepository extends GenericRepositoryUUID<Sys
     @Query(value = "select * from system_template_value where tenant_uid =?1  and template_type=?2 ", nativeQuery = true)
     List<SystemTemplateValue> findByTenantUidAndTemplateType(String tenantUID,String templateType);
 
+
+    @Query(value = "select * from system_template_value where site_uid =?1  and template_type=?2 ", nativeQuery = true)
+    List<SystemTemplateValue> findBySiteUidAndTemplateType(String tenantUID,String templateType);
 }

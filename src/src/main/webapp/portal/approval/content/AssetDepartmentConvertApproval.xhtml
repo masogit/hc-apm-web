@@ -8,7 +8,7 @@
 
 <ui:composition>
 
-    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 16}">
+    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 16 or multiLevelApprovalController.businessTypeFlag == 19}">
         <label class="label">设备转科审核内容</label>
         <p:dataTable id="assetDepartmentConvertList" value="#{multiLevelApprovalController.primaryApprovalData}"
                      var="item"

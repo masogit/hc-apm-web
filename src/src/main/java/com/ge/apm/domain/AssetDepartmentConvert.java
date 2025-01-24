@@ -125,6 +125,8 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     @Column(name="convert_no")
     private String convertNo;
+    @Column(name = "business_type")
+    private Integer businessType;
 
 
 
@@ -313,7 +315,7 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     @Override
     public int getBusinessType() {
-        return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT;
+        return this.businessType;
     }
 
     @Transient
@@ -421,6 +423,10 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     public void setConvertNo(String convertNo) {
         this.convertNo = convertNo;
+    }
+
+    public void setBusinessType(Integer businessType) {
+        this.businessType = businessType;
     }
 
     public String getApprovalUid() {

@@ -264,6 +264,12 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         List<String> collect = assetInfoList.stream().filter(item -> StringUtils.hasText(item.getQrCode())).map(item -> item.getQrCode() + ":" + item.getSiteUID()).collect(Collectors.toList());
         qrPreViewerBean.onServerEvent("",collect);
     }
+
+    public String openNewWindowView(String convertNo) {
+//             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=departmentConvert&amp;convertNo=" + convertNo;
+    }
+
     public Integer getStatus() {
         return status;
     }

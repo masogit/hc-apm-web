@@ -6,9 +6,9 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
     <p:dialog id="pmOrderReportTemplateEditDlg" widgetVar="pmOrderReportTemplateEditDialog"
-              onHide="#{pmOrderReportTemplateController.onSelect()}" width="1000" height="450" modal="true"
+              onHide="#{pmOrderReportSysTemplateController.onSelect()}" width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
-              header="#{pmOrderReportTemplateController.CRUDActionName} #{msg.ExportTemplateConfig}">
+              header="#{pmOrderReportSysTemplateController.CRUDActionName} #{msg.ExportTemplateConfig}">
         <h:form id="pmOrderReportTemplateEditForm">
             <h:panelGroup id="display">
                 <p:fieldset id="basic" legend="#{msg.ReportTemplateConfiguration}">
@@ -17,15 +17,24 @@
                             <p:commandButton update=":growl" icon="ui-icon-file-download" value="#{msg.DownloadTheCurrentActiveTemplate}"
                                              onclick="PrimeFaces.monitorDownload(start, stop);">
                                 <p:fileDownload
-                                        value="#{pmOrderReportTemplateController.getActiveTemplate()}"/>
+                                        value="#{pmOrderReportSysTemplateController.getActiveTemplate()}"/>
                             </p:commandButton>
+                        </h:panelGroup>
+
+
+
+                        <h:panelGroup>
+                            <label class="label">模板类型名称*</label>
+                            <p:inputText  value="#{pmOrderReportSysTemplateController.selected.templateTypeName}" required="true">
+                                <p:ajax/>
+                            </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>
-                            <h:outputText value="#{pmOrderReportTemplateController.file.fileName}"
-                                          rendered="#{not empty pmOrderReportTemplateController.file}"/>
-                            <p:fileUpload fileUploadListener="#{pmOrderReportTemplateController.uploadDataFile}"
-                                          value="#{pmOrderReportTemplateController.file}" mode="advanced"
+                            <h:outputText value="#{pmOrderReportSysTemplateController.file.fileName}"
+                                          rendered="#{not empty pmOrderReportSysTemplateController.file}"/>
+                            <p:fileUpload fileUploadListener="#{pmOrderReportSysTemplateController.uploadDataFile}"
+                                          value="#{pmOrderReportSysTemplateController.file}" mode="advanced"
                                           dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="10000000" update=":pmOrderReportTemplateEditForm"
                                           auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
@@ -35,7 +44,7 @@
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
-                                 actionListener="#{pmOrderReportTemplateController.applyChange()}" value="#{msg.Save}"
+                                 actionListener="#{pmOrderReportSysTemplateController.applyChange()}" value="#{msg.Save}"
                                  update="display,:pmOrderReportTemplateEditDlg, :pmOrderReportTemplateListForm:dataList, :growl"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmOrderReportTemplateEditDialog');"/>
                 &nbsp;&nbsp;
