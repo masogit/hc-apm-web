@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -1594,7 +1595,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
                 HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
                 response.setStatus(205);
-                return;
             }
         }
     }
@@ -1694,10 +1694,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (errFlag) {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("errFlag", errFlag);
-            return;
         }
 
-        try {
+       /*try {
             Map<String, Object> param = MapUtil.newHashMap();
             param.put("assetUids", selectedAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
             param.put("inDeptUid", selected.getClinicalDeptOrg().getUid());
@@ -1713,8 +1712,59 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         } catch(Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
             logger.error(e.getMessage(), e);
-        }
+        }*/
 
+    }
+
+    public void applyAssetApplication() {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+            return;
+        }
+        if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
+            try {
+                String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                BASE64Decoder decoder = new BASE64Decoder();
+                byte[] decode = decoder.decodeBuffer(base64);
+
+                V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                if (null != blobObject) {
+                    this.signatureId = blobObject.getObjectStorageId();
+                    woService.addUserSignature(this.signatureId);
+                }else{
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+                WebUtil.addErrorMessage("签名保存失败！");
+                response.setStatus(206);
+                return;
+            }
+        }
+        try {
+            List<AssetInfo> selectedAssets = assets.getTarget();
+            Map<String, Object> param = MapUtil.newHashMap();
+            param.put("assetUids", selectedAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
+            param.put("inDeptUid", selected.getClinicalDeptOrg().getUid());
+            param.put("inDeptName", selected.getClinicalDeptOrg().getName());
+            param.put("auditSignature", signatureId);
+            param.put("applyReason", applyReason);
+
+            assets.setSource(new ArrayList<>());
+            assets.setTarget(new ArrayList<>());
+            selected = new AssetInfo();
+            assetDepartmentConvertService.apply(param);
+        } catch(Exception e) {
+            WebUtil.addErrorMessage(e.getMessage());
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public void commitBulkEdit() {
