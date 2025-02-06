@@ -8,3 +8,8 @@ INSERT INTO sys_role ( "name", "role_desc", "role_desc_en")  select 'DepartmentC
 
 -- YHAAO-23861
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 8, 'false', '使用登记关机和终末消毒是否同时完成', 'disinfectedAfterShutdown', '使用登记关机和终末消毒是否同时完成', 'f','t',3 where not exists(select * from config_item where key = 'disinfectedAfterShutdown');
+
+
+
+---zkb归还数据增加item_id
+update zkb_part_order_return r set item_id = (select id from zkb_part_order_item where part_order_id = r.part_order_id and part_no = r.part_no limit 1) where item_id is null and part_order_id in (select id from zkb_part_order where current_step in ('ReturnPending', 'ClosePending'));
