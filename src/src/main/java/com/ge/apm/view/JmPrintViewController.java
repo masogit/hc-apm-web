@@ -68,6 +68,13 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
                     partPrintReport = dao.findReportByName("到货出库单");
                 }
                 break;
+            case "workOrderDetail" :
+                String woId = request.getParameter("woId");
+                String srId = request.getParameter("srId");
+                param.put("woId", woId);
+                param.put("srId", srId);
+                partPrintReport = dao.findReportByName("维修详情");
+                break;
             default:
                 break;
         }
@@ -75,7 +82,7 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
     }
 
     private String getViewUrl(JmReport partPrintReport, Map<String, String> param) {
-        String viewUrl = null;
+        String viewUrl = "";
         if (ObjectUtil.isNotEmpty(partPrintReport)) {
             StringBuilder requestParam = new StringBuilder();
             for (Map.Entry<String, String> entry : param.entrySet()) {

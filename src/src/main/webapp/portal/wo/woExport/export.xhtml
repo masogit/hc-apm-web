@@ -200,6 +200,7 @@
                  emptyMessage="#{msg.noRecordFound}"
                  rowsPerPageTemplate="20,50,100,500">
         <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
+<!--        <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>-->
         <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>
         <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}"
                   filterValue="#{workOrderReportExportController.filterMap.srNum}">
@@ -224,10 +225,12 @@
         <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}"
                   filterValue="#{workOrderReportExportController.filterMap.assetName}">
             <c:if test="#{userContextService.isLocale()}">
-                <h:outputText value="#{item.设备名称}"/>
+                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item.woId, item.srId)}" value="#{item.设备名称}" />
+<!--                <h:outputText value="#{item.设备名称}"/>-->
             </c:if>
             <c:if test="#{!userContextService.isLocale()}">
-                <h:outputText value="#{item.EquipmentName}"/>
+                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item.id, item.srId)}" value="#{item.EquipmentName}" />
+<!--                <h:outputText value="#{item.EquipmentName}"/>-->
             </c:if>
         </p:column>
         <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}"
@@ -311,7 +314,15 @@
         <f:facet name="{Toolbar}">
             <c:choose>
                 <c:when test="${userContextService.hasCurrentTenantName('')}">
-                    <p:commandButton ajax="false" value="#{msg.ExportWorkorderReports}"
+                    <p:menuButton id="reportButtonYF" value="工单导出">
+                        <p:menuitem style="padding: 0px;" immediate="true" value="#{msg.ExportWorkorderReports}" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{workOrderReportExportController.exportWo()}" rendered="#{not empty workOrderReportExportController.workOrderList}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                        </p:menuitem>
+                        <p:menuitem style="padding: 0px;" immediate="true" value="详情导出" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{workOrderReportExportController.exportWoDocx()}" rendered="#{not empty workOrderReportExportController.workOrderList}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+                        </p:menuitem>
+                    </p:menuButton>
+                    <!--<p:commandButton ajax="false" value="#{msg.ExportWorkorderReports}"
                                      rendered="#{not empty workOrderReportExportController.workOrderList}"
                                      actionListener="#{workOrderReportExportController.exportWo()}"
                                      icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
@@ -322,10 +333,28 @@
                                      actionListener="#{workOrderReportExportController.exportWoDocx()}"
                                      icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                         <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                    </p:commandButton>
+                    </p:commandButton>-->
                 </c:when>
                 <c:otherwise>
-                    <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
+                    <p:menuButton id="reportButton" value="工单导出" rendered="#{not empty workOrderReportExportController.workOrderList}">
+                        <p:menuitem style="padding: 0px;" immediate="true" value="#{msg.ExportAllReports}" ajax="false" icon="ui-icon-arrowstop-1-s"
+                                    actionListener="#{workOrderReportExportController.exportAllWo()}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                        </p:menuitem>
+                        <p:menuitem style="padding: 0px;" immediate="true" value="#{msg.SelectAndExportReports}" ajax="false" icon="ui-icon-arrowstop-1-s"
+                                    actionListener="#{workOrderReportExportController.exportSelectedWo()}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                        </p:menuitem>
+                        <p:menuitem style="padding: 0px;" immediate="true" value="#{msg.ExportAllDetails}" ajax="false" icon="ui-icon-arrowstop-1-s"  onclick="startProgress();"
+                                    actionListener="#{workOrderReportExportController.exportAllWoDocx()}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                        </p:menuitem>
+                        <p:menuitem style="padding: 0px;" immediate="true" value="#{msg.SelectAndExportDetails}" ajax="false" icon="ui-icon-arrowstop-1-s"
+                                    actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}">
+                            <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                        </p:menuitem>
+                    </p:menuButton>
+                    <!--<p:commandButton ajax="false" value="#{msg.ExportAllReports}"
                                      rendered="#{not empty workOrderReportExportController.workOrderList}"
                                      actionListener="#{workOrderReportExportController.exportAllWo()}"
 
@@ -349,7 +378,7 @@
                                      actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
                                      icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                         <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                    </p:commandButton>
+                    </p:commandButton>-->
                 </c:otherwise>
             </c:choose>
         </f:facet>
