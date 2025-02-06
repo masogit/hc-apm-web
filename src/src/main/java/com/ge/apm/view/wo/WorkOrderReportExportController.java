@@ -485,6 +485,14 @@ public class WorkOrderReportExportController implements Serializable {
         return exportFile;
     }
 
+    public String openNewWindowView(String woId, String srId) {
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=workOrderDetail&amp;woId=" + woId + "&amp;srId=" + srId;
+    }
+
+    public String onSelect(String woId, String srId) {
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=workOrderDetail&amp;woId=" + woId + "&amp;srId=" + srId;
+    }
+
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
     }
