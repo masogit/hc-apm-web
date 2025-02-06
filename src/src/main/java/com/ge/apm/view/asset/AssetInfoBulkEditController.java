@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
@@ -100,6 +101,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private MqUtils mqUtils;
     private UserContextService userContextService;
     private QrCodeLib createRequest;
+    private NurseSiteMaintainService nurseSiteMaintainService;
     //******* filter start
 
     @Getter @Setter
@@ -241,6 +243,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         woService= WebUtil.getBean(V2_WorkOrderService.class);
+        nurseSiteMaintainService= WebUtil.getBean(NurseSiteMaintainService.class);
         assetDepartmentConvertService= WebUtil.getBean(AssetDepartmentConvertService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -1684,9 +1687,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
-            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
-                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
-            }
+            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList);
+//            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
+//                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
+//            }
             toDeleteNurseMaintainSite = false;
             unCheckedNurseSite = false;
         }
