@@ -390,7 +390,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
             List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
             List<I18nMessage> assetGroup = i18nMessageService.getByMsgType("assetGroup");
-            Map<String, String> assetGroupMap  = assetGroup.parallelStream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue, (value1, value2) -> value1));
+            Map<String, String> assetGroupMap  = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue, (value1, value2) -> value1));
             List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
             Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
 
