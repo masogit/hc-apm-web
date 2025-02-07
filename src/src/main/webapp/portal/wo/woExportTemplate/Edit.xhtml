@@ -17,7 +17,7 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <p:commandButton update=":growl" icon="ui-icon-file-download" value="#{msg.DownloadTheCurrentActiveTemplate}"
-                                             onclick="PrimeFaces.monitorDownload(start, stop);">
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" validateClient="false" immediate="true">
                                 <p:fileDownload
                                         value="#{workOrderExportSysTemplateController.getActiveTemplate()}"/>
                             </p:commandButton>
