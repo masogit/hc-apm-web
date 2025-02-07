@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
+import com.deepoove.poi.data.PictureType;
 import org.apache.http.client.utils.DateUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
@@ -414,7 +415,7 @@ public class PccExamineReportService {
 		if (listPicture != null && listPicture.size() > 0) {
 			for (int i = 0; i < listPicture.size(); ++i) {
 				ApmStreamedContent tempContent = listPicture.get(i);
-				PictureRenderData tempPic = new PictureRenderData(200, 160, tempContent.getName(), tempContent.gettBytes());
+				PictureRenderData tempPic = new PictureRenderData(200, 160, PictureType.PNG, tempContent.gettBytes());
 				if (tempContent.getMark().equals("picture1")) {
 					data.put("picture1", tempPic);
 				} else if (tempContent.getMark().equals("picture2")) {
@@ -424,8 +425,10 @@ public class PccExamineReportService {
 				} else if (tempContent.getMark().equals("picture4")) {
 					data.put("picture4", tempPic);
 				} else if (tempContent.getMark().equals("pictureTail")) {
-					tempPic.setWidth(600);
-					tempPic.setHeight(600);
+//					tempPic.setWidth(600);
+//					tempPic.setHeight(600);
+				    tempPic = new PictureRenderData(600, 600, PictureType.PNG, tempContent.gettBytes());
+
 					data.put("pictureTail", tempPic);
 				}
 			}
