@@ -7,8 +7,10 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.wo.doctemplate.PartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Scope("prototype")
-public class WorkOrderExportService {
+public class WorkOrderExportService extends MicroServiceInvoker {
 
     private static final String SHEET_WORKORDER = "WorkOrder List";
     private static final String SHEET_PARTS = "Parts List";
@@ -640,6 +642,10 @@ public class WorkOrderExportService {
         }
 
         return Boolean.TRUE;
+    }
+
+    public String getFileSearchUrl() {
+        return getGatewayURL(GatewayURL.SEARCH_FILE);
     }
 /*
 
