@@ -225,11 +225,11 @@
         <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}"
                   filterValue="#{workOrderReportExportController.filterMap.assetName}">
             <c:if test="#{userContextService.isLocale()}">
-                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item.woId, item.srId)}" value="#{item.设备名称}" />
+                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.设备名称}" />
 <!--                <h:outputText value="#{item.设备名称}"/>-->
             </c:if>
             <c:if test="#{!userContextService.isLocale()}">
-                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item.id, item.srId)}" value="#{item.EquipmentName}" />
+                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.EquipmentName}" />
 <!--                <h:outputText value="#{item.EquipmentName}"/>-->
             </c:if>
         </p:column>

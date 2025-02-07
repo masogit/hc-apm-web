@@ -333,6 +333,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
 
             workOrderMap.put("assetId", workOrderExportPojo.getAssetId());
+            workOrderMap.put("assetUid", workOrderExportPojo.getAssetUid());
 
             if (workOrderExportPojo.getAssetFunctionGroup() != null) {
                 workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
