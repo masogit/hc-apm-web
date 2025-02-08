@@ -1,5 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.ge.apm.dao.*;
 
 import com.ge.apm.dao.mapper.*;
@@ -34,9 +38,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -413,11 +415,35 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
                     efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
                 }
             }
-            downloadFile(parseListToMap(list), fields);
+//            downloadFile(parseListToMap(list), fields);
+            easyExcelExport(list);
         }catch (Exception e){
             logger.error("导出效益设备异常 e:",e);
         }
 
+    }
+
+    public void easyExcelExport( List<EfficiencyEquipmentInfo> list ){
+        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BENEFIT_ANALYSIS.getCode(), SystemTemplate.SystemTemplateEnum.BENEFIT_ANALYSIS.getFileType());
+
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(stream).build();
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+            excelWriter.fill(list, fillConfig, writeSheet);
+            excelWriter.finish();
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
+
+            String start = com.ge.healthcare.cn.common.utils.date.DateUtil.format(startDate, "yyyy-MM-dd");
+            String end = com.ge.healthcare.cn.common.utils.date.DateUtil.format(endDate, "yyyy-MM-dd");
+            String fileName=start+"~"+end+"效益设备数据.xlsx";
+            excelFile = new DefaultStreamedContent(byteArrayInputStream, "application/vnd.ms-excel", fileName);
+            baos.close();
+            byteArrayInputStream.close();
+        }catch (Exception e){
+            logger.error("EfficiencyEquipmentInfoController exportExcel error:",e);
+        }
     }
 
     private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
