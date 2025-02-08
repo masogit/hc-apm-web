@@ -1,5 +1,9 @@
 package com.ge.apm.service.orginfo;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -8,9 +12,11 @@ import com.ge.apm.domain.BuildManagement;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.BuildManagementExportDto;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +27,8 @@ import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -296,27 +304,73 @@ public class BuildManagementService {
         }
     }
 
-    public ExcelDocument exportBuildManagement(TreeNode orgTree) throws IOException {
+//    public ExcelDocument exportBuildManagement(TreeNode orgTree) throws IOException {
+////        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
+//        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+//
+//        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
+//        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+//        String[] columnKeys = doc.getKeyRow(0, 1);
+//        int startRow = 2;
+//        List<Map<String, Object>> resultList = new ArrayList<>();
+//
+//        List<TreeNode> children = orgTree.getChildren();
+//        for (TreeNode child : children) {
+//            export(child, resultList);
+//        }
+//        doc.clearRow(startRow);
+//        for (Map<String, Object> map : resultList) {
+//            doc.writeRowData(0, columnKeys, startRow, map);
+//            ++startRow;
+//        }
+//        return doc;
+//    }
+
+
+    public InputStream exportBuildManagement(TreeNode orgTree) throws IOException {
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 
         InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
-        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-        String[] columnKeys = doc.getKeyRow(0, 1);
-        int startRow = 2;
+//        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+//        String[] columnKeys = doc.getKeyRow(0, 1);
+//        int startRow = 2;
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<TreeNode> children = orgTree.getChildren();
         for (TreeNode child : children) {
             export(child, resultList);
         }
-        doc.clearRow(startRow);
+
+        List<BuildManagementExportDto> buildManagementExportDtoList = new ArrayList<>();
         for (Map<String, Object> map : resultList) {
-            doc.writeRowData(0, columnKeys, startRow, map);
-            ++startRow;
+            BuildManagementExportDto buildManagementExportDto = new BuildManagementExportDto();
+            try {
+                org.apache.commons.beanutils.BeanUtils.populate(buildManagementExportDto, map);
+                buildManagementExportDtoList.add(buildManagementExportDto);
+            } catch (Exception e) {
+                logger.error("map to exportDto error: ",e);
+                return  new ByteArrayInputStream(new byte[0]);
+            }
         }
-        return doc;
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(stream).build();
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+            excelWriter.fill(buildManagementExportDtoList, fillConfig, writeSheet);
+            excelWriter.finish();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
+
+            return byteArrayInputStream;
+        }catch (Exception e){
+            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
+        }
+        return  new ByteArrayInputStream(new byte[0]);
     }
+
+
 
     private void export(TreeNode child, List<Map<String, Object>> resultList) {
         List<TreeNode> children = child.getChildren();
@@ -348,20 +402,20 @@ public class BuildManagementService {
             OrgInfo orgInfo = (OrgInfo) child.getData();
             Integer orgType = orgInfo.getOrgType();
             if (orgType == 1) {
-                map.put("集团", orgInfo.getName());
+                map.put("institutionName", orgInfo.getName());
             } else if (orgType == 2) {
                 TreeNode parent = child.getParent();
                 OrgInfo orgInfo1 = (OrgInfo) parent.getData();
-                map.put("集团", orgInfo1.getName());
-                map.put("医院", orgInfo.getName());
+                map.put("institutionName", orgInfo1.getName());
+                map.put("hospitalName", orgInfo.getName());
             } else if (orgType == 3) {
                 TreeNode parent = child.getParent();
                 OrgInfo orgInfo1 = (OrgInfo) parent.getData();
-                map.put("医院", orgInfo1.getName());
+                map.put("hospitalName", orgInfo1.getName());
                 TreeNode parent1 = parent.getParent();
                 OrgInfo orgInfo2 = (OrgInfo) parent1.getData();
-                map.put("集团", orgInfo2.getName());
-                map.put("院区", orgInfo.getName());
+                map.put("institutionName", orgInfo2.getName());
+                map.put("siteName", orgInfo.getName());
             }
         } else if (child.getData() instanceof BuildManagement) {
 
@@ -370,16 +424,16 @@ public class BuildManagementService {
             BuildManagement buildManagement = (BuildManagement) child.getData();
             Integer orgType = buildManagement.getBuildType();
             if (orgType == 4) {
-                map.put("楼栋名称", buildManagement.getName());
-                map.put("楼栋名称(EN)", buildManagement.getNameEn());
+                map.put("buildingName", buildManagement.getName());
+                map.put("buildingNameEn", buildManagement.getNameEn());
                 treeNode = child;
             } else if (orgType == 5) {
                 TreeNode parent = child.getParent();
                 BuildManagement buildManagement1 = (BuildManagement) parent.getData();
-                map.put("楼栋名称", buildManagement1.getName());
-                map.put("楼栋名称(EN)", buildManagement1.getNameEn());
-                map.put("楼层名称", buildManagement.getName());
-                map.put("楼层名称(EN)", buildManagement.getNameEn());
+                map.put("buildingName", buildManagement1.getName());
+                map.put("buildingNameEn", buildManagement1.getNameEn());
+                map.put("floorName", buildManagement.getName());
+                map.put("floorNameEn", buildManagement.getNameEn());
 
                 treeNode = parent;
             } else if (orgType == 6) {
@@ -387,12 +441,12 @@ public class BuildManagementService {
                 BuildManagement buildManagement1 = (BuildManagement) parent.getData();
                 TreeNode parent1 = parent.getParent();
                 BuildManagement buildManagement2 = (BuildManagement) parent1.getData();
-                map.put("楼栋名称", buildManagement2.getName());
-                map.put("楼栋名称(EN)", buildManagement2.getNameEn());
-                map.put("楼层名称", buildManagement1.getName());
-                map.put("楼层名称(EN)", buildManagement1.getNameEn());
-                map.put("房间名称", buildManagement.getName());
-                map.put("房间名称(EN)", buildManagement.getNameEn());
+                map.put("buildingName", buildManagement2.getName());
+                map.put("buildingNameEn", buildManagement2.getNameEn());
+                map.put("floorName", buildManagement1.getName());
+                map.put("floorNameEn", buildManagement1.getNameEn());
+                map.put("roomName", buildManagement.getName());
+                map.put("roomNameEn", buildManagement.getNameEn());
                 treeNode = parent1;
             }
             map.put("UUID", buildManagement.getUid());
