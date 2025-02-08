@@ -78,7 +78,7 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
 
     @Column(name = "current_status")
-    private Integer  currentStatus;   //当前状态 1申请中  2 审核中  3完成   4审核拒绝
+    private Integer  currentStatus;   //当前状态 -1 申请人已取消 1申请中  2 审核中  3完成     5工程师审核拒绝       //4审核拒绝 4状态废弃不用
 
 
     @Column(name="apply_audit_signature")
