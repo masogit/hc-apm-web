@@ -65,7 +65,7 @@
             </foreach>
         </if>
         and    date  between #{startDate} and #{endDate} GROUP BY qr_code )
-        select es.asset_uid assetUid,  COALESCE(isum.income, 0) AS income, COALESCE(esum.cost, 0) AS cost,COALESCE(csum.checkNumberPeople, 0) AS  checkNumberPeople,ai.name as assetName,ai.serial_num  serialNum , ai.qr_code qrCode,ai.function_type functionType ,ai.purchase_price purchasePrice,ai.clinical_dept_name clinicalDeptName ,ai.asset_group assetGroup,ai.make_short_name as  makerShortName,  ai.id  as assetId  from  efficiency_equipment_info es join asset_info ai on es.asset_uid=ai.uid
+        select es.asset_uid assetUid,  COALESCE(isum.income, 0) AS income, COALESCE(esum.cost, 0) AS cost,COALESCE(csum.checkNumberPeople, 0) AS  checkNumberPeople,ai.name as assetName,ai.serial_num  serialNum , ai.qr_code qrCode,ai.function_type functionType ,ai.purchase_price purchasePrice,ai.clinical_dept_name clinicalDeptName ,ai.asset_group assetGroup,ai.make_short_name as  makerShortName,  ai.id  as assetId,es.positive_rate  as  positiveRate  from  efficiency_equipment_info es join asset_info ai on es.asset_uid=ai.uid
         LEFT JOIN income_summary isum ON es.asset_uid = isum.asset_uid LEFT JOIN expense_summary esum ON es.asset_uid = esum.asset_uid LEFT JOIN check_summary csum ON ai.qr_code = csum.qr_code
         <where>
             <if test="assetUids != null and assetUids.size() > 0">
