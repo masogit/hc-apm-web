@@ -200,9 +200,9 @@
                  emptyMessage="#{msg.noRecordFound}"
                  rowsPerPageTemplate="20,50,100,500">
         <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
-        <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>
+<!--        <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>-->
         <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}"
-                  filterValue="#{workOrderReportExportController.filterMap.srNum}">
+                  filterValue="#{workOrderReportExportController.filterMap.srNum}" filterMatchMode="contains">
             <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
                 <c:if test="#{userContextService.isLocale()}">
                     <h:outputText value="#{item.报修单号}"/>
@@ -213,7 +213,7 @@
             </a>
         </p:column>
         <p:column headerText="#{msg.EquipmentID}" filterBy="#{item.设备编号}"
-                  filterValue="#{workOrderReportExportController.filterMap.assetDepartNum}">
+                  filterValue="#{workOrderReportExportController.filterMap.assetDepartNum}" filterMatchMode="contains">
             <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备编号}"/>
             </c:if>
@@ -222,7 +222,7 @@
             </c:if>
         </p:column>
         <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}"
-                  filterValue="#{workOrderReportExportController.filterMap.assetName}">
+                  filterValue="#{workOrderReportExportController.filterMap.assetName}" filterMatchMode="contains">
             <c:if test="#{userContextService.isLocale()}">
                 <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.设备名称}" />
 <!--                <h:outputText value="#{item.设备名称}"/>-->
@@ -233,7 +233,7 @@
             </c:if>
         </p:column>
         <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}"
-                  filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}">
+                  filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}" filterMatchMode="contains">
             <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备型号}"/>
             </c:if>
