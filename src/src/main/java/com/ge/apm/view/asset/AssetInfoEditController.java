@@ -1536,8 +1536,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     @Transactional
-    public void processUnfinishedNurseSiteMaintain(){
-        if (nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(bathSelectedList)) {
+    public void processUnfinishedNurseSiteMaintain(String comment){
+        if (nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(bathSelectedList, comment)) {
             WebUtil.addSuccessMessage("已自动处理未完成临床助手工单");
         } else {
             WebUtil.addErrorMessage("没有未完成的临床助手工单");

@@ -2589,7 +2589,7 @@ public class NurseSiteMaintainService {
 	 * @param bathSelectedList asset list
 	 */
 	@Transactional
-	public boolean processUnfinishedNurseSiteMaintain(List<AssetInfo> bathSelectedList){
+	public boolean processUnfinishedNurseSiteMaintain(List<AssetInfo> bathSelectedList, String comment){
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 		List<String> uids = bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList());
 		List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
@@ -2607,7 +2607,7 @@ public class NurseSiteMaintainService {
 					nurseSiteMaintainItem.setUpdateByUid(loginUser.getUid());
 					nurseSiteMaintainItem.setUpdateDate(new Date());
 					nurseSiteMaintainItem.setModifyByUid(loginUser.getUid());
-					nurseSiteMaintainItem.setComment(org.apache.commons.lang.StringUtils.isBlank(nurseSiteMaintainItem.getComment())?"已报废":nurseSiteMaintainItem.getComment()+",已报废");
+					nurseSiteMaintainItem.setComment(org.apache.commons.lang.StringUtils.isBlank(nurseSiteMaintainItem.getComment()) ? comment:nurseSiteMaintainItem.getComment() + "," + comment);
 					nurseSiteMaintainItems.add(nurseSiteMaintainItem);
 				}
 			}

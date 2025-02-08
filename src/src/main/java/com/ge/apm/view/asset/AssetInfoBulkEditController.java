@@ -1687,7 +1687,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
-            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList);
+            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList, "已转科");
 //            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
 //                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
 //            }
