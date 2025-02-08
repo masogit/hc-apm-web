@@ -11,6 +11,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Scope("prototype")
-public class WorkOrderExportService extends MicroServiceInvoker {
+public class WorkOrderExportService {
 
     private static final String SHEET_WORKORDER = "WorkOrder List";
     private static final String SHEET_PARTS = "Parts List";
@@ -87,6 +88,8 @@ public class WorkOrderExportService extends MicroServiceInvoker {
     private BlobObjectRepository blobObjectRepository;
     @Autowired
     private ExternalTempUserRepository externalTempUserDao;
+    @Autowired
+    private MicroServiceUtil microServiceUtil;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
@@ -645,7 +648,7 @@ public class WorkOrderExportService extends MicroServiceInvoker {
     }
 
     public String getFileSearchUrl() {
-        return getGatewayURL(GatewayURL.SEARCH_FILE);
+        return microServiceUtil.getWebContextUrl() + "/gateway" + GatewayURL.SEARCH_FILE;
     }
 /*
 
