@@ -2613,13 +2613,20 @@ public class NurseSiteMaintainService {
 			}
 			Set<String> afterItemIds = after.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
 			if(CollectionUtils.isNotEmpty(after)){
-				nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(afterItemIds);
-				nurseSiteMaintainItemRepository.delete(after);
+				nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(new ArrayList<>(afterItemIds));
+//                nurseSiteMaintainItemRepository.delete(after);
+				nurseSiteMaintainItemRepository.deleteMaintainItem(afterItemIds);
+				Set<String> strings = new HashSet<>();
+
 				for (NurseSiteMaintainItem nurseSiteMaintainItem : after) {
 					List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
 					if(CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent) &&  nurseSiteMaintainItemsParent.size()==1 &&  nurseSiteMaintainItemsParent.get(0).getId().equals(nurseSiteMaintainItem.getId())){
-						nurseSiteMaintainRepository.deleteMaintain(nurseSiteMaintainItem.getParentId());
+//                        nurseSiteMaintainRepository.deleteById(nurseSiteMaintainItem.getParentId());
+						strings.add(nurseSiteMaintainItem.getParentId());
 					}
+				}
+				if(CollectionUtils.isNotEmpty(strings)){
+					nurseSiteMaintainRepository.deleteMaintain(strings);
 				}
 			}
 			Set<String> historyItemIds = history.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
