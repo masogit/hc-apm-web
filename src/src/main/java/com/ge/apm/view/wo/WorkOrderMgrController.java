@@ -1039,7 +1039,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         filters.add(new SearchFilter("mvsIbMapping.ibTenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+        filters.add(new SearchFilter("mvsIbMapping.ibId", SearchFilter.Operator.IsNotNull, null));
 
         return filters;
     }
