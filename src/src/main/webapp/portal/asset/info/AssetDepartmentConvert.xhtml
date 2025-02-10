@@ -9,7 +9,7 @@
 
     <p:dialog id="unfinishedAssetDepartmentCovertOrderDetailDialog" widgetVar="unfinishedAssetDepartmentCovertOrderDetailDialog" modal="true" draggable="true" appendTo="@(body)" height="300" width="500"   >
         <p:fieldset legend="当前设备有未完成工单,请进行处理">
-            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('已转科')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('transfer')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
             <br/> <br/> <br/>
             <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
                 未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
