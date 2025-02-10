@@ -42,6 +42,8 @@ public enum GatewayURL {
     GET_MVSASSECT_UID_BYCLINICALDEPT("/hcapmassetservice/api/apm/asset/mvsassetinfos/byClinicalDept"),
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
+    // 处理未完成日常检查
+    PROCESS_UN_FINISHED_NURSE_SITE_MAINTAIN("/hcapmassetservice/api/apm/assetScrap/processUnfinishedNurseSiteMaintain/{assetId}"),
 
     //ACKER
     GET_ACKER_BY_OrderId("/hcapmassetservice/api/apm/asset/{workOrderId}/acker"),
