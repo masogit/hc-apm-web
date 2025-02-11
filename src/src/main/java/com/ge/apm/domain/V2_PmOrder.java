@@ -861,6 +861,10 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public MvsIbMapping getMvsIbMapping() {
+        if(  mvsIbMapping == null
+                && eMvsIbMapping != null) {
+            return eMvsIbMapping;
+        }
         return mvsIbMapping;
     }
 
