@@ -247,10 +247,11 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
             zkbIntegralOrder.setEngineerAuditDate(new Date());
             zkbIntegralOrder.setEngineerAuditer(userAccount.getName());
             zkbIntegralOrder.setEngineerAuditerUid(userAccount.getUid());
-            zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             if(flag){
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationAccept.name());
             }else{
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.name());
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name());
             }
         } else if(ZkbPartOrderStep.PartOrderStep.ManagePending.name().equals(zkbIntegralOrder.getCurrentStep())){

@@ -251,9 +251,10 @@ public class ZkbIntegralOrder implements Serializable {
     @Column(name = "order_no")
     private String orderNo;
 
-    /**
-     * 区域经理审批备注
-     */
+    //t  f
+    @Column(name = "engineer_qualifications_flag")
+    private String engineerQualificationsFlag;
+
     @Column(name = "engineer_remark")
     private String engineerRemark;
 

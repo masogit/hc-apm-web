@@ -258,6 +258,14 @@
                 </p:fieldset>
                 <p:fieldset legend="工程师资质审批" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showEngineer}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class="label">工程师是否有资质*</label>
+                            <p:selectOneMenu value="#{zkbIntegralOrderAuditController.selected.engineerQualificationsFlag}" disabled="#{!(zkbIntegralOrderAuditController.selected.currentStep eq 'EngineerQualificationPending')}" required="true" requiredMessage="工程师是否有资质 #{msg.ValidationRequire}" >
+                                <p:ajax event="change" update="reject accept" listener="#{zkbIntegralOrderAuditController.engineerQualificationsFlagChange}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbIntegralOrderAuditController.selected.currentStep eq 'EngineerQualificationPending')}">
                             <label class="label">工程师资质审批人</label>
                             <p:inputText value="#{zkbIntegralOrderAuditController.selected.engineerAuditer}" disabled="true" />
@@ -370,7 +378,7 @@
                     </p:panelGrid>
 
                 </p:fieldset>
-                <p:commandButton id="accept" validateClient="true" value="审批通过" action="#{zkbIntegralOrderAuditController.normalNext(true)}" update=":growl" icon="ui-icon-check" rendered="#{(zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showBtn eq 'Audit') and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}" />
+                <p:commandButton id="accept" validateClient="true" value="审批通过" action="#{zkbIntegralOrderAuditController.normalNext(true)}" update=":growl" icon="ui-icon-check" rendered="#{(zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showBtn eq 'Audit') and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}" disabled="#{!zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.toolBoxAuditBtnFlag}" />
                 <p:commandButton id="reject" immediate="false" process="@this" value="审批不通过" action="#{zkbIntegralOrderAuditController.normalNext(false)}" update=":growl" icon="ui-icon-close" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showBtn eq 'Audit' and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}" />
                 <p:commandButton validateClient="true" value="提交" action="#{zkbIntegralOrderAuditController.normalNext(true)}" icon="ui-icon-check" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showBtn eq 'Submit' and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}"/>
                 <!--<p:commandButton immediate="false" process="@this" value="拒绝" action="#{zkbIntegralOrderAuditController.normalNext(false)}" icon="ui-icon-check" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showBtn eq 'Submit' and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}"/>-->

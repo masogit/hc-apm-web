@@ -43,6 +43,8 @@ public class ZkbIntegralOrderStatusVo {
 
     private boolean haveTrainCourseFlag = false;
 
+    private boolean toolBoxAuditBtnFlag = true;
+
     /**
      * 空代表显示
      * Audit 代表审批显示按钮
