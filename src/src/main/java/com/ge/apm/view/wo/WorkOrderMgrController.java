@@ -958,6 +958,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             //查询Mvs工单
             if("MVS工单".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
+                logger.info("workordermgrmvsfilter "+JSONObject.toJSONString(filters));
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
                 loadMVSClinicalDeptList();
