@@ -1960,6 +1960,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
+                logger.info("loadData.MvsSearchFilter" +JSONObject.toJSONString(filters));
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
                 loadMVSClinicalDeptList();
