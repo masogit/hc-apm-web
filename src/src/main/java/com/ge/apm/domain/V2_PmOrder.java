@@ -278,6 +278,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @ManyToOne(fetch = FetchType.EAGER)
     private MvsIbMapping mvsIbMapping;
 
+    @JoinColumn(name = "asset_uid", referencedColumnName = "e_home_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.EAGER)
+    private MvsIbMapping eMvsIbMapping;
 
     @Transient
     private String businessDigest;
@@ -724,6 +727,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
                 && mvsIbMapping != null
                 && mvsIbMapping.getAssetInfo() != null){
             return mvsIbMapping.getAssetInfo();
+        }else if(assetInfo == null
+                && mvsIbMapping == null
+                && eMvsIbMapping != null
+                && eMvsIbMapping.getAssetInfo() != null){
+            return eMvsIbMapping.getAssetInfo();
         }
         return assetInfo;
     }
