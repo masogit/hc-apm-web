@@ -54,20 +54,26 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         return assetInfoMapper.selectMeasureResult(pagination, wrapper);
     }
 
-    public List<ServiceRequestProjection> getWorkOrderList(Integer assetId){
+//    public List<ServiceRequestProjection> getWorkOrderList(Integer assetId){
+//        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
+//        assetIds.add(assetId);
+//        Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
+//        PageRequest pr =  new PageRequest(0, 5000, sort);
+//        return srDao.findProjectionByAssetIdIn(assetIds, pr).getContent();
+//    }
+
+    public List<V2_ServiceRequest> getWorkOrderList(Integer assetId){
         List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
-        Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
-        PageRequest pr =  new PageRequest(0, 5000, sort);
-        return srDao.findProjectionByAssetIdIn(assetIds, pr).getContent();
+        return srDao.findByAssetIdInAndWorkOrderExists(assetIds,5000);
     }
 
-    public List<ServiceRequestProjection> getWorkOrderList(Integer assetId, Integer limit){
+    public List<V2_ServiceRequest>getWorkOrderList(Integer assetId, Integer limit){
         List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
         assetIds.add(assetId);
-        Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
-        PageRequest pr =  new PageRequest(0, limit, sort);
-        return srDao.findProjectionByAssetIdIn(assetIds, pr).getContent();
+//        Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
+//        PageRequest pr =  new PageRequest(0, limit, sort);
+        return srDao.findByAssetIdInAndWorkOrderExists(assetIds,limit);
     }
 
     public List<V2_PmOrder> getPmOrderList(Integer assetId){
