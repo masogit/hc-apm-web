@@ -1,10 +1,8 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -12,7 +10,6 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -29,12 +26,9 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
 
     private ZkbIntegralOrderRepository zkbIntegralOrderRepository;
 
-    private AssetInfoRepository assetInfoRepository;
-    private TenantInfoRepository tenantInfoRepository;
+    private UserContextService userContextService;
 
     private ZkbIntegralOrderAuditService zkbIntegralOrderAuditService;
-
-
 
     private UserAccount currentUser;
 
@@ -53,6 +47,8 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
     @Getter @Setter
     private List<ZkbContract> zkbContractList = new ArrayList<>();
 
+    private boolean toolBoxAuditControlFlag = true;
+
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
 
     String encodeStr;
@@ -66,8 +62,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
     protected void init() {
         super.init();
         zkbIntegralOrderRepository = WebUtil.getBean(ZkbIntegralOrderRepository.class);
-        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         zkbIntegralOrderAuditService = WebUtil.getBean(ZkbIntegralOrderAuditService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbIntegralOrderStatusVo = new ZkbIntegralOrderStatusVo();
@@ -90,6 +85,14 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
             zkbIntegralOrderAuditService.fieldRendered(currentUser, zkbIntegralOrderStatusVo, selected);
             zkbIntegralOrderAuditService.initPageData(selected, zkbContract, zkbIntegralOrderStatusVo);
             zkbPartOrderCatList = zkbIntegralOrderAuditService.queryCatList();
+
+            if(userContextService.isZkbUser()) {
+                if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
+                    if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
+                        WebUtil.addErrorMessage("申请人无资质，需有资质的工程师提交申请！","");
+                    }
+                }
+            }
         }
 
     }
@@ -104,6 +107,13 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
         return "List?faces-redirect=true&queryStatus="+queryStatus ;
     }
 
+    public void engineerQualificationsFlagChange(){
+        if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
+            zkbIntegralOrderStatusVo.setToolBoxAuditBtnFlag(false);
+        }else {
+            zkbIntegralOrderStatusVo.setToolBoxAuditBtnFlag(true);
+        }
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbIntegralOrder> getDAO() {
