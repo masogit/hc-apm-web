@@ -201,7 +201,7 @@ public class SystemTemplate implements Serializable {
         BUDGET_IMPORT("BUDGET_IMPORT","预算导入模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"Budget_Import_Template.xlsx"),
         OVER_FIFTY_THOUSAND("OVER_FIFTY_THOUSAND","医疗仪器设备年度采购申报表模板","word",SystemTemplateBusinessEnum.BUDGET.getCode(),"over_fifty_thousand.docx"),
         BUDGET_BAP_EXP("BUDGET_BAP_EXP","申购导出模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"APM_Budget_BAP_Exp_Template.xlsx"),
-        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
+        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","word",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
 
         //组织结构
         ORG_INFO("ORG_INFO","组织机构导入模板","excel",SystemTemplateBusinessEnum.ORG_INFO.getCode(),"APM_Org_Template.xlsx"),

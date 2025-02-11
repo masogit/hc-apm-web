@@ -2589,7 +2589,7 @@ public class NurseSiteMaintainService {
 	 * @param bathSelectedList asset list
 	 */
 	@Transactional
-	public boolean processUnfinishedNurseSiteMaintain(List<AssetInfo> bathSelectedList){
+	public boolean processUnfinishedNurseSiteMaintain(List<AssetInfo> bathSelectedList, String comment){
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 		List<String> uids = bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList());
 		List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
@@ -2607,19 +2607,26 @@ public class NurseSiteMaintainService {
 					nurseSiteMaintainItem.setUpdateByUid(loginUser.getUid());
 					nurseSiteMaintainItem.setUpdateDate(new Date());
 					nurseSiteMaintainItem.setModifyByUid(loginUser.getUid());
-					nurseSiteMaintainItem.setComment(org.apache.commons.lang.StringUtils.isBlank(nurseSiteMaintainItem.getComment())?"已报废":nurseSiteMaintainItem.getComment()+",已报废");
+					nurseSiteMaintainItem.setComment(org.apache.commons.lang.StringUtils.isBlank(nurseSiteMaintainItem.getComment()) ? comment:nurseSiteMaintainItem.getComment() + "," + comment);
 					nurseSiteMaintainItems.add(nurseSiteMaintainItem);
 				}
 			}
 			Set<String> afterItemIds = after.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
 			if(CollectionUtils.isNotEmpty(after)){
-				nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(afterItemIds);
-				nurseSiteMaintainItemRepository.delete(after);
+				nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(new ArrayList<>(afterItemIds));
+//                nurseSiteMaintainItemRepository.delete(after);
+				nurseSiteMaintainItemRepository.deleteMaintainItem(afterItemIds);
+				Set<String> strings = new HashSet<>();
+
 				for (NurseSiteMaintainItem nurseSiteMaintainItem : after) {
 					List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
 					if(CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent) &&  nurseSiteMaintainItemsParent.size()==1 &&  nurseSiteMaintainItemsParent.get(0).getId().equals(nurseSiteMaintainItem.getId())){
-						nurseSiteMaintainRepository.deleteMaintain(nurseSiteMaintainItem.getParentId());
+//                        nurseSiteMaintainRepository.deleteById(nurseSiteMaintainItem.getParentId());
+						strings.add(nurseSiteMaintainItem.getParentId());
 					}
+				}
+				if(CollectionUtils.isNotEmpty(strings)){
+					nurseSiteMaintainRepository.deleteMaintain(strings);
 				}
 			}
 			Set<String> historyItemIds = history.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());

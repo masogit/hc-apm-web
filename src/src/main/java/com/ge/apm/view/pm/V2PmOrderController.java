@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
@@ -1959,6 +1960,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
+                logger.info("loadData.MvsSearchFilter" +JSONObject.toJSONString(filters));
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
                 loadMVSClinicalDeptList();
@@ -2151,6 +2153,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             String tenantUid = tenantInfo.get().getUid();
             filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
             List<String> assetUids = pmOrderService.getMvsAssectUidsStr(token);
+            logger.info("pmorder.buildMvsSearchFilter" +JSONObject.toJSONString(assetUids));
             if (CollectionUtils.isEmpty(assetUids)) {
                 assetUids.add("1++1");
             }

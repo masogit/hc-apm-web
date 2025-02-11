@@ -347,6 +347,11 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
     //处理当前组织如果是第一次添加子模板需要把他上级组织的模板添加到他的组织下面
     public void handlerSubSystemTemplate(){
+        //修改为只处理到货安装的
+        if(!SystemTemplate.SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode().equals(selected.getTemplateType())){
+            return;
+        }
+
         List<SystemTemplate> byKeyAndSiteForUseParent = systemTemplateService.findByKeyAndSiteForUseParent(selected.getTemplateType(), selectedOrg.getSiteUID(),selectedOrg.getHospitalUID(),selectedOrg.getInstitutionUID(),selectedOrg.getTenantUID());
         List<SystemTemplate> filterSite = byKeyAndSiteForUseParent.stream().filter(item -> !selectedOrg.getSiteUID().equals(item.getSiteUid())).collect(Collectors.toList());
         if(CollectionUtils.isNotEmpty(filterSite)){

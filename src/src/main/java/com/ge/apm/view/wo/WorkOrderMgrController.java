@@ -958,6 +958,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             //查询Mvs工单
             if("MVS工单".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
+                logger.info("workordermgrmvsfilter "+JSONObject.toJSONString(filters));
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
                 loadMVSClinicalDeptList();
@@ -1019,6 +1020,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
         List<String> assetUIds = serviceRequestApiService.getVisableMvsAssetUidSystemId(UserContextService.getAccessToken());
+        logger.info("workorder.buildMvsSearchFilter" +JSONObject.toJSONString(assetUIds));
         if (CollectionUtils.isEmpty(assetUIds)) {
             assetUIds = new ArrayList<>();
             assetUIds.add("-------");
@@ -1039,7 +1041,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         filters.add(new SearchFilter("mvsIbMapping.ibTenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-        filters.add(new SearchFilter("mvsIbMapping.ibSystemId", SearchFilter.Operator.IsNotNull, null));
+        filters.add(new SearchFilter("mvsIbMapping.ibId", SearchFilter.Operator.IsNotNull, null));
 
         return filters;
     }
