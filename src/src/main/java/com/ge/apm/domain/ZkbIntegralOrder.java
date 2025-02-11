@@ -141,6 +141,8 @@ public class ZkbIntegralOrder implements Serializable {
     @Column(name = "zkb_engineer_phone")
     private String zkbEngineerPhone;
 
+    @Column(name = "engineer_no")
+    private String engineerNo;
     /**
      * 产品型号
      */
