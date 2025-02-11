@@ -215,6 +215,23 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">数量*</label>
+                            <p:inputText value="#{zkbIntegralOrderAuditController.selected.qty}"  disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">工程师姓名*</label>
+                            <p:inputText  value="#{zkbIntegralOrderAuditController.selected.zkbEngineerName}" disabled="true" required="false"  requiredMessage="工程师姓名 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">工程师电话*</label>
+                            <p:inputText  value="#{zkbIntegralOrderAuditController.selected.zkbEngineerPhone}" disabled="true" required="false"  requiredMessage="工程师电话 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">工程师学员号*</label>
+                            <p:inputText  value="#{zkbIntegralOrderAuditController.selected.zkbEngineerPhone}" disabled="true" required="false"  requiredMessage="工程师电话 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
                             <label class="label">备注</label>
                             <p:inputTextarea value="#{zkbIntegralOrderAuditController.selected.remark}" maxlength="255" disabled="true"/>
                         </h:panelGroup>
