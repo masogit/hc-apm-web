@@ -1020,6 +1020,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
         List<String> assetUIds = serviceRequestApiService.getVisableMvsAssetUidSystemId(UserContextService.getAccessToken());
+        logger.info("workorder.buildMvsSearchFilter" +JSONObject.toJSONString(assetUIds));
         if (CollectionUtils.isEmpty(assetUIds)) {
             assetUIds = new ArrayList<>();
             assetUIds.add("-------");
