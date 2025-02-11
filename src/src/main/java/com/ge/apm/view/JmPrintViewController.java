@@ -69,10 +69,10 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
                 }
                 break;
             case "workOrderDetail" :
-                String woId = request.getParameter("woId");
-                String srId = request.getParameter("srId");
-                param.put("woId", woId);
-                param.put("srId", srId);
+                param.put("woId", request.getParameter("woId"));
+                param.put("srId", request.getParameter("srId"));
+                param.put("assetUid", request.getParameter("assetUid"));
+                param.put("fileSearchUrl", request.getParameter("fileSearchUrl"));
                 partPrintReport = dao.findReportByName("维修详情");
                 break;
             default:

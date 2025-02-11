@@ -7,8 +7,11 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -85,6 +88,8 @@ public class WorkOrderExportService {
     private BlobObjectRepository blobObjectRepository;
     @Autowired
     private ExternalTempUserRepository externalTempUserDao;
+    @Autowired
+    private MicroServiceUtil microServiceUtil;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
@@ -333,6 +338,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
 
             workOrderMap.put("assetId", workOrderExportPojo.getAssetId());
+            workOrderMap.put("assetUid", workOrderExportPojo.getAssetUid());
 
             if (workOrderExportPojo.getAssetFunctionGroup() != null) {
                 workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
@@ -639,6 +645,10 @@ public class WorkOrderExportService {
         }
 
         return Boolean.TRUE;
+    }
+
+    public String getFileSearchUrl() {
+        return microServiceUtil.getWebContextUrl() + "/gateway" + GatewayURL.SEARCH_FILE;
     }
 /*
 

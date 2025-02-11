@@ -102,6 +102,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private UserContextService userContextService;
     private QrCodeLib createRequest;
     private NurseSiteMaintainService nurseSiteMaintainService;
+    private AssetScrapService assetScrapService;
     //******* filter start
 
     @Getter @Setter
@@ -244,6 +245,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         workflowService = WebUtil.getBean(WorkflowService.class);
         woService= WebUtil.getBean(V2_WorkOrderService.class);
         nurseSiteMaintainService= WebUtil.getBean(NurseSiteMaintainService.class);
+        assetScrapService= WebUtil.getBean(AssetScrapService.class);
         assetDepartmentConvertService= WebUtil.getBean(AssetDepartmentConvertService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -1687,10 +1689,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
-            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList);
-//            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
-//                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
-//            }
+            assetScrapService.processUnfinishedNurseSiteMaintain(UserContextService.getAccessToken(), unCheckedNursiteMaintainList.stream().map(AssetInfo::getUid).collect(Collectors.toList()), "transfer");
+//            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList, "已转科");
             toDeleteNurseMaintainSite = false;
             unCheckedNurseSite = false;
         }
