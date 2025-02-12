@@ -13,3 +13,10 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 ---zkb归还数据增加item_id
 update zkb_part_order_return r set item_id = (select id from zkb_part_order_item where part_order_id = r.part_order_id and part_no = r.part_no limit 1) where item_id is null and part_order_id in (select id from zkb_part_order where current_step in ('ReturnPending', 'ClosePending'));
+
+
+--清理zkb fe测试脏数据
+update zkb_part_order set current_step = 'Complete', status = 'Closed' where tenant_uid = '5ef0ed1fff3a431782f21ac634bd8d8e' and current_step != 'Complete';
+
+update zkb_part_order_cat set business_type = 'SpecialPart' where cat_type = 'specialPart' and business_type is null;
+update zkb_part_order_cat set business_type = 'Probe' where cat_type != 'specialPart' and business_type is null;
