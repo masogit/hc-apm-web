@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.RenderData;
 import com.deepoove.poi.data.TableRenderData;
 import com.deepoove.poi.data.TextRenderData;
@@ -8,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.wo.doctemplate.*;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -185,8 +187,14 @@ public class AssetOutStockService {
         XWPFTemplate template = null;
         try(ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+
+
+            Configure config = Configure.newBuilder()
+                    .bind("list", new AssetOutStockTableRenderPolicy())
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();
@@ -203,8 +211,14 @@ public class AssetOutStockService {
         XWPFTemplate template = null;
         try(ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("list", new AssetOutStockTableRenderPolicy(stockType));
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("list", new AssetOutStockTableRenderPolicy(stockType));
+
+            Configure config = Configure.newBuilder()
+                    .bind("list", new AssetOutStockTableRenderPolicy(stockType))
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
+
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();

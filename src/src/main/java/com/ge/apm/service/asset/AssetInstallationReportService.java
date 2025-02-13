@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.TenantInfoRepository;
@@ -371,8 +372,14 @@ public class AssetInstallationReportService {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream inputStream = new ByteArrayInputStream(templateBytes);
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy());
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy());
+
+
+            Configure config = Configure.newBuilder()
+                    .bind("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy())
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();
