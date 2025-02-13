@@ -1,7 +1,9 @@
 package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -30,7 +32,7 @@ import java.util.*;
 public class WorkOrderDocxRenderService {
 
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
-    private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
+    private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, PictureType.JPEG, new byte[0]);
 
 
 
@@ -116,12 +118,22 @@ public class WorkOrderDocxRenderService {
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("part_table", new PartTableRenderPolicy());
-            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
-            template.registerPolicy("audit_table", new AuditTableRenderPolicy());
-            template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
-            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("part_table", new PartTableRenderPolicy());
+//            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
+//            template.registerPolicy("audit_table", new AuditTableRenderPolicy());
+//            template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
+//            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
+            Configure config = Configure.newBuilder()
+                    .bind("part_table", new PartTableRenderPolicy())
+                    .bind("proceed_table", new ProceedTableRenderPolicy())
+                    .bind("audit_table", new AuditTableRenderPolicy())
+                    .bind("work_hours_table", new WorkHourTableRenderPolicy())
+                    .bind("parts_picture_table", new PartsPictureTableRenderPolicy(blobService, 2))
+                    .build();
+
+            template = XWPFTemplate.compile(inputStream, config);
+
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();
@@ -288,7 +300,7 @@ public class WorkOrderDocxRenderService {
     private void mapESign(Map<String, Object> source, Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
         byte[] blob = getBlob(source, key);
         if (blob != null) {
-            target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
+            target.put(key, new PictureRenderData(100, 75, PictureType.PNG, blob));
             target.put(eSignTitleKey, eSignTitleValue);
         } else {
             target.put(key, EMPTY_PICTURE);
@@ -301,7 +313,7 @@ public class WorkOrderDocxRenderService {
     private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue,int width,int height) {
         byte[] blob = getBlobSignature( storageId);
         if (blob != null) {
-            target.put(key, new PictureRenderData(width, height, "mock.png", blob));
+            target.put(key, new PictureRenderData(width, height,PictureType.PNG, blob));
             target.put(eSignTitleKey, eSignTitleValue);
         } else {
             target.put(key, EMPTY_PICTURE);

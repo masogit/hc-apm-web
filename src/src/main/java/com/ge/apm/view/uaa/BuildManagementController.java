@@ -33,6 +33,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -727,8 +728,8 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     private StreamedContent excelFile;
     public void exportExcel() throws IOException {
 //        ExcelDocument doc = buildManagementService.exportOrg();
-        ExcelDocument doc1 = buildManagementService.exportBuildManagement(orgTree);
-        excelFile = new DefaultStreamedContent(doc1.getStream(), "application/vnd.ms-excel", "APM_BuildManagement_Export.xlsx");
+        InputStream doc1 = buildManagementService.exportBuildManagement(orgTree);
+        excelFile = new DefaultStreamedContent(doc1, "application/vnd.ms-excel", "APM_BuildManagement_Export.xlsx");
     }
 
     public boolean getAcShow() {

@@ -2,12 +2,15 @@ package com.ge.apm.service.asset;
 
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
 import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemTableRenderPolicy;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
@@ -97,8 +100,14 @@ public class DepartmentConvertService {
     private byte[] generate(AssetDepartmentConvert assetDepartmentConvert, byte[] templateBytes) {
         Map<String, Object> datas = getData(assetDepartmentConvert);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
+//        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+//        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
+
+
+        Configure config = Configure.newBuilder()
+                .bind("list", new DepartmentConvertRenderPolicy())
+                .build();
+        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
         template.render(datas);
         try {
             template.write(out);
@@ -148,7 +157,7 @@ public class DepartmentConvertService {
                 continue;
             }
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
-            map.put(signature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
+            map.put(signature.name()+i, new PictureRenderData(100, 80, PictureType.PNG, levelSignatureBytes));
         }
 
         for(MultiLevelApproval multiLevelApproval : multiLevelApprovals){
