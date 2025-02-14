@@ -37,6 +37,7 @@ public class LargeScreenConfigService {
         screenConfig.setCreatedBy(userAccount.getUid());
         screenConfig.setCreatedDate(date);
         screenConfig.setStatus(0);
+        screenConfig.setTenantUID(userAccount.getTenantUID());
         screenConfig = largeScreenConfigRepository.save(screenConfig);
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("largeScreenConfigId", SearchFilter.Operator.EQ,config.getId()));
