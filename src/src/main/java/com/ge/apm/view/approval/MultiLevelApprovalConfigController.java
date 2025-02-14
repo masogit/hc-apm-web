@@ -7,6 +7,7 @@ import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetTypeGroupDto;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.dto.UserOrgInfoDto;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -16,6 +17,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -349,8 +352,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //        userAssetTypeUpdate();
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
-            Integer minAmount = (Integer) map.get("minAmount");
-            Integer maxAmount = (Integer) map.get("maxAmount");
+            Integer minAmount = Optional.ofNullable((Integer) map.get("minAmount")).orElse(0);
+            Integer maxAmount = Optional.ofNullable((Integer) map.get("maxAmount")).orElse(0);
 //            if (minAmountNew != minAmount || maxAmountNew != maxAmount || !enable){
                 if(this.check(minAmountNew, maxAmountNew ,enable)) return;
 //            }
@@ -451,15 +454,21 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
     public Boolean check(Integer minAmountNew,Integer maxAmountNew,boolean enable){
         List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = configDao.findByHierOrgUidAndBusinessTypeAndEnable(selected.getHierOrgUid(),selected.getBusinessType(),true);
+        String approvalMsg = "已存在同级别审批流";
+        /*if (selected.getBusinessType().equals(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT)) {
+            if (multiLevelApprovalConfigs.size() >= 2) {
+                WebUtil.addWarnMessage(approvalMsg);
+                return true;
+            }
+        }*/
         if(!multiLevelApprovalConfigs.isEmpty() && multiLevelApprovalConfigs != null){
-            String approvalMsg ="已存在同级别审批流";
             for (MultiLevelApprovalConfig multiLevelApprovalConfig :multiLevelApprovalConfigs){
                 String configration = multiLevelApprovalConfig.getConfigration();
                 if (minAmountNew != null && maxAmountNew != null && null != configration) {
                     if(!multiLevelApprovalConfig.getId().equals(selected.getId()) || !enable){
                         Map map = JSON.parseObject(configration, Map.class);
-                        Integer minAmount = ((Integer) map.get("minAmount"));
-                        Integer maxAmount = ((Integer) map.get("maxAmount"));
+                        Integer minAmount = Optional.ofNullable(((Integer) map.get("minAmount"))).orElse(0);
+                        Integer maxAmount = Optional.ofNullable(((Integer) map.get("maxAmount"))).orElse(0);
                         List<String>   selectAssetTypesOld=(List<String>) map.get("selectAssetTypes");
                         List<String>    selectAssetGroupsOld=(List<String>) map.get("selectAssetGroups");
                         List<String>   selectAssetClinicalDeptUidsOld=(List<String>) map.get("selectAssetClinicalDeptUids");
@@ -469,40 +478,28 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                         List<String> selectAssetTypes = selected.getSelectAssetTypes();
                         List<String> selectAssetClinicalDeptUids = selected.getSelectAssetClinicalDeptUids();
                         List<String> selectAssetPartsTypes = selected.getSelectAssetPartsTypes();
-//                        if(CollectionUtils.isEmpty(selectAssetGroups) || CollectionUtils.isEmpty(selectAssetTypes) ||CollectionUtils.isEmpty(selectAssetClinicalDeptUids) ){
-//                            String configrationNew = selected.getConfigration();
-//                            if (null != configrationNew) {
-//                                Map mapNew = JSON.parseObject(configrationNew, Map.class);
-//                                selectAssetTypes=(List<String>) mapNew.get("selectAssetTypes");
-//                                selectAssetGroups=(List<String>) mapNew.get("selectAssetGroups");
-//                                selectAssetClinicalDeptUids=(List<String>) mapNew.get("selectAssetClinicalDeptUids");
-//                            }
-//                        }
-                        if( (minAmountNew==0 && maxAmountNew==0 ) || (minAmount==0 && maxAmount==0)   ){
-                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
+                        if( (minAmountNew==0 && maxAmountNew==0 ) || (minAmount==0 && maxAmount==0)){
+                            if (conditionsCheck(multiLevelApprovalConfig, approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes)) {
                                 return true;
+                            }
                         }
                         if( minAmountNew >= minAmount && minAmountNew < maxAmount) {
-                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
+                            if (conditionsCheck(multiLevelApprovalConfig, approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
                                 return true;
                         }
                         if(( maxAmountNew > minAmount && maxAmountNew <= maxAmount)){
-                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
+                            if (conditionsCheck(multiLevelApprovalConfig, approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
                                 return true;
-//                            WebUtil.addWarnMessage(approvalMsg);
-//                            return true;
                         }
                         if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount  && maxAmount != 0){
-                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
-//                            WebUtil.addWarnMessage(approvalMsg);
+                            if (conditionsCheck(multiLevelApprovalConfig, approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
                             return true;
                         }
                         if(  (minAmountNew <= minAmount ||  minAmountNew >= minAmount ) && maxAmountNew == maxAmount  ){
-                            if (conditionsCheck(approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
+                            if (conditionsCheck(multiLevelApprovalConfig, approvalMsg, selectAssetTypesOld, selectAssetGroupsOld, selectAssetClinicalDeptUidsOld, selectAssetGroups, selectAssetTypes, selectAssetClinicalDeptUids,selectAssetPartsTypesOld,selectAssetPartsTypes))
                                 return true;
                         }
                     }
-
                 }else {
                     WebUtil.addWarnMessage(approvalMsg);
                     return true;
@@ -512,7 +509,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         return false;
     }
 
-    private boolean conditionsCheck(String approvalMsg, List<String> selectAssetTypesOld, List<String> selectAssetGroupsOld, List<String> selectAssetClinicalDeptUidsOld, List<String> selectAssetGroups, List<String> selectAssetTypes, List<String> selectAssetClinicalDeptUids, List<String> selectAssetPartTypesOld, List<String> selectAssetPartTypes) {
+    private boolean conditionsCheck(MultiLevelApprovalConfig multiLevelApprovalConfig, String approvalMsg, List<String> selectAssetTypesOld, List<String> selectAssetGroupsOld, List<String> selectAssetClinicalDeptUidsOld, List<String> selectAssetGroups, List<String> selectAssetTypes, List<String> selectAssetClinicalDeptUids, List<String> selectAssetPartTypesOld, List<String> selectAssetPartTypes) {
         if((CollectionUtils.isEmpty(selectAssetTypesOld)  &&   CollectionUtils.isEmpty(selectAssetGroupsOld)  &&   CollectionUtils.isEmpty(selectAssetClinicalDeptUidsOld) )||( CollectionUtils.isEmpty(selectAssetGroups)  && CollectionUtils.isEmpty(selectAssetGroups) && CollectionUtils.isEmpty(selectAssetClinicalDeptUids))){
             return false;
         }
@@ -523,15 +520,27 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
         if((CollectionUtils.containsAny(selectAssetTypesOld, selectAssetTypes) || (CollectionUtils.isEmpty(selectAssetTypesOld)  &&   CollectionUtils.isEmpty(selectAssetTypes)   )  )
                 && ( CollectionUtils.containsAny(selectAssetGroupsOld, selectAssetGroups)  || (CollectionUtils.isEmpty(selectAssetGroupsOld)  &&   CollectionUtils.isEmpty(selectAssetGroups)  ))
-                &&  (CollectionUtils.containsAny(selectAssetClinicalDeptUidsOld, selectAssetClinicalDeptUids) || (CollectionUtils.isEmpty(selectAssetClinicalDeptUidsOld)  &&   CollectionUtils.isEmpty(selectAssetClinicalDeptUids)  )  )
-
-        ){
-            if("assetRepair".equals(selected.getBusinessType())  ){
+                &&  (CollectionUtils.containsAny(selectAssetClinicalDeptUidsOld, selectAssetClinicalDeptUids) || (CollectionUtils.isEmpty(selectAssetClinicalDeptUidsOld)  &&   CollectionUtils.isEmpty(selectAssetClinicalDeptUids)  )  )){
+            if("assetRepair".equals(selected.getBusinessType())){
                 if((CollectionUtils.containsAny(selectAssetPartTypesOld, selectAssetPartTypes) || (CollectionUtils.isEmpty(selectAssetPartTypesOld)  &&   CollectionUtils.isEmpty(selectAssetPartTypes)  )  )   ){
                     WebUtil.addWarnMessage(approvalMsg);
                     return true;
                 }
-            }else{
+            /*} else if (ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT.equals(selected.getBusinessType())) {
+                String approvalStrategy;
+                if ("Create".equals(super.crudActionName)) {
+                    List<ApprovalNode> collect = nodesList.stream().filter(item -> !Objects.equals(item.getId(), SimplePartsConstant.PARTS_LOCAL_ORG_ID)).collect(Collectors.toList());
+                    approvalStrategy = JSON.toJSONString(collect);
+                } else {
+                    approvalStrategy = selected.getApprovalItem();
+                }
+                if ((approvalStrategy.contains("approvalStrategy") && multiLevelApprovalConfig.getApprovalItem().contains("approvalStrategy")) || (!approvalStrategy.contains("approvalStrategy") && !multiLevelApprovalConfig.getApprovalItem().contains("approvalStrategy"))) {
+                    WebUtil.addWarnMessage(approvalMsg);
+                    return true;
+                } else {
+                    return false;
+                }*/
+            } else {
                 WebUtil.addWarnMessage(approvalMsg);
                 return true;
             }
@@ -562,8 +571,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             String configrationOld = selected.getConfigration();
             if (null != configrationOld) {
                 Map map = JSON.parseObject(configrationOld, Map.class);
-                Integer minAmount = ((Integer) map.get("minAmount"));
-                Integer maxAmount = ((Integer) map.get("maxAmount"));
+                Integer minAmount = Optional.ofNullable((Integer) map.get("minAmount")).orElse(0);
+                Integer maxAmount = Optional.ofNullable((Integer) map.get("maxAmount")).orElse(0);
                 if(this.check(minAmount, maxAmount,true)) return true;
             }else {
                 if(this.check(minAmountNew, maxAmountNew,true)) return true;
@@ -1007,6 +1016,19 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     public boolean getApprovalRoleAssetHead() {
         return approvalRoleAssetHead;
+    }
+
+    public List<SelectItemDto> getApproveCondition() {
+        List<SelectItemDto> resultList = ListUtil.newArrayList();
+        switch (this.selected.getBusinessType()) {
+            case ApprovalConstant.APPROVAL_ASSET_REPAIR :
+                resultList.add(new SelectItemDto("工单设备所属科室", "1"));
+                break;
+            default:
+                break;
+
+        }
+        return resultList;
     }
 
     public void setApprovalRoleAssetHead(boolean approvalRoleAssetHead) {

@@ -316,7 +316,7 @@
                                     <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
 
                                     <p:commandButton id="preInactive" rendered="#{assetInfoEditController.CRUDActionName eq '修改' and  assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.selected.uid)}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
+                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoEditController.selected.uid))}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
 
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
@@ -574,7 +574,7 @@
                         <p:graphicImage value="#{assetInfoEditController.signatureContentStream}" stream="false" rendered="#{assetInfoEditController.signatureContentStream!=null}"></p:graphicImage>
                     </h:panelGroup>
                 </h:panelGrid>
-                <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetScrap()}" update=":tab:AssetInfoEditForm"  oncomplete="handleApproveSuccess(xhr, status, args);" />
+                <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetApplication('scrap')}" update=":tab:AssetInfoEditForm"  oncomplete="handleApproveSuccess(xhr, status, args);" />
                 <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoEditController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
             </h:form>
@@ -595,7 +595,7 @@
 
         <p:dialog  widgetVar="unfinishedAssetOrderDetailDialog"  modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true"    appendTo="@(body)"  height="300" width="500"   >
             <p:fieldset legend="当前设备有未完成工单,请进行处理">
-                <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain()}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+                <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('scrap')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
                 <br/> <br/> <br/>
                 <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
                     未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>

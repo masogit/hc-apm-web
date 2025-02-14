@@ -32,6 +32,16 @@ public class BudgetSearchForm {
     //申购年份
     private Date applicantYear;
 
+    private String temporallyPurchaseType;
+
+    public String getTemporallyPurchaseType() {
+        return temporallyPurchaseType;
+    }
+
+    public void setTemporallyPurchaseType(String temporallyPurchaseType) {
+        this.temporallyPurchaseType = temporallyPurchaseType;
+    }
+
     public OrgInfo getDept() {
         return dept;
     }

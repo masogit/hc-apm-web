@@ -42,6 +42,8 @@ public enum GatewayURL {
     GET_MVSASSECT_UID_BYCLINICALDEPT("/hcapmassetservice/api/apm/asset/mvsassetinfos/byClinicalDept"),
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
+    // 处理未完成日常检查
+    PROCESS_UN_FINISHED_NURSE_SITE_MAINTAIN("/hcapmassetservice/api/apm/assetScrap/processUnfinishedNurseSiteMaintain/{assetId}"),
 
     //ACKER
     GET_ACKER_BY_OrderId("/hcapmassetservice/api/apm/asset/{workOrderId}/acker"),
@@ -128,6 +130,10 @@ public enum GatewayURL {
     PART_ORDER_SEND_WECHAT_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatRemindLetter"),
     PART_ORDER_SEND_WECHAT_RETURN_AUDIT("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatReturnAudit"),
     PART_ORDER_SEND_EMAIL_ENGINEER("/hcapmreportservice/api/apm/report/partOrder/sendHtmlToEngineerByGeAdmin"),
+    INTEGRAL_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/integralOrder/sendMessage"),
+    INTEGRAL_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/integralOrder/sendEmail"),
+    INTEGRAL_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/integralOrder/sendWeChatMessages"),
+
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
@@ -191,6 +197,7 @@ public enum GatewayURL {
     JI_MU_REPORT("/apmReport/jmreport/view"),
 
     ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+    ASSET_DEPARTMENT_COVERT_APPLY("/hcapmassetservice/api/apm/departmentConvert/assetDepartmentConvert"),
 
     // davinci
     DAVINCI_EXTERNAL("/davinci/externalSharePageLink"),

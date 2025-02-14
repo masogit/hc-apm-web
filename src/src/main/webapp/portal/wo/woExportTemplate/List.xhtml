@@ -12,9 +12,9 @@
                     <p:outputLabel class="pageTitle" value="#{msg.ReportTemplateManagement}"/>
                 </div>
                 <h:form id="WoExportTemplateListForm">
-                    <p:dataTable id="datalist" value="#{workOrderExportTemplateController.lazyModel}" var="item"
+                    <p:dataTable id="datalist" value="#{workOrderExportSysTemplateController.lazyModel}" var="item"
                                  widgetVar="varDataList"
-                                 selectionMode="single" selection="#{workOrderExportTemplateController.selected}"
+                                 selectionMode="single" selection="#{workOrderExportSysTemplateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -22,26 +22,26 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{workOrderExportTemplateController.onSelect()}"
+                        <p:ajax event="rowSelect" listener="#{workOrderExportSysTemplateController.onSelect()}"
                                 update="createButton editButton deleteButton"/>
 
-                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
+                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUid}" filterBy="#{item.tenantUid}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{workOrderExportTemplateController.getTenantName(item.tenantUID)}"/>
+                            <h:outputText value="#{workOrderExportSysTemplateController.getTenantName(item.tenantUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
+                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUid}" filterBy="#{item.institutionUid}"
                                   filterMatchMode="EQ">
                             <h:outputText
-                                    value="#{workOrderExportTemplateController.getInsNameByUId(item.institutionUID)}"/>
+                                    value="#{workOrderExportSysTemplateController.getInsNameByUId(item.institutionUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}"
+                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUid}" filterBy="#{item.hospitalUid}"
                                   filterMatchMode="EQ">
                             <h:outputText
-                                    value="#{workOrderExportTemplateController.getHospitalNameByUId(item.hospitalUID)}"/>
+                                    value="#{workOrderExportSysTemplateController.getHospitalNameByUId(item.hospitalUid)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
+                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUid}" filterBy="#{item.siteUid}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{workOrderExportTemplateController.getSiteNameByUId(item.siteUID)}"/>
+                            <h:outputText value="#{workOrderExportSysTemplateController.getSiteNameByUId(item.siteUid)}"/>
                         </p:column>
                         <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
@@ -50,19 +50,19 @@
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
-                                             actionListener="#{workOrderExportTemplateController.prepareCreate}"
+                                             actionListener="#{workOrderExportSysTemplateController.prepareCreate}"
                                              update=":WoExportTemplateEditDlg"
                                              oncomplete="PF('WoExportTemplateEditDialog').show()"
-                                             disabled="#{workOrderExportTemplateController.existsSiteTemplate()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
+                                             disabled="#{workOrderExportSysTemplateController.existsSiteTemplate()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
-                                             actionListener="#{workOrderExportTemplateController.prepareEdit()}"
+                                             actionListener="#{workOrderExportSysTemplateController.prepareEdit()}"
                                              update=":WoExportTemplateEditDlg"
                                              oncomplete="PF('WoExportTemplateEditDialog').show()"
-                                             disabled="#{empty workOrderExportTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
+                                             disabled="#{empty workOrderExportSysTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
-                                             actionListener="#{workOrderExportTemplateController.delete}"
-                                             update=":WoExportTemplateEditDlg,datalist"
-                                             disabled="#{empty workOrderExportTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_DELETE')}">
+                                             actionListener="#{workOrderExportSysTemplateController.delete}"
+                                             update=":WoExportTemplateEditDlg,datalist,WoExportTemplateListForm"
+                                             disabled="#{empty workOrderExportSysTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                            icon="ui-icon-warning"/>
                             </p:commandButton>

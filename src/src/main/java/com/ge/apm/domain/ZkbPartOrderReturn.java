@@ -44,6 +44,9 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "part_no")
     private String partNo;
 
+    @Column(name = "item_id")
+    private String itemId;
+
     /**
      * 归还类型
      */
@@ -342,6 +345,14 @@ public class ZkbPartOrderReturn implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
     @Override

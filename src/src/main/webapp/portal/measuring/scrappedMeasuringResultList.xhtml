@@ -101,6 +101,7 @@
                                 <p:column headerText="附件列表" style="width: 400px">
                                     <p:dataList id="measuringFileList" value="#{measureAssetListController.getMeasuringAttachList(measuringResultItem.id)}" var="measuringFileItem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                         <p:commandLink value="#{measuringFileItem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measuringFileItem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
+                                        <p:commandButton icon="ui-icon-remove-red-eye" title="#{msg.preview}" rendered="#{measuringFileItem.showPreview()}" actionListener="#{preViewerBean.onServerEvent('', measuringFileItem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"/>
                                         <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(measuringFileItem.id)}" update="measuringFileList" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_INFO_EDIT')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
@@ -111,6 +112,7 @@
                     </p:panelGrid>
                 </p:fieldset>
             </h:form>
+<!--            <ui:include src="/portal/preview/view.xhtml" />-->
         </div>
     </ui:composition>
 </html>

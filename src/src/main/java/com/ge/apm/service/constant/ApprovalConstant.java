@@ -109,9 +109,11 @@ public interface ApprovalConstant {
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
     String APPROVAL_PURCHASE_MANAGEMENT = "purchaseManagement"; // 采购管理
     String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
-    String APPROVAL_ASSET_DEPARTMENT_CONVERT = "assetDepartmentConvert"; // 资产报废流程
+    String APPROVAL_ASSET_DEPARTMENT_CONVERT = "assetDepartmentConvert"; // 资产转科流程
+    String APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT = "bathAssetDepartmentConvert"; // 批量设备转科
     String APPROVAL_ASSET_SCRAP_CHI = "设备报废"; // 设备报废
     String APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI = "设备转科"; // 设备转科
+    String APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT_CHI = "批量设备转科"; // 批量设备转科
     String APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT  = "equipmentAdjustment"; // 设备调剂
 
     int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
@@ -132,6 +134,7 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT = 16; // 资产转科
     int BUSINESS_TYPE_PURCHASE_MANAGEMENT = 17; // 采购管理
     int BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT = 18; // 设备调剂
+    int BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT = 19; // 批量资产转科
 
     String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "申购管理"; // 预算管理
     String BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME = "采购管理"; // 预算管理
@@ -141,6 +144,7 @@ public interface ApprovalConstant {
     String BUSINESS_TYPE_ASSET_SCRAP_NAME = "设备报废"; // 资产报废
 
     String BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME = "设备转科"; // 资产转科
+    String BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT_NAME = "批量设备转科"; // 资产转科
     String BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME = "设备调剂"; // 设备调剂
 
     /**

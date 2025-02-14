@@ -1542,12 +1542,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     continue;
                 }
             }
-            if(returnMap.containsKey(r.getPartNo())){
-                Integer vv = returnMap.get(r.getPartNo());
+            if(returnMap.containsKey(r.getItemId())){
+                Integer vv = returnMap.get(r.getItemId());
                 vv += r.getQty();
-                returnMap.put(r.getPartNo(),vv);
+                returnMap.put(r.getItemId(),vv);
             }else{
-                returnMap.put(r.getPartNo(),r.getQty());
+                returnMap.put(r.getItemId(),r.getQty());
             }
         }
         boolean flag = true;
@@ -1555,7 +1555,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(zkbPartOrderItem.getPartQty() == 0){
                 continue;
             }
-            Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+            Integer returnQty = returnMap.get(zkbPartOrderItem.getId());
             if(returnQty == null){
                 flag = false;
             }else if(returnQty != zkbPartOrderItem.getPartQty()){
@@ -2668,7 +2668,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
@@ -2694,7 +2694,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
 
@@ -2991,12 +2991,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(!ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
                 continue;
             }
-            if(returnMap.containsKey(r.getPartNo())){
-                Integer vv = returnMap.get(r.getPartNo());
+            if(returnMap.containsKey(r.getItemId())){
+                Integer vv = returnMap.get(r.getItemId());
                 vv += r.getQty();
-                returnMap.put(r.getPartNo(),vv);
+                returnMap.put(r.getItemId(),vv);
             }else{
-                returnMap.put(r.getPartNo(),r.getQty());
+                returnMap.put(r.getItemId(),r.getQty());
             }
         }
         boolean flag = true;
@@ -3004,7 +3004,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(zkbPartOrderItem.getPartQty() == 0 ){
                 continue;
             }
-            Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+            Integer returnQty = returnMap.get(zkbPartOrderItem.getId());
             if(returnQty == null){
                 flag = false;
             }else if(returnQty != zkbPartOrderItem.getPartQty()){

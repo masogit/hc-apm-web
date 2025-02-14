@@ -79,6 +79,10 @@
                                 <label class="label">#{msg.currentPersonUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.currentPersonUID).name}" />
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">档案号</label>
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.fileNo}" />
+                            </h:panelGroup>
 
                         </p:panelGrid>
                     </p:fieldset>
@@ -782,24 +786,32 @@
                         <p:commandButton immediate="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
 
                         <p:menuButton id="reportButton" value="导出验收报告模版">
-                            <p:menuitem style="padding: 0px;" immediate="true" ajax="false" value="#{assetInstallationController.isSyf()?'医疗设备安装报告_简易安装':'技术验收报告'}" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('technology')}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="#{assetInstallationController.isSyf()?'医疗设备安装报告_正常安装':'商务验收报告'}" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('business')}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}" rendered="#{!assetInstallationController.isSyf()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="验收资料详单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('detail')}" rendered="#{!assetInstallationController.isSyf()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{userContextService.activeSupplier()}">
-                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
-                            </p:menuitem>
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" ajax="false" value="#{assetInstallationController.isSyf()?'医疗设备安装报告_简易安装':'技术验收报告'}" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('technology')}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="#{assetInstallationController.isSyf()?'医疗设备安装报告_正常安装':'商务验收报告'}" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('business')}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}" rendered="#{!assetInstallationController.isSyf()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="验收资料详单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('detail')}" rendered="#{!assetInstallationController.isSyf()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+                            <c:forEach items="#{assetInstallationController.getArrivalAcceptanceReportList()}" var="reportItem" >
+
+                                <p:menuitem style="padding: 0px;" immediate="true" value="#{empty reportItem.valueId ? reportItem.templateTypeName:reportItem.templateTypeNameValue}" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport(reportItem)}">
+                                    <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                                </p:menuitem>
+                            </c:forEach>
+
+
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{userContextService.activeSupplier()}">-->
+<!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
+<!--                            </p:menuitem>-->
                         </p:menuButton>
                         <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>

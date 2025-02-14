@@ -166,6 +166,10 @@
                                         <label  class="label">二维码前缀</label>
                                         <p:inputText  rendered="#{assetArrivedListEditController.selected.enableGenerateQrcode}"   value="#{assetArrivedListEditController.qrCodePrefix}"/>
                                     </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label  class="label">档案号</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.fileNo}"/>
+                                    </h:panelGroup>
 
                                     <c:if test="#{userContextService.activeSupplier()}">
                                         <h:panelGroup >

@@ -3,6 +3,7 @@ package com.ge.apm.view.wo;
 import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.V2WorkOrderReportDto;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
@@ -123,6 +124,8 @@ public class WorkOrderReportExportController implements Serializable {
     private String srNumStr;
 
     private WorkOrderDocxRenderService renderService;
+    
+    private SystemTemplateService systemTemplateService;
     @PostConstruct
     protected void init() {
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -138,6 +141,7 @@ public class WorkOrderReportExportController implements Serializable {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         renderService=WebUtil.getBean(WorkOrderDocxRenderService.class);
+        systemTemplateService=WebUtil.getBean(SystemTemplateService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         currentInstitutionUID = currentUser.getInstitutionUID();
@@ -272,8 +276,9 @@ public class WorkOrderReportExportController implements Serializable {
         data = workOrderExportService.supplementWorkOrder(data);
         try {
             progress=new Progress();
-            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
+//            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             //WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
+            byte[] templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT, currentUser);
             WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(data,templateBytes,renderService,progress);
             exportDocx = new DefaultStreamedContent(workOrderExportStream, workOrderExportStream.getContentType(), workOrderExportStream.getFileName());
         } catch (IOException e) {
@@ -478,6 +483,17 @@ public class WorkOrderReportExportController implements Serializable {
 
     public StreamedContent getExportFile() {
         return exportFile;
+    }
+
+    public String openNewWindowView(Map<String, Object> item) {
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=workOrderDetail&amp;woId=" + item.get("woId")
+                + "&amp;srId=" + item.get("srId")
+                + "&amp;assetUid=" + item.get("assetUid")
+                + "&amp;fileSearchUrl=" + workOrderExportService.getFileSearchUrl();
+    }
+
+    public String onSelect(String woId, String srId) {
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=workOrderDetail&amp;woId=" + woId + "&amp;srId=" + srId;
     }
 
     public void setExportFile(StreamedContent exportFile) {

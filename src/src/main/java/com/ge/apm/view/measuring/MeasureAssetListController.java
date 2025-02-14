@@ -323,6 +323,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
         if ("scrappedMeasuringAssetList".equals(tabId)) {
             scrapped = true;
+            selected = null;
+            measuringCertificateList = null;
         }
     }
 

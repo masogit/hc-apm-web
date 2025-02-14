@@ -8,25 +8,37 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <p:dialog id="probeEditDlg" widgetVar="probeEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="670" width="500" header="#{zkbProbeController.CRUDActionName} 探头信息">
+    <p:dialog id="probeEditDlg" widgetVar="probeEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="370" width="500" header="#{zkbProbeController.CRUDActionName} 探头信息">
         <h:form id="probeEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
-                    <label>探头号*：</label>
-                    <p:inputText id="catNo" value="#{zkbProbeController.selected.catNo}" required="true" requiredMessage="请输入探头号"/>
+                    <label>业务类型*：</label>
+                    <p:selectOneMenu  autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.businessType}" required="true" requiredMessage="业务类型 #{msg.ValidationRequire}" >
+                        <p:ajax update="probeEditForm" listener="#{zkbProbeController.businessTypeChange()}"/>
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('poCatBusinessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
                 </h:panelGroup>
-
                 <h:panelGroup>
-                    <label>探头型号*：</label>
-                    <p:inputText id="catModel"   value="#{zkbProbeController.selected.catModel}" required="true" requiredMessage="请输入探头型号" />
+                    <label>编号*：</label>
+                    <p:inputText id="catNo" value="#{zkbProbeController.selected.catNo}" required="true" requiredMessage="编号不能为空！"/>
                 </h:panelGroup>
-
-                <h:panelGroup>
-                    <label>探头类型*：</label>
-                    <p:inputText id="catType"  value="#{zkbProbeController.selected.catType}" required="true" requiredMessage="请输入探头类型" />
+                <h:panelGroup rendered="#{zkbProbeController.selected.businessType ne 'SpecialPart'}">
+                    <label>型号*：</label>
+                    <p:inputText id="catModel" value="#{zkbProbeController.selected.catModel}" required="true" requiredMessage="请输入探头型号" />
                 </h:panelGroup>
-
-                <h:panelGroup>
+                <h:panelGroup rendered="#{zkbProbeController.selected.businessType ne 'ToolBox'}">
+                    <label>类型*：</label>
+                    <p:inputText id="catType"  value="#{zkbProbeController.selected.catType}" required="true" requiredMessage="类型不能为空！" disabled="#{zkbProbeController.selected.businessType eq 'SpecialPart'}" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbProbeController.selected.businessType eq 'ToolBox'}">
+                    <label>类型*：</label>
+                    <p:selectOneMenu  autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.catType}" required="true" requiredMessage="类型 #{msg.ValidationRequire}" >
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('poCatToolBoxType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbProbeController.selected.businessType eq 'Probe'}">
                     <label class="label">价值类型*：</label>
                     <p:selectOneMenu  id="valueType" autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.valueType}" required="true" requiredMessage="请输入价值类型" >
                         <f:selectItem itemLabel="请选择..."/>
@@ -35,9 +47,9 @@
                         </c:forEach>
                     </p:selectOneMenu>
                 </h:panelGroup>
-                <h:panelGroup>
+                <h:panelGroup rendered="#{zkbProbeController.selected.businessType eq 'Probe'}">
                     <label class="label">是否有效*：</label>
-                    <p:selectOneMenu id="vaild" autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.isVaild}" required="true" requiredMessage="请输入是否有效" >
+                    <p:selectOneMenu id="vaild" autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.isVaild}" required="true" requiredMessage="是否有效不能为空！" disabled="#{!(zkbProbeController.selected.businessType eq 'Probe')}">
                         <f:selectItem itemLabel="请选择..."/>
                         <c:forEach items="#{fieldMsg.getFieldValueList('zkbProbe_isVaild')}" var="v">
                             <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>

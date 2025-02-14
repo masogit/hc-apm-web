@@ -119,6 +119,7 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        selected.setBusinessType(ZkbPartOrderCat.BusinessTypeEnum.Probe.name());
     }
 
     public boolean isInUsed() {
@@ -126,6 +127,17 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
             inUsed = true;
         }
         return inUsed;
+    }
+
+    public void businessTypeChange(){
+        if(ZkbPartOrderCat.BusinessTypeEnum.Probe.name().equals(selected.getBusinessType())){
+            selected.setIsVaild("Y");
+        }else if(ZkbPartOrderCat.BusinessTypeEnum.SpecialPart.name().equals(selected.getBusinessType())){
+            selected.setIsVaild("N");
+            selected.setCatType("specialPart");
+        }else if(ZkbPartOrderCat.BusinessTypeEnum.ToolBox.name().equals(selected.getBusinessType())){
+            selected.setIsVaild("N");
+        }
     }
 
     public void setInUsed(boolean inUsed) {

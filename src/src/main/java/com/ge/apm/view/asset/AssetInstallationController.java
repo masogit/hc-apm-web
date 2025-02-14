@@ -21,6 +21,8 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -164,6 +166,10 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private UserAccount loginUser;
     private TenantInfoRepository tenantInfoDao;
 
+    private SystemTemplateService systemTemplateService;
+    private MicroServiceUtil msService;
+
+
     @Getter @Setter
     private Map<String, Boolean> arrivalRequireField = new HashMap<>();
 
@@ -213,7 +219,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         wxMessageService = WebUtil.getBean(WxMessageService.class);
         loginUser = UserContextService.getCurrentUserAccount();
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
-
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        msService = WebUtil.getBean(MicroServiceUtil.class);
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
             AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
@@ -1130,12 +1137,27 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         return ownerList;
     }
 
-    public void exportReport(String reportType) {
+//    public void exportReport(String reportType) {
+//        try {
+//            Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
+//            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
+//            if (templateBytes != null) {
+//                exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
+//            }
+//        } catch (IOException e) {
+//            Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
+//            WebUtil.addErrorMessage("导出失败");
+//        }
+//    }
+
+    public void exportReport(SystemTemplate systemTemplate) {
         try {
             Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
-            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
+//            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
+
+            byte[] templateBytes =    msService.downloadSingleFileByte(systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId());
             if (templateBytes != null) {
-                exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
+                exportFile = assetInstallationReportService.exportDocx(data, templateBytes, systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
             }
         } catch (IOException e) {
             Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
@@ -1318,5 +1340,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
         TenantInfo tanentIfo = tenantInfoDao.findByUid(currentTenantUid);
         return "3".equals(tanentIfo.getCustomTenant());
+    }
+
+
+
+    public List<SystemTemplate> getArrivalAcceptanceReportList() {
+        return systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplate.SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(),loginUser);
     }
 }
