@@ -211,7 +211,14 @@ public class AssetInstallationReportService {
         reportData.put("contract_price", arrivalList.getContractPrice());//合同价格
         reportData.put("contract_qua", arrivalList.getQuantity());//数量
         reportData.put("manufacture", arrivalList.getManufacture());//生产厂家
-        reportData.put("purchase_price", arrivalListItem.getPurchasePrice());
+//        reportData.put("purchase_price", arrivalListItem.getPurchasePrice());
+
+        if(arrivalListItem.getPurchasePrice()!=null){
+            DecimalFormat df = new DecimalFormat("0.00");
+            String price= df.format(arrivalListItem.getPurchasePrice());
+            reportData.put("purchase_price", price);
+        }
+
 
         //技术验收
         reportData.put("technical_third_party_name", "");//第三方检查单位
@@ -448,17 +455,17 @@ public class AssetInstallationReportService {
             contractNum = StringUtils.replace(contractNum, "/", "_");
         }
 
-        String reportTypeTitle = "";
-        if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
-            reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
-        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
-            reportTypeTitle = REPORT_ASSET_TITLE_BATCH_BOTTOM;
-        }
+//        String reportTypeTitle = "";
+//        if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
+//            reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
+//        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
+//            reportTypeTitle = REPORT_ASSET_TITLE_BATCH_BOTTOM;
+//        }
 
         if(isEncoding){
-            return contractNum +"-"+ this.encoding(reportTypeTitle) +".docx";
+            return contractNum +"-"+ this.encoding(reportType) +".docx";
         }else {
-            return contractNum +"-"+ reportTypeTitle +".docx";
+            return contractNum +"-"+ reportType +".docx";
         }
     }
 
