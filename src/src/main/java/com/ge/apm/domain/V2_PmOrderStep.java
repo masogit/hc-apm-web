@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "v2_pm_order_step", indexes = {
-        @Index(name = "idx_inst_id", columnList = "inst_id")
+        @Index(name = "idx_pm_id", columnList = "pm_id")
 })
 public class V2_PmOrderStep   implements Serializable {
 
@@ -20,10 +20,8 @@ public class V2_PmOrderStep   implements Serializable {
     @Column(name="id")
     private String id;
 
-    @Column(name="pm_uid")
-    private String pmUid;
-    @Column(name="inst_id")
-    private String instId;
+    @Column(name="pm_id")
+    private String pmId;
 
     @Column(name="step_id")
     private  String stepId;
@@ -36,7 +34,6 @@ public class V2_PmOrderStep   implements Serializable {
     private  String ownerUid; //操作人
     @Column(name="owner_name")
     private  String ownerName;
-
 
     @Column(name="assignee",columnDefinition = "text")
     private String assignee;//待处理人
@@ -60,20 +57,12 @@ public class V2_PmOrderStep   implements Serializable {
         this.id = id;
     }
 
-    public String getPmUid() {
-        return pmUid;
+    public String getPmId() {
+        return pmId;
     }
 
-    public void setPmUid(String pmUid) {
-        this.pmUid = pmUid;
-    }
-
-    public String getInstId() {
-        return instId;
-    }
-
-    public void setInstId(String instId) {
-        this.instId = instId;
+    public void setPmId(String pmId) {
+        this.pmId = pmId;
     }
 
     public String getStepId() {
@@ -96,7 +85,7 @@ public class V2_PmOrderStep   implements Serializable {
         return comment;
     }
 
-    public void setComments(String comment) {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 
