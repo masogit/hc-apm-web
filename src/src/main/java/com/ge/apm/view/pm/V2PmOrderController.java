@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
@@ -1959,6 +1960,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
+                logger.info("loadData.MvsSearchFilter" +JSONObject.toJSONString(filters));
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
                 loadMVSClinicalDeptList();
@@ -2151,6 +2153,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             String tenantUid = tenantInfo.get().getUid();
             filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
             List<String> assetUids = pmOrderService.getMvsAssectUidsStr(token);
+            logger.info("pmorder.buildMvsSearchFilter" +JSONObject.toJSONString(assetUids));
             if (CollectionUtils.isEmpty(assetUids)) {
                 assetUids.add("1++1");
             }
@@ -2163,7 +2166,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }*/
 
             //filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-            filters.add(new SearchFilter("mvsIbMapping.ibId", SearchFilter.Operator.IsNotNull, null));
+            //filters.add(new SearchFilter("mvsIbMapping.ibId", SearchFilter.Operator.IsNotNull, null));
             for (SearchFilter searchFilter : filterArrayList) {
                 if (("mvsIbMapping.assetInfo.clinicalDeptUID,mvsIbMapping.assetInfo.siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
                         ",mvsIbMapping.assetInfo.name,mvsIbMapping.assetInfo.serialNum,mvsIbMapping.assetInfo.departNum,mvsIbMapping.assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {

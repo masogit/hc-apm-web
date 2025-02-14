@@ -9,9 +9,9 @@
 
 <ui:composition>
 
-    <p:dialog  widgetVar="unfinishedAssetOrderDetailDialog"  modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true"    appendTo="@(body)"  height="300" width="500"   >
+    <p:dialog widgetVar="unfinishedAssetOrderDetailDialog" modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true" appendTo="@(body)" height="300" width="500"   >
         <p:fieldset legend="当前设备有未完成工单,请进行处理">
-            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain()}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('scrap')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
             <br/> <br/> <br/>
             <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
                 未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
@@ -22,7 +22,6 @@
 
         </p:fieldset>
     </p:dialog>
-
 
     <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="500" width="500" header="报废申请">
         <h:form id="nodeForm" >
@@ -73,7 +72,7 @@
                     <p:graphicImage value="#{assetInfoEditController.signatureContentStream}" stream="false" rendered="#{assetInfoEditController.signatureContentStream!=null}"></p:graphicImage>
                 </h:panelGroup>
             </h:panelGrid>
-            <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetScrap()}" update=":assetDetail"  oncomplete="handleApproveSuccess(xhr, status, args);" />
+            <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetApplication('scrap')}" update=":assetDetail"  oncomplete="handleApproveSuccess(xhr, status, args);" />
             <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoEditController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
         </h:form>
@@ -96,7 +95,7 @@
                 PF('scrapapply').hide();
             }
         }
-        function handleCheckAssetOrderIsCompletes(xhr, status, args) {
+        function handleAssetScrapSubmit(xhr, status, args) {
             var asetOrderIsComplete = args.asetOrderIsComplete;
             if(asetOrderIsComplete==true) {
                 PF('unfinishedAssetOrderDetailDialog').show();

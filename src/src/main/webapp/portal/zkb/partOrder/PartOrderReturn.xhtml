@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition>
-    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细操作" height="#{zkbPartOrderAuditController.resizeReturnHeight() ? 650 : 540}" width="700">
+    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细操作" height="#{zkbPartOrderAuditController.resizeReturnHeight() ? 650 : 540}" >
         <h:form id="zkbItemEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
@@ -15,9 +15,9 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">配件号*</label>
-                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" required="true" requiredMessage="配件号不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
+                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.itemId}" valueChangeListener="#{zkbPartOrderAuditController.partNoChange}" required="true" requiredMessage="配件号不能为空" disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.text}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>

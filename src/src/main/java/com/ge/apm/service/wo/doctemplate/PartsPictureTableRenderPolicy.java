@@ -14,8 +14,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import org.springframework.util.CollectionUtils;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *  附件图片表格
@@ -44,27 +43,29 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
             XWPFTable table = doc.insertNewTable(run,1,maxCell);
             this.render(table, data);
 //            run.setText("", 23); // 清除页面标签
-            runTemplate.getRun().setText("", 0);
+//            runTemplate.getRun().setText("", 0);
         } catch (Exception var10) {
-            logger.error("dynamic table error:" + var10.getMessage(), var10);
+            var10.printStackTrace();
+            logger.info("dynamic table error:" + var10.getMessage(), var10);
         }
+        runTemplate.getRun().setText("", 0);
     }
     public void render(XWPFTable table, Object data) {
         if(data instanceof List){
             List<PartsPictureTableRenderPolicy.PartsPictureTable>  partsPictureTableList= (List<PartsPictureTableRenderPolicy.PartsPictureTable> )data;
-            int [] merge = new int[partsPictureTableList.size()];
+            Set<Integer> merge = new HashSet<>();
             for (int i = 0; i < partsPictureTableList.size(); i++) {
                 PartsPictureTableRenderPolicy.PartsPictureTable partsPictureTable = partsPictureTableList.get(i);
                 XWPFTableRow row = addRow(table);
                 addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
                 List<String> object = partsPictureTable.getObjectId();
-                int maxCell = object.size() > this.maxCell ? this.maxCell:object.size();
-                for (int j = 0; j < maxCell - 1; j++) {
-                    addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
-                }
-                merge[i] = table.getNumberOfRows();
                 if(CollectionUtils.isEmpty(object)){
-                    break;
+                    continue;
+                }
+                int maxCell = object.size() > this.maxCell ? this.maxCell:object.size();
+                for (int j = 0; j < maxCell-1; j++) {
+                    addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
+                    merge.add(table.getNumberOfRows());
                 }
                 XWPFTableRow rowImage = null;
                 for (int i1 = 0; i1 < object.size(); i1++) {
@@ -74,8 +75,9 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
                     addCellImages(rowImage, object.get(i1));
                 }
             }
-            for (int i = 0; i < merge.length ; i++) {
-                int rowNum = merge[i];
+            Iterator<Integer> iterator = merge.iterator();
+            while (iterator.hasNext()) {
+                int rowNum = iterator.next();
                 mergeHorizontal(table,rowNum-1,0,maxCell-1);
             }
         }
@@ -135,8 +137,9 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
         if (StringUtils.isNotEmpty(storageId)) {
             try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
                 return IOUtils.toByteArray(stream);
-            } catch (IOException ignore) {
+            } catch (IOException e) {
                 //ignore
+                e.printStackTrace();
             }
         }
         return null;

@@ -68,6 +68,9 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @Column(name = "procure_Status")
     private String procureStatus;
 
+    @Column(name = "temporally_purchase_type")
+    private String temporallyPurchaseType;
+
     /**
      * 采购单id
      */
@@ -230,6 +233,14 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
 
     @Transient
     private Integer offlineApplicationQuantity;
+
+    public String getTemporallyPurchaseType() {
+        return temporallyPurchaseType;
+    }
+
+    public void setTemporallyPurchaseType(String temporallyPurchaseType) {
+        this.temporallyPurchaseType = temporallyPurchaseType;
+    }
 
     public Integer getOfflineApplicationQuantity() {
         return offlineApplicationQuantity;

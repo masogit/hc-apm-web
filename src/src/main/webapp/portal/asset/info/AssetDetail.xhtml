@@ -544,6 +544,7 @@
             </p:tabView>
 
             <ui:include src="AssetScrap.xhtml"/>
+            <ui:include src="AssetDepartmentConvert.xhtml"/>
 
             <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                 <h:form id="qrCodeLibShowForm">
@@ -619,11 +620,10 @@
             </h:form>
         </p:dialog>
 
-
         <h:panelGroup >
             <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-            <p:commandButton id="preInactiveEnable" rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4)   and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoDetailController.selected.uid)}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
-
+            <p:commandButton id="preInactiveEnable" rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+            <p:commandButton id="departmentCovert" value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
         </h:panelGroup>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">

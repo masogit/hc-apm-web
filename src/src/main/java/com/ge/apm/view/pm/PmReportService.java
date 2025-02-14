@@ -22,6 +22,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -82,6 +83,9 @@ public class PmReportService {
 
     @Autowired
     private UnstructuredDataRepository unstructuredDataDao;
+
+    @Autowired
+    private SystemTemplateService systemTemplateService;
 
     /**
      * Render Dynamic Table content.
@@ -519,7 +523,10 @@ public class PmReportService {
             throw new BusinessException("未选中保养记录");
         }
         long count = pmOrders.values().stream().filter(i -> i).count();
-        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+//        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+
+        byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
+
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(bout)) {

@@ -28,6 +28,9 @@
                                        pattern="yyyy"/>
                 </h:outputText>
             </p:column>
+            <p:column headerText="申购类型" >
+                <h:outputText value="#{fieldMsg.fieldValue('temporallyPurchaseType', item.temporallyPurchaseType)}"/>
+            </p:column>
              <p:column headerText="设备名称" >
                 <h:outputText value="#{item.applicationAssetName}"/>
              </p:column>

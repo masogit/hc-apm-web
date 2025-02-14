@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <p:dialog id="unfinishedAssetDepartmentCovertOrderDetailDialog" widgetVar="unfinishedAssetDepartmentCovertOrderDetailDialog" modal="true" draggable="true" appendTo="@(body)" height="300" width="500"   >
+        <p:fieldset legend="当前设备有未完成工单,请进行处理">
+            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('transfer')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+            <br/> <br/> <br/>
+            <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
+                未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty assetInfoEditController.pmOrderList}">
+                未完成保养工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
+            </h:panelGroup>
+
+        </p:fieldset>
+    </p:dialog>
+
+    <p:dialog id="departmentCovertApply" widgetVar="departmentCovertApply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="500" width="500" header="转科申请">
+        <h:form id="departmentCovertNodeForm" >
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup rendered="#{assetInfoListController.isChecked()}">
+                    <h:outputText value="设备数量：#{assetInfoListController.getSelectedUidList().size()} 台"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">转入科室<span style="color:red">*</span></label>
+                    <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"
+                                    scrollHeight="300"  forceSelection="true" required="true" requiredMessage="转入科室 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                        <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('departmentCovert')}" />
+                        <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('departmentCovert')}" />
+                    </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">申请理由*</label>
+                    <p:inputTextarea placeholder="转科申请" value="#{assetInfoEditController.applyReason}" maxlength="256"  required="true" />
+                    <p:outputLabel value="#{assetInfoEditController.applyReason}" />
+                </h:panelGroup>
+            </p:panelGrid>
+
+            <p:commandButton id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleAssetDepartmentCovertCompleteSig(xhr, status, args);"/>
+            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
+
+            <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" oncomplete="PF('departmentCovertApply').hide()"/>
+        </h:form>
+
+    </p:dialog>
+
+    <p:dialog id="departmentCovertSignatureDlg" widgetVar="departmentCovertSignatureDlg" header="签名" modal="true">
+        <h:form id="departmentCovertSignatureForm">
+            <h:panelGrid columnClasses="value" columns="1">
+                <h:panelGroup>
+                    <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{assetInfoEditController.signatureContent}"
+                                 guideline="false" rendered="#{assetInfoEditController.signatureContentStream==null}" />
+                    <p:graphicImage value="#{assetInfoEditController.signatureContentStream}" stream="false" rendered="#{assetInfoEditController.signatureContentStream!=null}"></p:graphicImage>
+                </h:panelGroup>
+            </h:panelGrid>
+            <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetApplication('departmentCovert')}" oncomplete="handleAssetDepartmentCovertApproveSuccess(xhr, status, args);" />
+            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoEditController.resetSignature()}" update="departmentCovertSignatureForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('departmentCovertSignatureDlg').hide()"/>
+        </h:form>
+
+    </p:dialog>
+
+
+    <script type="text/javascript">
+        function handleAssetDepartmentCovertCompleteSig(xhr, status, args) {
+            if(xhr.status===205){
+                document.getElementById('departmentCovertNodeForm:departmentCovertOpenSignature').click();
+            }else{
+                PF('departmentCovertApply').hide();
+            }
+        }
+        function handleAssetDepartmentCovertApproveSuccess(xhr, status, args) {
+            if(xhr.status!==206){
+                PF('departmentCovertSignatureDlg').hide();
+                PF('departmentCovertApply').hide();
+            }
+        }
+        function handleAssetDepartmentCovertSubmit(xhr, status, args) {
+            var asetOrderIsComplete = args.asetOrderIsComplete;
+            if(asetOrderIsComplete==true) {
+                PF('unfinishedAssetDepartmentCovertOrderDetailDialog').show();
+            }else{
+                PF('departmentCovertApply').show();
+            }
+        }
+    </script>
+
+</ui:composition>
+</html>

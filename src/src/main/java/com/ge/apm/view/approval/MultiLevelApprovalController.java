@@ -309,11 +309,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 secondaryApprovalData =objects;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
-                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
-                List<AssetDepartmentConvert> assetDepartmentConverts = new ArrayList<>();
-                assetDepartmentConverts.add(assetDepartmentConvert);
+                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getId());
                 primaryApprovalData = assetDepartmentConvert;
-                secondaryApprovalData =assetDepartmentConvert;
+                secondaryApprovalData = assetDepartmentConvert;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT:
+                List<AssetDepartmentConvert> assetDepartmentConverts = assetDepartmentConvertRepository.findByTenantAndBusinessNumber(account.getTenantUID(), multiLevelApproval.getBusinessNumber());
+                primaryApprovalData = assetDepartmentConverts;
+                secondaryApprovalData = assetDepartmentConverts;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
                   SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
@@ -612,7 +615,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(this.businessTypeFlag == 15){
             AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
             siteUid = assetScrap.getSiteUid();
-        }else if(this.businessTypeFlag == 16){
+        }else if(this.businessTypeFlag == 16 || this.businessTypeFlag == 19){
             AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
             AssetInfo byUid = assetInfoRepository.findByUid(assetDepartmentConvert.getAssetUid());
             siteUid=byUid.getSiteUID();

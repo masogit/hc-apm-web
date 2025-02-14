@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDlg"
+               width="1000" height="450" modal="true"
+              resizable="true" draggable="true" appendTo="@(body)"
+              header="编辑系统模板">
+        <h:form id="WoExportTemplateEditForm">
+            <h:panelGroup id="display">
+                <p:fieldset id="basic">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+                        <h:panelGroup>
+                            <label class="label">模板类型</label>
+                            <h:outputText rendered="true"  value="#{sysConfigTemplateController.getTemplateName(sysConfigTemplateController.selected.templateType)}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup id="fileType">
+                            <label class="label">文件类型(必须一致)</label>
+                            <h:outputText  value="#{sysConfigTemplateController.selected.fileType}"/>
+                        </h:panelGroup>
+
+
+
+                        <h:panelGroup>
+                            <label class="label">模板类型名称*</label>
+                            <p:inputText  value="#{sysConfigTemplateController.systemTemplateValue.templateTypeName}" required="true"/>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup id="fileName">
+                            <label class="label">文件名称</label>
+                            <h:outputText  value="#{sysConfigTemplateController.file.fileName}"
+                                          rendered="#{not empty sysConfigTemplateController.file}"/>
+
+                            <h:outputText  value="#{sysConfigTemplateController.selected.fileName}"
+                                           rendered="#{ empty sysConfigTemplateController.file}"/>
+                        </h:panelGroup>
+
+
+
+                        <h:panelGroup>
+                            <p:fileUpload fileUploadListener="#{sysConfigTemplateController.uploadDataFile}"
+                                          value="#{sysConfigTemplateController.file}" mode="advanced"
+                                          dragDropSupport="false" style="width:100%" process="@this"
+                                          multiple="false" sizeLimit="10000000" update=":WoExportTemplateEditForm:fileName"
+                                          auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                          allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|XLS|XLSX|DOC|DOCX|PDF)$/" label="#{msg.Add}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:commandButton validateClient="false"
+                                 actionListener="#{sysConfigTemplateController.editTemplate()}" value="#{msg.Save}"
+                                 update="display,:TemplateEditDlg, :TemplateListForm:datalist, :growl"
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDlg');"/>
+                &nbsp;&nbsp;
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('TemplateEditDlg').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

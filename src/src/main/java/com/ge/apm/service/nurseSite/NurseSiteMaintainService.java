@@ -1972,6 +1972,7 @@ public class NurseSiteMaintainService {
 								.orElse(new HashMap<>());
 						mapCheckItemSequence.clear();
 						List<NurseSiteMaintainData> listData = dataMap.get(nurseSiteMaintainItem.getId());
+						listData.sort(Comparator.comparing(NurseSiteMaintainData::getCheckItem));
 						keyName.delete(0, keyName.length());
 						if (listData != null && !listData.isEmpty()) {
 							for (NurseSiteMaintainData tempData : listData) {
@@ -2582,6 +2583,86 @@ public class NurseSiteMaintainService {
 	public List<NurseSiteMaintain> searchMaintain(Map<String, Object> param) {
 		return nurseSiteMaintainMapper.searchMaintain(param);
 	}
+
+	/**
+	 * 批量处理资产未完成的日常检查
+	 * @param bathSelectedList asset list
+	 */
+	@Transactional
+	public boolean processUnfinishedNurseSiteMaintain(List<AssetInfo> bathSelectedList, String comment){
+		UserAccount loginUser = UserContextService.getCurrentUserAccount();
+		List<String> uids = bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+		List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
+		if(!org.springframework.util.StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0) {
+			Set<String> maintainIds = nurseSiteMaintainItemList.stream().map(NurseSiteMaintainItem::getParentId).collect(Collectors.toSet());
+			List<NurseSiteMaintainItem> maintainItemByParentId = nurseSiteMaintainItemRepository.findMaintainItemByParentId(maintainIds);
+			Map<String, List<NurseSiteMaintainItem>> maintainIdsMap = maintainItemByParentId.stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
+			List<NurseSiteMaintainItem> after = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) > 0).collect(Collectors.toList());
+			List<NurseSiteMaintainItem> history = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) < 0).collect(Collectors.toList());
+			ArrayList<NurseSiteMaintainItem> nurseSiteMaintainItems = new ArrayList<>();
+			for (NurseSiteMaintainItem nurseSiteMaintainItem : history) {
+				if(!nurseSiteMaintainItem.getIsFinish()){
+					nurseSiteMaintainItem.setCheckDate(new Date());
+					nurseSiteMaintainItem.setIsFinish(true);
+					nurseSiteMaintainItem.setUpdateByUid(loginUser.getUid());
+					nurseSiteMaintainItem.setUpdateDate(new Date());
+					nurseSiteMaintainItem.setModifyByUid(loginUser.getUid());
+					nurseSiteMaintainItem.setComment(org.apache.commons.lang.StringUtils.isBlank(nurseSiteMaintainItem.getComment()) ? comment:nurseSiteMaintainItem.getComment() + "," + comment);
+					nurseSiteMaintainItems.add(nurseSiteMaintainItem);
+				}
+			}
+			Set<String> afterItemIds = after.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
+			if(CollectionUtils.isNotEmpty(after)){
+				nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(new ArrayList<>(afterItemIds));
+//                nurseSiteMaintainItemRepository.delete(after);
+				nurseSiteMaintainItemRepository.deleteMaintainItem(afterItemIds);
+				Set<String> strings = new HashSet<>();
+
+				for (NurseSiteMaintainItem nurseSiteMaintainItem : after) {
+					List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
+					if(CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent) &&  nurseSiteMaintainItemsParent.size()==1 &&  nurseSiteMaintainItemsParent.get(0).getId().equals(nurseSiteMaintainItem.getId())){
+//                        nurseSiteMaintainRepository.deleteById(nurseSiteMaintainItem.getParentId());
+						strings.add(nurseSiteMaintainItem.getParentId());
+					}
+				}
+				if(CollectionUtils.isNotEmpty(strings)){
+					nurseSiteMaintainRepository.deleteMaintain(strings);
+				}
+			}
+			Set<String> historyItemIds = history.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
+			historyItemIds.add("-1");
+			Set<NurseSiteMaintainData> historyDatas = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(historyItemIds);
+			ArrayList<NurseSiteMaintainData> nurseSiteMaintainData1 = new ArrayList<>();
+			for (NurseSiteMaintainData nurseSiteMaintainData : historyDatas) {
+				if(nurseSiteMaintainData.getCheckValue() == null ){
+					nurseSiteMaintainData.setCheckValue(true);
+					nurseSiteMaintainData1.add(nurseSiteMaintainData);
+				}
+			}
+			if(CollectionUtils.isNotEmpty(nurseSiteMaintainItems)){
+				for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItems) {
+					List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
+					if (CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent)) {
+						NurseSiteMaintain nurseSiteMaintain = nurseSiteMaintainRepository.findById(nurseSiteMaintainItem.getParentId());
+						Map<String, List<NurseSiteMaintainItem>> historyMap = history.stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
+
+						List<NurseSiteMaintainItem> nurseSiteMaintainItems1 = historyMap.get(nurseSiteMaintainItem.getParentId());
+						for (NurseSiteMaintainItem siteMaintainItem : nurseSiteMaintainItems1) {
+							Map<String, List<NurseSiteMaintainData>> historyDataMap = historyDatas.stream().collect(Collectors.groupingBy(NurseSiteMaintainData::getParentId));
+							siteMaintainItem.setListData(historyDataMap.get(siteMaintainItem.getId()));
+						}
+						nurseSiteMaintain.setListNurseSiteMaintainItem(nurseSiteMaintainItems1);
+						saveMaintain(nurseSiteMaintain,new Date(),loginUser);
+					}
+				}
+			}
+			//删除检查项配置相关数据
+			nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUidIn(uids);
+			return true;
+		}
+		return false;
+	}
+
 	// private void formatExistMaintainDate(){
 	// List<Date> tempList=new ArrayList<Date>();
 	// for(int i=0;i<existMaintainDate.size();++i){

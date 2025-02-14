@@ -78,7 +78,7 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
 
     @Column(name = "current_status")
-    private Integer  currentStatus;   //当前状态 1申请中  2 审核中  3完成   4审核拒绝
+    private Integer  currentStatus;   //当前状态 -1 申请人已取消 1申请中  2 审核中  3完成     5工程师审核拒绝       //4审核拒绝 4状态废弃不用
 
 
     @Column(name="apply_audit_signature")
@@ -123,7 +123,10 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     @Column(name="in_site_name")
     private String inSiteName;
 
-
+    @Column(name="convert_no")
+    private String convertNo;
+    @Column(name = "business_type")
+    private Integer businessType;
 
 
 
@@ -312,7 +315,19 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     @Override
     public int getBusinessType() {
-        return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT;
+        return this.businessType;
+    }
+
+    @Transient
+    private boolean flag;
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    @Override
+    public boolean getFlag() {
+        return flag;
     }
 
     public void setBusinessNumber(String businessNumber) {
@@ -402,6 +417,17 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
         this.inSiteName = inSiteName;
     }
 
+    public String getConvertNo() {
+        return convertNo;
+    }
+
+    public void setConvertNo(String convertNo) {
+        this.convertNo = convertNo;
+    }
+
+    public void setBusinessType(Integer businessType) {
+        this.businessType = businessType;
+    }
 
     public String getApprovalUid() {
         return approvalUid;

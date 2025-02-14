@@ -27,11 +27,21 @@ public class ZkbPartOrderCat implements Serializable {
         HighValue,NormalValue,SpecialValue,
     }
 
+    public enum BusinessTypeEnum{
+        Probe, ToolBox, SpecialPart
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
+
+    /**
+     * 业务类型
+     */
+    @Column(name = "business_type")
+    private String businessType;
 
     //探头号*
     @Column(name = "cat_no")
@@ -169,6 +179,14 @@ public class ZkbPartOrderCat implements Serializable {
 
     public void setErrorInfo(String errorInfo) {
         this.errorInfo = errorInfo;
+    }
+
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
     }
 
     @Override

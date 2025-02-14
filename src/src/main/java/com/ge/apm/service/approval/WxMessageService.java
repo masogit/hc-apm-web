@@ -34,21 +34,23 @@ public class WxMessageService extends MicroServiceInvoker {
 
     private static final Logger logger = LoggerFactory.getLogger(WxMessageService.class);
 
-    public void sendMessage(AssetInfo assetInfo, String approvalName, ApprovableTarget
+    public void sendMessage(List<AssetInfo> assetInfos, String approvalName, ApprovableTarget
         approvableTarget, List<UserAccount> userAccounts, String linkUrl, UserAccount user, String reason,MSGEvent msgEvent) {
-        HashMap<String, String> params = combineMsg(approvalName, approvableTarget, assetInfo,user,reason);
+        HashMap<String, String> params = combineMsg(approvalName, approvableTarget, assetInfos,user,reason);
         List<String> sendUids= userAccounts.stream().filter(item-> StringUtils.isNotBlank(item.getUid())).map(UserAccount::getUid).collect(Collectors.toList());
         sendWxMsgToMq(params,linkUrl,msgEvent,sendUids,null);
     }
 
-    private HashMap<String, String> combineMsg(String woSteps, ApprovableTarget approvableTarget, AssetInfo assetInfo ,UserAccount user,String reason) {
+    private HashMap<String, String> combineMsg(String woSteps, ApprovableTarget approvableTarget, List<AssetInfo> assetInfos ,UserAccount user,String reason) {
+        AssetInfo assetInfo = assetInfos.get(0);
         String status="status";
         HashMap<String, String> params = new HashMap<>();
         String handler = user.getName();
         params.put("orderCode", approvableTarget.getBusinessNumber());
+        params.put("assetSum", String.valueOf(assetInfos.size()));
         params.put("dept",assetInfo.getClinicalDeptName());
         params.put("content", reason);
-        params.put("assetName", assetInfo.getName() );
+        params.put("assetName", assetInfo.getName());
         if(woSteps.equals("审批通过") || woSteps.equals("审批失败")){
             params.put(status, woSteps);
         }else{
@@ -106,6 +108,9 @@ public class WxMessageService extends MicroServiceInvoker {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 businessTypeName=(ApprovalConstant.APPROVAL_ASSET_DEPARTMENT_CONVERT_CHI);
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT:
+                businessTypeName=(ApprovalConstant.APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT_CHI);
                 break;
             default:
                 break;

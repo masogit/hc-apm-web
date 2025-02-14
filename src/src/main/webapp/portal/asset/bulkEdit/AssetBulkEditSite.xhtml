@@ -16,7 +16,7 @@
 
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="批量修改资产"/>
+                <p:outputLabel class="pageTitle" value="资产转科"/>
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="bulkEditForm">
@@ -24,7 +24,7 @@
                     <p:tabView id="tab">
                         <p:ajax event="tabChange" listener="#{assetInfoBulkEditController.onTabChange}" />
 
-                        <p:tab title="选择资产" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}">
+                        <p:tab title="资产批量转科" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}">
 
                             <p:fieldset legend="过滤条件">
 
@@ -118,10 +118,8 @@
                                     <h:outputText value="#{asset.qrCode}" />
                                 </p:column>
                             </p:pickList>
-
-                        </p:tab>
-
-                        <p:tab title="变更资产所属院区" rendered="true" >
+                            <br/>
+                            <br/>
                             <span  style="color:red">请务必将相关资产的维修负责人/保养负责人/设备标签工程师等用户迁移到新院区，以免导致工作流问题！</span>
                             <p:fieldset>
                                 <p:panelGrid  id="changeSite" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -156,11 +154,13 @@
                                     </h:panelGroup>
 
                                 </p:panelGrid>
-
+                                <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
+                                                 disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" oncomplete="handleComplete(xhr, status, args)" update="@form" class="clsBtnChangeSite"/>
                             </p:fieldset>
+                        </p:tab>
 
-                            <p:commandButton id="btnBulkEditSite" value="确认批量修改院区" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
-                                             disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" oncomplete="handleComplete(xhr, status, args)" update="@form" class="clsBtnChangeSite"/>
+                        <p:tab title="资产转科情况" rendered="true" >
+                            <ui:include src="departmentConvert.xhtml"/>
                         </p:tab>
 
 

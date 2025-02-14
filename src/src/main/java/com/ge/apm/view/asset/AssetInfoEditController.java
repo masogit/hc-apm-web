@@ -27,6 +27,7 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -241,6 +242,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private UserContextService userContextService;
 
     private AssetScrapService assetScrapService;
+    private AssetDepartmentConvertService assetDepartmentConvertService;
 
     private WxMessageService wxMessageService;
 
@@ -294,6 +296,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String approvalReason;
     private String equipmentDisposalMethod;
     private String customDisposalMethod;
+    @Getter @Setter
+    private String inDeptUid;
+    @Getter @Setter
+    private String inDeptName;
 
     private boolean showCustomDisposalMethod;
 
@@ -353,6 +359,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetScrapService = WebUtil.getBean(AssetScrapService.class);
+        assetDepartmentConvertService = WebUtil.getBean(AssetDepartmentConvertService.class);
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
@@ -537,32 +544,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
-
-//        selected.setAssetGroup(assetInfo.getAssetGroup());
-//        selected.setClinicalDeptId(assetInfo.getClinicalDeptId());
-//        selected.setClinicalDeptUID(assetInfo.getClinicalDeptUID());
-//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
-//        selected.setAssetDeptUID(assetInfo.getAssetDeptUID());
-//        selected.setAssetDeptId(assetInfo.getAssetDeptId());
-//        selected.setStatus(assetInfo.getStatus());
-//        selected.setName(assetInfo.getName());
-//
-//        selected.setManufactureId(assetInfo.getManufactureId());
-//        selected.setManufacture(assetInfo.getManufacture());
-//        selected.setManufactureTel(assetInfo.getManufactureTel());
-//        selected.setVendor(assetInfo.getVendor());
-//        selected.setSupplierId(assetInfo.getSupplierId());
-//        selected.setVendorTel(assetInfo.getVendorTel());
-//
-//        selected.setMaitanance(assetInfo.getMaitanance());
-//        selected.setMaitananceId(assetInfo.getMaitananceId());
-//        selected.setMaitananceTel(assetInfo.getMaitananceTel());
-//
-//        selected.setRegistrationNo(assetInfo.getRegistrationNo());
-//
-//        selected.setFunctionType(assetInfo.getFunctionType());
-//        selected.setMeasureGrade(assetInfo.getMeasureGrade());
-//        selected.setMeasuringItemCategory(assetInfo.getMeasuringItemCategory());
         BeanUtils.copyProperties(assetInfo,selected);
         selected.setSerialNum(null);
         selected.setFinancingNum(null);
@@ -1471,13 +1452,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
-    public void applyAssetScrap(){
+    public void applyAssetApplication(String action){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
         if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
             WebUtil.addErrorMessage("签名不可为空！");
             response.setStatus(206);
+            return;
         }
         if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
             try {
@@ -1502,32 +1484,46 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 return;
             }
         }
-
-//        boolean isAssetStaff = getIsAssetStaff();
-//        if(isAssetStaff && ( StringUtils.isBlank(applyReason) ||  StringUtils.isBlank(approvalReason)  ||  StringUtils.isBlank(equipmentDisposalMethod)  )){
-//            WebUtil.addErrorMessage("必填项为空");
-//            return;
-//        }else if(!isAssetStaff && StringUtils.isBlank(applyReason) ){
-//            WebUtil.addErrorMessage("必填项为空");
-//            return;
-//        }
-        assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId);
+        if ("scrap".equals(action)) {
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId);
+        } else if ("departmentCovert".equals(action)) {
+            Map<String, Object> param = MapUtil.newHashMap();
+            param.put("assetUids", bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
+            param.put("outDeptUid", selected.getClinicalDeptUID());
+            param.put("inDeptUid", inDeptUid);
+            param.put("inDeptName", inDeptName);
+            param.put("auditSignature", signatureId);
+            param.put("applyReason", applyReason);
+            assetDepartmentConvertService.apply(param);
+        }
     }
 
+    public List<String> getSelectedUidList(String uid) {
+        return Collections.singletonList(uid);
+    }
 
     @Getter @Setter
-    private  boolean  nurseSiteMaintainIsComplete=false ;
-
+    private boolean nurseSiteMaintainIsComplete = false;
     @Getter @Setter
-    private  List<String>  workOrderList=new ArrayList<>() ;
-
+    private List<String> workOrderList = new ArrayList<>();
     @Getter @Setter
-    private  List<String>  pmOrderList=new ArrayList<>() ;
-    public boolean checkAssetOrderIsComplete(String uid) {
-        selected = dao.findByUid(uid);
-        List<V2_WorkOrder> workOrders = v2WorkOrderRepository.getByAssetIdAndStatusOrderByCloseTimeDesc(selected.getId(), 1);
-        List<V2_PmOrder> pmOrders   =   v2PmOrderRepository.findByAssetUidAndIsFinished(selected.getUid(),false);
-        List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUid(selected.getUid());
+    private List<String> pmOrderList = new ArrayList<>();
+    @Getter @Setter
+    private List<AssetInfo> bathSelectedList = new ArrayList<>();
+
+    public boolean checkAssetOrderIsComplete(List<String> uidList) {
+        List<String> uids;
+        if (uidList.size() == 1) {
+            selected = dao.findByUid(uidList.get(0));
+            bathSelectedList = Collections.singletonList(selected);
+            uids = Collections.singletonList(selected.getUid());
+        } else {
+            bathSelectedList = dao.findByUidIn(uidList);
+            uids = bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+        }
+        List<V2_WorkOrder> workOrders = v2WorkOrderRepository.getByAssetUidInAndStatusOrderByCloseTimeDesc(uids, 1);
+        List<V2_PmOrder> pmOrders   =   v2PmOrderRepository.findByAssetUidInAndIsFinished(uids,false);
+        List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
         if(CollectionUtils.isNotEmpty(workOrders)  ||  CollectionUtils.isNotEmpty(pmOrders)  ||   CollectionUtils.isNotEmpty(nurseSiteMaintainItemList) ){
             nurseSiteMaintainIsComplete=CollectionUtils.isNotEmpty(nurseSiteMaintainItemList) ?true:false;
             workOrderList=workOrders.stream().map(V2_WorkOrder::getBusinessNumber).collect(Collectors.toList());
@@ -1540,73 +1536,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     @Transactional
-    public void processUnfinishedNurseSiteMaintain(){
-
-        List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUid(selected.getUid());
-        if(!org.springframework.util.StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0) {
-            Set<String> maintainIds = nurseSiteMaintainItemList.stream().map(NurseSiteMaintainItem::getParentId).collect(Collectors.toSet());
-            List<NurseSiteMaintainItem> maintainItemByParentId = nurseSiteMaintainItemRepository.findMaintainItemByParentId(maintainIds);
-            Map<String, List<NurseSiteMaintainItem>> maintainIdsMap = maintainItemByParentId.stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
-            List<NurseSiteMaintainItem> after = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) > 0).collect(Collectors.toList());
-            List<NurseSiteMaintainItem> history = nurseSiteMaintainItemList.stream().filter(item -> item.getScheduleDate().compareTo(new Date()) < 0).collect(Collectors.toList());
-            ArrayList<NurseSiteMaintainItem> nurseSiteMaintainItems = new ArrayList<>();
-            for (NurseSiteMaintainItem nurseSiteMaintainItem : history) {
-                if(!nurseSiteMaintainItem.getIsFinish()){
-                    nurseSiteMaintainItem.setCheckDate(new Date());
-                    nurseSiteMaintainItem.setIsFinish(true);
-                    nurseSiteMaintainItem.setUpdateByUid(loginUser.getUid());
-                    nurseSiteMaintainItem.setUpdateDate(new Date());
-                    nurseSiteMaintainItem.setModifyByUid(loginUser.getUid());
-                    nurseSiteMaintainItem.setComment(StringUtils.isBlank(nurseSiteMaintainItem.getComment())?"已报废":nurseSiteMaintainItem.getComment()+",已报废");
-                    nurseSiteMaintainItems.add(nurseSiteMaintainItem);
-                }
-            }
-            Set<String> afterItemIds = after.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
-            if(CollectionUtils.isNotEmpty(after)){
-                nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(afterItemIds);
-                nurseSiteMaintainItemRepository.delete(after);
-                for (NurseSiteMaintainItem nurseSiteMaintainItem : after) {
-                    List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
-                    if(CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent) &&  nurseSiteMaintainItemsParent.size()==1 &&  nurseSiteMaintainItemsParent.get(0).getId().equals(nurseSiteMaintainItem.getId())){
-                        nurseSiteMaintainRepository.deleteMaintain(nurseSiteMaintainItem.getParentId());
-                    }
-                }
-            }
-            Set<String> historyItemIds = history.stream().map(NurseSiteMaintainItem::getId).collect(Collectors.toSet());
-            Set<NurseSiteMaintainData> historyDatas = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(historyItemIds);
-            ArrayList<NurseSiteMaintainData> nurseSiteMaintainData1 = new ArrayList<>();
-            for (NurseSiteMaintainData nurseSiteMaintainData : historyDatas) {
-                if(nurseSiteMaintainData.getCheckValue() == null ){
-                    nurseSiteMaintainData.setCheckValue(true);
-                    nurseSiteMaintainData1.add(nurseSiteMaintainData);
-                }
-            }
-            if(CollectionUtils.isNotEmpty(nurseSiteMaintainItems)){
-                for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItems) {
-                    List<NurseSiteMaintainItem> nurseSiteMaintainItemsParent = maintainIdsMap.get(nurseSiteMaintainItem.getParentId());
-                    if (CollectionUtils.isNotEmpty(nurseSiteMaintainItemsParent)) {
-                        NurseSiteMaintain nurseSiteMaintain = nurseSiteMaintainRepository.findById(nurseSiteMaintainItem.getParentId());
-                        Map<String, List<NurseSiteMaintainItem>> historyMap = history.stream().collect(Collectors.groupingBy(NurseSiteMaintainItem::getParentId));
-
-                        List<NurseSiteMaintainItem> nurseSiteMaintainItems1 = historyMap.get(nurseSiteMaintainItem.getParentId());
-                        for (NurseSiteMaintainItem siteMaintainItem : nurseSiteMaintainItems1) {
-                            Map<String, List<NurseSiteMaintainData>> historyDataMap = historyDatas.stream().collect(Collectors.groupingBy(NurseSiteMaintainData::getParentId));
-                            siteMaintainItem.setListData(historyDataMap.get(siteMaintainItem.getId()));
-                        }
-                        nurseSiteMaintain.setListNurseSiteMaintainItem(nurseSiteMaintainItems1);
-                        nurseSiteMaintainService.saveMaintain(nurseSiteMaintain,new Date(),loginUser);
-                    }
-                }
-            }
-            //删除检查项配置相关数据
-//            List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(selected.getUid());
-            nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(selected.getUid());
-//            for(String parentId : parentIds) {
-//                int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
-//                if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
-//            }
+    public void processUnfinishedNurseSiteMaintain(String operationType){
+        if (assetScrapService.processUnfinishedNurseSiteMaintain(UserContextService.getAccessToken(), bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()), operationType)) {
             WebUtil.addSuccessMessage("已自动处理未完成临床助手工单");
-        }else{
+        } else {
             WebUtil.addErrorMessage("没有未完成的临床助手工单");
         }
     }
@@ -1831,6 +1764,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
                 selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
                 break;
+            case "departmentCovert" :
+                clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
+                inDeptUid = clinicalDept.getUid();
+                inDeptName = clinicalDept.getName();
         }
 
     }

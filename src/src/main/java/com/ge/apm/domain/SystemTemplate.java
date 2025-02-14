@@ -31,11 +31,12 @@ public class SystemTemplate implements Serializable {
 
 
     @Column(name = "file_type")
-    private String fileType;  //模板类型 唯一
+    private String fileType;
 
     @Column(name = "template_type")
     private String templateType;  //模板类型
-
+    @Column(name = "template_type_name")
+    private String templateTypeName;  //模板类型名称
     @Column(name = "business_type")
     private String businessType;  //业务类型
 
@@ -66,7 +67,27 @@ public class SystemTemplate implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate = new Date();
 
+    @Transient
+    private  String valueId;
 
+
+    @Transient
+    private  String onlyId;
+
+
+    @Transient
+    private  String templateTypeNameValue;
+
+    @Transient
+    private  String fileNameValue;
+
+    @Transient
+    private  String valueStorageId;
+    @Transient
+    private String siteUid;
+
+    @Transient
+    private boolean isEdit;
     public enum SystemTemplateBusinessEnum{
         ARRIVAL_INSTALLATION("ARRIVAL_INSTALLATION","到货安装模块"),
         ASSET("ASSET","设备档案模块"),
@@ -82,7 +103,8 @@ public class SystemTemplate implements Serializable {
         BUDGET("BUDGET","预算模块"),
         ORG_INFO("ORG_INFO","组织机构模块"),
         PARTS("PARTS","备件模块"),
-
+        WORK("WORK","维修模块"),
+        INVENTORY("INVENTORY","盘点"),
 
         ASSET_PERFORMANCE("ASSET_PERFORMANCE","设备绩效模块"),
         ;
@@ -123,15 +145,17 @@ public class SystemTemplate implements Serializable {
         ARRIVAL_ITEM("ARRIVAL_ITEM","导出安装单模板","excel",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"APM_AssetArrivalItem_Template.xlsx"),
         ARRIVAL_SUPPLIER_REPORT("ARRIVAL_SUPPLIER_REPORT","到货安装单模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ArrivalSupplierReportTemplate.docx"),
 
-        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
-        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
-        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
-        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
+        //到货安装验收模板调整为一个模板 需要用户自行添加子模板使用
+        ARRIVAL_ACCEPTANCE_REPORT("ARRIVAL_ACCEPTANCE_REPORT","到货安装验收报告","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        TECHNOLOGY("TECHNOLOGY","技术验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
+//        BUSINESS("BUSINESS","商务验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"BusinessReportTemplate.docx"),
+//        CLINICAL("CLINICAL","临床验收模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ClinicalReportTemplate.docx"),
+//        DETAIL("DETAIL","验收资料详单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"DetailReportTemplate.docx"),
 
-        FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
+//        FIXASSET("FIXASSET","固定资产验收单","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplate.docx"),//这模板应该是废弃的类型是有但是传参没找到
 
-        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatch.docx"),
-        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatchBottom.docx"),
+//        FIXASSET_BATCH("FIXASSET_BATCH","固定资产验收单(面单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatch.docx"),
+//        FIXASSET_BATCH_BOTTOM("FIXASSET_BATCH_BOTTOM","固定资产验收单(底单)","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"AssetReportTemplateBatchBottom.docx"),
 
         //调拨
         DEPARTMENT_CONVERT("DEPARTMENT_CONVERT","设备转科模板","word",SystemTemplateBusinessEnum.ASSET.code,"transferorder_template.docx"),
@@ -171,12 +195,13 @@ public class SystemTemplate implements Serializable {
         PM_ORDER_EXPORT("PM_ORDER_EXPORT","保养导出模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrder_export.xlsx"),
         PM_ORDER_IMPORT("PM_ORDER_IMPORT","保养工单导入模板","excel",SystemTemplateBusinessEnum.PM.getCode(),"PmOrderImport.xls"),
         MEASURE_ELECTRIC_SAFETY("MEASURE_ELECTRIC_SAFETY","电气安全数据导入模板","ps",SystemTemplateBusinessEnum.PM.getCode(),"APM_Electric_Safety_Template.ps"),
+        PM_ORDER_REPORT("PM_ORDER_REPORT","保养工单报告模板","word",SystemTemplateBusinessEnum.PM.getCode(),"maintenance-template_zh.docx"),
 
         //预算
         BUDGET_IMPORT("BUDGET_IMPORT","预算导入模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"Budget_Import_Template.xlsx"),
         OVER_FIFTY_THOUSAND("OVER_FIFTY_THOUSAND","医疗仪器设备年度采购申报表模板","word",SystemTemplateBusinessEnum.BUDGET.getCode(),"over_fifty_thousand.docx"),
         BUDGET_BAP_EXP("BUDGET_BAP_EXP","申购导出模板","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"APM_Budget_BAP_Exp_Template.xlsx"),
-        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","excel",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
+        ASSET_ARGUMENT_REPORT("ASSET_ARGUMENT_REPORT","预算设备论证报告","word",SystemTemplateBusinessEnum.BUDGET.getCode(),"单价50万元以上（含50万）设备论证报告.docx"),
 
         //组织结构
         ORG_INFO("ORG_INFO","组织机构导入模板","excel",SystemTemplateBusinessEnum.ORG_INFO.getCode(),"APM_Org_Template.xlsx"),
@@ -207,7 +232,9 @@ public class SystemTemplate implements Serializable {
         ASSET_TYPE_GROUP("ASSET_TYPE_GROUP","资产分类模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_Auth_Template.xlsx"),
         ASSET_PURCHASE("ASSET_PURCHASE","采购清单模板","excel",SystemTemplateBusinessEnum.ASSET.getCode(),"APM_PURCHASE_Template.xls"),
 
+        WORK_ORDER_REPORT("WORK_ORDER_REPORT","维修工单报告模板","word",SystemTemplateBusinessEnum.WORK.getCode(),"workOrderTemplate.docx"),
 
+        INVENTORY_ORDER_LIST("INVENTORY_ORDER_LIST","盘点工单列表模板","excel",SystemTemplateBusinessEnum.INVENTORY.getCode(),"inventoryOrderList.xlsx"),
 
         ;
         final String code;
@@ -360,10 +387,42 @@ public class SystemTemplate implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public String getTemplateTypeName() {
+        return templateTypeName;
+    }
+
+    public void setTemplateTypeName(String templateTypeName) {
+        this.templateTypeName = templateTypeName;
+    }
+
+    public String getValueId() {
+        return valueId;
+    }
+
+    public void setValueId(String valueId) {
+        this.valueId = valueId;
+    }
+
+    public String getTemplateTypeNameValue() {
+        return templateTypeNameValue;
+    }
+
+    public void setTemplateTypeNameValue(String templateTypeNameValue) {
+        this.templateTypeNameValue = templateTypeNameValue;
+    }
+
+    public String getOnlyId() {
+        return onlyId;
+    }
+
+    public void setOnlyId(String onlyId) {
+        this.onlyId = onlyId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (onlyId != null ? onlyId.hashCode() : 0);
         return hash;
     }
 
@@ -379,7 +438,7 @@ public class SystemTemplate implements Serializable {
             return false;
         }
         SystemTemplate other = (SystemTemplate) object;
-        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+        return (this.onlyId != null || other.onlyId == null) && (this.onlyId == null || this.onlyId.equals(other.onlyId));
     }
 
     @Override

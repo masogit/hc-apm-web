@@ -41,4 +41,7 @@ public interface ZkbPartOrderCatRepository extends GenericRepositoryUUID<ZkbPart
     @Query(value = "select cat.cat_id from (select zpo.cat_id from zkb_part_order zpo union all select zfpo.cat_id from zkb_fe_part_order zfpo) cat where exists(select 1 from zkb_part_order_cat zpoc where cat.cat_id = ?1)",nativeQuery = true)
     public List<String> queryInUsedIds(String id);
 
+
+    public List<ZkbPartOrderCat> findByBusinessType(String businessType);
+    public List<ZkbPartOrderCat> findByBusinessTypeAndCatType(String businessType, String catType);
 }

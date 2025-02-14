@@ -46,4 +46,8 @@ public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_Servi
     Page<ServiceRequestProjection> findProjectionByAssetIdIn(Collection<Integer> assetIds, Pageable pr);
 
     public V2_ServiceRequest findByTenantUIDAndSrNum(String tenantUid, String srNum);
+
+    @Query(nativeQuery = true, value = "SELECT sr.* FROM v2_service_request sr where sr.asset_id IN ?1 and  EXISTS (SELECT 1 FROM v2_work_order wo WHERE sr.id = wo.sr_id)  order by sr.request_time  desc    LIMIT ?2  OFFSET 0          ")
+    public List<V2_ServiceRequest> findByAssetIdInAndWorkOrderExists(Collection<Integer> assetIds,Integer pageNum);
+
 }

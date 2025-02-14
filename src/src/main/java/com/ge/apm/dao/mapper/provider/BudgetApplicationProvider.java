@@ -19,6 +19,7 @@ public class BudgetApplicationProvider {
                 "  baa.application_amount," +
                 "  baa.application_price," +
                 "  baa.application_quantity," +
+                "  t.temporally_purchase_type," +
                 "  ua.name as applicantName," +
                 "  t.application_date," +
                 "  t.application_status," +
@@ -85,6 +86,9 @@ public class BudgetApplicationProvider {
             }
             if("applicationNum".equals(tempColumn)) {
                 sb.append(" and t.application_num = '"+value.toString()+"'");
+            }
+            if("temporallyPurchaseType".equals(tempColumn)) {
+                sb.append(" and t.temporally_purchase_type like '%"+value.toString()+"%'");
             }
             //临床只能看自己创建
             if("applicantId".equals(tempColumn)) {

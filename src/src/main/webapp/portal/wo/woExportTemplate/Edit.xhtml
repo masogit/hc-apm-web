@@ -8,26 +8,36 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
     <p:dialog id="WoExportTemplateEditDlg" widgetVar="WoExportTemplateEditDialog"
-              onHide="#{workOrderExportTemplateController.onSelect()}" width="1000" height="450" modal="true"
+              onHide="#{workOrderExportSysTemplateController.onSelect()}" width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
-              header="#{workOrderExportTemplateController.CRUDActionName} #{msg.ExportTemplateConfig}">
+              header="#{workOrderExportSysTemplateController.CRUDActionName} #{msg.ExportTemplateConfig}">
         <h:form id="WoExportTemplateEditForm">
             <h:panelGroup id="display">
                 <p:fieldset id="basic" legend="#{msg.ExportTemplateConfig}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <p:commandButton update=":growl" icon="ui-icon-file-download" value="#{msg.DownloadTheCurrentActiveTemplate}"
-                                             onclick="PrimeFaces.monitorDownload(start, stop);">
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" validateClient="false" immediate="true">
                                 <p:fileDownload
-                                        value="#{workOrderExportTemplateController.getActiveTemplate()}"/>
+                                        value="#{workOrderExportSysTemplateController.getActiveTemplate()}"/>
                             </p:commandButton>
                         </h:panelGroup>
+
+
+
+                        <h:panelGroup>
+                            <label class="label">模板类型名称*</label>
+                            <p:inputText  value="#{workOrderExportSysTemplateController.selected.templateTypeName}" required="true">
+                                <p:ajax/>
+                            </p:inputText>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>
-                            <h:outputText value="#{workOrderExportTemplateController.file.fileName}"
-                                          rendered="#{not empty workOrderExportTemplateController.file}"/>
-                            <p:fileUpload fileUploadListener="#{workOrderExportTemplateController.uploadDataFile}"
-                                          value="#{workOrderExportTemplateController.file}" mode="advanced"
+                            <h:outputText value="#{workOrderExportSysTemplateController.file.fileName}"
+                                          rendered="#{not empty workOrderExportSysTemplateController.file}"/>
+                            <p:fileUpload fileUploadListener="#{workOrderExportSysTemplateController.uploadDataFile}"
+                                          value="#{workOrderExportSysTemplateController.file}" mode="advanced"
                                           dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="10000000" update=":WoExportTemplateEditForm"
                                           auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
@@ -37,7 +47,7 @@
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
-                                 actionListener="#{workOrderExportTemplateController.applyChange()}" value="#{msg.Save}"
+                                 actionListener="#{workOrderExportSysTemplateController.applyChange()}" value="#{msg.Save}"
                                  update="display,:WoExportTemplateEditDlg, :WoExportTemplateListForm:datalist, :growl"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'WoExportTemplateEditDialog');"/>
                 &nbsp;&nbsp;
