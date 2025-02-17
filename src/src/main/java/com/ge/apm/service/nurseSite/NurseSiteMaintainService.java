@@ -1107,15 +1107,20 @@ public class NurseSiteMaintainService {
 		passArr[1]=5;
 		passArr[2]=6;
 		passArr[3]=7;
+		boolean unCheck=nurseSiteMaintainItemRepository.findUnCheck(obj.getId());
 		boolean delay=nurseSiteMaintainItemRepository.findDelay(obj.getId());
 		boolean hasComment=nurseSiteMaintainItemRepository.findHasComment(obj.getId());
 		blnNotPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),Arrays.asList(errArr));
 		if(blnNotPass!=null && blnNotPass){
-			if(delay){
-				status=3;
-			}
-			else{
-				status=8;
+			if(unCheck){
+				status=9;
+			}else{
+				if(delay){
+					status=3;
+				}
+				else{
+					status=8;
+				}
 			}
 		}
 		else{
