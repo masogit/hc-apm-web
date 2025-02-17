@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.MvsWorkOrderMapper">
+
+    <resultMap id="v2_WorkOrderMap" type="com.ge.apm.domain.V2_WorkOrder">
+        <id property="id" column="id"/>
+        <result property="dispatchMode" column="dispatch_mode"/>
+        <result property="currentStepId" column="current_step_id"/>
+        <result property="srId" column="sr_id"/>
+        <result property="siteId" column="site_id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="assetId" column="asset_id"/>
+        <result property="currentPersonId" column="current_person_id"/>
+        <result property="currentPersonName" column="current_person_name"/>
+        <result property="currentStepName" column="current_step_name"/>
+        <result property="totalManHour" column="total_man_hour"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="status" column="status"/>
+        <result property="intExtType" column="int_ext_type"/>
+        <result property="parentWoId" column="parent_wo_id"/>
+        <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
+            <id property="uid" column="asset_uid"/>
+            <result property="name" column="asset_name"/>
+            <result property="serialNum" column="asset_serial_num"/>
+            <result property="departNum" column="asset_depart_num"/>
+            <result property="functionType" column="asset_function_type"/>
+            <result property="siteUID" column="asset_site_uid"/>
+            <result property="clinicalDeptUID" column="asset_clinical_dept_uid"/>
+            <result property="clinicalDeptName" column="asset_clinical_dept_name"/>
+            <result property="locationName" column="asset_location_name"/>
+            <result property="mvsEquip" column="asset_mvs_equip"/>
+            <result property="id" column="asset_id"/>
+            <result property="status" column="asset_status"/>
+        </association>
+        <association property="serviceRequest" javaType="com.ge.apm.domain.V2_ServiceRequest">
+            <id property="id" column="sr_id"/>
+            <result property="srNum" column="sr_sr_num"/>
+            <result property="fromDeptUID" column="sr_from_dept_uid"/>
+            <result property="requestorName" column="sr_requestor_name"/>
+            <result property="requestTime" column="sr_request_time"/>
+            <result property="requestReason" column="sr_request_reason"/>
+            <result property="casePriority" column="sr_case_priority"/>
+            <result property="assetLocation" column="sr_asset_location"/>
+            <result property="confirmedDownTime" column="sr_confirmed_down_time"/>
+            <result property="confirmedUpTime" column="sr_confirmed_up_time"/>
+            <result property="equipmentTaker" column="sr_equipment_taker"/>
+            <result property="takeTime" column="sr_take_time"/>
+            <result property="cancelPerson" column="sr_cancel_person"/>
+            <result property="cancelReason" column="sr_cancel_reason"/>
+            <result property="customerName" column="sr_customer_name"/>
+            <result property="customerTel" column="sr_customer_tel"/>
+            <result property="customerPosition" column="sr_customer_position"/>
+            <result property="status" column="sr_status"/>
+        </association>
+    </resultMap>
+    <select id="loadData" resultMap="v2_WorkOrderMap">
+        SELECT T.*,
+        a.name AS asset_name,
+        a.serial_num as asset_serial_num,
+        a.depart_num as asset_depart_num,
+        a.function_type as asset_function_type,
+        a.site_uid as asset_site_uid,
+        a.clinical_dept_name as asset_clinical_dept_name,
+        a.clinical_dept_uid as asset_clinical_dept_uid,
+        a.location_name as asset_location_name,
+        a.mvs_equip as asset_mvs_equip,
+        a.id as asset_id,
+        a.status as asset_status,
+        vs.sr_num as sr_sr_num,
+        vs.from_dept_uid as sr_from_dept_uid,
+        vs.requestor_name as sr_requestor_name,
+        vs.request_time as sr_request_time,
+        vs.request_reason as sr_request_reason,
+        vs.case_priority as sr_case_priority,
+        vs.asset_location as sr_asset_location,
+        vs.confirmed_down_time as sr_confirmed_down_time,
+        vs.confirmed_up_time as sr_confirmed_up_time,
+        vs.equipment_taker as sr_equipment_taker,
+        vs.take_time as sr_take_time,
+        vs.cancel_person as sr_cancel_person,
+        vs.cancel_reason as sr_cancel_reason,
+        vs.customer_name as sr_customer_name,
+        vs.customer_tel as sr_customer_tel,
+        vs.customer_position as sr_customer_position,
+        vs.status as sr_status,
+        a.uid AS asset_uid
+        FROM v2_work_order T
+        inner JOIN v2_service_request vs on T.sr_id = VS.ID
+        LEFT JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid
+        LEFT JOIN mvs_ib_mapping m2 ON T.asset_uid = m2.e_home_ib_uid AND m1.ib_id IS NULL
+        LEFT JOIN asset_info a ON COALESCE(m1.ib_id, m2.ib_id) = a.id
+        WHERE 1=1
+        <if test="srNum != null">
+            and vs.sr_Num = #{srNum}
+        </if>
+        <if test="currentStepId != null and currentStepId.length > 0">
+            and t.current_step_id IN
+            <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="casePriority != null">
+            and vs.case_priority = #{casePriority}
+        </if>
+        <if test="status != null">
+            and t.status = #{status}
+        </if>
+        <if test="queryAssetUid != null">
+            and a.uid = #{queryAssetUid}
+        </if>
+        <if test="assetInfoSiteUID != null">
+            and a.site_uid = #{assetInfoSiteUID}
+        </if>
+        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
+            and a.clinical_dept_uid IN
+            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+          and T.asset_uid IN (
+            SELECT DISTINCT COALESCE(mvs.mvs_ib_uid, mvs.e_home_ib_uid) AS mvs_ib_uid
+            FROM asset_info ai
+                     JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid)
+                     LEFT JOIN mvs_ib_mapping mvs ON ai.id = mvs.ib_id
+            WHERE 1=1
+        <if test="userUid != null">
+            AND uo.user_uid = #{userUid}
+        </if>
+        <if test="tenantUid != null">
+            AND ai.tenant_uid = #{tenantUid}
+        </if>
+        <if test="assetName != null">
+            AND ai.name like CONCAT('%', #{assetName}, '%')
+        </if>
+        <if test="assetSerialNum != null">
+            AND ai.serial_num like CONCAT('%', #{assetSerialNum}, '%')
+        </if>
+        <if test="departNum != null">
+            AND ai.depart_num like CONCAT('%', #{departNum}, '%')
+        </if>
+        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
+            and ai.asset_type IN
+            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="functionType != null">
+            AND ai.function_type  like CONCAT('%', #{functionType}, '%')
+        </if>
+              AND ai.is_valid
+              AND NOT ai.is_deleted
+              AND (mvs.mvs_ib_uid IS NOT NULL OR mvs.e_home_ib_uid IS NOT NULL)
+        )
+    </select>
+ </mapper>
