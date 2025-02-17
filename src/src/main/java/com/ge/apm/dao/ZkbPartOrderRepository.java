@@ -77,7 +77,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @return
      */
     @Query(value = "SELECT count(zkbp.id) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where  zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            "AND (zkbp.status !='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' " +
+            "AND (zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' " +
             "and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' " +
             "and zkbp.status != 'DirectorReject' and zkbp.status != 'ReturnCompleted' and zkbp.status != 'CloseCommited' and zkbp.status != 'CloseApproved' " +
             "and zkbp.status != 'CloseFailed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
