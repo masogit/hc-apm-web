@@ -1628,14 +1628,20 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void checkedIfNessesaryBeforeCommitBulkEditSite() {
-        unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
-        if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
-            unCheckedNurseSite = true;
+        try {
+            unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
+            if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
+                unCheckedNurseSite = true;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+                requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+            } else {
+                commitBulkEditSite();
+            }
+        } catch (Exception e) {
             RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
-            requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
-        } else {
-            commitBulkEditSite();
+            requestContext.addCallbackParam("errFlag", true);
+            logger.error("bath asset department convert checked err {} ", e.getMessage(), e);
         }
     }
 
