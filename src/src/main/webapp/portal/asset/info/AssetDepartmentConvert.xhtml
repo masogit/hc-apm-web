@@ -43,8 +43,8 @@
                 </h:panelGroup>
             </p:panelGrid>
 
-            <p:commandButton id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleAssetDepartmentCovertCompleteSig(xhr, status, args);"/>
-            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
+            <p:commandButton id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSignature()}" value="确定"  icon="ui-icon-check" update="departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();"/>
+<!--            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />-->
 
             <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" oncomplete="PF('departmentCovertApply').hide()"/>
         </h:form>
