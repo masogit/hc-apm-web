@@ -184,6 +184,6 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	public List<NurseSiteMaintainItem> findNoCheckedByAssetUidIn(List<String> assetUid);
 
 
-	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and  o.update_date is null)",nativeQuery=true)
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and ( o.is_finish = false or o.is_finish is null ))",nativeQuery=true)
 	boolean findUnCheck(String id);
 }
