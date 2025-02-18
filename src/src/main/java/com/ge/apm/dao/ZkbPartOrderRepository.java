@@ -80,7 +80,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
             "AND (zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' " +
             "and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' " +
             "and zkbp.status != 'DirectorReject' and zkbp.status != 'ReturnCompleted' and zkbp.status != 'CloseCommited' and zkbp.status != 'CloseApproved' " +
-            "and zkbp.status != 'CloseFailed' and zkbp.status != 'PartReturned') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
+            "and zkbp.status != 'CloseFailed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
     Integer fetchUnReturnCount(Date orderedDate,String orderType,String tenantUID);
 
     /**
