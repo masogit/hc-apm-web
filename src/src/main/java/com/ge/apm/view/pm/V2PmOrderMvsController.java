@@ -3,7 +3,6 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MvsPmOrderMapper;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -13,7 +12,6 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -25,13 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
@@ -50,7 +42,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,13 +56,8 @@ import java.util.stream.Collectors;
 public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderMvsController.class);
 
-
     @Getter @Setter
     private FileScanService fileScanService;
-    @Setter @Getter
-    private Boolean isBatchOp=true;
-
-
 
     private List<String> pmFieldsExport= new ArrayList<>();
     @Setter @Getter
@@ -94,7 +81,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
      private String assetUid;
     private Integer ruleLevel;
     private UaaService uaaService;
-    private UserContextService userContextService;
     private Integer queryIndex;
     private AssetInfo selectedAsset;
     private Integer currentStatus = 1;
@@ -138,7 +124,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     private ConfigCacheService configCacheService;
 
-    private FileDownloadService fileDownloadService;
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -161,12 +146,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private BlobObjectRepository blobObjectRepository;
 
     @Getter @Setter
-    public String customerName;
-    @Getter @Setter
-    public String customerTel;
-    @Getter @Setter
-    public String siteName;
-    @Getter @Setter
     private String requestAssetUid;
     public String getSiteOrgName(String siteUID) {
         OrgInfo org = configCacheService.findOrgByUid(siteUID);
@@ -184,26 +163,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
     }
     public void exportExcel() throws IOException{
-        if(queryIndex == 10){
-            long start = System.currentTimeMillis();
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-
-            List<Object> list =  dao.getAllPmOrder(orgUidList);
-            long search = System.currentTimeMillis();
-            logger.info("cost time :" + (search - start)/1000);
-
-            String path = new DateTime().toString("yyyyMMddHHmm") + File.separator + loginUser.getLoginName();
-            String filePath = fileScanService.getUploadFileFullPath(path);
-            File dest = new File(filePath + File.separator+"pm.xlsx");
-            FileUtils.forceMkdir(new File(filePath));
-            InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
-            FileUtils.copyToFile(inputStream,dest);
-            genPmExcel(filePath + File.separator+"pm.xlsx",list);
-            excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "PmOrder_Export.xlsx");
-            long end = System.currentTimeMillis();
-            logger.info("cost time :"+ (end - search)/1000);
-            return;
-        }
         PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
         if(pmOrderList ==null && queryIndex!=10){
@@ -223,89 +182,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
     }
 
-    public void genPmExcel(String path,List<Object> list){
-        SXSSFWorkbook wb = new SXSSFWorkbook(100);
-        Sheet sheet = wb.createSheet();
-        Row headRow = sheet.createRow(0);
-
-        Cell cell0 = headRow.createCell(0);
-        cell0.setCellValue(WebUtil.getMessage("hospitalId"));
-        Cell cell1 = headRow.createCell(1);
-        cell1.setCellValue(WebUtil.getMessage("assetName"));
-        Cell cell2 = headRow.createCell(2);
-        cell2.setCellValue(WebUtil.getMessage("serialNum"));
-        Cell cell3 = headRow.createCell(3);
-        cell3.setCellValue(WebUtil.getMessage("departNum"));
-        Cell cell4 = headRow.createCell(4);
-        cell4.setCellValue(WebUtil.getMessage("functionType"));
-        Cell cell5 = headRow.createCell(5);
-        cell5.setCellValue(WebUtil.getMessage("MeasurementGrade2"));
-        Cell cell6 = headRow.createCell(6);
-        cell6.setCellValue(WebUtil.getMessage("MaintenanceType"));
-        Cell cell7 = headRow.createCell(7);
-        cell7.setCellValue(WebUtil.getMessage("clinicalDeptId"));
-        Cell cell8 = headRow.createCell(8);
-        cell8.setCellValue(WebUtil.getMessage("PmOrderRule"));
-        Cell cell9 = headRow.createCell(9);
-        cell9.setCellValue(WebUtil.getMessage("MaintenancePeriod"));
-        Cell cell10 = headRow.createCell(10);
-        cell10.setCellValue(WebUtil.getMessage("creatorUID"));
-        Cell cell11 = headRow.createCell(11);
-        cell11.setCellValue(WebUtil.getMessage("caseOwnerId"));
-        Cell cell12 = headRow.createCell(12);
-        cell12.setCellValue(WebUtil.getMessage("MaintenanceNumber"));
-        Cell cell13 = headRow.createCell(13);
-        cell13.setCellValue(WebUtil.getMessage("currentStep"));
-        Cell cell14 = headRow.createCell(14);
-        cell14.setCellValue(WebUtil.getMessage("intExtType"));
-        Cell cell15 = headRow.createCell(15);
-        cell15.setCellValue(WebUtil.getMessage("PlannedCompletionTime"));
-
-        for(int i=0;i<list.size();i++){
-            Row dataRow = sheet.createRow(i+1);
-            for (int j = 0; j <16 ; j++) {
-                Cell dataCell = dataRow.createCell(j);
-                dataCell.setCellValue(checkValue(((Object[])list.get(i))[j]));
-            }
-        }
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(path);
-            wb.write(fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            if(fileOutputStream != null){
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     List<String> pmIdList = new ArrayList<String>();
     private  List<V2_PmOrder> getPmListByselectedId(){
-        selectedMap.forEach((k, v) -> {
-            if (v == true)
-                pmIdList.add(k);
-
-        });
-        if(queryIndex == 10 || queryIndex == 20){
-            if(pmIdList.size()==0) {//如果全部没选 就是在"全部中"点击了导出
-                selectedMap.forEach((k, v) -> {
-                    pmIdList.add(k);
-                });
-            }
-        }
-
         if(pmIdList.size()==0) {
             return null;
         }
-        List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+        Map<String, Object> params = new HashMap<>();
+        params.put("pmIdList", pmIdList.toArray());
+        List<V2_PmOrder> pmList = mvsPmOrderMapper.loadData(params);
         return pmList;
     }
     public void pick(String itemId){
@@ -323,15 +207,11 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         selectedMap.clear();
     }
 
-
-
-
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
-
 
     public boolean isChecked() {
         Map<String, Boolean> map = this.selectedMap;
@@ -351,7 +231,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public Map<String,Boolean> sameOpHashmap = new HashMap<String,Boolean>();
 
-
     public String getTableDefName(String templateId) {
         TableDefinition tb = tableDao.findById(templateId);
         if (tb != null) {
@@ -368,7 +247,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         untest = (UnstructuredData) hmCheck.get(key);
     }
 
-
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return configCacheService.findOrgByUid(orgUid);
     }
@@ -377,10 +255,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         return Optional.ofNullable(selected).map(V2_PmOrder::getId).map(pmOrderService::getPmOrderStep).orElse(ListUtil.empty());
     }
 
-
     protected void init() {
         mvsPmOrderMapper = WebUtil.getBean(MvsPmOrderMapper.class);
-        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         fileScanService = WebUtil.getBean(FileScanService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
@@ -390,12 +266,10 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         dao = WebUtil.getBean(V2_PmOrderRepository.class);
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        userContextService = WebUtil.getBean(UserContextService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
          blobDao = WebUtil.getBean(BlobObjectRepository.class);
          orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
@@ -414,32 +288,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                 query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
             }
         }
-        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 8;
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        }else {
-            if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 10;
-                }else{
-                    queryIndex = -1;
-                }
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
+        if (Strings.isNullOrEmpty(query)) {
+            queryIndex = -1;
+        } else {
+            queryIndex = Integer.valueOf(query);
+            searchList(queryIndex);
         }
-        for (ExportFields exs: ExportFields.values()
-        ) {
-            if(userContextService.isLocale()){
-                pmFieldsExport.add(exs.getChinese());
-            }else{
-                pmFieldsExport.add(exs.getEnglish());
-            }
+        for (ExportFields exs: ExportFields.values()){
+            pmFieldsExport.add(exs.getChinese());
         }
         queryIndex = Strings.isNullOrEmpty(query) ? 10  : Integer.valueOf(query);
         this.filterBySite = false;
@@ -448,13 +304,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
         WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
-        if(wfc !=null)
-            isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
     }
-
-
-
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -482,9 +333,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         bySearchFilterMVS = result.getContent();
         result.getContent().forEach(item->pmIdList.add(item.getId()));
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-        if(queryIndex==20 || queryIndex== 8){
-            pmIdList= new ArrayList<>();
-        }
         if(selectedMap.size() > 0){
             selectedMap = new HashMap();
         }
@@ -587,7 +435,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         return params;
     }
 
-
     public String getFilterPmRuleLevel() {
         return filterPmRuleLevel;
     }
@@ -601,8 +448,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         selected = null;
     }
 
-
-
     public StreamedContent getExcelFile() {
         return excelFile;
     }
@@ -611,7 +456,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         accessoryList = getWorkOrderDetail(selected.getId());
         picList = blobDao.findByBoUuid(selected.getId());
         reportList = pmOrderService.getReportList(selected.getId());
-
         loadHmCheck(selected);
      }
 
@@ -624,7 +468,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
-
         return Optional.ofNullable(selected).map(V2_PmOrder::getId).map(pmOrderService::getWorkOrderDetails).orElse(ListUtil.empty());
     }
 
@@ -742,16 +585,10 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
             return;
         }
         assetUid = asset.getUid();
-          this.selectedAsset = asset;
+        this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
             currentStatus = 3;
-        }
-        if(userContextService.isCountyArea()){
-            OrgInfo orgInfo = configCacheService.findOrgByUid(asset.getSiteUID());
-            customerName = orgInfo.getContactPerson();
-            customerTel = orgInfo.getContactPhone();
-            siteName = orgInfo.getName();
         }
         autoSetPmRuleUid(assetUid,ruleLevel);
     }
@@ -838,6 +675,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
         return orgListMVS;
     }
+    
 
     private void loadMVSClinicalDeptList() {
         try {
