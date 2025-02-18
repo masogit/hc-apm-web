@@ -7,6 +7,9 @@
         <result property="dispatchMode" column="dispatch_mode"/>
         <result property="currentStepId" column="current_step_id"/>
         <result property="assetId" column="asset_id"/>
+        <result property="assetUid" column="asset_uid"/>
+        <result property="assetName" column="asset_name"/>
+        <result property="clinicalDeptId" column="asset_clinical_dept_id"/>
         <result property="currentPersonId" column="current_person_id"/>
         <result property="currentPersonName" column="current_person_name"/>
         <result property="currentStepName" column="current_step_name"/>
@@ -34,6 +37,7 @@
             <result property="functionType" column="asset_function_type"/>
             <result property="siteUID" column="asset_site_uid"/>
             <result property="clinicalDeptUID" column="asset_clinical_dept_uid"/>
+            <result property="clinicalDeptId" column="asset_clinical_dept_id"/>
             <result property="clinicalDeptName" column="asset_clinical_dept_name"/>
             <result property="locationName" column="asset_location_name"/>
             <result property="mvsEquip" column="asset_mvs_equip"/>
@@ -50,9 +54,11 @@
         a.site_uid as asset_site_uid,
         a.clinical_dept_name as asset_clinical_dept_name,
         a.clinical_dept_uid as asset_clinical_dept_uid,
+        a.clinical_dept_id as asset_clinical_dept_id,
         a.location_name as asset_location_name,
         a.mvs_equip as asset_mvs_equip,
         a.id as asset_id,
+        a.uid as asset_uid,
         a.status as asset_status,
         a.uid AS asset_uid
         FROM v2_pm_order T
@@ -95,6 +101,12 @@
         </if>
         <if test="assetInfoSiteUID != null">
             and a.site_uid = #{assetInfoSiteUID}
+        </if>
+        <if test="pmIdList != null and pmIdList.length > 0">
+            and T.id IN
+            <foreach item="item" index="index" collection="pmIdList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
             and a.clinical_dept_uid IN
