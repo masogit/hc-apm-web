@@ -14,6 +14,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -232,6 +233,15 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         }
     }
 
+    public List<String> autoCompleteDeptNameMVS(String query) {
+        if (clinicalDeptListMVS == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptListMVS.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
 
 
     public void onClinicalDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {

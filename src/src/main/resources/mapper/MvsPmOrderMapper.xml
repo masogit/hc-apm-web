@@ -85,7 +85,7 @@
             and t.pm_type = #{pmType}
         </if>
         <if test="pmNum != null">
-            and t.pm_num = #{pmNum}
+            and t.pm_num like concat('%', #{pmNum}, '%')
         </if>
         <if test="status != null">
             and t.status = #{status}
