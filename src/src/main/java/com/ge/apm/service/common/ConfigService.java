@@ -6,6 +6,7 @@
 package com.ge.apm.service.common;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
@@ -16,7 +17,10 @@ import com.ge.apm.domain.WorkflowConfig;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ge.apm.service.pm.PmOrderAggregateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,6 +31,7 @@ import org.springframework.util.StringUtils;
  */
 @Component
 public class ConfigService {
+    Logger logger = LoggerFactory.getLogger(ConfigService.class);
 
     @Autowired
     private WorkflowConfigRepository configDao;
@@ -36,6 +41,7 @@ public class ConfigService {
 
     public WorkflowConfig findConfigBySite(String siteUid) {
         OrgInfo org = cacheService.findOrgByUid(siteUid);
+        logger.info("ConfigService.findConfigBySite {},{},{}",siteUid,isInsulateTenant(org.getTenantUID()), JSONObject.toJSONString(org));
         return cacheService.findConfigBySite(siteUid, isInsulateTenant(org.getTenantUID()), org);
     }
 
