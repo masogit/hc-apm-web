@@ -91,7 +91,7 @@
         LEFT JOIN asset_info a ON COALESCE(m1.ib_id, m2.ib_id) = a.id
         WHERE 1=1
         <if test="srNum != null">
-            and vs.sr_Num = #{srNum}
+            and vs.sr_Num like concat('%', #{srNum}, '%')
         </if>
         <if test="currentStepId != null and currentStepId.length > 0">
             and t.current_step_id IN
@@ -100,7 +100,7 @@
             </foreach>
         </if>
         <if test="casePriority != null">
-            and vs.case_priority = #{casePriority}
+            and vs.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
         </if>
         <if test="status != null">
             and t.status = #{status}
@@ -151,5 +151,6 @@
               AND NOT ai.is_deleted
               AND (mvs.mvs_ib_uid IS NOT NULL OR mvs.e_home_ib_uid IS NOT NULL)
         )
+        order by vs.request_time desc
     </select>
  </mapper>

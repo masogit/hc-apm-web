@@ -303,7 +303,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         hmCheck = new HashMap<String, UnstructuredData>();
         isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
-        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
         loadClinicalDeptList();
     }
 
@@ -328,7 +327,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         setParamsByQueryIndex(params);
         List<V2_PmOrder> v2PmOrderList = mvsPmOrderMapper.loadData(params);
         result= new PageImpl<V2_PmOrder>(this.pageNum(v2PmOrderList, pageRequest), pageRequest, v2PmOrderList.size());
-        loadMVSClinicalDeptList();
         currentPagePmOrders = result.getContent();
         bySearchFilterMVS = result.getContent();
         result.getContent().forEach(item->pmIdList.add(item.getId()));
@@ -336,6 +334,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         if(selectedMap.size() > 0){
             selectedMap = new HashMap();
         }
+        loadMVSClinicalDeptList();
         return result;
     }
     // 根据查询索引设置参数
@@ -474,13 +473,6 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     public List<V2_WorkOrderCoworker> getWorkOrderCoworkerON(String woId) {
         return Optional.ofNullable(selected).map(V2_PmOrder::getId).map(pmOrderService::getWorkOrderCoworker).orElse(ListUtil.empty());
     }
-
-
-
-
-
-
-
 
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
@@ -675,7 +667,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
         return orgListMVS;
     }
-    
+
 
     private void loadMVSClinicalDeptList() {
         try {
