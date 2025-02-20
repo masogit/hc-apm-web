@@ -135,12 +135,13 @@
                         <f:facet name="header">#{msg.RepairImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage value="#{fileDownloadService.getFile(woPicItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto"/>
+                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrMvsController,woPicItem.objectStorageId)}"/>
+                                <p:graphicImage value="#{fileDownloadService.getFile(woPicItem.objectStorageId)}" height="80" width="100" stream="false">
+                                </p:graphicImage>
                             </h:panelGrid>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{woPicItem.objectName}" action="#{fileDownloadService.downloadFile(woPicItem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                         </p:panel>
                     </p:dataGrid>
-
-
                     <p:dataGrid var="woAttachItem" value="#{workOrderMgrMvsController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrMvsController.attachList}">
                         <f:facet name="header">#{msg.RepairAttachment}</f:facet>
                         <p:panel  style="text-align:center">
@@ -344,9 +345,12 @@
                             <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrMvsController.getPartPictures(woItem.id)}" columns="5" layout="grid">
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
-                                    <h:panelGrid columns="1" style="width:100%" >
-                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" stream="false" height="80"  width="100"/>
+                                    <h:panelGrid columns="1" style="width:100%">
+                                        <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrMvsController,fileitem.objectStorageId)}"/>
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false">
+                                        </p:graphicImage>
                                     </h:panelGrid>
+                                    <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                                 </p:panel>
                             </p:dataGrid>
                             <h:panelGroup >

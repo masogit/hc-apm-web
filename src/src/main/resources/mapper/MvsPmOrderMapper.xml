@@ -46,7 +46,27 @@
         </association>
     </resultMap>
     <select id="loadData" resultMap="v2_PmOrderMap">
-        SELECT T.*,
+        SELECT
+        t.dispatch_mode,
+        t.current_step_id,
+        t.current_person_id,
+        t.current_person_name,
+        t.current_step_name,
+        t.total_man_hour,
+        t.total_price,
+        t.int_ext_type,
+        t.rule_name,
+        t.period,
+        t.period_unit,
+        t.creator_name,
+        t.pm_num,
+        t.current_step_name,
+        t.int_ext_type,
+        t.plan_time,
+        t.end_time,
+        t.pm_type,
+        t.rule_level,
+        t.owner_name,
         a.name AS asset_name,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
