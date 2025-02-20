@@ -41,7 +41,6 @@ public class ConfigService {
 
     public WorkflowConfig findConfigBySite(String siteUid) {
         OrgInfo org = cacheService.findOrgByUid(siteUid);
-        logger.info("ConfigService.findConfigBySite {},{},{}",siteUid,isInsulateTenant(org.getTenantUID()), JSONObject.toJSONString(org));
         return cacheService.findConfigBySite(siteUid, isInsulateTenant(org.getTenantUID()), org);
     }
 
