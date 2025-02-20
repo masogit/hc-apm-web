@@ -223,14 +223,16 @@
         </p:column>
         <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}"
                   filterValue="#{workOrderReportExportController.filterMap.assetName}" filterMatchMode="contains">
-            <c:if test="#{userContextService.isLocale()}">
-                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.设备名称}" />
-<!--                <h:outputText value="#{item.设备名称}"/>-->
-            </c:if>
-            <c:if test="#{!userContextService.isLocale()}">
-                <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.EquipmentName}" />
-<!--                <h:outputText value="#{item.EquipmentName}"/>-->
-            </c:if>
+            <a href="/geapm/portal/JmPrintReportView.xhtml?type=workOrderDetail&amp;woId=#{item.woId}&amp;srId=#{item.srId}&amp;assetUid=#{item.assetUid}&amp;fileSearchUrl=#{workOrderReportExportController.getFileSearchUrl()}"  target="_Blank">
+                <c:if test="#{userContextService.isLocale()}">
+<!--                    <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.设备名称}" />-->
+                    <h:outputText value="#{item.设备名称}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+<!--                    <h:commandLink target="_blank" action="#{workOrderReportExportController.openNewWindowView(item)}" value="#{item.EquipmentName}" />-->
+                    <h:outputText value="#{item.EquipmentName}"/>
+                </c:if>
+            </a>
         </p:column>
         <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}"
                   filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}" filterMatchMode="contains">
