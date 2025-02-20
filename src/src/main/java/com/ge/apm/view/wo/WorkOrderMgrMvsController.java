@@ -1,6 +1,7 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
@@ -237,13 +238,29 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         if (clinicalDeptListMVS == null) {
             return Collections.emptyList();
         }
-        List<OrgInfo> res = this.clinicalDeptListMVS.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        List<OrgInfo> res =  convertStreamToForLoop(query);
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    public List<OrgInfo> convertStreamToForLoop(String query) {
+        List<OrgInfo> res = new ArrayList<>();
+        if (clinicalDeptListMVS == null) {
+            return res;
+        }
 
+        for (OrgInfo item : clinicalDeptListMVS) {
+            if (item == null) {
+                continue;
+            }
+            boolean condition = StringUtils.isBlank(query) || item.getName().contains(query)
+                    || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()));
+            if (condition) {
+                res.add(item);
+            }
+        }
+        return res;
+    }
     public void onClinicalDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             fileterOrgNameMVS = (String) ((SelectEvent) event).getObject();
@@ -300,11 +317,11 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             pageResult = new PageImpl<V2_WorkOrder>(this.pageNum(workOrderList, pageRequest), pageRequest, workOrderList.size());
             bySearchFilterMVS = pageResult.getContent();
             loadMVSClinicalDeptList();
+            needTwoSubStatusBatch(pageResult.getContent());
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
-        needTwoSubStatusBatch(pageResult.getContent());
         return pageResult;
     }
     // 处理搜索过滤器
@@ -786,7 +803,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
     private void loadMVSClinicalDeptList() {
         try {
+            logger.info("loadMVSClinicalDeptList.mvs {} "+CollectionUtils.isEmpty(bySearchFilterMVS));
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                logger.info("loadMVSClinicalDeptList.size {} "+bySearchFilterMVS.size());
                 clinicalDeptListMVS = bySearchFilterMVS.stream()
                         .map(item -> Optional.ofNullable(item.getAssetInfo())
                                 .map(AssetInfo::getClinicalDeptUID)
@@ -796,6 +815,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                         .stream()
                         .map(val -> cacheService.findOrgByUid(val))
                         .collect(Collectors.toList());
+                logger.info("loadMVSClinicalDeptList.clinicalDeptListMVS {} "+JSONObject.toJSONString(clinicalDeptListMVS));
+
             }
         } catch (Exception e) {
             logger.info("暂无MVS列表");
@@ -805,7 +826,12 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
         workOrders.forEach(workOrder -> {
             V2_WorkOrder_Step workOrder_step = new V2_WorkOrder_Step();
-            workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            try {
+                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+            } catch (Exception e) {
+                logger.info("workOrder.info:"+JSONObject.toJSONString(workOrder)+";");
+                logger.error("needTwoSubStatusBatch", e);
+            }
             workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
             workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());
         });
