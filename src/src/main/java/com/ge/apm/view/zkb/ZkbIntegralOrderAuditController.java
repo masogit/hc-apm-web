@@ -6,6 +6,7 @@ import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -90,6 +92,16 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
                     if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
                         WebUtil.addErrorMessage("申请人无资质，需有资质的工程师提交申请！","");
+                    }
+                }
+            }
+            if(ZkbPartOrderStep.PartOrderStep.OrderPending.name().equals(selected.getCurrentStep())){
+                if(zkbIntegralOrderStatusVo.isCanEditFlag()){
+                    if(ZkbIntegralOrder.OrderTypeEnum.EngineerOnSiteMaintenance.name().equals(selected.getOrderType())){
+                        Date date1 = DateUtil.parse("2024/11/22");
+                        if(date1.after(zkbContract.getCreatedDate())){
+                            WebUtil.addErrorMessage("该合同需要联系OTR添加 PM active entitlement；","");
+                        }
                     }
                 }
             }
