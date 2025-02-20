@@ -187,6 +187,11 @@
                            <p:menuitem  value="模板管理" outcome="/portal/budget/purchaseTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPLATE_EDIT')}"/>
                        </p:submenu>
                    </c:when>
+                   <c:when test="#{item eq 'TRAIN_MANAGE'}">
+                       <p:submenu label="#{msg.trainManage}" icon="fa fa-usd fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_')}">
+                           <p:menuitem  value="#{msg.trainManage}" outcome="/portal/train/trainMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_EDIT')}"/>
+                       </p:submenu>
+                   </c:when>
                    <c:when test="#{item eq 'MEASURE'}">
                        <!-- 计量 -->
                        <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-adjust fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('MEASURE_')}">

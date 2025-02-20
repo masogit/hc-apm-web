@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition>
+    <div class="ui-g-12 card">
+
+        <h:form id="trainInsiteListForm">
+            <p:dataTable id="datalist" value="#{trainInSiteController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+                         selection="#{trainInSiteController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+                <p:ajax event="rowSelect" update="editButton" />
+                <p:ajax event="filter" listener="#{trainInSiteController.onFilter}" />
+                <p:column headerText="课程号" sortBy="#{item.courseNo}" filterMatchMode="GTE">
+                    <h:outputText value="#{item.courseNo}" />
+                </p:column>
+                <p:column headerText="培训类型" filterBy="#{item.trainType}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('trainType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('trainType', item.trainType)}"/>
+                </p:column>
+                <p:column headerText="课程名称" filterBy="#{item.courseName}" filterMatchMode="EQ">
+                    <h:outputText value="#{item.courseName}"/>
+                </p:column>
+                <!--<p:column headerText="计划培训日期" filterBy="#{item.plannTrainDate}" filterMatchMode="GTE">
+                    <f:facet name="filter">
+                        <p:inputText id="filterPlanTrainDate" widgetVar="varFilterPlanTrainDate" />
+                    </f:facet>
+                    <h:outputText value="#{item.plannTrainDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>-->
+                <p:column headerText="培训方式" filterBy="#{item.trainMode}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('trainMode')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('trainMode', item.trainMode)}"/>
+                </p:column>
+                <p:column headerText="培训科室数量" filterBy="#{item.trainingDeptCount}" filterMatchMode="EQ">
+                    <h:outputText value="#{item.trainingDeptCount}" />
+                </p:column>
+               <!-- <p:column headerText="实际培训结束日期" filterBy="#{item.actualTrainDate}" filterMatchMode="GTE">
+                    <f:facet name="filter">
+                        <p:inputText id="filterActualTrainDate" widgetVar="varFilterActualTrainDate" />
+                    </f:facet>
+                    <h:outputText value="#{item.actualTrainDate}" >
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                    </h:outputText>
+                </p:column>-->
+                <p:column headerText="培训进度" filterBy="#{item.status}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('trainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('trainStatus', item.status)}"/>
+                </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" actionListener="#{trainInSiteController.prepareCreate}" update="trainTab:trainInsiteListForm trainTab:createDialog" oncomplete="PF('createDialog').show()"/>
+                    <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareEdit}"  update="trainTab:createDialog" disabled="#{empty trainInSiteController.selected}" oncomplete="PF('createDialog').show()"/>
+                    <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{trainInSiteController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                        <p:fileDownload value="#{trainInSiteController.exportFile}"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+
+       <!-- <p:overlayPanel  widgetVar="panelFilterPlanTrainDate" for="trainTab:trainInsiteListForm:datalist:filterPlanTrainDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="cal1" />
+                <p:calendar id="cal1" widgetVar="varPlanTrainDateFrom" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                <p:outputLabel for="cal2"/>
+                <p:calendar id="cal2" widgetVar="varPlanTrainDateTo" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+            </h:panelGrid>
+            <p:commandButton onclick="PF('panelFilterPlanTrainDate').hide();setDateFilter('varDataList', 'varFilterPlanTrainDate', 'varPlanTrainDateFrom', 'varPlanTrainDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPlanTrainDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel  widgetVar="panelFilterActualTrainDate" for="trainTab:trainInsiteListForm:datalist:filterActualTrainDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="cal3" />
+                <p:calendar id="cal3" widgetVar="varActualTrainDateFrom" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                <p:outputLabel for="cal4"/>
+                <p:calendar id="cal4" widgetVar="varActualTrainDateTo" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+            </h:panelGrid>
+            <p:commandButton onclick="PF('panelFilterActualTrainDate').hide();setDateFilter('varDataList', 'varFilterActualTrainDate', 'varActualTrainDateFrom', 'varActualTrainDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterActualTrainDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+        </p:overlayPanel>-->
+    </div>
+    <ui:include src="trainEdit.xhtml"></ui:include>
+</ui:composition>
+
+</html>
