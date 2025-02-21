@@ -28,6 +28,8 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     private String id;
     @Column(name="asset_uid")
     private String assetUid;
+    @Column(name="asset_id")
+    private Integer assetId;
     @Column(name="asset_name")
     private String assetName;//设备名称
     @Column(name="asset_dept_num")
@@ -145,6 +147,14 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
+    }
+
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
     }
 
     public String getAssetName() {

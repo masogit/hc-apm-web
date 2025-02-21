@@ -202,6 +202,8 @@ public class MaintainController implements ServerEventInterface{
 								tempEvent.setStyleClass("schedule-item-nopass");
 							} else if (status == 4) {
 								tempEvent.setStyleClass("schedule-item-partialpass");
+							}else if (status == 9) {
+								tempEvent.setStyleClass("schedule-item-nopass-partialpass");
 							}
 						}
 						tempEvent.setId(UUID.randomUUID().toString());

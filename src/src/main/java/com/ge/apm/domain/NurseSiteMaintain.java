@@ -91,7 +91,7 @@ public class NurseSiteMaintain implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private List<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，已完成，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，已完成，没有延期 9.有问题，进行中
 	@Column(name = "status")
 	private Integer status=0;
 
@@ -357,7 +357,7 @@ public class NurseSiteMaintain implements Serializable {
 		else if(status==2|| status==5|| status==6|| status==7){
 			strStatus="通过";
 		}
-		else if(status==3 || status==8){
+		else if(status==3 || status==8 || status==9){
 			strStatus="有问题";
 		}
 		else if(status==4){

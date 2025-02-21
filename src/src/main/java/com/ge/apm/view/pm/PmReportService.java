@@ -2,7 +2,9 @@ package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
@@ -18,6 +20,7 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -169,7 +172,7 @@ public class PmReportService {
                             try {
                                 String val = (String) tableValue.getOrDefault(item.getKey(), emptyStr);
                                 byte[] pictureBytes = this.pmOrderReportTemplateService.getSignatureBytes(val);
-                                content.put(wrap(prefix, item.getKey()), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                                content.put(wrap(prefix, item.getKey()), new PictureRenderData(100, 80, PictureType.PNG, pictureBytes));
                             } catch (Exception e) {
                                 logger.info("自定义照片渲染出错:", e);
                                 content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
@@ -294,7 +297,7 @@ public class PmReportService {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(signatureStorageId);
             if (signatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), SIGNATURE_HOLDER);
-                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, PictureType.PNG, signatureBytes));
             }
         }
 
@@ -304,7 +307,7 @@ public class PmReportService {
             byte[] ackSignatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(ackSignatureStorageId);
             if (ackSignatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), ACK_SIGNATURE_HOLDER);
-                content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", ackSignatureBytes));
+                content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(100, 80, PictureType.PNG, ackSignatureBytes));
             }
         }
 
@@ -314,7 +317,7 @@ public class PmReportService {
             byte[] wcSignatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(wcSignatureStorageId);
             if (wcSignatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.WC_SIGNATURE_PLACE_HOLDER.toString(), WC_SIGNATURE_HOLDER);
-                content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", wcSignatureBytes));
+                content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(100, 80, PictureType.PNG, wcSignatureBytes));
             }
         }
         Boolean empty = false;
@@ -330,7 +333,7 @@ public class PmReportService {
             }
             if (pictureBytes != null) {
                 content.put("parts_picture_holder" + i, BooleanUtils.isTrue(empty) ? EMPTY_SIGNATURE_HOLDER : "备件图片");
-                content.put("parts_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                content.put("parts_picture" + i, new PictureRenderData(100, 80, PictureType.PNG, pictureBytes));
             }
         }
 
@@ -347,7 +350,7 @@ public class PmReportService {
                 pmPrePicture.add(pictureBytes);
             }
             if (pictureBytes != null) {
-                content.put("pm_pre_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                content.put("pm_pre_picture" + i, new PictureRenderData(100, 80, PictureType.PNG, pictureBytes));
             }
         }
         content.put("pm_pre_picture_table",pmPrePicture);
@@ -365,7 +368,7 @@ public class PmReportService {
                 pmAfterPicture.add(pictureBytes);
             }
             if (pictureBytes != null) {
-                content.put("pm_after_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                content.put("pm_after_picture" + i, new PictureRenderData(100, 80, PictureType.PNG, pictureBytes));
             }
         }
         content.put("pm_after_picture_table",pmAfterPicture);
@@ -389,7 +392,7 @@ public class PmReportService {
             }
             if (pictureBytes != null) {
                 content.put("pm_picture_holder" + i, BooleanUtils.isTrue(empty) ? EMPTY_SIGNATURE_HOLDER : "工单图片");
-                content.put("pm_picture" + i, new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                content.put("pm_picture" + i, new PictureRenderData(100, 80,PictureType.PNG, pictureBytes));
             }
         }
 
@@ -399,7 +402,7 @@ public class PmReportService {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(wcSignature);
             if (signatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), MAINTENANCE_COMPLETION_SIGNATURE_TITLE);
-                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(100, 80, "wcSignature.png", signatureBytes));
+                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(100, 80, PictureType.PNG, signatureBytes));
             }
         }
         //验收签名
@@ -408,34 +411,34 @@ public class PmReportService {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(ackSignature);
             if (signatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), ACCEPTANCE_SIGNATURE_TITLE);
-                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(100, 80, "ackSignature.png", signatureBytes));
+                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(100, 80, PictureType.PNG, signatureBytes));
             }
         }
 
         if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, PictureType.PNG, signatureBytes));
         }
         if (!content.containsKey(MaintenanceTemplate.Component.ACK_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(1, 1, PictureType.PNG, signatureBytes));
         }
         if (!content.containsKey(MaintenanceTemplate.Component.WC_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.WC_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(1, 1, PictureType.PNG, signatureBytes));
         }
         if (!content.containsKey(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(1, 1, PictureType.PNG, signatureBytes));
         }
         if (!content.containsKey(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(1, 1, PictureType.PNG, signatureBytes));
         }
 
         // Maintenance Workflow Information
@@ -612,17 +615,29 @@ public class PmReportService {
         Map<String, Object> datas = populateReportContent(pmOrder, reportList, hmCheck, coWorkerList, accessoryList, pmOrderSteps, pmCheckItemList, dataList);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
+//        XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
         // render policy for accessory information.
-        template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
-        // render policy for maintenance workflow.
-        template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
-        // render policy for check list
-        template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
-        // render policy for audit record
-        template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
-        template.registerPolicy(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
-        template.registerPolicy(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
+//        template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
+//        // render policy for maintenance workflow.
+//        template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
+//        // render policy for check list
+//        template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+//        // render policy for audit record
+//        template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
+//        template.registerPolicy(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
+//        template.registerPolicy(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(), new PmPartsPictureTableRenderPolicy(1));
+//
+
+
+        Configure config = Configure.newBuilder()
+                .bind(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy())
+                .bind(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy())
+                .bind(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy())
+                .bind(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy())
+                .bind(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1))
+                .bind(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1))
+                .build();
+        XWPFTemplate template = XWPFTemplate.compile(rawTemplate, config);
         template.render(datas);
         template.write(out);
         return out.toByteArray();

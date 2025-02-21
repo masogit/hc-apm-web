@@ -1,8 +1,10 @@
 package com.ge.apm.service.sparepart;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.StockRecord;
+import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemTableRenderPolicy;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -52,14 +54,25 @@ public class SparePartStockRecordService {
         Map<String, Object> data = mapData(list);
         byte[] bytes;
         XWPFTemplate template = null;
+        Configure config=null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
+//            template = XWPFTemplate.compile(inputStream);
             if(1 == recordType){
-                template.registerPolicy("parts_table", new InboundPartOrderTableRenderPolicy());
+//                template.registerPolicy("parts_table", new InboundPartOrderTableRenderPolicy());
+                config=  Configure.newBuilder()
+                        .bind("parts_table", new InboundPartOrderTableRenderPolicy())
+                        .build();
             }else if(2 == recordType){
-                template.registerPolicy("parts_table", new OutboundPartOrderTableRenderPolicy());
+//                template.registerPolicy("parts_table", new OutboundPartOrderTableRenderPolicy());
+
+                config=  Configure.newBuilder()
+                        .bind("parts_table", new OutboundPartOrderTableRenderPolicy())
+                        .build();
             }
+
+
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();

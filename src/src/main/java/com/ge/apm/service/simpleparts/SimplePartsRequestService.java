@@ -1,6 +1,7 @@
 package com.ge.apm.service.simpleparts;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.simpleparts.*;
 import com.ge.apm.dao.mapper.simpleparts.SimplePartsInventoryMapper;
@@ -8,6 +9,7 @@ import com.ge.apm.dao.mapper.simpleparts.SimplePartsTransactionMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.*;
+import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -533,8 +535,13 @@ public class SimplePartsRequestService {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream inputStream = new ByteArrayInputStream(templateBytes);
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("parts_request_line_item_batch", new SimplePartsRequestLineItemTableRenderPolicy());
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("parts_request_line_item_batch", new SimplePartsRequestLineItemTableRenderPolicy());
+
+            Configure config = Configure.newBuilder()
+                    .bind("parts_request_line_item_batch", new SimplePartsRequestLineItemTableRenderPolicy())
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();

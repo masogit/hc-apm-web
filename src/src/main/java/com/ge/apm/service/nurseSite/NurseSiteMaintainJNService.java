@@ -893,7 +893,7 @@ public class NurseSiteMaintainJNService {
 			tempItem.setStatus(itemStatus);
 		}
 	}
-	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，已完成，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，已完成，没有延期  9.有问题 进行中
 	public void updateMaintain(NurseSiteMaintain obj, Date date, UserAccount user) {
 		Boolean blnNotChecked=false;
 		Boolean blnNotPass=false;
@@ -908,16 +908,23 @@ public class NurseSiteMaintainJNService {
 		passArr[1]=5;
 		passArr[2]=6;
 		passArr[3]=7;
+		boolean unCheck=nurseSiteMaintainItemRepository.findUnCheck(obj.getId());
+
 		boolean delay=nurseSiteMaintainItemRepository.findDelay(obj.getId());
 		boolean hasComment=nurseSiteMaintainItemRepository.findHasComment(obj.getId());
 		blnNotPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),Arrays.asList(errArr));
 		if(blnNotPass!=null && blnNotPass){
-			if(delay){
-				status=3;
+			if(unCheck){
+				status=9;
+			}else{
+				if(delay){
+					status=3;
+				}
+				else{
+					status=8;
+				}
 			}
-			else{
-				status=8;
-			}
+
 		}
 		else{
 			blnRunning=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),4);

@@ -60,7 +60,7 @@ public class AssetScrapConvertRenderPolicy extends AbstractWoTableRenderPolicy {
         try {
             run.addPicture(inputStream, pictureType, "image.png", widthEMU, heightEMU);
         } catch (Exception e) {
-            logger.error("报废鉴定表导出签名写入异常 e:",e);
+//            logger.error("报废鉴定表导出签名写入异常 e:",e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetScrapRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
@@ -111,8 +112,13 @@ public class ExportToBeTerminatedAppraisalService {
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("asset_detail_table", new AssetDetailsRenderPolicy());
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("asset_detail_table", new AssetDetailsRenderPolicy());
+
+            Configure config = Configure.newBuilder()
+                    .bind("asset_detail_table", new AssetDetailsRenderPolicy())
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();

@@ -1,12 +1,14 @@
 package com.ge.apm.domain.bo;
 
-import com.deepoove.poi.data.TableRenderData;
+import com.deepoove.poi.data.*;
+import com.deepoove.poi.data.style.TableStyle;
 import com.ge.apm.domain.bo.parser.SchemaParser;
 import com.ge.apm.domain.pure.TableSchema;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,13 +33,19 @@ public class MaintenanceTemplate {
     }
 
     private TableRenderData empty() {
-        return new TableRenderData(
-                null,
-                new ArrayList<Object>() {{
-                    add("暂无");
-                }},
-                "no data",
-                8000);
+//        return new TableRenderData(
+//                null,
+//                new ArrayList<Object>() {{
+//                    add("暂无");
+//                }},
+//                "no data",
+//                8000);
+
+        TableRenderData tableRenderData = Tables.create(Rows.create("暂无"));
+        TableStyle tableStyle = new TableStyle();
+        tableStyle.setWidth(String.valueOf(8000));
+        tableRenderData.setTableStyle(tableStyle);
+        return tableRenderData;
     }
 
     /**
