@@ -48,7 +48,7 @@
             <p:dataList id="uploadList" value="#{trainInSiteController.blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
                <f:facet name="header">附件</f:facet>
                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-               <p:commandButton actionListener="#{trainInSiteController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{!(zkbPartOrderAuditController.returnFormFlag eq 'readOnly') and !(zkbPartOrderAuditController.returnFormFlag eq 'audit')}">
+               <p:commandButton actionListener="#{trainInSiteController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
                   <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                </p:commandButton>
             </p:dataList>
