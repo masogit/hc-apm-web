@@ -226,6 +226,13 @@
                             <p:outputLabel id="xxx" style="color: red" value="为符合GE医疗合规要求，代理商应确保工具的完好，自行补充损坏的工具，按时自行通过社会计量机构校验万用表" />
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">合同号*</label>
+                            <p:selectOneMenu value="#{zkbIntegralOrderEditController.selected.contractId}" required="true" requiredMessage="合同号不能为空！" valueChangeListener="#{zkbIntegralOrderEditController.contractChange}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{zkbIntegralOrderEditController.contractList}" var="item" itemLabel="#{item.contractNo}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">数量*</label>
                             <p:inputText value="#{zkbIntegralOrderEditController.selected.qty}" required="true" requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
@@ -240,6 +247,7 @@
                         <h:panelGroup>
                             <label class="label">工程师学员号*</label>
                             <p:inputText  value="#{zkbIntegralOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="工程师电话 #{msg.ValidationRequire}" />
+                            <p:outputLabel style="color: red; margin-left: 5px;" value="ZKB+6位数字" />
                         </h:panelGroup>
 
                        <!-- <h:panelGroup>

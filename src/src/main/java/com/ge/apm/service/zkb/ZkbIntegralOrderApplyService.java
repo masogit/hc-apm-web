@@ -183,6 +183,15 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         return "";
     }
 
+    public List<ZkbContract> queryContractByTenantUid(UserAccount userAccount){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
+        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, new Date()));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(new Date(), -1)));
+        List<ZkbContract> zkbContractList = zkbContractRepository.findBySearchFilter(filters);
+        return zkbContractList;
+    }
+
     public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount){
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbIntegralOrder.OrderTypeEnum.ToolBox.name()));
