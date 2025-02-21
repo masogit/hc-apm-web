@@ -80,6 +80,14 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         return selected;
     }
 
+    public ZkbContract queryZkbContract(String cid){
+        return zkbContractRepository.findById(cid);
+    }
+
+    public List<V2_BlobObject> queryBlobObjectByIntegralId(String id){
+        return blobObjectRepository.findByBoUuid(id);
+    }
+
     /**
      *
      * @param currentUser

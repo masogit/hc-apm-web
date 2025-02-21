@@ -430,7 +430,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    public void create(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract){
+    public void create(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract, List<V2_BlobObject> v2_blobObjectList){
         if(userAccount.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             zkbIntegralOrder.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
@@ -490,6 +490,13 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         zkbPartOrderStep.setPartOrderId(zkbIntegralOrder.getId());
         zkbPartOrderStepRepository.save(zkbPartOrderStep);
         applyIntegralHandle(zkbIntegralOrder, userAccount, ZkbIntegralRecord.RecordType.QuotaDeduct.name());
+
+        if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
+            for(V2_BlobObject v2BlobObject : v2_blobObjectList){
+                v2BlobObject.setBoUuid(zkbIntegralOrder.getId());
+            }
+            blobObjectRepository.save(v2_blobObjectList);
+        }
 
         List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
         if(strs.contains(zkbIntegralOrder.getCurrentStep())){

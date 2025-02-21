@@ -228,6 +228,7 @@
                         <h:panelGroup>
                             <label class="label">合同号*</label>
                             <p:selectOneMenu value="#{zkbIntegralOrderEditController.selected.contractId}" required="true" requiredMessage="合同号不能为空！" valueChangeListener="#{zkbIntegralOrderEditController.contractChange}">
+                                <p:ajax event="change" update="uploadGrip"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbIntegralOrderEditController.contractList}" var="item" itemLabel="#{item.contractNo}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
@@ -275,6 +276,24 @@
                             <p:inputTextarea value="#{zkbIntegralOrderEditController.selected.remark}" maxlength="255" />
                         </h:panelGroup>
                     </p:panelGrid>
+
+                    <p:panelGrid id="uploadGrip">
+                        <h:panelGroup rendered="#{zkbIntegralOrderEditController.selectedContract.contractType eq 'CCS' or zkbIntegralOrderEditController.selectedContract.contractType eq 'Biomed'}">
+                            <p:dataList id="uploadList" value="#{zkbIntegralOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">合同附件上传</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem,'ZkbPartOrder')}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload id="uploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/" fileUploadListener="#{zkbIntegralOrderEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            <p:panel id="warmMessageCT">
+                                <p:outputLabel style="color: red; margin-left: 5px;" value="请确保上传的合同里显示有积分兑换" />
+                                <p:commandLink validateClient="false" immediate="false" process="@this" value="查看示例" oncomplete="PF('showSampleDlg').show()" />
+                            </p:panel>
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="regionalManagerFieldset" legend="区域经理信息" rendered="#{zkbIntegralOrderEditController.showBodyForm() and zkbIntegralOrderEditController.showRegionalManager}" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -310,6 +329,11 @@
                     </div>
 
                 </h:form>
+
+            </p:dialog>
+
+            <p:dialog id="showSampleDlg" widgetVar="showSampleDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="查看示例" height="320">
+                <p:graphicImage url="image.png" style="width: 800px; height: 300px;"/>
 
             </p:dialog>
 
