@@ -4,6 +4,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbIntegralOrderApplyService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
@@ -33,12 +35,10 @@ import java.util.List;
 public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<ZkbIntegralOrder> {
 
     private ZkbIntegralOrderRepository zkbIntegralOrderRepository;
-
     private AssetInfoRepository assetInfoRepository;
     private TenantInfoRepository tenantInfoRepository;
-
     private ZkbIntegralOrderApplyService zkbIntegralOrderApplyService;
-
+    private BlobFileService blobService;
     private UserAccount currentUser;
 
     @Getter@Setter
@@ -63,6 +63,9 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
     @Getter @Setter
     List<ZkbPartOrderCat> zkbPartOrderCatList = new ArrayList<>();
 
+    @Getter @Setter
+    List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
+
     private String queryStatus;
 
     @Override
@@ -72,6 +75,7 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         zkbIntegralOrderApplyService = WebUtil.getBean(ZkbIntegralOrderApplyService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbIntegralOrderStatusVo = new ZkbIntegralOrderStatusVo();
         encodeStr = WebUtil.getRequestParameter("str");
@@ -183,15 +187,18 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
                 WebUtil.addErrorMessage("积分申请不符合条件，请检查！");
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
             }
-
+            selectedContract = null;
             contractList = zkbIntegralOrderApplyService.queryContractByTenantUid(currentUser);
+        }else{
+            selectedContract = null;
+            contractList = new ArrayList<>();
         }
     }
 
     public void contractChange(ValueChangeEvent event){
-        ZkbContract zkbContract = contractList.stream().filter(t -> t.getId().equals(event.getNewValue())).findAny().get();
-        if(zkbContract != null){
-            selected.setContractNo(zkbContract.getContractNo());
+        selectedContract = contractList.stream().filter(t -> t.getId().equals(event.getNewValue())).findAny().get();
+        if(selectedContract != null){
+            selected.setContractNo(selectedContract.getContractNo());
         }
     }
 
@@ -229,6 +236,14 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
                 WebUtil.addErrorMessage("机型不能为空！");
                 checkFlag = false;
             }
+        }else{
+            if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) ||
+              ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
+                if(CollectionUtils.isEmpty(v2_blobObjectList)){
+                    WebUtil.addErrorMessage("合同附件不能为空！");
+                    checkFlag = false;
+                }
+            }
         }
 
         if(!checkFlag){
@@ -249,7 +264,7 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         }
 
         selected.setTenantUID(currentUser.getTenantUID());
-        zkbIntegralOrderApplyService.create(selected, currentUser, selectedContract);
+        zkbIntegralOrderApplyService.create(selected, currentUser, selectedContract, v2_blobObjectList);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
 
     }
@@ -268,6 +283,19 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         return "List?faces-redirect=true&queryStatus="+queryStatus ;
     }
 
+    public void handleFileUpload(FileUploadEvent event){
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        if (null != v2_blobObject) {
+            //blobObject.setBoId(selected.getId());
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_INTEGRAL_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_INTEGRAL_ORDER);
+            v2_blobObject.setBoUuid(selected.getId());
+            v2_blobObjectList.add(v2_blobObject);
+            WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbIntegralOrder> getDAO() {

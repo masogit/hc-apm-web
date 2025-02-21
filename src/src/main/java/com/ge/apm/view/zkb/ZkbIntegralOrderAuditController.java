@@ -58,6 +58,9 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
     @Getter @Setter
     List<ZkbPartOrderCat> zkbPartOrderCatList = new ArrayList<>();
 
+    @Getter @Setter
+    List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
+
     private String queryStatus;
 
     @Override
@@ -75,10 +78,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
         queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
         if(StringUtils.isNotEmpty(selectedId)){
             selected = zkbIntegralOrderAuditService.queryInitData(selectedId, zkbContractList, v2_listHashMap);
-            if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-                zkbContract = zkbContractList.get(0);
-            }
-
+            zkbContract = zkbIntegralOrderAuditService.queryZkbContract(selected.getContractId());
             if(selected == null || StrUtil.isEmpty(selected.getId())){
                 WebUtil.addErrorMessage("数据不存在！");
                 return;
@@ -87,6 +87,9 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
             zkbIntegralOrderAuditService.fieldRendered(currentUser, zkbIntegralOrderStatusVo, selected);
             zkbIntegralOrderAuditService.initPageData(selected, zkbContract, zkbIntegralOrderStatusVo);
             zkbPartOrderCatList = zkbIntegralOrderAuditService.queryCatList();
+            if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType())){
+                v2_blobObjectList = zkbIntegralOrderAuditService.queryBlobObjectByIntegralId(selectedId);
+            }
 
             if(userContextService.isZkbUser()) {
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
