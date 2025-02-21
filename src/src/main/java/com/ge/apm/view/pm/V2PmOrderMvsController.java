@@ -3,6 +3,7 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MvsPmOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -44,6 +45,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -91,6 +94,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private V2_WorkOrderCoworker coWorkerDetail;
     private List<V2_BlobObject> picList;
     private List<AssetTypeGroup> assetTypeGroupList;
+    private PmReportService pmReportService;
 
     private List<V2_BlobObject> audioList;
     private BlobObjectRepository blobDao;
@@ -184,11 +188,15 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     List<String> pmIdList = new ArrayList<String>();
     private  List<V2_PmOrder> getPmListByselectedId(){
+        Map<String, Object> params = new HashMap<>();
         if(pmIdList.size()==0) {
             return null;
         }
-        Map<String, Object> params = new HashMap<>();
-        params.put("pmIdList", pmIdList.toArray());
+        params.put("userUid", loginUser.getUid());
+        params.put("tenantUid", loginUser.getTenantUID());
+        if(queryIndex!=10){
+            params.put("pmIdList", pmIdList.toArray());
+        }
         List<V2_PmOrder> pmList = mvsPmOrderMapper.loadData(params);
         return pmList;
     }
@@ -256,6 +264,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     }
 
     protected void init() {
+        pmReportService = WebUtil.getBean(PmReportService.class);
         mvsPmOrderMapper = WebUtil.getBean(MvsPmOrderMapper.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         fileScanService = WebUtil.getBean(FileScanService.class);
@@ -359,6 +368,50 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }  else if (queryIndex == 7) { //已关单
             params.put("currentStepName","已关单");
             params.put("isFinished",true);
+        }
+    }
+
+    /**
+     * Check whether the target is selected.
+     *
+     * @return true if the mantenance report item has been selected, false otherwise.
+     */
+    public boolean isTargetSelected() {
+        return !selectedMap.isEmpty() && selectedMap.values().contains(true);
+    }
+    private StreamedContent maintenanceReport;
+    /**
+     * Getter method for maintenance report.
+     *
+     * @return {@link StreamedContent} object that contains maintenance report.
+     */
+    public StreamedContent getMaintenanceReport() {
+        return maintenanceReport;
+    }
+
+    /**
+     * Setter for maintenance report.
+     *
+     * @param maintenanceReport {@link StreamedContent} object.
+     */
+    public void setMaintenanceReport(StreamedContent maintenanceReport) {
+        this.maintenanceReport = maintenanceReport;
+    }
+
+    /**
+     * Generate maintenance report.
+     */
+    public void doExportMaintenanceReport() {
+        maintenanceReport = null;
+        try {
+            maintenanceReport = pmReportService.generate(selectedMap, isInsulate, loginUser);
+        } catch (BusinessException e) {
+            logger.error("downLoad pm_word BusinessException ",e);
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("downLoad pm_word Exception",e);
+            Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
         }
     }
 
