@@ -78,6 +78,9 @@ public class ZkbIntegralOrderListService {
 
         specification = buildRoleSpecification(currentUser, ZkbPartOrderStep.PartOrderStep.OrderPending.name(), isZkbUser);
         zkbIntegralOrderStatusVo.setPendingOrderQty(zkbIntegralOrderRepository.count(specification));
+
+        specification = buildRoleSpecification(currentUser, ZkbPartOrderStep.PartOrderStep.Complete.name(), isZkbUser);
+        zkbIntegralOrderStatusVo.setPendingCompleteQty(zkbIntegralOrderRepository.count(specification));
     }
 
     public Specification<ZkbIntegralOrder> buildPendingSpecification(UserAccount currentUser, List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList) {

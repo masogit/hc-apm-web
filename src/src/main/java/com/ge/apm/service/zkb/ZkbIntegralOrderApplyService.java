@@ -220,8 +220,8 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("id", SearchFilter.Operator.IN,strings));
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
-        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
-        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, -1)));
+        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, new Date()));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(new Date(), -1)));
         List<ZkbContract> zkbContracts = zkbContractRepository.findBySearchFilter(filters);
         return zkbContracts;
     }
