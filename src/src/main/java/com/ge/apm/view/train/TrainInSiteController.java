@@ -193,6 +193,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     }
     public void removeFile(V2_BlobObject v2BlobObject){
         trainManageService.removeBlob(v2BlobObject);
+        blobObjectList.remove(v2BlobObject);
     }
 
     public void saveDetail(){
