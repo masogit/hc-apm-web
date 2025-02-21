@@ -22,6 +22,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,6 +183,15 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
                 WebUtil.addErrorMessage("积分申请不符合条件，请检查！");
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
             }
+
+            contractList = zkbIntegralOrderApplyService.queryContractByTenantUid(currentUser);
+        }
+    }
+
+    public void contractChange(ValueChangeEvent event){
+        ZkbContract zkbContract = contractList.stream().filter(t -> t.getId().equals(event.getNewValue())).findAny().get();
+        if(zkbContract != null){
+            selected.setContractNo(zkbContract.getContractNo());
         }
     }
 
