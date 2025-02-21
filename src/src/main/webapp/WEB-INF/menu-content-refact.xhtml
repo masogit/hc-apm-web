@@ -188,7 +188,7 @@
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'TRAIN_MANAGE'}">
-                       <p:submenu label="#{msg.trainManage}" icon="fa fa-usd fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_')}">
+                       <p:submenu label="#{msg.trainManage}" icon="fa fa-dot-circle-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_')}">
                            <p:menuitem  value="#{msg.trainManage}" outcome="/portal/train/trainMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_EDIT')}"/>
                        </p:submenu>
                    </c:when>
