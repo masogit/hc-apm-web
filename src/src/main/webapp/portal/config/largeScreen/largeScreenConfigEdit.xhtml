@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="largeScreenConfigDlg" widgetVar="largeScreenConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.i18nConfig}" max-height="600" width="850">
+            <h:form id="largeScreenConfigForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemName}*</label>
+                        <p:inputText id="name" value="#{largeScreenConfigController.selected.name}" required="true"  style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio id="defaultValue" value="#{largeScreenConfigController.selected.status}" disabled="#{largeScreenConfigController.selected.status eq -1}" layout="lineDirection">
+                            <f:selectItem itemLabel="#{msg.InService}" itemValue="1"/>
+                            <f:selectItem itemLabel="#{msg.NotEnabled}" itemValue="0"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{largeScreenConfigController.save()}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'largeScreenConfigDlg');" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('largeScreenConfigDlg').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

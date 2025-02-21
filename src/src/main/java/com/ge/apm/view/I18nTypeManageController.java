@@ -52,7 +52,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        selectTenant = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        selectTenant = tenantInfoRepository.findByuid(currentUser.getTenantUID());
         selectTenantId = selectTenant.getId();
         this.searchFilters = new ArrayList<>();
     }

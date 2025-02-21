@@ -159,8 +159,8 @@
             <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
                              disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}"
                              oncomplete="handleComplete(xhr, status, args);" update="bulkEditForm" class="clsBtnChangeSite"/>
-            <p:commandButton style="display: none" id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoBulkEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleAssetDepartmentCovertCompleteSig(xhr, status, args);"/>
-            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoBulkEditController.getSignature()}" value="查看签名" update="tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />
+            <p:commandButton style="display: none" id="departmentCovertButton"  validateClient="true" immediate="false" actionListener="#{assetInfoBulkEditController.getSignature()}" value="确定"  icon="ui-icon-check" update="tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();"/>
+<!--            <p:commandButton style="display: none" id="departmentCovertOpenSignature" actionListener="#{assetInfoBulkEditController.getSignature()}" value="查看签名" update="tab:departmentCovertSignatureDlg" oncomplete="PF('departmentCovertSignatureDlg').show();" />-->
 <!--                        <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoBulkEditController.getSelectedUidList())}"-->
 <!--                                         disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" class="clsBtnChangeSite"/>-->
         </p:fieldset>
@@ -196,7 +196,7 @@
             if(unCheckedNurseSite==true &amp;&amp; toDeleteNurseMaintainSite == false) {
                 PF('toDeleteCheckedNurseSite').show()
             } else if (errFlag == false) {
-                document.getElementById('tab:bulkEditForm:departmentCovertButton').click();
+                // document.getElementById('tab:bulkEditForm:departmentCovertButton').click();
             }
         }
 

@@ -94,6 +94,12 @@
                 ai.institution_uid institutionUid,
                 ai.hospital_uid hospitalUid,
                 ai.site_uid siteUid,
+                ai.purchase_price purchase_price,
+                ai.purchase_date purchase_date,
+                ai.purchase_date purchase_date,
+                ai.comments assetComments,
+                ai.make_short_name makerShortName,
+                u.name inventoryName,
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.comment WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.id IS NOT NULL THEN (select string_agg(icl.item, ', ') from inventory_check_list icl left join inventory_issue_detail isd on icl.id = isd.inventory_check_list_id where isd.inventory_issue_id = ii.id group by isd.inventory_issue_id) ELSE '' END inventoryCheckListItems,
@@ -104,6 +110,7 @@
                 asset_info ai
                 LEFT JOIN inventory_issue ii ON ai.id = ii.asset_id AND ii.is_last is true
                 LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id AND iod.is_last is true
+                left join user_account u on u.login_name=iod.last_modified_by
             WHERE
                 ai.is_checked = TRUE
                 AND ai.is_deleted = FALSE

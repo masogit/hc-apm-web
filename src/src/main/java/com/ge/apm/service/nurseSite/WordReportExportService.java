@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.service.asset.ArrivalItemTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -613,8 +615,13 @@ public class WordReportExportService {
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("tables", new AssetCheckTableRenderPolicy());
+//            template = XWPFTemplate.compile(inputStream);
+//            template.registerPolicy("tables", new AssetCheckTableRenderPolicy());
+
+            Configure config = Configure.newBuilder()
+                    .bind("tables", new AssetCheckTableRenderPolicy())
+                    .build();
+            template = XWPFTemplate.compile(inputStream, config);
             template.render(datas);
             template.write(out);
             return out.toByteArray();

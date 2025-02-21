@@ -640,8 +640,8 @@
                     </h:panelGroup>
                 </p:panelGrid>
 
-                <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSig()}" value="确定"  icon="ui-icon-check"  oncomplete="handleCompleteSig(xhr, status, args);"/>
-                <p:commandButton style="display: none" id="openSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
+                <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSignature()}" value="确定"  icon="ui-icon-check" update="signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+<!--                <p:commandButton style="display: none" id="openSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />-->
 
                 <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
             </h:form>
