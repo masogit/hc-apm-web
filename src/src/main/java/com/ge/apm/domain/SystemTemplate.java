@@ -144,6 +144,7 @@ public class SystemTemplate implements Serializable {
         //到货安装
         ARRIVAL_ITEM("ARRIVAL_ITEM","导出安装单模板","excel",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"APM_AssetArrivalItem_Template.xlsx"),
         ARRIVAL_SUPPLIER_REPORT("ARRIVAL_SUPPLIER_REPORT","到货安装单模板","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"ArrivalSupplierReportTemplate.docx"),
+        ARRIVAL_SUPPLIER_REPORT_PDF("ARRIVAL_SUPPLIER_REPORT_PDF","到货安装单模板PDF","xslt",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"arrivalItem.xslt"),
 
         //到货安装验收模板调整为一个模板 需要用户自行添加子模板使用
         ARRIVAL_ACCEPTANCE_REPORT("ARRIVAL_ACCEPTANCE_REPORT","到货安装验收报告","word",SystemTemplateBusinessEnum.ARRIVAL_INSTALLATION.code,"TechnologyReportTemplate.docx"),
