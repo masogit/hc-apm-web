@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderMvsController.class);
+    private UserContextService userContextService;
 
     @Getter @Setter
     private FileScanService fileScanService;
@@ -264,6 +265,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     }
 
     protected void init() {
+        userContextService =  WebUtil.getBean(UserContextService.class);
         pmReportService = WebUtil.getBean(PmReportService.class);
         mvsPmOrderMapper = WebUtil.getBean(MvsPmOrderMapper.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
@@ -324,6 +326,10 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         this.selected = null;
         Page<V2_PmOrder> result;
         if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
+        if(userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_TAKE")
+                &&userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_VIEW_ALL")){
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         if (this.searchFilters == null) {
