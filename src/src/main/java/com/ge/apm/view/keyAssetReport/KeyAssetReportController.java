@@ -37,6 +37,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -291,6 +292,25 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             assetOperationForYear.add(assetOperationDetail);
             operationOrder += 1;
         }
+        //年收入
+        BigDecimal annualIncome=Objects.nonNull(assetOperationDetail.get("annualIncome"))?BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualIncome"))):BigDecimal.valueOf(0.0);
+        //折旧
+        BigDecimal depreciation=Objects.nonNull(assetOperationDetail.get("depreciation"))?BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("depreciation"))):BigDecimal.valueOf(0.0);
+        //年维修支出
+        BigDecimal annualRepairExpenses=Objects.nonNull(assetOperationDetail.get("annualRepairExpenses"))?BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualRepairExpenses"))):BigDecimal.valueOf(0.0);
+        //年维保支出
+        BigDecimal annualMaintenanceExpenses=Objects.nonNull(assetOperationDetail.get("annualMaintenanceExpenses"))?BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualMaintenanceExpenses"))):BigDecimal.valueOf(0.0);
+        // 年耗材支出
+        BigDecimal annualConsumablesExpenses=Objects.nonNull(assetOperationDetail.get("annualConsumablesExpenses"))?BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualConsumablesExpenses"))):BigDecimal.valueOf(0.0);
+        BigDecimal netIncome=annualIncome.subtract(depreciation.add(annualRepairExpenses).add(annualMaintenanceExpenses).add(annualConsumablesExpenses));
+        //净收入
+        String netIncomeStr=netIncome.toString();
+        if(netIncomeStr.endsWith(".0")){
+            assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.longValue()));
+        }else{
+            assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.doubleValue()));
+        }
+
     }
 
     @Override
