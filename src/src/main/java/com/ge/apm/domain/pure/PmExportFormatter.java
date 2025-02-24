@@ -2,10 +2,7 @@ package com.ge.apm.domain.pure;
 
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -86,8 +83,8 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.RUNLEVEL.getChinese(), this.getFromI18(i18nRuleLevel,v2_pmOrder.getRuleLevel()));
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
-            map.put(ExportFields.PMRULE.getChinese(), this.pmOrderRule.getName());
-            map.put(ExportFields.MAINTENANCEPERIOD.getChinese(), this.pmOrderRule.getPeriod());
+            map.put(ExportFields.PMRULE.getChinese(), this.getRuleName());
+            map.put(ExportFields.MAINTENANCEPERIOD.getChinese(), this.getPeriod());
             map.put(ExportFields.CREATOR.getChinese(), this.getCreator());
             map.put(ExportFields.OWNER.getChinese(), this.getOwner());
             map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
@@ -111,8 +108,8 @@ public class PmExportFormatter<T> {
             }
             map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
-            map.put(ExportFields.PMRULE.getEnglish(), this.pmOrderRule.getName());
-            map.put(ExportFields.MAINTENANCEPERIOD.getEnglish(), this.pmOrderRule.getPeriod());
+            map.put(ExportFields.PMRULE.getEnglish(), this.getRuleName());
+            map.put(ExportFields.MAINTENANCEPERIOD.getEnglish(), this.getPeriod());
             map.put(ExportFields.CREATOR.getEnglish(), this.getCreator());
             map.put(ExportFields.OWNER.getEnglish(), this.getOwner());
             map.put(ExportFields.PMNUM.getEnglish(), this.getPmNum());
@@ -126,14 +123,28 @@ public class PmExportFormatter<T> {
         return map;
     }
 
+
+    public String getRuleName() {
+        return v2_pmOrder.getRuleName();
+    }
+
+    public String getPeriod() {
+        return Optional.ofNullable(v2_pmOrder)
+                .map(order -> order.getPeriod())
+                .map(period -> period.toString())
+                .orElse(null); // 或者返回一个默认值，如空字符串 ""
+    }
     public String getClincialName() {
-        OrgInfo orgInfo = orgDao.getByUid(v2_pmOrder.getClinicalDeptId());
+        OrgInfo orgInfo = Optional.ofNullable(v2_pmOrder)
+                .map(V2_PmOrder::getAssetInfo)
+                .map(AssetInfo::getClinicalDeptUID)
+                .map(orgDao::getByUid)
+                .orElse(null);
         if (orgInfo==null){
             return null;
         }
         return orgInfo.getName();
     }
-
 
     public String getOwner() {
         return v2_pmOrder.getOwnerName();
