@@ -405,7 +405,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         }
         if (loginUser.isEnableAssetTypeGroup() && !org.apache.commons.collections4.CollectionUtils.isEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-            params.put("assetInfoAssetType", encodedList);
+            params.put("assetInfoAssetType", encodedList.stream().toArray(String[]::new));
         }
         return params;
     }
