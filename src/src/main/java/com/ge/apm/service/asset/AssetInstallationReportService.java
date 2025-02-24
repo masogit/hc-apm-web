@@ -2,10 +2,12 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -355,47 +357,54 @@ public class AssetInstallationReportService {
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
 
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes);
-            template = XWPFTemplate.compile(inputStream);
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try {
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            InputStream inputStream = new ByteArrayInputStream(templateBytes);
+//            template = XWPFTemplate.compile(inputStream);
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        return WordExportServiceUtil.generate(data, templateBytes, bindings);
     }
 
     private byte[] renderDocxBatch(Map<String, Object> data, byte[] templateBytes) throws IOException {
 
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes);
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy());
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try {
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            InputStream inputStream = new ByteArrayInputStream(templateBytes);
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy());
+//
+//
+//            Configure config = Configure.newBuilder()
+//                    .bind("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy())
+//                    .build();
+//            template = XWPFTemplate.compile(inputStream, config);
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy());
+        return  WordExportServiceUtil.generate(data, templateBytes, bindings);
 
-
-            Configure config = Configure.newBuilder()
-                    .bind("arrival_item_batch", new ArrivalItemBatchTableRenderPolicy())
-                    .build();
-            template = XWPFTemplate.compile(inputStream, config);
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
     }
     private String buildFileName(Map<String, Object> data, String reportType, boolean isEncoding){
 

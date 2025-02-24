@@ -5,12 +5,20 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.bo.MaintenanceTemplate;
+import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
+import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
+import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
+import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemTableRenderPolicy;
+import com.ge.apm.view.pm.PmPartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
@@ -103,19 +111,24 @@ public class DepartmentConvertService {
 //        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
 //        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
 
+//
+//        Configure config = Configure.newBuilder()
+//                .bind("list", new DepartmentConvertRenderPolicy())
+//                .build();
+//        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
+//        template.render(datas);
+//        try {
+//            template.write(out);
+//        } catch (IOException e) {
+//            logger.error("调拨单导出失败 generate error:", e);
+//            return null;
+//        }
+//        return out.toByteArray();
 
-        Configure config = Configure.newBuilder()
-                .bind("list", new DepartmentConvertRenderPolicy())
-                .build();
-        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
-        template.render(datas);
-        try {
-            template.write(out);
-        } catch (IOException e) {
-            logger.error("调拨单导出失败 generate error:", e);
-            return null;
-        }
-        return out.toByteArray();
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("list", new DepartmentConvertRenderPolicy());
+
+        return  WordExportServiceUtil.generate(datas,templateBytes, bindings);
     }
 
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
