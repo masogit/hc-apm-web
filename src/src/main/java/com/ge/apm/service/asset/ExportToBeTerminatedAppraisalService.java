@@ -2,11 +2,13 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetScrapRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
@@ -108,32 +110,36 @@ public class ExportToBeTerminatedAppraisalService {
 
     public StreamedContent export(List<String> selectedIds, byte[] templateBytes ) {
         Map<String, Object> datas = getData(selectedIds,true);
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("asset_detail_table", new AssetDetailsRenderPolicy());
-
-            Configure config = Configure.newBuilder()
-                    .bind("asset_detail_table", new AssetDetailsRenderPolicy())
-                    .build();
-            template = XWPFTemplate.compile(inputStream, config);
-            template.render(datas);
-            template.write(out);
-            bytes = out.toByteArray();
-            return new ApmStreamedContent(new ByteArrayInputStream(bytes), "application/msword", "report.docx");
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception ignore) {
-
-            }
-        }
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+//             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("asset_detail_table", new AssetDetailsRenderPolicy());
+//
+//            Configure config = Configure.newBuilder()
+//                    .bind("asset_detail_table", new AssetDetailsRenderPolicy())
+//                    .build();
+//            template = XWPFTemplate.compile(inputStream, config);
+//            template.render(datas);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//            return new ApmStreamedContent(new ByteArrayInputStream(bytes), "application/msword", "report.docx");
+//        } catch (IOException e) {
+//            return null;
+//        } finally {
+//            try {
+//                if (template != null) {
+//                    template.close();
+//                }
+//            } catch (Exception ignore) {
+//
+//            }
+//        }
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("asset_detail_table", new AssetDetailsRenderPolicy());
+        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+        return new ApmStreamedContent(new ByteArrayInputStream(bytes), "application/msword", "report.docx");
     }
 
 
@@ -150,7 +156,11 @@ public class ExportToBeTerminatedAppraisalService {
                         item.forEach((k, v) ->
                             map.put(k.name(), v)
                         );
-                        byte[] bytes = generate(map, templateBytes);
+//                        byte[] bytes = generate(map, templateBytes);
+
+                        Map<String, RenderPolicy> bindings = new HashMap<>();
+                        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+
                         if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
                             String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));

@@ -4,8 +4,10 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -117,8 +119,13 @@ public class ExportTerminatedAppraisalService {
                 AssetInfo assetInfo = assetInfoMap.get(item);
                 if (assetInfo != null) {
                     try {
-                        byte[] bytes = generate(assetInfo, templateBytes);
-                        if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
+                        Map<String, Object> datas = getData(assetInfo);
+//                        byte[] bytes = generate(assetInfo, templateBytes);
+                        Map<String, RenderPolicy> bindings = new HashMap<>();
+                         bindings.put("list", new AssetScrapConvertRenderPolicy());
+                        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+
+                        if (!Arrays.equals(bytes, new byte[0])) {
                             String name = assetInfo.getName() + "-" + "资产报废单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
