@@ -437,7 +437,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         confirmedDownTime = null;
         selectedWorkOrderList = null;
         picList = null;
-        attachList = null;
+        attachList = new ArrayList<>();
         selectedAsset = null;
         locationName = null;
     }
@@ -449,7 +449,14 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);
         picList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
-        attachList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        List<V2_BlobObject> attachList1 = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        List<V2_BlobObject> attachList2 = blobObjectRepository.findByBoUuidAndBoType(selected.getSrId(),  V2_BlobObject.BO_SUB_TYPE_EHOME);
+        if(!CollectionUtils.isEmpty(attachList1)){
+            attachList.addAll(attachList1);
+        }
+        if(!CollectionUtils.isEmpty(attachList2)){
+            attachList.addAll(attachList2);
+        }
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
