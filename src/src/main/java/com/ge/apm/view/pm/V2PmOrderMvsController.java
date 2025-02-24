@@ -488,7 +488,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
         if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-            params.put("assetInfoAssetType", encodedList);
+            params.put("assetInfoAssetType", encodedList.stream().toArray(String[]::new));
         }
         return params;
     }
