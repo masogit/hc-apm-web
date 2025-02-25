@@ -37,6 +37,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -154,7 +155,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private JmReportRepository reportRepository;
 
-    private  UserAccount account;
+    private UserAccount account;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(KeyAssetReportRepository.class);
@@ -205,18 +207,18 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         selectedAssetList = new HashSet<>();
         addedAssetList = new ArrayList<>();
         deptList = new HashSet<>();
-        assetIds=new HashSet<>();
+        assetIds = new HashSet<>();
     }
 
     @Override
     public void prepareEdit() {
         initAssetOperation();
         selectedDept = selected.getClinicalDept();
-        if(selected.getAssetDetail()!=null){
+        if (selected.getAssetDetail() != null) {
             assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
 
-        }else{
-            assetDetail=new HashSet<>();
+        } else {
+            assetDetail = new HashSet<>();
         }
         assetOperationDetail = null;
         List<KeyAssetReportOrg> byKeyAssetReportId = keyAssetReportOrgRepository.findByKeyAssetReportId(selected.getId());
@@ -228,11 +230,19 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         } else if (2 == this.selected.getReportType()) {
             initAssetOperation();
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
+            for (Map<String, String> stringStringMap : assetOperationForYear) {
+                String netInCome = netIncomeComputing(stringStringMap);
+                if (Objects.nonNull(netInCome)) {
+                    stringStringMap.put("annualNetIncome", netInCome);
+                }
+
+            }
+
             operationOrder = assetOperationForYear.size() + 1;
         }
-        assetIds=new HashSet<>();
+        assetIds = new HashSet<>();
         for (Map<String, Object> stringObjectMap : assetDetail) {
-            if(stringObjectMap.get("assetId")!=null){
+            if (stringObjectMap.get("assetId") != null) {
                 String stringIds = (String) stringObjectMap.get("assetId");
                 List<Integer> ids = Arrays.stream(stringIds.split(","))
                         .map(String::trim)
@@ -291,6 +301,25 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             assetOperationForYear.add(assetOperationDetail);
             operationOrder += 1;
         }
+        //年收入
+        BigDecimal annualIncome = Objects.nonNull(assetOperationDetail.get("annualIncome")) ? BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualIncome"))) : BigDecimal.valueOf(0.0);
+        //折旧
+        BigDecimal depreciation = Objects.nonNull(assetOperationDetail.get("depreciation")) ? BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("depreciation"))) : BigDecimal.valueOf(0.0);
+        //年维修支出
+        BigDecimal annualRepairExpenses = Objects.nonNull(assetOperationDetail.get("annualRepairExpenses")) ? BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualRepairExpenses"))) : BigDecimal.valueOf(0.0);
+        //年维保支出
+        BigDecimal annualMaintenanceExpenses = Objects.nonNull(assetOperationDetail.get("annualMaintenanceExpenses")) ? BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualMaintenanceExpenses"))) : BigDecimal.valueOf(0.0);
+        // 年耗材支出
+        BigDecimal annualConsumablesExpenses = Objects.nonNull(assetOperationDetail.get("annualConsumablesExpenses")) ? BigDecimal.valueOf(Double.parseDouble(assetOperationDetail.get("annualConsumablesExpenses"))) : BigDecimal.valueOf(0.0);
+        BigDecimal netIncome = annualIncome.subtract(depreciation.add(annualRepairExpenses).add(annualMaintenanceExpenses).add(annualConsumablesExpenses));
+        //净收入
+        String netIncomeStr = netIncome.toString();
+        if (netIncomeStr.endsWith(".0")) {
+            assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.longValue()));
+        } else {
+            assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.doubleValue()));
+        }
+
     }
 
     @Override
@@ -396,10 +425,10 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 //        }
         int countReport = 0;
         if ("Create".equals(this.crudActionName)) {
-            countReport = dao.countByReport(this.selected.getAssetName(), this.selected.getAssetDeptName(), this.selected.getReportYear(),this.selected.getReportType());
+            countReport = dao.countByReport(this.selected.getAssetName(), this.selected.getAssetDeptName(), this.selected.getReportYear(), this.selected.getReportType());
         } else if ("Edit".equals(this.crudActionName)) {
             countReport = dao.countByReportAndId(this.selected.getAssetName(), this.selected.getAssetDeptName(),
-                    this.selected.getReportYear(), this.selected.getId(),this.selected.getReportType());
+                    this.selected.getReportYear(), this.selected.getId(), this.selected.getReportType());
         }
         if (countReport > 0) {
             WebUtil.addErrorMessage("年份+科室+设备名称+报表类型重复,不能提交!");
@@ -455,7 +484,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreator(userAccount.getName());
             this.selected.setCreateTime(new Date());
         }
-        if(assetDetail!=null){
+        if (assetDetail != null) {
             this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
         }
         if (1 == this.selected.getReportType()) {
@@ -475,11 +504,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             keyAssetReportOrg.setOrgId(orgUid);
             keyAssetReportOrgs.add(keyAssetReportOrg);
         }
-        if(CollectionUtils.isNotEmpty(keyAssetReportOrgs)){
+        if (CollectionUtils.isNotEmpty(keyAssetReportOrgs)) {
             keyAssetReportOrgRepository.save(keyAssetReportOrgs);
         }
         deptList = new HashSet<>();
-        assetIds=new HashSet<>();
+        assetIds = new HashSet<>();
 
     }
 
@@ -498,11 +527,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (CollectionUtils.isEmpty(deptList)) {
             deptList = new HashSet<>();
         }
-        List<AssetInfo> filterAssetList=addedAssetList;
-        if(CollectionUtils.isNotEmpty(assetIds)){
+        List<AssetInfo> filterAssetList = addedAssetList;
+        if (CollectionUtils.isNotEmpty(assetIds)) {
             filterAssetList = addedAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
         }
-        if(CollectionUtils.isEmpty(filterAssetList)){
+        if (CollectionUtils.isEmpty(filterAssetList)) {
             return;
         }
         assetDetail = service.groupAsset(filterAssetList, assetDetail);
@@ -597,8 +626,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (dept.getOrgType() == 4) {
             List<OrgInfo> userAccessibleSiteListWithClinicalDept = uaaService.getUserAccessibleSiteListWithClinicalDept(account.getUid());
             Set<OrgInfo> clinicalDeptSet = new HashSet<>();
-            collectChildClinicalDeptInExstingList(dept,userAccessibleSiteListWithClinicalDept,clinicalDeptSet);
-            if(CollectionUtils.isNotEmpty(clinicalDeptSet)){
+            collectChildClinicalDeptInExstingList(dept, userAccessibleSiteListWithClinicalDept, clinicalDeptSet);
+            if (CollectionUtils.isNotEmpty(clinicalDeptSet)) {
                 Set<String> clinicalDeptUids = clinicalDeptSet.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
                 assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptUids), "1*"));
 
@@ -625,7 +654,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
 
         allAssetList = assetDao.findBySearchFilter(assetSearchFilter);
-        if(CollectionUtils.isNotEmpty(assetIds)){
+        if (CollectionUtils.isNotEmpty(assetIds)) {
             allAssetList = allAssetList.stream().filter(item -> !assetIds.contains(item.getId())).collect(Collectors.toList());
         }
     }
@@ -635,7 +664,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
         clinicalDeptSetOutput.add(parentOrg);
 
-        for (OrgInfo orgInfo: clinicalDeptList) {
+        for (OrgInfo orgInfo : clinicalDeptList) {
             if (!orgInfo.getParentUID().equals(parentOrg.getUid())) continue;
             collectChildClinicalDeptInExstingList(orgInfo, clinicalDeptList, clinicalDeptSetOutput);
 
@@ -811,7 +840,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     @Transactional
-    public void deleteAsset(Map<String, Object> map){
+    public void deleteAsset(Map<String, Object> map) {
         logger.info(JSON.toJSON(map));
 
         String key = (String) map.get("key");
@@ -832,19 +861,43 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
         Set<String> clinicalDeptUids = new HashSet<>();
         for (Map<String, Object> stringObjectMap : assetDetail) {
-            String deptUidString = (String)  stringObjectMap.get("deptUid");
+            String deptUidString = (String) stringObjectMap.get("deptUid");
             List<String> deptUidList = Arrays.asList(deptUidString.split(","));
             clinicalDeptUids.addAll(deptUidList);
 
         }
         List<String> deleteDeptUidList = new ArrayList<>(deleteDeptUids);
         deleteDeptUidList.removeAll(clinicalDeptUids);
-        if(selected.getId()!=null){
-            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(),deleteDeptUidList);
+        if (selected.getId() != null) {
+            keyAssetReportOrgRepository.deleteByKeyAssetReportIdAndOrgIdIn(selected.getId(), deleteDeptUidList);
             saveKeyAssetReport();
         }
-        assetIds=filterIds;
-        deptList=clinicalDeptUids;
+        assetIds = filterIds;
+        deptList = clinicalDeptUids;
+    }
+
+    public String netIncomeComputing(Map<String, String> data) {
+        String annualNetIncome=data.get("annualNetIncome");
+        if(Objects.nonNull(annualNetIncome))
+            return null;
+        //年收入
+        BigDecimal annualIncome = Objects.nonNull(data.get("annualIncome")) ? BigDecimal.valueOf(Double.parseDouble(data.get("annualIncome"))) : BigDecimal.valueOf(0.0);
+        //折旧
+        BigDecimal depreciation = Objects.nonNull(data.get("depreciation")) ? BigDecimal.valueOf(Double.parseDouble(data.get("depreciation"))) : BigDecimal.valueOf(0.0);
+        //年维修支出
+        BigDecimal annualRepairExpenses = Objects.nonNull(data.get("annualRepairExpenses")) ? BigDecimal.valueOf(Double.parseDouble(data.get("annualRepairExpenses"))) : BigDecimal.valueOf(0.0);
+        //年维保支出
+        BigDecimal annualMaintenanceExpenses = Objects.nonNull(data.get("annualMaintenanceExpenses")) ? BigDecimal.valueOf(Double.parseDouble(data.get("annualMaintenanceExpenses"))) : BigDecimal.valueOf(0.0);
+        // 年耗材支出
+        BigDecimal annualConsumablesExpenses = Objects.nonNull(data.get("annualConsumablesExpenses")) ? BigDecimal.valueOf(Double.parseDouble(data.get("annualConsumablesExpenses"))) : BigDecimal.valueOf(0.0);
+        BigDecimal netIncome = annualIncome.subtract(depreciation.add(annualRepairExpenses).add(annualMaintenanceExpenses).add(annualConsumablesExpenses));
+        //净收入
+        String netIncomeStr = netIncome.toString();
+        if (netIncomeStr.endsWith(".0")) {
+            return String.valueOf(netIncome.longValue());
+        } else {
+            return String.valueOf(netIncome.doubleValue());
+        }
     }
 
 }

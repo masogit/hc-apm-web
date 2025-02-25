@@ -4,8 +4,11 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
+import com.ge.apm.service.asset.ArrivalItemBatchTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MultilApproveStatusMapping;
@@ -114,39 +117,47 @@ public class WorkOrderDocxRenderService {
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("part_table", new PartTableRenderPolicy());
-//            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
-//            template.registerPolicy("audit_table", new AuditTableRenderPolicy());
-//            template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
-//            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
-            Configure config = Configure.newBuilder()
-                    .bind("part_table", new PartTableRenderPolicy())
-                    .bind("proceed_table", new ProceedTableRenderPolicy())
-                    .bind("audit_table", new AuditTableRenderPolicy())
-                    .bind("work_hours_table", new WorkHourTableRenderPolicy())
-                    .bind("parts_picture_table", new PartsPictureTableRenderPolicy(blobService, 2))
-                    .build();
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+//             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("part_table", new PartTableRenderPolicy());
+////            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
+////            template.registerPolicy("audit_table", new AuditTableRenderPolicy());
+////            template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
+////            template.registerPolicy("parts_picture_table", new PartsPictureTableRenderPolicy(blobService,2));
+//            Configure config = Configure.newBuilder()
+//                    .bind("part_table", new PartTableRenderPolicy())
+//                    .bind("proceed_table", new ProceedTableRenderPolicy())
+//                    .bind("audit_table", new AuditTableRenderPolicy())
+//                    .bind("work_hours_table", new WorkHourTableRenderPolicy())
+//                    .bind("parts_picture_table", new PartsPictureTableRenderPolicy(blobService, 2))
+//                    .build();
+//
+//            template = XWPFTemplate.compile(inputStream, config);
+//
+//            template.render(datas);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        } finally {
+//            try {
+//                if (template != null) {
+//                    template.close();
+//                }
+//            } catch (Exception ignore) {
+//                log.error("render docx error:{}",ignore.getMessage());
+//            }
+//        }
 
-            template = XWPFTemplate.compile(inputStream, config);
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("part_table", new PartTableRenderPolicy());
+        bindings.put("proceed_table", new ProceedTableRenderPolicy());
+        bindings.put("audit_table", new AuditTableRenderPolicy());
+        bindings.put("work_hours_table", new WorkHourTableRenderPolicy());
+        bindings.put("parts_picture_table",  new PartsPictureTableRenderPolicy(blobService, 2));
+        return  WordExportServiceUtil.generate(datas, templateBytes, bindings);
 
-            template.render(datas);
-            template.write(out);
-            bytes = out.toByteArray();
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception ignore) {
-                log.error("render docx error:{}",ignore.getMessage());
-            }
-        }
-        return bytes;
     }
 
     private Map<String, Object> mapMyMap(Map<String, Object> source) {
