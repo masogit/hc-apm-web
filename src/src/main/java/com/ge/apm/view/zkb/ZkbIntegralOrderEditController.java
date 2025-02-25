@@ -6,6 +6,7 @@ import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbIntegralOrderApplyService;
+import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -38,6 +39,7 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
     private AssetInfoRepository assetInfoRepository;
     private TenantInfoRepository tenantInfoRepository;
     private ZkbIntegralOrderApplyService zkbIntegralOrderApplyService;
+    private ZkbIntegralOrderAuditService zkbIntegralOrderAuditService;
     private BlobFileService blobService;
     private UserAccount currentUser;
 
@@ -75,11 +77,13 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         zkbIntegralOrderApplyService = WebUtil.getBean(ZkbIntegralOrderApplyService.class);
+        zkbIntegralOrderAuditService = WebUtil.getBean(ZkbIntegralOrderAuditService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbIntegralOrderStatusVo = new ZkbIntegralOrderStatusVo();
         encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
         selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
         queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
         queryWorkFlow = new V2_WorkOrder();
@@ -93,6 +97,23 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
             selected.setRequestPhone(currentUser.getTelephone());
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(currentUser.getTenantUID());
             selected.setTenantName(tenantInfo.getName());
+        }else if("Edit".equals(actionName)){
+            selectionTenantInfo = currentUser.getTenantUID();
+            selected = zkbIntegralOrderAuditService.queryInitData(selectedId, contractList, v2_listHashMap);
+            selectedContract = zkbIntegralOrderAuditService.queryZkbContract(selected.getContractId());
+            if(selected == null || StrUtil.isEmpty(selected.getId())){
+                WebUtil.addErrorMessage("数据不存在！");
+                return;
+            }
+            if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
+                if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
+                    v2_blobObjectList = zkbIntegralOrderAuditService.queryBlobObjectByIntegralId(selectedId);
+                }
+                zkbPartOrderCatList = zkbIntegralOrderApplyService.queryPartOrderCatByContract(currentUser);
+                contractList = zkbIntegralOrderApplyService.queryContractByTenantUid(currentUser);
+            }else{
+                selectedWorkFlow = v2_listHashMap.get(0);
+            }
         }
         zkbIntegralOrderStatusVo.setCurrentScore(zkbIntegralOrderApplyService.queryScore(currentUser));
 
@@ -218,53 +239,52 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
     }
 
     public void preSave(){
-        boolean checkFlag = true;
-        Integer score = zkbIntegralOrderApplyService.queryScore(currentUser);
-        Integer deductScore = 0;
-        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-            deductScore = 900;
-        }else {
-            deductScore = 200;
-        }
-        if(score < deductScore){
-            WebUtil.addErrorMessage("当前申请需要扣除" +deductScore+ "，积分不够！", "");
-            checkFlag = false;
+        if(!zkbIntegralOrderApplyService.checkScore(currentUser, selected)){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
 
-        if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-            if(StrUtil.isEmpty(selected.getArtificialType())){
-                WebUtil.addErrorMessage("机型不能为空！");
-                checkFlag = false;
-            }
-        }else{
-            if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) ||
-              ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
-                if(CollectionUtils.isEmpty(v2_blobObjectList)){
-                    WebUtil.addErrorMessage("合同附件不能为空！");
-                    checkFlag = false;
-                }
-            }
+        if(!zkbIntegralOrderApplyService.checkSave(selected, v2_blobObjectList, selectedContract, selectedWorkFlow)){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
 
-        if(!checkFlag){
+        if(!zkbIntegralOrderApplyService.checkLogic(selected, currentUser,selectedContract)){
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         zkbIntegralOrderApplyService.preSave(selected, zkbIntegralOrderStatusVo);
     }
 
+    public void tempSave(){
+        if(StrUtil.isEmpty(selected.getId())){
+            if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
+                selected.setWorkOrderId(selectedWorkFlow.get("id").toString());
+                selected.setAssetId(selectedWorkFlow.get("assetId").toString());
+                selected.setSrNum(selectedWorkFlow.get("srNum").toString());
+                selected.setContractId(selectedContract.getId());
+                selected.setContractNo(selectedContract.getContractNo());
+            }
+            selected.setTenantUID(currentUser.getTenantUID());
+        }
+        zkbIntegralOrderApplyService.tempSave(selected, currentUser, selectedContract, v2_blobObjectList);
+        WebUtil.addSuccessMessage("保存成功！");
+    }
 
     public String saveData(){
-        if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-            selected.setWorkOrderId(selectedWorkFlow.get("id").toString());
-            selected.setAssetId(selectedWorkFlow.get("assetId").toString());
-            selected.setSrNum(selectedWorkFlow.get("srNum").toString());
-            selected.setContractId(selectedContract.getId());
-            selected.setContractNo(selectedContract.getContractNo());
+        if(StrUtil.isEmpty(selected.getId())){
+            if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
+                selected.setWorkOrderId(selectedWorkFlow.get("id").toString());
+                selected.setAssetId(selectedWorkFlow.get("assetId").toString());
+                selected.setSrNum(selectedWorkFlow.get("srNum").toString());
+                selected.setContractId(selectedContract.getId());
+                selected.setContractNo(selectedContract.getContractNo());
+            }
+            selected.setTenantUID(currentUser.getTenantUID());
         }
 
-        selected.setTenantUID(currentUser.getTenantUID());
         zkbIntegralOrderApplyService.create(selected, currentUser, selectedContract, v2_blobObjectList);
+        WebUtil.addSuccessMessage("提交成功！");
         return "List?faces-redirect=true&queryStatus="+queryStatus;
 
     }
@@ -295,6 +315,11 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public void removeFile(V2_BlobObject v2BlobObject){
+        v2_blobObjectList.remove(v2BlobObject);
+        blobService.deleteBlobFile(v2BlobObject);
     }
 
     @Override
