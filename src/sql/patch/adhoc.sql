@@ -5,3 +5,5 @@ INSERT INTO v2_pm_order_step (id, pm_id, step_id, owner_uid, start_time, end_tim
 
 --  YHAAO-24132 日常检查-有问题工单颜色显示优化  日常检查新增状态类型
 update  nurse_site_maintain nsm  set status=9 where (status=3  or  status=8  ) and exists(select 1 from nurse_site_maintain_item nsmi where nsmi.parent_id=nsm.id  and  (nsmi.is_finish=false  or nsmi.is_finish is null ) );
+-- YHAAO-24181  【综合绩效分析】新增投资收益率相关数据  添加投资收益配置
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 10, '1', '采取什么计算方式来计算月投资收益率', 'investmentCalculationMethod', '投资收益率计算方式', 'f', 't', 7 , '[{"key":"计算方式1","value":"1"},{"key":"计算方式2","value":"2"},{"key":"计算方式3","value":"3"}]' where not exists (select * from config_item where key = 'investmentCalculationMethod');
