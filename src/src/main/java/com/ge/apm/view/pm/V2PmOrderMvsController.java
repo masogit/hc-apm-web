@@ -328,8 +328,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
-        if(userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_TAKE")
-                &&userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_VIEW_ALL")){
+        if(!userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_TAKE")
+                &&!userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_VIEW_ALL")){
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         if (this.searchFilters == null) {
