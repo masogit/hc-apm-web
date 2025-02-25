@@ -661,7 +661,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
         if(strs.contains(zkbIntegralOrder.getCurrentStep())){
             sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
         }
     }
 
@@ -730,14 +730,14 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
     }
 
     @Async
-    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token){
+    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
-            String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
+            //String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
 
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);

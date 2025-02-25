@@ -326,10 +326,13 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         }else{
             //如果当前步骤是commercial则需要推送短信
             if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
                 zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            }else{
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+            }else if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL));
+            }else if(!ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
+
             }
         }
 

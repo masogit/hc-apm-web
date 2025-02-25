@@ -132,6 +132,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_EMAIL_ENGINEER("/hcapmreportservice/api/apm/report/partOrder/sendHtmlToEngineerByGeAdmin"),
     INTEGRAL_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/integralOrder/sendMessage"),
     INTEGRAL_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/integralOrder/sendEmail"),
+    INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL("/hcapmreportservice/api/apm/report/integralOrder/sendGeAdminHtml"),
     INTEGRAL_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/integralOrder/sendWeChatMessages"),
 
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
