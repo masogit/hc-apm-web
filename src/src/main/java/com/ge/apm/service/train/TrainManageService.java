@@ -45,6 +45,9 @@ public class TrainManageService extends MicroServiceInvoker {
     private CustomRoleRepository customRoleRepository;
 
     @Autowired
+    private SysRoleRepository sysRoleRepository;
+
+    @Autowired
     private TrainDetailSignRepository trainDetailSignRepository;
 
     public List<OrgDto> onCreateInventory(){
@@ -57,14 +60,15 @@ public class TrainManageService extends MicroServiceInvoker {
 
     public List<TrainRoleDto> queryTrainRole(UserAccount userAccount){
         List<TrainRoleDto> trainRoleDtoList = new ArrayList<>();
-        List<CustomRole> customRoles = customRoleRepository.findByTenantUID(userAccount.getTenantUID());
-        customRoles.stream()
-                .filter(customRole -> customRole.getFunctionList() != null)
-                .filter(customRole -> customRole.getFunctionList().contains("TRAIN_MANAGE_VIEW"))
-                .forEach(customRole -> {
+        List<SysRole> sysRoleList = sysRoleRepository.find();
+        //List<CustomRole> customRoles = customRoleRepository.findByTenantUID(userAccount.getTenantUID());
+        sysRoleList.stream()
+                /*.filter(customRole -> customRole.getFunctionList() != null)
+                .filter(customRole -> customRole.getFunctionList().contains("TRAIN_MANAGE_VIEW"))*/
+                .forEach(s -> {
                     TrainRoleDto trainRoleDto = new TrainRoleDto();
-                    trainRoleDto.setId(customRole.getId().toString());
-                    trainRoleDto.setRoleName(customRole.getName());
+                    trainRoleDto.setId(s.getId().toString());
+                    trainRoleDto.setRoleName(s.getRoleDesc());
                     trainRoleDtoList.add(trainRoleDto);
                 });
 
@@ -250,7 +254,8 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public List<TrainDetail> queryDetailByTrainId(String trainId){
-        return trainDetailRepository.findByTrainId(trainId);
+        List<TrainDetail> trainDetailList = trainDetailRepository.findByTrainId(trainId);
+        return trainDetailList;
     }
 
     public void saveSign(TrainDetailSign trainDetailSign){

@@ -115,6 +115,11 @@
                     <p:column headerText="培训地点">
                         <h:outputText value="#{item.trainLocation}"/>
                     </p:column>
+                    <p:column headerText="附件">
+                        <ui:repeat value="#{trainInSiteController.queryFileByDetailId(item.id)}" var="f" varStatus="status">
+                            <p:commandLink value="#{f.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(f.objectStorageId)}" styleClass="p-mr-2"/><br/>
+                        </ui:repeat>
+                    </p:column>
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareItemCreate}" update=":growl trainTab:detailEditDialog" oncomplete="PF('detailEditDialog').show()"  rendered="#{trainInSiteController.canEdit}"/>

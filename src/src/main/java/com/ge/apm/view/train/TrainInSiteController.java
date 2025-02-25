@@ -166,11 +166,13 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
 
     public void prepareItemEdit(){
         detailActionName = "Edit";
-        /*if(StrUtil.isEmpty(selectedTrainDetail.getDataStatus())) {
-            selectedTrainDetail.setDataStatus(TrainDetail.DataStatus.Original.name());
-        }*/
+
         blobObjectList = trainManageService.queryBlobByDetailId(selectedTrainDetail.getId());
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetail.getId());
+    }
+
+    public List<V2_BlobObject> queryFileByDetailId(String id ){
+        return trainManageService.queryBlobByDetailId(id);
     }
 
     public void deleteItem(){
