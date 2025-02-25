@@ -877,7 +877,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     public String netIncomeComputing(Map<String, String> data) {
-        String annualNetIncome=data.get("annualIncome");
+        String annualNetIncome=data.get("annualNetIncome");
         if(Objects.nonNull(annualNetIncome))
             return null;
         //年收入
