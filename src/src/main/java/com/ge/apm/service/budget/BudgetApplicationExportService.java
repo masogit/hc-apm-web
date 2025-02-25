@@ -4,14 +4,22 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.data.style.Style;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.bo.MaintenanceTemplate;
+import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
+import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
+import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
+import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.pm.PmPartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
@@ -307,21 +315,24 @@ public class BudgetApplicationExportService {
     }
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            //template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+//             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+//            template = XWPFTemplate.compile(inputStream);
+//            //template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        return  WordExportServiceUtil.generate(data, templateBytes, bindings);
     }
 
     private String buildFileName(Map<String, Object> data, boolean isEncoding,String orderType){

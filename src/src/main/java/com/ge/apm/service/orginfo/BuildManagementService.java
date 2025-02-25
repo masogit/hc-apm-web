@@ -13,6 +13,8 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.dto.BuildManagementExportDto;
+import com.ge.apm.service.EasyExcelExportUtil;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -329,9 +331,9 @@ public class BuildManagementService {
 
     public InputStream exportBuildManagement(TreeNode orgTree) throws IOException {
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
-        FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-
-        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
+        SystemTemplateService systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        byte[] stream = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT, user);
 //        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
 //        String[] columnKeys = doc.getKeyRow(0, 1);
 //        int startRow = 2;
@@ -354,20 +356,8 @@ public class BuildManagementService {
             }
         }
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(stream).build();
-            WriteSheet writeSheet = EasyExcel.writerSheet().build();
-            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
-            excelWriter.fill(buildManagementExportDtoList, fillConfig, writeSheet);
-            excelWriter.finish();
-
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
-
-            return byteArrayInputStream;
-        }catch (Exception e){
-            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
-        }
-        return  new ByteArrayInputStream(new byte[0]);
+        byte[] bytes = EasyExcelExportUtil.exportExcel(stream, buildManagementExportDtoList, new HashMap<>());
+        return new ByteArrayInputStream(bytes);
     }
 
 

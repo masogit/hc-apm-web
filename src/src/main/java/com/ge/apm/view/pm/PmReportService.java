@@ -5,6 +5,7 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
@@ -20,6 +21,7 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
@@ -27,6 +29,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
+import com.ge.apm.service.wo.doctemplate.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
@@ -629,18 +632,27 @@ public class PmReportService {
 //
 
 
-        Configure config = Configure.newBuilder()
-                .bind(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy())
-                .bind(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy())
-                .bind(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy())
-                .bind(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy())
-                .bind(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1))
-                .bind(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1))
-                .build();
-        XWPFTemplate template = XWPFTemplate.compile(rawTemplate, config);
-        template.render(datas);
-        template.write(out);
-        return out.toByteArray();
+//        Configure config = Configure.newBuilder()
+//                .bind(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy())
+//                .bind(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy())
+//                .bind(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy())
+//                .bind(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy())
+//                .bind(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1))
+//                .bind(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1))
+//                .build();
+//        XWPFTemplate template = XWPFTemplate.compile(rawTemplate, config);
+//        template.render(datas);
+//        template.write(out);
+//        return out.toByteArray();
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));
+        bindings.put(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1));
+        return  WordExportServiceUtil.generate(datas, IOUtils.toByteArray(rawTemplate), bindings);
     }
 
     public List<V2_WorkOrder_Detail> getAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {

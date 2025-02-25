@@ -40,7 +40,10 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 	public List<V2_BlobObject> findSomeTestRecords();
 
     public List<V2_BlobObject> findByBoUuidAndBoSubType(String boUuid, String boSubType);
-    
+
+    public List<V2_BlobObject> findByBoUuidAndBoType(String boUuid, String boSubType);
+
+
     @Query(value="select o.* from v2_blob_object o where o.id in ?1",nativeQuery=true)
 	public List<V2_BlobObject> fetchListByIds(Set<String> ids);
 	

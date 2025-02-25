@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
@@ -320,35 +321,25 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         map.put("totalPrice", totalPrice);
         map.put("sum", resultList.size());
         map.put("hospitalName", orgInfo.getName());
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(new ByteArrayInputStream(templateFileByte)).build();
-            WriteSheet writeSheet = EasyExcel.writerSheet().build();
-            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
-            excelWriter.fill(resultList, fillConfig, writeSheet);
-            excelWriter.fill(map, writeSheet);
-            excelWriter.finish();
 
+        byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, resultList, map);
+        excelFile = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
 
-//            ExcelWriter excelWriter = EasyExcel.write(baos, InventoryOrderDetail.class)
-//                    .withTemplate(new ByteArrayInputStream(templateFileByte))
-//                    .build();
+//        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+//            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(new ByteArrayInputStream(templateFileByte)).build();
 //            WriteSheet writeSheet = EasyExcel.writerSheet().build();
-//            excelWriter.write(resultList,writeSheet);
-//            List<Object> statisticsRow = new ArrayList<>(Collections.nCopies(InventoryOrderDetail.class.getDeclaredFields().length, null));
-//            statisticsRow.set(0, "总计:");
-//            statisticsRow.set(5, totalPrice);
-//
-//            statisticsRow.set(6, resultList.size());
-//
-//            excelWriter.write(Collections.singletonList(statisticsRow),writeSheet);
+//            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+//            excelWriter.fill(resultList, fillConfig, writeSheet);
+//            excelWriter.fill(map, writeSheet);
 //            excelWriter.finish();
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
-            excelFile = new DefaultStreamedContent(byteArrayInputStream, "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
-//            baos.close();
-//            byteArrayInputStream.close();
-        }catch (Exception e){
-            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
-        }
+//
+//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
+//            excelFile = new DefaultStreamedContent(byteArrayInputStream, "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
+////            baos.close();
+////            byteArrayInputStream.close();
+//        }catch (Exception e){
+//            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
+//        }
 
     }
 }
