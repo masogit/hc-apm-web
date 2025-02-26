@@ -159,6 +159,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         detailActionName = "Create";
         selectedTrainDetail = new TrainDetail();
         selectedTrainDetail.setTrainId(selected.getId());
+        selectedTrainDetail.setStatus(TrainDetail.Status.Planned.name());
         //selectedTrainDetail.setDataStatus(TrainDetail.DataStatus.Create.name());
         blobObjectList = new ArrayList<>();
         //selectedTrainDetail.setCreatedDate(new Date());
@@ -216,16 +217,22 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
                 }
             }
         }*/
-        selectedTrainDetail = new TrainDetail();
+        selectedTrainDetail = null;
 
     }
 
     public void completeDetail(){
         trainManageService.completeDetail(selectedTrainDetail, blobObjectList, selected,loginUser);
+        selectedTrainDetail = null;
     }
 
     public void cancelDetail(){
         trainManageService.cancelDetail(selectedTrainDetail, selected,loginUser);
+        selectedTrainDetail = null;
+    }
+
+    public void backDetail(){
+        selectedTrainDetail = null;
     }
 
     public void exportAll(){
