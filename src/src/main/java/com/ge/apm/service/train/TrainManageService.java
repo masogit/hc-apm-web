@@ -8,6 +8,7 @@ import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.domain.dto.TrainRoleDto;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -50,6 +51,12 @@ public class TrainManageService extends MicroServiceInvoker {
     @Autowired
     private TrainDetailSignRepository trainDetailSignRepository;
 
+    @Autowired
+    TenantInfoRepository tenantInfoRepository;
+
+    @Autowired
+    private UaaService uaaService;
+
     public List<OrgDto> onCreateInventory(){
 
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
@@ -59,19 +66,49 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public List<TrainRoleDto> queryTrainRole(UserAccount userAccount){
+        TenantInfo ti = tenantInfoRepository.findByuid(userAccount.getTenantUID());
         List<TrainRoleDto> trainRoleDtoList = new ArrayList<>();
         List<SysRole> sysRoleList = sysRoleRepository.find();
-        //List<CustomRole> customRoles = customRoleRepository.findByTenantUID(userAccount.getTenantUID());
-        sysRoleList.stream()
-                /*.filter(customRole -> customRole.getFunctionList() != null)
-                .filter(customRole -> customRole.getFunctionList().contains("TRAIN_MANAGE_VIEW"))*/
-                .forEach(s -> {
-                    TrainRoleDto trainRoleDto = new TrainRoleDto();
-                    trainRoleDto.setId(s.getId().toString());
-                    trainRoleDto.setRoleName(s.getRoleDesc());
-                    trainRoleDtoList.add(trainRoleDto);
-                });
-
+        List<SysRole> newRoles = sysRoleList.stream()
+                .filter(t -> {
+                    if(UserContextService.isOnlyLocalITAdmin()){
+                        if("ITAdmin".equals(t.getName())){
+                            return false;
+                        }
+                    }
+                    if(ti.getInsulate() == null || !ti.getInsulate()){
+                        if("LocalITAdmin".equals(t.getName())){
+                            return false;
+                        }
+                    }
+                    //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
+                    if(t.getName().equals("zkbDealerSales") || t.getName().equals("zkbDealerFE")){
+                        if(null != ti.getType() && ti.getType()!=3){
+                            return false;
+                        }
+                    }
+                    //如果是GE租户下放开产品超管和PM超管角色 别的租户看不到
+                    if(!"GE".equals(ti.getName())){
+                        if(t.getName().equals("ReviewSystemAdministrator")|| t.getName().equals("PMAdministrator")){
+                            return false;
+                        }
+                    }
+                    return true;
+                }).collect(Collectors.toList());
+        if (uaaService.isOpenNewMenuRoles(userAccount.getTenantUID())) {
+            Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(userAccount.getTenantUID());
+            Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(userAccount.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+            newRoles = newRoles.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+        }
+        newRoles.stream().forEach(s -> {
+            TrainRoleDto trainRoleDto = new TrainRoleDto();
+            trainRoleDto.setId(s.getId().toString());
+            trainRoleDto.setRoleName(s.getRoleDesc());
+            trainRoleDtoList.add(trainRoleDto);
+        });
+        /*List<CustomRole> customRoles = customRoleRepository.findByTenantUID(userAccount.getTenantUID());
+        .filter(customRole -> customRole.getFunctionList() != null)
+        .filter(customRole -> customRole.getFunctionList().contains("TRAIN_MANAGE_VIEW"))*/
         return trainRoleDtoList;
     }
 
@@ -147,6 +184,7 @@ public class TrainManageService extends MicroServiceInvoker {
         }else{
             trainDetail.setLastModifiedDate(new Date());
         }
+        trainDetail.setStatus(TrainDetail.Status.Planned.name());
         trainDetailRepository.save(trainDetail);
         for(V2_BlobObject blobObject : blobObjects){
             if(StrUtil.isEmpty(blobObject.getBoUuid())){
