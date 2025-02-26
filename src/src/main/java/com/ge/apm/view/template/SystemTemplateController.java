@@ -10,6 +10,7 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +23,6 @@ import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,12 +33,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.ActionListener;
-import javax.swing.text.StyledEditorKit;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @ManagedBean
 @ViewScoped
@@ -190,15 +187,15 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 
 
     public String getTemplateName(String code){
-        return SystemTemplate.SystemTemplateEnum.getName(code);
+        return SystemTemplateEnum.getName(code);
     }
 
     public String getBusinessName(String code){
-        return SystemTemplate.SystemTemplateBusinessEnum.getName(code);
+        return SystemTemplateEnum.SystemTemplateBusinessEnum.getName(code);
     }
 
-    public List<SystemTemplate.SystemTemplateBusinessEnum> getBusinessTypes(){
-       return Arrays.asList(SystemTemplate.SystemTemplateBusinessEnum.values());
+    public List<SystemTemplateEnum.SystemTemplateBusinessEnum> getBusinessTypes(){
+       return Arrays.asList(SystemTemplateEnum.SystemTemplateBusinessEnum.values());
     }
 
     public String getTenantName(String tenantUID) {
@@ -348,7 +345,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
     //处理当前组织如果是第一次添加子模板需要把他上级组织的模板添加到他的组织下面
     public void handlerSubSystemTemplate(){
         //修改为只处理到货安装的
-        if(!SystemTemplate.SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode().equals(selected.getTemplateType())){
+        if(!SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode().equals(selected.getTemplateType())){
             return;
         }
 

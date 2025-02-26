@@ -9,6 +9,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -70,6 +71,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private AdverseEventServiceClient adverseEventServiceClient;
     private ConfigCacheService configCacheService;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    private SystemTemplateService systemTemplateService;
     /*属性类*/
     static PageRequest pageRequest = new PageRequest(0, 1000);
     @Getter@Setter
@@ -131,6 +133,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private TenantInfoRepository tenantInfoRepository;
 
     String configItemValue;
+    
+    private UserAccount currentUser;
 
     @Getter@Setter
     private StreamedContent excelFile;
@@ -158,6 +162,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
@@ -169,9 +174,10 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selectedMap = new HashMap();
         injuryPerformance = new ArrayList<>();
         mechanicalFailure = new ArrayList<>();
+        currentUser = UserContextService.getCurrentUserAccount();
         /*初始化方法*/
-        //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", UserContextService.getCurrentUserAccount().getSiteUID());
-        configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "setAdverseEventProductType");
+        //configItemValue = configItemMapper.findByKey("setAdverseEventProductType", currentUser.getSiteUID());
+        configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(),currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "setAdverseEventProductType");
         configItemValue = StrUtil.isEmpty(configItemValue) ? "1" : configItemValue;
         loadAdverseEventById(selectedId);
         loadClinicalDeptList();
@@ -180,7 +186,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     public void loadAdverseEventById(String id) {
         if (StringUtils.isEmpty(id)) {
             this.selected = new AdverseEvents();
-            this.selected.setReporterName(UserContextService.getCurrentUserAccount().getName());
+            this.selected.setReporterName(currentUser.getName());
             this.selected.setReportDate(new Date());
             this.selected.setDepartment(selectSite.getUid());
             //发生地默认【境内】
@@ -211,9 +217,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public void loadUsePlace(){
-        String usePlaceConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(UserContextService.getCurrentUserAccount().getSiteUID(),UserContextService.getCurrentUserAccount().getHospitalUID(), UserContextService.getCurrentUserAccount().getInstitutionUID(), UserContextService.getCurrentUserAccount().getTenantUID(), "enableInsertUsePlace");
+        String usePlaceConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(),currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "enableInsertUsePlace");
         if(StrUtil.isNotEmpty(usePlaceConfigValue) && "true".equals(usePlaceConfigValue)){
-            TenantInfo tenantInfo = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(currentUser.getTenantUID());
             selected.setPlaceName(tenantInfo == null ? "" : tenantInfo.getName());
         }
     }
@@ -243,7 +249,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     }
 
     public void setUserSearchFilters() {
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         if (!ObjectUtils.isEmpty(selectSite)) {
@@ -665,7 +671,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     public boolean isWithdrawnButton(){
         String createUserUid = selected.getCreateUserUID();
-        String uid = UserContextService.getCurrentUserAccount().getUid();
+        String uid = currentUser.getUid();
         List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUidAndApprovalStatus(ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS, selected.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
         if(createUserUid.equals(uid)  &&  !CollectionUtils.isEmpty(multiLevelApprovals)  &&  multiLevelApprovals.size()==1 && multiLevelApprovals.get(0).getApprovalLevelNow()==1   && multiLevelApprovals.get(0).getInitiateApproverUid().equals(selected.getCreateUserUID()) ){
             return true;

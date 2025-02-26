@@ -1,5 +1,7 @@
 package com.ge.apm.domain;
 
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+
 import java.util.Arrays;
 
 public enum DownloadTemplateFileType {
@@ -45,40 +47,40 @@ public enum DownloadTemplateFileType {
      * 下载模板文件类型
      */
     DEFAULT(null, null),
-    CONTRACT(SystemTemplate.SystemTemplateEnum.CONTRACT, SystemTemplate.SystemTemplateEnum.CONTRACT_EN),
-    CONTRACT_ITEM(SystemTemplate.SystemTemplateEnum.CONTRACT_ITEM, SystemTemplate.SystemTemplateEnum.CONTRACT_ITEM),
+    CONTRACT(SystemTemplateEnum.CONTRACT, SystemTemplateEnum.CONTRACT_EN),
+    CONTRACT_ITEM(SystemTemplateEnum.CONTRACT_ITEM, SystemTemplateEnum.CONTRACT_ITEM),
 
 
-    SMALL_ASSET_PERFORMANCE(SystemTemplate.SystemTemplateEnum.SMALL_ASSET_PERFORMANCE, SystemTemplate.SystemTemplateEnum.SMALL_ASSET_PERFORMANCE),
-    SMALL_ASSET_PERFORMANCE_CONFIG(SystemTemplate.SystemTemplateEnum.SMALL_ASSET_PERFORMANCE_CONFIG, SystemTemplate.SystemTemplateEnum.SMALL_ASSET_PERFORMANCE_CONFIG),
-    ORG_INFO(SystemTemplate.SystemTemplateEnum.ORG_INFO, SystemTemplate.SystemTemplateEnum.ORG_INFO),
-    USER_ACCOUNT(SystemTemplate.SystemTemplateEnum.USER_ACCOUNT, SystemTemplate.SystemTemplateEnum.USER_ACCOUNT),
-    MEASURING_RESULT(SystemTemplate.SystemTemplateEnum.MEASURING_RESULT, SystemTemplate.SystemTemplateEnum.MEASURING_RESULT),
-    MEASURE_ELECTRIC_SAFETY(SystemTemplate.SystemTemplateEnum.MEASURE_ELECTRIC_SAFETY, SystemTemplate.SystemTemplateEnum.MEASURE_ELECTRIC_SAFETY),
-    MVS_CONTRACT(SystemTemplate.SystemTemplateEnum.MVS_CONTRACT, SystemTemplate.SystemTemplateEnum.MVS_CONTRACT),
-    MVS_SITE(SystemTemplate.SystemTemplateEnum.MVS_SITE, SystemTemplate.SystemTemplateEnum.MVS_SITE),
-    HIS_EQUIPMENT_CONNECT(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_CONNECT, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_CONNECT),
-    HIS_CLINICAL(SystemTemplate.SystemTemplateEnum.HIS_CLINICAL, SystemTemplate.SystemTemplateEnum.HIS_CLINICAL),
-    HIS_EQUIPMENT_SFXM(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_SFXM, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_SFXM),
-    HIS_EQUIPMENT_DATA_SOURCE(SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE, SystemTemplate.SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE),
-    SUPPLIER(SystemTemplate.SystemTemplateEnum.SUPPLIER, SystemTemplate.SystemTemplateEnum.SUPPLIER),
-    ARRIVAL_ITEM(SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM, SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM),
+    SMALL_ASSET_PERFORMANCE(SystemTemplateEnum.SMALL_ASSET_PERFORMANCE, SystemTemplateEnum.SMALL_ASSET_PERFORMANCE),
+    SMALL_ASSET_PERFORMANCE_CONFIG(SystemTemplateEnum.SMALL_ASSET_PERFORMANCE_CONFIG, SystemTemplateEnum.SMALL_ASSET_PERFORMANCE_CONFIG),
+    ORG_INFO(SystemTemplateEnum.ORG_INFO, SystemTemplateEnum.ORG_INFO),
+    USER_ACCOUNT(SystemTemplateEnum.USER_ACCOUNT, SystemTemplateEnum.USER_ACCOUNT),
+    MEASURING_RESULT(SystemTemplateEnum.MEASURING_RESULT, SystemTemplateEnum.MEASURING_RESULT),
+    MEASURE_ELECTRIC_SAFETY(SystemTemplateEnum.MEASURE_ELECTRIC_SAFETY, SystemTemplateEnum.MEASURE_ELECTRIC_SAFETY),
+    MVS_CONTRACT(SystemTemplateEnum.MVS_CONTRACT, SystemTemplateEnum.MVS_CONTRACT),
+    MVS_SITE(SystemTemplateEnum.MVS_SITE, SystemTemplateEnum.MVS_SITE),
+    HIS_EQUIPMENT_CONNECT(SystemTemplateEnum.HIS_EQUIPMENT_CONNECT, SystemTemplateEnum.HIS_EQUIPMENT_CONNECT),
+    HIS_CLINICAL(SystemTemplateEnum.HIS_CLINICAL, SystemTemplateEnum.HIS_CLINICAL),
+    HIS_EQUIPMENT_SFXM(SystemTemplateEnum.HIS_EQUIPMENT_SFXM, SystemTemplateEnum.HIS_EQUIPMENT_SFXM),
+    HIS_EQUIPMENT_DATA_SOURCE(SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE, SystemTemplateEnum.HIS_EQUIPMENT_DATA_SOURCE),
+    SUPPLIER(SystemTemplateEnum.SUPPLIER, SystemTemplateEnum.SUPPLIER),
+    ARRIVAL_ITEM(SystemTemplateEnum.ARRIVAL_ITEM, SystemTemplateEnum.ARRIVAL_ITEM),
 
-    ASSET_PURCHASE(SystemTemplate.SystemTemplateEnum.ASSET_PURCHASE, SystemTemplate.SystemTemplateEnum.ASSET_PURCHASE),
+    ASSET_PURCHASE(SystemTemplateEnum.ASSET_PURCHASE, SystemTemplateEnum.ASSET_PURCHASE),
 
     ;
 
-    private final SystemTemplate.SystemTemplateEnum enumZh;
-    private final SystemTemplate.SystemTemplateEnum enumEn;
+    private final SystemTemplateEnum enumZh;
+    private final SystemTemplateEnum enumEn;
 
 
-    DownloadTemplateFileType(SystemTemplate.SystemTemplateEnum enumZh, SystemTemplate.SystemTemplateEnum enumEn) {
+    DownloadTemplateFileType(SystemTemplateEnum enumZh, SystemTemplateEnum enumEn) {
         this.enumZh = enumZh;
         this.enumEn = enumEn;
     }
 
 
-    public static SystemTemplate.SystemTemplateEnum getSystemTemplate(String type, Boolean isLocal) {
+    public static SystemTemplateEnum getSystemTemplate(String type, Boolean isLocal) {
         DownloadTemplateFileType templateFileType = Arrays.stream(DownloadTemplateFileType.values()).filter(value -> value.name().equals(type)).findFirst().orElse(DownloadTemplateFileType.DEFAULT);
         return Boolean.TRUE.equals(isLocal) ? templateFileType.enumZh : templateFileType.enumEn;
     }

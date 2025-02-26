@@ -12,6 +12,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -37,7 +38,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -363,7 +363,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void exportAssetExcelTemplate() {
 //        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
-        InputStream resourceAsStream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BATCH_ASSET_TERMINATION.getCode(), SystemTemplate.SystemTemplateEnum.BATCH_ASSET_TERMINATION.getFileType());
+        InputStream resourceAsStream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.BATCH_ASSET_TERMINATION.getCode(), SystemTemplateEnum.BATCH_ASSET_TERMINATION.getFileType());
         assetTemplateFile = new DefaultStreamedContent(resourceAsStream, "application/vnd.ms-excel", "template.xlsx");
     }
 

@@ -6,8 +6,8 @@ import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
 
-import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -44,7 +43,7 @@ public class PmOrderImportService {
     public StreamedContent getWorkOrderTemplate() throws IOException {
 //        FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/pm/pmOrderReportTemplate/" + "PmOrderImport.xls")
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_IMPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_IMPORT.getFileType());
+        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.PM_ORDER_IMPORT.getCode(), SystemTemplateEnum.PM_ORDER_IMPORT.getFileType());
         DefaultStreamedContent ret= new DefaultStreamedContent(inputStream);
         ret.setName("PmOrderImport.xls");
         ret.setContentType("application/vnd.ms-excel");

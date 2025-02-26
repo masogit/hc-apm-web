@@ -2,13 +2,13 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ContractExportService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -73,7 +73,7 @@ public class ContractInfoExportController {
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/contract/contractExport/APM_Contract_Export_Template.xlsx");
 
-            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.CONTRACT_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.CONTRACT_EXPORT.getFileType());
+            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.CONTRACT_EXPORT.getCode(), SystemTemplateEnum.CONTRACT_EXPORT.getFileType());
 
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = contractExportService.exportData(doc, contractData, contractItemData);

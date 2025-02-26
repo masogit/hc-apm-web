@@ -1,7 +1,5 @@
 package com.ge.apm.service.asset;
 
-
-
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.policy.RenderPolicy;
@@ -12,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +57,7 @@ public class DepartmentConvertService {
         byte[] templateBytes = null;
 
         FileDownloadService   fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        templateBytes=fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getCode(), SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getFileType());
+        templateBytes=fileDownloadService.getTemplateFileByte(SystemTemplateEnum.DEPARTMENT_CONVERT.getCode(), SystemTemplateEnum.DEPARTMENT_CONVERT.getFileType());
 
         return templateBytes;
     }

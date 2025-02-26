@@ -1,7 +1,5 @@
 package com.ge.apm.service.simpleparts;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.simpleparts.*;
@@ -11,16 +9,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.service.WordExportServiceUtil;
-import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
-import com.ge.apm.service.asset.AssetScrapConvertRenderPolicy;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -31,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -519,7 +513,7 @@ public class SimplePartsRequestService {
 
 //        return IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(REPORT_OUT_BOUND_ORDER));
          FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        return fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getCode(), SystemTemplate.SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getFileType());
+        return fileDownloadService.getTemplateFileByte(SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getCode(), SystemTemplateEnum.PARTS_OUT_BOUND_ORDER.getFileType());
 
     }
 
