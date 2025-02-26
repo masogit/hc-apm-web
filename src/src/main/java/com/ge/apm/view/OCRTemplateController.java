@@ -220,13 +220,16 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     }
 
     public void handleFileUpload(FileUploadEvent event) {
-        previewResult = "";
-        String id = this.selected.getId();
-        UploadedFile file = event.getFile();
-        JSONObject jsonObject = templateService.readFileToObject(file,id);
-        previewResult=JSON.toJSONString(jsonObject,SerializerFeature.PrettyFormat);
-
-
+        try {
+            previewResult = "";
+            String id = this.selected.getId();
+            UploadedFile file = event.getFile();
+            JSONObject jsonObject = templateService.readFileToObject(file,id);
+            previewResult=JSON.toJSONString(jsonObject,SerializerFeature.PrettyFormat);
+        } catch (Exception e) {
+            e.printStackTrace();
+            previewResult = e.getMessage();
+        }
     }
 
     public String getPreviewResult() {

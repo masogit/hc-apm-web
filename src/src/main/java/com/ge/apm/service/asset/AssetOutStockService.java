@@ -5,9 +5,11 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.RenderData;
 import com.deepoove.poi.data.TableRenderData;
 import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.wo.doctemplate.*;
 import com.ge.apm.view.sysutil.FileDownloadService;
@@ -184,50 +186,58 @@ public class AssetOutStockService {
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
         byte[] bytes;
-        XWPFTemplate template = null;
-        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+//        XWPFTemplate template = null;
+//        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("list", new AssetOutStockTableRenderPolicy());
+//
+//
+//            Configure config = Configure.newBuilder()
+//                    .bind("list", new AssetOutStockTableRenderPolicy())
+//                    .build();
+//            template = XWPFTemplate.compile(inputStream, config);
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
 
-
-            Configure config = Configure.newBuilder()
-                    .bind("list", new AssetOutStockTableRenderPolicy())
-                    .build();
-            template = XWPFTemplate.compile(inputStream, config);
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("list", new AssetOutStockTableRenderPolicy());
+        return WordExportServiceUtil.generate(data, templateBytes, bindings);
     }
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes, String stockType) throws IOException {
         byte[] bytes;
-        XWPFTemplate template = null;
-        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("list", new AssetOutStockTableRenderPolicy(stockType));
+//        XWPFTemplate template = null;
+//        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("list", new AssetOutStockTableRenderPolicy(stockType));
+//
+//            Configure config = Configure.newBuilder()
+//                    .bind("list", new AssetOutStockTableRenderPolicy(stockType))
+//                    .build();
+//            template = XWPFTemplate.compile(inputStream, config);
+//
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
 
-            Configure config = Configure.newBuilder()
-                    .bind("list", new AssetOutStockTableRenderPolicy(stockType))
-                    .build();
-            template = XWPFTemplate.compile(inputStream, config);
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("list", new AssetOutStockTableRenderPolicy(stockType));
+        return WordExportServiceUtil.generate(data, templateBytes, bindings);
 
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
     }
 
     public String queryInStockNo(String preStr){
