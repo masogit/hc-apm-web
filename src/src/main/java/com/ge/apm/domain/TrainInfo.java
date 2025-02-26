@@ -60,6 +60,7 @@ public class TrainInfo implements Serializable {
 
     //培训科室
     @Column(name = "training_dept_uid")
+    @Size(max = 4000)
     private String trainingDeptUid;
 
     //培训科室数量
@@ -68,6 +69,7 @@ public class TrainInfo implements Serializable {
 
     //培训角色
     @Column(name = "training_role_uid")
+    @Size(max = 2000)
     private String trainingRoleUid;
 
     //培训人数

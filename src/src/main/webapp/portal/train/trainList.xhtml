@@ -31,7 +31,7 @@
                     </f:facet>
                     <h:outputText value="#{fieldMsg.fieldValue('trainType', item.trainType)}"/>
                 </p:column>
-                <p:column headerText="课程名称" filterBy="#{item.courseName}" filterMatchMode="EQ">
+                <p:column headerText="课程名称" filterBy="#{item.courseName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.courseName}"/>
                 </p:column>
                 <!--<p:column headerText="计划培训日期" filterBy="#{item.plannTrainDate}" filterMatchMode="GTE">
@@ -74,8 +74,8 @@
                 <f:facet name="{Toolbar}">
                     <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" actionListener="#{trainInSiteController.prepareCreate}" update="trainTab:trainInsiteListForm trainTab:createDialog" oncomplete="PF('createDialog').show()"/>
                     <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareEdit}"  update="trainTab:createDialog" disabled="#{empty trainInSiteController.selected}" oncomplete="PF('createDialog').show()"/>
-                    <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{trainInSiteController.exportAll}" icon="ui-icon-arrowstop-1-s">
-                        <p:fileDownload value="#{trainInSiteController.exportFile}"/>
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                        <p:dataExporter type="xls" target="datalist" fileName="Train_info_Export"/>
                     </p:commandButton>
                 </f:facet>
             </p:dataTable>
