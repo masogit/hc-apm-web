@@ -56,6 +56,8 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
 
     private String previewResult;
 
+    private String fileName;
+
     private static final double DEFAULT_WIDTH = 600.00;
     private static final double DEFAULT_HEIGHT = 850.00;
 
@@ -130,9 +132,9 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
             Double positionY = jsonObject.getDouble("PositionY");
             positionY = Objects.isNull(positionY)?0:positionY;
             Double widthItem = jsonObject.getDouble("Width");
-            widthItem = Objects.isNull(widthItem)?DEFAULT_WIDTH:widthItem;
+            widthItem = Objects.isNull(widthItem) || widthItem <=0 ?DEFAULT_WIDTH:widthItem;
             Double heightItem = jsonObject.getDouble("Height");
-            heightItem = Objects.isNull(heightItem)?DEFAULT_HEIGHT:heightItem;
+            heightItem = Objects.isNull(heightItem) || heightItem <=0 ? DEFAULT_HEIGHT:heightItem;
             List<Double[]> range = new ArrayList<>();
             Double[] topLeft = {positionX / DEFAULT_WIDTH,positionY / DEFAULT_HEIGHT};
             range.add(topLeft);
@@ -224,6 +226,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
             previewResult = "";
             String id = this.selected.getId();
             UploadedFile file = event.getFile();
+            fileName = file.getFileName();
             JSONObject jsonObject = templateService.readFileToObject(file,id);
             previewResult=JSON.toJSONString(jsonObject,SerializerFeature.PrettyFormat);
         } catch (Exception e) {
@@ -232,8 +235,17 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         }
     }
 
+    public void clearCache(){
+        previewResult = "";
+        fileName = "";
+    }
+
     public String getPreviewResult() {
         return previewResult;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
 }
