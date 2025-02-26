@@ -16,6 +16,7 @@ import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -122,18 +123,18 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (userContextService.isCountyArea()) {
             if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template.xlsx";
-                templateType=SystemTemplate.SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE.getCode();
+                templateType = SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE.getCode();
             } else {
                 fileName = "APM_Asset_Dynamic_CountryArea_Template_en.xlsx";
-                templateType=SystemTemplate.SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE_EN.getCode();
+                templateType = SystemTemplateEnum.ASSET_COUNTRYAREA_TEMPLATE_EN.getCode();
             }
         } else {
             if (userContextService.isLocale()) {
                 fileName = "APM_Asset_Dynamic_Template.xlsx";
-                templateType=SystemTemplate.SystemTemplateEnum.ASSET_TEMPLATE.getCode();
+                templateType = SystemTemplateEnum.ASSET_TEMPLATE.getCode();
             } else {
                 fileName = "APM_Asset_Dynamic_Template_en.xlsx";
-                templateType=SystemTemplate.SystemTemplateEnum.ASSET_TEMPLATE_EN.getCode();
+                templateType = SystemTemplateEnum.ASSET_TEMPLATE_EN.getCode();
             }
         }
 

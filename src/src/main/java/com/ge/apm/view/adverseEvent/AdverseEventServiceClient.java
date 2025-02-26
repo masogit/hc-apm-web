@@ -6,9 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TempFileUtil;
-import org.apache.regexp.RE;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,12 +27,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import webapp.framework.dao.SearchFilter;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
 public class AdverseEventServiceClient extends MicroServiceInvoker {
     @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private SystemTemplateService systemTemplateService;
 
     public AdverseEvents tempSaveAdverseEvents(String token, AdverseEvents adverseEvents) throws RuntimeException{
         HttpEntity<AdverseEvents> requestEntity = new HttpEntity<>(adverseEvents, createHttpHeaders(token));
@@ -164,9 +169,11 @@ public class AdverseEventServiceClient extends MicroServiceInvoker {
         }
     }
 
-    public TempFileUtil downLoadPdf(String token, String[] workOrderNums) {
+    public TempFileUtil downLoadPdf(String token, String[] workOrderNums) throws IOException {
+        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.ADVERSE_EVENT_BATH_EXPORT_PDF, UserContextService.getCurrentUserAccount());
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("workOrderNums", workOrderNums);
+        jsonObject.put("templateFileByte", templateFileByte);
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(jsonObject, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ADVERSE_EVENTS_EXPORT_PDF);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);

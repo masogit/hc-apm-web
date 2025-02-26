@@ -9,6 +9,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -58,7 +59,7 @@ public class BudgetFileDynamicTemplate  {
 //        String fileName = "Budget_Import_Template.xlsx";
 //        InputStream inputStream = BudgetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUDGET_IMPORT.getCode(), SystemTemplate.SystemTemplateEnum.BUDGET_IMPORT.getFileType());
+        InputStream inputStream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.BUDGET_IMPORT.getCode(), SystemTemplateEnum.BUDGET_IMPORT.getFileType());
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         budgetSheet = workBook.getSheet(SHEET_BUDGET);

@@ -20,6 +20,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -458,7 +459,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         }
 //        InputStream stream = SupplierController.class.getClassLoader().getResourceAsStream("template/APM_Supplier.xlsx");
 
-        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.SUPPLIER.getCode(), SystemTemplate.SystemTemplateEnum.SUPPLIER.getFileType());
+        InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.SUPPLIER.getCode(), SystemTemplateEnum.SUPPLIER.getFileType());
 
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);

@@ -1,7 +1,5 @@
 package com.ge.apm.service.asset;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
@@ -9,10 +7,10 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.*;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -301,7 +298,7 @@ public class AssetInstallationReportService {
 
         byte[] templateBytes = null;
         String templatePath = null;
-        SystemTemplate.SystemTemplateEnum systemTemplateEnum = null;
+        SystemTemplateEnum systemTemplateEnum = null;
 //        if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){
 //            templatePath = REPORT_TECHNOLOGY_TEMPLATE;
 //            systemTemplateEnum= SystemTemplate.SystemTemplateEnum.TECHNOLOGY;

@@ -13,6 +13,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -252,7 +253,7 @@ public class MaintainHistoryController {
         }
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.xlsx");
-            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getCode(), SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getFileType());
+            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getCode(), SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getFileType());
 
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             byte[] result = nurseSiteMaintainService.writeMaintainDetailToExcel(doc, new ArrayList<NurseSiteMaintainHistory>(listMaintainData));
@@ -273,7 +274,7 @@ public class MaintainHistoryController {
         }
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.xlsx");
-            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getCode(), SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getFileType());
+            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getCode(), SystemTemplateEnum.NURSE_SITE_MAINTAIN_DETAIL.getFileType());
 
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             byte[] result = nurseSiteMaintainService.writeMaintainDetailToExcel(doc, selectedListMaintain);
@@ -340,7 +341,7 @@ public class MaintainHistoryController {
     private void downloadFile(List<Map<String, Object>> data) {
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintain_Template.xlsx");
-            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN.getCode(), SystemTemplate.SystemTemplateEnum.NURSE_SITE_MAINTAIN.getFileType());
+            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.NURSE_SITE_MAINTAIN.getCode(), SystemTemplateEnum.NURSE_SITE_MAINTAIN.getFileType());
 
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = nurseSiteMaintainService.exportData(doc, data);

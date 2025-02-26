@@ -1,6 +1,5 @@
 package com.ge.apm.view.asset;
 
-import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -17,9 +16,9 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.view.asset.components.BatchRiskAssessment;
-import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import lombok.*;
 import org.apache.commons.lang3.BooleanUtils;
@@ -44,7 +43,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
 import java.util.*;
@@ -508,7 +506,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         });
 //        FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/riskAssessment/assetRiskAssessment.docx")
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT, currentUserAccount);
+        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.ASSET_RISK_ASSESSMENT, currentUserAccount);
 
 //        XWPFTemplate doc = XWPFTemplate.compile(inputStream);
         if (!CollectionUtils.isEmpty(assetInfos) && assetInfos.size() == 1) {
