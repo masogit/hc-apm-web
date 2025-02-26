@@ -18,13 +18,17 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.template}#{msg.type}</label>
-                    <p:selectOneMenu disabled="true" value="#{ocrTemplateController.thisTemplate.type}" required="true" requiredMessage="#{msg.template}#{msg.type}不能为空">
+                    <p:selectOneMenu disabled="true" value="#{ocrTemplateController.selected.type}" required="true" requiredMessage="#{msg.template}#{msg.type}不能为空">
                         <f:selectItems value="#{ocrTemplateController.fieldsMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
                     <p:fileUpload allowTypes="/(\.|\/)(pdf|jpeg|jpg|png)$/" fileUploadListener="#{ocrTemplateController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                  multiple="false" sizeLimit="20000000" update="previewResult" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}20M"  label="#{msg.Add}"  />
+                                  multiple="false" sizeLimit="20000000" update="previewResult fileName" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}20M"  label="#{msg.Add}"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">文件名</label>
+                    <h:outputText id="fileName" value="#{ocrTemplateController.fileName}"/>
                 </h:panelGroup>
             </p:panelGrid>
             <h:panelGrid columns="1" layout="grid" >
