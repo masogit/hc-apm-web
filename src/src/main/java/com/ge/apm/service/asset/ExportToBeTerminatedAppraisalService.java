@@ -182,19 +182,19 @@ public class ExportToBeTerminatedAppraisalService {
         }
     }
 
-    private byte[] generate( Map<String, Object> map, byte[] templateBytes) {
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-        template.render(map);
-        try {
-            template.write(out);
-        } catch (IOException e) {
-            logger.error("报废鉴定报导出失败 generate error:", e);
-            return new byte[0];
-        }
-        return out.toByteArray();
-    }
+//    private byte[] generate( Map<String, Object> map, byte[] templateBytes) {
+//
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        XWPFTemplate template = (new ByteArrayInputStream(templateBytes));
+//        template.render(map);
+//        try {
+//            template.write(out);
+//        } catch (IOException e) {
+//            logger.error("报废鉴定报导出失败 generate error:", e);
+//            return new byte[0];
+//        }
+//        return out.toByteArray();
+//    }
     public Map<String, Object> getData(List<String> selectedIds,boolean single) {
         Map<String, Object> datas = new HashMap<>();
         Set<String> departmentName = new HashSet<>();

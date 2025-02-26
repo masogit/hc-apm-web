@@ -1,8 +1,7 @@
 package com.ge.apm.service.asset;
 
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
+
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.policy.RenderPolicy;
@@ -10,15 +9,8 @@ import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.bo.MaintenanceTemplate;
-import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
-import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
-import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
-import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
-import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemTableRenderPolicy;
-import com.ge.apm.view.pm.PmPartsPictureTableRenderPolicy;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
@@ -28,14 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import webapp.framework.context.LocaleHolder;
+
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,27 +97,8 @@ public class DepartmentConvertService {
 
     private byte[] generate(AssetDepartmentConvert assetDepartmentConvert, byte[] templateBytes) {
         Map<String, Object> datas = getData(assetDepartmentConvert);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-//        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-//        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
-
-//
-//        Configure config = Configure.newBuilder()
-//                .bind("list", new DepartmentConvertRenderPolicy())
-//                .build();
-//        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
-//        template.render(datas);
-//        try {
-//            template.write(out);
-//        } catch (IOException e) {
-//            logger.error("调拨单导出失败 generate error:", e);
-//            return null;
-//        }
-//        return out.toByteArray();
-
         Map<String, RenderPolicy> bindings = new HashMap<>();
         bindings.put("list", new DepartmentConvertRenderPolicy());
-
         return  WordExportServiceUtil.generate(datas,templateBytes, bindings);
     }
 

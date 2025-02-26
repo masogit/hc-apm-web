@@ -159,26 +159,26 @@ public class ExportTerminatedAppraisalService {
         return data;
     }
 
-    private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
-        Map<String, Object> datas = getData(assetInfo);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-//        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-//        template.registerPolicy("list", new AssetScrapConvertRenderPolicy());
-
-        Configure config = Configure.newBuilder()
-                .bind("list", new AssetScrapConvertRenderPolicy())
-                .build();
-        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
-
-        template.render(datas);
-        try {
-            template.write(out);
-        } catch (IOException e) {
-            logger.error("报废鉴定报导出失败 generate error:", e);
-            return new byte[0];
-        }
-        return out.toByteArray();
-    }
+//    private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
+//        Map<String, Object> datas = getData(assetInfo);
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+////        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+////        template.registerPolicy("list", new AssetScrapConvertRenderPolicy());
+//
+//        Configure config = Configure.newBuilder()
+//                .bind("list", new AssetScrapConvertRenderPolicy())
+//                .build();
+//        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
+//
+//        template.render(datas);
+//        try {
+//            template.write(out);
+//        } catch (IOException e) {
+//            logger.error("报废鉴定报导出失败 generate error:", e);
+//            return new byte[0];
+//        }
+//        return out.toByteArray();
+//    }
 
     public Map<String, Object> getData(AssetInfo assetInfo) {
         Map<String, Object> map = new HashMap<>();
