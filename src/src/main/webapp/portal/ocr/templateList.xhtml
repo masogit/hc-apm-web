@@ -63,7 +63,7 @@
                             <p:commandButton id="deleteButton" icon="ui-icon ui-icon-delete" actionListener="#{ocrTemplateController.delete()}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":templateListForm"  disabled="#{empty ocrTemplateController.selected}" >
                                 <p:confirm header="删除-#{item.name}" message="您确认要删除选中的配置吗？" icon="ui-icon-warning"/>
                             </p:commandButton>
-                            <p:commandButton id="testButton" title="测试" icon="ui-icon ui-icon-wifi-tethering" update=":ocrPreviewedDlg"  class="btn btn-sm btn-gray" oncomplete="PF('ocrPreviewedDlg').show()" disabled="#{empty ocrTemplateController.selected}" />
+                            <p:commandButton id="testButton" title="嗅探测试" icon="ui-icon ui-icon-wifi-tethering" action="#{ocrTemplateController.clearCache}" update=":ocrPreviewedDlg"  class="btn btn-sm btn-gray" oncomplete="PF('ocrPreviewedDlg').show()" disabled="#{empty ocrTemplateController.selected}" />
                         </f:facet>
                     </p:dataTable>
                 </h:form>
