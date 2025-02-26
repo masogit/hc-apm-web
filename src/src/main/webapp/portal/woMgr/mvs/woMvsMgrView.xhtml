@@ -16,107 +16,114 @@
             <h:form id="woMvsMgrDetailForm">
                 <p:fieldset legend="#{msg.RequestWorkorder} (#{fieldMsg.fieldValue('casePriority',workOrderMgrMvsController.selected.serviceRequest.casePriority)})" rendered="#{not empty workOrderMgrMvsController.selected}">
 
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
-                            <label class="label">#{msg.assetName}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.assetInfo.name}" />
-                        </h:panelGroup>
+                    <div class="ui-g">
+                        <div class="ui-g-10 ui-g-nopad">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetName}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.assetInfo.name}" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                                    <label class="label">#{msg.MVSContractStartDate}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.getMvsContract(workOrderMgrMvsController.selected.assetInfo.id).contractStartDate}" />
 
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                                    <label class="label">#{msg.MVSContractEndDate}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.getMvsContract(workOrderMgrMvsController.selected.assetInfo.id).contractEndDate}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.departNum}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.assetInfo.departNum}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.srNum}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.srNum}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.requestorName}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestorName}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.requestTime}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestTime}" >
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                    </p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetLocation}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.assetLocation}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.requestReason}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestReason}" style="word-wrap: break-word;"/>
+                                </h:panelGroup>
+                                <h:panelGroup id="assetstatus" class="updateDownTime">
+                                    <label class="label">#{msg.status}</label>
+                                    <p:selectOneRadio id="status" value="#{workOrderMgrMvsController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{workOrderMgrMvsController.currentStatus ne 3}">
+                                        <p:ajax  listener="#{workOrderMgrMvsController.onStatusChange()}"  update="assetstatus" />
 
-                        <h:panelGroup rendered="#{workOrderMgrMvsController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
-                            <label class="label">#{msg.MVSContractStartDate}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.getMvsContract(workOrderMgrMvsController.selected.assetInfo.id).contractStartDate}" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrMvsController.selected.serviceRequest.status ne 1}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrMvsController.selected.serviceRequest.status ne 1 or !assetInfoEditController.hasScrappedAuthority()}"/>
 
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrMvsController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
-                            <label class="label">#{msg.MVSContractEndDate}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.getMvsContract(workOrderMgrMvsController.selected.assetInfo.id).contractEndDate}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.departNum}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.assetInfo.departNum}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.srNum}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.srNum}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestorName}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestorName}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestTime}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestTime}" >
-                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.assetLocation}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.assetLocation}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestReason}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.requestReason}" style="word-wrap: break-word;"/>
-                        </h:panelGroup>
-                        <h:panelGroup id="assetstatus" class="updateDownTime">
-                            <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{workOrderMgrMvsController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{workOrderMgrMvsController.currentStatus ne 3}">
-                                <p:ajax  listener="#{workOrderMgrMvsController.onStatusChange()}"  update="assetstatus" />
+                                    </p:selectOneRadio>
+                                    <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrMvsController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrMvsController.confirmedDownTime}" showOn="button"
+                                                readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                                    <p:commandButton value="#{msg.UpdateShutdownTime}" rendered="#{workOrderMgrMvsController.needConfirmTime}" actionListener="#{workOrderMgrMvsController.updateDownTime}" process="@(.updateDownTime)" update="assetstatus showDownTime"/>
+                                </h:panelGroup>
+                                <h:panelGroup id="showDownTime">
+                                    <label class="label">#{msg.confirmedDownTime}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.confirmedDownTime}" >
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                    </p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.UpTimeExcel}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.confirmedUpTime}" >
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                    </p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.equipmentTaker}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.equipmentTaker}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.PickUpTime}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.takeTime}" >
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                                    </p:outputLabel>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.status eq 3}">
+                                    <label class="label">#{msg.Cancelor}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.cancelPerson}" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.status eq 3}">
+                                    <label class="label">#{msg.cancelWorkOrderReason}</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.cancelReason}" style="word-wrap: break-word;"/>
+                                </h:panelGroup>
 
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrMvsController.selected.serviceRequest.status ne 1}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrMvsController.selected.serviceRequest.status ne 1 or !assetInfoEditController.hasScrappedAuthority()}"/>
-
-                            </p:selectOneRadio>
-                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrMvsController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrMvsController.confirmedDownTime}" showOn="button"
-                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
-                            <p:commandButton value="#{msg.UpdateShutdownTime}" rendered="#{workOrderMgrMvsController.needConfirmTime}" actionListener="#{workOrderMgrMvsController.updateDownTime}" process="@(.updateDownTime)" update="assetstatus showDownTime"/>
-                        </h:panelGroup>
-                        <h:panelGroup id="showDownTime">
-                            <label class="label">#{msg.confirmedDownTime}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.confirmedDownTime}" >
-                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.UpTimeExcel}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.confirmedUpTime}" >
-                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.equipmentTaker}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.equipmentTaker}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.PickUpTime}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.takeTime}" >
-                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.status eq 3}">
-                            <label class="label">#{msg.Cancelor}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.cancelPerson}" />
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.status eq 3}">
-                            <label class="label">#{msg.cancelWorkOrderReason}</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.cancelReason}" style="word-wrap: break-word;"/>
-                        </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">医院客户姓名</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerName}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">医院客户电话</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerTel}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">医院客户职务</label>
-                            <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerPosition}" />
-                        </h:panelGroup>
-                    </p:panelGrid>
-
+                                <h:panelGroup>
+                                    <label class="label">医院客户姓名</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerName}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">医院客户电话</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerTel}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">医院客户职务</label>
+                                    <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.customerPosition}" />
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <div class="ui-g-2">
+                            <h:outputText value="验收人签名：" />
+                            <div class="container-fluid" style="height: 200px; width: 200px;">
+                                <p:graphicImage value="#{fileDownloadService.getFile(workOrderMgrMvsController.selected.ackSignature)}" stream="false" style="max-width: 100%;height: auto"/>
+                            </div>
+                        </div>
+                    </div>
                     <p:fieldset legend="#{msg.RequestImage}" toggleable="false" rendered="#{not empty workOrderMgrMvsController.getPicListByBoType('ServiceRequest')}">
                         <p:dataGrid id="requestImage" var="picItem" value="#{workOrderMgrMvsController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid"  rendered="#{not empty workOrderMgrMvsController.getPicListByBoType('ServiceRequest')}">
 
