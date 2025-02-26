@@ -52,6 +52,10 @@
             <result property="customerPosition" column="sr_customer_position"/>
             <result property="status" column="sr_status"/>
         </association>
+        <collection property="v2_workOrder_detail_list" ofType="com.ge.apm.domain.V2_WorkOrder_Detail">
+            <id property="id" column="step_id"/>
+            <result property="woId" column="wo_id"/>
+        </collection>
     </resultMap>
     <select id="loadData" resultMap="v2_WorkOrderMap">
         SELECT T.*,
@@ -89,6 +93,7 @@
         LEFT JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid
         LEFT JOIN mvs_ib_mapping m2 ON T.asset_uid = m2.e_home_ib_uid AND m1.ib_id IS NULL
         LEFT JOIN asset_info a ON COALESCE(m1.ib_id, m2.ib_id) = a.id
+        LEFT JOIN v2_work_order_detail ws ON T.id = ws.wo_id
         WHERE 1=1
         <if test="srNum != null">
             and vs.sr_Num like concat('%', #{srNum}, '%')
