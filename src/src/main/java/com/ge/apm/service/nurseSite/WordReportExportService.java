@@ -7,11 +7,14 @@ import com.alibaba.fastjson.TypeReference;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.ArrivalItemTableRenderPolicy;
+import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -612,30 +615,9 @@ public class WordReportExportService {
     }
 
     public byte[] export(byte[] templateBytes, Map<String, Object> datas) {
-        XWPFTemplate template = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-//            template.registerPolicy("tables", new AssetCheckTableRenderPolicy());
-
-            Configure config = Configure.newBuilder()
-                    .bind("tables", new AssetCheckTableRenderPolicy())
-                    .build();
-            template = XWPFTemplate.compile(inputStream, config);
-            template.render(datas);
-            template.write(out);
-            return out.toByteArray();
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception ignore) {
-
-            }
-        }
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("tables", new AssetCheckTableRenderPolicy());
+        return WordExportServiceUtil.generate(datas, templateBytes, bindings);
     }
 
     private class AssetCheckTableRenderPolicy extends DynamicTableRenderPolicy {

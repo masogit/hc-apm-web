@@ -2,20 +2,21 @@ package com.ge.apm.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -23,6 +24,9 @@ import java.util.Map;
 public class OCRTemplateService extends MicroServiceInvoker {
 
     Logger logger = LoggerFactory.getLogger(OCRTemplateService.class);
+
+    @Autowired
+    private FileScanService fileScanService;
 
     public JSONObject readFileToObject(UploadedFile uploadedFile,String id){
         File file = null;
@@ -46,7 +50,7 @@ public class OCRTemplateService extends MicroServiceInvoker {
             }
             ResponseEntity<JSONObject> response = template.exchange(url,HttpMethod.POST, requestEntity, JSONObject.class);
             return response.getBody();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }finally {
@@ -56,20 +60,10 @@ public class OCRTemplateService extends MicroServiceInvoker {
         }
     }
 
-    public static File getFile(UploadedFile file) throws IOException {
-        String path= System.getProperty("user.dir");
-        File tempFile = new File(path + File.separator +file.getFileName());
-        if(tempFile.exists()){
-            tempFile.delete();
-        }
-        tempFile.createNewFile();
-        byte[] bytes = file.getContents();
-        try(FileOutputStream outputStream = new FileOutputStream(tempFile)){
-            outputStream.write(bytes);
-            outputStream.flush();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+    public  File getFile(UploadedFile file) throws Exception {
+        String fileName = fileScanService.saveUploadedFile(file);
+        if(StringUtils.isEmpty(fileName)) return  null;
+        File tempFile = new File(fileName);
         return tempFile;
     }
 }
