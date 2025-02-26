@@ -6,6 +6,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 
 public interface TrainInfoRepository extends GenericRepositoryUUID<TrainInfo> {
 
-    @Query("select max(p.partOrderIndex) from ZkbPartOrder p where p.partOrderNo like ?1")
+    @Query("select max(p.courseNo) from TrainInfo p where p.courseNo like ?1")
     Object queryMaxCourseNo(String preCourseNo);
 }
