@@ -2,8 +2,11 @@ package com.ge.apm.service.sparepart;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.StockRecord;
+import com.ge.apm.service.WordExportServiceUtil;
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemTableRenderPolicy;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
@@ -52,40 +55,50 @@ public class SparePartStockRecordService {
 
     public byte[] generateFile(List<StockRecord> list, byte[] templateBytes, Integer recordType) throws IOException {
         Map<String, Object> data = mapData(list);
-        byte[] bytes;
-        XWPFTemplate template = null;
-        Configure config=null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-//            template = XWPFTemplate.compile(inputStream);
-            if(1 == recordType){
-//                template.registerPolicy("parts_table", new InboundPartOrderTableRenderPolicy());
-                config=  Configure.newBuilder()
-                        .bind("parts_table", new InboundPartOrderTableRenderPolicy())
-                        .build();
-            }else if(2 == recordType){
-//                template.registerPolicy("parts_table", new OutboundPartOrderTableRenderPolicy());
-
-                config=  Configure.newBuilder()
-                        .bind("parts_table", new OutboundPartOrderTableRenderPolicy())
-                        .build();
-            }
-
-
-            template = XWPFTemplate.compile(inputStream, config);
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception e) {
-                logger.error("设备出入库单导出，IO关闭异常", e);
-            }
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        if(1 == recordType){
+            bindings.put("parts_table", new InboundPartOrderTableRenderPolicy());
+        }else if(2 == recordType){
+            bindings.put("parts_table",  new OutboundPartOrderTableRenderPolicy());
         }
-        return bytes;
+        return WordExportServiceUtil.generate(data, templateBytes, bindings);
+
+
+//
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        Configure config=null;
+//        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+//             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+////            template = XWPFTemplate.compile(inputStream);
+//            if(1 == recordType){
+////                template.registerPolicy("parts_table", new InboundPartOrderTableRenderPolicy());
+//                config=  Configure.newBuilder()
+//                        .bind("parts_table", new InboundPartOrderTableRenderPolicy())
+//                        .build();
+//            }else if(2 == recordType){
+////                template.registerPolicy("parts_table", new OutboundPartOrderTableRenderPolicy());
+//
+//                config=  Configure.newBuilder()
+//                        .bind("parts_table", new OutboundPartOrderTableRenderPolicy())
+//                        .build();
+//            }
+//
+//
+//            template = XWPFTemplate.compile(inputStream, config);
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        } finally {
+//            try {
+//                if (template != null) {
+//                    template.close();
+//                }
+//            } catch (Exception e) {
+//                logger.error("设备出入库单导出，IO关闭异常", e);
+//            }
+//        }
+//        return bytes;
     }
 
     private Map<String, Object> mapData(List<StockRecord> list){

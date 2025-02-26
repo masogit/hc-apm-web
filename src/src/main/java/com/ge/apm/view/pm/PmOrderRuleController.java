@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
@@ -84,6 +85,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private Map<String, Boolean> selectedMap;
     private List<PmOrderRule> currentPageAssets;
 
+    private SystemTemplateService systemTemplateService;
+
     @Override
     protected void init() {
         filterBySite = false;
@@ -106,6 +109,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
@@ -712,14 +716,16 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
     public void generateReportTemplateFile() throws IOException{
-        String fileName = "maintenance-template.docx";
-        if (isLocale()){
-            fileName = "maintenance-template_zh.docx";
-        } else {
-            fileName = "maintenance-template_en.docx";
+//        String fileName = "maintenance-template.docx";
+//        if (isLocale()){
+//            fileName = "maintenance-template_zh.docx";
+//        } else {
+//            fileName = "maintenance-template_en.docx";
+//
+//        }
+//        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
+        InputStream stream = systemTemplateService.getTemplateInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
 
-        }
-        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
 
         try {
             InputStream doc = pmOrderReportTemplateService.generateReportTemplateByRule(stream, selected);

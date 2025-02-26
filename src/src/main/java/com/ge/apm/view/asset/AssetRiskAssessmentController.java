@@ -4,16 +4,15 @@ import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SystemTemplate;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetLifecyleService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.MessageUtil;
@@ -122,12 +121,12 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     @Getter@Setter
     private String assetName; //设备名称
 
-    private FileDownloadService fileDownloadService;
+    private SystemTemplateService systemTemplateService;
 
     @Override
     protected void init() {
         /*接口类*/
-        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
@@ -508,28 +507,33 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             dataMaps.put(key + ".docx", buildWordTitle(val));
         });
 //        FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/riskAssessment/assetRiskAssessment.docx")
-        InputStream inputStream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT.getCode(), SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT.getFileType());
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.ASSET_RISK_ASSESSMENT, currentUserAccount);
 
-        XWPFTemplate doc = XWPFTemplate.compile(inputStream);
+//        XWPFTemplate doc = XWPFTemplate.compile(inputStream);
         if (!CollectionUtils.isEmpty(assetInfos) && assetInfos.size() == 1) {
             dataMaps.forEach((key, val) -> {
-                try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-                    doc.render(val);
-                    doc.write(outStream);
-                    zipFile = new DefaultStreamedContent(new ByteArrayInputStream(outStream.toByteArray()), "application/docx", key);
-                } catch (IOException e) {
-                    return;
-                }
+                byte[] generate = WordExportServiceUtil.generate(val, templateFileByte, new HashMap<>());
+                zipFile = new DefaultStreamedContent(new ByteArrayInputStream(generate), "application/docx", key);
+//                try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+//                    doc.render(val);
+//                    doc.write(outStream);
+//                    zipFile = new DefaultStreamedContent(new ByteArrayInputStream(outStream.toByteArray()), "application/docx", key);
+//                } catch (IOException e) {
+//                    return;
+//                }
             });
         } else if (!CollectionUtils.isEmpty(assetInfos) && assetInfos.size() > 1){
             dataMaps.forEach((key, val) -> {
-                doc.render(val);
-                try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()){
-                    doc.write(outStream);
-                    expr.put(key, outStream.toByteArray());
-                } catch (IOException e) {
-                    return;
-                }
+                byte[] generate = WordExportServiceUtil.generate(val, templateFileByte, new HashMap<>());
+                expr.put(key, generate);
+//                doc.render(val);
+//                try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()){
+//                    doc.write(outStream);
+//                    expr.put(key, outStream.toByteArray());
+//                } catch (IOException e) {
+//                    return;
+//                }
             });
             byte[] result = exportService.docxZip(expr);
             if (result != null) {
