@@ -57,6 +57,9 @@ public class TrainManageService extends MicroServiceInvoker {
     @Autowired
     private UaaService uaaService;
 
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
     public List<OrgDto> onCreateInventory(){
 
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
@@ -253,7 +256,7 @@ public class TrainManageService extends MicroServiceInvoker {
         StringBuilder sb = new StringBuilder();
         String pre = DateUtil.format(new Date(), "yyyyMMdd");
         sb.append(pre);
-        Object object = trainInfoRepository.queryMaxCourseNo(pre);
+        Object object = trainInfoRepository.queryMaxCourseNo(pre+"%");
         if(object == null){
             sb.append("001");
         }else{
@@ -293,7 +296,20 @@ public class TrainManageService extends MicroServiceInvoker {
 
     public List<TrainDetail> queryDetailByTrainId(String trainId){
         List<TrainDetail> trainDetailList = trainDetailRepository.findByTrainId(trainId);
+        for(TrainDetail td :trainDetailList){
+            List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.findByBoUuid(td.getId());
+            td.setBlobObjectList(v2_blobObjectList);
+        }
         return trainDetailList;
+    }
+
+    public Integer queryUserCountByRoles(List<String> roles, List<String> deptUid){
+        if(CollectionUtils.isEmpty(roles)){
+            return 0;
+        }
+        List<Integer> ids = roles.stream().map(t -> Integer.parseInt(t)).collect(Collectors.toList());
+        List<UserAccount> userAccountList = userAccountRepository.findBySiteUidAndRoleNames(ids, deptUid);
+        return userAccountList.size();
     }
 
     public void saveSign(TrainDetailSign trainDetailSign){

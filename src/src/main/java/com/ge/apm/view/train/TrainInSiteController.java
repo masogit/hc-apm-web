@@ -148,11 +148,25 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         }
     }
 
+    public void roleChange(){
+        if(CollectionUtils.isEmpty(selectedRoleId)){
+            return;
+        }
+        if(CollectionUtils.isEmpty(selectedOrgUid)){
+            return;
+        }
+        Integer i = trainManageService.queryUserCountByRoles(selectedRoleId, selectedOrgUid);
+        selected.setTrainingPeopleCount(i);
+    }
+
     public void saveData(){
         if(!trainManageService.saveCheck(selected, trainDetailList)){
             return;
         }
         trainManageService.save(selected, loginUser, selectedOrgUid, selectedRoleId);
+        selected = null;
+        selectedOrgUid = new ArrayList<>();
+        selectedRoleId = new ArrayList<>();
     }
 
     public void prepareItemCreate(){
