@@ -268,13 +268,14 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
             zkbIntegralOrder.setManageAuditerUid(userAccount.getUid());
             if(flag){
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.ManageAccept.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             }else{
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.ManageReject.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.name());
             }
            /* if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
                 zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
             }else {*/
-                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             //}
         }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
             zkbIntegralOrder.setCommercialAuditDate(new Date());
@@ -282,10 +283,11 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
             zkbIntegralOrder.setCommercialAuditerUid(userAccount.getUid());
             if(flag){
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.CommercialAccept.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             }else{
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.CommercialReject.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.name());
             }
-            zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
         }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.name().equals(zkbIntegralOrder.getCurrentStep())){
             zkbIntegralOrder.setOrderedDate(new Date());
             zkbIntegralOrder.setOrderedAuditer(userAccount.getName());
