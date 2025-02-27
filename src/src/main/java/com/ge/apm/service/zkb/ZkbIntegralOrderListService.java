@@ -117,10 +117,11 @@ public class ZkbIntegralOrderListService {
                 }
                 if (userConfigPredicates.size() > 0) {
                     predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
+                }else{
+                    predicates.add(builder.isFalse(builder.literal(true)));
                 }
             } else {
-                return null;
-                //predicates.add(builder.isNull(root.get("currentStep")));
+                predicates.add(builder.isFalse(builder.literal(true)));
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));

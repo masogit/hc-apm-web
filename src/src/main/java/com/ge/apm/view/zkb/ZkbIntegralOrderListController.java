@@ -158,9 +158,7 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                                 userConfigPredicates.add(pre3);
                             }else if(!"all".equals(queryStatus)){
                                 Predicate pre1 = builder.equal(root.get("currentStep"), queryStatus);
-                                Predicate pre2 = builder.notEqual(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
-                                Predicate pre3 = builder.and(pre1, pre2);
-                                userConfigPredicates.add(pre3);
+                                userConfigPredicates.add(pre1);
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if(StringUtils.isEmpty(queryStatus)){
@@ -184,10 +182,15 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                     }
                     if(userConfigPredicates.size() > 0){
                         predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
+                    }else{
+                        if(StringUtils.isEmpty(queryStatus)){
+                            predicates.add(builder.isFalse(builder.literal(true)));
+                        }else if(!"all".equals(queryStatus)){
+                            predicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                        }
                     }
                 } else {
-                    return null;
-                    //predicates.add(builder.isNull(root.get("currentStep")));
+                    predicates.add(builder.isFalse(builder.literal(true)));
                 }
             }
 
