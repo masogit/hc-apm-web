@@ -28,6 +28,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.CollectionUtils;
@@ -528,7 +529,7 @@ public class PmReportService {
         long count = pmOrders.values().stream().filter(i -> i).count();
 //        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
 
-        byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
+        byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();

@@ -16,6 +16,7 @@ import com.ge.apm.service.wo.*;
 import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -278,7 +278,7 @@ public class WorkOrderReportExportController implements Serializable {
             progress=new Progress();
 //            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             //WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
-            byte[] templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT, currentUser);
+            byte[] templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.WORK_ORDER_REPORT, currentUser);
             WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(data,templateBytes,renderService,progress);
             exportDocx = new DefaultStreamedContent(workOrderExportStream, workOrderExportStream.getContentType(), workOrderExportStream.getFileName());
         } catch (IOException e) {

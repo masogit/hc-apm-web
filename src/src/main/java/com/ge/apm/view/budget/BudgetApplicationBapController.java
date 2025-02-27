@@ -1,4 +1,5 @@
 package com.ge.apm.view.budget;
+
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
@@ -17,6 +18,7 @@ import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AccessRecordsFeature;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,9 +48,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.FacesEvent;
-import javax.faces.event.ValueChangeEvent;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -249,7 +248,7 @@ public class BudgetApplicationBapController extends GenericCRUDUUIDController<Bu
         List<Map<String, Object>> budgetDataList = persistService.createBudgeApplicationData(dataList,orderType);
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/budget/application/excel/APM_Budget_BAP_Exp_Template.xlsx");
-            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUDGET_BAP_EXP.getCode(), SystemTemplate.SystemTemplateEnum.BUDGET_BAP_EXP.getFileType());
+            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.BUDGET_BAP_EXP.getCode(), SystemTemplateEnum.BUDGET_BAP_EXP.getFileType());
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             persistService.exportData(doc, budgetDataList,orderType);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Budget_BAP.xlsx");

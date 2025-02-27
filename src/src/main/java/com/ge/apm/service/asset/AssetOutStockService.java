@@ -1,19 +1,13 @@
 package com.ge.apm.service.asset;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
-import com.deepoove.poi.data.RenderData;
-import com.deepoove.poi.data.TableRenderData;
-import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.wo.doctemplate.*;
-import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.io.IOUtils;
@@ -25,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.*;
 
 @Service
@@ -105,11 +96,11 @@ public class AssetOutStockService {
         if ("inStock".equals(sockType)) {
             templatePath = PATH_WORD_IN_STOCK_TEMPLATE;
             fileName = "入库单.docx";
-            type=SystemTemplate.SystemTemplateEnum.IN_STOCKED.getCode();
+            type= SystemTemplateEnum.IN_STOCKED.getCode();
         } else {
             templatePath = PATH_WORD_OUT_STOCK_TEMPLATE;
             fileName = "出库单.docx";
-            type=SystemTemplate.SystemTemplateEnum.OUT_STOCKED.getCode();
+            type=SystemTemplateEnum.OUT_STOCKED.getCode();
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
         String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),type,"doc");

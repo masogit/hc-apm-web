@@ -1,10 +1,6 @@
 package com.ge.apm.view.inventory;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.util.MapUtils;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.InventoryOrderMapper;
@@ -17,6 +13,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -39,7 +36,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
@@ -261,7 +257,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     public void exportExcel() throws IOException {
 
 
-        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.INVENTORY_ORDER_LIST, currentUser);
+        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.INVENTORY_ORDER_LIST, currentUser);
         List<InventoryOrderDetail> resultList ;
         //before
         if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {

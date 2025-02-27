@@ -15,6 +15,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.wo.Map2XmlConverter;
 import com.ge.apm.view.wo.WorkOrderReportExportController;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
@@ -44,7 +45,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -320,7 +320,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 //                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
 //                        getResource("../../portal/pdf/arrivalItem.xsl").getPath());
 //            }
-            InputStream templateInputStream = systemTemplateService.getTemplateInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT_PDF, currentUserAccount);
+            InputStream templateInputStream = systemTemplateService.getTemplateInputStream(SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT_PDF, currentUserAccount);
 
 
 //

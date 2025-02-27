@@ -1,11 +1,6 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.ge.apm.dao.*;
-
 import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetCostDTO;
@@ -16,14 +11,13 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
@@ -427,7 +421,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     }
 
     public void easyExcelExport( List<EfficiencyEquipmentInfo> list ) throws IOException {
-        byte[] stream =systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.BENEFIT_ANALYSIS,user);
+        byte[] stream =systemTemplateService.getTemplateFileByte(SystemTemplateEnum.BENEFIT_ANALYSIS,user);
         byte[] bytes = EasyExcelExportUtil.exportExcel(stream, list, new HashMap<>());
         String start = com.ge.healthcare.cn.common.utils.date.DateUtil.format(startDate, "yyyy-MM-dd");
         String end = com.ge.healthcare.cn.common.utils.date.DateUtil.format(endDate, "yyyy-MM-dd");
