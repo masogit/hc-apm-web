@@ -355,7 +355,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     // 根据查询索引设置参数
     private void setParamsByQueryIndex(Map<String, Object> params) {
         if(queryIndex == 20){
-            params.put("currentStepName",WebUtil.getMessage("Canceled"));
+            String[] strArray = new String[]{WebUtil.getMessage("Canceled")};
+            params.put("currentStepName",strArray);
         }
         if(queryIndex==100){
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
@@ -368,12 +369,13 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         if(queryIndex==10){
             pmIdList = new ArrayList<>();
             //loadMVSClinicalDeptList();
-        } else if (queryIndex == 0) { //已计划
-            params.put("currentStepId","Maintain");
+        } else if (queryIndex == 0) {
+            String[] strArray = new String[]{"已计划","进行中"};
+            params.put("currentStepName",strArray);
             params.put("isFinished",false);
-        }  else if (queryIndex == 7) { //已关单
-            params.put("currentStepName","已关单");
-            params.put("isFinished",true);
+        }  else if (queryIndex == 7) {
+            String[] strArray = new String[]{"已关单"};
+            params.put("currentStepName",strArray);
         }
     }
 
