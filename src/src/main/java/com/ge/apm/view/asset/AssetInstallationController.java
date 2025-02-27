@@ -26,6 +26,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -1372,6 +1373,6 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
 
     public List<SystemTemplate> getArrivalAcceptanceReportList() {
-        return systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplate.SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(),loginUser);
+        return systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(),loginUser);
     }
 }

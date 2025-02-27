@@ -1,7 +1,6 @@
 package com.ge.apm.service.wo;
 
 import com.alibaba.fastjson.JSONObject;
-import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -14,6 +13,7 @@ import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import webapp.framework.context.LocaleHolder;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -83,7 +82,7 @@ public class PmOrderReportTemplateService {
 //            }
 //            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
 
-            templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
+            templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
         }
 

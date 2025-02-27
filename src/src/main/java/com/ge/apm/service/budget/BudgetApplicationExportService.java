@@ -9,6 +9,7 @@ import com.ge.apm.domain.budget.PurchaseOrderInfo;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -114,7 +115,7 @@ public class BudgetApplicationExportService {
         Map<String, Object> data = createReportData(budgetApplicationAsset, budgetApplication);
 //        byte[] templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
 
-        byte[] templateBytes =fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
+        byte[] templateBytes =fileDownloadService.getTemplateFileByte(SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
 
         /*if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);

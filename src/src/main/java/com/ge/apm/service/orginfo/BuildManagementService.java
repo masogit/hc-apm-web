@@ -1,16 +1,9 @@
 package com.ge.apm.service.orginfo;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.fill.FillConfig;
-import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.BuildManagement;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.dto.BuildManagementExportDto;
 import com.ge.apm.service.EasyExcelExportUtil;
@@ -18,19 +11,16 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.primefaces.model.DefaultStreamedContent;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,7 +44,7 @@ public class BuildManagementService {
 
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 
-        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
+        InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.BUILD_MANAGEMENT.getCode(), SystemTemplateEnum.BUILD_MANAGEMENT.getFileType());
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
@@ -333,7 +323,7 @@ public class BuildManagementService {
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Building_Template.xlsx");
         SystemTemplateService systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         UserAccount user = UserContextService.getCurrentUserAccount();
-        byte[] stream = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.BUILD_MANAGEMENT, user);
+        byte[] stream = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.BUILD_MANAGEMENT, user);
 //        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
 //        String[] columnKeys = doc.getKeyRow(0, 1);
 //        int startRow = 2;

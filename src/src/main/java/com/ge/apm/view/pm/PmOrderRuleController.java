@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -724,7 +725,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 //
 //        }
 //        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
-        InputStream stream = systemTemplateService.getTemplateInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
+        InputStream stream = systemTemplateService.getTemplateInputStream(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
 
         try {

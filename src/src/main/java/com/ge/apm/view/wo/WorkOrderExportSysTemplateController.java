@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -71,7 +72,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
     protected Page<SystemTemplateValue> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, user.getSiteUID()));
-        searchFilters.add(new SearchFilter("templateType", SearchFilter.Operator.EQ, SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT.getCode()));
+        searchFilters.add(new SearchFilter("templateType", SearchFilter.Operator.EQ, SystemTemplateEnum.WORK_ORDER_REPORT.getCode()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
@@ -88,7 +89,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
 
     public StreamedContent getActiveTemplate() {
         try {
-            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT, user);
+            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.WORK_ORDER_REPORT, user);
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
         } catch (IOException e) {
             WebUtil.addErrorMessage("Fail to download work order template");
@@ -97,7 +98,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
     }
 
     public boolean existsSiteTemplate() {
-      return   systemTemplateService.existsSiteTemplate(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT.getCode(),user.getSiteUID());
+      return   systemTemplateService.existsSiteTemplate(SystemTemplateEnum.WORK_ORDER_REPORT.getCode(),user.getSiteUID());
     }
 
 
@@ -180,10 +181,10 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
         selected.setCreateBy(user.getUid());
         selected.setFileName(file.getFileName());
         selected.setStorageId(uploadedFileObject.getObjectStorageId());
-        selected.setTemplateType(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT.getCode());
+        selected.setTemplateType(SystemTemplateEnum.WORK_ORDER_REPORT.getCode());
         dao.save(selected);
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-        uploadedFileObject.setBoSubType(SystemTemplate.SystemTemplateEnum.WORK_ORDER_REPORT.getCode());
+        uploadedFileObject.setBoSubType(SystemTemplateEnum.WORK_ORDER_REPORT.getCode());
         uploadedFileObject.setBoUuid(selected.getId());
         blobService.saveBlobObject(uploadedFileObject);
     }

@@ -38,6 +38,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -398,7 +399,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //            String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
 //            File source = new File(sourcePath);
 //           FileUtils.copyFile(source,dest);
-           InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
+           InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
            FileUtils.copyToFile(inputStream,dest);
            genPmExcel(filePath + File.separator+"pm.xlsx",list);
            excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "PmOrder_Export.xlsx");
