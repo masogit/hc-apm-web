@@ -116,6 +116,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
             updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("orgUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
@@ -143,8 +144,12 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
             selectedRoleId = Arrays.asList(selected.getTrainingRoleUid().split(","));
         }
         trainDetailList = trainManageService.queryDetailByTrainId(selected.getId());
-        if(!selected.getSiteUID().equals(loginUser.getSiteUID())){
+
+        UserAccount userAccount = uaaService.getUserByUid(selected.getCreatedUid());
+        if(!userAccount.getOrgInfoUID().equals(loginUser.getOrgInfoUID())){
             canEdit = false;
+        }else{
+            canEdit = true;
         }
     }
 

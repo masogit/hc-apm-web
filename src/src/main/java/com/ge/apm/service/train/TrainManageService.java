@@ -139,6 +139,7 @@ public class TrainManageService extends MicroServiceInvoker {
             trainInfo.setTenantUID(userAccount.getTenantUID());
             trainInfo.setInstitutionUID(userAccount.getInstitutionUID());
             trainInfo.setHospitalUID(userAccount.getHospitalUID());
+            trainInfo.setOrgUid(userAccount.getOrgInfoUID());
             trainInfo.setSiteUID(userAccount.getSiteUID());
             trainInfo.setStatus(TrainDetail.Status.Planned.name());
         }
