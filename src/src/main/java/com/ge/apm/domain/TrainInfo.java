@@ -97,6 +97,9 @@ public class TrainInfo implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name="org_uid",columnDefinition = "CHAR(32)")
+    private String orgUid;
+
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
