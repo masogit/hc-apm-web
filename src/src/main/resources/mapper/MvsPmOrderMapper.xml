@@ -85,9 +85,8 @@
         a.status as asset_status,
         a.uid AS asset_uid
         FROM v2_pm_order T
-        LEFT JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid
-        LEFT JOIN mvs_ib_mapping m2 ON T.asset_uid = m2.e_home_ib_uid AND m1.ib_id IS NULL
-        LEFT JOIN asset_info a ON COALESCE(m1.ib_id, m2.ib_id) = a.id
+        inner JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
+        inner JOIN asset_info a ON m1.ib_id = a.id
         WHERE 1=1
         <if test="ruleLevel != null">
             and t.rule_level = CAST(#{ruleLevel, jdbcType=INTEGER} AS INTEGER)
