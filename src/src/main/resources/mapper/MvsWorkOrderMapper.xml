@@ -92,7 +92,7 @@
         inner JOIN v2_service_request vs on T.sr_id = VS.ID
         inner JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
         inner JOIN asset_info a ON m1.ib_id = a.id
-        inner JOIN v2_work_order_detail ws ON T.id = ws.wo_id
+        left JOIN v2_work_order_detail ws ON T.id = ws.wo_id
         WHERE 1=1
         <if test="srNum != null">
             and vs.sr_Num like concat('%', #{srNum}, '%')
