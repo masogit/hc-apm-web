@@ -93,7 +93,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private List<V2_BlobObject> audioList;
     private List<V2_BlobObject> attachList;
 
-
+    private List<V2_BlobObject> attachListEhme;
     private String requestAssetUid;
     private String queryAssetUid;
     private ConfigCacheService cacheService;
@@ -438,6 +438,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         selectedWorkOrderList = null;
         picList = null;
         attachList = new ArrayList<>();
+        attachListEhme = new ArrayList<>();
         selectedAsset = null;
         locationName = null;
     }
@@ -449,14 +450,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);
         picList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
-        List<V2_BlobObject> attachList1 = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
-        List<V2_BlobObject> attachList2 = blobObjectRepository.findByBoUuidAndBoType(selected.getSrId(),  V2_BlobObject.BO_SUB_TYPE_EHOME);
-        if(!CollectionUtils.isEmpty(attachList1)){
-            attachList.addAll(attachList1);
-        }
-        if(!CollectionUtils.isEmpty(attachList2)){
-            attachList.addAll(attachList2);
-        }
+        attachList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        attachListEhme = blobObjectRepository.findByBoUuidAndBoType(selected.getSrId(),  V2_BlobObject.BO_SUB_TYPE_EHOME);
+
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
@@ -748,6 +744,14 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
     public void setRequestAssetUid(String requestAssetUid) {
         this.requestAssetUid = requestAssetUid;
+    }
+
+    public List<V2_BlobObject> getAttachListEhme() {
+        return attachListEhme;
+    }
+
+    public void setAttachListEhme(List<V2_BlobObject> attachListEhme) {
+        this.attachListEhme = attachListEhme;
     }
 
     public List<V2_BlobObject> getAttachList() {
