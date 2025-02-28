@@ -204,8 +204,9 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
             if(CollectionUtils.isEmpty(zkbPartOrderCatList)){
                 zkbPartOrderCatList = zkbIntegralOrderApplyService.queryPartOrderCatByContract(currentUser);
             }
-            if(!zkbIntegralOrderApplyService.checkScoreFlagValid(selectedContract, selected.getOrderType(), currentUser)){
-                WebUtil.addErrorMessage("积分申请不符合条件，请检查！");
+            String rs = zkbIntegralOrderApplyService.checkScoreFlagValid(selectedContract, selected.getOrderType(), currentUser);
+            if(StrUtil.isNotEmpty(rs)){
+                WebUtil.addErrorMessage("积分申请不符合条件:"+rs);
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
             }
             selectedContract = null;

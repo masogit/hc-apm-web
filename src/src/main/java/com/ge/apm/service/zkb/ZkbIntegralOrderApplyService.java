@@ -174,10 +174,10 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                     return "兑换GE工程师现场保养合同类型只能是CCS或Biomed！";
                 }
             }
-            boolean r = checkScoreFlagValid(ct, selected.getOrderType(), userAccount);
-            zkbIntegralOrderStatusVo.setScoreCanApply(r);
-            if(!r){
-                return"积分申请不符合条件，请检查！";
+            String rs = checkScoreFlagValid(ct, selected.getOrderType(), userAccount);
+            zkbIntegralOrderStatusVo.setScoreCanApply(StrUtil.isEmpty(rs));
+            if(StrUtil.isNotEmpty(rs)){
+                return"积分申请不符合条件：" + rs;
             }
         }
         return "";
@@ -272,13 +272,14 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         return zkbIntegralService.queryScoreFlag(userAccount.getTenantUID());
     }
 
-    public boolean checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
+    public String checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
+        StringBuilder sb = new StringBuilder();
         List<String> ids = new ArrayList<>();
         List<ZkbContract> zkbContractList = new ArrayList<>();
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
             zkbContractList = zkbContractRepository.queryByTenantAndDate(userAccount.getTenantUID(), new Date());
             if(CollectionUtils.isEmpty(zkbContractList)){
-                return false;
+                return sb.append("不存在有效期内合同！").toString();
             }
             ids = zkbContractList.stream().map(ZkbContract::getId).collect(Collectors.toList());
         }
@@ -387,7 +388,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             d++;
         }
         if(a > d){
-            flag = false;
+            return sb.append("该租户申请未归还数量超过30%，请及时归还！").toString();
         }
 
         if(flag){
@@ -415,11 +416,11 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 filters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Ordered.toString()));
                 List<ZkbPartOrder> threeMonthList = zkbPartOrderRepository.findBySearchFilter(filters);
                 if(threeMonthList != null && threeMonthList.size() > 0){
-                    flag = false;
+                    return sb.append("该租户存在超过3个月未归还数据，请及时归还！").toString();
                 }
             }
         }
-        return flag;
+        return "";
     }
 
     public void tempSave(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract, List<V2_BlobObject> v2_blobObjectList){
@@ -600,8 +601,9 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 checkFlag = false;
             }
         }
-        if(!checkScoreFlagValid(zkbContract, zkbIntegralOrder.getOrderType(), currentUser)){
-            WebUtil.addErrorMessage("积分申请不符合条件，请检查！");
+        String rs = checkScoreFlagValid(zkbContract, zkbIntegralOrder.getOrderType(), currentUser);
+        if(StrUtil.isNotEmpty(rs)){
+            WebUtil.addErrorMessage("积分申请不符合条件:" + rs);
             checkFlag = false;
         }
         return checkFlag;
