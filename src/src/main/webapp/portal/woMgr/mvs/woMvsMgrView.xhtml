@@ -159,6 +159,15 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+                    <p:dataGrid var="woAttachItemE" value="#{workOrderMgrMvsController.attachListEhme}" columns="4" layout="grid" rendered="#{not empty workOrderMgrMvsController.attachListEhme}">
+                        <f:facet name="header">#{msg.RepairAttachment}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                #{woAttachItemE.objectName}
+                                <p:commandLink value="#{msg.DownloadFile}" ajax="false" actionListener="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}" styleClass="p-mr-2"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
 
 
                     <p:dataGrid var="audioItem" value="#{workOrderMgrMvsController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrMvsController.audioList}">

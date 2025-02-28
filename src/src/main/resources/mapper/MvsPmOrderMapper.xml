@@ -29,6 +29,8 @@
         <result property="pmType" column="pm_type"/>
         <result property="ruleLevel" column="rule_level"/>
         <result property="ownerName" column="owner_name"/>
+        <result property="ackSignature" column="ack_signature"/>
+
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
             <result property="name" column="asset_name"/>
@@ -48,6 +50,7 @@
     <select id="loadData" resultMap="v2_PmOrderMap">
         SELECT
             t.id,
+            t.ack_signature,
         t.dispatch_mode,
         t.current_step_id,
         t.current_person_id,
@@ -173,6 +176,5 @@
               AND NOT ai.is_deleted
               AND (mvs.mvs_ib_uid IS NOT NULL OR mvs.e_home_ib_uid IS NOT NULL)
         )
-        order by t.plan_time desc
-    </select>
+     </select>
  </mapper>

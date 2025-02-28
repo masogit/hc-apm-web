@@ -94,6 +94,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private V2_WorkOrder_Detail itemDetail;
     private V2_WorkOrderCoworker coWorkerDetail;
     private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> attachListEhome;
+
     private List<AssetTypeGroup> assetTypeGroupList;
     private PmReportService pmReportService;
 
@@ -515,6 +517,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     public void onSelectPmOrder() {
         accessoryList = getWorkOrderDetail(selected.getId());
         picList = blobDao.findByBoUuid(selected.getId());
+        attachListEhome = blobDao.findByBoUuidAndBoType(selected.getId(),"PmOrderEHome");
         reportList = pmOrderService.getReportList(selected.getId());
         loadHmCheck(selected);
      }
@@ -562,6 +565,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
          ruleLevel = null;
         picList = null;
         assetUid = null;
+        attachListEhome = null;
     }
 
 
@@ -928,6 +932,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
             }
         }
         return null;
+    }
+
+    public List<V2_BlobObject> getAttachListEhome() {
+        return attachListEhome;
+    }
+
+    public void setAttachListEhome(List<V2_BlobObject> attachListEhome) {
+        this.attachListEhome = attachListEhome;
     }
 
     public String getAssetUid() {
