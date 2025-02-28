@@ -126,6 +126,32 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return fileStream;
     }
 
+    public StreamedContent downloadSingleFileForEhome(String fileId) {
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+        HttpHeaders responseHeader = response.getHeaders();
+        byte[] result = response.getBody();
+        InputStream ins = new ByteArrayInputStream(result);
+        DefaultStreamedContent fileStream = new DefaultStreamedContent(ins);
+        fileStream.setContentType(responseHeader.getContentType().toString());
+        List<String> dispositions = responseHeader.get("content-disposition");
+        String disposition = dispositions.get(0);
+        String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
+        /*List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
+        if(!CollectionUtils.isEmpty(allByObjectStorageId)){
+            try {
+                fileStream.setName(new String(allByObjectStorageId.get(0).getObjectName().getBytes("UTF-8"), "ISO-8859-1"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("download file with  transforming chinese filename chart set error:{}",e);
+            }
+        }else{
+            fileStream.setName(fileName);
+        }*/
+        fileStream.setName(fileName);
+        return fileStream;
+    }
+
     public byte[] downloadSingleFileByte(String fileId) {
         HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);

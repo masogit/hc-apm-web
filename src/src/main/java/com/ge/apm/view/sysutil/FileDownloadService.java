@@ -63,9 +63,20 @@ public class FileDownloadService {
             return null;
         }
     }
+    public StreamedContent getFileForEhome(String fileId) {
+        try {
+            return msService.downloadSingleFileForEhome(fileId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public void downloadFile(String fileId) {
         StreamedContent file = getFile(fileId);
+        exportFile(file.getStream(), file.getName());
+    }
+    public void downloadFileForEhome(String fileId) {
+        StreamedContent file = getFileForEhome(fileId);
         exportFile(file.getStream(), file.getName());
     }
 
