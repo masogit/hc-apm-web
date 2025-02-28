@@ -92,7 +92,7 @@
                             </div>
                         </div>
                     </div>
-                    <p:dataGrid id="pictureMvsList" var="fileitem" value="#{v2PmOrderMvsController.picList}" columns="5" layout="grid">
+                    <p:dataGrid id="pictureMvsList" var="fileitem" value="#{v2PmOrderMvsController.picList}" columns="5" layout="grid" rendered="#{ empty v2PmOrderMvsController.attachListEhome}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -104,7 +104,15 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-
+                    <p:dataGrid var="woAttachItemE" value="#{v2PmOrderMvsController.attachListEhome}" columns="4" layout="grid" rendered="#{not empty v2PmOrderMvsController.attachListEhome}">
+                        <f:facet name="header">#{msg.RepairAttachment}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                #{woAttachItemE.objectName}
+                                <p:commandLink value="#{msg.DownloadFile}" ajax="false" actionListener="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}" styleClass="p-mr-2"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
                     <p:dataTable value="#{v2PmOrderMvsController.aquirePmOrderStep()}" var="stepItem">
                         <p:column headerText="#{msg.stepName}">
                             <h:outputText value="#{stepItem.stepName}" />
