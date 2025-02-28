@@ -260,7 +260,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
 
-                    <h:panelGroup rendered="#{zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed'}">
+                    <h:panelGroup rendered="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">
                         <p:dataList id="uploadList" value="#{zkbIntegralOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">合同附件上传</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
