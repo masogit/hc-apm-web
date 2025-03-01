@@ -104,15 +104,33 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+                    <!--E 家图片附件显示-->
+                    <!--e家图片附件显示-->
                     <p:dataGrid var="woAttachItemE" value="#{v2PmOrderMvsController.attachListEhome}" columns="4" layout="grid" rendered="#{not empty v2PmOrderMvsController.attachListEhome}">
-                        <f:facet name="header">#{msg.RepairAttachment}</f:facet>
-                        <p:panel  style="text-align:center">
+                        <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                        <!-- 非 IMG 类型的面板 -->
+                        <p:panel style="text-align:center"
+                                 rendered="#{woAttachItemE.boType != 'IMG'}">
                             <h:panelGrid columns="1" style="width:100%">
                                 #{woAttachItemE.objectName}
-                                <p:commandLink value="#{msg.DownloadFile}" ajax="false" actionListener="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink value="#{msg.DownloadFile}" ajax="false"
+                                               actionListener="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}"
+                                               styleClass="p-mr-2"/>
+                            </h:panelGrid>
+                        </p:panel>
+                        <!-- IMG 类型的面板 -->
+                        <p:panel style="text-align:center"
+                                 rendered="#{woAttachItemE.boType == 'IMG'}">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage value="#{fileDownloadService.getFile(woAttachItemE.objectStorageId)}"
+                                                height="80" width="100" stream="false"/>
+                                <p:commandLink value="#{msg.DownloadFile}" ajax="false"
+                                               actionListener="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}"
+                                               styleClass="p-mr-2"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+                    <!--E 家图片附件显示-->
                     <p:dataTable value="#{v2PmOrderMvsController.aquirePmOrderStep()}" var="stepItem">
                         <p:column headerText="#{msg.stepName}">
                             <h:outputText value="#{stepItem.stepName}" />
