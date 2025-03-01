@@ -10,6 +10,7 @@ import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.DownloadTemplateFileType;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -30,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -66,6 +68,14 @@ public class FileDownloadService {
     public StreamedContent getFileForEhome(String fileId) {
         try {
             return msService.downloadSingleFileForEhome(fileId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<FileInfoResult> getFileInfoForEhome(Collection<String> fileIds) {
+        try {
+            return msService.getFiles(fileIds);
         } catch (Exception e) {
             return null;
         }
