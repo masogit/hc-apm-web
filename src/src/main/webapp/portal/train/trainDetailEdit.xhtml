@@ -89,7 +89,7 @@
          <br/>
          <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveDetail}" oncomplete="PF('detailEditDialog').hide()" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" icon="ui-icon-check" rendered="#{empty trainInSiteController.selectedTrainDetail.status or trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
          <p:commandButton validateClient="true" value="完成" action="#{trainInSiteController.completeDetail}" oncomplete="PF('detailEditDialog').hide()" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" icon="ui-icon-check" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}" />
-         <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();PF('detailEditDialog').hide()" update="trainTab:cancelForm  trainTab:editForm:detailDatalist" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
+         <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();" update="trainTab:cancelForm  trainTab:editForm:detailDatalist" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
          <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trainInSiteController.backDetail}" oncomplete="PF('detailEditDialog').hide()"  update=" trainTab:editForm:detailDatalist"/>
       </h:form>
    </p:dialog>
@@ -105,7 +105,7 @@
             </h:panelGroup>
          </p:panelGrid>
          <br/>
-         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trainInSiteController.cancelDetail()}" oncomplete="PF('cancelDlg').hide();" update=":growl trainTab:editForm:detailDatalist" icon="ui-icon-check" />
+         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trainInSiteController.cancelDetail()}" oncomplete="PF('cancelDlg').hide();PF('detailEditDialog').hide();" update=":growl trainTab:editForm:detailDatalist" icon="ui-icon-check" />
          <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('cancelDlg').hide()"/>
       </h:form>
 
