@@ -51,6 +51,8 @@ public class OCRTemplate implements Serializable{
 
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+    @Transient
+    private V2_BlobObject blobObject;
     @Override
     public int hashCode() {
         int hash = 0;
@@ -69,5 +71,13 @@ public class OCRTemplate implements Serializable{
             return false;
         }
         return true;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

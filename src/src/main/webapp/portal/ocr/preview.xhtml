@@ -19,7 +19,7 @@
                 <h:panelGroup>
                     <label class="label">#{msg.template}#{msg.type}</label>
                     <p:selectOneMenu disabled="true" value="#{ocrTemplateController.selected.type}" required="true" requiredMessage="#{msg.template}#{msg.type}不能为空">
-                        <f:selectItems value="#{ocrTemplateController.fieldsMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
+                        <f:selectItems value="#{ocrTemplateController.businessType.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
