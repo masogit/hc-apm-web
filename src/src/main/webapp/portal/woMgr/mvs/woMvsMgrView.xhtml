@@ -177,7 +177,7 @@
                                 <p:graphicImage value="#{fileDownloadService.getFile(woPicItem.objectStorageId)}" height="80" width="100" stream="false">
                                 </p:graphicImage>
                             </h:panelGrid>
-                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{woPicItem.objectName}" action="#{fileDownloadService.downloadFile(woPicItem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{woPicItem.objectName}" action="#{fileDownloadService.downloadFileForEhome(woPicItem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                         </p:panel>
                     </p:dataGrid>
                     <!--e home  图片 附件展示-->
