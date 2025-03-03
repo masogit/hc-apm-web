@@ -45,11 +45,11 @@
                         </p:column>
 
                         <p:column headerText="#{msg.template}#{msg.type}" filterBy="#{item.type}" filterMatchMode="LIKE">
-                            <h:outputText value="#{ocrTemplateController.fieldsMap.get(item.type)}"/>
+                            <h:outputText value="#{ocrTemplateController.businessType.get(item.type)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{ocrTemplateController.fieldsMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
+                                    <f:selectItems value="#{ocrTemplateController.businessType.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -60,7 +60,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon ui-icon-add" title="#{msg.Create}" class="btn btn-sm btn-gray" action="CreateTemplate.xhtml?faces-redirect=true&amp;action=Create" />
                             <p:commandButton id="editButton" icon="ui-icon ui-icon-pencil" action="#{ocrTemplateController.getEditLink}" class="btn btn-sm btn-gray" title="#{msg.Edit}" disabled="#{empty ocrTemplateController.selected}" />
-                            <p:commandButton id="deleteButton" icon="ui-icon ui-icon-delete" actionListener="#{ocrTemplateController.delete()}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":templateListForm"  disabled="#{empty ocrTemplateController.selected}" >
+                            <p:commandButton id="deleteButton" icon="ui-icon ui-icon-delete" actionListener="#{ocrTemplateController.delete()}" class="btn btn-sm btn-gray" title="#{msg.Delete}" update=":templateListForm"  disabled="#{empty ocrTemplateController.selected}" >
                                 <p:confirm header="删除-#{item.name}" message="您确认要删除选中的配置吗？" icon="ui-icon-warning"/>
                             </p:commandButton>
                             <p:commandButton id="testButton" title="嗅探测试" icon="ui-icon ui-icon-wifi-tethering" action="#{ocrTemplateController.clearCache}" update=":ocrPreviewedDlg"  class="btn btn-sm btn-gray" oncomplete="PF('ocrPreviewedDlg').show()" disabled="#{empty ocrTemplateController.selected}" />

@@ -4,7 +4,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" encoding="UTF-8">
 
     <ui:define name="content">
         <div class="ui-g">
@@ -15,18 +15,32 @@
             <div class="ui-g-12 card">
 
                 <h:form id="ocrEditForm">
-                    <div class="ui-g-12 ui-lg-7">
+                    <div class="ui-g-12 ui-lg-7" style="height: 100vh;">
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">#{msg.template}#{msg.name}*</label>
-                                    <p:inputText value="#{ocrTemplateController.thisTemplate.name}" required="true" requiredMessage="#{msg.template}#{msg.type}不能为空"/>
+                                    <p:inputText value="#{ocrTemplateController.thisTemplate.name}" required="true" requiredMessage="#{msg.template}#{msg.name}不能为空"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">#{msg.template}#{msg.type}</label>
+                                    <label class="label">#{msg.template}#{msg.type}*</label>
                                     <p:selectOneMenu value="#{ocrTemplateController.thisTemplate.type}" required="true" requiredMessage="#{msg.template}#{msg.type}不能为空">
-                                        <p:ajax event="select" process="@this" update="elementTable" />
-                                        <f:selectItems value="#{ocrTemplateController.fieldsMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
+                                        <p:ajax event="valueChange" process="@this" update=":ocrEditForm:elementTable" />
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
+                                        <f:selectItems value="#{ocrTemplateController.businessType.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
                                     </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
+                                        <h:panelGroup>
+                                            <p:fileUpload allowTypes="/(\.|\/)(pdf|jpeg|jpg|png)$/" fileUploadListener="#{ocrTemplateController.handleFileUploadTemplate}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                                          multiple="false" sizeLimit="20000000" update="elementTable preView" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}20M"  label="#{msg.Add}"  />
+
+                                            <p:dataList id="pictureList" value="#{ocrTemplateController.attachList}" rendered="#{'Edit'.equals(ocrTemplateController.actionName)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                                <f:facet name="header">#{msg.template}文件</f:facet>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            </p:dataList>
+                                        </h:panelGroup>
+                                    </p:panel>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.remark}</label>
@@ -34,47 +48,61 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                             <h:panelGroup >
-                                <p:dataTable  id="elementTable"  value="#{ocrTemplateController.templateJsonObject['Elements']}" var="element" editable="true" >
-                                    <f:facet name="header">
-                                        #{msg.Text}#{msg.modify}
-                                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{ocrTemplateController.createNewElement}" update="elementTable" process="@this" />
-                                    </f:facet>
-                                    <p:ajax event="rowEdit"  update="ocrEditForm:preView :growl" />
-                                    <p:ajax event="rowEditCancel"  update=":growl" />
-
+                                <p:dataTable style="height: 70%;overflow: auto"  id="elementTable"  value="#{ocrTemplateController.templateJsonObject['Elements']}" var="element" editable="true"  >
+<!--                                    <f:facet name="header">-->
+<!--                                        #{msg.Text}#{msg.modify}-->
+<!--                                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{ocrTemplateController.createNewElement}" update="elementTable" process="@this" />-->
+<!--                                    </f:facet>-->
+                                    <p:ajax event="rowEdit" listener="#{ocrTemplateController.onRowEdit}" update=":ocrEditForm:preView :growl :ocrEditForm:elementTable" />
+                                    <p:ajax event="rowEditCancel"  update=":ocrEditForm:preView :growl :ocrEditForm:elementTable" />
                                     <p:column headerText="关键字">
-                                        <p:cellEditor>
+                                        <p:cellEditor id="TextValue">
                                             <f:facet name="output"><h:outputText value="#{element.TextValue}" /></f:facet>
                                             <f:facet name="input"><p:inputText  value="#{element.TextValue}" style="width:100%"/></f:facet>
                                         </p:cellEditor>
                                     </p:column>
                                     <p:column headerText="#{msg.field}">
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{element.FieldKey}" /></f:facet>
-                                            <f:facet name="input"><p:inputText  value="#{element.FieldKey}" style="width:100%"/></f:facet>
+                                        <p:cellEditor id="FieldKey">
+                                            <f:facet name="output"><h:outputText value="#{ocrTemplateController.fieldsList()[element.FieldKey]}" /></f:facet>
+                                            <f:facet name="input">
+                                                <p:selectOneMenu  value="#{element.FieldKey}" >
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
+                                                    <f:selectItems value="#{ocrTemplateController.fieldsList().entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}"  />
+                                                </p:selectOneMenu>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+                                    <p:column headerText="模式">
+                                        <p:cellEditor id="Pattern">
+                                            <f:facet name="output"><h:outputText value="#{ocrTemplateController.patternMap[element.Pattern]}" /></f:facet>
+                                            <f:facet name="input">
+                                                <p:selectOneMenu  value="#{element.Pattern}" >
+                                                    <f:selectItems value="#{ocrTemplateController.patternMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
+                                                </p:selectOneMenu>
+                                            </f:facet>
                                         </p:cellEditor>
                                     </p:column>
 
                                     <p:column headerText="#{msg.positionX}">
-                                        <p:cellEditor>
+                                        <p:cellEditor id="PositionX">
                                             <f:facet name="output"><h:outputText value="#{element.PositionX}" /></f:facet>
-                                            <f:facet name="input"><p:inputNumber  value="#{element.PositionX}" decimalPlaces="0" /></f:facet>
+                                            <f:facet name="input"><p:inputNumber   value="#{element.PositionX}" decimalPlaces="0" /></f:facet>
                                         </p:cellEditor>
                                     </p:column>
                                     <p:column headerText="#{msg.positionY}">
-                                        <p:cellEditor>
+                                        <p:cellEditor id="PositionY">
                                             <f:facet name="output"><h:outputText value="#{element.PositionY}" /></f:facet>
-                                            <f:facet name="input"><p:inputNumber  value="#{element.PositionY}" decimalPlaces="0" /></f:facet>
+                                            <f:facet name="input"><p:inputNumber   value="#{element.PositionY}" decimalPlaces="0" /></f:facet>
                                         </p:cellEditor>
                                     </p:column>
                                     <p:column headerText="#{msg.width}">
-                                        <p:cellEditor>
+                                        <p:cellEditor id="Width">
                                             <f:facet name="output"><h:outputText value="#{element.Width}" /></f:facet>
                                             <f:facet name="input"><p:inputNumber  value="#{element.Width}" decimalPlaces="0" /></f:facet>
                                         </p:cellEditor>
                                     </p:column>
                                     <p:column headerText="#{msg.height}">
-                                        <p:cellEditor>
+                                        <p:cellEditor id="Height">
                                             <f:facet name="output"><h:outputText value="#{element.Height}" /></f:facet>
                                             <f:facet name="input"><p:inputNumber  value="#{element.Height}" decimalPlaces="0" /></f:facet>
                                         </p:cellEditor>
@@ -87,7 +115,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup >
-                                <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{ocrTemplateController.saveChange()}" oncomplete="" validateClient="true" update="ocrEditForm:preView :growl"  style="float:right"/>
+                                <p:commandButton  value="#{msg.Save}" icon="ui-icon-check" action="#{ocrTemplateController.saveChange()}" oncomplete="" validateClient="false" update="ocrEditForm:preView :growl"  style="float:right"/>
                                 <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="templateList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:right"/>
                             </h:panelGroup>
 
