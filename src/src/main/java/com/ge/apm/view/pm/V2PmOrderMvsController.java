@@ -3,6 +3,7 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MvsPmOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
@@ -13,6 +14,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -95,9 +97,12 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private V2_WorkOrderCoworker coWorkerDetail;
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> attachListEhome;
+    private List<V2_BlobObject> attachListEhomeFile;
+    private List<V2_BlobObject> attachListEhomeImg;
 
     private List<AssetTypeGroup> assetTypeGroupList;
     private PmReportService pmReportService;
+    private FileDownloadService fileDownloadService;
 
     private List<V2_BlobObject> audioList;
     private BlobObjectRepository blobDao;
@@ -267,6 +272,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     }
 
     protected void init() {
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         userContextService =  WebUtil.getBean(UserContextService.class);
         pmReportService = WebUtil.getBean(PmReportService.class);
         mvsPmOrderMapper = WebUtil.getBean(MvsPmOrderMapper.class);
@@ -515,9 +521,55 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     }
 
     public void onSelectPmOrder() {
+        attachListEhomeImg = new ArrayList<>();
+        attachListEhomeFile = new ArrayList<>();
         accessoryList = getWorkOrderDetail(selected.getId());
         picList = blobDao.findByBoUuid(selected.getId());
         attachListEhome = blobDao.findByBoUuidAndBoType(selected.getId(),"PmOrderEHome");
+        if(!org.springframework.util.CollectionUtils.isEmpty(attachListEhome)){
+            Set<String> objectIds = attachListEhome.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
+            List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
+            List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
+            if (fileInfoResults == null) {
+                fileInfoResults = new ArrayList<>();
+            }
+            List<FileInfoResult> imageFiles = fileInfoResults.stream()
+                    .filter(result -> result != null && result.getObjectName() != null)
+                    .filter(result -> imageExtensions.stream()
+                            .anyMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
+                    .collect(Collectors.toList());
+            if(!org.springframework.util.CollectionUtils.isEmpty(imageFiles)){
+                attachListEhomeImg = imageFiles.stream()
+                        .filter(result -> result.getObjectId() != null)
+                        .map(result -> {
+                            V2_BlobObject blobObject = new V2_BlobObject();
+                            blobObject.setObjectStorageId(result.getObjectId());
+                            blobObject.setObjectName(result.getObjectName());
+                            blobObject.setBoType("IMG");
+                            return blobObject;
+                        })
+                        .collect(Collectors.toList());
+            }
+            List<FileInfoResult> otherFiles = fileInfoResults.stream()
+                    .filter(result -> result != null && result.getObjectName() != null)
+                    .filter(result -> imageExtensions.stream()
+                            .noneMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
+                    .collect(Collectors.toList());
+            if(!org.springframework.util.CollectionUtils.isEmpty(otherFiles)){
+                attachListEhomeFile = otherFiles.stream()
+                        .filter(result -> result.getObjectId() != null)
+                        .map(result -> {
+                            V2_BlobObject blobObject = new V2_BlobObject();
+                            blobObject.setObjectStorageId(result.getObjectId());
+                            blobObject.setObjectName(result.getObjectName());
+                            return blobObject;
+                        })
+                        .collect(Collectors.toList());
+            }
+            attachListEhome.clear();
+            attachListEhome.addAll(attachListEhomeImg);
+            attachListEhome.addAll(attachListEhomeFile);
+        }
         reportList = pmOrderService.getReportList(selected.getId());
         loadHmCheck(selected);
      }
@@ -566,6 +618,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         picList = null;
         assetUid = null;
         attachListEhome = null;
+        attachListEhomeImg = null;
+        attachListEhomeFile = null;
     }
 
 
@@ -955,5 +1009,21 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
             return true;
         }
         return false;
+    }
+
+    public List<V2_BlobObject> getAttachListEhomeImg() {
+        return attachListEhomeImg;
+    }
+
+    public void setAttachListEhomeImg(List<V2_BlobObject> attachListEhomeImg) {
+        this.attachListEhomeImg = attachListEhomeImg;
+    }
+
+    public List<V2_BlobObject> getAttachListEhomeFile() {
+        return attachListEhomeFile;
+    }
+
+    public void setAttachListEhomeFile(List<V2_BlobObject> attachListEhomeFile) {
+        this.attachListEhomeFile = attachListEhomeFile;
     }
 }
