@@ -168,6 +168,6 @@
               AND a.is_valid
               AND NOT a.is_deleted
               AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
-
+        order by t.plan_time desc
      </select>
  </mapper>
