@@ -12,13 +12,10 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.QrCodeDrawService;
 import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.ocr.support.MatcherType;
 import org.apache.commons.codec.binary.Base64;
-import org.primefaces.component.api.UIColumn;
-import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.model.UploadedFile;
@@ -35,7 +32,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.ValueChangeEvent;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -70,6 +66,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     private JSONObject templateJsonObject;
 
     private String previewResult;
+    private String source;
 
     private String fileName;
     private byte[] contents;
@@ -91,8 +88,8 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         templateService = WebUtil.getBean(OCRTemplateService.class);
         this.searchFilters = new ArrayList<>();
         initActionData();
-        List<I18nMessage> fieldName = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("field_name", currentUser.getSiteId());
-        i18nMessages = fieldName.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,item->item));
+//        List<I18nMessage> fieldName = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("field_name", currentUser.getSiteId());
+//        i18nMessages = fieldName.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,item->item));
     }
 
     private void initActionData() {
@@ -208,15 +205,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         BusinessType businessType = BusinessType.valueOf(type);
         if(businessType == null) return new HashMap<>();
         List<String> fields = Arrays.asList(BusinessType.valueOf(type).getFields());
-        Map<String,String> field = new HashMap<>();
-        fields.stream().filter(item->!selectFiled.contains(item)).forEach(item->{
-            I18nMessage i18nMessage = i18nMessages.get(item);
-            String value = item;
-            if(i18nMessage != null){
-                 value = i18nMessage.getValue();
-            }
-            field.put(item,value);
-        });
+        Map<String, String> field = fields.stream().collect(Collectors.toMap(item -> item, item -> item));
         return field;
     }
 
@@ -339,12 +328,20 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
             params.put("templateId",id);
             if(fileName.toLowerCase().endsWith("pdf")){
                  jsonObject = templateService.upload(file, GatewayURL.OCR_DOCUMENT,params);
+                JSONArray data = jsonObject.getJSONArray("data");
+                previewResult=JSON.toJSONString(data.subList(0, data.size() - 1),SerializerFeature.PrettyFormat);
+                source=JSON.toJSONString(data.getJSONObject(data.size() - 1),SerializerFeature.PrettyFormat);
             }else{
                  jsonObject = templateService.upload(file,GatewayURL.OCR_IMAGE,params);
+                JSONObject data = jsonObject.getJSONObject("data");
+                Object remove = data.remove("source");
+                source=JSON.toJSONString(remove,SerializerFeature.PrettyFormat);
+                previewResult=JSON.toJSONString(data,SerializerFeature.PrettyFormat);
+
             }
-            previewResult=JSON.toJSONString(jsonObject,SerializerFeature.PrettyFormat);
         } catch (Exception e) {
             e.printStackTrace();
+            source = e.getMessage();
             previewResult = e.getMessage();
         }
     }
@@ -352,6 +349,11 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     public void clearCache(){
         previewResult = "";
         fileName = "";
+        source="";
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String getPreviewResult() {
