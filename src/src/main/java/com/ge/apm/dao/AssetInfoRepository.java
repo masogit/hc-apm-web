@@ -398,4 +398,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Transactional
     @Query(value = "UPDATE asset_info SET clinical_dept_id = ?2, clinical_dept_uid = ?3, clinical_dept_name = ?4 WHERE uid IN ?1",nativeQuery = true)
     void outStocked(List<String> assetIds, Integer clinicalDeptId, String clinicalDeptUid, String clinicalDeptName);
+
+    @Query(nativeQuery = true, value = "SELECT uid FROM asset_info WHERE tenant_uid = ?1 AND asset_type IN (?3) AND is_checked = TRUE AND is_deleted = FALSE AND is_valid = TRUE AND clinical_dept_uid IN (?2) AND (tenant_uid != 'dccf4542d20648bdb8122e1628d84e82' OR (depart_num !~* '^XL' AND depart_num !~* '^L' AND depart_num !~* '^X\\d*$' AND depart_num !~* '^\\d+$'))")
+    List<String> findAssetTypeToInventory(String tenantUid, List<String> clinicalDeptUIDs, Collection<String> assetTypes);
+
 }

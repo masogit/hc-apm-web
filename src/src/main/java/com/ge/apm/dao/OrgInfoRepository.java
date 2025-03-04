@@ -351,4 +351,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
             " where uo.org_uid in (o.tenant_uid, o.institution_uid,o.hospital_uid,o.site_uid, o.uid) and uo.user_uid = ? and o.org_type = 4 ")
     List<String> getUserDeptScope(String userUID);
 
+    @Query(nativeQuery = true, value = "select  distinct o.uid from org_info o, user_org uo, asset_info ai " +
+            " where uo.user_uid = ?1 and uo.org_uid in (o.tenant_uid, o.institution_uid,o.hospital_uid,o.site_uid, o.uid) and ai.clinical_dept_uid in (o.tenant_uid, o.institution_uid,o.hospital_uid,o.site_uid, o.uid)" +
+            " and o.org_type = 4 and ai.is_checked = true and ai.is_deleted = false and ai.is_valid = true and ai.asset_type in (?2) ")
+    List<String> getUserDeptScopeByAssetType(String userUID, Collection<String> assetType);
+
 }
