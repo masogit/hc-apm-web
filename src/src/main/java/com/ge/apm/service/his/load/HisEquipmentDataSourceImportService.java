@@ -229,14 +229,14 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "HIS数据执行科室代码不能为空");
             isValidateData = false;
         }
-//        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode())) &&  hisEquipmentDataSource.getExecTime() != null  ){
-//            List<HisEquipmentDataSource> hisEquipmentDataSources = collect.get(hisEquipmentDataSource.getOrgCode());
-//            if( hisEquipmentDataSource.getExecTime().before(hisEquipmentDataSources.get(0).getExecTime())){
-//                item.put("status", ImportStatus.Failure);
-//                ContractRow.addErrMessage(item, "已经导入此时间段数据");
-//                isValidateData = false;
-//            }
-//        }
+        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode())) &&  hisEquipmentDataSource.getExecTime() != null  ){
+            List<HisEquipmentDataSource> hisEquipmentDataSources = collect.get(hisEquipmentDataSource.getOrgCode());
+            if( hisEquipmentDataSource.getExecTime().before(hisEquipmentDataSources.get(0).getExecTime())){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "已经导入此时间段数据");
+                isValidateData = false;
+            }
+        }
         if(StringUtils.isNotBlank(hisEquipmentDataSource.getOrgCode())){
             if(!orgCodeList.contains(hisEquipmentDataSource.getOrgCode())){
                 item.put("status", HisEquipmentImportService.ImportStatus.Failure);
