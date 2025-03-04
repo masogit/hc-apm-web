@@ -1,5 +1,6 @@
 package com.ge.apm.service.train;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
@@ -11,10 +12,18 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.xpath.operations.Bool;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.ultima.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -23,6 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,12 +73,31 @@ public class TrainManageService extends MicroServiceInvoker {
     @Autowired
     private UserAccountRepository userAccountRepository;
 
-    public List<OrgDto> onCreateInventory(){
+    @Autowired
+    AssetInfoRepository assetInfoDao;
 
-        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
+    @Autowired
+    AssetTypeGroupRepository assetTypeGroupRepository;
+
+    @Autowired
+    OrgInfoRepository orgInfoDao;
+
+    public List<OrgDto> onCreateInventory(){
+        List<OrgDto> orgDtoList = new ArrayList<>();
+        List<Map> maps = getOrgListForGrouping(UserContextService.getCurrentUserAccount());
+        for(Map m : maps){
+            OrgDto o = new OrgDto();
+            o.setSelected(Boolean.parseBoolean(m.get("selected").toString()));
+            o.setUid(m.get("uid").toString());
+            o.setId(Integer.parseInt(m.get("id").toString()));
+            o.setOrgName(m.get("orgName").toString());
+            orgDtoList.add(o);
+        }
+        /*HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
         String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET,requestEntity,LinkedHashMap.class);
-        return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgDto>>() {});
+        return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgDto>>() {});*/
+        return orgDtoList;
     }
 
     public List<TrainRoleDto> queryTrainRole(UserAccount userAccount){
@@ -331,4 +363,67 @@ public class TrainManageService extends MicroServiceInvoker {
         return trainDetailSignRepository.findByDetailId(detailId);
     }
 
+
+    public List getOrgListForGrouping(UserAccount user) {
+        List<Map> userClinicalDeptList = findClinicalDeptMapByUser(user);
+        List<String> clinicalDeptUIDs = ListUtil.newArrayList("-1");
+        clinicalDeptUIDs.addAll(userClinicalDeptList.stream().map(t -> (String) t.get("uid")).collect(Collectors.toList()));
+        if (user.isEnableAssetTypeGroup()) {
+            List<AssetInfo> assetInfoList = Optional.
+                    ofNullable(assetInfoDao.findAssetTypeToInventory(user.getTenantUID(), clinicalDeptUIDs, user.getAssetTypeGroupMap().keySet())).
+                    map(assetInfoDao::findByUidIn).orElse(ListUtil.empty());
+            Map<String, List<AssetInfo>> assetMap = assetInfoList.stream().collect(Collectors.groupingBy(AssetInfo::getClinicalDeptUID));
+            List<AssetTypeGroup> assetTypeGroups = assetTypeGroupRepository.listParentAssetTypeGroupByEncodeds(user.getTenantUID(), user.getAssetTypeGroupMap().keySet());
+            Map<String, String> assetTypeMap = assetTypeGroups.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, AssetTypeGroup::getName));
+            List<Map> userAssetTypeClinicalDeptList = ListUtil.newArrayList();
+            for (Map userClinicalDept : userClinicalDeptList) {
+                List<AssetInfo> clinicalAssets = assetMap.get((String) userClinicalDept.get("uid"));
+                Set<String> assetTypeParent = clinicalAssets.stream().map(asset -> asset.getAssetType().split("-")[0]).collect(Collectors.toSet());
+                for (String assetType : assetTypeParent) {
+                    Map userAssetTypeClinicalDept = MapUtil.newHashMap();
+                    userAssetTypeClinicalDept.putAll(userClinicalDept);
+                    userAssetTypeClinicalDept.put("assetType", assetType);
+                    userAssetTypeClinicalDept.put("orgName", assetTypeMap.get(assetType) + " / " + userClinicalDept.get("orgName"));
+                    userAssetTypeClinicalDeptList.add(userAssetTypeClinicalDept);
+                }
+            }
+            userClinicalDeptList = userAssetTypeClinicalDeptList;
+        }
+        userClinicalDeptList.sort(Comparator.comparing(o -> {
+            try {
+                return PinyinHelper.convertToPinyinString(String.valueOf(o.get("orgName")), "", PinyinFormat.WITHOUT_TONE);
+            } catch (PinyinException e) {
+                return String.valueOf(o.get("orgName"));
+            }
+        }));
+        return userClinicalDeptList;
+    }
+
+    private List<Map> findClinicalDeptMapByUser(UserAccount user) {
+        return findUserDeptScope(user).stream().map(orgInfo -> {
+            Map map = new HashMap();
+            map.put("id", orgInfo.getId());
+            map.put("uid", orgInfo.getUid());
+            map.put("orgName", orgInfo.getParentOrg() == null ? orgInfo.getName() : orgInfo.getParentOrg().getName() + " / " + orgInfo.getName());
+            map.put("selected", true);
+            return map;
+        }).collect(Collectors.toList());
+    }
+
+    private List<OrgInfo> findUserDeptScope(UserAccount user) {
+        List<String> orgUIDList = ListUtil.newArrayList("-1");
+        if (user.isEnableAssetTypeGroup()) {
+            if (ObjectUtil.isNotEmpty(user.getAssetTypeGroupList())) {
+                orgUIDList.addAll(orgInfoDao.getUserDeptScopeByAssetType(user.getUid(), user.getAssetTypeGroupMap().keySet()));
+            }
+        } else {
+            orgUIDList.addAll(orgInfoDao.getUserDeptScope(user.getUid()));
+        }
+        return orgInfoDao.findBySpecification((Root<OrgInfo> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(root.get("uid").in(orgUIDList));
+            predicates.add(builder.equal(root.get("orgType"), 4));
+            return builder.and(predicates.toArray(new Predicate[0]));
+        });
+    }
 }
