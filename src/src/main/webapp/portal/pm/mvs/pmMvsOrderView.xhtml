@@ -8,6 +8,8 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
+        <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
+        <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
         <div class="ui-g-12 card" >
 
             <h:form id="pmMvsOrderDetailForm" class="pmOrderDetailFormCls">
@@ -122,6 +124,7 @@
                         <p:panel style="text-align:center"
                                  rendered="#{woAttachItemE.boType == 'IMG'}">
                             <h:panelGrid columns="1" style="width:100%">
+                                <p:ajax  event="click" update="pmTab:previewedDlgEhome" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderMvsController,woAttachItemE.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(woAttachItemE.objectStorageId)}"
                                                 height="80" width="100" stream="false"/>
                                 <p:commandLink validateClient="false" immediate="true" process="@this"
