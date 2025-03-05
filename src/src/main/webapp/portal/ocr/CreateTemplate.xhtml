@@ -30,10 +30,18 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
+                                    <label class="label">宽</label>
+                                    <p:inputText id="width" value="#{ocrTemplateController.thisTemplate.width}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">高</label>
+                                    <p:inputText id="height" value="#{ocrTemplateController.thisTemplate.height}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
                                     <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
                                         <h:panelGroup>
                                             <p:fileUpload allowTypes="/(\.|\/)(pdf|jpeg|jpg|png)$/" fileUploadListener="#{ocrTemplateController.handleFileUploadTemplate}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                                          multiple="false" sizeLimit="20000000" update="elementTable preView" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}20M"  label="#{msg.Add}"  />
+                                                          multiple="false" sizeLimit="20000000" update="elementTable preView width height" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}20M"  label="#{msg.Add}"  />
 
                                             <p:dataList id="pictureList" value="#{ocrTemplateController.attachList}" rendered="#{'Edit'.equals(ocrTemplateController.actionName)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{msg.template}文件</f:facet>
