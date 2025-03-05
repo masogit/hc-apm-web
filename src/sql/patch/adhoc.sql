@@ -13,3 +13,8 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --trainMvsShowFlag 培训管理是否显示MVS工单
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 15, 'false', '培训管理是否显示MVS工单', 'trainMvsShowFlag', '培训管理是否显示MVS工单', 'f','t',3 where not exists(select * from config_item where key = 'trainMvsShowFlag');
+
+
+-- YHAAO-24327
+delete from  arrival_list_item  where qr_code in('XM23012600','XM23011000','XM23011100','XM23011500','XM23011300','XM23011400','XM23000300','XM23000400','XM23000500','XM23000700','XM23000900','XM23000100','XM23001000') and install_status='finished';
+update qr_code_lib set status = 1  where qr_code in('XM23012600','XM23011000','XM23011100','XM23011500','XM23011300','XM23011400','XM23000300','XM23000400','XM23000500','XM23000700','XM23000900','XM23000100','XM23001000') and tenant_uid='52c6699a32084f3f9cbb19f5c56d9998';
