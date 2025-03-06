@@ -14,6 +14,7 @@
         <result property="currentPersonName" column="current_person_name"/>
         <result property="currentStepName" column="current_step_name"/>
         <result property="totalManHour" column="total_man_hour"/>
+        <result property="manHours" column="man_hours"/>
         <result property="totalPrice" column="total_price"/>
         <result property="intExtType" column="int_ext_type"/>
         <result property="ruleName" column="rule_name"/>
@@ -56,6 +57,7 @@
         t.current_person_id,
         t.current_person_name,
         t.total_man_hour,
+        t.man_hours,
         t.total_price,
         t.rule_name,
         t.period,

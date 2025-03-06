@@ -118,6 +118,16 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         String jsonText = thisTemplate.getJsonText();
         if(jsonText != null){
             templateJsonObject = JSONObject.parseObject(jsonText);
+            JSONArray elements = templateJsonObject.getJSONArray("Elements");
+            JSONArray elementsNew= new JSONArray();
+            elements.stream().forEach(item->{
+                JSONObject jsonObject =(JSONObject) item;
+                String textValue = jsonObject.getString("TextValue");
+                if (StringUtils.hasText(textValue)) {
+                    elementsNew.add(jsonObject);
+                }
+            });
+            templateJsonObject.put("Elements",elementsNew);
         }else{
             templateJsonObject = new JSONObject();
             templateJsonObject.put("Elements",new ArrayList<>());
@@ -159,27 +169,34 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     private void conversionPercentage(){
         Integer width = thisTemplate.getWidth();
         Integer height = thisTemplate.getHeight();
-        templateJsonObject.getJSONArray("Elements").forEach(item->{
-            JSONObject jsonObject =(JSONObject) item;
+        JSONArray elements = templateJsonObject.getJSONArray("Elements");
+        List<JSONObject> collect = elements.stream().filter(item -> {
+            JSONObject jsonObject = (JSONObject) item;
+            String fieldKey = jsonObject.getString("FieldKey");
+            return StringUtils.hasText(fieldKey);
+        }).map(item -> {
+            JSONObject jsonObject = (JSONObject) item;
             Double positionX = jsonObject.getDouble("PositionX");
-            positionX = Objects.isNull(positionX)?0:positionX;
+            positionX = Objects.isNull(positionX) ? 0 : positionX;
             Double positionY = jsonObject.getDouble("PositionY");
-            positionY = Objects.isNull(positionY)?0:positionY;
+            positionY = Objects.isNull(positionY) ? 0 : positionY;
             Double widthItem = jsonObject.getDouble("Width");
-            widthItem = Objects.isNull(widthItem) || widthItem <=0 ?width:widthItem;
+            widthItem = Objects.isNull(widthItem) || widthItem <= 0 ? width : widthItem;
             Double heightItem = jsonObject.getDouble("Height");
-            heightItem = Objects.isNull(heightItem) || heightItem <=0 ? height:heightItem;
+            heightItem = Objects.isNull(heightItem) || heightItem <= 0 ? height : heightItem;
             List<Double[]> range = new ArrayList<>();
-            Double[] topLeft = {positionX / width,positionY / height};
+            Double[] topLeft = {positionX / width, positionY / height};
             range.add(topLeft);
-            Double[] topRight = {(positionX + widthItem) / width,positionY / height};
+            Double[] topRight = {(positionX + widthItem) / width, positionY / height};
             range.add(topRight);
-            Double[] lowerLeft = {positionX / width,(positionY + heightItem) / height};
+            Double[] lowerLeft = {positionX / width, (positionY + heightItem) / height};
             range.add(lowerLeft);
-            Double[] lowerRight = {(positionX + widthItem) / width,(positionY + heightItem) / height};
+            Double[] lowerRight = {(positionX + widthItem) / width, (positionY + heightItem) / height};
             range.add(lowerRight);
-            jsonObject.put("Range",range);
-        });
+            jsonObject.put("Range", range);
+            return jsonObject;
+        }).collect(Collectors.toList());
+        templateJsonObject.put("Elements",collect);
     }
 
     public void removeElement(JSONObject element) {

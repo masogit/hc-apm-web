@@ -91,11 +91,15 @@ public class OCRTemplateService extends MicroServiceInvoker {
         JSONArray elements = new JSONArray();
         for (int i=0;i<dataItems.size();i++) {
             DataItem item = dataItems.get(i);
+            String text = item.getText();
+            if(StringUtils.isEmpty(text)){
+                continue;
+            }
             List<Double[]> box = item.getBox();
             Double[] topLeft = box.get(0);
             Double[] lowerRight = box.get(2);
             JSONObject element = new JSONObject();
-            element.put("TextValue",item.getText());
+            element.put("TextValue", text);
             element.put("SerialNumber",i);
             element.put("FieldKey","");
             element.put("PositionX",Math.ceil(topLeft[0]));
